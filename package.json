@@ -9,8 +9,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
-    "start": "node ./dist/server/server.js",
-    "start:prod": "cross-env NODE_ENV=production node ./dist/server/server.js",
+    "start": "cross-env NODE_ENV=production node ./dist/server/server.js",
     "build-client": "cd ./src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd ./src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
