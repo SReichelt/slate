@@ -1,0 +1,29 @@
+%../../../../../logics/hlm%
+
+$product(
+  a: %Element(
+    $"Real numbers",
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_a: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_b: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+      )
+    }
+  )
+): %ExplicitOperator {
+  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence product"(
+    α = {r_a},
+    β = {r_b}
+  )})]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "hlm",
+  "version": "0.1.0",
+  "description": "HLM Proof Assistant",
+  "main": "index.js",
+  "engines": {
+    "node": ">=6.9.5"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
+    "start": "node ./dist/server/server.js",
+    "start:prod": "cross-env NODE_ENV=production node ./dist/server/server.js",
+    "build-client": "cd ./src/client && cross-env NODE_ENV=production webpack -p",
+    "dev-client": "cd ./src/client && webpack-dev-server -w",
+    "build-server": "tsc -p ./src/server",
+    "dev-server": "tsc-watch -p ./src/server --onSuccess \"node ./dist/server/server.js\"",
+    "dev": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
+    "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run build-server\" \"npm run build-client\""
+  },
+  "license": "MIT",
+  "author": "Sebastian Reichelt",
+  "dependencies": {
+    "express": "^4.16.3",
+    "http-proxy-middleware": "^0.18.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-loading-animation": "^1.4.0",
+    "react-markdown": "^3.4.1",
+    "react-portal-tooltip": "^2.4.0",
+    "react-split-pane": "^0.1.82",
+    "tslib": "^1.9.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/http-proxy-middleware": "^0.17.5",
+    "@types/inline-style-prefixer": "^3.0.1",
+    "@types/node": "^10.7.1",
+    "@types/react": "^16.4.11",
+    "@types/react-dom": "^16.0.7",
+    "awesome-typescript-loader": "^5.2.0",
+    "babel-polyfill": "^6.26.0",
+    "concurrently": "^3.6.1",
+    "cross-env": "^5.2.0",
+    "css-loader": "^0.28.11",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
+    "open-browser-webpack-plugin": "0.0.5",
+    "rimraf": "^2.6.2",
+    "style-loader": "^0.21.0",
+    "tsc-watch": "^1.0.26",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2",
+    "url-loader": "^1.1.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  }
+}

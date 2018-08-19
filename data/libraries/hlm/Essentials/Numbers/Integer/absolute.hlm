@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+$absolute(a: %Element($Integers)): %ExplicitOperator {
+  definition = [%cases(cases = [
+    {
+      formula = $"less or equal"(
+        b = {a},
+        a = {$../Natural/number(value = 0)}
+      ),
+      value = a
+    },
+    {
+      formula = $less(
+        a = {a},
+        b = {$../Natural/number(value = 0)}
+      ),
+      value = $inverse(a = {a})
+    }
+  ])]
+}

@@ -1,0 +1,20 @@
+%../../../../logics/hlm%
+
+$identity(𝔐: %Element(
+  $Magmas,
+  shortcut = {
+    $Magmas.magma,
+    #(
+      M: %Set,
+      ∗: %Element($../../Essentials/Functions/Functions(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {M},
+          T = {M}
+        )},
+        Y = {M}
+      ))
+    )
+  }
+)): %ExplicitOperator {
+  definition = [$../../Essentials/Functions/identity(X = {M})]
+}

@@ -1,0 +1,33 @@
+%../../../../../logics/hlm%
+
+$"Segment (greater)"(n: %Element($"Natural numbers")): %SetOperator {
+  definition = [
+    %subset(
+      #(m: %Element($"Natural numbers")),
+      $less(
+        n = {m},
+        m = {n}
+      )
+    ),
+    $../../Sets/"Relative complement"(
+      S = {$"Natural numbers"},
+      T = {$"Segment (less or equal)"(n = {n})}
+    ),
+    $"Segment (greater or equal)"(n = {$sum(
+      m = {n},
+      n = {$number(value = 1)}
+    )})
+  ],
+  display = [$Segment(
+    set = 'ℕ',
+    symbol = '>',
+    limit = n
+  )],
+  definitionDisplay = {
+    parameter = #(m: %Expr),
+    display = [$Relation(
+      symbol = '>',
+      operands = [m, n]
+    )]
+  }
+}

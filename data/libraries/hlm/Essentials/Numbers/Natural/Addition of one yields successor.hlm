@@ -1,0 +1,11 @@
+%../../../../../logics/hlm%
+
+$"Addition of one yields successor"(n: %Element($"Natural numbers")): %StandardTheorem {
+  claim = %equals(
+    $"Natural numbers".successor(n = {n}),
+    $sum(
+      m = {n},
+      n = {$number(value = 1)}
+    )
+  )
+}

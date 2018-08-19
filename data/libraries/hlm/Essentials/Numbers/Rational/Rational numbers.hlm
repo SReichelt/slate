@@ -1,0 +1,37 @@
+%../../../../../logics/hlm%
+
+$"Rational numbers": %Construction {
+  $quotient(
+    n: %Element($../Integer/Integers),
+    m: %Element($../Natural/"Positive numbers")
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        n: %Element($../Integer/Integers),
+        m: %Element($../Natural/"Positive numbers")
+      ),
+      rightParameters = #(
+        "n'": %Element($../Integer/Integers),
+        "m'": %Element($../Natural/"Positive numbers")
+      ),
+      definition = [%equals(
+        $../Integer/product(
+          a = {n},
+          b = {"m'"}
+        ),
+        $../Integer/product(
+          a = {"n'"},
+          b = {m}
+        )
+      )]
+    }
+  }
+
+  embedding = {
+    parameter = #(x: %Element($../Integer/Integers)),
+    target = $"Rational numbers".quotient(
+      n = {x},
+      m = {$../Natural/number(value = 1)}
+    )
+  }
+}

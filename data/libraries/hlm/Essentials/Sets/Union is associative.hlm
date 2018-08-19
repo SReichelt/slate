@@ -1,0 +1,29 @@
+%../../../../logics/hlm%
+
+$"Union is associative"(
+  U: %Set,
+  R: %Subset(U),
+  S: %Subset(%previous),
+  T: %Subset(%previous)
+): %StandardTheorem {
+  claim = %setEquals(
+    $Union(
+      U = {U},
+      S = {$Union(
+        U = {U},
+        S = {R},
+        T = {S}
+      )},
+      T = {T}
+    ),
+    $Union(
+      U = {U},
+      S = {R},
+      T = {$Union(
+        U = {U},
+        S = {S},
+        T = {T}
+      )}
+    )
+  )
+}

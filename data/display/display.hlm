@@ -1,0 +1,29 @@
+%../format/meta%
+
+$display: %MetaModel {
+  definitionTypes = [$Template],
+  expressionTypes = [$Bool, $Int, $String, $Expr],
+  functions = [$true, $false, $opt, $add, $for, $neg]
+}
+
+$Template: %DefinitionType($Expr) {
+  members = #(
+    display?: $Expr
+  )
+}
+
+$Bool: %ExpressionType {}
+$Int: %ExpressionType {}
+$String: %ExpressionType {}
+$Expr: %ExpressionType {}
+
+$true: $Bool {}
+$false: $Bool {}
+
+$opt(param: %Any, valueIfPresent?: %Any, valueIfMissing?: %Any): %Any {}
+
+$add(items...: $Int): $Int {}
+
+$for(param: %Any, dimension: %Int, item: %Any, separator?: %Any): %Any {}
+
+$neg(items...: %Any): %Any {}

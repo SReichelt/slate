@@ -1,0 +1,36 @@
+%../../../../../logics/hlm%
+
+$Isomorphisms(
+  𝔵: %Element(
+    $"Cardinal numbers",
+    shortcut = {
+      $"Cardinal numbers".cardinality,
+      #(X: %Set)
+    }
+  ),
+  𝔶: %Element(
+    %previous,
+    shortcut = {
+      $"Cardinal numbers".cardinality,
+      #(Y: %Set)
+    }
+  )
+): %SetOperator {
+  definition = [
+    %subset(
+      #(φ: %Element($Homomorphisms(
+        𝔵 = {𝔵},
+        𝔶 = {𝔶}
+      ))),
+      $../../Functions/bijective(
+        X = {X},
+        Y = {Y},
+        f = {φ}
+      )
+    ),
+    $../../Functions/Bijections(
+      X = {X},
+      Y = {Y}
+    )
+  ]
+}

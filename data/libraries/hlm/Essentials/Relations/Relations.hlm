@@ -1,0 +1,35 @@
+%../../../../logics/hlm%
+
+$Relations(S: %Set): %Construction {
+  $relation(R: %Subset($../Sets/"Cartesian product"(
+    S = {S},
+    T = {S}
+  ))): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      ))),
+      rightParameters = #("R'": %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      ))),
+      definition = [%setEquals(R, "R'")],
+      isomorphic = %true
+    },
+    display = [$Parens(
+      body = R,
+      style = '()'
+    )]
+  }
+
+  display = [$Function(
+    function = 'Rel',
+    arguments = [S]
+  )],
+  definitionDisplay = {
+    parameter = #(≺: %Expr),
+    singularName = ['relation on ', S],
+    pluralName = ['relations on ', S]
+  }
+}

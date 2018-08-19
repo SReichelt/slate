@@ -1,0 +1,18 @@
+%../../../../format/library%
+
+$Magmas: %Section {
+  items = [
+    %item($Magmas),
+    %item($associative),
+    %item($commutative),
+    %item($Homomorphisms),
+    %item($identity),
+    %item($Isomorphisms),
+    %item($"Equality criterion"),
+    %item($"Inverse of isomorphism is also isomorphism"),
+    %item($"Binary trees"),
+    %item($"free magma"),
+    %item($"free on set"),
+    %item($free)
+  ]
+}

@@ -1,0 +1,30 @@
+%../../../../logics/hlm%
+
+$"Application of function and inverse is neutral"(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Bijections(
+    X = {X},
+    Y = {Y}
+  )),
+  x: %Element(X)
+): %StandardTheorem {
+  claim = %equals(
+    $value(
+      X = {Y},
+      Y = {X},
+      f = {$inverse(
+        X = {X},
+        Y = {Y},
+        f = {f}
+      )},
+      x = {$value(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        x = {x}
+      )}
+    ),
+    x
+  )
+}

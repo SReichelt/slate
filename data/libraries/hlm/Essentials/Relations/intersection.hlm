@@ -1,0 +1,39 @@
+%../../../../logics/hlm%
+
+$intersection(
+  S: %Set(auto = %true),
+  ≺: %Element(
+    $Relations(S = {S}),
+    shortcut = {
+      $Relations(S = {S}).relation,
+      #(Q: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )))
+    }
+  ),
+  ⊂: %Element(
+    %previous,
+    shortcut = {
+      $Relations(S = {S}).relation,
+      #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )))
+    }
+  )
+): %ExplicitOperator {
+  definition = [$Relations(S = {S}).relation(R = {$../Sets/Intersection(
+    U = {$../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    )},
+    S = {Q},
+    T = {R}
+  )})],
+  display = [$Operator(
+    symbol = '∩',
+    operands = [≺, ⊂],
+    maxParenLevel = 2
+  )]
+}

@@ -1,0 +1,53 @@
+%../../../../logics/hlm%
+
+$closure(
+  S: %Set(auto = %true),
+  ≺: %Element(
+    $Relations(S = {S}),
+    shortcut = {
+      $Relations(S = {S}).relation,
+      #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )))
+    }
+  ),
+  P: %Subset($Relations(S = {S}))
+): %ExplicitOperator {
+  definition = [$Relations(S = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
+    U = {$../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    )},
+    S = {%subset(
+      #(x: %Element(
+        $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+          S = {S},
+          T = {S}
+        )}),
+        shortcut = {
+          $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+            S = {S},
+            T = {S}
+          )}).subset,
+          #(X: %Subset($../Sets/"Cartesian product"(
+            S = {S},
+            T = {S}
+          ))),
+          override = %true
+        }
+      )),
+      %and(
+        %sub(R, X),
+        %in(
+          $Relations(S = {S}).relation(R = {X}),
+          P
+        )
+      )
+    )}
+  )})],
+  display = [$Function(
+    function = 'cl',
+    arguments = [≺, P]
+  )]
+}

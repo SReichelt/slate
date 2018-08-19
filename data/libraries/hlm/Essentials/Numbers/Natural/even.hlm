@@ -1,0 +1,31 @@
+%../../../../../logics/hlm%
+
+$even(n: %Element($"Natural numbers")): %Predicate {
+  definition = [
+    %structural(
+      n,
+      $"Natural numbers",
+      [
+        {
+          constructor = $"Natural numbers".zero,
+          value = %and,
+          rewrite = %true
+        },
+        {
+          constructor = $"Natural numbers".successor,
+          parameters = #(x: %Element($"Natural numbers")),
+          value = %not($even(n = {x})),
+          rewrite = %true
+        }
+      ]
+    ),
+    $divisible(
+      m = {$number(value = 2)},
+      n = {n}
+    )
+  ],
+  display = [$Property(
+    property = %neg('even', 'odd'),
+    operand = n
+  )]
+}

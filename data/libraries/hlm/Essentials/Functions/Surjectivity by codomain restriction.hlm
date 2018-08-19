@@ -1,0 +1,33 @@
+%../../../../logics/hlm%
+
+$"Surjectivity by codomain restriction"(
+  X: %Set(auto = %true),
+  A: %Subset(X),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %StandardTheorem {
+  claim = $surjective(
+    X = {A},
+    Y = {$Image(
+      X = {X},
+      Y = {Y},
+      f = {f},
+      S = {A}
+    )},
+    f = {$"codomain restriction"(
+      X = {X},
+      A = {A},
+      Y = {Y},
+      B = {$Image(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        S = {A}
+      )},
+      f = {f}
+    )}
+  )
+}

@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+$preorder(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %Predicate {
+  definition = [%and(
+    $reflexive(
+      S = {S},
+      ≺ = {≺}
+    ),
+    $transitive(
+      S = {S},
+      ≺ = {≺}
+    )
+  )],
+  display = [$Property(
+    property = 'preorder',
+    operand = ≺,
+    article = 'a'
+  )]
+}

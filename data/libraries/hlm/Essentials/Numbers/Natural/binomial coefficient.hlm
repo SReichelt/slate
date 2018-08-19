@@ -1,0 +1,80 @@
+%../../../../../logics/hlm%
+
+$"binomial coefficient"(
+  n: %Element($"Natural numbers"),
+  k: %Element(%previous)
+): %ExplicitOperator {
+  definition = [
+    %structuralCases(
+      k,
+      $"Natural numbers",
+      [
+        {
+          constructor = $"Natural numbers".zero,
+          value = $number(value = 1),
+          rewrite = %true
+        },
+        {
+          constructor = $"Natural numbers".successor,
+          parameters = #(x: %Element($"Natural numbers")),
+          value = %structuralCases(
+            n,
+            $"Natural numbers",
+            [
+              {
+                constructor = $"Natural numbers".zero,
+                value = $number(value = 0),
+                rewrite = %true
+              },
+              {
+                constructor = $"Natural numbers".successor,
+                parameters = #(m: %Element($"Natural numbers")),
+                value = $sum(
+                  m = {$"binomial coefficient"(
+                    n = {m},
+                    k = {x}
+                  )},
+                  n = {$"binomial coefficient"(
+                    n = {m},
+                    k = {k}
+                  )}
+                ),
+                rewrite = %true
+              }
+            ]
+          ),
+          rewrite = %true
+        }
+      ]
+    ),
+    %cases(cases = [
+      {
+        formula = $"less or equal"(
+          n = {n},
+          m = {k}
+        ),
+        value = $quotient(
+          n = {$factorial(n = {n})},
+          m = {$product(
+            m = {$factorial(n = {k})},
+            n = {$factorial(n = {$difference(
+              n = {n},
+              m = {k}
+            )})}
+          )}
+        )
+      },
+      {
+        formula = $less(
+          m = {n},
+          n = {k}
+        ),
+        value = $number(value = 0)
+      }
+    ])
+  ],
+  display = [$BinomialCoefficient(
+    top = n,
+    bottom = k
+  )]
+}

@@ -1,0 +1,69 @@
+%../../../../logics/hlm%
+
+$"morphism transform"(
+  X_1: %Set(auto = %true),
+  X_2: %Set(auto = %true),
+  X_3: %Set(auto = %true),
+  Y_1: %Set(auto = %true),
+  Y_2: %Set(auto = %true),
+  Y_3: %Set(auto = %true),
+  φ_1: %Element($../../Essentials/Functions/Bijections(
+    X = {X_1},
+    Y = {Y_1}
+  )),
+  φ_2: %Element($../../Essentials/Functions/Bijections(
+    X = {X_2},
+    Y = {Y_2}
+  )),
+  φ_3: %Element($../../Essentials/Functions/Bijections(
+    X = {X_3},
+    Y = {Y_3}
+  )),
+  ∘: %Element($../../Essentials/Functions/Functions(
+    X = {$../../Essentials/Sets/"Cartesian product"(
+      S = {X_1},
+      T = {X_2}
+    )},
+    Y = {X_3}
+  ))
+): %ExplicitOperator {
+  definition = [$../../Essentials/Functions/composition(
+    X = {$../../Essentials/Sets/"Cartesian product"(
+      S = {Y_1},
+      T = {Y_2}
+    )},
+    Y = {X_3},
+    Z = {Y_3},
+    g = {φ_3},
+    f = {$../../Essentials/Functions/composition(
+      X = {$../../Essentials/Sets/"Cartesian product"(
+        S = {Y_1},
+        T = {Y_2}
+      )},
+      Y = {$../../Essentials/Sets/"Cartesian product"(
+        S = {X_1},
+        T = {X_2}
+      )},
+      Z = {X_3},
+      g = {∘},
+      f = {$../../Essentials/Functions/inverse(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {X_1},
+          T = {X_2}
+        )},
+        Y = {$../../Essentials/Sets/"Cartesian product"(
+          S = {Y_1},
+          T = {Y_2}
+        )},
+        f = {$../../Essentials/Functions/"cartesian product"(
+          V = {X_1},
+          W = {Y_1},
+          X = {X_2},
+          Y = {Y_2},
+          f = {φ_1},
+          g = {φ_2}
+        )}
+      )}
+    )}
+  )]
+}

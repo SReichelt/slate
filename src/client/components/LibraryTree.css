@@ -1,0 +1,50 @@
+.tree {
+  display: table;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.tree-item {
+  display: table-row;
+  text-decoration: initial;
+  color: initial;
+  background-color: initial;
+}
+
+.tree-item:hover {
+  background-color: #ffd700;
+}
+
+.tree-item.selected {
+  background-color: #f2cd00;
+}
+
+.tree-item-contents {
+  display: table-row;
+}
+
+.tree-item-icon {
+  display: table-cell;
+  width: 1em;
+  padding: 2pt;
+  position: relative;
+  vertical-align: middle;
+}
+
+.tree-item-icon svg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.tree-item-display {
+  display: table-cell;
+  padding: 2pt;
+}
+
+.tree-item-content-display {
+  display: table-cell;
+  padding-left: 2pt;
+}

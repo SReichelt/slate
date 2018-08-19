@@ -1,0 +1,5 @@
+%../../../../../../logics/hlm%
+
+$"Two is prime": %StandardTheorem {
+  claim = $prime(n = {$../number(value = 2)})
+}

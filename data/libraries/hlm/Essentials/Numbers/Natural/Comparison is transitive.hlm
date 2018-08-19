@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+$"Comparison is transitive"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element(%previous),
+  _1: %Constraint($"less or equal"(
+    m = {a},
+    n = {b}
+  )),
+  _2: %Constraint($"less or equal"(
+    m = {b},
+    n = {c}
+  ))
+): %StandardTheorem {
+  claim = $"less or equal"(
+    m = {a},
+    n = {c}
+  )
+}

@@ -1,0 +1,82 @@
+%../../../../logics/hlm%
+
+$Homomorphisms(
+  𝔐: %Element(
+    $Magmas,
+    shortcut = {
+      $Magmas.magma,
+      #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {M},
+            T = {M}
+          )},
+          Y = {M}
+        ))
+      )
+    }
+  ),
+  𝔑: %Element(
+    %previous,
+    shortcut = {
+      $Magmas.magma,
+      #(
+        N: %Set,
+        ⋆: %Element($../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {N},
+            T = {N}
+          )},
+          Y = {N}
+        ))
+      )
+    }
+  )
+): %SetOperator {
+  definition = [%subset(
+    #(f: %Element($../../Essentials/Functions/Functions(
+      X = {M},
+      Y = {N}
+    ))),
+    %forall(
+      #(
+        a: %Element(M),
+        b: %Element(%previous)
+      ),
+      %equals(
+        $../../Essentials/Functions/value(
+          X = {M},
+          Y = {N},
+          f = {f},
+          x = {$../../Essentials/Functions/"infix value"(
+            X = {M},
+            Y = {M},
+            Z = {M},
+            ∗ = {∗},
+            x = {a},
+            y = {b}
+          )}
+        ),
+        $../../Essentials/Functions/"infix value"(
+          X = {N},
+          Y = {N},
+          Z = {N},
+          ∗ = {⋆},
+          x = {$../../Essentials/Functions/value(
+            X = {M},
+            Y = {N},
+            f = {f},
+            x = {a}
+          )},
+          y = {$../../Essentials/Functions/value(
+            X = {M},
+            Y = {N},
+            f = {f},
+            x = {b}
+          )}
+        )
+      )
+    )
+  )]
+}

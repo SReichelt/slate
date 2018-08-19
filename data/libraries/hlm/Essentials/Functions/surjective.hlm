@@ -1,0 +1,50 @@
+%../../../../logics/hlm%
+
+$surjective(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %Predicate {
+  definition = [
+    %forall(
+      #(y: %Element(Y)),
+      %exists(
+        #(x: %Element(X)),
+        %equals(
+          $value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {x}
+          ),
+          y
+        )
+      )
+    ),
+    %sub(
+      Y,
+      $Image(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        S = {X}
+      )
+    ),
+    %setEquals(
+      $Image(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        S = {X}
+      ),
+      Y
+    )
+  ],
+  display = [$Property(
+    operand = f,
+    property = 'surjective'
+  )]
+}

@@ -1,0 +1,32 @@
+%../../../../logics/hlm%
+
+$related(
+  S: %Set(auto = %true),
+  ≺: %Element(
+    $Relations(S = {S}),
+    shortcut = {
+      $Relations(S = {S}).relation,
+      #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )))
+    }
+  ),
+  s: %Element(S),
+  t: %Element(%previous)
+): %Predicate {
+  definition = [%in(
+    $../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    ).pair(
+      s = {s},
+      t = {t}
+    ),
+    R
+  )],
+  display = [$Relation(
+    symbol = ≺,
+    operands = [s, t]
+  )]
+}

@@ -1,0 +1,11 @@
+%../../../../../logics/hlm%
+
+$"Multiplication by one is neutral"(n: %Element($"Natural numbers")): %StandardTheorem {
+  claim = %equals(
+    $product(
+      m = {n},
+      n = {$number(value = 1)}
+    ),
+    n
+  )
+}

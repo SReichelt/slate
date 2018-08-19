@@ -1,0 +1,31 @@
+%../../../../format/library%
+
+$Functions: %Section {
+  items = [
+    %item($Functions),
+    %item($value),
+    %item($"infix value"),
+    %item($Image),
+    %item($Preimage),
+    %item($identity),
+    %item($"generalized restriction"),
+    %item($"codomain restriction"),
+    %item($restriction),
+    %item($composition),
+    %item($"Composition is associative"),
+    %item($"cartesian product"),
+    %item($injective),
+    %item($surjective),
+    %item($bijective),
+    %item($"Generalized restriction preserves injectivity"),
+    %item($"Restriction preserves injectivity"),
+    %item($"Generalized extension preserves surjectivity"),
+    %item($"Extension preserves surjectivity"),
+    %item($"Surjectivity by codomain restriction"),
+    %item($Bijections),
+    %item($inverse),
+    %item($"Inverse of inverse yields original"),
+    %item($"Application of function and inverse is neutral"),
+    %item($"Application of function after inverse is neutral")
+  ]
+}

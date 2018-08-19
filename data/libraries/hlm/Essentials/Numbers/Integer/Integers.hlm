@@ -1,0 +1,484 @@
+%../../../../../logics/hlm%
+
+$Integers: %Construction {
+  $difference(
+    n: %Element($../Natural/"Natural numbers"),
+    m: %Element(%previous)
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        n: %Element($../Natural/"Natural numbers"),
+        m: %Element(%previous)
+      ),
+      rightParameters = #(
+        "n'": %Element($../Natural/"Natural numbers"),
+        "m'": %Element(%previous)
+      ),
+      definition = [%equals(
+        $../Natural/sum(
+          m = {n},
+          n = {"m'"}
+        ),
+        $../Natural/sum(
+          m = {"n'"},
+          n = {m}
+        )
+      )],
+      reflexivityProof = {
+        parameters = #(
+          a: %Element($../Natural/"Natural numbers"),
+          b: %Element(%previous)
+        ),
+        goal = %equals(
+          $../Natural/sum(
+            m = {a},
+            n = {b}
+          ),
+          $../Natural/sum(
+            m = {a},
+            n = {b}
+          )
+        ),
+        steps = #()
+      },
+      symmetryProof = {
+        parameters = #(
+          a: %Element($../Natural/"Natural numbers"),
+          b: %Element(%previous),
+          c: %Element($../Natural/"Natural numbers"),
+          d: %Element(%previous),
+          _1: %Constraint(%equals(
+            $../Natural/sum(
+              m = {a},
+              n = {d}
+            ),
+            $../Natural/sum(
+              m = {c},
+              n = {b}
+            )
+          ))
+        ),
+        goal = %equals(
+          $../Natural/sum(
+            m = {c},
+            n = {b}
+          ),
+          $../Natural/sum(
+            m = {a},
+            n = {d}
+          )
+        ),
+        steps = #()
+      },
+      transitivityProof = {
+        parameters = #(
+          a: %Element($../Natural/"Natural numbers"),
+          b: %Element(%previous),
+          c: %Element($../Natural/"Natural numbers"),
+          d: %Element(%previous),
+          e: %Element($../Natural/"Natural numbers"),
+          f: %Element(%previous),
+          _1: %Constraint(%equals(
+            $../Natural/sum(
+              m = {a},
+              n = {d}
+            ),
+            $../Natural/sum(
+              m = {c},
+              n = {b}
+            )
+          )),
+          _2: %Constraint(%equals(
+            $../Natural/sum(
+              m = {c},
+              n = {f}
+            ),
+            $../Natural/sum(
+              m = {e},
+              n = {d}
+            )
+          ))
+        ),
+        goal = %equals(
+          $../Natural/sum(
+            m = {a},
+            n = {f}
+          ),
+          $../Natural/sum(
+            m = {e},
+            n = {b}
+          )
+        ),
+        steps = #(
+          _: %Consider(_1),
+          _: %Extend($../Natural/sum(
+            m = {%previous},
+            n = {f}
+          )),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is commutative"(
+                a = {c},
+                b = {b}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {c},
+                  n = {b}
+                ),
+                $../Natural/sum(
+                  m = {b},
+                  n = {c}
+                )
+              )
+            )),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {d}
+                )},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {b},
+                  n = {c}
+                )},
+                n = {f}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is associative"(
+                a = {b},
+                b = {c},
+                c = {f}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {$../Natural/sum(
+                    m = {b},
+                    n = {c}
+                  )},
+                  n = {f}
+                ),
+                $../Natural/sum(
+                  m = {b},
+                  n = {$../Natural/sum(
+                    m = {c},
+                    n = {f}
+                  )}
+                )
+              )
+            )),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {d}
+                )},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {b},
+                n = {$../Natural/sum(
+                  m = {c},
+                  n = {f}
+                )}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %Consider(_2)),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {d}
+                )},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {b},
+                n = {$../Natural/sum(
+                  m = {e},
+                  n = {d}
+                )}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is associative"(
+                a = {b},
+                b = {e},
+                c = {d}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {$../Natural/sum(
+                    m = {b},
+                    n = {e}
+                  )},
+                  n = {d}
+                ),
+                $../Natural/sum(
+                  m = {b},
+                  n = {$../Natural/sum(
+                    m = {e},
+                    n = {d}
+                  )}
+                )
+              )
+            )),
+            %right,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {d}
+                )},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {b},
+                  n = {e}
+                )},
+                n = {d}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is commutative"(
+                a = {b},
+                b = {e}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {b},
+                  n = {e}
+                ),
+                $../Natural/sum(
+                  m = {e},
+                  n = {b}
+                )
+              )
+            )),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {d}
+                )},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {e},
+                  n = {b}
+                )},
+                n = {d}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is associative"(
+                a = {a},
+                b = {d},
+                c = {f}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {$../Natural/sum(
+                    m = {a},
+                    n = {d}
+                  )},
+                  n = {f}
+                ),
+                $../Natural/sum(
+                  m = {a},
+                  n = {$../Natural/sum(
+                    m = {d},
+                    n = {f}
+                  )}
+                )
+              )
+            )),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {a},
+                n = {$../Natural/sum(
+                  m = {d},
+                  n = {f}
+                )}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {e},
+                  n = {b}
+                )},
+                n = {d}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is commutative"(
+                a = {d},
+                b = {f}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {d},
+                  n = {f}
+                ),
+                $../Natural/sum(
+                  m = {f},
+                  n = {d}
+                )
+              )
+            )),
+            %left,
+            %equals(
+              $../Natural/sum(
+                m = {a},
+                n = {$../Natural/sum(
+                  m = {f},
+                  n = {d}
+                )}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {e},
+                  n = {b}
+                )},
+                n = {d}
+              )
+            )
+          ),
+          _: %Substitute(
+            #(_: %UseTheorem(
+              $../Natural/"Sum is associative"(
+                a = {a},
+                b = {f},
+                c = {d}
+              ),
+              %equals(
+                $../Natural/sum(
+                  m = {$../Natural/sum(
+                    m = {a},
+                    n = {f}
+                  )},
+                  n = {d}
+                ),
+                $../Natural/sum(
+                  m = {a},
+                  n = {$../Natural/sum(
+                    m = {f},
+                    n = {d}
+                  )}
+                )
+              )
+            )),
+            %right,
+            %equals(
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {a},
+                  n = {f}
+                )},
+                n = {d}
+              ),
+              $../Natural/sum(
+                m = {$../Natural/sum(
+                  m = {e},
+                  n = {b}
+                )},
+                n = {d}
+              )
+            )
+          ),
+          _: %UseTheorem(
+            $../Natural/"Addition of a fixed number is injective"(
+              a = {$../Natural/sum(
+                m = {a},
+                n = {f}
+              )},
+              b = {$../Natural/sum(
+                m = {e},
+                n = {b}
+              )},
+              c = {d}
+            ),
+            %equals(
+              $../Natural/sum(
+                m = {a},
+                n = {f}
+              ),
+              $../Natural/sum(
+                m = {e},
+                n = {b}
+              )
+            )
+          )
+        )
+      }
+    },
+    rewrite = {
+      value = $difference(
+        b = {n},
+        a = {m}
+      ),
+      theorem = $"Actual difference equals formal difference"
+    }
+  }
+
+  embedding = {
+    parameter = #(x: %Element($../Natural/"Natural numbers")),
+    target = $Integers.difference(
+      n = {x},
+      m = {$../Natural/number(value = 0)}
+    ),
+    wellDefinednessProof = {
+      parameters = #(
+        x: %Element($../Natural/"Natural numbers"),
+        y: %Element(%previous),
+        _1: %Constraint(%equals(
+          $Integers.difference(
+            n = {x},
+            m = {$../Natural/number(value = 0)}
+          ),
+          $Integers.difference(
+            n = {y},
+            m = {$../Natural/number(value = 0)}
+          )
+        ))
+      ),
+      goal = %equals(x, y),
+      steps = #(
+        _: %Consider(_1),
+        _: %UseDef(result = %equals(
+          $../Natural/sum(
+            m = {x},
+            n = {$../Natural/number(value = 0)}
+          ),
+          $../Natural/sum(
+            m = {y},
+            n = {$../Natural/number(value = 0)}
+          )
+        )),
+        _: %ResolveDef(%equals(x, y))
+      )
+    }
+  }
+}

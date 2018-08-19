@@ -1,0 +1,57 @@
+%../../../../../logics/hlm%
+
+$"Cardinal numbers": %Construction {
+  $cardinality(S: %Set): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(S: %Set),
+      rightParameters = #(T: %Set),
+      definition = [%exists(#(f: %Element($../../Functions/Bijections(
+        X = {S},
+        Y = {T}
+      ))))],
+      isomorphic = %true
+    },
+    display = [$Parens(
+      body = S,
+      style = '||'
+    )]
+  }
+
+  embedding = {
+    parameter = #(n: %Element($../Natural/"Natural numbers")),
+    target = $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {n})}),
+    wellDefinednessProof = {
+      parameters = #(
+        m: %Element($../Natural/"Natural numbers"),
+        n: %Element(%previous),
+        _1: %Constraint(%equals(
+          $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {m})}),
+          $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {n})})
+        ))
+      ),
+      goal = %equals(m, n),
+      steps = #(
+        _: %Consider(_1),
+        _: %UseDef(result = %exists(#(f: %Element($../../Functions/Bijections(
+          X = {$../Natural/"Segment (less)"(n = {m})},
+          Y = {$../Natural/"Segment (less)"(n = {n})}
+        ))))),
+        _: %UseExists({
+          parameters = #(f: %Element($../../Functions/Bijections(
+            X = {$../Natural/"Segment (less)"(n = {m})},
+            Y = {$../Natural/"Segment (less)"(n = {n})}
+          ))),
+          steps = #(_: %UseTheorem(
+            $"Natural cardinality lemma"(
+              m = {m},
+              n = {n},
+              f = {f}
+            ),
+            %equals(m, n)
+          ))
+        })
+      )
+    }
+  },
+  display = ['𝓒𝓻𝓭']
+}

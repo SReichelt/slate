@@ -1,0 +1,20 @@
+%../../../../logics/hlm%
+
+$reflexive(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %Predicate {
+  definition = [%forall(
+    #(s: %Element(S)),
+    $related(
+      S = {S},
+      s = {s},
+      ≺ = {≺},
+      t = {s}
+    )
+  )],
+  display = [$Property(
+    operand = ≺,
+    property = 'reflexive'
+  )]
+}

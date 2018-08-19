@@ -1,0 +1,33 @@
+%../../../../../../logics/hlm%
+
+$converges(
+  α: %Element(
+    $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
+    shortcut = {
+      $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+      #(n: %Binding(
+        $../../Natural/"Natural numbers",
+        #(a: %Element($../"Rational numbers"))
+      )),
+      override = %true
+    }
+  ),
+  l: %Element($../"Rational numbers")
+): %Predicate {
+  definition = [%forall(
+    #(ε: %Element($../"Positive numbers")),
+    %exists(
+      #(n: %Element($../../Natural/"Natural numbers")),
+      %forall(
+        #(m: %Element($../../Natural/"Segment (greater or equal)"(n = {n}))),
+        $../less(
+          a = {$../absolute(a = {$../difference(
+            b = {a[m]},
+            a = {l}
+          )})},
+          b = {ε}
+        )
+      )
+    )
+  )]
+}

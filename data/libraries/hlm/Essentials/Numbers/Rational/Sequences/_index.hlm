@@ -1,0 +1,15 @@
+%../../../../../../format/library%
+
+$Sequences: %Section {
+  items = [
+    %item($converges),
+    %item($convergent),
+    %item($"sequence limit"),
+    %item($limit),
+    %item($cauchy),
+    %item($"sequence sum"),
+    %item($"sequence inverse"),
+    %item($"sequence difference"),
+    %item($"sequence product")
+  ]
+}

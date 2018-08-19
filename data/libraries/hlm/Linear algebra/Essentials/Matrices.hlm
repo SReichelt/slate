@@ -1,0 +1,18 @@
+%../../../../logics/hlm%
+
+$Matrices(
+  S: %Set(
+    auto = %true,
+    embedSubsets = %true
+  ),
+  m: %Element($../../Essentials/Numbers/Natural/"Natural numbers"),
+  n: %Element(%previous)
+): %Construction {
+  $matrix(i: %Binding(
+    $../../Essentials/Numbers/Natural/"Segment (less)"(n = {m}),
+    #(j: %Binding(
+      $../../Essentials/Numbers/Natural/"Segment (less)"(n = {n}),
+      #(a: %Element(S))
+    ))
+  )): %Constructor {}
+}

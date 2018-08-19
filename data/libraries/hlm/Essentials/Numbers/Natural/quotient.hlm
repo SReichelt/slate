@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$quotient(
+  n: %Element($"Natural numbers"),
+  m: %Element($Divisors(n = {n}))
+): %ImplicitOperator {
+  parameter = #(x: %Element($"Natural numbers")),
+  definition = [%equals(
+    n,
+    $product(
+      m = {x},
+      n = {m}
+    )
+  )],
+  display = [$Quotient(
+    numerator = n,
+    denominator = m
+  )]
+}

@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+$"Empty set is subset of any set"(S: %Set): %StandardTheorem {
+  claim = %sub(
+    $"Empty set",
+    S
+  ),
+  proofs = [{steps = #(_: %ProveDef(proof = {
+    goal = %forall(
+      #(x: %Element($"Empty set")),
+      %in(x, S)
+    ),
+    steps = #(_: %ProveForAll({
+      parameters = #(x: %Element($"Empty set")),
+      goal = %in(x, S),
+      steps = #(
+        _: %Consider(x),
+        _: %UseDef(result = %or)
+      )
+    }))
+  }))}]
+}

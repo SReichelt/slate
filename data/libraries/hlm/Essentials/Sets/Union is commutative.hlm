@@ -1,0 +1,20 @@
+%../../../../logics/hlm%
+
+$"Union is commutative"(
+  U: %Set,
+  S: %Subset(U),
+  T: %Subset(%previous)
+): %StandardTheorem {
+  claim = %setEquals(
+    $Union(
+      U = {U},
+      S = {S},
+      T = {T}
+    ),
+    $Union(
+      U = {U},
+      S = {T},
+      T = {S}
+    )
+  )
+}

@@ -1,0 +1,32 @@
+%../../../../logics/hlm%
+
+$"Generalized restriction preserves injectivity"(
+  X: %Set(auto = %true),
+  A: %Subset(X),
+  B: %Set,
+  Y: %Subset(
+    B,
+    auto = %true
+  ),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  )),
+  _1: %Constraint($injective(
+    X = {X},
+    Y = {Y},
+    f = {f}
+  ))
+): %StandardTheorem {
+  claim = $injective(
+    X = {A},
+    Y = {B},
+    f = {$"generalized restriction"(
+      X = {X},
+      A = {A},
+      B = {B},
+      Y = {Y},
+      f = {f}
+    )}
+  )
+}

@@ -1,0 +1,66 @@
+%../../../../logics/hlm%
+
+$"cartesian product"(
+  V: %Set(auto = %true),
+  W: %Set(auto = %true),
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {V},
+    Y = {W}
+  )),
+  g: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %ExplicitOperator {
+  definition = [$Functions(
+    X = {$../Sets/"Cartesian product"(
+      S = {V},
+      T = {X}
+    )},
+    Y = {$../Sets/"Cartesian product"(
+      S = {W},
+      T = {Y}
+    )}
+  ).function(x = {
+    #(z: %Element(
+      $../Sets/"Cartesian product"(
+        S = {V},
+        T = {X}
+      ),
+      shortcut = {
+        $../Sets/"Cartesian product"(
+          S = {V},
+          T = {X}
+        ).pair,
+        #(
+          v: %Element(V),
+          x: %Element(X)
+        ),
+        override = %true
+      }
+    )),
+    {y = {$../Sets/"Cartesian product"(
+      S = {W},
+      T = {Y}
+    ).pair(
+      s = {$value(
+        X = {V},
+        Y = {W},
+        f = {f},
+        x = {v}
+      )},
+      t = {$value(
+        X = {X},
+        Y = {Y},
+        f = {g},
+        x = {x}
+      )}
+    )}}
+  })],
+  display = [$Operator(
+    symbol = '×',
+    operands = [f, g]
+  )]
+}

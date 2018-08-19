@@ -1,0 +1,35 @@
+%../../format/library%
+
+$Library: %Library {
+  logic = 'hlm',
+  items = [
+    %subsection(
+      $Essentials,
+      title = {
+        de = 'Grundlagen',
+        en = 'Essentials'
+      }
+    ),
+    %subsection(
+      $Algebra,
+      title = {
+        de = 'Algebra',
+        en = 'Algebra'
+      }
+    ),
+    %subsection(
+      $"Category theory",
+      title = {
+        de = 'Kategorientheorie',
+        en = 'Category theory'
+      }
+    ),
+    %subsection(
+      $"Linear algebra",
+      title = {
+        de = 'Lineare Algebra',
+        en = 'Linear algebra'
+      }
+    )
+  ]
+}

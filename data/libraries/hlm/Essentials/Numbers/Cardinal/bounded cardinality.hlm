@@ -1,0 +1,39 @@
+%../../../../../logics/hlm%
+
+$"bounded cardinality"(
+  M: %Subset($../Natural/"Natural numbers"),
+  n: %Element($../Natural/"Natural numbers")
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $../Natural/"Natural numbers",
+    [
+      {
+        constructor = $../Natural/"Natural numbers".zero,
+        value = $../Natural/number(value = 0),
+        rewrite = %true
+      },
+      {
+        constructor = $../Natural/"Natural numbers".successor,
+        parameters = #(x: %Element($../Natural/"Natural numbers")),
+        value = %cases([
+          {
+            formula = %not($../../Sets/empty(S = {M})),
+            value = $../Natural/"Natural numbers".successor(n = {$"bounded cardinality"(
+              M = {$../../Sets/"Relative complement"(
+                S = {M},
+                T = {%enumeration($../Natural/minimum(M = {M}))}
+              )},
+              n = {x}
+            )})
+          },
+          {
+            formula = $../../Sets/empty(S = {M}),
+            value = $../Natural/number(value = 0)
+          }
+        ]),
+        rewrite = %true
+      }
+    ]
+  )]
+}

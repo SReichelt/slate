@@ -1,0 +1,19 @@
+%../../../../logics/hlm%
+
+$Union(
+  U: %Set(auto = %true),
+  S: %Subset(U),
+  T: %Subset(%previous)
+): %SetOperator {
+  definition = [%subset(
+    #(x: %Element(U)),
+    %or(
+      %in(x, S),
+      %in(x, T)
+    )
+  )],
+  display = [$Operator(
+    symbol = '∪',
+    operands = [S, T]
+  )]
+}

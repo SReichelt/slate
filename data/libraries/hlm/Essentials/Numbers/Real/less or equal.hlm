@@ -1,0 +1,61 @@
+%../../../../../logics/hlm%
+
+$"less or equal"(
+  a: %Element(
+    $"Real numbers",
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_a: %Element(
+          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          shortcut = {
+            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            #(n: %Binding(
+              $../Natural/"Natural numbers",
+              #(x: %Element($../Rational/"Rational numbers"))
+            )),
+            override = %true
+          }
+        ),
+        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_b: %Element(
+          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          shortcut = {
+            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            #(n: %Binding(
+              $../Natural/"Natural numbers",
+              #(y: %Element($../Rational/"Rational numbers"))
+            )),
+            override = %true
+          }
+        ),
+        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+      )
+    }
+  )
+): %Predicate {
+  definition = [%forall(
+    #(ε: %Element($../Rational/"Positive numbers")),
+    %exists(
+      #(n: %Element($../Natural/"Natural numbers")),
+      %forall(
+        #(m: %Element($../Natural/"Segment (greater or equal)"(n = {n}))),
+        $../Rational/"less or equal"(
+          a = {x[m]},
+          b = {$../Rational/sum(
+            a = {y[m]},
+            b = {ε}
+          )}
+        )
+      )
+    )
+  )]
+}

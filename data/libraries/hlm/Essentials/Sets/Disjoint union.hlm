@@ -1,0 +1,43 @@
+%../../../../logics/hlm%
+
+$"Disjoint union"(
+  S: %Set(
+    auto = %false,
+    embedSubsets = %true
+  ),
+  T: %Set(
+    auto = %false,
+    embedSubsets = %true
+  )
+): %Construction {
+  $left(s: %Element(S)): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(s: %Element(S)),
+      rightParameters = #("s'": %Element(S)),
+      definition = [%equals(s, "s'")],
+      isomorphic = %true
+    },
+    display = [$Constructor(
+      name = 'l',
+      arguments = [s]
+    )]
+  }
+
+  $right(t: %Element(T)): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(t: %Element(T)),
+      rightParameters = #("t'": %Element(T)),
+      definition = [%equals(t, "t'")],
+      isomorphic = %true
+    },
+    display = [$Constructor(
+      name = 'r',
+      arguments = [t]
+    )]
+  }
+
+  display = [$Operator(
+    symbol = '⊍',
+    operands = [S, T]
+  )]
+}

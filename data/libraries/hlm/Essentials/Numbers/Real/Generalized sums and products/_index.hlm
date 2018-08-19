@@ -1,0 +1,8 @@
+%../../../../../../format/library%
+
+$"Generalized sums and products": %Section {
+  items = [
+    %item($"inductive sum (exclusive)"),
+    %item($"inductive product (exclusive)")
+  ]
+}

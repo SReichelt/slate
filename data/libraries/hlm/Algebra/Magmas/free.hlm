@@ -1,0 +1,26 @@
+%../../../../logics/hlm%
+
+$free(𝔐: %Element(
+  $Magmas,
+  shortcut = {
+    $Magmas.magma,
+    #(
+      M: %Set,
+      ∗: %Element($../../Essentials/Functions/Functions(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {M},
+          T = {M}
+        )},
+        Y = {M}
+      ))
+    )
+  }
+)): %Predicate {
+  definition = [%exists(
+    #(S: %Subset(M)),
+    $"free on set"(
+      𝔐 = {𝔐},
+      S = {S}
+    )
+  )]
+}

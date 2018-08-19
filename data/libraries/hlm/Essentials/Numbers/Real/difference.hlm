@@ -1,0 +1,35 @@
+%../../../../../logics/hlm%
+
+$difference(
+  b: %Element(
+    $"Real numbers",
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_b: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+      )
+    }
+  ),
+  a: %Element(
+    %previous,
+    shortcut = {
+      $"Real numbers".class,
+      #(
+        r_a: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+      )
+    }
+  )
+): %ExplicitOperator {
+  definition = [
+    $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
+      β = {r_b},
+      α = {r_a}
+    )}),
+    $sum(
+      a = {b},
+      b = {$inverse(a = {a})}
+    )
+  ]
+}

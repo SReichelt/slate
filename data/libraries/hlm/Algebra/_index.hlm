@@ -1,0 +1,20 @@
+%../../../format/library%
+
+$Algebra: %Section {
+  items = [
+    %subsection(
+      $Isomorphisms,
+      title = {
+        de = 'Isomorphismen',
+        en = 'Isomorphisms'
+      }
+    ),
+    %subsection(
+      $Magmas,
+      title = {
+        de = 'Magmen',
+        en = 'Magmas'
+      }
+    )
+  ]
+}

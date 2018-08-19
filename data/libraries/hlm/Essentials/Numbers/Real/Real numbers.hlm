@@ -1,0 +1,70 @@
+%../../../../../logics/hlm%
+
+$"Real numbers": %Construction {
+  $class(
+    r: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+    _1: %Constraint($../Rational/Sequences/cauchy(α = {r}))
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        r: %Element(
+          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          shortcut = {
+            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            #(n: %Binding(
+              $../Natural/"Natural numbers",
+              #(a: %Element($../Rational/"Rational numbers"))
+            ))
+          }
+        ),
+        _1: %Constraint($../Rational/Sequences/cauchy(α = {r}))
+      ),
+      rightParameters = #(
+        "r'": %Element(
+          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          shortcut = {
+            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            #(n: %Binding(
+              $../Natural/"Natural numbers",
+              #("a'": %Element($../Rational/"Rational numbers"))
+            ))
+          }
+        ),
+        _2: %Constraint($../Rational/Sequences/cauchy(α = {"r'"}))
+      ),
+      definition = [
+        $../Rational/Sequences/converges(
+          α = {$../Rational/Sequences/"sequence difference"(
+            β = {r},
+            α = {"r'"}
+          )},
+          l = {$../Natural/number(value = 0)}
+        ),
+        %forall(
+          #(ε: %Element($../Rational/"Positive numbers")),
+          %exists(
+            #(n: %Element($../Natural/"Natural numbers")),
+            %forall(
+              #(m: %Element($../Natural/"Segment (greater or equal)"(n = {n}))),
+              $../Rational/less(
+                a = {$../Rational/absolute(a = {$../Rational/difference(
+                  b = {a[m]},
+                  a = {"a'"[m]}
+                )})},
+                b = {ε}
+              )
+            )
+          )
+        )
+      ]
+    }
+  }
+
+  embedding = {
+    parameter = #(x: %Element($../Rational/"Rational numbers")),
+    target = $"Real numbers".class(r = {$../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence(n = {
+      #(k: %Element($../Natural/"Natural numbers")),
+      {a = {x}}
+    })})
+  }
+}

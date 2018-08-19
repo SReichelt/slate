@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$root(
+  a: %Element($"Nonnegative numbers"),
+  n: %Element($../Natural/"Natural numbers")
+): %ImplicitOperator {
+  parameter = #(r: %Element($"Nonnegative numbers")),
+  definition = [%equals(
+    a,
+    $power(
+      a = {r},
+      n = {n}
+    )
+  )],
+  display = [$Radical(
+    radicand = a,
+    degree = n
+  )]
+}

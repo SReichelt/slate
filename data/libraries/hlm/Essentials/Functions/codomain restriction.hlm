@@ -1,0 +1,43 @@
+%../../../../logics/hlm%
+
+$"codomain restriction"(
+  X: %Set(auto = %true),
+  A: %Subset(X),
+  Y: %Set(auto = %true),
+  B: %Subset(Y),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  )),
+  _1: %Constraint(%sub(
+    $Image(
+      X = {X},
+      Y = {Y},
+      f = {f},
+      S = {A}
+    ),
+    B
+  ))
+): %ExplicitOperator {
+  definition = [$Functions(
+    X = {A},
+    Y = {B}
+  ).function(x = {
+    #(x: %Element(A)),
+    {y = {$value(
+      X = {X},
+      Y = {Y},
+      f = {f},
+      x = {x}
+    )}}
+  })],
+  display = [$UnaryOperator(
+    symbol = $SubSup(
+      body = '∣',
+      sub = A,
+      sup = B
+    ),
+    operand = f
+  )],
+  remarks = 'This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition.'
+}

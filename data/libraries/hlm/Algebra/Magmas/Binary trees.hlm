@@ -1,0 +1,41 @@
+%../../../../logics/hlm%
+
+$"Binary trees"(S: %Set(
+  auto = %true,
+  embedSubsets = %true
+)): %Construction {
+  $leaf(s: %Element(S)): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(s: %Element(S)),
+      rightParameters = #("s'": %Element(S)),
+      definition = [%equals(s, "s'")],
+      isomorphic = %true
+    }
+  }
+
+  $join(
+    a: %Element($"Binary trees"(S = {S})),
+    b: %Element(%previous)
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        a: %Element($"Binary trees"(S = {S})),
+        b: %Element(%previous)
+      ),
+      rightParameters = #(
+        "a'": %Element($"Binary trees"(S = {S})),
+        "b'": %Element(%previous)
+      ),
+      definition = [%and(
+        %equals(a, "a'"),
+        %equals(b, "b'")
+      )],
+      isomorphic = %true
+    }
+  }
+
+  embedding = {
+    parameter = #(x: %Element(S)),
+    target = $"Binary trees".leaf(s = {x})
+  }
+}

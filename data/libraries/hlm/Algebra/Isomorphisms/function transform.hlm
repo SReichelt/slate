@@ -1,0 +1,32 @@
+%../../../../logics/hlm%
+
+$"function transform"(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  φ: %Element($../../Essentials/Functions/Bijections(
+    X = {X},
+    Y = {Y}
+  )),
+  f: %Element($../../Essentials/Functions/Functions(
+    X = {X},
+    Y = {X}
+  ))
+): %ExplicitOperator {
+  definition = [$../../Essentials/Functions/composition(
+    X = {Y},
+    Y = {X},
+    Z = {Y},
+    g = {φ},
+    f = {$../../Essentials/Functions/composition(
+      X = {Y},
+      Y = {X},
+      Z = {X},
+      g = {f},
+      f = {$../../Essentials/Functions/inverse(
+        X = {X},
+        Y = {Y},
+        f = {φ}
+      )}
+    )}
+  )]
+}

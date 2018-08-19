@@ -1,0 +1,88 @@
+%../../../../logics/hlm%
+
+$empty(S: %Set): %Predicate {
+  definition = [
+    %setEquals(
+      S,
+      $"Empty set"
+    ),
+    %sub(
+      S,
+      $"Empty set"
+    ),
+    %not(%exists(#(x: %Element(S))))
+  ],
+  equivalenceProofs = [
+    {
+      from = 1,
+      to = 2,
+      steps = #(_: %UseDef(result = %sub(
+        S,
+        $"Empty set"
+      )))
+    },
+    {
+      from = 2,
+      to = 3,
+      parameters = #(@: %Constraint(%sub(
+        S,
+        $"Empty set"
+      ))),
+      steps = #(_: %ProveNeg({
+        parameters = #(_1: %Constraint(%exists(#(x: %Element(S))))),
+        steps = #(_: %UseExists({
+          parameters = #(x: %Element(S)),
+          steps = #(
+            _: %Consider(@),
+            _: %UseDef(result = %forall(
+              #(s: %Element(S)),
+              %in(
+                s,
+                $"Empty set"
+              )
+            )),
+            _: %UseForAll({s = {x}}),
+            _: %UseDef(result = %or)
+          )
+        }))
+      }))
+    },
+    {
+      from = 3,
+      to = 1,
+      steps = #(_: %ProveSetEquals(
+        subsetProof = {steps = #(_: %ProveDef(proof = {
+          goal = %forall(
+            #(a: %Element(S)),
+            %in(
+              a,
+              $"Empty set"
+            )
+          ),
+          steps = #(_: %ProveForAll({
+            parameters = #(a: %Element(S)),
+            goal = %in(
+              a,
+              $"Empty set"
+            ),
+            steps = #(_: %State(
+              %exists(#(x: %Element(S))),
+              proof = {steps = #(_: %ProveExists({x = {a}}))}
+            ))
+          }))
+        }))},
+        supersetProof = {steps = #(_: %UseTheorem(
+          $"Empty set is subset of any set"(S = {S}),
+          %sub(
+            $"Empty set",
+            S
+          )
+        ))}
+      ))
+    }
+  ],
+  display = [$Property(
+    operand = S,
+    property = %neg('empty', 'nonempty')
+  )]
+}

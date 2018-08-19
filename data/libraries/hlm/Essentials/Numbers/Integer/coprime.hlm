@@ -1,0 +1,78 @@
+%../../../../../logics/hlm%
+
+$coprime(
+  a: %Element($Integers),
+  b: %Element(%previous)
+): %Predicate {
+  definition = [
+    %forall(
+      #(
+        c: %Element($"Positive numbers"),
+        _1: %Constraint($divisible(
+          a = {c},
+          b = {a}
+        )),
+        _2: %Constraint($divisible(
+          a = {c},
+          b = {b}
+        ))
+      ),
+      %equals(
+        c,
+        $../Natural/number(value = 1)
+      )
+    ),
+    %forall(
+      #(
+        d: %Element($"Nonzero numbers"),
+        _3: %Constraint($divisible(
+          a = {d},
+          b = {a}
+        )),
+        _4: %Constraint($divisible(
+          a = {d},
+          b = {b}
+        ))
+      ),
+      %equals(
+        $absolute(a = {d}),
+        $../Natural/number(value = 1)
+      )
+    ),
+    %sub(
+      $../../Sets/Intersection(
+        U = {$Integers},
+        S = {$Divisors(b = {a})},
+        T = {$Divisors(b = {b})}
+      ),
+      %enumeration(
+        $../Natural/number(value = 1),
+        $inverse(a = {$../Natural/number(value = 1)})
+      )
+    ),
+    %setEquals(
+      $../../Sets/Intersection(
+        U = {$Integers},
+        S = {$Divisors(b = {a})},
+        T = {$Divisors(b = {b})}
+      ),
+      %enumeration(
+        $../Natural/number(value = 1),
+        $inverse(a = {$../Natural/number(value = 1)})
+      )
+    ),
+    %not(%exists(
+      #(p: %Element($../Natural/Prime/"Prime numbers")),
+      %and(
+        $divisible(
+          a = {p},
+          b = {a}
+        ),
+        $divisible(
+          a = {p},
+          b = {b}
+        )
+      )
+    ))
+  ]
+}

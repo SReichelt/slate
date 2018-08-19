@@ -1,0 +1,9 @@
+%../../../../../../logics/hlm%
+
+$"Prime numbers": %SetOperator {
+  definition = [%subset(
+    #(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))),
+    $prime(n = {n})
+  )],
+  display = ['ℙ']
+}

@@ -1,0 +1,20 @@
+%../../../../../../logics/hlm%
+
+$"Sum over constant"(
+  n: %Element($../"Natural numbers"),
+  a: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $"inductive sum (exclusive)"(
+      i = {
+        #(i: %Element($../"Segment (less)"(n = {n}))),
+        {a = {a}}
+      },
+      n = {n}
+    ),
+    $../product(
+      m = {n},
+      n = {a}
+    )
+  )
+}

@@ -1,0 +1,53 @@
+%../../../../logics/hlm%
+
+$Magmas: %Construction {
+  $magma(
+    S: %Set,
+    ∗: %Element($../../Essentials/Functions/Functions(
+      X = {$../../Essentials/Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )},
+      Y = {S}
+    ))
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        S: %Set,
+        ∗: %Element($../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {S},
+            T = {S}
+          )},
+          Y = {S}
+        ))
+      ),
+      rightParameters = #(
+        "S'": %Set,
+        "∗'": %Element($../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {"S'"},
+            T = {"S'"}
+          )},
+          Y = {"S'"}
+        ))
+      ),
+      definition = [%exists(
+        #(φ: %Element($../../Essentials/Functions/Bijections(
+          X = {S},
+          Y = {"S'"}
+        ))),
+        %equals(
+          $../Isomorphisms/"inner operation transform"(
+            X = {S},
+            Y = {"S'"},
+            φ = {φ},
+            ∗ = {∗}
+          ),
+          "∗'"
+        )
+      )],
+      isomorphic = %true
+    }
+  }
+}

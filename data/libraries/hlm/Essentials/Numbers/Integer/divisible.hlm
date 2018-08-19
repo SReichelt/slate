@@ -1,0 +1,43 @@
+%../../../../../logics/hlm%
+
+$divisible(
+  a: %Element(
+    $"Nonzero numbers",
+    shortcut = {
+      $Integers.difference,
+      #(
+        n_a: %Element($../Natural/"Natural numbers"),
+        m_a: %Element(%previous)
+      ),
+      rewrite = %true
+    }
+  ),
+  b: %Element(
+    $Integers,
+    shortcut = {
+      $Integers.difference,
+      #(
+        n_b: %Element($../Natural/"Natural numbers"),
+        m_b: %Element(%previous)
+      ),
+      rewrite = %true
+    }
+  )
+): %Predicate {
+  definition = [
+    %exists(
+      #(x: %Element($Integers)),
+      %equals(
+        $product(
+          a = {a},
+          b = {x}
+        ),
+        b
+      )
+    ),
+    $../Natural/divisible(
+      m = {$absolute(a = {a})},
+      n = {$absolute(a = {b})}
+    )
+  ]
+}

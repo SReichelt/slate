@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$"Sum is commutative"(
+  a: %Element($Integers),
+  b: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $sum(
+      a = {a},
+      b = {b}
+    ),
+    $sum(
+      a = {b},
+      b = {a}
+    )
+  )
+}

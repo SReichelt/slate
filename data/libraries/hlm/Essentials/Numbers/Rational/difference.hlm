@@ -1,0 +1,47 @@
+%../../../../../logics/hlm%
+
+$difference(
+  b: %Element(
+    $"Rational numbers",
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_b: %Element($../Integer/Integers),
+        m_b: %Element($../Natural/"Positive numbers")
+      )
+    }
+  ),
+  a: %Element(
+    %previous,
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_a: %Element($../Integer/Integers),
+        m_a: %Element($../Natural/"Positive numbers")
+      )
+    }
+  )
+): %ExplicitOperator {
+  definition = [
+    $"Rational numbers".quotient(
+      n = {$../Integer/difference(
+        b = {$../Integer/product(
+          a = {n_b},
+          b = {m_a}
+        )},
+        a = {$../Integer/product(
+          a = {n_a},
+          b = {m_b}
+        )}
+      )},
+      m = {$../Natural/product(
+        m = {m_b},
+        n = {m_a}
+      )}
+    ),
+    $sum(
+      a = {b},
+      b = {$inverse(a = {a})}
+    )
+  ]
+}

@@ -1,0 +1,69 @@
+%../../../../../logics/hlm%
+
+$"Left-addition of zero is neutral"(n: %Element($"Natural numbers")): %StandardTheorem {
+  claim = %equals(
+    $sum(
+      m = {$number(value = 0)},
+      n = {n}
+    ),
+    n
+  ),
+  proofs = [{
+    goal = %equals(
+      %structuralCases(
+        n,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = $number(value = 0)
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(x: %Element($"Natural numbers")),
+            value = $"Natural numbers".successor(n = {$sum(
+              m = {$number(value = 0)},
+              n = {x}
+            )})
+          }
+        ]
+      ),
+      n
+    ),
+    steps = #(_: %ProveCases(
+      side = %left,
+      caseProofs = [
+        {
+          goal = %equals(
+            $number(value = 0),
+            $number(value = 0)
+          ),
+          steps = #()
+        },
+        {
+          parameters = #(x: %Element($"Natural numbers")),
+          goal = %equals(
+            $"Natural numbers".successor(n = {$sum(
+              m = {$number(value = 0)},
+              n = {x}
+            )}),
+            $"Natural numbers".successor(n = {x})
+          ),
+          steps = #(
+            _: %UseTheorem(
+              $"Left-addition of zero is neutral"(n = {x}),
+              %equals(
+                $sum(
+                  m = {$number(value = 0)},
+                  n = {x}
+                ),
+                x
+              )
+            ),
+            _: %Extend($"Natural numbers".successor(n = {%previous}))
+          )
+        }
+      ]
+    ))
+  }]
+}

@@ -1,0 +1,18 @@
+%../../../../../../logics/hlm%
+
+$"sequence inverse"(α: %Element(
+  $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
+  shortcut = {
+    $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+    #(n: %Binding(
+      $../../Natural/"Natural numbers",
+      #(a: %Element($../"Rational numbers"))
+    )),
+    override = %true
+  }
+)): %ExplicitOperator {
+  definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
+    #(n: %Element($../../Natural/"Natural numbers")),
+    {a = {$../inverse(a = {a[n]})}}
+  })]
+}

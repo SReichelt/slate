@@ -1,0 +1,236 @@
+%../../../../../logics/hlm%
+
+$"Well-ordering principle"(
+  M: %Subset($"Natural numbers"),
+  _1: %Constraint(%not($../../Sets/empty(S = {M})))
+): %StandardTheorem {
+  claim = %exists(
+    #(m: %Element(M)),
+    %forall(
+      #(n: %Element(M)),
+      $"less or equal"(
+        m = {m},
+        n = {n}
+      )
+    )
+  ),
+  proofs = [{steps = #(
+    S: %SetDef(%subset(
+      #(s: %Element($"Natural numbers")),
+      %forall(
+        #(t: %Element(M)),
+        $less(
+          m = {s},
+          n = {t}
+        )
+      )
+    )),
+    _: %State(
+      %not($inductive(M = {S})),
+      proof = {steps = #(_: %ProveNeg({steps = #(
+        _: %Consider(_1),
+        _: %UseDef(result = %exists(#(y: %Element(M)))),
+        _: %UseExists({
+          parameters = #(y: %Element(M)),
+          steps = #(
+            _: %UseTheorem(
+              $"Induction lemma"(
+                M = {S},
+                n = {y}
+              ),
+              %in(y, S)
+            ),
+            _: %UseDef(result = %forall(
+              #(z: %Element(M)),
+              $less(
+                m = {y},
+                n = {z}
+              )
+            )),
+            _: %UseForAll({z = {y}}),
+            _: %UseDef(result = %not(%equals(y, y)))
+          )
+        })
+      )}))}
+    ),
+    _: %UseDef(result = %or(
+      %not(%in(
+        $number(value = 0),
+        S
+      )),
+      %exists(
+        #(x: %Element(S)),
+        %not(%in(
+          $sum(
+            m = {x},
+            n = {$number(value = 1)}
+          ),
+          S
+        ))
+      )
+    )),
+    _: %UseCases(caseProofs = [
+      {steps = #(
+        _: %UseDef(result = %exists(
+          #(u: %Element(M)),
+          $"less or equal"(
+            n = {$number(value = 0)},
+            m = {u}
+          )
+        )),
+        _: %UseExists({
+          parameters = #(u: %Element(M)),
+          steps = #(
+            _: %UseDef(result = $"less or equal"(
+              m = {u},
+              n = {$number(value = 0)}
+            )),
+            _: %Consider(u),
+            _: %Substitute(
+              #(_: %UseTheorem(
+                $"Zero is the only number less than or equal to zero"(n = {u}),
+                %equals(
+                  u,
+                  $number(value = 0)
+                )
+              )),
+              %left,
+              %in(
+                $number(value = 0),
+                M
+              )
+            ),
+            _: %ProveExists(
+              {m = {$number(value = 0)}},
+              proof = {
+                goal = %forall(
+                  #(n: %Element(M)),
+                  $"less or equal"(
+                    m = {$number(value = 0)},
+                    n = {n}
+                  )
+                ),
+                steps = #(_: %ProveForAll({
+                  parameters = #(n: %Element(M)),
+                  goal = $"less or equal"(
+                    m = {$number(value = 0)},
+                    n = {n}
+                  ),
+                  steps = #(_: %UseTheorem(
+                    $"Zero is the smallest number"(n = {n}),
+                    $"less or equal"(
+                      m = {$number(value = 0)},
+                      n = {n}
+                    )
+                  ))
+                }))
+              }
+            )
+          )
+        })
+      )},
+      {steps = #(_: %UseExists({
+        parameters = #(x: %Element(S)),
+        steps = #(
+          _: %UseDef(result = %exists(
+            #(v: %Element(M)),
+            $"less or equal"(
+              n = {$sum(
+                m = {x},
+                n = {$number(value = 1)}
+              )},
+              m = {v}
+            )
+          )),
+          _: %UseExists({
+            parameters = #(v: %Element(M)),
+            steps = #(
+              _: %Consider(x),
+              _2: %UseDef(result = %forall(
+                #(w: %Element(M)),
+                $less(
+                  m = {x},
+                  n = {w}
+                )
+              )),
+              _: %UseForAll({w = {v}}),
+              _: %UseDef(result = $"less or equal"(
+                m = {$sum(
+                  m = {x},
+                  n = {$number(value = 1)}
+                )},
+                n = {v}
+              )),
+              _: %Consider(v),
+              _: %Substitute(
+                #(_: %UseTheorem(
+                  $"Comparison is antisymmetric"(
+                    a = {v},
+                    b = {$sum(
+                      m = {x},
+                      n = {$number(value = 1)}
+                    )}
+                  ),
+                  %equals(
+                    v,
+                    $sum(
+                      m = {x},
+                      n = {$number(value = 1)}
+                    )
+                  )
+                )),
+                %left,
+                %in(
+                  $sum(
+                    m = {x},
+                    n = {$number(value = 1)}
+                  ),
+                  M
+                )
+              ),
+              _: %ProveExists(
+                {m = {$sum(
+                  m = {x},
+                  n = {$number(value = 1)}
+                )}},
+                proof = {
+                  goal = %forall(
+                    #(n: %Element(M)),
+                    $"less or equal"(
+                      m = {$sum(
+                        m = {x},
+                        n = {$number(value = 1)}
+                      )},
+                      n = {n}
+                    )
+                  ),
+                  steps = #(_: %ProveForAll({
+                    parameters = #(n: %Element(M)),
+                    goal = $"less or equal"(
+                      m = {$sum(
+                        m = {x},
+                        n = {$number(value = 1)}
+                      )},
+                      n = {n}
+                    ),
+                    steps = #(
+                      _: %Consider(_2),
+                      _: %UseForAll({w = {n}}),
+                      _: %UseDef(result = $"less or equal"(
+                        m = {$sum(
+                          m = {x},
+                          n = {$number(value = 1)}
+                        )},
+                        n = {n}
+                      ))
+                    )
+                  }))
+                }
+              )
+            )
+          })
+        )
+      }))}
+    ])
+  )}]
+}

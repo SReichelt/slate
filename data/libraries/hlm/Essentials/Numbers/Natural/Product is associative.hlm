@@ -1,0 +1,24 @@
+%../../../../../logics/hlm%
+
+$"Product is associative"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $product(
+      m = {$product(
+        m = {a},
+        n = {b}
+      )},
+      n = {c}
+    ),
+    $product(
+      m = {a},
+      n = {$product(
+        m = {b},
+        n = {c}
+      )}
+    )
+  )
+}

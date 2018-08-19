@@ -1,0 +1,33 @@
+%../../../../../../logics/hlm%
+
+$cauchy(α: %Element(
+  $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
+  shortcut = {
+    $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+    #(n: %Binding(
+      $../../Natural/"Natural numbers",
+      #(a: %Element($../"Rational numbers"))
+    )),
+    override = %true
+  }
+)): %Predicate {
+  definition = [%forall(
+    #(ε: %Element($../"Positive numbers")),
+    %exists(
+      #(n: %Element($../../Natural/"Natural numbers")),
+      %forall(
+        #(
+          l: %Element($../../Natural/"Segment (greater or equal)"(n = {n})),
+          m: %Element(%previous)
+        ),
+        $../less(
+          a = {$../absolute(a = {$../difference(
+            b = {a[l]},
+            a = {a[m]}
+          )})},
+          b = {ε}
+        )
+      )
+    )
+  )]
+}

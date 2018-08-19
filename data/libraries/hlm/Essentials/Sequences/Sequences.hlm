@@ -1,0 +1,37 @@
+%../../../../logics/hlm%
+
+$Sequences(S: %Set): %Construction {
+  $sequence(n: %Binding(
+    $"../Numbers/Natural/Natural numbers",
+    #(a: %Element(S))
+  )): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(n: %Binding(
+        $"../Numbers/Natural/Natural numbers",
+        #(a: %Element(S))
+      )),
+      rightParameters = #(n: %Binding(
+        $"../Numbers/Natural/Natural numbers",
+        #("a'": %Element(S))
+      )),
+      definition = [%forall(
+        #(n: %Element($"../Numbers/Natural/Natural numbers")),
+        %equals(a[n], "a'"[n])
+      )],
+      isomorphic = %true
+    },
+    display = [$SubSup(
+      body = $Parens(
+        body = a,
+        style = '()'
+      ),
+      sub = [n, '∈ℕ'],
+      sup = S
+    )]
+  }
+
+  display = [$Power(
+    base = S,
+    exponent = 'ℕ'
+  )]
+}

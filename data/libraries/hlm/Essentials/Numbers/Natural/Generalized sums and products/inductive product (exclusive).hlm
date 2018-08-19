@@ -1,0 +1,46 @@
+%../../../../../../logics/hlm%
+
+$"inductive product (exclusive)"(
+  n: %Element($../"Natural numbers"),
+  i: %Binding(
+    $../"Segment (less)"(n = {n}),
+    #(a: %Element($../"Natural numbers"))
+  )
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $../"Natural numbers",
+    [
+      {
+        constructor = $../"Natural numbers".zero,
+        value = $../number(value = 1),
+        rewrite = %true
+      },
+      {
+        constructor = $../"Natural numbers".successor,
+        parameters = #(m: %Element($../"Natural numbers")),
+        value = $../product(
+          m = {$"inductive product (exclusive)"(
+            n = {m},
+            i = {
+              #(j: %Element($../"Segment (less)"(n = {m}))),
+              {a = {a[j]}}
+            }
+          )},
+          n = {a[m]}
+        ),
+        rewrite = %true
+      }
+    ]
+  )],
+  display = [$LargeOperator(
+    symbol = '∏',
+    operand = a,
+    under = $Relation(
+      symbol = '<',
+      operands = [i, n]
+    ),
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )]
+}

@@ -1,0 +1,35 @@
+%../../../../../../logics/hlm%
+
+$"inductive sum (exclusive)"(
+  n: %Element($../../Natural/"Natural numbers"),
+  i: %Binding(
+    $../../Natural/"Segment (less)"(n = {n}),
+    #(a: %Element($../"Real numbers"))
+  )
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $../../Natural/"Natural numbers",
+    [
+      {
+        constructor = $../../Natural/"Natural numbers".zero,
+        value = $../../Natural/number(value = 0)
+      },
+      {
+        constructor = $../../Natural/"Natural numbers".successor,
+        parameters = #(m: %Element($../../Natural/"Natural numbers")),
+        value = $../sum(
+          a = {$"inductive sum (exclusive)"(
+            n = {m},
+            i = {
+              #(j: %Element($../../Natural/"Segment (less)"(n = {m}))),
+              {a = {a[j]}}
+            }
+          )},
+          b = {a[m]}
+        ),
+        rewrite = %true
+      }
+    ]
+  )]
+}

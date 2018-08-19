@@ -1,0 +1,44 @@
+%../../../../../logics/hlm%
+
+$rational(a: %Element($"Real numbers")): %Predicate {
+  definition = [
+    %in(
+      a,
+      $../Rational/"Rational numbers"
+    ),
+    %exists(
+      #(
+        b: %Element($../Integer/"Nonzero numbers"),
+        c: %Element($../Integer/Integers)
+      ),
+      %equals(
+        a,
+        $quotient(
+          b = {c},
+          a = {b}
+        )
+      )
+    ),
+    %existsUnique(
+      #(
+        d: %Element($../Integer/"Positive numbers"),
+        e: %Element($../Integer/Integers),
+        _1: %Constraint($../Integer/coprime(
+          a = {d},
+          b = {e}
+        ))
+      ),
+      %equals(
+        a,
+        $quotient(
+          b = {e},
+          a = {d}
+        )
+      )
+    )
+  ],
+  display = [$Property(
+    operand = a,
+    property = %neg('rational', 'irrational')
+  )]
+}

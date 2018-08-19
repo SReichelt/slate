@@ -1,0 +1,12 @@
+%../../../../../logics/hlm%
+
+$"Natural cardinality lemma"(
+  m: %Element($../Natural/"Natural numbers"),
+  n: %Element(%previous),
+  f: %Element($../../Functions/Bijections(
+    X = {$../Natural/"Segment (less)"(n = {m})},
+    Y = {$../Natural/"Segment (less)"(n = {n})}
+  ))
+): %StandardTheorem {
+  claim = %equals(m, n)
+}

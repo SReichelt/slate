@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$"Nonnegative numbers": %SetOperator {
+  definition = [
+    $"Segment (greater or equal)"(a = {$../Natural/number(value = 0)}),
+    %subset(
+      #(a: %Element($"Real numbers")),
+      $"less or equal"(
+        b = {a},
+        a = {$../Natural/number(value = 0)}
+      )
+    )
+  ]
+}

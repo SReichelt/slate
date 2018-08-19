@@ -1,0 +1,8 @@
+%../../../../format/library%
+
+$Essentials: %Section {
+  items = [
+    %item($Matrices),
+    %item($Vectors)
+  ]
+}

@@ -1,0 +1,43 @@
+%../../../../logics/hlm%
+
+$"Cartesian product"(
+  S: %Set(
+    auto = %true,
+    embedSubsets = %true
+  ),
+  T: %Set(
+    auto = %true,
+    embedSubsets = %true
+  )
+): %Construction {
+  $pair(
+    s: %Element(S),
+    t: %Element(T)
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        s: %Element(S),
+        t: %Element(T)
+      ),
+      rightParameters = #(
+        "s'": %Element(S),
+        "t'": %Element(T)
+      ),
+      definition = [%and(
+        %equals(s, "s'"),
+        %equals(t, "t'")
+      )],
+      isomorphic = %true
+    },
+    display = [$Parens(
+      body = $Group(items = [s, t]),
+      style = '()'
+    )]
+  }
+
+  display = [$Operator(
+    symbol = '×',
+    operands = [S, T],
+    minParenLevel = 1
+  )]
+}

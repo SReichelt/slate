@@ -1,0 +1,558 @@
+%../../../../logics/hlm%
+
+$Categories: %Construction {
+  $category(
+    O: %Set,
+    a: %Binding(
+      O,
+      #(b: %Binding(
+        %previous,
+        #(M: %Set)
+      ))
+    ),
+    c: %Binding(
+      O,
+      #(i: %Element(M[c,c]))
+    ),
+    d: %Binding(
+      O,
+      #(e: %Binding(
+        %previous,
+        #(f: %Binding(
+          %previous,
+          #(∘: %Element($../../Essentials/Functions/Functions(
+            X = {$../../Essentials/Sets/"Cartesian product"(
+              S = {M[e,f]},
+              T = {M[d,e]}
+            )},
+            Y = {M[d,f]}
+          )))
+        ))
+      ))
+    ),
+    _1: %Constraint(%forall(
+      #(
+        w: %Element(O),
+        x: %Element(%previous),
+        y: %Element(%previous),
+        z: %Element(%previous),
+        p: %Element(M[w,x]),
+        q: %Element(M[x,y]),
+        r: %Element(M[y,z])
+      ),
+      %equals(
+        $../../Essentials/Functions/"infix value"(
+          X = {M[x,z]},
+          Y = {M[w,x]},
+          Z = {M[w,z]},
+          ∗ = {∘[w,x,z]},
+          x = {$../../Essentials/Functions/"infix value"(
+            X = {M[y,z]},
+            Y = {M[x,y]},
+            Z = {M[x,z]},
+            ∗ = {∘[x,y,z]},
+            x = {r},
+            y = {q}
+          )},
+          y = {p}
+        ),
+        $../../Essentials/Functions/"infix value"(
+          X = {M[y,z]},
+          Y = {M[w,y]},
+          Z = {M[w,z]},
+          ∗ = {∘[w,y,z]},
+          x = {r},
+          y = {$../../Essentials/Functions/"infix value"(
+            X = {M[x,y]},
+            Y = {M[w,x]},
+            Z = {M[w,y]},
+            ∗ = {∘[w,x,y]},
+            x = {q},
+            y = {p}
+          )}
+        )
+      )
+    )),
+    _2: %Constraint(%forall(
+      #(
+        u: %Element(O),
+        v: %Element(%previous),
+        s: %Element(M[u,v])
+      ),
+      %and(
+        %equals(
+          $../../Essentials/Functions/"infix value"(
+            X = {M[v,v]},
+            Y = {M[u,v]},
+            Z = {M[u,v]},
+            ∗ = {∘[u,v,v]},
+            x = {i[v]},
+            y = {s}
+          ),
+          s
+        ),
+        %equals(
+          $../../Essentials/Functions/"infix value"(
+            X = {M[u,v]},
+            Y = {M[u,u]},
+            Z = {M[u,v]},
+            ∗ = {∘[u,u,v]},
+            x = {s},
+            y = {i[u]}
+          ),
+          s
+        )
+      )
+    )),
+    _3: %Constraint(%forall(
+      #(
+        u: %Element(O),
+        v: %Element(%previous),
+        s: %Element(M[u,v]),
+        t: %Element(M[v,u]),
+        _4: %Constraint(%equals(
+          $../../Essentials/Functions/"infix value"(
+            X = {M[u,v]},
+            Y = {M[v,u]},
+            Z = {M[v,v]},
+            ∗ = {∘[v,u,v]},
+            x = {s},
+            y = {t}
+          ),
+          i[v]
+        )),
+        _5: %Constraint(%equals(
+          $../../Essentials/Functions/"infix value"(
+            X = {M[v,u]},
+            Y = {M[u,v]},
+            Z = {M[u,u]},
+            ∗ = {∘[u,v,u]},
+            x = {t},
+            y = {s}
+          ),
+          i[u]
+        ))
+      ),
+      %equals(s, t)
+    ))
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        O: %Set,
+        a: %Binding(
+          O,
+          #(b: %Binding(
+            %previous,
+            #(M: %Set)
+          ))
+        ),
+        c: %Binding(
+          O,
+          #(i: %Element(M[c,c]))
+        ),
+        d: %Binding(
+          O,
+          #(e: %Binding(
+            %previous,
+            #(f: %Binding(
+              %previous,
+              #(∘: %Element($../../Essentials/Functions/Functions(
+                X = {$../../Essentials/Sets/"Cartesian product"(
+                  S = {M[e,f]},
+                  T = {M[d,e]}
+                )},
+                Y = {M[d,f]}
+              )))
+            ))
+          ))
+        ),
+        _1: %Constraint(%forall(
+          #(
+            w: %Element(O),
+            x: %Element(%previous),
+            y: %Element(%previous),
+            z: %Element(%previous),
+            p: %Element(M[w,x]),
+            q: %Element(M[x,y]),
+            r: %Element(M[y,z])
+          ),
+          %equals(
+            $../../Essentials/Functions/"infix value"(
+              X = {M[x,z]},
+              Y = {M[w,x]},
+              Z = {M[w,z]},
+              ∗ = {∘[w,x,z]},
+              x = {$../../Essentials/Functions/"infix value"(
+                X = {M[y,z]},
+                Y = {M[x,y]},
+                Z = {M[x,z]},
+                ∗ = {∘[x,y,z]},
+                x = {r},
+                y = {q}
+              )},
+              y = {p}
+            ),
+            $../../Essentials/Functions/"infix value"(
+              X = {M[y,z]},
+              Y = {M[w,y]},
+              Z = {M[w,z]},
+              ∗ = {∘[w,y,z]},
+              x = {r},
+              y = {$../../Essentials/Functions/"infix value"(
+                X = {M[x,y]},
+                Y = {M[w,x]},
+                Z = {M[w,y]},
+                ∗ = {∘[w,x,y]},
+                x = {q},
+                y = {p}
+              )}
+            )
+          )
+        )),
+        _2: %Constraint(%forall(
+          #(
+            u: %Element(O),
+            v: %Element(%previous),
+            s: %Element(M[u,v])
+          ),
+          %and(
+            %equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {M[v,v]},
+                Y = {M[u,v]},
+                Z = {M[u,v]},
+                ∗ = {∘[u,v,v]},
+                x = {i[v]},
+                y = {s}
+              ),
+              s
+            ),
+            %equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {M[u,v]},
+                Y = {M[u,u]},
+                Z = {M[u,v]},
+                ∗ = {∘[u,u,v]},
+                x = {s},
+                y = {i[u]}
+              ),
+              s
+            )
+          )
+        )),
+        _3: %Constraint(%forall(
+          #(
+            u: %Element(O),
+            v: %Element(%previous),
+            s: %Element(M[u,v]),
+            t: %Element(M[v,u]),
+            _4: %Constraint(%equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {M[u,v]},
+                Y = {M[v,u]},
+                Z = {M[v,v]},
+                ∗ = {∘[v,u,v]},
+                x = {s},
+                y = {t}
+              ),
+              i[v]
+            )),
+            _5: %Constraint(%equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {M[v,u]},
+                Y = {M[u,v]},
+                Z = {M[u,u]},
+                ∗ = {∘[u,v,u]},
+                x = {t},
+                y = {s}
+              ),
+              i[u]
+            ))
+          ),
+          %equals(s, t)
+        ))
+      ),
+      rightParameters = #(
+        "O'": %Set,
+        "a'": %Binding(
+          "O'",
+          #("b'": %Binding(
+            %previous,
+            #("M'": %Set)
+          ))
+        ),
+        "c'": %Binding(
+          "O'",
+          #("i'": %Element("M'"["c'","c'"]))
+        ),
+        "d'": %Binding(
+          "O'",
+          #("e'": %Binding(
+            %previous,
+            #("f'": %Binding(
+              %previous,
+              #("∘'": %Element($../../Essentials/Functions/Functions(
+                X = {$../../Essentials/Sets/"Cartesian product"(
+                  S = {"M'"["e'","f'"]},
+                  T = {"M'"["d'","e'"]}
+                )},
+                Y = {"M'"["d'","f'"]}
+              )))
+            ))
+          ))
+        ),
+        "_1'": %Constraint(%forall(
+          #(
+            "w'": %Element("O'"),
+            "x'": %Element(%previous),
+            "y'": %Element(%previous),
+            "z'": %Element(%previous),
+            "p'": %Element("M'"["w'","x'"]),
+            "q'": %Element("M'"["x'","y'"]),
+            "r'": %Element("M'"["y'","z'"])
+          ),
+          %equals(
+            $../../Essentials/Functions/"infix value"(
+              X = {"M'"["x'","z'"]},
+              Y = {"M'"["w'","x'"]},
+              Z = {"M'"["w'","z'"]},
+              ∗ = {"∘'"["w'","x'","z'"]},
+              x = {$../../Essentials/Functions/"infix value"(
+                X = {"M'"["y'","z'"]},
+                Y = {"M'"["x'","y'"]},
+                Z = {"M'"["x'","z'"]},
+                ∗ = {"∘'"["x'","y'","z'"]},
+                x = {"r'"},
+                y = {"q'"}
+              )},
+              y = {"p'"}
+            ),
+            $../../Essentials/Functions/"infix value"(
+              X = {"M'"["y'","z'"]},
+              Y = {"M'"["w'","y'"]},
+              Z = {"M'"["w'","z'"]},
+              ∗ = {"∘'"["w'","y'","z'"]},
+              x = {"r'"},
+              y = {$../../Essentials/Functions/"infix value"(
+                X = {"M'"["x'","y'"]},
+                Y = {"M'"["w'","x'"]},
+                Z = {"M'"["w'","y'"]},
+                ∗ = {"∘'"["w'","x'","y'"]},
+                x = {"q'"},
+                y = {"p'"}
+              )}
+            )
+          )
+        )),
+        "_2'": %Constraint(%forall(
+          #(
+            "u'": %Element("O'"),
+            "v'": %Element(%previous),
+            "s'": %Element("M'"["u'","v'"])
+          ),
+          %and(
+            %equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {"M'"["v'","v'"]},
+                Y = {"M'"["u'","v'"]},
+                Z = {"M'"["u'","v'"]},
+                ∗ = {"∘'"["u'","v'","v'"]},
+                x = {"i'"["v'"]},
+                y = {"s'"}
+              ),
+              "s'"
+            ),
+            %equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {"M'"["u'","v'"]},
+                Y = {"M'"["u'","u'"]},
+                Z = {"M'"["u'","v'"]},
+                ∗ = {"∘'"["u'","u'","v'"]},
+                x = {"s'"},
+                y = {"i'"["u'"]}
+              ),
+              "s'"
+            )
+          )
+        )),
+        "_3'": %Constraint(%forall(
+          #(
+            "u'": %Element("O'"),
+            "v'": %Element(%previous),
+            "s'": %Element("M'"["u'","v'"]),
+            "t'": %Element("M'"["v'","u'"]),
+            "_4'": %Constraint(%equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {"M'"["u'","v'"]},
+                Y = {"M'"["v'","u'"]},
+                Z = {"M'"["v'","v'"]},
+                ∗ = {"∘'"["v'","u'","v'"]},
+                x = {"s'"},
+                y = {"t'"}
+              ),
+              "i'"["v'"]
+            )),
+            "_5'": %Constraint(%equals(
+              $../../Essentials/Functions/"infix value"(
+                X = {"M'"["v'","u'"]},
+                Y = {"M'"["u'","v'"]},
+                Z = {"M'"["u'","u'"]},
+                ∗ = {"∘'"["u'","v'","u'"]},
+                x = {"t'"},
+                y = {"s'"}
+              ),
+              "i'"["u'"]
+            ))
+          ),
+          %equals("s'", "t'")
+        ))
+      ),
+      definition = [%exists(
+        #(
+          φ: %Element($../../Essentials/Functions/Bijections(
+            X = {O},
+            Y = {"O'"}
+          )),
+          a: %Binding(
+            O,
+            #(b: %Binding(
+              %previous,
+              #(ψ: %Element($../../Essentials/Functions/Bijections(
+                X = {M[a,b]},
+                Y = {"M'"[
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {a}
+                  ),
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {b}
+                  )
+                ]}
+              )))
+            ))
+          )
+        ),
+        %and(
+          %forall(
+            #(c: %Element(O)),
+            %equals(
+              $../../Algebra/Isomorphisms/"element transform"(
+                X = {M[c,c]},
+                Y = {"M'"[
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {c}
+                  ),
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {c}
+                  )
+                ]},
+                φ = {ψ[c,c]},
+                x = {i[c]}
+              ),
+              "i'"[$../../Algebra/Isomorphisms/"element transform"(
+                X = {O},
+                Y = {"O'"},
+                φ = {φ},
+                x = {c}
+              )]
+            )
+          ),
+          %forall(
+            #(
+              d: %Element(O),
+              e: %Element(%previous),
+              f: %Element(%previous)
+            ),
+            %equals(
+              $../../Algebra/Isomorphisms/"morphism transform"(
+                X_1 = {M[d,e]},
+                X_2 = {M[e,f]},
+                X_3 = {M[d,f]},
+                Y_1 = {"M'"[
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {d}
+                  ),
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {e}
+                  )
+                ]},
+                Y_2 = {"M'"[
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {e}
+                  ),
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {f}
+                  )
+                ]},
+                Y_3 = {"M'"[
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {d}
+                  ),
+                  $../../Algebra/Isomorphisms/"element transform"(
+                    X = {O},
+                    Y = {"O'"},
+                    φ = {φ},
+                    x = {f}
+                  )
+                ]},
+                φ_1 = {ψ[d,e]},
+                φ_2 = {ψ[e,f]},
+                φ_3 = {ψ[d,f]},
+                ∘ = {∘[d,e,f]}
+              ),
+              "∘'"[
+                $../../Algebra/Isomorphisms/"element transform"(
+                  X = {O},
+                  Y = {"O'"},
+                  φ = {φ},
+                  x = {d}
+                ),
+                $../../Algebra/Isomorphisms/"element transform"(
+                  X = {O},
+                  Y = {"O'"},
+                  φ = {φ},
+                  x = {e}
+                ),
+                $../../Algebra/Isomorphisms/"element transform"(
+                  X = {O},
+                  Y = {"O'"},
+                  φ = {φ},
+                  x = {f}
+                )
+              ]
+            )
+          )
+        )
+      )],
+      isomorphic = %true
+    }
+  }
+
+  remarks = 'This definition of categories includes the requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). This makes sense because it ensures that two categories are equal if and only if they are equivalent, and because in HLM, all of the usual examples of categories are skeletal anyway.'
+}

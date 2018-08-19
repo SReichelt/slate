@@ -1,0 +1,57 @@
+%../../../../logics/hlm%
+
+$"inner operation transform"(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  φ: %Element($../../Essentials/Functions/Bijections(
+    X = {X},
+    Y = {Y}
+  )),
+  ∗: %Element($../../Essentials/Functions/Functions(
+    X = {$../../Essentials/Sets/"Cartesian product"(
+      S = {X},
+      T = {X}
+    )},
+    Y = {X}
+  ))
+): %ExplicitOperator {
+  definition = [$../../Essentials/Functions/composition(
+    X = {$../../Essentials/Sets/"Cartesian product"(
+      S = {Y},
+      T = {Y}
+    )},
+    Y = {X},
+    Z = {Y},
+    g = {φ},
+    f = {$../../Essentials/Functions/composition(
+      X = {$../../Essentials/Sets/"Cartesian product"(
+        S = {Y},
+        T = {Y}
+      )},
+      Y = {$../../Essentials/Sets/"Cartesian product"(
+        S = {X},
+        T = {X}
+      )},
+      Z = {X},
+      g = {∗},
+      f = {$../../Essentials/Functions/inverse(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {X},
+          T = {X}
+        )},
+        Y = {$../../Essentials/Sets/"Cartesian product"(
+          S = {Y},
+          T = {Y}
+        )},
+        f = {$../../Essentials/Functions/"cartesian product"(
+          V = {X},
+          W = {Y},
+          X = {X},
+          Y = {Y},
+          f = {φ},
+          g = {φ}
+        )}
+      )}
+    )}
+  )]
+}

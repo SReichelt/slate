@@ -1,0 +1,33 @@
+%../../../../logics/hlm%
+
+$Bijections(
+  X: %Set,
+  Y: %Set
+): %SetOperator {
+  definition = [%subset(
+    #(f: %Element($Functions(
+      X = {X},
+      Y = {Y}
+    ))),
+    $bijective(
+      X = {X},
+      Y = {Y},
+      f = {f}
+    )
+  )],
+  display = [$FunctionOperator(
+    symbol = '↔',
+    operands = [X, Y]
+  )],
+  definitionDisplay = {
+    parameter = #(f: %Expr),
+    display = [$FunctionDefinition(
+      function = f,
+      symbol = '↔',
+      operands = [X, Y]
+    )],
+    singularName = 'bijection',
+    pluralName = 'bijections',
+    nameOptional = %true
+  }
+}

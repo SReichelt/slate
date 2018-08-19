@@ -1,0 +1,5 @@
+%../../../format/library%
+
+$"Category theory": %Section {
+  items = [%subsection($Categories)]
+}

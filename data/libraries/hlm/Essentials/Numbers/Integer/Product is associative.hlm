@@ -1,0 +1,24 @@
+%../../../../../logics/hlm%
+
+$"Product is associative"(
+  a: %Element($Integers),
+  b: %Element(%previous),
+  c: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $product(
+      a = {$product(
+        a = {a},
+        b = {b}
+      )},
+      b = {c}
+    ),
+    $product(
+      a = {a},
+      b = {$product(
+        a = {b},
+        b = {c}
+      )}
+    )
+  )
+}

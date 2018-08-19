@@ -1,0 +1,30 @@
+%../../../../../logics/hlm%
+
+$"Natural numbers": %Construction {
+  $zero: %Constructor {
+    rewrite = {value = $number(value = 0)},
+    display = [$ConstructorName(name = 'O')]
+  }
+
+  $successor(n: %Element($"Natural numbers")): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(m: %Element($"Natural numbers")),
+      rightParameters = #(n: %Element($"Natural numbers")),
+      definition = [%equals(m, n)],
+      isomorphic = %true
+    },
+    rewrite = {
+      value = $sum(
+        m = {n},
+        n = {$number(value = 1)}
+      ),
+      theorem = $"Addition of one yields successor"
+    },
+    display = [$Constructor(
+      name = 'S',
+      arguments = [n]
+    )]
+  }
+
+  display = ['ℕ']
+}

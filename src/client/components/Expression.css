@@ -1,0 +1,393 @@
+.expr {
+  font-family: STIX, serif;
+  line-height: 110%;
+  text-decoration: initial;
+  color: initial;
+  background-color: initial;
+  text-align: left;
+}
+
+span.expr.interactive {
+  cursor: initial;
+}
+
+.label, .sub-heading {
+  font-weight: bold;
+}
+
+.label .title {
+  font-weight: normal;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.paragraph+.paragraph, .paragraph+.list, .list+.list, p+p, p+ul, p+ol, ul+ul, ul+ol, ol+ul, ol+ol {
+  margin-top: 1ex;
+}
+
+.paragraph.sub-heading {
+  margin-top: 1em;
+}
+
+.list {
+  padding-left: 1em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.list-item {
+  padding-left: 1ex;
+}
+
+.list-item+.list-item {
+  margin-top: 0.5ex;
+}
+
+.display-math {
+  margin-left: 1em;
+  white-space: nowrap;
+}
+
+.addendum {
+  font-size: 75%;
+}
+
+.aligned {
+  display: inline-table;
+  vertical-align: middle;
+}
+
+.aligned-row {
+  display: table-row;
+}
+
+.aligned-left {
+  display: table-cell;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.aligned-right {
+  display: table-cell;
+  text-align: left;
+}
+
+.display-math>.aligned-row>.aligned-left, .display-math>.aligned-row>.aligned-right {
+  padding-top: 1pt;
+  padding-bottom: 1pt;
+}
+
+.subsup {
+  display: inline-table;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.subsup-body-row, .subsup-sub-row, .subsup-sup-row {
+  display: table-row;
+}
+
+.subsup-body, .subsup-empty {
+  display: table-cell;
+}
+
+.subsup-left-sub {
+  display: table-cell;
+  text-align: right;
+  vertical-align: top;
+  font-size: smaller;
+}
+
+.subsup-left-sup {
+  display: table-cell;
+  text-align: right;
+  vertical-align: bottom;
+  font-size: smaller;
+}
+
+.subsup-right-sub {
+  display: table-cell;
+  text-align: left;
+  vertical-align: top;
+  font-size: smaller;
+}
+
+.subsup-right-sup {
+  display: table-cell;
+  text-align: left;
+  vertical-align: bottom;
+  font-size: smaller;
+}
+
+.overunder {
+  display: inline-table;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.overunder-body-row {
+  display: table-row;
+}
+
+.overunder-over-row, .overunder-under-row {
+  display: table-row;
+  height: 0.7em;
+  font-size: 75%;
+}
+
+.overunder-body, .overunder-over, .overunder-under {
+  display: table-cell;
+  line-height: 100%;
+}
+
+.paren-round-text {
+  font-family: sans;
+}
+
+.paren-round {
+  display: inline-block;
+  border-left: solid 2pt;
+  border-right: solid 2pt;
+  border-radius: 1ex;
+  padding: 0.5ex;
+  margin: 1pt;
+  white-space: nowrap;
+}
+
+.paren-flat {
+  display: inline-block;
+  border-left: solid 1pt;
+  border-right: solid 1pt;
+  padding: 2pt;
+  margin: 1pt;
+  white-space: nowrap;
+}
+
+.paren-square-text, .paren-curly-text {
+  font-size: 115%;
+}
+
+.paren-square, .paren-curly, .paren-angle {
+  display: inline-table;
+  vertical-align: middle;
+  margin: 1pt;
+  white-space: nowrap;
+}
+
+.paren-square-row, .paren-curly-row, .paren-angle-row {
+  display: table-row;
+}
+
+.paren-square-left {
+  display: table-cell;
+  width: 3pt;
+  min-width: 3pt;
+  border-left: solid 2pt;
+  border-top: solid 1pt;
+  border-bottom: solid 1pt;
+}
+
+.paren-square-right {
+  display: table-cell;
+  width: 3pt;
+  min-width: 3pt;
+  border-right: solid 2pt;
+  border-top: solid 1pt;
+  border-bottom: solid 1pt;
+}
+
+.paren-curly-left, .paren-curly-right, .paren-angle-left, .paren-angle-right {
+  display: table-cell;
+  width: 1ex;
+  min-width: 1ex;
+  vertical-align: top;
+  position: relative;
+}
+
+.paren-square-body, .paren-curly-body, .paren-angle-body {
+  display: table-cell;
+}
+
+.paren-left-hairline {
+  border-left: dashed 1pt gray;
+  padding-left: 1pt;
+}
+
+.paren-right-hairline {
+  border-right: dashed 1pt gray;
+  padding-right: 1pt;
+}
+
+.height-2 {
+  font-size: 110%;
+}
+
+.height-3 {
+  font-size: 120%;
+}
+
+.height-4 {
+  font-size: 130%;
+}
+
+.height-5 {
+  font-size: 140%;
+}
+
+.table {
+  display: inline-table;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-row {
+  display: table-row;
+}
+
+.table-cell {
+  display: table-cell;
+  padding-left: 2pt;
+  padding-right: 2pt;
+}
+
+.cases {
+  text-align: left;
+}
+
+.cases>.table-row>.table-cell:not(:first-child) {
+  padding-left: 1ex;
+}
+
+.binom {
+  margin-top: -2pt;
+  margin-bottom: -2pt;
+}
+
+.construction {
+  text-align: left;
+}
+
+.construction>.table-row>.table-cell:first-child {
+  padding-right: 1ex;
+}
+
+.construction>.table-row>.table-cell:not(:first-child) {
+  border-left: solid 1pt;
+  padding-left: 1ex;
+}
+
+.fraction {
+  display: inline-table;
+  text-align: center;
+  vertical-align: 50%;
+  white-space: nowrap;
+}
+
+.fraction-numerator-row, .fraction-denominator-row {
+  display: table-row;
+}
+
+.fraction-numerator, .fraction-denominator {
+  display: table-cell;
+  padding-left: 0.3ex;
+  padding-right: 0.3ex;
+}
+
+.fraction-numerator {
+  border-bottom: solid 1pt;
+}
+
+.radical {
+  display: inline-table;
+  vertical-align: middle;
+  margin: 1pt;
+  white-space: nowrap;
+}
+
+.radical-row {
+  display: table-row;
+}
+
+.radical-degree-col {
+  display: table-cell;
+  vertical-align: bottom;
+}
+
+.radical-degree-table {
+  display: table;
+}
+
+.radical-degree-top-row {
+  display: table-row;
+}
+
+.radical-degree-bottom-row {
+  display: table-row;
+}
+
+.radical-degree {
+  display: table-cell;
+  font-size: smaller;
+  line-height: 75%;
+  padding-left: 0.5pt;
+  padding-bottom: 0.15em;
+}
+
+.radical-degree-bottom-cell {
+  display: table-cell;
+  height: 0.6em;
+  position: relative;
+}
+
+.radical-diagonal {
+  display: table-cell;
+  width: 1ex;
+  min-width: 1ex;
+  position: relative;
+}
+
+.radical-radicand {
+  display: table-cell;
+  vertical-align: middle;
+  border-top: solid 1pt;
+  padding-right: 0.3ex;
+}
+
+.fraction .fraction, .radical .fraction, .radical .radical {
+  font-size: 98%;
+}
+
+.var {
+  font-style: italic;
+}
+
+.ctor {
+  font-family: sans;
+}
+
+.largesym {
+  font-size: 150%;
+}
+
+.baseline {
+  vertical-align: baseline;
+}
+
+.hover {
+  background-color: #ffd700;
+}
+
+.definition.hover {
+  background-color: #80ff00;
+}
+
+.expr svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

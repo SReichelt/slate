@@ -1,0 +1,18 @@
+%../../../../logics/hlm%
+
+$"element transform"(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  φ: %Element($../../Essentials/Functions/Bijections(
+    X = {X},
+    Y = {Y}
+  )),
+  x: %Element(X)
+): %ExplicitOperator {
+  definition = [$../../Essentials/Functions/value(
+    X = {X},
+    Y = {Y},
+    f = {φ},
+    x = {x}
+  )]
+}

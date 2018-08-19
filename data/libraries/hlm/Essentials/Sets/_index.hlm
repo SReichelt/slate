@@ -1,0 +1,27 @@
+%../../../../format/library%
+
+$Sets: %Section {
+  items = [
+    %item($"Empty set"),
+    %item($"Empty set is subset of any set"),
+    %item($empty),
+    %item($finite),
+    %item($"Subsets of finite sets are finite"),
+    %item($Intersection),
+    %item($"Intersection is associative"),
+    %item($"Intersection is commutative"),
+    %item($"Intersection is subset of argument"),
+    %item($Union),
+    %item($"Union is associative"),
+    %item($"Union is commutative"),
+    %item($"Union is superset of argument"),
+    %item($"Relative complement"),
+    %item($"Disjoint union"),
+    %item($"Cartesian product"),
+    %item($"Power set"),
+    %item($"Generalized intersection"),
+    %item($"Generalized intersection using power set"),
+    %item($"Generalized union"),
+    %item($"Generalized union using power set")
+  ]
+}

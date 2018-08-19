@@ -1,0 +1,90 @@
+%../../../../logics/hlm%
+
+$injective(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %Predicate {
+  definition = [
+    %forall(
+      #(
+        a: %Element(X),
+        b: %Element(%previous),
+        _1: %Constraint(%equals(
+          $value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {a}
+          ),
+          $value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {b}
+          )
+        ))
+      ),
+      %equals(a, b)
+    ),
+    %forall(
+      #(
+        c: %Element(Y),
+        d: %Element($Preimage(
+          X = {X},
+          Y = {Y},
+          f = {f},
+          S = {%enumeration(c)}
+        )),
+        e: %Element(%previous)
+      ),
+      %equals(d, e)
+    ),
+    %forall(
+      #(y: %Element($Image(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        S = {X}
+      ))),
+      %existsUnique(
+        #(x: %Element(X)),
+        %equals(
+          $value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {x}
+          ),
+          y
+        )
+      )
+    ),
+    %or(
+      $../Sets/empty(S = {X}),
+      %exists(
+        #(g: %Element($Functions(
+          X = {Y},
+          Y = {X}
+        ))),
+        %equals(
+          $composition(
+            X = {X},
+            Y = {Y},
+            Z = {X},
+            f = {f},
+            g = {g}
+          ),
+          $identity(X = {X})
+        )
+      )
+    )
+  ],
+  display = [$Property(
+    operand = f,
+    property = 'injective'
+  )]
+}

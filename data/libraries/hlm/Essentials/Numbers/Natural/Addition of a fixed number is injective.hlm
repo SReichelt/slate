@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$"Addition of a fixed number is injective"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element(%previous),
+  _1: %Constraint(%equals(
+    $sum(
+      m = {a},
+      n = {c}
+    ),
+    $sum(
+      m = {b},
+      n = {c}
+    )
+  ))
+): %StandardTheorem {
+  claim = %equals(a, b)
+}

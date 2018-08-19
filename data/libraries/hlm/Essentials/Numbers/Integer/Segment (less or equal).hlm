@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$"Segment (less or equal)"(a: %Element($Integers)): %SetOperator {
+  definition = [
+    %subset(
+      #(b: %Element($Integers)),
+      $"less or equal"(
+        a = {b},
+        b = {a}
+      )
+    ),
+    $"Segment (less)"(a = {$sum(
+      a = {a},
+      b = {$../Natural/number(value = 1)}
+    )})
+  ]
+}

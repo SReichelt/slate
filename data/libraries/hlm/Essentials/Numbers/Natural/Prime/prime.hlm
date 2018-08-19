@@ -1,0 +1,106 @@
+%../../../../../../logics/hlm%
+
+$prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Predicate {
+  definition = [
+    %forall(
+      #(
+        m: %Element($../"Positive numbers"),
+        _1: %Constraint($../divisible(
+          m = {m},
+          n = {n}
+        ))
+      ),
+      %or(
+        %equals(
+          m,
+          $../number(value = 1)
+        ),
+        %equals(m, n)
+      )
+    ),
+    %forall(
+      #(
+        l: %Element($../"Segment (greater)"(n = {$../number(value = 1)})),
+        _2: %Constraint($../divisible(
+          m = {l},
+          n = {n}
+        ))
+      ),
+      %equals(l, n)
+    ),
+    %sub(
+      $../Divisors(n = {n}),
+      %enumeration(
+        $../number(value = 1),
+        n
+      )
+    ),
+    %setEquals(
+      $../Divisors(n = {n}),
+      %enumeration(
+        $../number(value = 1),
+        n
+      )
+    ),
+    %equals(
+      $../../Cardinal/"Cardinal numbers".cardinality(S = {$../Divisors(n = {n})}),
+      $../number(value = 2)
+    ),
+    %forall(
+      #(
+        a: %Element($../"Natural numbers"),
+        b: %Element(%previous),
+        _3: %Constraint(%equals(
+          n,
+          $../product(
+            m = {a},
+            n = {b}
+          )
+        ))
+      ),
+      %or(
+        %and(
+          %equals(
+            a,
+            $../number(value = 1)
+          ),
+          %equals(b, n)
+        ),
+        %and(
+          %equals(a, n),
+          %equals(
+            b,
+            $../number(value = 1)
+          )
+        )
+      )
+    ),
+    %forall(
+      #(
+        c: %Element($../"Natural numbers"),
+        d: %Element(%previous),
+        _4: %Constraint($../divisible(
+          m = {n},
+          n = {$../product(
+            m = {c},
+            n = {d}
+          )}
+        ))
+      ),
+      %or(
+        $../divisible(
+          m = {n},
+          n = {c}
+        ),
+        $../divisible(
+          m = {n},
+          n = {d}
+        )
+      )
+    )
+  ],
+  display = [$Property(
+    property = 'prime',
+    operand = n
+  )]
+}

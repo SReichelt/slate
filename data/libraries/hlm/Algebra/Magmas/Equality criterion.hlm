@@ -1,0 +1,14 @@
+%../../../../logics/hlm%
+
+$"Equality criterion"(
+  𝔐: %Element($Magmas),
+  𝔑: %Element(%previous)
+): %EquivalenceTheorem {
+  conditions = [
+    %not($../../Essentials/Sets/empty(S = {$Isomorphisms(
+      𝔐 = {𝔐},
+      𝔑 = {𝔑}
+    )})),
+    %equals(𝔐, 𝔑)
+  ]
+}

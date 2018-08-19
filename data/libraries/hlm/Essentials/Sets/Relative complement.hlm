@@ -1,0 +1,15 @@
+%../../../../logics/hlm%
+
+$"Relative complement"(
+  S: %Set,
+  T: %Subset(S)
+): %SetOperator {
+  definition = [%subset(
+    #(x: %Element(S)),
+    %not(%in(x, T))
+  )],
+  display = [$Operator(
+    symbol = '∖',
+    operands = [S, T]
+  )]
+}

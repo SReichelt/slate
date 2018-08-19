@@ -1,0 +1,23 @@
+%../../../../../logics/hlm%
+
+$Homomorphisms(
+  𝔵: %Element(
+    $"Cardinal numbers",
+    shortcut = {
+      $"Cardinal numbers".cardinality,
+      #(X: %Set)
+    }
+  ),
+  𝔶: %Element(
+    %previous,
+    shortcut = {
+      $"Cardinal numbers".cardinality,
+      #(Y: %Set)
+    }
+  )
+): %SetOperator {
+  definition = [$../../Functions/Functions(
+    X = {X},
+    Y = {Y}
+  )]
+}

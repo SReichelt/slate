@@ -1,0 +1,11 @@
+%../../../../../logics/hlm%
+
+$"Segment (less)"(a: %Element($"Rational numbers")): %SetOperator {
+  definition = [%subset(
+    #(b: %Element($"Rational numbers")),
+    $less(
+      a = {b},
+      b = {a}
+    )
+  )]
+}

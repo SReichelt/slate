@@ -1,0 +1,16 @@
+%../../../../../logics/hlm%
+
+$"Comparison is antisymmetric"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  _1: %Constraint($"less or equal"(
+    m = {a},
+    n = {b}
+  )),
+  _2: %Constraint($"less or equal"(
+    m = {b},
+    n = {a}
+  ))
+): %StandardTheorem {
+  claim = %equals(a, b)
+}

@@ -1,0 +1,24 @@
+%../../../../../logics/hlm%
+
+$inductive(M: %Subset($"Natural numbers")): %Predicate {
+  definition = [%and(
+    %in(
+      $number(value = 0),
+      M
+    ),
+    %forall(
+      #(m: %Element(M)),
+      %in(
+        $sum(
+          m = {m},
+          n = {$number(value = 1)}
+        ),
+        M
+      )
+    )
+  )],
+  display = [$Property(
+    property = 'inductive',
+    operand = M
+  )]
+}

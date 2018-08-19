@@ -1,0 +1,23 @@
+%../../../../../logics/hlm%
+
+$"Segment (less)"(n: %Element($"Natural numbers")): %SetOperator {
+  definition = [%subset(
+    #(m: %Element($"Natural numbers")),
+    $less(
+      m = {m},
+      n = {n}
+    )
+  )],
+  display = [$Segment(
+    set = 'ℕ',
+    symbol = '<',
+    limit = n
+  )],
+  definitionDisplay = {
+    parameter = #(m: %Expr),
+    display = [$Relation(
+      symbol = '<',
+      operands = [m, n]
+    )]
+  }
+}

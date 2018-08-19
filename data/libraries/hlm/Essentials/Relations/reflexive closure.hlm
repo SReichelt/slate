@@ -1,0 +1,29 @@
+%../../../../logics/hlm%
+
+$"reflexive closure"(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %ExplicitOperator {
+  definition = [
+    $closure(
+      S = {S},
+      ≺ = {≺},
+      P = {%subset(
+        #(⊂: %Element($Relations(S = {S}))),
+        $reflexive(
+          S = {S},
+          ≺ = {⊂}
+        )
+      )}
+    ),
+    $union(
+      S = {S},
+      ≺ = {≺},
+      ⊂ = {$equality(S = {S})}
+    )
+  ],
+  display = [$Power(
+    base = ≺,
+    exponent = '='
+  )]
+}

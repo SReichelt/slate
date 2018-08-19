@@ -1,0 +1,30 @@
+%../../../../logics/hlm%
+
+$value(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element(
+    $Functions(
+      X = {X},
+      Y = {Y}
+    ),
+    shortcut = {
+      $Functions(
+        X = {X},
+        Y = {Y}
+      ).function,
+      #(z: %Binding(
+        X,
+        #(y: %Element(Y))
+      ))
+    }
+  ),
+  x: %Element(X)
+): %ExplicitOperator {
+  definition = [y[x]],
+  display = [$Function(
+    function = f,
+    arguments = [x]
+  )],
+  remarks = 'This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.'
+}

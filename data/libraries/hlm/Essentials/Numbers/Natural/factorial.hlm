@@ -1,0 +1,28 @@
+%../../../../../logics/hlm%
+
+$factorial(n: %Element($"Natural numbers")): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $"Natural numbers",
+    [
+      {
+        constructor = $"Natural numbers".zero,
+        value = $number(value = 1),
+        rewrite = %true
+      },
+      {
+        constructor = $"Natural numbers".successor,
+        parameters = #(x: %Element($"Natural numbers")),
+        value = $product(
+          m = {$factorial(n = {x})},
+          n = {n}
+        ),
+        rewrite = %true
+      }
+    ]
+  )],
+  display = [$UnaryOperator(
+    symbol = '!',
+    operand = n
+  )]
+}

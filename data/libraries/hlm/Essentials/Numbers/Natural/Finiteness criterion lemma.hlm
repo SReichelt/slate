@@ -1,0 +1,145 @@
+%../../../../../logics/hlm%
+
+$"Finiteness criterion lemma"(
+  M: %Subset($"Natural numbers"),
+  k: %Element($"Natural numbers"),
+  f: %Element($../../Functions/Bijections(
+    X = {$"Segment (less or equal)"(n = {k})},
+    Y = {M}
+  ))
+): %StandardTheorem {
+  claim = %exists(
+    #(m: %Element(M)),
+    %forall(
+      #(n: %Element(M)),
+      $"less or equal"(
+        m = {n},
+        n = {m}
+      )
+    )
+  ),
+  proofs = [{steps = #(_: %State(
+    %structural(
+      k,
+      $"Natural numbers",
+      [
+        {
+          constructor = $"Natural numbers".zero,
+          value = %exists(
+            #(a: %Element(M)),
+            %forall(
+              #(b: %Element(M)),
+              $"less or equal"(
+                m = {b},
+                n = {a}
+              )
+            )
+          )
+        },
+        {
+          constructor = $"Natural numbers".successor,
+          parameters = #(x: %Element($"Natural numbers")),
+          value = %exists(
+            #(c: %Element(M)),
+            %forall(
+              #(d: %Element(M)),
+              $"less or equal"(
+                m = {d},
+                n = {c}
+              )
+            )
+          ),
+          rewrite = %true
+        }
+      ]
+    ),
+    proof = {steps = #(_: %ProveCases(caseProofs = [
+      {
+        goal = %exists(
+          #(a: %Element(M)),
+          %forall(
+            #(b: %Element(M)),
+            $"less or equal"(
+              m = {b},
+              n = {a}
+            )
+          )
+        ),
+        steps = #(_: %ProveExists({a = {$../../Functions/value(
+          f = {f},
+          x = {$number(value = 0)}
+        )}}))
+      },
+      {
+        parameters = #(x: %Element($"Natural numbers")),
+        goal = %exists(
+          #(c: %Element(M)),
+          %forall(
+            #(d: %Element(M)),
+            $"less or equal"(
+              m = {d},
+              n = {c}
+            )
+          )
+        ),
+        steps = #(
+          S: %SetDef($"Segment (less or equal)"(n = {x})),
+          _: %UseTheorem(
+            $"Finiteness criterion lemma"(
+              M = {$../../Functions/Image(
+                f = {f},
+                S = {S}
+              )},
+              k = {x},
+              f = {$../../Functions/restriction(
+                f = {f},
+                A = {S}
+              )}
+            ),
+            %exists(
+              #(i: %Element(M)),
+              %forall(
+                #(j: %Element($../../Functions/Image(
+                  f = {f},
+                  S = {S}
+                ))),
+                $"less or equal"(
+                  m = {j},
+                  n = {i}
+                )
+              )
+            )
+          ),
+          _: %UseExists({
+            parameters = #(i: %Element(M)),
+            steps = #(_: %ProveExists({c = {%cases([
+              {
+                formula = $less(
+                  n = {$../../Functions/value(
+                    f = {f},
+                    x = {k}
+                  )},
+                  m = {i}
+                ),
+                value = $../../Functions/value(
+                  f = {f},
+                  x = {k}
+                )
+              },
+              {
+                formula = $"less or equal"(
+                  m = {$../../Functions/value(
+                    f = {f},
+                    x = {k}
+                  )},
+                  n = {i}
+                ),
+                value = i
+              }
+            ])}}))
+          })
+        )
+      }
+    ]))}
+  ))}]
+}

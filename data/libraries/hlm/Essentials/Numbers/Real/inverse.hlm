@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$inverse(a: %Element(
+  $"Real numbers",
+  shortcut = {
+    $"Real numbers".class,
+    #(
+      r_a: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+      _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+    )
+  }
+)): %ExplicitOperator {
+  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence inverse"(α = {r_a})})]
+}

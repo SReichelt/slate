@@ -1,0 +1,25 @@
+%../../../../format/library%
+
+$Relations: %Section {
+  items = [
+    %item($Relations),
+    %item($related),
+    %item($restriction),
+    %item($equality),
+    %item($opposite),
+    %item($reflexive),
+    %item($symmetric),
+    %item($transitive),
+    %item($preorder),
+    %item($equivalence),
+    %item($intersection),
+    %item($union),
+    %item($closure),
+    %item($"reflexive closure"),
+    %item($"symmetric closure"),
+    %item($"reflexive symmetric closure"),
+    %item($"transitive closure"),
+    %item($"reflexive transitive closure"),
+    %item($"reflexive symmetric transitive closure")
+  ]
+}

@@ -1,0 +1,24 @@
+%meta%
+
+$library: %MetaModel {
+  definitionTypes = [$Library, $Section],
+  functions = [$item, $subsection]
+}
+
+$Section: %DefinitionType {
+  members = #(
+    items: $Item[] = []
+  )
+}
+
+$Library: %DefinitionType {
+  superType = $Section,
+  members = #(
+    logic: %Any
+  )
+}
+
+$Item: %ExpressionType {}
+
+$item(ref: %Any, type?: %String, title?: %Any): $Item {}
+$subsection(ref: %Any, title?: %Any): $Item {}

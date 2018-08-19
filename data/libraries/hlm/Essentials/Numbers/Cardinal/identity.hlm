@@ -1,0 +1,11 @@
+%../../../../../logics/hlm%
+
+$identity(𝔵: %Element(
+  $"Cardinal numbers",
+  shortcut = {
+    $"Cardinal numbers".cardinality,
+    #(X: %Set)
+  }
+)): %ExplicitOperator {
+  definition = [$../../Functions/identity(X = {X})]
+}

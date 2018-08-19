@@ -1,0 +1,37 @@
+%../../../../../logics/hlm%
+
+$product(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $"Natural numbers",
+    [
+      {
+        constructor = $"Natural numbers".zero,
+        value = $number(value = 0),
+        rewrite = %true
+      },
+      {
+        constructor = $"Natural numbers".successor,
+        parameters = #(x: %Element($"Natural numbers")),
+        value = $sum(
+          m = {$product(
+            m = {m},
+            n = {x}
+          )},
+          n = {m}
+        ),
+        rewrite = %true
+      }
+    ]
+  )],
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [m, n],
+    space = ' ',
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )]
+}

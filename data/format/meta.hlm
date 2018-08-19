@@ -1,0 +1,54 @@
+%meta%
+
+$meta: %MetaModel {
+  definitionTypes = [$MetaModel, $DefinitionType, $ExpressionType, $ParameterType, %Any],
+  expressionTypes = [$Any, $Type, $Int, $String, $ParameterList, $SingleParameter, $ArgumentList, %Any],
+  functions = [$Any]
+}
+
+$MetaModel: %DefinitionType {
+  members = #(
+    definitionTypes: %Any[],
+    expressionTypes: %Any[] = [],
+    functions: %Any[] = []
+  )
+}
+
+$DefinedType: %DefinitionType {
+  members = #(
+    superType?: $DefinedType,
+    members?: %ParameterList
+  )
+}
+
+$DefinitionType(resultType?: $Type): %DefinitionType {
+  superType = $DefinedType,
+  members = #(
+    innerDefinitionTypes: $DefinedType[] = []
+  )
+}
+
+$ExpressionType: %DefinitionType {
+  superType = $DefinedType
+}
+
+$ParameterType(variableType?: $Type): %DefinitionType {
+  superType = $ExpressionType,
+  members = #(
+    argumentType?: $ExpressionType
+  )
+}
+
+$Any: %ExpressionType {}
+
+$Type: %ExpressionType {}
+
+$Int: %ExpressionType {}
+$String: %ExpressionType {}
+
+$ParameterList: %ExpressionType {}
+$SingleParameter(type: $Type): %ExpressionType {
+  superType = $ParameterList
+}
+
+$ArgumentList: %ExpressionType {}

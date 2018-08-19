@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$"Negative numbers": %SetOperator {
+  definition = [
+    $"Segment (less)"(a = {$../Natural/number(value = 0)}),
+    %subset(
+      #(a: %Element($Integers)),
+      $less(
+        a = {a},
+        b = {$../Natural/number(value = 0)}
+      )
+    )
+  ]
+}

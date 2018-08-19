@@ -1,0 +1,41 @@
+%../../../../../logics/hlm%
+
+$sum(
+  a: %Element(
+    $"Rational numbers",
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_a: %Element($../Integer/Integers),
+        m_a: %Element($../Natural/"Positive numbers")
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_b: %Element($../Integer/Integers),
+        m_b: %Element($../Natural/"Positive numbers")
+      )
+    }
+  )
+): %ExplicitOperator {
+  definition = [$"Rational numbers".quotient(
+    n = {$../Integer/sum(
+      a = {$../Integer/product(
+        a = {n_a},
+        b = {m_b}
+      )},
+      b = {$../Integer/product(
+        a = {n_b},
+        b = {m_a}
+      )}
+    )},
+    m = {$../Natural/product(
+      m = {m_a},
+      n = {m_b}
+    )}
+  )]
+}

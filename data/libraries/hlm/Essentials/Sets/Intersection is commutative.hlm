@@ -1,0 +1,20 @@
+%../../../../logics/hlm%
+
+$"Intersection is commutative"(
+  U: %Set,
+  S: %Subset(U),
+  T: %Subset(%previous)
+): %StandardTheorem {
+  claim = %setEquals(
+    $Intersection(
+      U = {U},
+      S = {S},
+      T = {T}
+    ),
+    $Intersection(
+      U = {U},
+      S = {T},
+      T = {S}
+    )
+  )
+}

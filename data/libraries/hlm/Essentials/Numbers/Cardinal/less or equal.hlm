@@ -1,0 +1,34 @@
+%../../../../../logics/hlm%
+
+$"less or equal"(
+  𝔵: %Element($"Cardinal numbers"),
+  𝔶: %Element(%previous)
+): %Predicate {
+  definition = [%exists(
+    #(f: %Element($Homomorphisms(
+      𝔵 = {𝔵},
+      𝔶 = {𝔶}
+    ))),
+    $../../Functions/injective(
+      X = {%setStructuralCases(
+        𝔵,
+        $"Cardinal numbers",
+        [{
+          constructor = $"Cardinal numbers".cardinality,
+          parameters = #(X: %Set),
+          value = X
+        }]
+      )},
+      Y = {%setStructuralCases(
+        𝔶,
+        $"Cardinal numbers",
+        [{
+          constructor = $"Cardinal numbers".cardinality,
+          parameters = #(Y: %Set),
+          value = Y
+        }]
+      )},
+      f = {f}
+    )
+  )]
+}

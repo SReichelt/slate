@@ -1,0 +1,21 @@
+%../../../../../logics/hlm%
+
+$"Square root of two is irrational": %StandardTheorem {
+  claim = %not($rational(a = {$"square root"(a = {$../Natural/number(value = 2)})})),
+  proofs = [{steps = #(
+    _: %UseTheorem(
+      $../Natural/Prime/"Two is prime",
+      $../Natural/Prime/prime(n = {$../Natural/number(value = 2)})
+    ),
+    _: %UseTheorem(
+      $"Roots of primes are irrational"(
+        p = {$../Natural/number(value = 2)},
+        n = {$../Natural/number(value = 2)}
+      ),
+      %not($rational(a = {$root(
+        a = {$../Natural/number(value = 2)},
+        n = {$../Natural/number(value = 2)}
+      )}))
+    )
+  )}]
+}

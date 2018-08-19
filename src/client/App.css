@@ -1,0 +1,48 @@
+body {
+  font-family: sans;
+}
+
+.error {
+  display: inline-block;
+  color: red;
+  font-family: sans;
+  border: solid 1pt red;
+  padding: 2pt;
+  margin: 2pt;
+}
+
+.app {
+  position: absolute;
+  top: 1ex;
+  bottom: 1ex;
+  left: 1ex;
+  right: 1ex;
+}
+
+.app-pane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: solid 1pt gray;
+  overflow: auto;
+}
+
+.app-tree {
+  padding: 2pt;
+}
+
+.app-contents {
+  padding: 1ex;
+}
+
+.Resizer.vertical {
+  width: 5pt;
+  margin: 1pt;
+  cursor: col-resize;
+}
+
+.Resizer:hover {
+  background-color: #e0e0e0;
+}

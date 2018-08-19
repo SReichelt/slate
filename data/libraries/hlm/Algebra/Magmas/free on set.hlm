@@ -1,0 +1,67 @@
+%../../../../logics/hlm%
+
+$"free on set"(
+  𝔐: %Element(
+    $Magmas,
+    shortcut = {
+      $Magmas.magma,
+      #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {M},
+            T = {M}
+          )},
+          Y = {M}
+        ))
+      )
+    }
+  ),
+  S: %Subset(M)
+): %Predicate {
+  definition = [
+    %equals(
+      𝔐,
+      $"free magma"(S = {S})
+    ),
+    %forall(
+      #(
+        𝔑: %Element(
+          $Magmas,
+          shortcut = {
+            $Magmas.magma,
+            #(
+              N: %Set,
+              ⋆: %Element($../../Essentials/Functions/Functions(
+                X = {$../../Essentials/Sets/"Cartesian product"(
+                  S = {N},
+                  T = {N}
+                )},
+                Y = {N}
+              ))
+            )
+          }
+        ),
+        f: %Element($../../Essentials/Functions/Functions(
+          X = {S},
+          Y = {N}
+        ))
+      ),
+      %existsUnique(
+        #(φ: %Element($Homomorphisms(
+          𝔐 = {𝔐},
+          𝔑 = {𝔑}
+        ))),
+        %equals(
+          $../../Essentials/Functions/restriction(
+            X = {M},
+            Y = {N},
+            A = {S},
+            f = {φ}
+          ),
+          f
+        )
+      )
+    )
+  ]
+}

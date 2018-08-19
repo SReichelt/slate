@@ -1,0 +1,65 @@
+%../../../../logics/hlm%
+
+$"Subsets of finite sets are finite"(
+  S: %Set,
+  _1: %Constraint($finite(S = {S})),
+  T: %Subset(S)
+): %StandardTheorem {
+  claim = $finite(S = {T}),
+  proofs = [{steps = #(_: %ProveDef(proof = {
+    goal = %exists(
+      #(
+        m: %Element($../Numbers/Natural/"Natural numbers"),
+        f: %Element($../Functions/Functions(
+          X = {T},
+          Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
+        ))
+      ),
+      $../Functions/injective(f = {f})
+    ),
+    steps = #(
+      _: %Consider(_1),
+      _: %UseDef(result = %exists(
+        #(
+          n: %Element($../Numbers/Natural/"Natural numbers"),
+          g: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/"Segment (less)"(n = {n})}
+          ))
+        ),
+        $../Functions/injective(f = {g})
+      )),
+      _: %UseExists({
+        parameters = #(
+          n: %Element($../Numbers/Natural/"Natural numbers"),
+          g: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/"Segment (less)"(n = {n})}
+          ))
+        ),
+        steps = #(_: %ProveExists(
+          {
+            m = {n},
+            f = {$../Functions/restriction(
+              f = {g},
+              A = {T}
+            )}
+          },
+          proof = {
+            goal = $../Functions/injective(f = {g}),
+            steps = #(_: %UseTheorem(
+              $../Functions/"Restriction preserves injectivity"(
+                f = {g},
+                A = {T}
+              ),
+              $../Functions/injective(f = {$../Functions/restriction(
+                f = {g},
+                A = {T}
+              )})
+            ))
+          }
+        ))
+      })
+    )
+  }))}]
+}

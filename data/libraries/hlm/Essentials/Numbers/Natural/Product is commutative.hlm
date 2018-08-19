@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$"Product is commutative"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $product(
+      m = {a},
+      n = {b}
+    ),
+    $product(
+      m = {b},
+      n = {a}
+    )
+  )
+}

@@ -1,0 +1,58 @@
+%../../../../logics/hlm%
+
+$associative(𝔐: %Element(
+  $Magmas,
+  shortcut = {
+    $Magmas.magma,
+    #(
+      M: %Set,
+      ∗: %Element($../../Essentials/Functions/Functions(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {M},
+          T = {M}
+        )},
+        Y = {M}
+      ))
+    )
+  }
+)): %Predicate {
+  definition = [%forall(
+    #(
+      a: %Element(M),
+      b: %Element(%previous),
+      c: %Element(%previous)
+    ),
+    %equals(
+      $../../Essentials/Functions/"infix value"(
+        X = {M},
+        Y = {M},
+        Z = {M},
+        ∗ = {∗},
+        x = {$../../Essentials/Functions/"infix value"(
+          X = {M},
+          Y = {M},
+          Z = {M},
+          ∗ = {∗},
+          x = {a},
+          y = {b}
+        )},
+        y = {c}
+      ),
+      $../../Essentials/Functions/"infix value"(
+        X = {M},
+        Y = {M},
+        Z = {M},
+        ∗ = {∗},
+        x = {a},
+        y = {$../../Essentials/Functions/"infix value"(
+          X = {M},
+          Y = {M},
+          Z = {M},
+          ∗ = {∗},
+          x = {b},
+          y = {c}
+        )}
+      )
+    )
+  )]
+}

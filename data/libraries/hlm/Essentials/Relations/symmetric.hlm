@@ -1,0 +1,29 @@
+%../../../../logics/hlm%
+
+$symmetric(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %Predicate {
+  definition = [%forall(
+    #(
+      s: %Element(S),
+      t: %Element(%previous),
+      _1: %Constraint($related(
+        S = {S},
+        s = {s},
+        ≺ = {≺},
+        t = {t}
+      ))
+    ),
+    $related(
+      S = {S},
+      s = {t},
+      ≺ = {≺},
+      t = {s}
+    )
+  )],
+  display = [$Property(
+    operand = ≺,
+    property = 'symmetric'
+  )]
+}

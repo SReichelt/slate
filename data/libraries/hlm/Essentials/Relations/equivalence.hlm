@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+$equivalence(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %Predicate {
+  definition = [%and(
+    $preorder(
+      S = {S},
+      ≺ = {≺}
+    ),
+    $symmetric(
+      S = {S},
+      ≺ = {≺}
+    )
+  )],
+  display = [$Property(
+    property = 'equivalence relation',
+    operand = ≺,
+    article = 'an'
+  )]
+}

@@ -1,0 +1,27 @@
+%../../../../../logics/hlm%
+
+$"Power base product law"(
+  a: %Element($"Real numbers"),
+  b: %Element(%previous),
+  n: %Element($../Natural/"Natural numbers")
+): %StandardTheorem {
+  claim = %equals(
+    $power(
+      a = {$product(
+        a = {a},
+        b = {b}
+      )},
+      n = {n}
+    ),
+    $product(
+      a = {$power(
+        a = {a},
+        n = {n}
+      )},
+      b = {$power(
+        a = {b},
+        n = {n}
+      )}
+    )
+  )
+}

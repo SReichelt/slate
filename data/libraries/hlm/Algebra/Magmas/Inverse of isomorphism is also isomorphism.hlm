@@ -1,0 +1,56 @@
+%../../../../logics/hlm%
+
+$"Inverse of isomorphism is also isomorphism"(
+  𝔐: %Element($Magmas),
+  𝔑: %Element(%previous),
+  φ: %Element($Isomorphisms(
+    𝔐 = {𝔐},
+    𝔑 = {𝔑}
+  ))
+): %StandardTheorem {
+  claim = %in(
+    $../../Essentials/Functions/inverse(
+      X = {%setStructuralCases(
+        𝔐,
+        $Magmas,
+        [{
+          constructor = $Magmas.magma,
+          parameters = #(
+            M: %Set,
+            ∗: %Element($../../Essentials/Functions/Functions(
+              X = {$../../Essentials/Sets/"Cartesian product"(
+                S = {M},
+                T = {M}
+              )},
+              Y = {M}
+            ))
+          ),
+          value = M
+        }]
+      )},
+      Y = {%setStructuralCases(
+        𝔑,
+        $Magmas,
+        [{
+          constructor = $Magmas.magma,
+          parameters = #(
+            N: %Set,
+            ⋆: %Element($../../Essentials/Functions/Functions(
+              X = {$../../Essentials/Sets/"Cartesian product"(
+                S = {N},
+                T = {N}
+              )},
+              Y = {N}
+            ))
+          ),
+          value = N
+        }]
+      )},
+      f = {φ}
+    ),
+    $Isomorphisms(
+      𝔐 = {𝔑},
+      𝔑 = {𝔐}
+    )
+  )
+}

@@ -1,0 +1,21 @@
+%../../../../../../logics/hlm%
+
+$"Inductive product is a multiple of each element"(
+  n: %Element($../"Natural numbers"),
+  i: %Binding(
+    $../"Segment (less)"(n = {n}),
+    #(a: %Element($../"Natural numbers"))
+  ),
+  j: %Element($../"Segment (less)"(n = {n}))
+): %StandardTheorem {
+  claim = $../divisible(
+    m = {a[j]},
+    n = {$"inductive product (exclusive)"(
+      n = {n},
+      i = {
+        #(k: %Element($../"Segment (less)"(n = {n}))),
+        {a = {a[k]}}
+      }
+    )}
+  )
+}

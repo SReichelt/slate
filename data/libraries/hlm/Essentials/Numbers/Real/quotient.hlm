@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$quotient(
+  b: %Element($"Real numbers"),
+  a: %Element($"Nonzero numbers")
+): %ImplicitOperator {
+  parameter = #(x: %Element($"Real numbers")),
+  definition = [%equals(
+    b,
+    $product(
+      a = {x},
+      b = {a}
+    )
+  )],
+  display = [$Quotient(
+    numerator = b,
+    denominator = a
+  )]
+}

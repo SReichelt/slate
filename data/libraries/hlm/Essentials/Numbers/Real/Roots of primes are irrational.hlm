@@ -1,0 +1,381 @@
+%../../../../../logics/hlm%
+
+$"Roots of primes are irrational"(
+  p: %Element($../Natural/Prime/"Prime numbers"),
+  n: %Element($../Natural/"Segment (greater)"(n = {$../Natural/number(value = 1)}))
+): %StandardTheorem {
+  claim = %not($rational(a = {$root(
+    a = {p},
+    n = {n}
+  )})),
+  proofs = [{steps = #(_: %ProveNeg({steps = #(
+    _: %UseDef(result = %exists(
+      #(
+        a: %Element($../Integer/"Positive numbers"),
+        b: %Element($../Integer/Integers),
+        _1: %Constraint($../Integer/coprime(
+          a = {a},
+          b = {b}
+        ))
+      ),
+      %equals(
+        $root(
+          a = {p},
+          n = {n}
+        ),
+        $quotient(
+          b = {b},
+          a = {a}
+        )
+      )
+    )),
+    _: %UseExists({
+      parameters = #(
+        a: %Element($../Integer/"Positive numbers"),
+        b: %Element($../Integer/Integers),
+        _1: %Constraint($../Integer/coprime(
+          a = {a},
+          b = {b}
+        ))
+      ),
+      steps = #(
+        _: %UseDef(result = %equals(
+          p,
+          $power(
+            a = {$quotient(
+              b = {b},
+              a = {a}
+            )},
+            n = {n}
+          )
+        )),
+        _: %Substitute(
+          #(_: %UseTheorem(
+            $"Power base quotient law"(
+              b = {b},
+              a = {a},
+              n = {n}
+            ),
+            %equals(
+              $power(
+                a = {$quotient(
+                  b = {b},
+                  a = {a}
+                )},
+                n = {n}
+              ),
+              $quotient(
+                b = {$power(
+                  a = {b},
+                  n = {n}
+                )},
+                a = {$power(
+                  a = {a},
+                  n = {n}
+                )}
+              )
+            )
+          )),
+          %left,
+          %equals(
+            p,
+            $quotient(
+              b = {$power(
+                a = {b},
+                n = {n}
+              )},
+              a = {$power(
+                a = {a},
+                n = {n}
+              )}
+            )
+          )
+        ),
+        _2: %UseDef(result = %equals(
+          $../Integer/product(
+            a = {p},
+            b = {$../Integer/power(
+              a = {a},
+              n = {n}
+            )}
+          ),
+          $../Integer/power(
+            a = {b},
+            n = {n}
+          )
+        )),
+        _: %State(
+          $../Integer/divisible(
+            a = {p},
+            b = {$../Integer/power(
+              a = {b},
+              n = {n}
+            )}
+          ),
+          proof = {steps = #(_: %ProveDef(proof = {
+            goal = %exists(
+              #(x: %Element($../Integer/Integers)),
+              %equals(
+                $../Integer/product(
+                  a = {p},
+                  b = {x}
+                ),
+                $../Integer/power(
+                  a = {b},
+                  n = {n}
+                )
+              )
+            ),
+            steps = #(_: %ProveExists({x = {$../Integer/power(
+              a = {a},
+              n = {n}
+            )}}))
+          }))}
+        ),
+        _: %UseTheorem(
+          $../Integer/Prime/"Prime and power divisibility criterion"(
+            p = {p},
+            a = {b},
+            n = {n}
+          ),
+          $../Integer/divisible(
+            a = {p},
+            b = {b}
+          )
+        ),
+        _3: %UseDef(result = %exists(
+          #(y: %Element($../Integer/Integers)),
+          %equals(
+            $../Integer/product(
+              a = {p},
+              b = {y}
+            ),
+            b
+          )
+        )),
+        _: %UseExists({
+          parameters = #(y: %Element($../Integer/Integers)),
+          steps = #(
+            _: %Consider(n),
+            _: %UseDef(result = $../Natural/less(
+              n = {n},
+              m = {$../Natural/number(value = 1)}
+            )),
+            _: %UseDef(result = %exists(
+              #(m: %Element($../Natural/"Positive numbers")),
+              %equals(
+                $../Natural/sum(
+                  m = {$../Natural/number(value = 1)},
+                  n = {m}
+                ),
+                n
+              )
+            )),
+            _: %UseExists({
+              parameters = #(m: %Element($../Natural/"Positive numbers")),
+              steps = #(
+                _: %Consider(m),
+                _: %UseDef(result = %exists(
+                  #(l: %Element($../Natural/"Natural numbers")),
+                  %equals(
+                    $../Natural/sum(
+                      m = {$../Natural/number(value = 1)},
+                      n = {l}
+                    ),
+                    m
+                  )
+                )),
+                _: %UseExists({
+                  parameters = #(l: %Element($../Natural/"Natural numbers")),
+                  steps = #(
+                    _: %Consider(_2),
+                    _: %ResolveDef(%equals(
+                      $../Integer/product(
+                        a = {$../Integer/power(
+                          a = {b},
+                          n = {m}
+                        )},
+                        b = {b}
+                      ),
+                      $../Integer/product(
+                        a = {$../Integer/power(
+                          a = {a},
+                          n = {n}
+                        )},
+                        b = {p}
+                      )
+                    )),
+                    _: %ResolveDef(%equals(
+                      $../Integer/product(
+                        a = {$../Integer/product(
+                          a = {$../Integer/power(
+                            a = {b},
+                            n = {l}
+                          )},
+                          b = {b}
+                        )},
+                        b = {b}
+                      ),
+                      $../Integer/product(
+                        a = {$../Integer/power(
+                          a = {a},
+                          n = {n}
+                        )},
+                        b = {p}
+                      )
+                    )),
+                    _: %Substitute(
+                      #(_: %Consider(_3)),
+                      %right,
+                      %equals(
+                        $../Integer/product(
+                          a = {$../Integer/product(
+                            a = {$../Integer/power(
+                              a = {b},
+                              n = {l}
+                            )},
+                            b = {$../Integer/product(
+                              a = {p},
+                              b = {y}
+                            )}
+                          )},
+                          b = {$../Integer/product(
+                            a = {p},
+                            b = {y}
+                          )}
+                        ),
+                        $../Integer/product(
+                          a = {$../Integer/power(
+                            a = {a},
+                            n = {n}
+                          )},
+                          b = {p}
+                        )
+                      )
+                    ),
+                    _: %UseTheorem(
+                      $../Integer/"Multiplication of a nonzero number is injective"(
+                        a = {$../Integer/product(
+                          a = {$../Integer/product(
+                            a = {$../Integer/power(
+                              a = {b},
+                              n = {l}
+                            )},
+                            b = {$../Integer/product(
+                              a = {p},
+                              b = {y}
+                            )}
+                          )},
+                          b = {y}
+                        )},
+                        b = {$../Integer/power(
+                          a = {a},
+                          n = {n}
+                        )},
+                        c = {p}
+                      ),
+                      %equals(
+                        $../Integer/product(
+                          a = {$../Integer/product(
+                            a = {$../Integer/power(
+                              a = {b},
+                              n = {l}
+                            )},
+                            b = {$../Integer/product(
+                              a = {p},
+                              b = {y}
+                            )}
+                          )},
+                          b = {y}
+                        ),
+                        $../Integer/power(
+                          a = {a},
+                          n = {n}
+                        )
+                      )
+                    ),
+                    _: %State(
+                      $../Integer/divisible(
+                        a = {p},
+                        b = {$../Integer/power(
+                          a = {a},
+                          n = {n}
+                        )}
+                      ),
+                      proof = {steps = #(_: %ProveDef(proof = {
+                        goal = %exists(
+                          #(z: %Element($../Integer/Integers)),
+                          %equals(
+                            $../Integer/product(
+                              a = {p},
+                              b = {z}
+                            ),
+                            $../Integer/power(
+                              a = {a},
+                              n = {n}
+                            )
+                          )
+                        ),
+                        steps = #(_: %ProveExists({z = {$../Integer/product(
+                          a = {$../Integer/product(
+                            a = {$../Integer/power(
+                              a = {b},
+                              n = {l}
+                            )},
+                            b = {y}
+                          )},
+                          b = {y}
+                        )}}))
+                      }))}
+                    ),
+                    _: %UseTheorem(
+                      $../Integer/Prime/"Prime and power divisibility criterion"(
+                        p = {p},
+                        a = {a},
+                        n = {n}
+                      ),
+                      $../Integer/divisible(
+                        a = {p},
+                        b = {a}
+                      )
+                    ),
+                    _: %State(
+                      %exists(
+                        #(q: %Element($../Natural/Prime/"Prime numbers")),
+                        %and(
+                          $../Integer/divisible(
+                            a = {q},
+                            b = {a}
+                          ),
+                          $../Integer/divisible(
+                            a = {q},
+                            b = {b}
+                          )
+                        )
+                      ),
+                      proof = {steps = #(_: %ProveExists({q = {p}}))}
+                    ),
+                    _: %Consider(_1),
+                    _: %UseDef(result = %not(%exists(
+                      #(r: %Element($../Natural/Prime/"Prime numbers")),
+                      %and(
+                        $../Integer/divisible(
+                          a = {r},
+                          b = {a}
+                        ),
+                        $../Integer/divisible(
+                          a = {r},
+                          b = {b}
+                        )
+                      )
+                    )))
+                  )
+                })
+              )
+            })
+          )
+        })
+      )
+    })
+  )}))}]
+}

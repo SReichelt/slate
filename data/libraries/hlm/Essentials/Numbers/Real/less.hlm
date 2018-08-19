@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+$less(
+  a: %Element($"Real numbers"),
+  b: %Element(%previous)
+): %Predicate {
+  definition = [
+    %not($"less or equal"(
+      b = {a},
+      a = {b}
+    )),
+    %and(
+      $"less or equal"(
+        a = {a},
+        b = {b}
+      ),
+      %not(%equals(a, b))
+    )
+  ]
+}

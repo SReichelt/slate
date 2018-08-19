@@ -1,0 +1,19 @@
+%../../../../../../format/library%
+
+$Prime: %Section {
+  items = [
+    %item($prime),
+    %item($"Two is prime", type = 'example'),
+    %item($"Prime numbers"),
+    %item($"Every number greater than one has a prime factor"),
+    %item(
+      $"Euclids theorem",
+      type = 'theorem',
+      title = {
+        de = 'Satz von Euklid',
+        en = 'Euclid\'s theorem'
+      }
+    ),
+    %item($"Prime and power divisibility criterion")
+  ]
+}

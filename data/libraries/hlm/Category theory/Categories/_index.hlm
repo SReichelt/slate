@@ -1,0 +1,9 @@
+%../../../../format/library%
+
+$Categories: %Section {
+  items = [
+    %item($Categories),
+    %item($cardinals),
+    %item($magmas)
+  ]
+}

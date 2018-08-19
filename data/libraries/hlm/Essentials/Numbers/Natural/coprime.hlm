@@ -1,0 +1,59 @@
+%../../../../../logics/hlm%
+
+$coprime(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %Predicate {
+  definition = [
+    %forall(
+      #(
+        a: %Element($"Positive numbers"),
+        _1: %Constraint($divisible(
+          m = {a},
+          n = {m}
+        )),
+        _2: %Constraint($divisible(
+          m = {a},
+          n = {n}
+        ))
+      ),
+      %equals(
+        a,
+        $number(value = 1)
+      )
+    ),
+    %sub(
+      $../../Sets/Intersection(
+        U = {$"Natural numbers"},
+        S = {$Divisors(n = {m})},
+        T = {$Divisors(n = {n})}
+      ),
+      %enumeration($number(value = 1))
+    ),
+    %setEquals(
+      $../../Sets/Intersection(
+        U = {$"Natural numbers"},
+        S = {$Divisors(n = {m})},
+        T = {$Divisors(n = {n})}
+      ),
+      %enumeration($number(value = 1))
+    ),
+    %not(%exists(
+      #(p: %Element($Prime/"Prime numbers")),
+      %and(
+        $divisible(
+          m = {p},
+          n = {m}
+        ),
+        $divisible(
+          m = {p},
+          n = {n}
+        )
+      )
+    ))
+  ],
+  display = [$MultiProperty(
+    operands = [m, n],
+    property = 'coprime'
+  )]
+}

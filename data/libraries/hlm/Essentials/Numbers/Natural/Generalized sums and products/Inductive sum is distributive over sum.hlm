@@ -1,0 +1,41 @@
+%../../../../../../logics/hlm%
+
+$"Inductive sum is distributive over sum"(
+  n: %Element($../"Natural numbers"),
+  i: %Binding(
+    $../"Segment (less)"(n = {n}),
+    #(
+      a: %Element($../"Natural numbers"),
+      b: %Element(%previous)
+    )
+  )
+): %StandardTheorem {
+  claim = %equals(
+    $"inductive sum (exclusive)"(
+      n = {n},
+      i = {
+        #(j: %Element($../"Segment (less)"(n = {n}))),
+        {a = {$../sum(
+          m = {a[j]},
+          n = {b[j]}
+        )}}
+      }
+    ),
+    $../sum(
+      m = {$"inductive sum (exclusive)"(
+        n = {n},
+        i = {
+          #(k: %Element($../"Segment (less)"(n = {n}))),
+          {a = {a[k]}}
+        }
+      )},
+      n = {$"inductive sum (exclusive)"(
+        n = {n},
+        i = {
+          #(l: %Element($../"Segment (less)"(n = {n}))),
+          {a = {b[l]}}
+        }
+      )}
+    )
+  )
+}

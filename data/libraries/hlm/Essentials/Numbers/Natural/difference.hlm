@@ -1,0 +1,21 @@
+%../../../../../logics/hlm%
+
+$difference(
+  n: %Element($"Natural numbers"),
+  m: %Element($"Segment (less or equal)"(n = {n}))
+): %ImplicitOperator {
+  parameter = #(x: %Element($"Segment (less or equal)"(n = {n}))),
+  definition = [%equals(
+    n,
+    $sum(
+      m = {x},
+      n = {m}
+    )
+  )],
+  display = [$Operator(
+    symbol = '−',
+    operands = [n, m],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )]
+}

@@ -1,0 +1,36 @@
+%../../../../logics/hlm%
+
+$"infix value"(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  Z: %Set(auto = %true),
+  ∗: %Element($Functions(
+    X = {$../Sets/"Cartesian product"(
+      S = {X},
+      T = {Y}
+    )},
+    Y = {Z}
+  )),
+  x: %Element(X),
+  y: %Element(Y)
+): %ExplicitOperator {
+  definition = [$value(
+    X = {$../Sets/"Cartesian product"(
+      S = {X},
+      T = {Y}
+    )},
+    Y = {Z},
+    f = {∗},
+    x = {$../Sets/"Cartesian product"(
+      S = {X},
+      T = {Y}
+    ).pair(
+      s = {x},
+      t = {y}
+    )}
+  )],
+  display = [$Operator(
+    symbol = ∗,
+    operands = [x, y]
+  )]
+}

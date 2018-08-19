@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$less(
+  𝔵: %Element($"Cardinal numbers"),
+  𝔶: %Element(%previous)
+): %Predicate {
+  definition = [%and(
+    $"less or equal"(
+      𝔵 = {𝔵},
+      𝔶 = {𝔶}
+    ),
+    %not(%equals(𝔵, 𝔶))
+  )]
+}

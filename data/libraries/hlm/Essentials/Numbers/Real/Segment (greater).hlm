@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$"Segment (greater)"(a: %Element($"Real numbers")): %SetOperator {
+  definition = [
+    %subset(
+      #(b: %Element($"Real numbers")),
+      $less(
+        b = {b},
+        a = {a}
+      )
+    ),
+    $../../Sets/"Relative complement"(
+      S = {$"Real numbers"},
+      T = {$"Segment (less or equal)"(a = {a})}
+    )
+  ]
+}

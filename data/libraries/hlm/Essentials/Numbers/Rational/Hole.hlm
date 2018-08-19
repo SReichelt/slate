@@ -1,0 +1,15 @@
+%../../../../../logics/hlm%
+
+$Hole(a: %Element($"Rational numbers")): %SetOperator {
+  definition = [
+    %subset(
+      #(b: %Element($"Rational numbers")),
+      %not(%equals(b, a))
+    ),
+    $../../Sets/Union(
+      U = {$"Rational numbers"},
+      S = {$"Segment (less)"(a = {a})},
+      T = {$"Segment (greater)"(a = {a})}
+    )
+  ]
+}

@@ -1,0 +1,5 @@
+%../../../../../logics/hlm%
+
+$number(value: %Nat): %MacroOperator {
+  display = [value]
+}

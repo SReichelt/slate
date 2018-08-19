@@ -1,0 +1,11 @@
+%../../../../../logics/hlm%
+
+$"Successor is always greater"(n: %Element($"Natural numbers")): %StandardTheorem {
+  claim = $less(
+    n = {$sum(
+      m = {n},
+      n = {$number(value = 1)}
+    )},
+    m = {n}
+  )
+}

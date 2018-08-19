@@ -1,0 +1,129 @@
+%../../../../../logics/hlm%
+
+$"Sum is commutative"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $sum(
+      m = {a},
+      n = {b}
+    ),
+    $sum(
+      m = {b},
+      n = {a}
+    )
+  ),
+  proofs = [{
+    goal = %equals(
+      %structuralCases(
+        b,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = a,
+            rewrite = %true
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(x: %Element($"Natural numbers")),
+            value = $"Natural numbers".successor(n = {$sum(
+              m = {a},
+              n = {x}
+            )}),
+            rewrite = %true
+          }
+        ]
+      ),
+      $sum(
+        m = {b},
+        n = {a}
+      )
+    ),
+    steps = #(_: %ProveCases(
+      side = %left,
+      caseProofs = [
+        {
+          goal = %equals(
+            a,
+            $sum(
+              m = {$number(value = 0)},
+              n = {a}
+            )
+          ),
+          steps = #(_: %UseTheorem(
+            $"Left-addition of zero is neutral"(n = {a}),
+            %equals(
+              $sum(
+                m = {$number(value = 0)},
+                n = {a}
+              ),
+              a
+            )
+          ))
+        },
+        {
+          parameters = #(x: %Element($"Natural numbers")),
+          goal = %equals(
+            $"Natural numbers".successor(n = {$sum(
+              m = {a},
+              n = {x}
+            )}),
+            $sum(
+              m = {$"Natural numbers".successor(n = {x})},
+              n = {a}
+            )
+          ),
+          steps = #(
+            _: %UseTheorem(
+              $"Successor can be pulled over addition"(
+                m = {x},
+                n = {a}
+              ),
+              %equals(
+                $sum(
+                  m = {$"Natural numbers".successor(n = {x})},
+                  n = {a}
+                ),
+                $"Natural numbers".successor(n = {$sum(
+                  m = {x},
+                  n = {a}
+                )})
+              )
+            ),
+            _: %Substitute(
+              #(_: %UseTheorem(
+                $"Sum is commutative"(
+                  a = {a},
+                  b = {x}
+                ),
+                %equals(
+                  $sum(
+                    m = {a},
+                    n = {x}
+                  ),
+                  $sum(
+                    m = {x},
+                    n = {a}
+                  )
+                )
+              )),
+              %right,
+              %equals(
+                $sum(
+                  m = {$"Natural numbers".successor(n = {x})},
+                  n = {a}
+                ),
+                $"Natural numbers".successor(n = {$sum(
+                  m = {a},
+                  n = {x}
+                )})
+              )
+            )
+          )
+        }
+      ]
+    ))
+  }]
+}

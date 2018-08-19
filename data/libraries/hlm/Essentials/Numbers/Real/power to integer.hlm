@@ -1,0 +1,42 @@
+%../../../../../logics/hlm%
+
+$"power to integer"(
+  a: %Element($"Real numbers"),
+  b: %Element($../Integer/Integers),
+  _1: %Constraint(%or(
+    %not(%equals(
+      a,
+      $../Natural/number(value = 0)
+    )),
+    $../Integer/"less or equal"(
+      b = {b},
+      a = {$../Natural/number(value = 0)}
+    )
+  ))
+): %ExplicitOperator {
+  definition = [%cases([
+    {
+      formula = $../Integer/"less or equal"(
+        b = {b},
+        a = {$../Natural/number(value = 0)}
+      ),
+      value = $power(
+        a = {a},
+        n = {b}
+      )
+    },
+    {
+      formula = $../Integer/less(
+        a = {b},
+        b = {$../Natural/number(value = 0)}
+      ),
+      value = $quotient(
+        b = {$../Natural/number(value = 1)},
+        a = {$power(
+          a = {a},
+          n = {$inverse(a = {b})}
+        )}
+      )
+    }
+  ])]
+}

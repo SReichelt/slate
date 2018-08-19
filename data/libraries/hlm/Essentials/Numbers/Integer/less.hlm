@@ -1,0 +1,27 @@
+%../../../../../logics/hlm%
+
+$less(
+  a: %Element($Integers),
+  b: %Element(%previous)
+): %Predicate {
+  definition = [
+    %not($"less or equal"(
+      b = {a},
+      a = {b}
+    )),
+    $"less or equal"(
+      a = {$sum(
+        a = {a},
+        b = {$../Natural/number(value = 1)}
+      )},
+      b = {b}
+    ),
+    %and(
+      $"less or equal"(
+        a = {a},
+        b = {b}
+      ),
+      %not(%equals(a, b))
+    )
+  ]
+}

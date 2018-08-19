@@ -1,0 +1,36 @@
+%../../../../logics/hlm%
+
+$transitive(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %Predicate {
+  definition = [%forall(
+    #(
+      s: %Element(S),
+      t: %Element(%previous),
+      u: %Element(%previous),
+      _1: %Constraint($related(
+        S = {S},
+        s = {s},
+        ≺ = {≺},
+        t = {t}
+      )),
+      _2: %Constraint($related(
+        S = {S},
+        s = {t},
+        ≺ = {≺},
+        t = {u}
+      ))
+    ),
+    $related(
+      S = {S},
+      s = {s},
+      ≺ = {≺},
+      t = {u}
+    )
+  )],
+  display = [$Property(
+    operand = ≺,
+    property = 'transitive'
+  )]
+}

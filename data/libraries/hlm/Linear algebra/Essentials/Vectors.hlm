@@ -1,0 +1,12 @@
+%../../../../logics/hlm%
+
+$Vectors(
+  S: %Set,
+  n: %Element($../../Essentials/Numbers/Natural/"Natural numbers")
+): %SetOperator {
+  definition = [$Matrices(
+    S = {S},
+    m = {$../../Essentials/Numbers/Natural/number(value = 1)},
+    n = {n}
+  )]
+}

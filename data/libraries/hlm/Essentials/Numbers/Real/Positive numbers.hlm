@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$"Positive numbers": %SetOperator {
+  definition = [
+    $"Segment (greater)"(a = {$../Natural/number(value = 0)}),
+    %subset(
+      #(a: %Element($"Real numbers")),
+      $less(
+        b = {a},
+        a = {$../Natural/number(value = 0)}
+      )
+    )
+  ]
+}

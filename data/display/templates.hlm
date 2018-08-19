@@ -1,0 +1,521 @@
+%display%
+
+$Style(body: %Expr, styleClass: %String): %Template {}
+$Parens(body: %Expr, style: %String): %Template {}
+$InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+$OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+$SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): %Template {}
+$OverUnder(body: %Expr, over?: %Expr, under?: %Expr): %Template {}
+$Table(items: %Expr[,]): %Template {}
+$Aligned(items: %Expr[,]): %Template {}
+$Fraction(numerator: %Expr, denominator: %Expr): %Template {}
+$Radical(radicand: %Expr, degree?: %Expr): %Template {}
+
+$Group(items: %Expr[], separator: %Expr = ', '): %Template {
+  display = %for(
+    param = items,
+    dimension = 0,
+    item = items,
+    separator = separator
+  )
+}
+
+$Constraint(left: %Expr, right: %Expr): %Template {
+  display = [left, ' : ', right]
+}
+
+$Function(function: %Expr, arguments: %Expr[], maxParenLevel: %Int = 2): %Template {
+  display = [
+    $InnerParens(
+      body = function,
+      maxLevel = maxParenLevel
+    ),
+    $Parens(
+      body = $Group(
+        items = arguments
+      ),
+      style = '()'
+    )
+  ]
+}
+
+$ConstructorName(name: %String): %Template {
+  display = $Style(
+    body = name,
+    styleClass = 'ctor'
+  )
+}
+
+$Constructor(name: %String, arguments: %Expr[]): %Template {
+  display = $Function(
+    function = $ConstructorName(
+      name = name
+    ),
+    arguments = arguments
+  )
+}
+
+$Operator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+  display = $OuterParens(
+    body = %for(
+      param = operands,
+      dimension = 0,
+      item = $InnerParens(
+        body = operands,
+        maxLevel = maxParenLevel
+      ),
+      separator = [space, symbol, space]
+    ),
+    minLevel = minParenLevel
+  )
+}
+
+$AssociativeOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int): %Template {
+  display = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = %add(parenLevel, -1)
+  )
+}
+
+$UnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = '', minParenLevel: %Int = 3, maxParenLevel: %Int = 2): %Template {
+  display = $OuterParens(
+    body = [$InnerParens(
+      body = operand,
+      maxLevel = maxParenLevel
+    ), space, symbol],
+    minLevel = minParenLevel
+  )
+}
+
+$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+  display = $OuterParens(
+    body = [symbol, space, $InnerParens(
+      body = operand,
+      maxLevel = maxParenLevel
+    )],
+    minLevel = minParenLevel
+  )
+}
+
+$Relation(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int = -1): %Template {
+  display = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
+  )
+}
+
+$BooleanOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int = -2): %Template {
+  display = $OuterParens(
+    body = %for(
+      param = operands,
+      dimension = 0,
+      item = $InnerParens(
+        body = operands,
+        maxLevel = parenLevel
+      ),
+      separator = [space, symbol, space]
+    ),
+    minLevel = parenLevel
+  )
+}
+
+$UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', parenLevel: %Int = -2): %Template {
+  display = $OuterParens(
+    body = [symbol, space, $InnerParens(
+      body = operand,
+      maxLevel = parenLevel,
+      right = %false
+    )],
+    minLevel = parenLevel,
+    left = %false
+  )
+}
+
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+  display = $OuterParens(
+    body = [
+      $OverUnder(
+        body = $Style(
+          body = symbol,
+          styleClass = 'largesym'
+        ),
+        over = over,
+        under = under
+      ),
+      space,
+      $InnerParens(
+        body = operand,
+        maxLevel = maxParenLevel
+      )
+    ],
+    minLevel = minParenLevel
+  )
+}
+
+$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
+  display = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
+  )
+}
+
+$Quantification(symbol: %Expr, parameters: %Expr, formula: %Expr, parenLevel: %Int = -2): %Template {
+  display = $OuterParens(
+    body = [symbol, ' ', $Constraint(
+      left = parameters,
+      right = $InnerParens(
+        body = formula,
+        maxLevel = parenLevel,
+        right = %false
+      )
+    )],
+    minLevel = parenLevel,
+    left = %false
+  )
+}
+
+$PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %Template {
+  display = $OuterParens(
+    body = [symbol, ' ', parameters],
+    minLevel = parenLevel,
+    left = %false
+  )
+}
+
+$Property(operand: %Expr, property: %String, article?: %String): %Template {
+  display = [operand, %neg(' is ', ' is not '), %opt(article, [article, ' ']), property]
+}
+
+$MultiProperty(operands: %Expr[], property: %String): %Template {
+  display = [
+    %for(
+      param = operands,
+      dimension = 0,
+      item = operands,
+      separator = ' and '
+    ),
+    %neg(' are ', ' are not '),
+    property
+  ]
+}
+
+$Sum(first: %Expr, second: %Expr): %Template {
+  display = $AssociativeOperator(
+    symbol = '+',
+    operands = [first, second],
+    parenLevel = 1
+  )
+}
+
+$Difference(minuend: %Expr, subtrahend: %Expr): %Template {
+  display = $AssociativeOperator(
+    symbol = '−',
+    operands = [minuend, subtrahend],
+    parenLevel = 1
+  )
+}
+
+$Product(first: %Expr, second: %Expr): %Template {
+  display = $AssociativeOperator(
+    symbol = '⋅',
+    operands = [first, second],
+    space = ' ',
+    parenLevel = 2
+  )
+}
+
+$Quotient(numerator: %Expr, denominator: %Expr): %Template {
+  display = $OuterParens(
+    body = $Fraction(
+      numerator = numerator,
+      denominator = denominator
+    ),
+    minLevel = 3
+  )
+}
+
+$Power(base: %Expr, exponent: %Expr): %Template {
+  display = $OuterParens(
+    body = $SubSup(
+      body = $InnerParens(
+        body = base
+      ),
+      sup = exponent
+    ),
+    minLevel = 3
+  )
+}
+
+$SubsetParameter(subset: %Expr, superset: %Expr): %Template {
+  display = $Relation(
+    symbol = '⊆',
+    operands = [subset, superset],
+    space = ' '
+  )
+}
+
+$ElementParameter(element: %Expr, set: %Expr): %Template {
+  display = $Relation(
+    symbol = '∈',
+    operands = [element, set],
+    space = ' '
+  )
+}
+
+$VariableDefinition(left: %Expr, right: %Expr): %Template {
+  display = $Relation(
+    symbol = ':=',
+    operands = [left, right],
+    space = ' '
+  )
+}
+
+$Shortcut(element: %Expr, shortcut: %Expr): %Template {
+  display = $Relation(
+    symbol = '=:',
+    operands = [element, shortcut],
+    space = ' ',
+    parenLevel = 0
+  )
+}
+
+$MultiEqualityRelation(operands: %Expr[]): %Template {
+  display = $Relation(
+    symbol = %neg('=', '≠'),
+    operands = operands
+  )
+}
+
+$EqualityRelation(left: %Expr, right: %Expr): %Template {
+  display = $MultiEqualityRelation(
+    operands = [left, right]
+  )
+}
+
+$EqualityDefinition(left: %Expr, right: %Expr): %Template {
+  display = $Relation(
+    symbol = ':=',
+    operands = [left, right]
+  )
+}
+
+$ConstructionDefinition(left: %Expr, right: %Expr): %Template {
+  display = $Relation(
+    symbol = ':=:',
+    operands = [left, right]
+  )
+}
+
+$MultiEquivalenceRelation(operands: %Expr[]): %Template {
+  display = $Relation(
+    symbol = %neg('⇔', '⇎'),
+    operands = operands,
+    space = '  ',
+    parenLevel = -3
+  )
+}
+
+$EquivalenceRelation(left: %Expr, right: %Expr): %Template {
+  display = $MultiEquivalenceRelation(
+    operands = [left, right]
+  )
+}
+
+$EquivalenceDefinition(left: %Expr, right: %Expr): %Template {
+  display = $Relation(
+    symbol = ':⇔',
+    operands = [left, right],
+    space = '  ',
+    parenLevel = -3
+  )
+}
+
+$ElementRelation(element: %Expr, set: %Expr): %Template {
+  display = $Relation(
+    symbol = %neg('∈', '∉'),
+    operands = [element, set]
+  )
+}
+
+$SubsetRelation(subset: %Expr, superset: %Expr): %Template {
+  display = $Relation(
+    symbol = %neg('⊆', '⊈'),
+    operands = [subset, superset]
+  )
+}
+
+$EmbeddingDefinition(subset: %Expr, superset: %Expr): %Template {
+  display = $Relation(
+    symbol = '⊆:',
+    operands = [subset, superset]
+  )
+}
+
+$FunctionPrefix(function: %Expr, body: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0): %Template {
+  display = $Operator(
+    symbol = ':',
+    operands = [function, body],
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = -1
+  )
+}
+
+$FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
+  display = $FunctionPrefix(
+    function = function,
+    body = $FunctionOperator(
+      symbol = symbol,
+      operands = operands,
+      space = space,
+      maxParenLevel = maxParenLevel
+    ),
+    space = space,
+    minParenLevel = minParenLevel
+  )
+}
+
+$Binding(variable: %Expr, value: %Expr): %Template {
+  display = [variable, '↦', value]
+}
+
+$Enumeration(items: %Expr[]): %Template {
+  display = $Parens(
+    body = $Group(
+      items = items
+    ),
+    style = '{}'
+  )
+}
+
+$SetBuilder(element: %Expr, constraint: %Expr): %Template {
+  display = $Parens(
+    body = $Constraint(
+      left = element,
+      right = constraint
+    ),
+    style = '{}'
+  )
+}
+
+$Construction(constructors: %Expr[,]): %Template {
+  display = $Parens(
+    body = $Style(
+      body = $Table(
+        items = constructors
+      ),
+      styleClass = 'construction'
+    ),
+    style = '{}'
+  )
+}
+
+$Negation(operand: %Expr): %Template {
+  display = $UnaryBooleanOperator(
+    symbol = 'not',
+    operand = operand
+  )
+}
+
+$True: %Template {
+  display = 'true'
+}
+
+$False: %Template {
+  display = 'false'
+}
+
+$Conjunction(operands: %Expr[]): %Template {
+  display = $BooleanOperator(
+    symbol = 'and',
+    operands = operands
+  )
+}
+
+$Disjunction(operands: %Expr[]): %Template {
+  display = $BooleanOperator(
+    symbol = 'or',
+    operands = operands
+  )
+}
+
+$UniversalQuantification(parameters: %Expr, formula: %Expr): %Template {
+  display = $Quantification(
+    symbol = '∀',
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$ExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
+  display = $Quantification(
+    symbol = %neg('∃', '∄'),
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$PlainExistentialQuantification(parameters: %Expr): %Template {
+  display = $PlainQuantification(
+    symbol = %neg('∃', '∄'),
+    parameters = parameters
+  )
+}
+
+$UniqueExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
+  display = $Quantification(
+    symbol = '∃!',
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
+  display = $Quantification(
+    symbol = '∃!',
+    parameters = parameters
+  )
+}
+
+$Cases(cases: %Expr[,]): %Template {
+  display = $Parens(
+    body = $Style(
+      body = $Table(
+        items = cases
+      ),
+      styleClass = 'cases'
+    ),
+    style = '{'
+  )
+}
+
+$BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
+  display = $Parens(
+    body = $Style(
+      body = $Table(
+        items = [[top], [bottom]]
+      ),
+      styleClass = 'binom'
+    ),
+    style = '()'
+  )
+}
+
+$Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
+  display = $SubSup(
+    body = set,
+    sub = [symbol, $InnerParens(
+      body = limit,
+      maxLevel = 2
+    )]
+  )
+}

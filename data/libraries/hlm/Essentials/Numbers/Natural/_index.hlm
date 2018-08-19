@@ -1,0 +1,91 @@
+%../../../../../format/library%
+
+$Natural: %Section {
+  items = [
+    %item($"Natural numbers"),
+    %item(
+      $number,
+      title = {
+        de = 'Stellenwertsystem',
+        en = 'Positional notation'
+      }
+    ),
+    %item($sum),
+    %item($"Addition of one yields successor"),
+    %item($"Sum is associative"),
+    %item($"Left-addition of zero is neutral"),
+    %item($"Successor can be pulled over addition", type = 'lemma'),
+    %item($"Sum is commutative"),
+    %item($"less or equal"),
+    %item($less),
+    %item($"Comparison is reflexive"),
+    %item($"Comparison is antisymmetric"),
+    %item($"Comparison is transitive"),
+    %item($"Less and less or equal combine to less"),
+    %item($"Less or equal and less combine to less"),
+    %item($"Zero is the smallest number"),
+    %item($"Zero is the only number less than or equal to zero"),
+    %item($"Successor is always greater"),
+    %item($"Segment (less)"),
+    %item($"Segment (less or equal)"),
+    %item($"Segment (greater or equal)"),
+    %item($"Segment (greater)"),
+    %item($"Positive numbers"),
+    %item($"Exclusive initial segment is subset of inclusive segment"),
+    %item($"Initial segments are finite"),
+    %item($"Binary digits"),
+    %item($"Finiteness criterion lemma", type = 'lemma'),
+    %item($"Finiteness criterion"),
+    %item($"Addition of a fixed number is injective"),
+    %item($"Multiplication by a positive number is injective"),
+    %item($difference),
+    %item($product),
+    %item($"Multiplication by one is neutral"),
+    %item($"Product is associative"),
+    %item($"Product is commutative"),
+    %item($divisible),
+    %item($Divisors),
+    %item($"Divisors are less or equal"),
+    %item($"Divisibility criterion"),
+    %item($even),
+    %item($quotient),
+    %item($power),
+    %item($inductive),
+    %item($"Induction lemma", type = 'lemma'),
+    %item(
+      $"Induction principle",
+      type = 'theorem',
+      title = {
+        de = 'Induktionsprinzip',
+        en = 'Induction principle'
+      }
+    ),
+    %item(
+      $"Well-ordering principle",
+      type = 'theorem',
+      title = {
+        de = 'Wohlordnungssatz',
+        en = 'Well-ordering principle'
+      }
+    ),
+    %item($minimum),
+    %item($factorial),
+    %item($"binomial coefficient"),
+    %subsection(
+      $"Generalized sums and products",
+      title = {
+        de = 'Verallgemeinerte Summen und Produkte',
+        en = 'Generalized sums and products'
+      }
+    ),
+    %subsection(
+      $Prime,
+      title = {
+        de = 'Primzahlen',
+        en = 'Prime numbers'
+      }
+    ),
+    %item($coprime),
+    %item($"Coprime test")
+  ]
+}

@@ -1,0 +1,100 @@
+%../../../../logics/hlm%
+
+$bijective(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %Predicate {
+  definition = [
+    %and(
+      $injective(
+        X = {X},
+        Y = {Y},
+        f = {f}
+      ),
+      $surjective(
+        X = {X},
+        Y = {Y},
+        f = {f}
+      )
+    ),
+    %forall(
+      #(y: %Element(Y)),
+      %existsUnique(
+        #(x: %Element(X)),
+        %equals(
+          $value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {x}
+          ),
+          y
+        )
+      )
+    ),
+    %exists(
+      #(g: %Element($Functions(
+        X = {Y},
+        Y = {X}
+      ))),
+      %and(
+        %equals(
+          $composition(
+            X = {X},
+            Y = {Y},
+            Z = {X},
+            f = {f},
+            g = {g}
+          ),
+          $identity(X = {X})
+        ),
+        %equals(
+          $composition(
+            X = {Y},
+            Y = {X},
+            Z = {Y},
+            f = {g},
+            g = {f}
+          ),
+          $identity(X = {Y})
+        )
+      )
+    ),
+    %existsUnique(
+      #(h: %Element($Functions(
+        X = {Y},
+        Y = {X}
+      ))),
+      %and(
+        %equals(
+          $composition(
+            X = {X},
+            Y = {Y},
+            Z = {X},
+            f = {f},
+            g = {h}
+          ),
+          $identity(X = {X})
+        ),
+        %equals(
+          $composition(
+            X = {Y},
+            Y = {X},
+            Z = {Y},
+            f = {h},
+            g = {f}
+          ),
+          $identity(X = {Y})
+        )
+      )
+    )
+  ],
+  display = [$Property(
+    operand = f,
+    property = 'bijective'
+  )]
+}

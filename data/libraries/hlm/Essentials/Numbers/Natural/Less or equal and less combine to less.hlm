@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+$"Less or equal and less combine to less"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element(%previous),
+  _1: %Constraint($"less or equal"(
+    m = {a},
+    n = {b}
+  )),
+  _2: %Constraint($less(
+    m = {b},
+    n = {c}
+  ))
+): %StandardTheorem {
+  claim = $less(
+    m = {a},
+    n = {c}
+  )
+}

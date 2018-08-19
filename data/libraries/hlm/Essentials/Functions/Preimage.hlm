@@ -1,0 +1,32 @@
+%../../../../logics/hlm%
+
+$Preimage(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  )),
+  S: %Subset(Y)
+): %SetOperator {
+  definition = [%subset(
+    #(x: %Element(X)),
+    %in(
+      $value(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        x = {x}
+      ),
+      S
+    )
+  )],
+  display = [$Function(
+    function = $Power(
+      base = f,
+      exponent = '-1'
+    ),
+    arguments = [S]
+  )],
+  references = ['https://en.wikipedia.org/wiki/Preimage']
+}

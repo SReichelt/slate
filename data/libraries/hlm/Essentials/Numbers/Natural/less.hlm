@@ -1,0 +1,47 @@
+%../../../../../logics/hlm%
+
+$less(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %Predicate {
+  definition = [
+    %not($"less or equal"(
+      n = {m},
+      m = {n}
+    )),
+    $"less or equal"(
+      m = {$sum(
+        m = {m},
+        n = {$number(value = 1)}
+      )},
+      n = {n}
+    ),
+    %and(
+      $"less or equal"(
+        m = {m},
+        n = {n}
+      ),
+      %not(%equals(m, n))
+    ),
+    %exists(
+      #(x: %Element($"Positive numbers")),
+      %equals(
+        $sum(
+          m = {m},
+          n = {x}
+        ),
+        n
+      )
+    )
+  ],
+  display = [
+    $Relation(
+      symbol = %neg('<', '≮'),
+      operands = [m, n]
+    ),
+    $Relation(
+      symbol = %neg('>', '≯'),
+      operands = [n, m]
+    )
+  ]
+}

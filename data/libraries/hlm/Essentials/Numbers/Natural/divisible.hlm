@@ -1,0 +1,22 @@
+%../../../../../logics/hlm%
+
+$divisible(
+  m: %Element($"Positive numbers"),
+  n: %Element($"Natural numbers")
+): %Predicate {
+  definition = [%exists(
+    #(x: %Element($"Natural numbers")),
+    %equals(
+      $product(
+        m = {m},
+        n = {x}
+      ),
+      n
+    )
+  )],
+  display = [$Relation(
+    symbol = %neg('∣', '∤'),
+    operands = [m, n],
+    parenLevel = 1
+  )]
+}

@@ -1,0 +1,27 @@
+%../../../../../logics/hlm%
+
+$"Power base quotient law"(
+  b: %Element($"Real numbers"),
+  a: %Element($"Nonzero numbers"),
+  n: %Element($../Natural/"Positive numbers")
+): %StandardTheorem {
+  claim = %equals(
+    $power(
+      a = {$quotient(
+        b = {b},
+        a = {a}
+      )},
+      n = {n}
+    ),
+    $quotient(
+      b = {$power(
+        a = {b},
+        n = {n}
+      )},
+      a = {$power(
+        a = {a},
+        n = {n}
+      )}
+    )
+  )
+}

@@ -1,0 +1,42 @@
+%../../../../logics/hlm%
+
+$opposite(
+  S: %Set(auto = %true),
+  ≺: %Element(
+    $Relations(S = {S}),
+    shortcut = {
+      $Relations(S = {S}).relation,
+      #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )))
+    }
+  )
+): %ExplicitOperator {
+  definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
+    #(x: %Element(
+      R,
+      shortcut = {
+        $../Sets/"Cartesian product"(
+          S = {S},
+          T = {S}
+        ).pair,
+        #(
+          s: %Element(S),
+          t: %Element(S)
+        )
+      }
+    )),
+    $../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    ).pair(
+      s = {t},
+      t = {s}
+    )
+  )})],
+  display = [$Power(
+    base = ≺,
+    exponent = 'op'
+  )]
+}

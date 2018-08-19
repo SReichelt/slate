@@ -1,0 +1,18 @@
+%../../../../logics/hlm%
+
+$equality(S: %Set): %ExplicitOperator {
+  definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
+    #(s: %Element(S)),
+    $../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    ).pair(
+      s = {s},
+      t = {s}
+    )
+  )})],
+  display = [$SubSup(
+    body = '=',
+    sub = S
+  )]
+}

@@ -1,0 +1,41 @@
+%../../../../format/library%
+
+$Numbers: %Section {
+  items = [
+    %subsection(
+      $Natural,
+      title = {
+        de = 'Natürliche Zahlen',
+        en = 'Natural numbers'
+      }
+    ),
+    %subsection(
+      $Cardinal,
+      title = {
+        de = 'Kardinalzahlen',
+        en = 'Cardinal numbers'
+      }
+    ),
+    %subsection(
+      $Integer,
+      title = {
+        de = 'Ganze Zahlen',
+        en = 'Integers'
+      }
+    ),
+    %subsection(
+      $Rational,
+      title = {
+        de = 'Rationale Zahlen',
+        en = 'Rational numbers'
+      }
+    ),
+    %subsection(
+      $Real,
+      title = {
+        de = 'Reelle Zahlen',
+        en = 'Real numbers'
+      }
+    )
+  ]
+}

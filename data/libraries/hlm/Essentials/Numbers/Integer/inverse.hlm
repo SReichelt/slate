@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$inverse(a: %Element(
+  $Integers,
+  shortcut = {
+    $Integers.difference,
+    #(
+      n_a: %Element($../Natural/"Natural numbers"),
+      m_a: %Element(%previous)
+    )
+  }
+)): %ExplicitOperator {
+  definition = [$Integers.difference(
+    n = {m_a},
+    m = {n_a}
+  )]
+}

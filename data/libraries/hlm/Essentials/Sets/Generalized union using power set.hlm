@@ -1,0 +1,26 @@
+%../../../../logics/hlm%
+
+$"Generalized union using power set"(
+  U: %Set(auto = %true),
+  S: %Subset($"Power set"(S = {U}))
+): %SetOperator {
+  definition = [$"Generalized union"(
+    i = {
+      #(i: %Element(
+        S,
+        shortcut = {
+          $"Power set"(S = {U}).subset,
+          #(T: %Subset(U)),
+          override = %true
+        }
+      )),
+      {S = {T}}
+    },
+    U = {U},
+    I = {S}
+  )],
+  display = [$PrefixUnaryOperator(
+    symbol = '⋃',
+    operand = S
+  )]
+}

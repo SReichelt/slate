@@ -1,0 +1,11 @@
+%../../../format/library%
+
+$"Linear algebra": %Section {
+  items = [%subsection(
+    $Essentials,
+    title = {
+      de = 'Grundlagen',
+      en = 'Essentials'
+    }
+  )]
+}

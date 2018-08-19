@@ -1,0 +1,40 @@
+%../../../../../format/library%
+
+$Real: %Section {
+  items = [
+    %item($"Real numbers"),
+    %item($sum),
+    %item($inverse),
+    %item($difference),
+    %item($"less or equal"),
+    %item($less),
+    %item($"Segment (less)"),
+    %item($"Segment (less or equal)"),
+    %item($"Segment (greater or equal)"),
+    %item($"Segment (greater)"),
+    %item($Hole),
+    %item($"Negative numbers"),
+    %item($"Nonpositive numbers"),
+    %item($"Nonnegative numbers"),
+    %item($"Positive numbers"),
+    %item($"Nonzero numbers"),
+    %item($product),
+    %item($quotient),
+    %item($power),
+    %item($"power to integer"),
+    %item($"Power base product law"),
+    %item($"Power base quotient law"),
+    %item($root),
+    %item($"square root"),
+    %item($rational),
+    %item($"Roots of primes are irrational", type = 'theorem'),
+    %item($"Square root of two is irrational", type = 'corollary'),
+    %subsection(
+      $"Generalized sums and products",
+      title = {
+        de = 'Verallgemeinerte Summen und Produkte',
+        en = 'Generalized sums and products'
+      }
+    )
+  ]
+}

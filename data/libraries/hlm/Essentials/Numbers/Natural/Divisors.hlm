@@ -1,0 +1,15 @@
+%../../../../../logics/hlm%
+
+$Divisors(n: %Element($"Natural numbers")): %SetOperator {
+  definition = [%subset(
+    #(m: %Element($"Positive numbers")),
+    $divisible(
+      m = {m},
+      n = {n}
+    )
+  )],
+  display = [$Function(
+    function = 'Div',
+    arguments = [n]
+  )]
+}

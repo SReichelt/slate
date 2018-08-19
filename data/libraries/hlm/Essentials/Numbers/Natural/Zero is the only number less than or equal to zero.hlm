@@ -1,0 +1,14 @@
+%../../../../../logics/hlm%
+
+$"Zero is the only number less than or equal to zero"(
+  n: %Element($"Natural numbers"),
+  _1: %Constraint($"less or equal"(
+    m = {n},
+    n = {$number(value = 0)}
+  ))
+): %StandardTheorem {
+  claim = %equals(
+    n,
+    $number(value = 0)
+  )
+}

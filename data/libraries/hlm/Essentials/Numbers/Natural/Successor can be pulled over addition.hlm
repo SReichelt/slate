@@ -1,0 +1,87 @@
+%../../../../../logics/hlm%
+
+$"Successor can be pulled over addition"(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $sum(
+      m = {$"Natural numbers".successor(n = {m})},
+      n = {n}
+    ),
+    $"Natural numbers".successor(n = {$sum(
+      m = {m},
+      n = {n}
+    )})
+  ),
+  proofs = [{
+    goal = %equals(
+      %structuralCases(
+        n,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = $"Natural numbers".successor(n = {m})
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(x: %Element($"Natural numbers")),
+            value = $"Natural numbers".successor(n = {$sum(
+              m = {$"Natural numbers".successor(n = {m})},
+              n = {x}
+            )})
+          }
+        ]
+      ),
+      $"Natural numbers".successor(n = {$sum(
+        m = {m},
+        n = {n}
+      )})
+    ),
+    steps = #(_: %ProveCases(
+      side = %left,
+      caseProofs = [
+        {
+          goal = %equals(
+            $"Natural numbers".successor(n = {m}),
+            $"Natural numbers".successor(n = {m})
+          ),
+          steps = #()
+        },
+        {
+          parameters = #(x: %Element($"Natural numbers")),
+          goal = %equals(
+            $"Natural numbers".successor(n = {$sum(
+              m = {$"Natural numbers".successor(n = {m})},
+              n = {x}
+            )}),
+            $"Natural numbers".successor(n = {$"Natural numbers".successor(n = {$sum(
+              m = {m},
+              n = {x}
+            )})})
+          ),
+          steps = #(
+            _: %UseTheorem(
+              $"Successor can be pulled over addition"(
+                m = {m},
+                n = {x}
+              ),
+              %equals(
+                $sum(
+                  m = {$"Natural numbers".successor(n = {m})},
+                  n = {x}
+                ),
+                $"Natural numbers".successor(n = {$sum(
+                  m = {m},
+                  n = {x}
+                )})
+              )
+            ),
+            _: %Extend($"Natural numbers".successor(n = {%previous}))
+          )
+        }
+      ]
+    ))
+  }]
+}

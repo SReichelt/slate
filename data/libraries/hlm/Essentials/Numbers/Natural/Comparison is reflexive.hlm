@@ -1,0 +1,8 @@
+%../../../../../logics/hlm%
+
+$"Comparison is reflexive"(a: %Element($"Natural numbers")): %StandardTheorem {
+  claim = $"less or equal"(
+    m = {a},
+    n = {a}
+  )
+}

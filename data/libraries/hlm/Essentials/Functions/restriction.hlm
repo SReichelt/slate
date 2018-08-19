@@ -1,0 +1,27 @@
+%../../../../logics/hlm%
+
+$restriction(
+  X: %Set(auto = %true),
+  A: %Subset(X),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  ))
+): %ExplicitOperator {
+  definition = [$"generalized restriction"(
+    X = {X},
+    Y = {Y},
+    A = {A},
+    B = {Y},
+    f = {f}
+  )],
+  display = [$UnaryOperator(
+    symbol = $SubSup(
+      body = '∣',
+      sub = A
+    ),
+    operand = f
+  )],
+  references = ['[https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))']
+}

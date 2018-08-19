@@ -1,0 +1,44 @@
+%../../../../logics/hlm%
+
+$"reflexive symmetric closure"(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %ExplicitOperator {
+  definition = [
+    $closure(
+      S = {S},
+      ≺ = {≺},
+      P = {%subset(
+        #(⊂: %Element($Relations(S = {S}))),
+        %and(
+          $reflexive(
+            S = {S},
+            ≺ = {⊂}
+          ),
+          $symmetric(
+            S = {S},
+            ≺ = {⊂}
+          )
+        )
+      )}
+    ),
+    $"symmetric closure"(
+      S = {S},
+      ≺ = {$"reflexive closure"(
+        S = {S},
+        ≺ = {≺}
+      )}
+    ),
+    $"reflexive closure"(
+      S = {S},
+      ≺ = {$"symmetric closure"(
+        S = {S},
+        ≺ = {≺}
+      )}
+    )
+  ],
+  display = [$Power(
+    base = ≺,
+    exponent = '⇔'
+  )]
+}

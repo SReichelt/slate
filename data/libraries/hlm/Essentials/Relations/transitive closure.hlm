@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+$"transitive closure"(
+  S: %Set(auto = %true),
+  ≺: %Element($Relations(S = {S}))
+): %ExplicitOperator {
+  definition = [$closure(
+    S = {S},
+    ≺ = {≺},
+    P = {%subset(
+      #(⊂: %Element($Relations(S = {S}))),
+      $transitive(
+        S = {S},
+        ≺ = {⊂}
+      )
+    )}
+  )],
+  display = [$Power(
+    base = ≺,
+    exponent = '+'
+  )]
+}

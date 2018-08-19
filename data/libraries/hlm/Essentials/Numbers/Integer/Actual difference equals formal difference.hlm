@@ -1,0 +1,17 @@
+%../../../../../logics/hlm%
+
+$"Actual difference equals formal difference"(
+  n: %Element($../Natural/"Natural numbers"),
+  m: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $Integers.difference(
+      n = {n},
+      m = {m}
+    ),
+    $difference(
+      b = {n},
+      a = {m}
+    )
+  )
+}

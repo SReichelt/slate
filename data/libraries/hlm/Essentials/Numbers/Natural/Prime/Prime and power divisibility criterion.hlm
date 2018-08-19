@@ -1,0 +1,31 @@
+%../../../../../../logics/hlm%
+
+$"Prime and power divisibility criterion"(
+  p: %Element($"Prime numbers"),
+  m: %Element($../"Natural numbers"),
+  n: %Element($../"Positive numbers")
+): %EquivalenceTheorem {
+  conditions = [
+    $../divisible(
+      m = {p},
+      n = {m}
+    ),
+    $../divisible(
+      m = {p},
+      n = {$../power(
+        m = {m},
+        n = {n}
+      )}
+    ),
+    $../divisible(
+      m = {$../power(
+        m = {p},
+        n = {n}
+      )},
+      n = {$../power(
+        m = {m},
+        n = {n}
+      )}
+    )
+  ]
+}

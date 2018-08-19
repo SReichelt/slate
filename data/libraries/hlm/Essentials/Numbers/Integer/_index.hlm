@@ -1,0 +1,44 @@
+%../../../../../format/library%
+
+$Integer: %Section {
+  items = [
+    %item($Integers),
+    %item($sum),
+    %item($"Sum is associative"),
+    %item($"Sum is commutative"),
+    %item($inverse),
+    %item($difference),
+    %item($"Actual difference equals formal difference"),
+    %item($"less or equal"),
+    %item($less),
+    %item($"Segment (less)"),
+    %item($"Segment (less or equal)"),
+    %item($"Segment (greater or equal)"),
+    %item($"Segment (greater)"),
+    %item($Hole),
+    %item($"Negative numbers"),
+    %item($"Nonpositive numbers"),
+    %item($"Nonnegative numbers"),
+    %item($"Positive numbers"),
+    %item($"Nonzero numbers"),
+    %item($absolute),
+    %item($product),
+    %item($"Product is associative"),
+    %item($"Product is commutative"),
+    %item($divisible),
+    %item($Divisors),
+    %item($quotient),
+    %item($power),
+    %item($"Addition of a fixed number is injective"),
+    %item($"Multiplication of a nonzero number is injective"),
+    %item($"Power base product law"),
+    %subsection(
+      $Prime,
+      title = {
+        de = 'Primzahlen',
+        en = 'Prime Numbers'
+      }
+    ),
+    %item($coprime)
+  ]
+}

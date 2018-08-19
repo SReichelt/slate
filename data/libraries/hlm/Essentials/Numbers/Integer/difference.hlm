@@ -1,0 +1,41 @@
+%../../../../../logics/hlm%
+
+$difference(
+  b: %Element(
+    $Integers,
+    shortcut = {
+      $Integers.difference,
+      #(
+        n_b: %Element($../Natural/"Natural numbers"),
+        m_b: %Element(%previous)
+      )
+    }
+  ),
+  a: %Element(
+    %previous,
+    shortcut = {
+      $Integers.difference,
+      #(
+        n_a: %Element($../Natural/"Natural numbers"),
+        m_a: %Element(%previous)
+      )
+    }
+  )
+): %ExplicitOperator {
+  definition = [
+    $Integers.difference(
+      n = {$../Natural/sum(
+        m = {n_b},
+        n = {m_a}
+      )},
+      m = {$../Natural/sum(
+        m = {m_b},
+        n = {n_a}
+      )}
+    ),
+    $sum(
+      a = {b},
+      b = {$inverse(a = {a})}
+    )
+  ]
+}

@@ -1,0 +1,19 @@
+%../../../../../format/library%
+
+$Cardinal: %Section {
+  items = [
+    %item($"Natural cardinality lemma", type = 'lemma'),
+    %item($"Cardinal numbers"),
+    %item($Homomorphisms),
+    %item($identity),
+    %item($Isomorphisms),
+    %item($"less or equal"),
+    %item($less),
+    %item($sum),
+    %item($product),
+    %item($power),
+    %item($"Cardinality of power set"),
+    %item($"indexed element"),
+    %item($"bounded cardinality")
+  ]
+}

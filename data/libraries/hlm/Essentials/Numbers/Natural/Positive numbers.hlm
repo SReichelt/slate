@@ -1,0 +1,55 @@
+%../../../../../logics/hlm%
+
+$"Positive numbers": %SetOperator {
+  definition = [
+    $"Segment (greater)"(n = {$number(value = 0)}),
+    %subset(
+      #(m: %Element($"Natural numbers")),
+      $less(
+        n = {m},
+        m = {$number(value = 0)}
+      )
+    ),
+    %subset(
+      #(n: %Element($"Natural numbers")),
+      %not(%equals(
+        n,
+        $number(value = 0)
+      ))
+    ),
+    $../../Sets/"Relative complement"(
+      S = {$"Natural numbers"},
+      T = {%enumeration($number(value = 0))}
+    ),
+    %subset(
+      #(a: %Element($"Natural numbers")),
+      %exists(
+        #(b: %Element($"Natural numbers")),
+        %equals(
+          $sum(
+            m = {b},
+            n = {$number(value = 1)}
+          ),
+          a
+        )
+      )
+    ),
+    %subset(
+      #(c: %Element($"Natural numbers")),
+      %existsUnique(
+        #(d: %Element($"Natural numbers")),
+        %equals(
+          $sum(
+            m = {d},
+            n = {$number(value = 1)}
+          ),
+          c
+        )
+      )
+    )
+  ],
+  display = [$SubSup(
+    body = 'ℕ',
+    sub = ['+']
+  )]
+}

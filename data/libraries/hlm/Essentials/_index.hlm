@@ -1,0 +1,41 @@
+%../../../format/library%
+
+$Essentials: %Section {
+  items = [
+    %subsection(
+      $Sets,
+      title = {
+        de = 'Mengen',
+        en = 'Sets'
+      }
+    ),
+    %subsection(
+      $Functions,
+      title = {
+        de = 'Funktionen',
+        en = 'Functions'
+      }
+    ),
+    %subsection(
+      $Relations,
+      title = {
+        de = 'Relationen',
+        en = 'Relations'
+      }
+    ),
+    %subsection(
+      $Sequences,
+      title = {
+        de = 'Folgen',
+        en = 'Sequences'
+      }
+    ),
+    %subsection(
+      $Numbers,
+      title = {
+        de = 'Zahlen',
+        en = 'Numbers'
+      }
+    )
+  ]
+}

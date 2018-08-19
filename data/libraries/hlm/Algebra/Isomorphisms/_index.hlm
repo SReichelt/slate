@@ -1,0 +1,11 @@
+%../../../../format/library%
+
+$Isomorphisms: %Section {
+  items = [
+    %item($"element transform"),
+    %item($"function transform"),
+    %item($"inner operation transform"),
+    %item($"relation transform"),
+    %item($"morphism transform")
+  ]
+}

@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$"Multiplication by a positive number is injective"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element($"Positive numbers"),
+  _1: %Constraint(%equals(
+    $product(
+      m = {a},
+      n = {c}
+    ),
+    $product(
+      m = {b},
+      n = {c}
+    )
+  ))
+): %StandardTheorem {
+  claim = %equals(a, b)
+}

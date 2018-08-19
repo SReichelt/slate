@@ -1,0 +1,122 @@
+%../../../../../logics/hlm%
+
+$"Sum is associative"(
+  a: %Element($"Natural numbers"),
+  b: %Element(%previous),
+  c: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $sum(
+      m = {$sum(
+        m = {a},
+        n = {b}
+      )},
+      n = {c}
+    ),
+    $sum(
+      m = {a},
+      n = {$sum(
+        m = {b},
+        n = {c}
+      )}
+    )
+  ),
+  proofs = [{
+    goal = %equals(
+      %structuralCases(
+        c,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = $sum(
+              m = {a},
+              n = {b}
+            )
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(x: %Element($"Natural numbers")),
+            value = $"Natural numbers".successor(n = {$sum(
+              m = {$sum(
+                m = {a},
+                n = {b}
+              )},
+              n = {x}
+            )})
+          }
+        ]
+      ),
+      $sum(
+        m = {a},
+        n = {$sum(
+          m = {b},
+          n = {c}
+        )}
+      )
+    ),
+    steps = #(_: %ProveCases(
+      side = %left,
+      caseProofs = [
+        {
+          goal = %equals(
+            $sum(
+              m = {a},
+              n = {b}
+            ),
+            $sum(
+              m = {a},
+              n = {b}
+            )
+          ),
+          steps = #()
+        },
+        {
+          parameters = #(x: %Element($"Natural numbers")),
+          goal = %equals(
+            $"Natural numbers".successor(n = {$sum(
+              m = {$sum(
+                m = {a},
+                n = {b}
+              )},
+              n = {x}
+            )}),
+            $"Natural numbers".successor(n = {$sum(
+              m = {a},
+              n = {$sum(
+                m = {b},
+                n = {x}
+              )}
+            )})
+          ),
+          steps = #(
+            _: %UseTheorem(
+              $"Sum is associative"(
+                a = {a},
+                b = {b},
+                c = {x}
+              ),
+              %equals(
+                $sum(
+                  m = {$sum(
+                    m = {a},
+                    n = {b}
+                  )},
+                  n = {x}
+                ),
+                $sum(
+                  m = {a},
+                  n = {$sum(
+                    m = {b},
+                    n = {x}
+                  )}
+                )
+              )
+            ),
+            _: %Extend($"Natural numbers".successor(n = {%previous}))
+          )
+        }
+      ]
+    ))
+  }]
+}

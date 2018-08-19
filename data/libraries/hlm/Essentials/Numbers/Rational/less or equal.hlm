@@ -1,0 +1,35 @@
+%../../../../../logics/hlm%
+
+$"less or equal"(
+  a: %Element(
+    $"Rational numbers",
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_a: %Element($../Integer/Integers),
+        m_a: %Element($../Natural/"Positive numbers")
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      $"Rational numbers".quotient,
+      #(
+        n_b: %Element($../Integer/Integers),
+        m_b: %Element($../Natural/"Positive numbers")
+      )
+    }
+  )
+): %Predicate {
+  definition = [$../Integer/"less or equal"(
+    a = {$../Integer/product(
+      a = {n_a},
+      b = {m_b}
+    )},
+    b = {$../Integer/product(
+      a = {n_b},
+      b = {m_a}
+    )}
+  )]
+}

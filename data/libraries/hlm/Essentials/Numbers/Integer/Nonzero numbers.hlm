@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$"Nonzero numbers": %SetOperator {
+  definition = [
+    $Hole(a = {$../Natural/number(value = 0)}),
+    %subset(
+      #(a: %Element($Integers)),
+      %not(%equals(
+        a,
+        $../Natural/number(value = 0)
+      ))
+    ),
+    $../../Sets/Union(
+      U = {$Integers},
+      S = {$"Negative numbers"},
+      T = {$"Positive numbers"}
+    )
+  ]
+}

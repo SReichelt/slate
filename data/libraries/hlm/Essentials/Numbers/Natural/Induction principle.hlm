@@ -1,0 +1,28 @@
+%../../../../../logics/hlm%
+
+$"Induction principle"(
+  M: %Subset($"Natural numbers"),
+  _1: %Constraint($inductive(M = {M}))
+): %StandardTheorem {
+  claim = %setEquals(
+    M,
+    $"Natural numbers"
+  ),
+  proofs = [{steps = #(_: %ProveSetEquals(supersetProof = {steps = #(_: %ProveDef(proof = {
+    goal = %forall(
+      #(n: %Element($"Natural numbers")),
+      %in(n, M)
+    ),
+    steps = #(_: %ProveForAll({
+      parameters = #(n: %Element($"Natural numbers")),
+      goal = %in(n, M),
+      steps = #(_: %UseTheorem(
+        $"Induction lemma"(
+          M = {M},
+          n = {n}
+        ),
+        %in(n, M)
+      ))
+    }))
+  }))}))}]
+}

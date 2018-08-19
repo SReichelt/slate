@@ -1,0 +1,29 @@
+%../../../../logics/hlm%
+
+$"Intersection is associative"(
+  U: %Set,
+  R: %Subset(U),
+  S: %Subset(%previous),
+  T: %Subset(%previous)
+): %StandardTheorem {
+  claim = %setEquals(
+    $Intersection(
+      U = {U},
+      S = {$Intersection(
+        U = {U},
+        S = {R},
+        T = {S}
+      )},
+      T = {T}
+    ),
+    $Intersection(
+      U = {U},
+      S = {R},
+      T = {$Intersection(
+        U = {U},
+        S = {S},
+        T = {T}
+      )}
+    )
+  )
+}

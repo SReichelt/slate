@@ -1,0 +1,30 @@
+%../../../../../logics/hlm%
+
+$power(
+  a: %Element($Integers),
+  n: %Element($../Natural/"Natural numbers")
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $../Natural/"Natural numbers",
+    [
+      {
+        constructor = $../Natural/"Natural numbers".zero,
+        value = $../Natural/number(value = 1),
+        rewrite = %true
+      },
+      {
+        constructor = $../Natural/"Natural numbers".successor,
+        parameters = #(x: %Element($../Natural/"Natural numbers")),
+        value = $product(
+          a = {$power(
+            a = {a},
+            n = {x}
+          )},
+          b = {a}
+        ),
+        rewrite = %true
+      }
+    ]
+  )]
+}

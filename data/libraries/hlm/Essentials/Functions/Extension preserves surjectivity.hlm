@@ -1,0 +1,27 @@
+%../../../../logics/hlm%
+
+$"Extension preserves surjectivity"(
+  X: %Set(auto = %true),
+  A: %Subset(X),
+  Y: %Set(auto = %true),
+  f: %Element($Functions(
+    X = {X},
+    Y = {Y}
+  )),
+  _1: %Constraint($surjective(
+    X = {A},
+    Y = {Y},
+    f = {$restriction(
+      X = {X},
+      A = {A},
+      Y = {Y},
+      f = {f}
+    )}
+  ))
+): %StandardTheorem {
+  claim = $surjective(
+    X = {X},
+    Y = {Y},
+    f = {f}
+  )
+}
