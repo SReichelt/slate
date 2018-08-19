@@ -1,4 +1,4 @@
-// Generated from public/format/meta.hlm by generateMetaDeclarations.ts.
+// Generated from data/format/meta.hlm by generateMetaDeclarations.ts.
 // tslint:disable:class-name
 // tslint:disable:variable-name
 
@@ -177,7 +177,6 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
-
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
   }
@@ -273,7 +272,6 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Any';
   }
@@ -287,7 +285,6 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Type';
   }
@@ -301,7 +298,6 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Int';
   }
@@ -315,7 +311,6 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_String extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'String';
   }
@@ -329,7 +324,6 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'ParameterList';
   }
@@ -343,7 +337,6 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
-
   type: Fmt.Expression;
 
   getName(): string {
@@ -376,7 +369,6 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'ArgumentList';
   }

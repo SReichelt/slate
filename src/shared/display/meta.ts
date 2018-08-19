@@ -1,4 +1,4 @@
-// Generated from public/display/display.hlm by generateMetaDeclarations.ts.
+// Generated from data/display/display.hlm by generateMetaDeclarations.ts.
 // tslint:disable:class-name
 // tslint:disable:variable-name
 
@@ -47,7 +47,6 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Bool';
   }
@@ -61,7 +60,6 @@ export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Int';
   }
@@ -75,7 +73,6 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_String extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'String';
   }
@@ -89,7 +86,6 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'Expr';
   }
@@ -103,7 +99,6 @@ export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_true extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'true';
   }
@@ -117,7 +112,6 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_false extends Fmt.MetaRefExpression {
-
   getName(): string {
     return 'false';
   }
@@ -131,7 +125,6 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
-
   param: Fmt.Expression;
   valueIfPresent?: Fmt.Expression;
   valueIfMissing?: Fmt.Expression;
@@ -186,7 +179,6 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_add extends Fmt.MetaRefExpression {
-
   items: Fmt.Expression[];
 
   getName(): string {
@@ -234,7 +226,6 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_for extends Fmt.MetaRefExpression {
-
   param: Fmt.Expression;
   dimension: Fmt.BigInt;
   item: Fmt.Expression;
@@ -297,7 +288,6 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
-
   items: Fmt.Expression[];
 
   getName(): string {

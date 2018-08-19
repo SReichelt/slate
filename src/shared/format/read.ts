@@ -137,15 +137,17 @@ class Reader {
     }
     let contentsContext = this.contextProvider.getDefinitionContentsContext(definition, context);
     this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
-    let contents = new contentClass;
-    let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-    this.readArguments(args, contentsContext, definition);
-    try {
-      contents.fromArgumentList(args);
-    } catch (error) {
-      this.error(error.message);
+    if (contentClass) {
+      let contents = new contentClass;
+      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      this.readArguments(args, contentsContext, definition);
+      try {
+        contents.fromArgumentList(args);
+      } catch (error) {
+        this.error(error.message);
+      }
+      definition.contents = contents;
     }
-    definition.contents = contents;
     this.readChar('}');
     return definition;
   }

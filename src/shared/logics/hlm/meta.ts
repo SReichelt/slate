@@ -1,4 +1,4 @@
-// Generated from public/logics/hlm.hlm by generateMetaDeclarations.ts.
+// Generated from data/logics/hlm.hlm by generateMetaDeclarations.ts.
 // tslint:disable:class-name
 // tslint:disable:variable-name
 

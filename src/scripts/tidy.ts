@@ -1,7 +1,7 @@
 import * as fs from 'fs';
-import * as Fmt from '../format/format';
-import * as FmtReader from '../format/read';
-import * as FmtWriter from '../format/write';
+import * as Fmt from '../shared/format/format';
+import * as FmtReader from '../shared/format/read';
+import * as FmtWriter from '../shared/format/write';
 
 function tidy(fileName: string): void {
   let fileStr: string = fs.readFileSync(fileName, 'utf8');

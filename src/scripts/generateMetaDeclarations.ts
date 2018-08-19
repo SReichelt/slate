@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import * as Fmt from '../format/format';
-import * as FmtMeta from '../format/meta';
-import * as FmtReader from '../format/read';
-import { translateMemberName } from '../format/common';
+import * as Fmt from '../shared/format/format';
+import * as FmtMeta from '../shared/format/meta';
+import * as FmtReader from '../shared/format/read';
+import { translateMemberName } from '../shared/format/common';
 
 function isVisibleType(visibleTypeNames: string[], definition: Fmt.Definition): boolean {
   return visibleTypeNames.indexOf(definition.name) >= 0;
@@ -603,7 +603,7 @@ function generate(inFileName: string, outFileName: string): void {
 
   let srcPath = outFileName.split('/');
   srcPath.pop();
-  let dstPath = 'src/format'.split('/');
+  let dstPath = 'src/shared/format'.split('/');
   while (srcPath.length && dstPath.length && srcPath[0] === dstPath[0]) {
     srcPath.splice(0, 1);
     dstPath.splice(0, 1);
