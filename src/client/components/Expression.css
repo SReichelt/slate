@@ -1,11 +1,5 @@
-@font-face {
-  font-family: 'STIX2Math';
-  src: url('https://github.com/stipub/stixfonts/raw/master/WOFF2/STIX2Math.woff2') format('woff2'),
-       url('https://github.com/stipub/stixfonts/raw/master/WOFF/STIX2Math.woff') format('woff');
-}
-
 .expr {
-  font-family: 'STIX2Math', serif;
+  font-family: 'Lora', serif;
   line-height: 110%;
   text-decoration: initial;
   color: initial;
