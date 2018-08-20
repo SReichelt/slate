@@ -1,5 +1,5 @@
 .expr {
-  font-family: 'Lora', serif;
+  font-family: 'MathJax', serif;
   line-height: 110%;
   text-decoration: initial;
   color: initial;
@@ -144,16 +144,12 @@ p {
   line-height: 100%;
 }
 
-.paren-round-text {
-  font-family: sans;
-}
-
 .paren-round {
   display: inline-block;
-  border-left: solid 1.5pt;
-  border-right: solid 1.5pt;
+  border-left: solid 1.25pt;
+  border-right: solid 1.25pt;
   border-radius: 5pt;
-  padding: 0.5ex;
+  padding: 3pt;
   margin: 1pt;
   white-space: nowrap;
 }
@@ -165,10 +161,6 @@ p {
   padding: 2pt;
   margin: 1pt;
   white-space: nowrap;
-}
-
-.paren-square-text, .paren-curly-text {
-  font-size: 115%;
 }
 
 .paren-square, .paren-curly, .paren-angle {
