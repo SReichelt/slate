@@ -1,5 +1,11 @@
+@font-face {
+  font-family: 'STIX2Math';
+  src: url('https://github.com/stipub/stixfonts/raw/master/WOFF2/STIX2Math.woff2') format('woff2'),
+       url('https://github.com/stipub/stixfonts/raw/master/WOFF/STIX2Math.woff') format('woff');
+}
+
 .expr {
-  font-family: STIX, serif;
+  font-family: 'STIX2Math', serif;
   line-height: 110%;
   text-decoration: initial;
   color: initial;
@@ -150,9 +156,9 @@ p {
 
 .paren-round {
   display: inline-block;
-  border-left: solid 2pt;
-  border-right: solid 2pt;
-  border-radius: 1ex;
+  border-left: solid 1.5pt;
+  border-right: solid 1.5pt;
+  border-radius: 5pt;
   padding: 0.5ex;
   margin: 1pt;
   white-space: nowrap;
