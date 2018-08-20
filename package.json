@@ -9,13 +9,15 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
-    "start": "cross-env NODE_ENV=production node ./dist/server/server.js",
+    "start": "node ./dist/server/server.js",
+    "start:prod": "cross-env NODE_ENV=production node ./dist/server/server.js",
     "build-client": "cd ./src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd ./src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node ./dist/server/server.js\"",
     "dev": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run build-server\" \"npm run build-client\""
+    "postinstall": "npm run build"
   },
   "license": "MIT",
   "author": "Sebastian Reichelt",
