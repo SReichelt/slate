@@ -71,22 +71,46 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       semanticLink = expression.semanticLink;
     }
     let result: any = null;
-    let needsSpan = true;
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
-      needsSpan = false;
     } else if (expression instanceof Display.TextExpression) {
-      result = expression.text.replace('  ', ' \xa0');
-      if (this.props.parent) {
-        needsSpan = false;
-      }
-      if (result) {
-        if (result.charAt(0) === ' ') {
-          result = '\xa0' + result.substring(1);
+      let text = expression.text;
+      if (text.length) {
+        text = text.replace('  ', ' \xa0');
+        if (text.startsWith(' ')) {
+          text = '\xa0' + text.substring(1);
         }
-        if (result.charAt(result.length - 1) === ' ') {
-          result = result.substring(0, result.length - 1) + '\xa0';
+        if (text.endsWith(' ')) {
+          text = text.substring(0, text.length - 1) + '\xa0';
         }
+        let lineBreakPos = text.indexOf('\n');
+        if (lineBreakPos >= 0) {
+          result = [];
+          do {
+            result.push(text.substring(0, lineBreakPos));
+            result.push(<br/>);
+            text = text.substring(lineBreakPos + 1);
+          } while (lineBreakPos > 0);
+          result.push(text);
+        } else {
+          result = text;
+        }
+        let firstChar = text.charAt(0);
+        let lastChar = text.charAt(text.length - 1);
+        if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
+          className += ' space-start';
+        }
+        if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
+          className += ' charcorner-tr';
+          if (lastChar === 'T' || lastChar === 'Y') {
+            className += ' charcorner-large';
+          }
+        }
+        if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
+          className += ' charcorner-bl';
+        }
+      } else {
+        result = '\u200b';
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
@@ -149,6 +173,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         </span>
       ));
     } else if (expression instanceof Display.ParenExpression) {
+      className += ' paren';
       let parenExpression = expression;
       let render = parenExpression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
         if (surroundingParenStyle === parenExpression.style) {
@@ -594,7 +619,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
         result = [result, preview];
       }
-    } else if (needsSpan || className.includes(' ')) {
+    } else {
       result = (
         <span className={className}>
           {result}

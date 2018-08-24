@@ -852,7 +852,8 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
             || display.path.name === 'UnaryOperator'
             || display.path.name === 'Relation'
             || display.path.name === 'BooleanOperator'
-            || display.path.name === 'UnaryBooleanOperator') {
+            || display.path.name === 'UnaryBooleanOperator'
+            || display.path.name === 'FunctionOperator') {
           abbr = display.path.arguments.getValue('symbol');
         } else if (display.path.name === 'Function') {
           abbr = display.path.arguments.getValue('function');
@@ -873,7 +874,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
             abbr = negationList;
           }
         }
-        if (abbr && !(abbr instanceof Fmt.VariableRefExpression)) {
+        if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {
           display = abbr;
         }
       }

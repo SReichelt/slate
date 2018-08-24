@@ -10,6 +10,7 @@ $"Relative complement"(
   )],
   display = [$Operator(
     symbol = '∖',
-    operands = [S, T]
+    operands = [S, T],
+    space = ' '
   )]
 }
