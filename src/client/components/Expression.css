@@ -11,6 +11,10 @@ span.expr.interactive {
   cursor: initial;
 }
 
+.native {
+  font-family: serif;
+}
+
 .label, .sub-heading {
   font-weight: bold;
 }
@@ -149,7 +153,10 @@ p {
   border-left: solid 1.25pt;
   border-right: solid 1.25pt;
   border-radius: 5pt;
-  padding: 3pt;
+  padding-left: 4pt;
+  padding-right: 4pt;
+  padding-top: 2pt;
+  padding-bottom: 2pt;
   margin: 1pt;
   white-space: nowrap;
 }
@@ -256,8 +263,7 @@ p {
 }
 
 .binom {
-  margin-top: -2pt;
-  margin-bottom: -2pt;
+  margin: -2pt;
 }
 
 .construction {

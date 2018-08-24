@@ -38,7 +38,8 @@ $"inductive sum (exclusive)"(
     operand = a,
     under = $Relation(
       symbol = '<',
-      operands = [i, n]
+      operands = [i, n],
+      space = ' '
     ),
     minParenLevel = 1,
     maxParenLevel = 1
