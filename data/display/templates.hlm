@@ -25,18 +25,21 @@ $Constraint(left: %Expr, right: %Expr): %Template {
 }
 
 $Function(function: %Expr, arguments: %Expr[], maxParenLevel: %Int = 2): %Template {
-  display = [
-    $InnerParens(
-      body = function,
-      maxLevel = maxParenLevel
-    ),
-    $Parens(
-      body = $Group(
-        items = arguments
+  display = $OuterParens(
+    body = [
+      $InnerParens(
+        body = function,
+        maxLevel = maxParenLevel
       ),
-      style = '()'
-    )
-  ]
+      $Parens(
+        body = $Group(
+          items = arguments
+        ),
+        style = '()'
+      )
+    ],
+    minLevel = 3
+  )
 }
 
 $ConstructorName(name: %String): %Template {

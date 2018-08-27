@@ -43,5 +43,11 @@ $difference(
       a = {b},
       b = {$inverse(a = {a})}
     )
-  ]
+  ],
+  display = [$Operator(
+    symbol = '−',
+    operands = [b, a],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )]
 }

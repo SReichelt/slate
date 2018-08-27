@@ -11,5 +11,9 @@ $quotient(
       a = {x},
       b = {a}
     )
+  )],
+  display = [$Quotient(
+    numerator = b,
+    denominator = a
   )]
 }

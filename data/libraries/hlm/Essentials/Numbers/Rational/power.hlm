@@ -26,5 +26,9 @@ $power(
         rewrite = %true
       }
     ]
+  )],
+  display = [$Power(
+    base = a,
+    exponent = n
   )]
 }

@@ -100,7 +100,7 @@ $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Pred
     )
   ],
   display = [$Property(
-    property = 'prime',
+    property = %neg('prime', 'composite'),
     operand = n
   )]
 }

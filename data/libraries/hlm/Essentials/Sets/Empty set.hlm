@@ -2,9 +2,6 @@
 
 $"Empty set": %SetOperator {
   definition = [%enumeration],
-  display = [$Style(
-    body = '∅',
-    styleClass = 'native'
-  )],
+  display = ['∅'],
   references = ['https://en.wikipedia.org/wiki/Empty_set', 'http://mathworld.wolfram.com/EmptySet.html', 'https://proofwiki.org/wiki/Definition:Empty_Set']
 }

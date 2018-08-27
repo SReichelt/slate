@@ -362,16 +362,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             subSupResult.unshift(<sup key="preSup"><Expression expression={subSupExpression.preSup} parent={this} hover={this.hover}/></sup>);
           }
         } else {
+          let empty = <span className={'subsup-empty'} key="empty"/>;
           let rightSub = null;
           let rightSup = null;
-          let rightEmpty = null;
           if (subSupExpression.sub) {
             rightSub = (
               <span className={'subsup-right-sub'} key="sub">
                 <Expression expression={subSupExpression.sub} parent={this} hover={this.hover}/>
               </span>
             );
-            rightEmpty = <span className={'subsup-empty'} key="empty"/>;
           }
           if (subSupExpression.sup) {
             rightSup = (
@@ -379,18 +378,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 <Expression expression={subSupExpression.sup} parent={this} hover={this.hover}/>
               </span>
             );
-            rightEmpty = <span className={'subsup-empty'} key="empty"/>;
           }
           let leftSub = null;
           let leftSup = null;
-          let leftEmpty = null;
           if (subSupExpression.preSub) {
             leftSub = (
               <span className={'subsup-left-sub'} key="sub">
                 <Expression expression={subSupExpression.preSub} parent={this} hover={this.hover}/>
               </span>
             );
-            leftEmpty = <span className={'subsup-empty'} key="empty"/>;
           }
           if (subSupExpression.preSup) {
             leftSup = (
@@ -398,7 +394,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 <Expression expression={subSupExpression.preSup} parent={this} hover={this.hover}/>
               </span>
             );
-            leftEmpty = <span className={'subsup-empty'} key="empty"/>;
           }
           if (lineHeight) {
             subSupResult = [subSupResult];
@@ -406,10 +401,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               subSupResult.unshift(
                 <span className={'subsup'} key="left">
                   <span className={'subsup-sup-row'} key="sup">
-                    {leftSup ? leftSup : leftEmpty}
+                    {leftSup ? leftSup : empty}
                   </span>
                   <span className={'subsup-sub-row'} key="sub">
-                    {leftSub ? leftSub : leftEmpty}
+                    {leftSub ? leftSub : empty}
                   </span>
                 </span>
               );
@@ -418,45 +413,34 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               subSupResult.push(
                 <span className={'subsup'} key="right">
                   <span className={'subsup-sup-row'} key="sup">
-                    {rightSup ? rightSup : leftEmpty}
+                    {rightSup ? rightSup : empty}
                   </span>
                   <span className={'subsup-sub-row'} key="sub">
-                    {rightSub ? rightSub : leftEmpty}
+                    {rightSub ? rightSub : empty}
                   </span>
                 </span>
               );
             }
           } else {
-            let rows = [(
-              <span className={'subsup-body-row'} key="body">
-                {leftEmpty}
-                <span className={'subsup-body'} key="middle">
-                  {subSupResult}
-                </span>
-                {rightEmpty}
-              </span>
-            )];
-            if (leftSup || rightSup) {
-              rows.unshift(
-                <span className={'subsup-sup-row'} key="sup">
-                  {leftSup}
-                  <span className={'subsup-empty'} key="middle"/>
-                  {rightSup}
-                </span>
-              );
-            }
-            if (leftSub || rightSub) {
-              rows.push(
-                <span className={'subsup-sub-row'} key="sub">
-                  {leftSub}
-                  <span className={'subsup-empty'} key="middle"/>
-                  {rightSub}
-                </span>
-              );
-            }
             subSupResult = (
-              <span className={'subsup'}>
-                {rows}
+              <span className={'subsup subsup-full'}>
+                <span className={'subsup-sup-row subsup-full-row'} key="sup">
+                  {leftSup || leftSub ? leftSup || empty : null}
+                  <span className={'subsup-empty'} key="middle"/>
+                  {rightSup || rightSub ? rightSup || empty : null}
+                </span>
+                <span className={'subsup-body-row'} key="body">
+                  {leftSup || leftSub ? empty : null}
+                  <span className={'subsup-body'} key="middle">
+                    {subSupResult}
+                  </span>
+                  {rightSup || rightSub ? empty : null}
+                </span>
+                <span className={'subsup-sub-row subsup-full-row'} key="sub">
+                  {leftSup || leftSub ? leftSub || empty : null}
+                  <span className={'subsup-empty'} key="middle"/>
+                  {rightSup || rightSub ? rightSub || empty : null}
+                </span>
               </span>
             );
           }

@@ -22,12 +22,5 @@ $"Segment (greater)"(n: %Element($"Natural numbers")): %SetOperator {
     set = 'ℕ',
     symbol = '>',
     limit = n
-  )],
-  definitionDisplay = {
-    parameter = #(m: %Expr),
-    display = [$Relation(
-      symbol = '>',
-      operands = [m, n]
-    )]
-  }
+  )]
 }

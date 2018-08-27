@@ -38,5 +38,9 @@ $"power to integer"(
         )}
       )
     }
-  ])]
+  ])],
+  display = [$Power(
+    base = a,
+    exponent = b
+  )]
 }

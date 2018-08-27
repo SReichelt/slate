@@ -25,5 +25,11 @@ $sum(
   definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence sum"(
     α = {r_a},
     β = {r_b}
-  )})]
+  )})],
+  display = [$Operator(
+    symbol = '+',
+    operands = [a, b],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )]
 }

@@ -11,10 +11,6 @@ span.expr.interactive {
   cursor: initial;
 }
 
-.native {
-  font-family: serif;
-}
-
 .label, .sub-heading {
   font-weight: bold;
 }
@@ -90,8 +86,18 @@ p {
   white-space: nowrap;
 }
 
-.subsup-body-row, .subsup-sub-row, .subsup-sup-row {
+.subsup-full {
+  margin-top: -0.5em;
+  margin-bottom: -0.5em;
+}
+
+.subsup-body-row {
   display: table-row;
+}
+
+.subsup-sub-row, .subsup-sup-row {
+  display: table-row;
+  height: 0.5em;
 }
 
 .subsup-body, .subsup-empty {
@@ -126,6 +132,16 @@ p {
   font-size: smaller;
 }
 
+.subsup-full-row>.subsup-left-sub, .subsup-full-row>.subsup-right-sub {
+  position: relative;
+  bottom: 0.5em;
+}
+
+.subsup-full-row>.subsup-left-sup, .subsup-full-row>.subsup-right-sup {
+  position: relative;
+  top: 0.5em;
+}
+
 .overunder {
   display: inline-table;
   vertical-align: middle;
@@ -154,8 +170,8 @@ p {
 
 .paren-round {
   display: inline-block;
-  border-left: solid 1.4pt;
-  border-right: solid 1.4pt;
+  border-left: solid 1.5pt;
+  border-right: solid 1.5pt;
   border-radius: 5pt;
   padding-left: 4pt;
   padding-right: 4pt;
@@ -334,7 +350,6 @@ p {
   font-size: smaller;
   line-height: 75%;
   padding-left: 0.5pt;
-  padding-bottom: 0.15em;
 }
 
 .radical-degree-bottom-cell {
@@ -365,12 +380,17 @@ p {
   font-style: italic;
 }
 
-.var.charcorner-tr:last-child::after, .var.charcorner-tr.charcorner-large+.space-start::before {
+.var.charcorner-tr:last-child::after, .var.charcorner-tr+*::before {
   content: ' ';
+  font-size: smaller;
 }
 
-.var.charcorner-tr+sup::before, .var.charcorner-tr.charcorner-large:last-child::after {
-  content: ' ';
+.var.charcorner-tr.charcorner-large+.space-start::before, .var.charcorner-tr+sup::before {
+  font-size: initial;
+}
+
+.var.charcorner-tr+sub::before {
+  content: '';
 }
 
 .ctor {
@@ -378,7 +398,9 @@ p {
 }
 
 .largesym {
-  font-size: 150%;
+  font-family: 'TeX-Large', serif;
+  font-size: 120%;
+  line-height: 150%;
 }
 
 .baseline {

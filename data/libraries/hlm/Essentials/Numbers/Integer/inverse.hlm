@@ -13,5 +13,12 @@ $inverse(a: %Element(
   definition = [$Integers.difference(
     n = {m_a},
     m = {n_a}
+  )],
+  display = [$PrefixUnaryOperator(
+    symbol = '−',
+    operand = a,
+    space = '',
+    minParenLevel = 1,
+    maxParenLevel = 1
   )]
 }

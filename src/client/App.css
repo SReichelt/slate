@@ -43,6 +43,12 @@ body {
   cursor: col-resize;
 }
 
+.Resizer.horizontal {
+  height: 5pt;
+  margin: 1pt;
+  cursor: row-resize;
+}
+
 .Resizer:hover {
   background-color: #e0e0e0;
 }

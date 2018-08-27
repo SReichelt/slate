@@ -37,5 +37,11 @@ $sum(
       m = {m_a},
       n = {m_b}
     )}
+  )],
+  display = [$Operator(
+    symbol = '+',
+    operands = [a, b],
+    minParenLevel = 1,
+    maxParenLevel = 1
   )]
 }
