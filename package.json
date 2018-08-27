@@ -17,7 +17,7 @@
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node ./dist/server/server.js\"",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run build-server\" \"npm run build-client\"",
-    "heroku-postinstall": "npm run build"
+    "heroku-postbuild": "npm run build"
   },
   "license": "MIT",
   "author": "Sebastian Reichelt",
