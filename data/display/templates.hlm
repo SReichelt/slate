@@ -58,7 +58,7 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
   )
 }
 
-$Operator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$Operator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = %for(
       param = operands,
@@ -93,7 +93,7 @@ $UnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = '', minParenLevel: 
   )
 }
 
-$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [symbol, space, $InnerParens(
       body = operand,
@@ -161,7 +161,7 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
   )
 }
 
-$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
+$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
   display = $Operator(
     symbol = symbol,
     operands = operands,

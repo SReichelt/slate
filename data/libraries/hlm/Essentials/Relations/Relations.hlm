@@ -24,7 +24,7 @@ $Relations(S: %Set): %Construction {
   }
 
   display = [$Function(
-    function = 'Rel',
+    function = '𝓡𝓮𝓵',
     arguments = [S]
   )],
   definitionDisplay = {

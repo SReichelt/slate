@@ -83,18 +83,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (text.endsWith(' ')) {
           text = text.substring(0, text.length - 1) + '\xa0';
         }
-        let lineBreakPos = text.indexOf('\n');
-        if (lineBreakPos >= 0) {
-          result = [];
-          do {
-            result.push(text.substring(0, lineBreakPos));
-            result.push(<br/>);
-            text = text.substring(lineBreakPos + 1);
-          } while (lineBreakPos > 0);
-          result.push(text);
-        } else {
-          result = text;
-        }
         let firstChar = text.charAt(0);
         let lastChar = text.charAt(text.length - 1);
         if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
@@ -109,6 +97,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
           className += ' charcorner-bl';
         }
+        result = this.convertText(text);
       } else {
         result = '\u200b';
       }
@@ -611,6 +600,140 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       );
     }
     return result;
+  }
+
+  private convertText(text: string): any {
+    let curText = '';
+    let curStyle: string | undefined = undefined;
+    let result = [];
+    let iterator = text[Symbol.iterator]();
+    for (let next = iterator.next(); !next.done; next = iterator.next()) {
+      let c = next.value;
+      if (c === '\r') {
+        // ignore
+      } else if (c === '\n') {
+        result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+        result.push(<br/>);
+        curText = '';
+        curStyle = undefined;
+      } else {
+        let cp = c.codePointAt(0)!;
+        if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
+          if (curStyle !== 'sans') {
+            if (curText.length) {
+              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+              curText = '';
+            }
+            curStyle = 'sans';
+          }
+          curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
+                                                         cp - 0x1d5ba + 0x61);
+        } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
+          if (curStyle !== 'calligraphic') {
+            if (curText.length) {
+              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+              curText = '';
+            }
+            curStyle = 'calligraphic';
+          }
+          switch (cp) {
+            case 0x212c:
+              curText += 'B';
+              break;
+            case 0x2130:
+              curText += 'E';
+              break;
+            case 0x2131:
+              curText += 'F';
+              break;
+            case 0x210b:
+              curText += 'H';
+              break;
+            case 0x2110:
+              curText += 'I';
+              break;
+            case 0x2112:
+              curText += 'L';
+              break;
+            case 0x2133:
+              curText += 'M';
+              break;
+            case 0x211b:
+              curText += 'R';
+              break;
+            case 0x212f:
+              curText += 'e';
+              break;
+            case 0x210a:
+              curText += 'g';
+              break;
+            case 0x2134:
+              curText += 'o';
+              break;
+            default:
+              curText += String.fromCodePoint(cp < 0x1d4b6 ? cp - 0x1d49c + 0x41 :
+                                              cp < 0x1d4d0 ? cp - 0x1d4b6 + 0x61 :
+                                              cp < 0x1d4ea ? cp - 0x1d4d0 + 0x41 :
+                                                             cp - 0x1d4ea + 0x61);
+          }
+        } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
+          if (curStyle !== 'fraktur') {
+            if (curText.length) {
+              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+              curText = '';
+            }
+            curStyle = 'fraktur';
+          }
+          switch (cp) {
+            case 0x212d:
+              curText += 'C';
+              break;
+            case 0x210c:
+              curText += 'H';
+              break;
+            case 0x2111:
+              curText += 'I';
+              break;
+            case 0x211c:
+              curText += 'R';
+              break;
+            case 0x2128:
+              curText += 'Z';
+              break;
+            default:
+              curText += String.fromCodePoint(cp < 0x1d51e ? cp - 0x1d504 + 0x41 :
+                                              cp < 0x1d56c ? cp - 0x1d51e + 0x61 :
+                                              cp < 0x1d586 ? cp - 0x1d56c + 0x41 :
+                                                             cp - 0x1d586 + 0x61);
+          }
+        } else if (cp >= 0x1d538 && cp < 0x1d56c) {
+          if (curStyle !== 'double-struck') {
+            if (curText.length) {
+              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+              curText = '';
+            }
+            curStyle = 'double-struck';
+          }
+          curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
+                                                         cp - 0x1d552 + 0x61);
+        } else {
+          if (curStyle) {
+            result.push(<span className={curStyle}>{curText}</span>);
+            curText = '';
+            curStyle = undefined;
+          }
+          curText += c;
+        }
+      }
+    }
+    if (curText.length) {
+      result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
+    }
+    if (result.length === 1) {
+      return result[0];
+    } else {
+      return result;
+    }
   }
 
   private setOwnHover(hover: Display.SemanticLink | undefined): void {

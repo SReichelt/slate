@@ -170,8 +170,8 @@ p {
 
 .paren-round {
   display: inline-block;
-  border-left: solid 1.5pt;
-  border-right: solid 1.5pt;
+  border-left: solid 1.4pt;
+  border-right: solid 1.4pt;
   border-radius: 5pt;
   padding-left: 4pt;
   padding-right: 4pt;
@@ -398,8 +398,29 @@ p {
   content: '';
 }
 
-.ctor {
-  font-family: sans;
+.sans, .ctor {
+  font-family: 'TeX-Sans', sans-serif;
+  font-style: normal;
+}
+
+.calligraphic {
+  font-family: 'TeX-Calligraphic', 'Apple Chancery', 'URW Chancery L', cursive;
+  font-style: normal;
+}
+
+.fraktur {
+  font-family: 'TeX-Fraktur', 'Courier New', 'Courier', monospace;
+  font-style: normal;
+}
+
+.monospace {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-style: normal;
+}
+
+.double-struck {
+  font-family: 'TeX-DoubleStruck', 'Courier New', 'Courier', monospace;
+  font-style: normal;
 }
 
 .largesym {

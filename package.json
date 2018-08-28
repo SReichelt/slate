@@ -14,7 +14,7 @@
     "build-client": "cd ./src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd ./src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
-    "dev-server": "tsc-watch -p ./src/server --onSuccess \"node ./dist/server/server.js\"",
+    "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server.js\"",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run build-server\" \"npm run build-client\"",
     "heroku-postbuild": "npm run build"

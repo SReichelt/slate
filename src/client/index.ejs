@@ -51,12 +51,47 @@
              url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
       }
       @font-face {
+        font-family: 'TeX-Sans';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot'); /* IE9 Compat Modes */
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot?iefix') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_SansSerif-Regular.svg#MathJax_SansSerif-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Calligraphic';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot'); /* IE9 Compat Modes */
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot?iefix') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Caligraphic-Regular.svg#MathJax_Caligraphic-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Fraktur';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot'); /* IE9 Compat Modes */
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot?iefix') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Fraktur-Regular.svg#MathJax_Fraktur-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-DoubleStruck';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot'); /* IE9 Compat Modes */
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot?iefix') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_AMS-Regular.svg#MathJax_AMS-Regular') format('svg');
+      }
+      @font-face {
         font-family: 'TeX-Large';
         src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot'); /* IE9 Compat Modes */
         src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot?iefix') format('eot'),
              url('/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
              url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
              url('/fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
+      }
+      .preload-font {
+        font-family: 'TeX';
       }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -66,7 +101,7 @@
       <div id="app">
         <p>Welcome to the HLM proof assistant.</p>
         <p>This website requires a modern web browser with JavaScript.</p>
-        <p>Loading...</p>
+        <p>Loading<span class="preload-font">...</span></p>
       </div>
     </div>
   </body>
