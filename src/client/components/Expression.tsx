@@ -519,7 +519,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 <span className={'radical-degree-bottom-cell'}>
                   <svg viewBox="0 0 1 1" preserveAspectRatio="none">
                     <line x1="0" y1="0.35" x2="0.4" y2="0.1" stroke="black" strokeWidth="0.05" strokeLinecap="square"/>
-                    <line x1="0.5" y1="0.12" x2="1.1" y2="1" stroke="black" strokeWidth="0.2" strokeLinecap="square"/>
+                    <line x1="0.5" y1="0.12" x2="1" y2="1" stroke="black" strokeWidth="0.2" strokeLinecap="square"/>
                   </svg>
                 </span>
               </span>

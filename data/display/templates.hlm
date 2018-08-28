@@ -140,7 +140,7 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', parenLe
   )
 }
 
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
   display = $OuterParens(
     body = [
       $OverUnder(
