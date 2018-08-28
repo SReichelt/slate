@@ -761,7 +761,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (hover && (!this.state.ownHover || this.state.ownHover === this.hover)) {
         let update = () => {
           if (this.hover) {
-            this.setState((prevState) => ({showPreview: prevState.ownHover === this.hover}));
+            this.setState((prevState) => ({showPreview: prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
           }
         };
         setTimeout(update, 250);
