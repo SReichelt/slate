@@ -6,10 +6,6 @@ $finite(S: %Set): %Predicate {
       $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
       $../Numbers/Natural/"Natural numbers"
     ),
-    $../Numbers/Cardinal/less(
-      𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
-      𝔶 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/"Natural numbers"})}
-    ),
     %exists(#(
       k: %Element($../Numbers/Natural/"Natural numbers"),
       f: %Element($../Functions/Bijections(
@@ -70,7 +66,7 @@ $finite(S: %Set): %Predicate {
   equivalenceProofs = [
     {
       from = 1,
-      to = 3,
+      to = 2,
       steps = #(
         _: %Embed(
           $../Numbers/Cardinal/"Cardinal numbers",
@@ -94,8 +90,8 @@ $finite(S: %Set): %Predicate {
       )
     },
     {
-      from = 3,
-      to = 4,
+      from = 2,
+      to = 3,
       steps = #(_: %UseExists({
         parameters = #(
           k: %Element($../Numbers/Natural/"Natural numbers"),
@@ -111,7 +107,7 @@ $finite(S: %Set): %Predicate {
       }))
     },
     {
-      from = 4,
+      from = 3,
       to = 1,
       steps = #(_: %UseExists({
         parameters = #(
@@ -160,8 +156,8 @@ $finite(S: %Set): %Predicate {
       }))
     },
     {
-      from = 3,
-      to = 5,
+      from = 2,
+      to = 4,
       steps = #(_: %UseExists({
         parameters = #(
           k: %Element($../Numbers/Natural/"Natural numbers"),
@@ -180,8 +176,8 @@ $finite(S: %Set): %Predicate {
       }))
     },
     {
-      from = 5,
-      to = 6,
+      from = 4,
+      to = 5,
       steps = #(_: %UseExists({
         parameters = #(
           m: %Element($../Numbers/Natural/"Natural numbers"),
@@ -210,8 +206,8 @@ $finite(S: %Set): %Predicate {
       }))
     },
     {
-      from = 6,
-      to = 7,
+      from = 5,
+      to = 6,
       steps = #(_: %UseExists({
         parameters = #(
           n: %Element($../Numbers/Natural/"Natural numbers"),
@@ -252,8 +248,8 @@ $finite(S: %Set): %Predicate {
       }))
     },
     {
-      from = 7,
-      to = 3,
+      from = 6,
+      to = 2,
       steps = #(_: %UseExists({
         parameters = #(x: %Element($../Numbers/Natural/"Natural numbers")),
         steps = #(
