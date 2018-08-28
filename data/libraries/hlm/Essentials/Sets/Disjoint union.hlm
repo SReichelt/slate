@@ -37,7 +37,7 @@ $"Disjoint union"(
   }
 
   display = [$Operator(
-    symbol = '⊍',
+    symbol = '⊎',
     operands = [S, T],
     space = ' '
   )]

@@ -562,7 +562,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let uri = this.interactionHandler.getURI(semanticLink);
       if (uri) {
         result = (
-          <a className={className} href={uri} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <a className={className} href={uri} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </a>
         );
@@ -769,8 +769,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private linkClicked(semanticLink: Display.SemanticLink | undefined, event: any): void {
+  private setPermanentHighlight(semanticLink: Display.SemanticLink | undefined, event: React.SyntheticEvent<HTMLAnchorElement>): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.updateGlobalHover(semanticLink);
+  }
+
+  private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLAnchorElement>): void {
     if (event.button < 1) {
+      event.stopPropagation();
       event.preventDefault();
       if (this.interactionHandler && semanticLink && this.hover && this.hover === this.state.ownHover) {
         this.interactionHandler.linkClicked(semanticLink);
