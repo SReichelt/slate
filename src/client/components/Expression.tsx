@@ -31,6 +31,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private interactionHandler?: ExpressionInteractionHandler;
   private htmlNode: HTMLElement | null = null;
   private hover?: Display.SemanticLink;
+  private permanentHighlightExpression?: Expression;
 
   constructor(props: ExpressionProps) {
     super(props);
@@ -555,8 +556,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         className += ' definition';
       }
       if (this.hover
-          && ((this.state.ownHover === this.hover)
-              || (this.hover.showAllReferences && semanticLink.linkedObject && this.hover.linkedObject === semanticLink.linkedObject))) {
+          && (this.state.ownHover === this.hover
+              || (this.hover.showAllReferences && semanticLink.linkedObject && this.hover.linkedObject === semanticLink.linkedObject))
+              || this.getPermanentHighlightExpression() === this) {
         className += ' hover';
       }
       let uri = this.interactionHandler.getURI(semanticLink);
@@ -568,7 +570,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
       } else {
         result = (
-          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </span>
         );
@@ -771,7 +773,25 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private setPermanentHighlight(semanticLink: Display.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
     this.stopPropagation(event);
+    this.updatePermanentHighlightExpression(this);
     this.updateGlobalHover(semanticLink);
+  }
+
+  private updatePermanentHighlightExpression(permanentHighlightExpression: Expression | undefined): void {
+    if (this.props.parent) {
+      this.props.parent.updatePermanentHighlightExpression(permanentHighlightExpression);
+    } else {
+      this.permanentHighlightExpression = permanentHighlightExpression;
+      this.forceUpdate();
+    }
+  }
+
+  private getPermanentHighlightExpression(): Expression | undefined {
+    if (this.props.parent) {
+      return this.props.parent.getPermanentHighlightExpression();
+    } else {
+      return this.permanentHighlightExpression;
+    }
   }
 
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {

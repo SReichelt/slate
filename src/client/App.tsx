@@ -15,13 +15,18 @@ import { HLM } from './logics/hlm/hlm';
 interface AppProps {
 }
 
-interface AppState {
-  error?: string;
-  templates?: Fmt.File;
+interface SelectionState {
   selectedItemPath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
   selectedItemDefinition?: CachedPromise<Fmt.Definition>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
+}
+
+interface AppState extends SelectionState {
+  width: number;
+  height: number;
+  error?: string;
+  templates?: Fmt.File;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -41,12 +46,15 @@ class App extends React.Component<AppProps, AppState> {
     this.treeItemClicked = this.treeItemClicked.bind(this);
     this.linkClicked = this.linkClicked.bind(this);
 
-    let state: AppState = {};
+    let state: AppState = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    };
     this.updateSelectionState(state);
     this.state = state;
   }
 
-  private updateSelectionState(state: AppState): boolean {
+  private updateSelectionState(state: SelectionState): boolean {
     let path = this.libraryDataProvider.uriToPath(location.pathname);
     if (path) {
       this.fillSelectionState(state, path);
@@ -55,7 +63,7 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   }
 
-  private fillSelectionState(state: AppState, path: Fmt.Path): void {
+  private fillSelectionState(state: SelectionState, path: Fmt.Path): void {
     state.selectedItemPath = path;
     state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
     state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name);
@@ -63,11 +71,18 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount(): void {
-    onpopstate = () => {
-      let state: AppState = {};
+    window.onpopstate = () => {
+      let state: SelectionState = {};
       if (this.updateSelectionState(state)) {
         this.setState(state);
       }
+    };
+
+    window.onresize = () => {
+      this.setState({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
     };
 
     fetch('/display/templates.hlm')
@@ -82,9 +97,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentWillUnmount(): void {
-    onpopstate = () => {
-      // Can't do anything after unmounting.
-    };
+    window.onresize = null;
+    window.onpopstate = null;
   }
 
   render(): any {
@@ -99,9 +113,12 @@ class App extends React.Component<AppProps, AppState> {
       contents = 'Please select an item from the tree.';
     }
 
+    let verticalWindow = this.state.height > this.state.width;
+    let windowSize = verticalWindow ? this.state.height : this.state.width;
+
     return (
       <div className={'app'}>
-        <SplitPane split="vertical" minSize={innerWidth / 5} defaultSize={innerWidth / 3}>
+        <SplitPane split={verticalWindow ? 'horizontal' : 'vertical'} minSize={windowSize / 5} defaultSize={windowSize / 3}>
           <div className={'app-pane'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
             <div className={'app-tree'}>
               <LibraryTree libraryDataProvider={this.libraryDataProvider} section={this.library} itemNumber={[]} templates={this.state.templates} parentScrollPane={this.treePaneNode} isLast={true} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>
@@ -130,7 +147,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   linkClicked(libraryDataProvider: LibraryDataProvider, path: Fmt.Path) {
-    let state: AppState = {};
+    let state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.setState(state);
 
