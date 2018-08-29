@@ -1,0 +1,26 @@
+{
+    "name": "hlm",
+    "displayName": "HLM",
+    "description": "Provides syntax highlighting for the HLM proof assistant language.",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.26.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "publisher": "",
+    "contributes": {
+        "languages": [{
+            "id": "hlm",
+            "aliases": ["HLM", "hlm"],
+            "extensions": [".hlm"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "hlm",
+            "scopeName": "source.hlm",
+            "path": "./syntaxes/hlm.tmLanguage.json"
+        }]
+    }
+}

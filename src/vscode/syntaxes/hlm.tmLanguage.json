@@ -1,0 +1,48 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "HLM",
+	"patterns": [
+		{
+			"name": "support.other.metamodel-ref.hlm",
+			"match": "^%.*%$"
+		},
+		{
+			"name": "keyword.other.meta-ref.hlm.unquoted",
+			"match": "%\\w+\\b"
+		},
+		{
+			"name": "keyword.other.meta-ref.hlm.quoted",
+			"begin": "%\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.hlm",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"name": "identifier.quoted.double.hlm",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.hlm",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"name": "string.quoted.single.hlm",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.hlm",
+					"match": "\\\\."
+				}
+			]
+		}
+	],
+	"scopeName": "source.hlm"
+}
