@@ -764,16 +764,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private setGlobalHover(hover: Display.SemanticLink | undefined): void {
     if (this.hover !== hover) {
       this.hover = hover;
-      if (hover && (!this.state.ownHover || this.state.ownHover === this.hover)) {
-        let update = () => {
-          if (this.hover) {
-            this.setState((prevState) => ({showPreview: prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
-          }
-        };
-        setTimeout(update, 250);
-      } else {
-        this.setState({showPreview: false});
-      }
+      this.setState((prevState) => {
+        if (hover && (prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this)) {
+          let update = () => {
+            if (this.hover) {
+              this.setState((laterPrevState) => ({showPreview: laterPrevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
+            }
+          };
+          setTimeout(update, 250);
+          return {showPreview: prevState.showPreview};
+        } else {
+          return {showPreview: false};
+        }
+      });
     }
   }
 

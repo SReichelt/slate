@@ -24,7 +24,8 @@ $opposite(
         #(
           s: %Element(S),
           t: %Element(S)
-        )
+        ),
+        override = %true
       }
     )),
     $../Sets/"Cartesian product"(
