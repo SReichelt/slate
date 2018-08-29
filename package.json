@@ -7,12 +7,13 @@
     "node": ">=6.9.5"
   },
   "scripts": {
+    "postinstall": "svn update data/fonts || (svn checkout --depth empty https://github.com/mathjax/MathJax/trunk/fonts data/fonts && svn update --depth empty data/fonts/HTML-CSS && svn update --depth empty data/fonts/HTML-CSS/TeX && svn update data/fonts/HTML-CSS/TeX/eot && svn update data/fonts/HTML-CSS/TeX/woff && svn update data/fonts/HTML-CSS/TeX/otf && svn update data/fonts/HTML-CSS/TeX/svg)",
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "start": "node ./dist/server/server.js",
     "start:prod": "cross-env NODE_ENV=production node ./dist/server/server.js",
-    "build-client": "cd ./src/client && cross-env NODE_ENV=production webpack -p",
-    "dev-client": "cd ./src/client && webpack-dev-server -w",
+    "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p",
+    "dev-client": "cd src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server.js\"",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",

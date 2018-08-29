@@ -9,11 +9,5 @@ export function apiRouter() {
 
   router.use(express.static(dataPath));
 
-  router.use('/fonts', proxy(
-    {
-      target: 'http://cdn.mathjax.org/mathjax/latest',
-      changeOrigin: true
-    }));
-
   return router;
 }
