@@ -14,6 +14,25 @@
                 "dev"
             ],
             "port": 9229
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "webRoot": "${workspaceFolder}/src/client",
+            "sourceMapPathOverrides": {
+                "webpack:///./*":  "${webRoot}/*",
+                "webpack:///../*": "${webRoot}/../*",
+                "webpack:///*":    "*"
+            },
+            "timeout": 20000
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch and attach",
+            "configurations": ["Launch via NPM", "Attach to Chrome"]
         }
     ]
 }

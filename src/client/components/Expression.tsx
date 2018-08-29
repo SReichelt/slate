@@ -32,6 +32,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private hover?: Display.SemanticLink;
   private permanentHighlightExpression?: Expression;
+  private windowClickListener?: (this: Window, ev: MouseEvent) => any;
 
   constructor(props: ExpressionProps) {
     super(props);
@@ -40,24 +41,40 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       showPreview: false
     };
 
-    this.updateInteraction(props);
+    if (!props.parent) {
+      this.windowClickListener = () => this.setPermanentHighlight(undefined);
+    }
+
+    this.updateInteraction(props, false);
   }
 
-  componentWillReceiveProps(props: ExpressionProps) {
-    this.updateInteraction(props);
+  componentDidMount(): void {
+    if (this.windowClickListener) {
+      window.addEventListener('click', this.windowClickListener);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.windowClickListener) {
+      window.removeEventListener('click', this.windowClickListener);
+    }
+  }
+
+  componentWillReceiveProps(props: ExpressionProps): void {
+    this.updateInteraction(props, true);
     if (props.expression !== this.props.expression) {
       this.permanentHighlightExpression = undefined;
     }
   }
 
-  private updateInteraction(props: ExpressionProps) {
+  private updateInteraction(props: ExpressionProps, mounted: boolean): void {
     if (props.interactionHandler) {
       this.interactionHandler = props.interactionHandler;
     } else if (props.parent) {
       this.interactionHandler = props.parent.interactionHandler;
     }
     if (props.parent) {
-      this.setGlobalHover(props.hover);
+      this.setGlobalHover(props.hover, mounted);
     }
   }
 
@@ -566,6 +583,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let uri = this.interactionHandler.getURI(semanticLink);
       if (uri) {
+        className += ' link';
+      }
+      if (uri && process.env.NODE_ENV !== 'development') {
+        /* This causes nested anchors, which, strictly speaking, are illegal.
+           However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+           So we do this anyway, but only in production mode, to prevent warnings from React. */
         result = (
           <a className={className} href={uri} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
@@ -573,7 +596,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
       } else {
         result = (
-          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.stopPropagation(event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </span>
         );
@@ -756,33 +779,35 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       this.props.parent.updateGlobalHover(hover);
     } else {
-      this.setGlobalHover(hover);
+      this.setGlobalHover(hover, true);
       this.forceUpdate();
     }
   }
 
-  private setGlobalHover(hover: Display.SemanticLink | undefined): void {
+  private setGlobalHover(hover: Display.SemanticLink | undefined, mounted: boolean): void {
     if (this.hover !== hover) {
       this.hover = hover;
-      this.setState((prevState) => {
-        if (hover && (prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this)) {
-          let update = () => {
-            if (this.hover) {
-              this.setState((laterPrevState) => ({showPreview: laterPrevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
-            }
-          };
-          setTimeout(update, 250);
-          return {showPreview: prevState.showPreview};
-        } else {
-          return {showPreview: false};
-        }
-      });
+      if (mounted) {
+        this.setState((prevState) => {
+          if (hover && (prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this)) {
+            let update = () => {
+              if (this.hover) {
+                this.setState((laterPrevState) => ({showPreview: laterPrevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
+              }
+            };
+            setTimeout(update, 250);
+            return {showPreview: prevState.showPreview};
+          } else {
+            return {showPreview: false};
+          }
+        });
+      }
     }
   }
 
-  private setPermanentHighlight(semanticLink: Display.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
+  private setPermanentHighlight(semanticLink: Display.SemanticLink | undefined, event?: React.SyntheticEvent<HTMLElement>): void {
     this.stopPropagation(event);
-    this.updatePermanentHighlightExpression(this);
+    this.updatePermanentHighlightExpression(semanticLink ? this : undefined);
     this.updateGlobalHover(semanticLink);
   }
 
@@ -812,9 +837,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {
-    event.stopPropagation();
-    event.preventDefault();
+  private stopPropagation(event?: React.SyntheticEvent<HTMLElement>): void {
+    if (event !== undefined) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
   }
 }
 

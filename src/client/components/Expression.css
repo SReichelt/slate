@@ -8,7 +8,11 @@
 }
 
 span.expr.interactive {
-  cursor: initial;
+  cursor: text;
+}
+
+span.expr.interactive.link {
+  cursor: pointer;
 }
 
 .label, .sub-heading {

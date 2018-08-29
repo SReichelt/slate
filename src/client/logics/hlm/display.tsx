@@ -43,9 +43,9 @@ export class HLMDisplay implements Logic.LogicDisplay {
         <rect x="-2" y="3" width="4" height="4" fill="gray" stroke="black" strokeWidth="1" key="rect"/>
       ];
       if (itemInfo.type === 'theorem') {
-        contents.unshift(<line x1="-7" y1="-6" x2="7" y2="2" stroke="gray" strokeWidth="1" key="rect"/>);
-        contents.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="1" key="rect"/>);
-        contents.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="1" key="rect"/>);
+        contents.unshift(<line x1="-7" y1="-6" x2="7" y2="2" stroke="gray" strokeWidth="1" key="line1"/>);
+        contents.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="1" key="line2"/>);
+        contents.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="1" key="line3"/>);
       }
       return (
         <svg height="1em" width="1em" viewBox={viewBox}>

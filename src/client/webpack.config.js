@@ -17,7 +17,10 @@ const plugins = [
 ];
 
 if (!config.IS_PRODUCTION) {
-  plugins.push(new OpenBrowserPlugin({ url: `http://localhost:${config.SERVER_PORT}` }));
+  plugins.push(new OpenBrowserPlugin({
+    url: `http://localhost:${config.SERVER_PORT}`,
+    browser: 'chromium --remote-debugging-port=9222'
+  }));
 }
 
 module.exports = {
@@ -68,6 +71,9 @@ module.exports = {
         use: 'url-loader?limit=10000'
       }
     ]
+  },
+  watchOptions: {
+    ignored: /node_modules/
   },
   plugins
 };

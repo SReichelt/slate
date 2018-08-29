@@ -9,7 +9,7 @@ import renderPromise from './PromiseHelper';
 type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
 class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
-  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private onLinkClicked?: OnLinkClicked) {}
+  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {}
 
   getURI(semanticLink: Display.SemanticLink): string | undefined {
     let path = this.getPath(semanticLink);
@@ -61,6 +61,12 @@ class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
       while (path.parentPath instanceof Fmt.Path) {
         path = path.parentPath;
       }
+      if (!path.parentPath) {
+        let ownDefinition = this.definition.getImmediateResult();
+        if (ownDefinition && path.name === ownDefinition.name) {
+          return undefined;
+        }
+      }
       return path;
     } else {
       return undefined;
@@ -84,7 +90,7 @@ interface LibraryItemProps {
 function LibraryItem(props: LibraryItemProps): any {
   let logic = props.libraryDataProvider.logic;
   let renderer = logic.display.getRenderer(props.libraryDataProvider, props.templates);
-  let interactionHandler = props.interactive ? new LibraryItemInteractionHandler(props.libraryDataProvider, props.templates, props.onLinkClicked) : undefined;
+  let interactionHandler = props.interactive ? new LibraryItemInteractionHandler(props.libraryDataProvider, props.templates, props.definition, props.onLinkClicked) : undefined;
 
   let render = props.definition.then((definition: Fmt.Definition) => {
     let expression = renderer.renderDefinition(definition, props.itemInfo, props.includeLabel, props.includeExtras, props.includeProofs, props.includeRemarks);
