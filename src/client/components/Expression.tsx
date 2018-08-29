@@ -45,6 +45,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   componentWillReceiveProps(props: ExpressionProps) {
     this.updateInteraction(props);
+    if (props.expression !== this.props.expression) {
+      this.permanentHighlightExpression = undefined;
+    }
   }
 
   private updateInteraction(props: ExpressionProps) {
@@ -570,7 +573,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
       } else {
         result = (
-          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.stopPropagation(event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </span>
         );
@@ -581,6 +584,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           previewContents = this.interactionHandler.getPreviewContents(semanticLink);
           if (previewContents) {
             showPreview = true;
+          }
+          if (uri) {
+            previewContents = <a href={uri} onClick={(event) => this.linkClicked(semanticLink, event)}>{previewContents}</a>;
           }
         }
         let previewStyle = {
@@ -797,7 +803,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {
     if (event.button < 1) {
       this.stopPropagation(event);
-      if (this.interactionHandler && semanticLink && this.hover && this.hover === this.state.ownHover) {
+      if (this.interactionHandler && semanticLink) {
         this.interactionHandler.linkClicked(semanticLink);
       }
     }
