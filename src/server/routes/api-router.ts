@@ -5,9 +5,12 @@ import { Router } from 'express';
 
 export function apiRouter() {
   const router = Router();
-  const dataPath = path.join(__dirname, '..', '..', '..', 'data');
+  const rootPath = path.join(__dirname, '..', '..', '..');
+  const dataPath = path.join(rootPath, 'data');
+  const fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
 
   router.use(express.static(dataPath));
+  router.use('/fonts', express.static(fontPath));
 
   return router;
 }
