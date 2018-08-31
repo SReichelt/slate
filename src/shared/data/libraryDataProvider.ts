@@ -261,7 +261,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         uri = uri.substring(slashPos + 1);
         slashPos = uri.indexOf('/');
       }
-      if (uri.length) {
+      if (uri) {
         let result = new Fmt.Path;
         result.name = decodeURI(uri);
         result.parentPath = path;

@@ -13,8 +13,8 @@ export class StringInputStream implements InputStream {
   private pos: number;
   private endPos: number;
 
-  line: number = 1;
-  col: number = 1;
+  line: number = 0;
+  col: number = 0;
 
   constructor(private str: string) {
     this.pos = 0;
@@ -27,7 +27,7 @@ export class StringInputStream implements InputStream {
       this.pos++;
       if (c === '\n') {
         this.line++;
-        this.col = 1;
+        this.col = 0;
       } else {
         this.col++;
       }
@@ -46,11 +46,13 @@ export class StringInputStream implements InputStream {
   }
 }
 
+type ErrorHandler = (msg: string, line: number, col: number) => void;
 
-class Reader {
+export class Reader {
   private triedChars: string[] = [];
+  private atError = false;
 
-  constructor(private stream: InputStream, private fileName: string, private contextProvider: Fmt.ContextProvider) {}
+  constructor(private stream: InputStream, private errorHandler: ErrorHandler, private contextProvider: Fmt.ContextProvider) {}
 
   readFile(): Fmt.File {
     let file = new Fmt.File;
@@ -58,14 +60,14 @@ class Reader {
     this.readChar('%');
     file.metaModelPath = this.readPath(context, file);
     if (context.metaDefinitions && file.metaModelPath.name !== context.metaDefinitions.metaModelName) {
-      return this.error(`Expected file of type "${context.metaDefinitions.metaModelName}"`);
+      this.error(`Expected file of type "${context.metaDefinitions.metaModelName}"`);
     }
     this.readChar('%');
     let definitionTypes = context.metaDefinitions ? context.metaDefinitions.definitionTypes : undefined;
     this.readDefinitions(file.definitions, definitionTypes, context);
     this.skipWhitespace();
     if (this.peekChar()) {
-      return this.error('Definition or end of file expected');
+      this.error('Definition or end of file expected');
     }
     return file;
   }
@@ -214,7 +216,7 @@ class Reader {
 
   readParameter(context: Fmt.Context, parent: Object): Fmt.Parameter {
     this.skipWhitespace();
-    return this.tryReadParameter(context, parent) || this.error('Parameter expected');
+    return this.tryReadParameter(context, parent) || this.error('Parameter expected') || new Fmt.Parameter;
   }
 
   tryReadArgumentList(args: Fmt.ArgumentList, context: Fmt.Context, parent: Object): boolean {
@@ -274,7 +276,7 @@ class Reader {
 
   readArgument(context: Fmt.Context, parent: Object): Fmt.Argument {
     this.skipWhitespace();
-    return this.tryReadArgument(context, parent) || this.error('Argument expected');
+    return this.tryReadArgument(context, parent) || this.error('Argument expected') || new Fmt.Argument;
   }
 
   tryReadType(metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Type | undefined {
@@ -297,7 +299,7 @@ class Reader {
 
   readType(metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Type {
     this.skipWhitespace();
-    return this.tryReadType(metaDefinitionList, context) || this.error('Type expected');
+    return this.tryReadType(metaDefinitionList, context) || this.error('Type expected') || new Fmt.Type;
   }
 
   readExpressions(context: Fmt.Context): Fmt.Expression[] {
@@ -399,7 +401,7 @@ class Reader {
 
   readExpression(isType: boolean, metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Expression {
     this.skipWhitespace();
-    return this.tryReadExpression(isType, metaDefinitionList, context) || this.error('Expression expected');
+    return this.tryReadExpression(isType, metaDefinitionList, context) || this.error('Expression expected') || new Fmt.StringExpression;
   }
 
   tryReadString(quoteChar: string): string | undefined {
@@ -411,7 +413,8 @@ class Reader {
       for (;;) {
         let c = this.readAnyChar();
         if (!c) {
-          return this.error('Unterminated string');
+          this.error('Unterminated string');
+          break;
         } else if (c === quoteChar) {
           break;
         } else if (c === '\\') {
@@ -432,7 +435,7 @@ class Reader {
             str += '\n';
             break;
           default:
-            return this.error('Unknown escape sequence');
+            this.error('Unknown escape sequence');
           }
         } else {
           str += c;
@@ -462,19 +465,20 @@ class Reader {
     if (c === '"') {
       return this.tryReadString('"');
     } else if (isSpecialCharacter(c) || isNumericalCharacter(c)) {
+      this.triedChars.push('');
       return undefined;
     } else {
       let identifier = '';
       do {
         identifier += this.readAnyChar();
         c = this.peekChar();
-      } while (!isSpecialCharacter(c));
+      } while (c && !isSpecialCharacter(c));
       return identifier;
     }
   }
 
   readIdentifier(): string {
-    return this.tryReadIdentifier() || this.error('Identifier expected');
+    return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
   private skipWhitespace(): void {
@@ -513,7 +517,7 @@ class Reader {
             expected += 'or ';
           }
         }
-        expected += `'${tried}'`;
+        expected += tried.length ? `'${tried}'` : 'identifier';
         index++;
       }
       this.error(`${expected} expected`);
@@ -526,21 +530,28 @@ class Reader {
 
   private readAnyChar(): string {
     this.triedChars.length = 0;
+    this.atError = false;
     return this.stream.readChar();
   }
 
-  private error(msg: string): never {
-    let error: any = new SyntaxError(this.fileName + ':' + this.stream.line + ':' + this.stream.col + ': ' + msg);
-    error.fileName = this.fileName;
-    error.lineNumber = this.stream.line;
-    error.columnNumber = this.stream.col;
-    throw error;
+  private error(msg: string): void {
+    if (!this.atError) {
+      this.errorHandler(msg, this.stream.line, this.stream.col);
+      this.atError = true;
+    }
   }
 }
 
 
 export function readStream(stream: InputStream, fileName: string, contextProvider: Fmt.ContextProvider): Fmt.File {
-  let reader = new Reader(stream, fileName, contextProvider);
+  let errorHandler = (msg: string, line: number, col: number) => {
+    let error: any = new SyntaxError(`${fileName}:${line + 1}:${col + 1}: ${msg}`);
+    error.fileName = fileName;
+    error.lineNumber = line + 1;
+    error.columnNumber = col + 1;
+    throw error;
+  };
+  let reader = new Reader(stream, errorHandler, contextProvider);
   return reader.readFile();
 }
 
@@ -548,6 +559,11 @@ export function readString(str: string, fileName: string, contextProvider: Fmt.C
   return readStream(new StringInputStream(str), fileName, contextProvider);
 }
 
-export function readResponse(response: Response, contextProvider: Fmt.ContextProvider): Promise<Fmt.File> {
+interface TextResponse {
+  url: string;
+  text(): Promise<string>;
+}
+
+export function readResponse(response: TextResponse, contextProvider: Fmt.ContextProvider): Promise<Fmt.File> {
   return response.text().then((str: string) => readString(str, response.url, contextProvider));
 }

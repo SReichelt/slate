@@ -114,7 +114,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
   renderDefinitionLabel(definition: Fmt.Definition, itemInfo: CachedPromise<LibraryItemInfo>): Display.RenderedExpression {
     let formattedInfoPromise = itemInfo.then((info: LibraryItemInfo) => {
       let text: string;
-      if (info.type && info.type.length) {
+      if (info.type) {
         text = info.type.charAt(0).toUpperCase() + info.type.slice(1);
       } else {
         text = definition.contents instanceof FmtHLM.ObjectContents_Theorem ? 'Proposition' : 'Definition';

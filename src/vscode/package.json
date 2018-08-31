@@ -3,13 +3,13 @@
     "displayName": "HLM",
     "description": "Provides syntax highlighting for the HLM proof assistant language.",
     "version": "0.0.1",
+    "publisher": "",
     "engines": {
         "vscode": "^1.26.0"
     },
     "categories": [
         "Programming Languages"
     ],
-    "publisher": "",
     "contributes": {
         "languages": [{
             "id": "hlm",
@@ -21,6 +21,29 @@
             "language": "hlm",
             "scopeName": "source.hlm",
             "path": "./syntaxes/hlm.tmLanguage.json"
-        }]
+        }],
+        "configurationDefaults": {
+            "hlm": {
+                "files.encoding": "utf-8"
+            }
+        }
+    },
+    "activationEvents": [
+        "onLanguage:hlm"
+    ],
+    "main": "./out/vscode/src/extension",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.21",
+        "tslint": "^5.8.0",
+        "@types/node": "^8.10.25",
+        "@types/mocha": "^2.2.42"
     }
 }

@@ -169,7 +169,7 @@ function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, t
       }
     }
   }
-  if (!outFileStr.length) {
+  if (!outFileStr) {
     outFileStr = `${indent}${outputBegin}${source}${outputEnd};\n`;
   }
   return outFileStr;
@@ -283,7 +283,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
         }
       }
     }
-    if (!outFileStr.length) {
+    if (!outFileStr) {
       outFileStr = `${indent}${outputBegin}${source}${outputEnd};\n`;
     }
   }
@@ -572,7 +572,7 @@ function outputMetaAssignments(inFile: Fmt.File, visibleTypeNames: string[]): st
     }
   }
 
-  if (outFileStr.length) {
+  if (outFileStr) {
     outFileStr += `\n`;
   }
   return outFileStr;

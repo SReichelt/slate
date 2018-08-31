@@ -19,7 +19,7 @@ interface IndentInfo {
   outerIndent: string;
 }
 
-class Writer {
+export class Writer {
   private lineLength = 0;
 
   constructor(private stream: OutputStream) {}

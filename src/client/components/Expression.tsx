@@ -96,7 +96,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = '\u200b';
     } else if (expression instanceof Display.TextExpression) {
       let text = expression.text;
-      if (text.length) {
+      if (text) {
         text = text.replace('  ', ' \xa0');
         if (text.startsWith(' ')) {
           text = '\xa0' + text.substring(1);
@@ -651,7 +651,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         let cp = c.codePointAt(0)!;
         if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
           if (curStyle !== 'sans') {
-            if (curText.length) {
+            if (curText) {
               result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
               curText = '';
             }
@@ -661,7 +661,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                                                          cp - 0x1d5ba + 0x61);
         } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
           if (curStyle !== 'calligraphic') {
-            if (curText.length) {
+            if (curText) {
               result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
               curText = '';
             }
@@ -709,7 +709,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
           if (curStyle !== 'fraktur') {
-            if (curText.length) {
+            if (curText) {
               result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
               curText = '';
             }
@@ -739,7 +739,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         } else if (cp >= 0x1d538 && cp < 0x1d56c) {
           if (curStyle !== 'double-struck') {
-            if (curText.length) {
+            if (curText) {
               result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
               curText = '';
             }
@@ -757,7 +757,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       }
     }
-    if (curText.length) {
+    if (curText) {
       result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
     }
     if (result.length === 1) {
