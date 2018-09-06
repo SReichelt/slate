@@ -243,6 +243,9 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     let row: Display.RenderedExpression[] = [];
 
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+      state.inLetExpr = false;
+      state.inConstraint = false;
+
       for (let param of parameters) {
         row.push(new Display.TextExpression(state.abbreviate ? ' f.e. ' : ' for each '));
         let variables: Fmt.Parameter[] = [param];
