@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-TS_NODE_COMPILER_OPTIONS={\"module\":\"commonjs\"} ts-node src/scripts/generateMetaDeclarations.ts "$@"
+ts-node src/scripts/generateMetaDeclarations.ts "$@"

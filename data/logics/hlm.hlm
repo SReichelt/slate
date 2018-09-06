@@ -32,7 +32,7 @@ $Definition: %DefinitionType {
 $DefinitionDisplay: %ExpressionType {
   members = #(
     parameter: %SingleParameter($../display/display/Expr),
-    display?: $../display/display/Expr[],
+    display[parameter]?: $../display/display/Expr[],
     singularName?: $../display/display/Expr,
     pluralName?: $../display/display/Expr,
     nameOptional: $../display/display/Bool = $../display/display/false
@@ -50,7 +50,7 @@ $Construction: %DefinitionType($SetTerm) {
 $Embedding: %ExpressionType {
   members = #(
     parameter: %SingleParameter($Element),
-    target: $ElementTerm,
+    target[parameter]: $ElementTerm,
     wellDefinednessProof?: $Proof
   )
 }
@@ -58,7 +58,7 @@ $Embedding: %ExpressionType {
 $Constructor: %DefinitionType($ElementTerm) {
   superType = $Definition,
   members = #(
-    equalityDefinition?: $EqualityDefinition,
+    equalityDefinition[$Construction]?: $EqualityDefinition,
     rewrite?: $RewriteDefinition
   )
 }
@@ -67,8 +67,8 @@ $EqualityDefinition: %ExpressionType {
   members = #(
     leftParameters: %ParameterList,
     rightParameters: %ParameterList,
-    definition: $Formula[],
-    equivalenceProofs?: $Proof[],
+    definition[leftParameters, rightParameters]: $Formula[],
+    equivalenceProofs[leftParameters, rightParameters]?: $Proof[],
     reflexivityProof?: $Proof,
     symmetryProof?: $Proof,
     transitivityProof?: $Proof,
@@ -111,8 +111,8 @@ $ImplicitOperator: %DefinitionType($ElementTerm) {
   superType = $Operator,
   members = #(
     parameter: %SingleParameter($Element),
-    definition: $Formula[],
-    equivalenceProofs: $Proof[] = [],
+    definition[parameter]: $Formula[],
+    equivalenceProofs[parameter]: $Proof[] = [],
     wellDefinednessProof?: $Proof
   )
 }
@@ -186,8 +186,9 @@ $Symbol: %ParameterType($SymbolTerm) {
 $Constraint(formula: $Formula): %ParameterType($Formula) {
   argumentType = $ConstraintArg
 }
-$Binding(set: $SetTerm, parameters: %ParameterList, shortcut?: $Shortcut): %ParameterType {
-  argumentType = $BindingArg
+$Binding(set: $SetTerm, parameters[%self]: %ParameterList, shortcut?: $Shortcut): %ParameterType {
+  argumentType = $BindingArg,
+  exports = [parameters]
 }
 $SetDef(set: $SetTerm): %ParameterType($SetTerm) {}
 $Def(element: $ElementTerm): %ParameterType($ElementTerm) {}
@@ -198,7 +199,8 @@ $Shortcut: %ExpressionType {
     parameters: %ParameterList = #(),
     rewrite: $Bool = $false,
     override: $Bool = $false
-  )
+  ),
+  exports = [parameters]
 }
 
 $SetArg: %ExpressionType {
@@ -231,7 +233,7 @@ $ConstraintArg: %ExpressionType {
 $BindingArg: %ExpressionType {
   members = #(
     parameter: %SingleParameter($Element),
-    arguments: %ArgumentList
+    arguments[parameter]: %ArgumentList
   )
 }
 
@@ -244,8 +246,8 @@ $empty: %Any {}
 $previous: %Any {}
 
 $enumeration(terms...?: $ElementTerm): $SetTerm {}
-$subset(parameter: %SingleParameter($Element), formula: $Formula): $SetTerm {}
-$extendedSubset(parameters: %ParameterList, term: $ElementTerm): $SetTerm {}
+$subset(parameter: %SingleParameter($Element), formula[parameter]: $Formula): $SetTerm {}
+$extendedSubset(parameters: %ParameterList, term[parameters]: $ElementTerm): $SetTerm {}
 $setStructuralCases(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($SetTerm)[]): $SetTerm {}
 
 $cases(cases: $Case($ElementTerm)[]): $ElementTerm {}
@@ -254,9 +256,9 @@ $structuralCases(term: $ElementTerm, construction: $Construction, cases: $Struct
 $not(formula: $Formula): $Formula {}
 $and(formulae...?: $Formula): $Formula {}
 $or(formulae...?: $Formula): $Formula {}
-$forall(parameters: %ParameterList, formula: $Formula): $Formula {}
-$exists(parameters: %ParameterList, formula?: $Formula): $Formula {}
-$existsUnique(parameters: %ParameterList, formula?: $Formula): $Formula {}
+$forall(parameters: %ParameterList, formula[parameters]: $Formula): $Formula {}
+$exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
+$existsUnique(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $in(element: $ElementTerm, set: $SetTerm): $Formula {}
 $sub(subset: $SetTerm, superset: $SetTerm): $Formula {}
 $setEquals(left: $SetTerm, right: $SetTerm): $Formula {}
@@ -275,7 +277,7 @@ $StructuralCase(type: %Type): %ExpressionType {
   members = #(
     constructor: $Constructor,
     parameters: %ParameterList = #(),
-    value: type,
+    value[parameters]: type,
     rewrite: $Bool = $false,
     wellDefinednessProof?: $Proof
   )
@@ -286,8 +288,8 @@ $Proof: %ExpressionType {
     from?: %Int,
     to?: %Int,
     parameters?: %ParameterList,
-    goal?: $Formula,
-    steps: %ParameterList
+    goal[parameters]?: $Formula,
+    steps[parameters]: %ParameterList
   )
 }
 

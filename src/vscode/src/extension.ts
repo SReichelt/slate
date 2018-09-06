@@ -12,7 +12,7 @@ class HLMDocumentFormatter implements vscode.DocumentFormattingEditProvider {
     provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
         try {
             let unformatted = document.getText();
-            let file = FmtReader.readString(unformatted, document.fileName, new Fmt.DummyContextProvider);
+            let file = FmtReader.readString(unformatted, document.fileName, new Fmt.DummyMetaModel);
             let formatted = FmtWriter.writeString(file);
             if (formatted !== unformatted) {
                 let range = new vscode.Range(
@@ -51,7 +51,7 @@ function updateDiagnostics(document: vscode.TextDocument, collection: vscode.Dia
             severity: vscode.DiagnosticSeverity.Error
         });
     };
-    let reader = new FmtReader.Reader(stream, errorHandler, new Fmt.DummyContextProvider);
+    let reader = new FmtReader.Reader(stream, errorHandler, new Fmt.DummyMetaModel);
     try {
         reader.readFile();
     } catch (error) {

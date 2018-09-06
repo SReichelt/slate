@@ -69,6 +69,7 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
 export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   superType?: Fmt.Expression;
   members?: Fmt.ParameterList;
+  exports?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.superType = argumentList.getOptionalValue('superType', 0);
@@ -80,6 +81,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         throw new Error('members: Parameter expression expected');
       }
     }
+    this.exports = argumentList.getOptionalValue('exports', 2);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -91,6 +93,9 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       let membersExpr = new Fmt.ParameterExpression;
       membersExpr.parameters.push(...this.members);
       argumentList.add(membersExpr, 'members');
+    }
+    if (this.exports !== undefined) {
+      argumentList.add(this.exports, 'exports');
     }
   }
 
@@ -108,6 +113,12 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         changed = true;
       }
     }
+    if (this.exports) {
+      result.exports = this.exports.substitute(fn, replacedParameters);
+      if (result.exports !== this.exports) {
+        changed = true;
+      }
+    }
     return changed;
   }
 }
@@ -117,7 +128,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.innerDefinitionTypes = argumentList.getOptionalValue('innerDefinitionTypes', 2);
+    this.innerDefinitionTypes = argumentList.getOptionalValue('innerDefinitionTypes', 3);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -212,7 +223,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.argumentType = argumentList.getOptionalValue('argumentType', 2);
+    this.argumentType = argumentList.getOptionalValue('argumentType', 3);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -383,7 +394,7 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
 
 export const metaDefinitions: Fmt.MetaDefinitions = {
   metaModelName: 'meta',
-  definitionTypes: {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.DefinitionRefExpression},
-  expressionTypes: {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.DefinitionRefExpression},
+  definitionTypes: {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression},
+  expressionTypes: {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression},
   functions: {'Any': MetaRefExpression_Any}
 };

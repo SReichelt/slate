@@ -4,21 +4,21 @@ import * as FmtDisplay from '../../display/meta';
 import { LogicFormat } from '../format';
 
 export class HLMFormat implements LogicFormat {
-  contextProvider: HLMContextProvider = new HLMContextProvider(FmtHLM.metaDefinitions);
+  metaModel: HLMMetaModel = new HLMMetaModel;
 }
 
-class HLMContextProvider extends Fmt.ContextProvider {
+class HLMMetaModel extends Fmt.MetaModel {
+  constructor() {
+    super(FmtHLM.metaDefinitions);
+  }
+
   getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
     let definitionContext = new DefinitionContext(definition, parentContext);
-    return this.createParameterListContext(definition.parameters, definitionContext);
+    return super.getDefinitionContentsContext(definition, definitionContext);
   }
 
   getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context, parent: Object): Fmt.Context {
     return new ParameterTypeContext(parameter, parentContext);
-  }
-
-  getNextParameterContext(parameter: Fmt.Parameter, previousContext: Fmt.Context, parent: Object): Fmt.Context {
-    return this.createParameterContext(parameter, previousContext);
   }
 
   getNextArgumentContext(argument: Fmt.Argument, previousContext: Fmt.Context, parent: Object): Fmt.Context {
@@ -26,7 +26,7 @@ class HLMContextProvider extends Fmt.ContextProvider {
       previousContext = new Fmt.ParameterContext(previousContext.parameter, previousContext);
     }
     if (argument.value instanceof Fmt.ParameterExpression && !(parent instanceof Fmt.DefinitionRefExpression)) {
-      return this.createParameterListContext(argument.value.parameters, previousContext);
+      return this.getParameterListContext(argument.value.parameters, previousContext);
     }
     return previousContext;
   }
@@ -49,28 +49,14 @@ class HLMContextProvider extends Fmt.ContextProvider {
     return parentContext;
   }
 
-  private createParameterContext(parameter: Fmt.Parameter, parentContext: Fmt.Context, suffix?: string): Fmt.Context {
-    if (suffix) {
-      let newParameter: Fmt.Parameter = Object.create(parameter);
-      newParameter.name += suffix;
-      parameter = newParameter;
+  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+    if (expression instanceof FmtHLM.MetaRefExpression_Element && expression.shortcut && expression.shortcut.parameters) {
+      return this.getParameterListContext(expression.shortcut.parameters, parentContext);
+    } else if (expression instanceof FmtHLM.MetaRefExpression_Binding) {
+      return this.getParameterListContext(expression.parameters, parentContext);
+    } else {
+      return parentContext;
     }
-    let context: Fmt.Context = new Fmt.ParameterContext(parameter, parentContext);
-    let type = parameter.type.expression;
-    if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && type.shortcut.parameters) {
-      context = this.createParameterListContext(type.shortcut.parameters, context, suffix);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-      context = this.createParameterListContext(type.parameters, context, suffix);
-    }
-    return context;
-  }
-
-  private createParameterListContext(parameters: Fmt.ParameterList, parentContext: Fmt.Context, suffix?: string): Fmt.Context {
-    let context = parentContext;
-    for (let param of parameters) {
-      context = this.createParameterContext(param, context, suffix);
-    }
-    return context;
   }
 }
 

@@ -112,6 +112,7 @@ export class Parameter {
   defaultValue?: Expression;
   optional: boolean;
   list: boolean;
+  dependencies?: Expression[];
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;
@@ -238,6 +239,10 @@ export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList): void;
   abstract toArgumentList(argumentList: ArgumentList): void;
 
+  getArgumentValueContext(parentContext: Context, previousArguments: ArgumentList, name: string): Context {
+    return parentContext;
+  }
+
   fromCompoundExpression(expression: CompoundExpression): void {
     this.fromArgumentList(expression.arguments);
   }
@@ -310,6 +315,10 @@ export abstract class MetaRefExpression extends ObjectRefExpression {
   abstract getName(): string;
   abstract fromArgumentList(argumentList: ArgumentList): void;
   abstract toArgumentList(argumentList: ArgumentList): void;
+
+  getArgumentValueContext(parentContext: Context, previousArguments: ArgumentList, name: string): Context {
+    return parentContext;
+  }
 }
 
 export class GenericMetaRefExpression extends MetaRefExpression {
@@ -334,7 +343,7 @@ export class GenericMetaRefExpression extends MetaRefExpression {
 }
 
 export interface MetaDefinitionList {
-  [name: string]: any;
+  [name: string]: {new(): MetaRefExpression};
 }
 
 export interface MetaDefinitions {
@@ -453,26 +462,6 @@ export class ParameterContext extends DerivedContext {
   }
 }
 
-export class ParameterListContext extends Context {
-  constructor(public parameters: ParameterList, public parentContext: Context) {
-    super(parentContext.metaDefinitions);
-  }
-
-  getVariables(): Parameter[] {
-    return this.parentContext.getVariables().concat(this.parameters);
-  }
-
-  getVariable(name: string): Parameter {
-    for (let i = this.parameters.length - 1; i >= 0; --i) {
-      let param = this.parameters[i];
-      if (param.name === name) {
-        return param;
-      }
-    }
-    return this.parentContext.getVariable(name);
-  }
-}
-
 export class DummyContext extends Context {
   getVariables(): Parameter[] {
     return [];
@@ -485,7 +474,7 @@ export class DummyContext extends Context {
   }
 }
 
-export class ContextProvider {
+export class MetaModel {
   constructor(public metaDefinitions?: MetaDefinitions) {}
 
   getRootContext(): Context {
@@ -497,7 +486,7 @@ export class ContextProvider {
   }
 
   getDefinitionContentsContext(definition: Definition, parentContext: Context): Context {
-    return new ParameterListContext(definition.parameters, parentContext);
+    return this.getParameterListContext(definition.parameters, parentContext);
   }
 
   getParameterTypeContext(parameter: Parameter, parentContext: Context, parent: Object): Context {
@@ -505,19 +494,38 @@ export class ContextProvider {
   }
 
   getNextParameterContext(parameter: Parameter, previousContext: Context, parent: Object): Context {
-    return previousContext;
+    return this.getParameterContext(parameter, previousContext);
   }
 
   getNextArgumentContext(argument: Argument, previousContext: Context, parent: Object): Context {
+    // TODO look up dependencies in meta definitions
     return previousContext;
   }
 
   getArgumentValueContext(argument: Argument, parentContext: Context, parent: Object): Context {
+    // TODO look up dependencies in meta definitions
+    return parentContext;
+  }
+
+  protected getParameterContext(parameter: Parameter, parentContext: Context): Context {
+    let typeContext = this.getExports(parameter.type.expression, parentContext);
+    return new ParameterContext(parameter, typeContext);
+  }
+
+  protected getParameterListContext(parameters: ParameterList, parentContext: Context): Context {
+    let context = parentContext;
+    for (let param of parameters) {
+      context = this.getParameterContext(param, context);
+    }
+    return context;
+  }
+
+  protected getExports(expression: Expression, parentContext: Context): Context {
     return parentContext;
   }
 }
 
-export class DummyContextProvider extends ContextProvider {
+export class DummyMetaModel extends MetaModel {
   getRootContext(): Context {
     return new DummyContext;
   }

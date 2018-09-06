@@ -549,7 +549,7 @@ function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression,
         } else {
           outFileStr += `, `;
         }
-        outFileStr += `'': Fmt.DefinitionRefExpression`;
+        outFileStr += `'': Fmt.GenericMetaRefExpression`;
       }
     }
   }
@@ -594,7 +594,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
 
 function generate(inFileName: string, outFileName: string): void {
   let inFileStr: string = fs.readFileSync(inFileName, 'utf8');
-  let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, new Fmt.ContextProvider(FmtMeta.metaDefinitions));
+  let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, new Fmt.MetaModel(FmtMeta.metaDefinitions));
 
   let outFileStr = `// Generated from ${inFileName} by generateMetaDeclarations.ts.\n`;
   outFileStr += `// tslint:disable:class-name\n`;

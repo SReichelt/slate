@@ -153,6 +153,11 @@ export class Writer {
 
   writeParameter(parameter: Fmt.Parameter, indent: IndentInfo): void {
     this.writeIdentifier(parameter.name);
+    if (parameter.dependencies) {
+      this.write('[');
+      this.writeExpressions(parameter.dependencies, indent, false, false);
+      this.write(']');
+    }
     if (parameter.list) {
       this.write('...');
     }

@@ -3,7 +3,7 @@
 $meta: %MetaModel {
   definitionTypes = [$MetaModel, $DefinitionType, $ExpressionType, $ParameterType, %Any],
   expressionTypes = [$Any, $Type, $Int, $String, $ParameterList, $SingleParameter, $ArgumentList, %Any],
-  functions = [$Any]
+  functions = [$Any, $self]
 }
 
 $MetaModel: %DefinitionType {
@@ -17,7 +17,8 @@ $MetaModel: %DefinitionType {
 $DefinedType: %DefinitionType {
   members = #(
     superType?: $DefinedType,
-    members?: %ParameterList
+    members?: %ParameterList,
+    exports[members]: %Any[] = []
   )
 }
 
@@ -52,3 +53,5 @@ $SingleParameter(type: $Type): %ExpressionType {
 }
 
 $ArgumentList: %ExpressionType {}
+
+$self: %Any {}

@@ -112,13 +112,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return false;
   }
 
-  private fetchDefinition(name: string, contextProvider: Fmt.ContextProvider): CachedPromise<Fmt.Definition> {
+  private fetchDefinition(name: string, metaModel: Fmt.MetaModel): CachedPromise<Fmt.Definition> {
     let cachedDefinition = this.definitionCache[name];
     if (cachedDefinition) {
       return CachedPromise.resolve(cachedDefinition);
     } else {
       let promise = fetch(this.uri + encodeURI(name) + '.hlm')
-        .then((response: Response) => FmtReader.readResponse(response, contextProvider))
+        .then((response: Response) => FmtReader.readResponse(response, metaModel))
         .then((file: Fmt.File) => {
           let definition = file.definitions[0];
           this.definitionCache[name] = definition;
@@ -129,7 +129,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
-    let result = this.fetchDefinition(name, new Fmt.ContextProvider(FmtLibrary.metaDefinitions));
+    let result = this.fetchDefinition(name, new Fmt.MetaModel(FmtLibrary.metaDefinitions));
     if (prefetchContents) {
       result = result.then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
@@ -166,7 +166,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
     let format = this.logic.format;
-    return this.fetchDefinition(name, format.contextProvider);
+    return this.fetchDefinition(name, format.metaModel);
   }
 
   fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
