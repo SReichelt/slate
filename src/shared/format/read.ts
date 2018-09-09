@@ -1,12 +1,20 @@
 import * as Fmt from './format';
 import { isWhitespaceCharacter, isSpecialCharacter, isNumericalCharacter } from './common';
 
+export interface Location {
+  line: number;
+  col: number;
+}
+
+export interface Range {
+  start: Location;
+  end: Location;
+}
+
 export interface InputStream {
   readChar(): string;
   peekChar(): string;
-
-  line: number;
-  col: number;
+  getLocation(): Location;
 }
 
 export class StringInputStream implements InputStream {
@@ -24,12 +32,12 @@ export class StringInputStream implements InputStream {
   readChar(): string {
     if (this.pos < this.endPos) {
       let c = this.str.charAt(this.pos);
-      this.pos++;
+      this.pos += c.length;
       if (c === '\n') {
         this.line++;
         this.col = 0;
       } else {
-        this.col++;
+        this.col += c.length;
       }
       return c;
     } else {
@@ -44,35 +52,48 @@ export class StringInputStream implements InputStream {
       return '';
     }
   }
+
+  getLocation(): Location {
+    return {
+      line: this.line,
+      col: this.col
+    };
+  }
 }
 
-type ErrorHandler = (msg: string, line: number, col: number) => void;
+type ErrorHandler = (msg: string, range: Range) => void;
 
 export class Reader {
+  private markedStart?: Location;
+  private markedEnd?: Location;
   private triedChars: string[] = [];
   private atError = false;
 
-  constructor(private stream: InputStream, private errorHandler: ErrorHandler, private metaModel: Fmt.MetaModel) {}
+  constructor(private stream: InputStream, private reportError: ErrorHandler, private getMetaModel: Fmt.MetaModelGetter) {}
 
   readFile(): Fmt.File {
     let file = new Fmt.File;
-    let context = this.metaModel.getRootContext();
+    let metaModelStart = this.markStart();
     this.readChar('%');
-    file.metaModelPath = this.readPath(context, file);
-    if (context.metaDefinitions && file.metaModelPath.name && file.metaModelPath.name !== context.metaDefinitions.metaModelName) {
-      this.error(`Expected file of type "${context.metaDefinitions.metaModelName}"`);
+    file.metaModelPath = this.readPath(undefined);
+    this.readChar('%');
+    let metaModelRange = this.markEnd(metaModelStart);
+    let metaModel: Fmt.MetaModel | undefined;
+    try {
+      metaModel = this.getMetaModel(file.metaModelPath);
+    } catch (error) {
+      this.error(error.message, metaModelRange);
+      metaModel = new Fmt.DummyMetaModel;
     }
-    this.readChar('%');
-    let definitionTypes = context.metaDefinitions ? context.metaDefinitions.definitionTypes : undefined;
-    this.readDefinitions(file.definitions, definitionTypes, context);
-    this.skipWhitespace();
+    let context = metaModel.getRootContext();
+    this.readDefinitions(file.definitions, metaModel.definitionTypes, context);
     if (this.peekChar()) {
       this.error('Definition or end of file expected');
     }
     return file;
   }
 
-  readPath(context: Fmt.Context, parent: Object): Fmt.Path {
+  readPath(context: Fmt.Context | undefined): Fmt.Path {
     let path: Fmt.PathItem | undefined = undefined;
     for (;;) {
       this.skipWhitespace();
@@ -94,7 +115,9 @@ export class Reader {
           for (;;) {
             let item = new Fmt.Path;
             item.name = identifier;
-            this.readOptionalArgumentList(item.arguments, context, parent);
+            if (context) {
+              this.readOptionalArgumentList(item.arguments, context);
+            }
             item.parentPath = path;
             if (!this.tryReadChar('.')) {
               return item;
@@ -108,10 +131,10 @@ export class Reader {
     }
   }
 
-  readDefinitions(definitions: Fmt.Definition[], metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): void {
+  readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): void {
     for (;;) {
       this.skipWhitespace();
-      let definition = this.tryReadDefinition(metaDefinitionList, context);
+      let definition = this.tryReadDefinition(metaDefinitions, context);
       if (definition) {
         definitions.push(definition);
       } else {
@@ -120,33 +143,36 @@ export class Reader {
     }
   }
 
-  tryReadDefinition(metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Definition | undefined {
+  tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Definition | undefined {
     if (!this.tryReadChar('$')) {
       return undefined;
     }
     let definition = new Fmt.Definition;
     definition.name = this.readIdentifier();
-    this.readOptionalParameterList(definition.parameters, context, definition);
-    let typeContext = this.metaModel.getDefinitionTypeContext(definition, context);
-    definition.type = this.readType(metaDefinitionList, typeContext);
+    context = new Fmt.ParentInfoContext(definition, context);
+    this.readOptionalParameterList(definition.parameters, context);
+    let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
+    definition.type = this.readType(metaDefinitions, typeContext);
     this.readChar('{');
-    let metaInnerDefinitionTypes: Fmt.MetaDefinitionList | undefined = undefined;
-    let contentClass: any = Fmt.GenericObjectContents;
-    if (definition.type.expression instanceof Fmt.MetaRefExpression) {
-      let typeExpressionClass: any = definition.type.expression.constructor;
-      metaInnerDefinitionTypes = typeExpressionClass.metaInnerDefinitionTypes;
-      contentClass = typeExpressionClass.metaContents;
+    let metaInnerDefinitionTypes: Fmt.MetaDefinitionFactory | undefined = undefined;
+    let contents: Fmt.ObjectContents | undefined;
+    let type = definition.type.expression;
+    if (type instanceof Fmt.MetaRefExpression) {
+      metaInnerDefinitionTypes = type.getMetaInnerDefinitionTypes();
+      contents = type.createDefinitionContents();
+    } else {
+      contents = new Fmt.GenericObjectContents;
     }
-    let contentsContext = this.metaModel.getDefinitionContentsContext(definition, context);
+    let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
     this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
-    if (contentClass) {
-      let contents = new contentClass;
+    if (contents) {
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      this.readArguments(args, contentsContext, definition);
+      let argumentsStart = this.markStart();
+      this.readArguments(args, contentsContext);
       try {
         contents.fromArgumentList(args);
       } catch (error) {
-        this.error(error.message);
+        this.error(error.message, this.markEnd(argumentsStart));
       }
       definition.contents = contents;
     }
@@ -154,43 +180,43 @@ export class Reader {
     return definition;
   }
 
-  tryReadParameterList(parameters: Fmt.ParameterList, context: Fmt.Context, parent: Object): boolean {
+  tryReadParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): boolean {
     if (!this.tryReadChar('(')) {
       return false;
     }
-    this.readParameters(parameters, context, parent);
+    this.readParameters(parameters, context);
     this.readChar(')');
     return true;
   }
 
-  readParameterList(parameters: Fmt.ParameterList, context: Fmt.Context, parent: Object): void {
+  readParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): void {
     this.skipWhitespace();
-    if (!this.tryReadParameterList(parameters, context, parent)) {
+    if (!this.tryReadParameterList(parameters, context)) {
       this.error('Parameter list expected');
     }
   }
 
-  readOptionalParameterList(parameters: Fmt.ParameterList, context: Fmt.Context, parent: Object): void {
+  readOptionalParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): void {
     this.skipWhitespace();
-    this.tryReadParameterList(parameters, context, parent);
+    this.tryReadParameterList(parameters, context);
   }
 
-  readParameters(parameters: Fmt.ParameterList, context: Fmt.Context, parent: Object): void {
+  readParameters(parameters: Fmt.ParameterList, context: Fmt.Context): void {
     this.skipWhitespace();
-    let parameter = this.tryReadParameter(context, parent);
+    let parameter = this.tryReadParameter(context);
     if (parameter) {
       parameters.push(parameter);
       this.skipWhitespace();
       while (this.tryReadChar(',')) {
-        context = this.metaModel.getNextParameterContext(parameter, context, parent);
-        parameter = this.readParameter(context, parent);
+        context = context.metaModel.getNextParameterContext(parameter, context);
+        parameter = this.readParameter(context);
         parameters.push(parameter);
         this.skipWhitespace();
       }
     }
   }
 
-  tryReadParameter(context: Fmt.Context, parent: Object): Fmt.Parameter | undefined {
+  tryReadParameter(context: Fmt.Context): Fmt.Parameter | undefined {
     let parameter = new Fmt.Parameter;
     let name = this.tryReadIdentifier();
     if (!name) {
@@ -209,69 +235,69 @@ export class Reader {
       this.skipWhitespace();
     }
     parameter.optional = this.tryReadChar('?');
-    let expressionTypes = context.metaDefinitions ? context.metaDefinitions.expressionTypes : undefined;
-    let typeContext = this.metaModel.getParameterTypeContext(parameter, context, parent);
-    parameter.type = this.readType(expressionTypes, typeContext);
+    let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
+    parameter.type = this.readType(typeContext.metaModel.expressionTypes, typeContext);
     this.skipWhitespace();
     if (this.tryReadChar('=')) {
-      let functions = context.metaDefinitions ? context.metaDefinitions.functions : undefined;
-      parameter.defaultValue = this.readExpression(false, functions, context);
+      parameter.defaultValue = this.readExpression(false, context.metaModel.functions, context);
     }
     return parameter;
   }
 
-  readParameter(context: Fmt.Context, parent: Object): Fmt.Parameter {
+  readParameter(context: Fmt.Context): Fmt.Parameter {
     this.skipWhitespace();
-    return this.tryReadParameter(context, parent) || this.error('Parameter expected') || new Fmt.Parameter;
+    return this.tryReadParameter(context) || this.error('Parameter expected') || new Fmt.Parameter;
   }
 
-  tryReadArgumentList(args: Fmt.ArgumentList, context: Fmt.Context, parent: Object): boolean {
+  tryReadArgumentList(args: Fmt.ArgumentList, context: Fmt.Context): boolean {
     if (!this.tryReadChar('(')) {
       return false;
     }
-    this.readArguments(args, context, parent);
+    this.readArguments(args, context);
     this.readChar(')');
     return true;
   }
 
-  readOptionalArgumentList(args: Fmt.ArgumentList, context: Fmt.Context, parent: Object): void {
+  readOptionalArgumentList(args: Fmt.ArgumentList, context: Fmt.Context): void {
     this.skipWhitespace();
-    this.tryReadArgumentList(args, context, parent);
+    this.tryReadArgumentList(args, context);
   }
 
-  readArguments(args: Fmt.ArgumentList, context: Fmt.Context, parent: Object): void {
+  readArguments(args: Fmt.ArgumentList, context: Fmt.Context): void {
     this.skipWhitespace();
-    let arg = this.tryReadArgument(context, parent);
+    let argIndex = 0;
+    let arg = this.tryReadArgument(argIndex, context);
     if (arg) {
       args.push(arg);
       this.skipWhitespace();
       while (this.tryReadChar(',')) {
-        context = this.metaModel.getNextArgumentContext(arg, context, parent);
-        arg = this.readArgument(context, parent);
+        context = context.metaModel.getNextArgumentContext(arg, argIndex, context);
+        argIndex++;
+        arg = this.readArgument(argIndex, context);
         args.push(arg);
         this.skipWhitespace();
       }
     }
   }
 
-  tryReadArgument(context: Fmt.Context, parent: Object): Fmt.Argument | undefined {
+  tryReadArgument(argIndex: number, context: Fmt.Context): Fmt.Argument | undefined {
     let arg = new Fmt.Argument;
+    let identifierStart = this.markStart();
     let identifier = this.tryReadIdentifier();
     if (identifier) {
+      let identifierRange = this.markEnd(identifierStart);
       this.skipWhitespace();
       if (this.tryReadChar('=')) {
         arg.name = identifier;
-        let functions = context.metaDefinitions ? context.metaDefinitions.functions : undefined;
-        let contentsContext = this.metaModel.getArgumentValueContext(arg, context, parent);
-        arg.value = this.readExpression(false, functions, contentsContext);
+        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+        arg.value = this.readExpression(false, valueContext.metaModel.functions, valueContext);
       } else {
-        let contentsContext = this.metaModel.getArgumentValueContext(arg, context, parent);
-        arg.value = this.readExpressionAfterIdentifier(identifier, contentsContext);
+        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+        arg.value = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
       }
     } else {
-      let functions = context.metaDefinitions ? context.metaDefinitions.functions : undefined;
-      let contentsContext = this.metaModel.getArgumentValueContext(arg, context, parent);
-      let value = this.tryReadExpression(false, functions, contentsContext);
+      let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+      let value = this.tryReadExpression(false, valueContext.metaModel.functions, valueContext);
       if (!value) {
         return undefined;
       }
@@ -280,17 +306,17 @@ export class Reader {
     return arg;
   }
 
-  readArgument(context: Fmt.Context, parent: Object): Fmt.Argument {
+  readArgument(argIndex: number, context: Fmt.Context): Fmt.Argument {
     this.skipWhitespace();
-    return this.tryReadArgument(context, parent) || this.error('Argument expected') || new Fmt.Argument;
+    return this.tryReadArgument(argIndex, context) || this.error('Argument expected') || new Fmt.Argument;
   }
 
-  tryReadType(metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Type | undefined {
+  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Type | undefined {
     if (!this.tryReadChar(':')) {
       return undefined;
     }
     let type = new Fmt.Type;
-    type.expression = this.readExpression(true, metaDefinitionList, context) as Fmt.ObjectRefExpression;
+    type.expression = this.readExpression(true, metaDefinitions, context) as Fmt.ObjectRefExpression;
     type.arrayDimensions = 0;
     this.skipWhitespace();
     if (this.tryReadChar('[')) {
@@ -303,37 +329,36 @@ export class Reader {
     return type;
   }
 
-  readType(metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Type {
+  readType(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Type {
     this.skipWhitespace();
-    return this.tryReadType(metaDefinitionList, context) || this.error('Type expected') || new Fmt.Type;
+    return this.tryReadType(metaDefinitions, context) || this.error('Type expected') || new Fmt.Type;
   }
 
   readExpressions(context: Fmt.Context): Fmt.Expression[] {
     let expressions: Fmt.Expression[] = [];
     this.skipWhitespace();
-    let functions = context.metaDefinitions ? context.metaDefinitions.functions : undefined;
-    let expression = this.tryReadExpression(false, functions, context);
+    let expression = this.tryReadExpression(false, context.metaModel.functions, context);
     if (expression) {
       expressions.push(expression);
       this.skipWhitespace();
       while (this.tryReadChar(',')) {
-        expressions.push(this.readExpression(false, functions, context));
+        expressions.push(this.readExpression(false, context.metaModel.functions, context));
         this.skipWhitespace();
       }
     }
     return expressions;
   }
 
-  tryReadExpression(isType: boolean, metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Expression | undefined {
+  tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Expression | undefined {
+    let expressionStart = this.markStart();
     if (this.tryReadChar('%')) {
       let name = this.readIdentifier();
       let expression: Fmt.MetaRefExpression | undefined = undefined;
-      if (metaDefinitionList && name) {
-        let metaDefinitionClass = metaDefinitionList[name];
-        if (metaDefinitionClass) {
-          expression = new metaDefinitionClass;
-        } else {
-          this.error(`Meta object "${name}" not found`);
+      if (metaDefinitions && name) {
+        try {
+          expression = metaDefinitions.createMetaRefExpression(name);
+        } catch (error) {
+          this.error(error.message, this.markEnd(expressionStart));
         }
       }
       if (!expression) {
@@ -341,34 +366,39 @@ export class Reader {
         genericExpression.name = name;
         expression = genericExpression;
       }
+      context = new Fmt.ParentInfoContext(expression, context);
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      this.readOptionalArgumentList(args, context, expression!);
+      this.readOptionalArgumentList(args, context);
       try {
         expression!.fromArgumentList(args);
       } catch (error) {
-        this.error(error.message);
+        this.error(error.message, this.markEnd(expressionStart));
       }
       return expression;
-    } else if (isType && metaDefinitionList && !metaDefinitionList['']) {
+    } else if (isType && metaDefinitions && !metaDefinitions.allowDefinitionRefs()) {
       return undefined;
     } else if (this.tryReadChar('$')) {
       let expression = new Fmt.DefinitionRefExpression;
-      expression.path = this.readPath(context, expression);
+      context = new Fmt.ParentInfoContext(expression, context);
+      expression.path = this.readPath(context);
       return expression;
     } else {
       let identifier = this.tryReadIdentifier();
       if (identifier) {
-        return this.readExpressionAfterIdentifier(identifier, context);
+        let identifierRange = this.markEnd(expressionStart);
+        return this.readExpressionAfterIdentifier(identifier, identifierRange, context);
       } else if (isType) {
         return undefined;
       } else if (this.tryReadChar('{')) {
         let expression = new Fmt.CompoundExpression;
-        this.readArguments(expression.arguments, context, expression);
+        context = new Fmt.ParentInfoContext(expression, context);
+        this.readArguments(expression.arguments, context);
         this.readChar('}');
         return expression;
       } else if (this.tryReadChar('#')) {
         let expression = new Fmt.ParameterExpression;
-        this.readParameterList(expression.parameters, context, expression);
+        context = new Fmt.ParentInfoContext(expression, context);
+        this.readParameterList(expression.parameters, context);
         return expression;
       } else if (this.tryReadChar('[')) {
         let expression = new Fmt.ArrayExpression;
@@ -395,12 +425,12 @@ export class Reader {
     }
   }
 
-  private readExpressionAfterIdentifier(identifier: string, context: Fmt.Context): Fmt.Expression {
+  private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Fmt.Context): Fmt.Expression {
     let expression = new Fmt.VariableRefExpression;
     try {
       expression.variable = context.getVariable(identifier);
     } catch (error) {
-      this.error(error.message);
+      this.error(error.message, identifierRange);
     }
     this.skipWhitespace();
     if (this.tryReadChar('[')) {
@@ -410,9 +440,9 @@ export class Reader {
     return expression;
   }
 
-  readExpression(isType: boolean, metaDefinitionList: Fmt.MetaDefinitionList | undefined, context: Fmt.Context): Fmt.Expression {
+  readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Expression {
     this.skipWhitespace();
-    return this.tryReadExpression(isType, metaDefinitionList, context) || this.error('Expression expected') || new Fmt.StringExpression;
+    return this.tryReadExpression(isType, metaDefinitions, context) || this.error('Expression expected') || new Fmt.StringExpression;
   }
 
   tryReadString(quoteChar: string): string | undefined {
@@ -495,12 +525,15 @@ export class Reader {
   }
 
   private skipWhitespace(): void {
-    for (;;) {
-      let c = this.peekChar();
-      if (isWhitespaceCharacter(c)) {
-        this.readAnyChar();
-      } else {
-        break;
+    let c = this.stream.peekChar();
+    if (isWhitespaceCharacter(c)) {
+      this.markedEnd = this.stream.getLocation();
+      do {
+        this.stream.readChar();
+        c = this.stream.peekChar();
+      } while (isWhitespaceCharacter(c));
+      if (this.markedStart) {
+        Object.assign(this.markedStart, this.stream.getLocation());
       }
     }
   }
@@ -542,34 +575,70 @@ export class Reader {
   }
 
   private readAnyChar(): string {
+    this.markedStart = undefined;
+    this.markedEnd = undefined;
     this.triedChars.length = 0;
     this.atError = false;
     return this.stream.readChar();
   }
 
-  private error(msg: string): void {
+  private markStart(): Location {
+    if (!this.markedStart) {
+      this.markedStart = this.stream.getLocation();
+    }
+    return this.markedStart;
+  }
+
+  private markEnd(start: Location): Range {
+    if (!this.markedEnd) {
+      this.markedEnd = this.stream.getLocation();
+    }
+    return {
+      start: start,
+      end: this.markedEnd
+    };
+  }
+
+  private error(msg: string, range?: Range): void {
     if (!this.atError) {
-      this.errorHandler(msg, this.stream.line, this.stream.col);
+      if (!range) {
+        let start = this.stream.getLocation();
+        let end = start;
+        let c = this.peekChar();
+        if (c && c !== '\r' && c !== '\n') {
+          end = {
+            line: end.line,
+            col: end.col + 1
+          };
+        }
+        range = {
+          start: start,
+          end: end
+        };
+      }
+      this.reportError(msg, range);
       this.atError = true;
     }
   }
 }
 
 
-export function readStream(stream: InputStream, fileName: string, metaModel: Fmt.MetaModel): Fmt.File {
-  let errorHandler = (msg: string, line: number, col: number) => {
-    let error: any = new SyntaxError(`${fileName}:${line + 1}:${col + 1}: ${msg}`);
+export function readStream(stream: InputStream, fileName: string, getMetaModel: Fmt.MetaModelGetter): Fmt.File {
+  let reportError = (msg: string, range: Range) => {
+    let line = range.start.line + 1;
+    let col = range.start.col + 1;
+    let error: any = new SyntaxError(`${fileName}:${line}:${col}: ${msg}`);
     error.fileName = fileName;
-    error.lineNumber = line + 1;
-    error.columnNumber = col + 1;
+    error.lineNumber = line;
+    error.columnNumber = col;
     throw error;
   };
-  let reader = new Reader(stream, errorHandler, metaModel);
+  let reader = new Reader(stream, reportError, getMetaModel);
   return reader.readFile();
 }
 
-export function readString(str: string, fileName: string, metaModel: Fmt.MetaModel): Fmt.File {
-  return readStream(new StringInputStream(str), fileName, metaModel);
+export function readString(str: string, fileName: string, getMetaModel: Fmt.MetaModelGetter): Fmt.File {
+  return readStream(new StringInputStream(str), fileName, getMetaModel);
 }
 
 interface TextResponse {
@@ -577,6 +646,6 @@ interface TextResponse {
   text(): Promise<string>;
 }
 
-export function readResponse(response: TextResponse, metaModel: Fmt.MetaModel): Promise<Fmt.File> {
-  return response.text().then((str: string) => readString(str, response.url, metaModel));
+export function readResponse(response: TextResponse, metaModelGetter: Fmt.MetaModelGetter): Promise<Fmt.File> {
+  return response.text().then((str: string) => readString(str, response.url, metaModelGetter));
 }

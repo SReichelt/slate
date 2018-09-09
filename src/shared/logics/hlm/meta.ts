@@ -260,9 +260,6 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
 }
 
 export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Construction;
-
   getName(): string {
     return 'Construction';
   }
@@ -272,6 +269,15 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
+    const innerDefinitionTypes: Fmt.MetaDefinitionList = {'Constructor': MetaRefExpression_Constructor};
+    return new Fmt.MetaDefinitionFactoryImpl(innerDefinitionTypes);
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Construction;
   }
 }
 
@@ -398,9 +404,6 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
 }
 
 export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Constructor;
-
   getName(): string {
     return 'Constructor';
   }
@@ -410,6 +413,10 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Constructor;
   }
 }
 
@@ -716,9 +723,6 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
 }
 
 export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_SetOperator;
-
   getName(): string {
     return 'SetOperator';
   }
@@ -728,6 +732,10 @@ export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_SetOperator;
   }
 }
 
@@ -843,9 +851,6 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
 }
 
 export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_ExplicitOperator;
-
   getName(): string {
     return 'ExplicitOperator';
   }
@@ -855,6 +860,10 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_ExplicitOperator;
   }
 }
 
@@ -960,9 +969,6 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
 }
 
 export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_ImplicitOperator;
-
   getName(): string {
     return 'ImplicitOperator';
   }
@@ -972,6 +978,10 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_ImplicitOperator;
   }
 }
 
@@ -991,9 +1001,6 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 }
 
 export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_MacroOperator;
-
   getName(): string {
     return 'MacroOperator';
   }
@@ -1003,6 +1010,10 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_MacroOperator;
   }
 }
 
@@ -1070,9 +1081,6 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
 }
 
 export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Predicate;
-
   getName(): string {
     return 'Predicate';
   }
@@ -1082,6 +1090,10 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Predicate;
   }
 }
 
@@ -1225,9 +1237,6 @@ export class ObjectContents_StandardTheorem extends ObjectContents_Theorem {
 }
 
 export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_StandardTheorem;
-
   getName(): string {
     return 'StandardTheorem';
   }
@@ -1237,6 +1246,10 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_StandardTheorem;
   }
 }
 
@@ -1304,9 +1317,6 @@ export class ObjectContents_EquivalenceTheorem extends ObjectContents_Theorem {
 }
 
 export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_EquivalenceTheorem;
-
   getName(): string {
     return 'EquivalenceTheorem';
   }
@@ -1316,6 +1326,10 @@ export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression 
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_EquivalenceTheorem;
   }
 }
 
@@ -1397,6 +1411,19 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
 export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
   getName(): string {
     return 'Nat';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+}
+
+export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'Expr';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -1645,7 +1672,6 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
 export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
   _set: Fmt.Expression;
   parameters: Fmt.ParameterList;
-  shortcut?: ObjectContents_Shortcut;
 
   getName(): string {
     return 'Binding';
@@ -1659,16 +1685,6 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
     } else {
       throw new Error('parameters: Parameter expression expected');
     }
-    let shortcutRaw = argumentList.getOptionalValue('shortcut', 2);
-    if (shortcutRaw !== undefined) {
-      if (shortcutRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Shortcut;
-        newItem.fromCompoundExpression(shortcutRaw);
-        this.shortcut = newItem;
-      } else {
-        throw new Error('shortcut: Compound expression expected');
-      }
-    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -1677,11 +1693,6 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
     let parametersExpr = new Fmt.ParameterExpression;
     parametersExpr.parameters.push(...this.parameters);
     argumentList.add(parametersExpr);
-    if (this.shortcut !== undefined) {
-      let shortcutExpr = new Fmt.CompoundExpression;
-      this.shortcut.toCompoundExpression(shortcutExpr);
-      argumentList.add(shortcutExpr, 'shortcut');
-    }
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -1696,12 +1707,6 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
     if (this.parameters) {
       result.parameters = Object.create(Fmt.ParameterList.prototype);
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    if (this.shortcut) {
-      result.shortcut = new ObjectContents_Shortcut;
-      if (this.shortcut.substituteExpression(fn, result.shortcut!, replacedParameters)) {
         changed = true;
       }
     }
@@ -4144,11 +4149,19 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
   }
 }
 
-MetaRefExpression_Construction.metaInnerDefinitionTypes = {'Constructor': MetaRefExpression_Constructor};
+const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
+const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Symbol': MetaRefExpression_Symbol, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural};
 
-export const metaDefinitions: Fmt.MetaDefinitions = {
-  metaModelName: 'hlm',
-  definitionTypes: {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem},
-  expressionTypes: {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Symbol': MetaRefExpression_Symbol, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction},
-  functions: {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural}
-};
+export const metaModel = new Fmt.MetaModel(
+  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(functions)
+);
+
+export function getMetaModel(path: Fmt.Path) {
+  if (path.name !== 'hlm') {
+    throw new Error('File of type "hlm" expected');
+  }
+  return metaModel;
+}

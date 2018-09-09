@@ -350,6 +350,48 @@ function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string
   return outFileStr;
 }
 
+function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression, secondaryList?: Fmt.Expression): string {
+  let outFileStr = `{`;
+  if (list instanceof Fmt.ArrayExpression) {
+    let first = true;
+    for (let item of list.items) {
+      if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
+        if (first) {
+          first = false;
+        } else {
+          outFileStr += `, `;
+        }
+        let name = item.path.name;
+        outFileStr += `'${name}': MetaRefExpression_${name}`;
+        visibleTypeNames.push(name);
+      } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
+        if (secondaryList instanceof Fmt.ArrayExpression) {
+          for (let secondaryItem of secondaryList.items) {
+            if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
+              if (first) {
+                first = false;
+              } else {
+                outFileStr += `, `;
+              }
+              let name = secondaryItem.path.name;
+              outFileStr += `'${name}': MetaRefExpression_${name}`;
+              visibleTypeNames.push(name);
+            }
+          }
+        }
+        if (first) {
+          first = false;
+        } else {
+          outFileStr += `, `;
+        }
+        outFileStr += `'': Fmt.GenericMetaRefExpression`;
+      }
+    }
+  }
+  outFileStr += `}`;
+  return outFileStr;
+}
+
 function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): string {
   let outFileStr = '';
 
@@ -432,18 +474,6 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
 
     if (isVisibleType(visibleTypeNames, definition)) {
       outFileStr += `export class MetaRefExpression_${definition.name} extends Fmt.MetaRefExpression {\n`;
-      let hasStaticMembers = false;
-      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
-        outFileStr += `  static metaInnerDefinitionTypes: any = {};\n`;
-        hasStaticMembers = true;
-      }
-      if (hasObjectContents(inFile, definition)) {
-        outFileStr += `  static readonly metaContents = ObjectContents_${definition.name};\n`;
-        hasStaticMembers = true;
-      }
-      if (hasStaticMembers) {
-        outFileStr += `\n`;
-      }
       if (definition.parameters.length) {
         for (let parameter of definition.parameters) {
           let memberName = translateMemberName(parameter.name);
@@ -508,6 +538,19 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    return fn(result);\n`;
         outFileStr += `  }\n`;
       }
+      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
+        outFileStr += `\n`;
+        outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;
+        outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, definition.contents.innerDefinitionTypes)};\n`;
+        outFileStr += `    return new Fmt.MetaDefinitionFactoryImpl(innerDefinitionTypes);\n`;
+        outFileStr += `  }\n`;
+      }
+      if (hasObjectContents(inFile, definition)) {
+        outFileStr += `\n`;
+        outFileStr += `  createDefinitionContents(): Fmt.ObjectContents | undefined {\n`;
+        outFileStr += `    return new ObjectContents_${definition.name};\n`;
+        outFileStr += `  }\n`;
+      }
       outFileStr += `}\n\n`;
     }
   }
@@ -515,86 +558,33 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
   return outFileStr;
 }
 
-function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression, secondaryList?: Fmt.Expression): string {
-  let outFileStr = `{`;
-  if (list instanceof Fmt.ArrayExpression) {
-    let first = true;
-    for (let item of list.items) {
-      if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
-        if (first) {
-          first = false;
-        } else {
-          outFileStr += `, `;
-        }
-        let name = item.path.name;
-        outFileStr += `'${name}': MetaRefExpression_${name}`;
-        visibleTypeNames.push(name);
-      } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
-        if (secondaryList instanceof Fmt.ArrayExpression) {
-          for (let secondaryItem of secondaryList.items) {
-            if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
-              if (first) {
-                first = false;
-              } else {
-                outFileStr += `, `;
-              }
-              let name = secondaryItem.path.name;
-              outFileStr += `'${name}': MetaRefExpression_${name}`;
-              visibleTypeNames.push(name);
-            }
-          }
-        }
-        if (first) {
-          first = false;
-        } else {
-          outFileStr += `, `;
-        }
-        outFileStr += `'': Fmt.GenericMetaRefExpression`;
-      }
-    }
-  }
-  outFileStr += `}`;
-  return outFileStr;
-}
-
-function outputMetaAssignments(inFile: Fmt.File, visibleTypeNames: string[]): string {
-  let outFileStr = '';
-
-  for (let definition of inFile.definitions) {
-    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
-      continue;
-    }
-
-    if (isVisibleType(visibleTypeNames, definition)) {
-      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
-        outFileStr += `MetaRefExpression_${definition.name}.metaInnerDefinitionTypes = ${outputDefinitionList(visibleTypeNames, definition.contents.innerDefinitionTypes)};\n`;
-      }
-    }
-  }
-
-  if (outFileStr) {
-    outFileStr += `\n`;
-  }
-  return outFileStr;
-}
-
 function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): string {
   let outFileStr = '';
   let metaModel = inFile.definitions[0];
   if (metaModel && metaModel.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-    outFileStr += `export const metaDefinitions: Fmt.MetaDefinitions = {\n`;
-    outFileStr += `  metaModelName: '${metaModel.name}',\n`;
-    outFileStr += `  definitionTypes: ${outputDefinitionList(visibleTypeNames, metaModel.contents.definitionTypes, metaModel.contents.expressionTypes)},\n`;
-    outFileStr += `  expressionTypes: ${outputDefinitionList(visibleTypeNames, metaModel.contents.expressionTypes)},\n`;
-    outFileStr += `  functions: ${outputDefinitionList(visibleTypeNames, metaModel.contents.functions)}\n`;
-    outFileStr += `};\n`;
+    outFileStr += `const definitionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.definitionTypes, metaModel.contents.expressionTypes)};\n`;
+    outFileStr += `const expressionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.expressionTypes)};\n`;
+    outFileStr += `const functions: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.functions)};\n`;
+    outFileStr += `\n`;
+    outFileStr += `export const metaModel = new Fmt.MetaModel(\n`;
+    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),\n`;
+    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),\n`;
+    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(functions)\n`;
+    outFileStr += `);\n`;
+    outFileStr += `\n`;
+    outFileStr += `export function getMetaModel(path: Fmt.Path) {\n`;
+    outFileStr += `  if (path.name !== '${metaModel.name}') {\n`;
+    outFileStr += `    throw new Error('File of type "${metaModel.name}" expected');\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `  return metaModel;\n`;
+    outFileStr += `}\n`;
   }
   return outFileStr;
 }
 
 function generate(inFileName: string, outFileName: string): void {
   let inFileStr: string = fs.readFileSync(inFileName, 'utf8');
-  let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, new Fmt.MetaModel(FmtMeta.metaDefinitions));
+  let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, FmtMeta.getMetaModel);
 
   let outFileStr = `// Generated from ${inFileName} by generateMetaDeclarations.ts.\n`;
   outFileStr += `// tslint:disable:class-name\n`;
@@ -619,10 +609,8 @@ function generate(inFileName: string, outFileName: string): void {
 
   let visibleTypeNames: string[] = [];
   let metaDefinitions = outputMetaDefinitions(inFile, visibleTypeNames);
-  let metaAssignments = outputMetaAssignments(inFile, visibleTypeNames);
 
   outFileStr += outputDeclarations(inFile, visibleTypeNames);
-  outFileStr += metaAssignments;
   outFileStr += metaDefinitions;
 
   fs.writeFileSync(outFileName, outFileStr, 'utf8');

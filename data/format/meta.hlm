@@ -48,7 +48,7 @@ $Int: %ExpressionType {}
 $String: %ExpressionType {}
 
 $ParameterList: %ExpressionType {}
-$SingleParameter(type: $Type): %ExpressionType {
+$SingleParameter(type?: $Type): %ExpressionType {
   superType = $ParameterList
 }
 

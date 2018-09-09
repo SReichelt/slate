@@ -5,7 +5,7 @@ import * as FmtWriter from '../shared/format/write';
 
 function tidy(fileName: string): void {
   let fileStr: string = fs.readFileSync(fileName, 'utf8');
-  let file: Fmt.File = FmtReader.readString(fileStr, fileName, new Fmt.DummyMetaModel);
+  let file: Fmt.File = FmtReader.readString(fileStr, fileName, () => new Fmt.DummyMetaModel);
   fileStr = FmtWriter.writeString(file);
   fs.writeFileSync(fileName, fileStr, 'utf8');
 }

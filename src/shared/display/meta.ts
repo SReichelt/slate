@@ -31,9 +31,6 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
 }
 
 export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Template;
-
   getName(): string {
     return 'Template';
   }
@@ -43,6 +40,10 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Template;
   }
 }
 
@@ -334,9 +335,19 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   }
 }
 
-export const metaDefinitions: Fmt.MetaDefinitions = {
-  metaModelName: 'display',
-  definitionTypes: {'Template': MetaRefExpression_Template},
-  expressionTypes: {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr},
-  functions: {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg}
-};
+const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_Template};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg};
+
+export const metaModel = new Fmt.MetaModel(
+  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(functions)
+);
+
+export function getMetaModel(path: Fmt.Path) {
+  if (path.name !== 'display') {
+    throw new Error('File of type "display" expected');
+  }
+  return metaModel;
+}

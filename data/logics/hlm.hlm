@@ -2,7 +2,7 @@
 
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
-  expressionTypes = [$Bool, $Nat,
+  expressionTypes = [$Expr, $Bool, $Nat,
                      $Set, $Subset, $Element, $Symbol, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
@@ -31,7 +31,7 @@ $Definition: %DefinitionType {
 
 $DefinitionDisplay: %ExpressionType {
   members = #(
-    parameter: %SingleParameter($../display/display/Expr),
+    parameter: %SingleParameter($Expr),
     display[parameter]?: $../display/display/Expr[],
     singularName?: $../display/display/Expr,
     pluralName?: $../display/display/Expr,
@@ -167,6 +167,8 @@ $false: $Bool {}
 
 $Nat: %ExpressionType {}
 
+$Expr: %ExpressionType {}
+
 $EquationSide: %ExpressionType {}
 $left: $EquationSide {}
 $right: $EquationSide {}
@@ -178,7 +180,8 @@ $Subset(superset: $SetTerm, auto: $Bool = $false, embedSubsets: $Bool = $false):
   argumentType = $SubsetArg
 }
 $Element(set: $SetTerm, auto: $Bool = $false, shortcut?: $Shortcut): %ParameterType($ElementTerm) {
-  argumentType = $ElementArg
+  argumentType = $ElementArg,
+  exports = [shortcut]
 }
 $Symbol: %ParameterType($SymbolTerm) {
   argumentType = $SymbolArg
@@ -186,7 +189,7 @@ $Symbol: %ParameterType($SymbolTerm) {
 $Constraint(formula: $Formula): %ParameterType($Formula) {
   argumentType = $ConstraintArg
 }
-$Binding(set: $SetTerm, parameters[%self]: %ParameterList, shortcut?: $Shortcut): %ParameterType {
+$Binding(set: $SetTerm, parameters[%self]: %ParameterList): %ParameterType {
   argumentType = $BindingArg,
   exports = [parameters]
 }

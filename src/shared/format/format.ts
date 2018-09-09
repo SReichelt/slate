@@ -145,13 +145,25 @@ export class Parameter {
 }
 
 export class ParameterList extends Array<Parameter> {
-  getParameter(name: string): Parameter {
-    for (let param of this) {
-      if (param.name === name) {
-        return param;
+  getParameter(name?: string, index?: number): Parameter {
+    if (name !== undefined) {
+      for (let param of this) {
+        if (param.name === name) {
+          return param;
+        }
       }
+      throw new Error(`Parameter "${name}" not found`);
+    } else if (index !== undefined) {
+      if (index < this.length) {
+        return this[index];
+      } else if (this.length && this[this.length - 1].list) {
+        return this[this.length - 1];
+      } else {
+        throw new Error(`Parameter ${index + 1} not found`);
+      }
+    } else {
+      throw new Error('Parameter name or index must be given');
     }
-    throw new Error(`Parameter "${name}" not found`);
   }
 
   substituteExpression(fn: ExpressionSubstitutionFn, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
@@ -188,7 +200,7 @@ export class ArgumentList extends Array<Argument> {
   getOptionalValue(name?: string, index?: number): Expression | undefined {
     let curIndex = 0;
     for (let arg of this) {
-      if (arg.name) {
+      if (arg.name !== undefined) {
         if (arg.name === name) {
           return arg.value;
         }
@@ -238,10 +250,6 @@ export class Type {
 export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList): void;
   abstract toArgumentList(argumentList: ArgumentList): void;
-
-  getArgumentValueContext(parentContext: Context, previousArguments: ArgumentList, name: string): Context {
-    return parentContext;
-  }
 
   fromCompoundExpression(expression: CompoundExpression): void {
     this.fromArgumentList(expression.arguments);
@@ -316,14 +324,11 @@ export abstract class MetaRefExpression extends ObjectRefExpression {
   abstract fromArgumentList(argumentList: ArgumentList): void;
   abstract toArgumentList(argumentList: ArgumentList): void;
 
-  getArgumentValueContext(parentContext: Context, previousArguments: ArgumentList, name: string): Context {
-    return parentContext;
-  }
+  getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined { return undefined; }
+  createDefinitionContents(): ObjectContents | undefined { return undefined; }
 }
 
 export class GenericMetaRefExpression extends MetaRefExpression {
-  static readonly metaContents = GenericObjectContents;
-
   name: string;
   arguments: ArgumentList = Object.create(ArgumentList.prototype);
 
@@ -340,17 +345,10 @@ export class GenericMetaRefExpression extends MetaRefExpression {
     argumentList.length = 0;
     argumentList.push(...this.arguments);
   }
-}
 
-export interface MetaDefinitionList {
-  [name: string]: {new(): MetaRefExpression};
-}
-
-export interface MetaDefinitions {
-  metaModelName: string;
-  definitionTypes: MetaDefinitionList;
-  expressionTypes: MetaDefinitionList;
-  functions: MetaDefinitionList;
+  createDefinitionContents(): ObjectContents | undefined {
+    return new GenericObjectContents;
+  }
 }
 
 export class DefinitionRefExpression extends ObjectRefExpression {
@@ -415,7 +413,7 @@ export class ArrayExpression extends Expression {
 
 
 export abstract class Context {
-  constructor(public metaDefinitions?: MetaDefinitions) {}
+  constructor(public metaModel: MetaModel, public parentObject?: Object) {}
 
   abstract getVariables(): Parameter[];
   abstract getVariable(name: string): Parameter;
@@ -433,7 +431,7 @@ export class EmptyContext extends Context {
 
 export class DerivedContext extends Context {
   constructor(public parentContext: Context) {
-    super(parentContext.metaDefinitions);
+    super(parentContext.metaModel, parentContext.parentObject);
   }
 
   getVariables(): Parameter[] {
@@ -442,6 +440,13 @@ export class DerivedContext extends Context {
 
   getVariable(name: string): Parameter {
     return this.parentContext.getVariable(name);
+  }
+}
+
+export class ParentInfoContext extends DerivedContext {
+  constructor(parentObject: Object, parentContext: Context) {
+    super(parentContext);
+    this.parentObject = parentObject;
   }
 }
 
@@ -474,11 +479,48 @@ export class DummyContext extends Context {
   }
 }
 
+export interface MetaDefinitionList {
+  [name: string]: {new(): MetaRefExpression};
+}
+
+export interface MetaDefinitionFactory {
+  createMetaRefExpression(name: string): MetaRefExpression;
+  allowDefinitionRefs(): boolean;
+}
+
+export class MetaDefinitionFactoryImpl implements MetaDefinitionFactory {
+  constructor(private metaDefinitionList: MetaDefinitionList) {}
+
+  createMetaRefExpression(name: string): MetaRefExpression {
+    let metaDefinitionClass = this.metaDefinitionList[name];
+    if (!metaDefinitionClass) {
+      throw new Error(`Meta object "${name}" not found`);
+    }
+    return new metaDefinitionClass;
+  }
+
+  allowDefinitionRefs(): boolean {
+    return this.metaDefinitionList[''] !== undefined;
+  }
+}
+
+export class DummyMetaDefinitionFactory implements MetaDefinitionFactory {
+  createMetaRefExpression(name: string): MetaRefExpression {
+    let result = new GenericMetaRefExpression;
+    result.name = name;
+    return result;
+  }
+
+  allowDefinitionRefs(): boolean {
+    return true;
+  }
+}
+
 export class MetaModel {
-  constructor(public metaDefinitions?: MetaDefinitions) {}
+  constructor(public definitionTypes: MetaDefinitionFactory, public expressionTypes: MetaDefinitionFactory, public functions: MetaDefinitionFactory) {}
 
   getRootContext(): Context {
-    return new EmptyContext(this.metaDefinitions);
+    return new EmptyContext(this);
   }
 
   getDefinitionTypeContext(definition: Definition, parentContext: Context): Context {
@@ -489,20 +531,24 @@ export class MetaModel {
     return this.getParameterListContext(definition.parameters, parentContext);
   }
 
-  getParameterTypeContext(parameter: Parameter, parentContext: Context, parent: Object): Context {
+  getParameterTypeContext(parameter: Parameter, parentContext: Context): Context {
     return parentContext;
   }
 
-  getNextParameterContext(parameter: Parameter, previousContext: Context, parent: Object): Context {
+  getNextParameterContext(parameter: Parameter, previousContext: Context): Context {
     return this.getParameterContext(parameter, previousContext);
   }
 
-  getNextArgumentContext(argument: Argument, previousContext: Context, parent: Object): Context {
-    // TODO look up dependencies in meta definitions
-    return previousContext;
+  getNextArgumentContext(argument: Argument, argumentIndex: number, previousContext: Context): Context {
+    // TODO restrict variable references in metamodel
+    if (argument.value instanceof ParameterExpression) {
+      return this.getParameterListContext(argument.value.parameters, previousContext);
+    } else {
+      return previousContext;
+    }
   }
 
-  getArgumentValueContext(argument: Argument, parentContext: Context, parent: Object): Context {
+  getArgumentValueContext(argument: Argument, argumentIndex: number, parentContext: Context): Context {
     // TODO look up dependencies in meta definitions
     return parentContext;
   }
@@ -526,7 +572,14 @@ export class MetaModel {
 }
 
 export class DummyMetaModel extends MetaModel {
+  constructor() {
+    let dummyFactory = new DummyMetaDefinitionFactory;
+    super(dummyFactory, dummyFactory, dummyFactory);
+  }
+
   getRootContext(): Context {
-    return new DummyContext;
+    return new DummyContext(this);
   }
 }
+
+export type MetaModelGetter = (path: Path) => MetaModel;

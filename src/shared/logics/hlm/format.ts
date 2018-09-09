@@ -4,12 +4,13 @@ import * as FmtDisplay from '../../display/meta';
 import { LogicFormat } from '../format';
 
 export class HLMFormat implements LogicFormat {
-  metaModel: HLMMetaModel = new HLMMetaModel;
+  getMetaModel(): Fmt.MetaModel { return new HLMMetaModel; }
 }
 
+// TODO remove after it is fully generated
 class HLMMetaModel extends Fmt.MetaModel {
   constructor() {
-    super(FmtHLM.metaDefinitions);
+    super(FmtHLM.metaModel.definitionTypes, FmtHLM.metaModel.expressionTypes, FmtHLM.metaModel.functions);
   }
 
   getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
@@ -17,22 +18,19 @@ class HLMMetaModel extends Fmt.MetaModel {
     return super.getDefinitionContentsContext(definition, definitionContext);
   }
 
-  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context, parent: Object): Fmt.Context {
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
-  getNextArgumentContext(argument: Fmt.Argument, previousContext: Fmt.Context, parent: Object): Fmt.Context {
-    if (parent instanceof FmtHLM.MetaRefExpression_Binding && previousContext instanceof ParameterTypeContext) {
-      previousContext = new Fmt.ParameterContext(previousContext.parameter, previousContext);
-    }
-    if (argument.value instanceof Fmt.ParameterExpression && !(parent instanceof Fmt.DefinitionRefExpression)) {
-      return this.getParameterListContext(argument.value.parameters, previousContext);
-    }
-    return previousContext;
-  }
-
-  getArgumentValueContext(argument: Fmt.Argument, parentContext: Fmt.Context, parent: Object): Fmt.Context {
-    if (parent instanceof Fmt.Definition) {
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, parentContext: Fmt.Context): Fmt.Context {
+    let parent = parentContext.parentObject;
+    if (parent instanceof FmtHLM.MetaRefExpression_Binding) {
+      for (let context = parentContext; context instanceof Fmt.DerivedContext; context = context.parentContext) {
+        if (context instanceof ParameterTypeContext) {
+          parentContext = new Fmt.ParameterContext(context.parameter, parentContext);
+        }
+      }
+    } else if (parent instanceof Fmt.Definition) {
       switch (argument.name) {
       case 'equalityDefinition':
         while (parentContext instanceof Fmt.DerivedContext && !(parentContext instanceof DefinitionContext)) {
@@ -42,7 +40,7 @@ class HLMMetaModel extends Fmt.MetaModel {
       case 'display':
       case 'definitionDisplay':
         let context = new Fmt.DerivedContext(parentContext);
-        context.metaDefinitions = FmtDisplay.metaDefinitions;
+        context.metaModel = FmtDisplay.metaModel;
         return context;
       }
     }

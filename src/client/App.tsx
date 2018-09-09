@@ -86,7 +86,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     fetch('/display/templates.hlm')
-      .then((response: Response) => FmtReader.readResponse(response, new Fmt.MetaModel(FmtDisplay.metaDefinitions)))
+      .then((response: Response) => FmtReader.readResponse(response, FmtDisplay.getMetaModel))
       .then((templates: Fmt.File) => {
         this.setState({templates: templates});
       })

@@ -51,9 +51,6 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
 }
 
 export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_MetaModel;
-
   getName(): string {
     return 'MetaModel';
   }
@@ -63,6 +60,10 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_MetaModel;
   }
 }
 
@@ -151,9 +152,6 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
 }
 
 export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_DefinitionType;
-
   resultType?: Fmt.Expression;
 
   getName(): string {
@@ -185,6 +183,10 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     }
     return fn(result);
   }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_DefinitionType;
+  }
 }
 
 export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
@@ -203,9 +205,6 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
 }
 
 export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_ExpressionType;
-
   getName(): string {
     return 'ExpressionType';
   }
@@ -215,6 +214,10 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_ExpressionType;
   }
 }
 
@@ -246,9 +249,6 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
 }
 
 export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_ParameterType;
-
   variableType?: Fmt.Expression;
 
   getName(): string {
@@ -279,6 +279,10 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
       result = this;
     }
     return fn(result);
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_ParameterType;
   }
 }
 
@@ -348,19 +352,21 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
-  type: Fmt.Expression;
+  type?: Fmt.Expression;
 
   getName(): string {
     return 'SingleParameter';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.type = argumentList.getValue('type', 0);
+    this.type = argumentList.getOptionalValue('type', 0);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.type);
+    if (this.type !== undefined) {
+      argumentList.add(this.type, 'type');
+    }
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -392,9 +398,32 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
   }
 }
 
-export const metaDefinitions: Fmt.MetaDefinitions = {
-  metaModelName: 'meta',
-  definitionTypes: {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression},
-  expressionTypes: {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression},
-  functions: {'Any': MetaRefExpression_Any}
-};
+export class MetaRefExpression_self extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'self';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+}
+
+const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
+const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
+const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self};
+
+export const metaModel = new Fmt.MetaModel(
+  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(functions)
+);
+
+export function getMetaModel(path: Fmt.Path) {
+  if (path.name !== 'meta') {
+    throw new Error('File of type "meta" expected');
+  }
+  return metaModel;
+}

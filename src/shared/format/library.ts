@@ -31,9 +31,6 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
 }
 
 export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Section;
-
   getName(): string {
     return 'Section';
   }
@@ -43,6 +40,10 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Section;
   }
 }
 
@@ -72,9 +73,6 @@ export class ObjectContents_Library extends ObjectContents_Section {
 }
 
 export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
-  static metaInnerDefinitionTypes: any = {};
-  static readonly metaContents = ObjectContents_Library;
-
   getName(): string {
     return 'Library';
   }
@@ -84,6 +82,10 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    return new ObjectContents_Library;
   }
 }
 
@@ -187,9 +189,19 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   }
 }
 
-export const metaDefinitions: Fmt.MetaDefinitions = {
-  metaModelName: 'library',
-  definitionTypes: {'Library': MetaRefExpression_Library, 'Section': MetaRefExpression_Section},
-  expressionTypes: {},
-  functions: {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection}
-};
+const definitionTypes: Fmt.MetaDefinitionList = {'Library': MetaRefExpression_Library, 'Section': MetaRefExpression_Section};
+const expressionTypes: Fmt.MetaDefinitionList = {};
+const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection};
+
+export const metaModel = new Fmt.MetaModel(
+  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
+  new Fmt.MetaDefinitionFactoryImpl(functions)
+);
+
+export function getMetaModel(path: Fmt.Path) {
+  if (path.name !== 'library') {
+    throw new Error('File of type "library" expected');
+  }
+  return metaModel;
+}
