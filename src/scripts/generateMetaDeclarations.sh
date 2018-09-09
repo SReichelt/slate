@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-ts-node src/scripts/generateMetaDeclarations.ts "$@"
+ts-node -P src/scripts/tsconfig.json src/scripts/generateMetaDeclarations.ts "$@"

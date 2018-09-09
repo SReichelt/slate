@@ -340,9 +340,9 @@ const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool,
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg};
 
 export const metaModel = new Fmt.MetaModel(
-  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(functions)
+  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+  new Fmt.StandardMetaDefinitionFactory(functions)
 );
 
 export function getMetaModel(path: Fmt.Path) {

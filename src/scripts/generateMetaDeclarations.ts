@@ -539,7 +539,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    return fn(result);\n`;
         outFileStr += `  }\n`;
       }
-      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
+      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
         outFileStr += `\n`;
         outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;
         outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, definition.contents.innerDefinitionTypes, (metaModel.contents as FmtMeta.ObjectContents_MetaModel).expressionTypes)};\n`;

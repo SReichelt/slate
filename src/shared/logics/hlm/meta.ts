@@ -273,7 +273,7 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
 
   getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
     const innerDefinitionTypes: Fmt.MetaDefinitionList = {'Constructor': MetaRefExpression_Constructor};
-    return new Fmt.MetaDefinitionFactoryImpl(innerDefinitionTypes);
+    return new Fmt.StandardMetaDefinitionFactory(innerDefinitionTypes);
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -4154,9 +4154,9 @@ const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr,
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural};
 
 export const metaModel = new Fmt.MetaModel(
-  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(functions)
+  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+  new Fmt.StandardMetaDefinitionFactory(functions)
 );
 
 export function getMetaModel(path: Fmt.Path) {

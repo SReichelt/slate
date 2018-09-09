@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-ts-node src/scripts/tidy.ts "$@"
+ts-node -P src/scripts/tsconfig.json src/scripts/tidy.ts "$@"
