@@ -394,6 +394,7 @@ function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression,
 
 function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): string {
   let outFileStr = '';
+  let metaModel = inFile.definitions[0];
 
   for (let definition of inFile.definitions) {
     if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
@@ -538,11 +539,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    return fn(result);\n`;
         outFileStr += `  }\n`;
       }
-      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
+      if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
         outFileStr += `\n`;
         outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;
-        outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, definition.contents.innerDefinitionTypes)};\n`;
-        outFileStr += `    return new Fmt.MetaDefinitionFactoryImpl(innerDefinitionTypes);\n`;
+        outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, definition.contents.innerDefinitionTypes, (metaModel.contents as FmtMeta.ObjectContents_MetaModel).expressionTypes)};\n`;
+        outFileStr += `    return new Fmt.StandardMetaDefinitionFactory(innerDefinitionTypes);\n`;
         outFileStr += `  }\n`;
       }
       if (hasObjectContents(inFile, definition)) {
@@ -567,9 +568,9 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `const functions: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.functions)};\n`;
     outFileStr += `\n`;
     outFileStr += `export const metaModel = new Fmt.MetaModel(\n`;
-    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),\n`;
-    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),\n`;
-    outFileStr += `  new Fmt.MetaDefinitionFactoryImpl(functions)\n`;
+    outFileStr += `  new Fmt.StandardMetaDefinitionFactory(definitionTypes),\n`;
+    outFileStr += `  new Fmt.StandardMetaDefinitionFactory(expressionTypes),\n`;
+    outFileStr += `  new Fmt.StandardMetaDefinitionFactory(functions)\n`;
     outFileStr += `);\n`;
     outFileStr += `\n`;
     outFileStr += `export function getMetaModel(path: Fmt.Path) {\n`;

@@ -416,9 +416,9 @@ const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, '
 const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self};
 
 export const metaModel = new Fmt.MetaModel(
-  new Fmt.MetaDefinitionFactoryImpl(definitionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(expressionTypes),
-  new Fmt.MetaDefinitionFactoryImpl(functions)
+  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+  new Fmt.StandardMetaDefinitionFactory(functions)
 );
 
 export function getMetaModel(path: Fmt.Path) {

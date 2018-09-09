@@ -131,7 +131,7 @@ export class Reader {
     }
   }
 
-  readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): void {
+  readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): void {
     for (;;) {
       this.skipWhitespace();
       let definition = this.tryReadDefinition(metaDefinitions, context);
@@ -143,7 +143,7 @@ export class Reader {
     }
   }
 
-  tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Definition | undefined {
+  tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
     if (!this.tryReadChar('$')) {
       return undefined;
     }
@@ -164,7 +164,9 @@ export class Reader {
       contents = new Fmt.GenericObjectContents;
     }
     let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
-    this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
+    if (metaInnerDefinitionTypes) {
+      this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
+    }
     if (contents) {
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
       let argumentsStart = this.markStart();
@@ -311,7 +313,7 @@ export class Reader {
     return this.tryReadArgument(argIndex, context) || this.error('Argument expected') || new Fmt.Argument;
   }
 
-  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Type | undefined {
+  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Type | undefined {
     if (!this.tryReadChar(':')) {
       return undefined;
     }
@@ -329,7 +331,7 @@ export class Reader {
     return type;
   }
 
-  readType(metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Type {
+  readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Type {
     this.skipWhitespace();
     return this.tryReadType(metaDefinitions, context) || this.error('Type expected') || new Fmt.Type;
   }
@@ -349,7 +351,7 @@ export class Reader {
     return expressions;
   }
 
-  tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Expression | undefined {
+  tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Expression | undefined {
     let expressionStart = this.markStart();
     if (this.tryReadChar('%')) {
       let name = this.readIdentifier();
@@ -440,7 +442,7 @@ export class Reader {
     return expression;
   }
 
-  readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, context: Fmt.Context): Fmt.Expression {
+  readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Expression {
     this.skipWhitespace();
     return this.tryReadExpression(isType, metaDefinitions, context) || this.error('Expression expected') || new Fmt.StringExpression;
   }

@@ -346,6 +346,10 @@ export class GenericMetaRefExpression extends MetaRefExpression {
     argumentList.push(...this.arguments);
   }
 
+  getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined {
+    return new GenericMetaDefinitionFactory;
+  }
+
   createDefinitionContents(): ObjectContents | undefined {
     return new GenericObjectContents;
   }
@@ -488,7 +492,7 @@ export interface MetaDefinitionFactory {
   allowDefinitionRefs(): boolean;
 }
 
-export class MetaDefinitionFactoryImpl implements MetaDefinitionFactory {
+export class StandardMetaDefinitionFactory implements MetaDefinitionFactory {
   constructor(private metaDefinitionList: MetaDefinitionList) {}
 
   createMetaRefExpression(name: string): MetaRefExpression {
@@ -504,7 +508,7 @@ export class MetaDefinitionFactoryImpl implements MetaDefinitionFactory {
   }
 }
 
-export class DummyMetaDefinitionFactory implements MetaDefinitionFactory {
+export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
   createMetaRefExpression(name: string): MetaRefExpression {
     let result = new GenericMetaRefExpression;
     result.name = name;
@@ -573,7 +577,7 @@ export class MetaModel {
 
 export class DummyMetaModel extends MetaModel {
   constructor() {
-    let dummyFactory = new DummyMetaDefinitionFactory;
+    let dummyFactory = new GenericMetaDefinitionFactory;
     super(dummyFactory, dummyFactory, dummyFactory);
   }
 
