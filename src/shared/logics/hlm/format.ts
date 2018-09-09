@@ -22,7 +22,7 @@ class HLMMetaModel extends Fmt.MetaModel {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
-  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, parentContext: Fmt.Context): Fmt.Context {
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
     let parent = parentContext.parentObject;
     if (parent instanceof FmtHLM.MetaRefExpression_Binding) {
       for (let context = parentContext; context instanceof Fmt.DerivedContext; context = context.parentContext) {

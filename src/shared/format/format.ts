@@ -552,7 +552,7 @@ export class MetaModel {
     }
   }
 
-  getArgumentValueContext(argument: Argument, argumentIndex: number, parentContext: Context): Context {
+  getArgumentValueContext(argument: Argument, argumentIndex: number, previousArguments: ArgumentList, parentContext: Context): Context {
     // TODO look up dependencies in meta definitions
     return parentContext;
   }

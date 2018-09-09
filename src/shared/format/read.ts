@@ -268,21 +268,21 @@ export class Reader {
   readArguments(args: Fmt.ArgumentList, context: Fmt.Context): void {
     this.skipWhitespace();
     let argIndex = 0;
-    let arg = this.tryReadArgument(argIndex, context);
+    let arg = this.tryReadArgument(argIndex, args, context);
     if (arg) {
       args.push(arg);
       this.skipWhitespace();
       while (this.tryReadChar(',')) {
         context = context.metaModel.getNextArgumentContext(arg, argIndex, context);
         argIndex++;
-        arg = this.readArgument(argIndex, context);
+        arg = this.readArgument(argIndex, args, context);
         args.push(arg);
         this.skipWhitespace();
       }
     }
   }
 
-  tryReadArgument(argIndex: number, context: Fmt.Context): Fmt.Argument | undefined {
+  tryReadArgument(argIndex: number, previousArgs: Fmt.ArgumentList, context: Fmt.Context): Fmt.Argument | undefined {
     let arg = new Fmt.Argument;
     let identifierStart = this.markStart();
     let identifier = this.tryReadIdentifier();
@@ -291,14 +291,14 @@ export class Reader {
       this.skipWhitespace();
       if (this.tryReadChar('=')) {
         arg.name = identifier;
-        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         arg.value = this.readExpression(false, valueContext.metaModel.functions, valueContext);
       } else {
-        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+        let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         arg.value = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
       }
     } else {
-      let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, context);
+      let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
       let value = this.tryReadExpression(false, valueContext.metaModel.functions, valueContext);
       if (!value) {
         return undefined;
@@ -308,9 +308,9 @@ export class Reader {
     return arg;
   }
 
-  readArgument(argIndex: number, context: Fmt.Context): Fmt.Argument {
+  readArgument(argIndex: number, previousArguments: Fmt.ArgumentList, context: Fmt.Context): Fmt.Argument {
     this.skipWhitespace();
-    return this.tryReadArgument(argIndex, context) || this.error('Argument expected') || new Fmt.Argument;
+    return this.tryReadArgument(argIndex, previousArguments, context) || this.error('Argument expected') || new Fmt.Argument;
   }
 
   tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Type | undefined {
