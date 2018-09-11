@@ -603,7 +603,14 @@ export class Reader {
 
   private error(msg: string, range?: Range): void {
     if (!this.atError) {
-      if (!range) {
+      if (range) {
+        if (range.start.line > range.end.line || (range.start.line === range.end.line && range.start.col > range.end.col)) {
+          range = {
+            start: range.end,
+            end: range.start
+          };
+        }
+      } else {
         let start = this.stream.getLocation();
         let end = start;
         let c = this.peekChar();

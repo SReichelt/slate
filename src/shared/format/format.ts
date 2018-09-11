@@ -214,10 +214,16 @@ export class ArgumentList extends Array<Argument> {
     return undefined;
   }
 
-  getValue(name: string, index?: number): Expression {
+  getValue(name?: string, index?: number): Expression {
     let value = this.getOptionalValue(name, index);
     if (value === undefined) {
-      throw new Error(`Missing argument for parameter "${name}"`);
+      if (name !== undefined) {
+        throw new Error(`Missing argument for parameter "${name}"`);
+      } else if (index !== undefined) {
+        throw new Error(`Missing argument for parameter ${index + 1}`);
+      } else {
+        throw new Error('Argument name or index must be given');
+      }
     }
     return value;
   }

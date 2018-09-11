@@ -1,6 +1,19 @@
 import * as Fmt from './format';
 import * as FmtMeta from './meta';
 
+function hasObjectContents(definitions: Fmt.DefinitionList, metaDefinition: Fmt.Definition): boolean {
+  if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
+    if (metaDefinition.contents.members) {
+      return true;
+    }
+    if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression && !metaDefinition.contents.superType.path.parentPath) {
+      let parentMetaDefinition = definitions.getDefinition(metaDefinition.contents.superType.path.name);
+      return hasObjectContents(definitions, parentMetaDefinition);
+    }
+  }
+  return false;
+}
+
 function findMember(definitions: Fmt.DefinitionList, metaDefinition: Fmt.Definition, name?: string, index?: number): {result: Fmt.Parameter | undefined, memberCount: number} {
   let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
   let result: Fmt.Parameter | undefined = undefined;
@@ -26,8 +39,45 @@ function findMember(definitions: Fmt.DefinitionList, metaDefinition: Fmt.Definit
   return {result: result, memberCount: parentMemberCount};
 }
 
+function checkValueImpl(definitions: Fmt.DefinitionList, type: Fmt.Expression, arrayDimensions: number, value: Fmt.Expression): void {
+  if (arrayDimensions) {
+    if (!(value instanceof Fmt.ArrayExpression)) {
+      throw new Error('Array expression expected');
+    }
+    for (let item of value.items) {
+      checkValueImpl(definitions, type, arrayDimensions - 1, item);
+    }
+  } else if (type instanceof Fmt.MetaRefExpression) {
+    if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+      if (!(value instanceof Fmt.ParameterExpression)) {
+        throw new Error('Parameter expression expected');
+      }
+    } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+      if (!(value instanceof Fmt.ParameterExpression)) {
+        throw new Error('Parameter expression expected');
+      }
+      if (value.parameters.length !== 1) {
+        throw new Error('Single parameter expected');
+      }
+    }
+  } else if (type instanceof Fmt.DefinitionRefExpression && !type.path.parentPath) {
+    let metaDefinition = definitions.getDefinition(type.path.name);
+    if (hasObjectContents(definitions, metaDefinition)) {
+      if (!(value instanceof Fmt.CompoundExpression)) {
+        throw new Error('Compound expression expected');
+      }
+      let objectContents = new DynamicObjectContents(definitions, metaDefinition, false);
+      objectContents.fromCompoundExpression(value);
+    }
+  }
+}
+
+function checkValue(definitions: Fmt.DefinitionList, type: Fmt.Type, value: Fmt.Expression): void {
+  checkValueImpl(definitions, type.expression, type.arrayDimensions, value);
+}
+
 class DynamicObjectContents extends Fmt.GenericObjectContents {
-  constructor(private definitions: Fmt.DefinitionList, public metaDefinition: Fmt.Definition) {
+  constructor(private definitions: Fmt.DefinitionList, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
     super();
   }
 
@@ -44,28 +94,44 @@ class DynamicObjectContents extends Fmt.GenericObjectContents {
       }
       argIndex++;
     }
-    super.fromArgumentList(argumentList);
   }
 
-  private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): number {
+  private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
     let memberIndex = 0;
+    let hadOptionalMembers = !this.isDefinition;
     if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
       let superType = metaDefinition.contents.superType;
       if (superType instanceof Fmt.DefinitionRefExpression && !superType.path.parentPath) {
         let superTypeMetaDefinition = this.definitions.getDefinition(superType.path.name);
-        memberIndex = this.checkMembers(argumentList, superTypeMetaDefinition);
+        let superTypeResult = this.checkMembers(argumentList, superTypeMetaDefinition);
+        memberIndex = superTypeResult.memberCount;
+        hadOptionalMembers = superTypeResult.hadOptionalMembers;
       }
       if (metaDefinition.contents.members) {
         for (let member of metaDefinition.contents.members) {
-          // TODO check value according to code generation rules
-          if (!(member.optional || member.defaultValue)) {
-            argumentList.getValue(member.name, memberIndex);
+          let memberName: string | undefined = member.name;
+          let value: Fmt.Expression | undefined;
+          if (member.optional || member.defaultValue) {
+            hadOptionalMembers = true;
+            value = argumentList.getOptionalValue(memberName, memberIndex);
+          } else {
+            value = argumentList.getValue(memberName, memberIndex);
+            if (!hadOptionalMembers) {
+              memberName = undefined;
+            }
+          }
+          if (value) {
+            checkValue(this.definitions, member.type, value);
+            this.arguments.add(value, memberName);
           }
           memberIndex++;
         }
       }
     }
-    return memberIndex;
+    return {
+      memberCount: memberIndex,
+      hadOptionalMembers: hadOptionalMembers
+    };
   }
 }
 
@@ -77,19 +143,40 @@ class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     let paramIndex = 0;
+    let hadOptionalParams = false;
     for (let param of this.metaDefinition.parameters) {
-      // TODO check value according to code generation rules
-      if (!(param.optional || param.defaultValue)) {
-        argumentList.getValue(param.name, paramIndex);
+      let paramName = param.list ? undefined : param.name;
+      let value: Fmt.Expression | undefined;
+      if (param.optional || param.defaultValue) {
+        hadOptionalParams = true;
+        value = argumentList.getOptionalValue(paramName, paramIndex);
+      } else {
+        value = argumentList.getValue(paramName, paramIndex);
+        if (!hadOptionalParams) {
+          paramName = undefined;
+        }
+      }
+      if (value) {
+        checkValue(this.definitions, param.type, value);
+        this.arguments.add(value, paramName);
       }
       paramIndex++;
+      if (param.list) {
+        while (value) {
+          value = argumentList.getOptionalValue(paramName, paramIndex);
+          if (value) {
+            checkValue(this.definitions, param.type, value);
+            this.arguments.add(value, paramName);
+          }
+          paramIndex++;
+        }
+      }
     }
     let argIndex = 0;
     for (let arg of argumentList) {
       this.metaDefinition.parameters.getParameter(arg.name, argIndex);
       argIndex++;
     }
-    super.fromArgumentList(argumentList);
   }
 
   getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
@@ -103,7 +190,11 @@ class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new DynamicObjectContents(this.definitions, this.metaDefinition);
+    if (hasObjectContents(this.definitions, this.metaDefinition)) {
+      return new DynamicObjectContents(this.definitions, this.metaDefinition, true);
+    } else {
+      return super.createDefinitionContents();
+    }
   }
 }
 
