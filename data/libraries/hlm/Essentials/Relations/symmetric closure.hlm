@@ -4,6 +4,10 @@ $"symmetric closure"(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %ExplicitOperator {
+  display = [$Power(
+    base = ≺,
+    exponent = '↔'
+  )],
   definition = [
     $closure(
       S = {S},
@@ -24,9 +28,5 @@ $"symmetric closure"(
         ≺ = {≺}
       )}
     )
-  ],
-  display = [$Power(
-    base = ≺,
-    exponent = '↔'
-  )]
+  ]
 }

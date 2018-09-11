@@ -10,12 +10,12 @@ $inverse(a: %Element(
     )
   }
 )): %ExplicitOperator {
-  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence inverse"(α = {r_a})})],
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     space = '',
     minParenLevel = 1,
     maxParenLevel = 1
-  )]
+  )],
+  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence inverse"(α = {r_a})})]
 }

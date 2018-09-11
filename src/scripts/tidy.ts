@@ -2,10 +2,11 @@ import * as fs from 'fs';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtWriter from '../shared/format/write';
+import { getMetaModelWithFallback } from '../shared/data/dynamic';
 
 function tidy(fileName: string): void {
   let fileStr: string = fs.readFileSync(fileName, 'utf8');
-  let file: Fmt.File = FmtReader.readString(fileStr, fileName, () => new Fmt.DummyMetaModel);
+  let file: Fmt.File = FmtReader.readString(fileStr, fileName, (path: Fmt.Path) => getMetaModelWithFallback(fileName, path));
   fileStr = FmtWriter.writeString(file);
   fs.writeFileSync(fileName, fileStr, 'utf8');
 }

@@ -2,6 +2,10 @@
 
 $"Cardinal numbers": %Construction {
   $cardinality(S: %Set): %Constructor {
+    display = [$Parens(
+      body = S,
+      style = '||'
+    )],
     equalityDefinition = {
       leftParameters = #(S: %Set),
       rightParameters = #(T: %Set),
@@ -10,13 +14,10 @@ $"Cardinal numbers": %Construction {
         Y = {T}
       ))))],
       isomorphic = %true
-    },
-    display = [$Parens(
-      body = S,
-      style = '||'
-    )]
+    }
   }
 
+  display = ['𝓒𝓻𝓭'],
   embedding = {
     parameter = #(n: %Element($../Natural/"Natural numbers")),
     target = $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {n})}),
@@ -52,6 +53,5 @@ $"Cardinal numbers": %Construction {
         })
       )
     }
-  },
-  display = ['𝓒𝓻𝓭']
+  }
 }

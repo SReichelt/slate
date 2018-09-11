@@ -11,29 +11,29 @@ $"Disjoint union"(
   )
 ): %Construction {
   $left(s: %Element(S)): %Constructor {
+    display = [$Constructor(
+      name = 'l',
+      arguments = [s]
+    )],
     equalityDefinition = {
       leftParameters = #(s: %Element(S)),
       rightParameters = #("s'": %Element(S)),
       definition = [%equals(s, "s'")],
       isomorphic = %true
-    },
-    display = [$Constructor(
-      name = 'l',
-      arguments = [s]
-    )]
+    }
   }
 
   $right(t: %Element(T)): %Constructor {
+    display = [$Constructor(
+      name = 'r',
+      arguments = [t]
+    )],
     equalityDefinition = {
       leftParameters = #(t: %Element(T)),
       rightParameters = #("t'": %Element(T)),
       definition = [%equals(t, "t'")],
       isomorphic = %true
-    },
-    display = [$Constructor(
-      name = 'r',
-      arguments = [t]
-    )]
+    }
   }
 
   display = [$Operator(

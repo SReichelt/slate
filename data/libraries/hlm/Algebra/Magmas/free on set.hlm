@@ -52,7 +52,7 @@ $"free on set"(
           𝔐 = {𝔐},
           𝔑 = {𝔑}
         ))),
-        %equals(
+        formula = %equals(
           $../../Essentials/Functions/restriction(
             X = {M},
             Y = {N},

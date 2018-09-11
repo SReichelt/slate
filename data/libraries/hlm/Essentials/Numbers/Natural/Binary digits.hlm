@@ -1,12 +1,12 @@
 %../../../../../logics/hlm%
 
 $"Binary digits": %SetOperator {
+  display = ['Bin'],
   definition = [
     $"Segment (less or equal)"(n = {$number(value = 1)}),
     %enumeration(
       $number(value = 0),
       $number(value = 1)
     )
-  ],
-  display = ['Bin']
+  ]
 }

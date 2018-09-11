@@ -15,7 +15,7 @@ $"Subsets of finite sets are finite"(
           Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
         ))
       ),
-      $../Functions/injective(f = {f})
+      formula = $../Functions/injective(f = {f})
     ),
     steps = #(
       _: %Consider(_1),
@@ -27,7 +27,7 @@ $"Subsets of finite sets are finite"(
             Y = {$../Numbers/Natural/"Segment (less)"(n = {n})}
           ))
         ),
-        $../Functions/injective(f = {g})
+        formula = $../Functions/injective(f = {g})
       )),
       _: %UseExists({
         parameters = #(

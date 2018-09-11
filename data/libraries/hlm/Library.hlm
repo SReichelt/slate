@@ -1,7 +1,6 @@
 %../../format/library%
 
 $Library: %Library {
-  logic = 'hlm',
   items = [
     %subsection(
       $Essentials,
@@ -31,5 +30,6 @@ $Library: %Library {
         en = 'Linear algebra'
       }
     )
-  ]
+  ],
+  logic = 'hlm'
 }

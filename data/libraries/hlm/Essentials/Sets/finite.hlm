@@ -1,6 +1,11 @@
 %../../../../logics/hlm%
 
 $finite(S: %Set): %Predicate {
+  references = ['https://en.wikipedia.org/wiki/Finite_set', 'http://mathworld.wolfram.com/FiniteSet.html', 'https://proofwiki.org/wiki/Definition:Finite'],
+  display = [$Property(
+    operand = S,
+    property = %neg('finite', 'infinite')
+  )],
   definition = [
     %in(
       $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
@@ -28,7 +33,7 @@ $finite(S: %Set): %Predicate {
           Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
         ))
       ),
-      $../Functions/injective(
+      formula = $../Functions/injective(
         X = {S},
         Y = {$../Numbers/Natural/"Segment (less)"(n = {m})},
         f = {h}
@@ -42,7 +47,7 @@ $finite(S: %Set): %Predicate {
           Y = {$../Numbers/Natural/"Segment (less or equal)"(n = {n})}
         ))
       ),
-      $../Functions/injective(
+      formula = $../Functions/injective(
         X = {S},
         Y = {$../Numbers/Natural/"Segment (less or equal)"(n = {n})},
         f = {i}
@@ -50,14 +55,14 @@ $finite(S: %Set): %Predicate {
     ),
     %exists(
       #(x: %Element($../Numbers/Natural/"Natural numbers")),
-      $../Numbers/Cardinal/"less or equal"(
+      formula = $../Numbers/Cardinal/"less or equal"(
         𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
         𝔶 = {x}
       )
     ),
     %exists(
       #(y: %Element($../Numbers/Natural/"Natural numbers")),
-      $../Numbers/Cardinal/less(
+      formula = $../Numbers/Cardinal/less(
         𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
         𝔶 = {y}
       )
@@ -238,7 +243,7 @@ $finite(S: %Set): %Predicate {
                     X = {S},
                     Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})}
                   ))),
-                  $../Functions/injective(f = {t})
+                  formula = $../Functions/injective(f = {t})
                 ),
                 steps = #(_: %ProveExists({t = {i}}))
               }))
@@ -258,7 +263,7 @@ $finite(S: %Set): %Predicate {
               X = {S},
               Y = {$../Numbers/Natural/"Segment (less)"(n = {x})}
             ))),
-            $../Functions/injective(f = {u})
+            formula = $../Functions/injective(f = {u})
           )),
           _: %UseExists({
             parameters = #(u: %Element($../Functions/Functions(
@@ -303,10 +308,5 @@ $finite(S: %Set): %Predicate {
         )
       }))
     }
-  ],
-  display = [$Property(
-    operand = S,
-    property = %neg('finite', 'infinite')
-  )],
-  references = ['https://en.wikipedia.org/wiki/Finite_set', 'http://mathworld.wolfram.com/FiniteSet.html', 'https://proofwiki.org/wiki/Definition:Finite']
+  ]
 }

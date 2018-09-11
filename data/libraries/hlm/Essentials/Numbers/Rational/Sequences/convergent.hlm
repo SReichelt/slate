@@ -13,7 +13,7 @@ $convergent(α: %Element(
 )): %Predicate {
   definition = [%exists(
     #(l: %Element($../"Rational numbers")),
-    $converges(
+    formula = $converges(
       α = {α},
       l = {l}
     )

@@ -4,6 +4,10 @@ $quotient(
   n: %Element($"Natural numbers"),
   m: %Element($Divisors(n = {n}))
 ): %ImplicitOperator {
+  display = [$Quotient(
+    numerator = n,
+    denominator = m
+  )],
   parameter = #(x: %Element($"Natural numbers")),
   definition = [%equals(
     n,
@@ -11,9 +15,5 @@ $quotient(
       m = {x},
       n = {m}
     )
-  )],
-  display = [$Quotient(
-    numerator = n,
-    denominator = m
   )]
 }

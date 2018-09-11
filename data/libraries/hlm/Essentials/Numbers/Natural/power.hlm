@@ -4,6 +4,10 @@ $power(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
 ): %ExplicitOperator {
+  display = [$Power(
+    base = m,
+    exponent = n
+  )],
   definition = [%structuralCases(
     n,
     $"Natural numbers",
@@ -26,9 +30,5 @@ $power(
         rewrite = %true
       }
     ]
-  )],
-  display = [$Power(
-    base = m,
-    exponent = n
   )]
 }

@@ -22,15 +22,15 @@ $product(
     }
   )
 ): %ExplicitOperator {
-  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence product"(
-    α = {r_a},
-    β = {r_b}
-  )})],
   display = [$Operator(
     symbol = '⋅',
     operands = [a, b],
     space = ' ',
     minParenLevel = 2,
     maxParenLevel = 2
-  )]
+  )],
+  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence product"(
+    α = {r_a},
+    β = {r_b}
+  )})]
 }

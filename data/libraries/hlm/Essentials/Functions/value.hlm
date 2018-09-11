@@ -21,10 +21,10 @@ $value(
   ),
   x: %Element(X)
 ): %ExplicitOperator {
-  definition = [y[x]],
+  remarks = 'This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.',
   display = [$Function(
     function = f,
     arguments = [x]
   )],
-  remarks = 'This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.'
+  definition = [y[x]]
 }

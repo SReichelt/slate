@@ -10,15 +10,15 @@ $inverse(a: %Element(
     )
   }
 )): %ExplicitOperator {
-  definition = [$Integers.difference(
-    n = {m_a},
-    m = {n_a}
-  )],
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     space = '',
     minParenLevel = 1,
     maxParenLevel = 1
+  )],
+  definition = [$Integers.difference(
+    n = {m_a},
+    m = {n_a}
   )]
 }

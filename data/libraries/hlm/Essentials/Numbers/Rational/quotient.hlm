@@ -4,6 +4,10 @@ $quotient(
   b: %Element($"Rational numbers"),
   a: %Element($"Nonzero numbers")
 ): %ImplicitOperator {
+  display = [$Quotient(
+    numerator = b,
+    denominator = a
+  )],
   parameter = #(x: %Element($"Rational numbers")),
   definition = [%equals(
     b,
@@ -11,9 +15,5 @@ $quotient(
       a = {x},
       b = {a}
     )
-  )],
-  display = [$Quotient(
-    numerator = b,
-    denominator = a
   )]
 }

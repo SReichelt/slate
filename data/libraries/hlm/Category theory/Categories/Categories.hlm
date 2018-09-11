@@ -437,7 +437,7 @@ $Categories: %Construction {
             ))
           )
         ),
-        %and(
+        formula = %and(
           %forall(
             #(c: %Element(O)),
             %equals(

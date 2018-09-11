@@ -4,6 +4,10 @@ $"reflexive closure"(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %ExplicitOperator {
+  display = [$Power(
+    base = ≺,
+    exponent = '='
+  )],
   definition = [
     $closure(
       S = {S},
@@ -21,9 +25,5 @@ $"reflexive closure"(
       ≺ = {≺},
       ⊂ = {$equality(S = {S})}
     )
-  ],
-  display = [$Power(
-    base = ≺,
-    exponent = '='
-  )]
+  ]
 }

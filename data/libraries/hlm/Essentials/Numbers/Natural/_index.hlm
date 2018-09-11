@@ -14,7 +14,10 @@ $Natural: %Section {
     %item($"Addition of one yields successor"),
     %item($"Sum is associative"),
     %item($"Left-addition of zero is neutral"),
-    %item($"Successor can be pulled over addition", type = 'lemma'),
+    %item(
+      $"Successor can be pulled over addition",
+      type = 'lemma'
+    ),
     %item($"Sum is commutative"),
     %item($"less or equal"),
     %item($less),
@@ -34,7 +37,10 @@ $Natural: %Section {
     %item($"Exclusive initial segment is subset of inclusive segment"),
     %item($"Initial segments are finite"),
     %item($"Binary digits"),
-    %item($"Finiteness criterion lemma", type = 'lemma'),
+    %item(
+      $"Finiteness criterion lemma",
+      type = 'lemma'
+    ),
     %item($"Finiteness criterion"),
     %item($"Addition of a fixed number is injective"),
     %item($"Multiplication by a positive number is injective"),
@@ -51,7 +57,10 @@ $Natural: %Section {
     %item($quotient),
     %item($power),
     %item($inductive),
-    %item($"Induction lemma", type = 'lemma'),
+    %item(
+      $"Induction lemma",
+      type = 'lemma'
+    ),
     %item(
       $"Induction principle",
       type = 'theorem',

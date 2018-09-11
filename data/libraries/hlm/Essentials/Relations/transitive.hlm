@@ -4,6 +4,10 @@ $transitive(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %Predicate {
+  display = [$Property(
+    operand = ≺,
+    property = 'transitive'
+  )],
   definition = [%forall(
     #(
       s: %Element(S),
@@ -28,9 +32,5 @@ $transitive(
       ≺ = {≺},
       t = {u}
     )
-  )],
-  display = [$Property(
-    operand = ≺,
-    property = 'transitive'
   )]
 }

@@ -10,15 +10,15 @@ $inverse(a: %Element(
     )
   }
 )): %ExplicitOperator {
-  definition = [$"Rational numbers".quotient(
-    n = {$../Integer/inverse(a = {n_a})},
-    m = {m_a}
-  )],
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     space = '',
     minParenLevel = 1,
     maxParenLevel = 1
+  )],
+  definition = [$"Rational numbers".quotient(
+    n = {$../Integer/inverse(a = {n_a})},
+    m = {m_a}
   )]
 }

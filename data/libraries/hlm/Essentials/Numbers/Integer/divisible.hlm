@@ -27,7 +27,7 @@ $divisible(
   definition = [
     %exists(
       #(x: %Element($Integers)),
-      %equals(
+      formula = %equals(
         $product(
           a = {a},
           b = {x}

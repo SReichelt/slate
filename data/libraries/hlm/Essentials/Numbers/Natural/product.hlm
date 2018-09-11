@@ -4,6 +4,13 @@ $product(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [m, n],
+    space = ' ',
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
   definition = [%structuralCases(
     n,
     $"Natural numbers",
@@ -26,12 +33,5 @@ $product(
         rewrite = %true
       }
     ]
-  )],
-  display = [$Operator(
-    symbol = '⋅',
-    operands = [m, n],
-    space = ' ',
-    minParenLevel = 2,
-    maxParenLevel = 2
   )]
 }

@@ -72,7 +72,7 @@ $"Euclids theorem": %StandardTheorem {
           $"Every number greater than one has a prime factor"(n = {b}),
           %exists(
             #(p: %Element($"Prime numbers")),
-            $../divisible(
+            formula = $../divisible(
               m = {p},
               n = {b}
             )

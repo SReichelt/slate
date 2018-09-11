@@ -7,7 +7,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       $../../Sets/empty(S = {M}),
       %exists(
         #(m: %Element(M)),
-        %forall(
+        formula = %forall(
           #(n: %Element(M)),
           $"less or equal"(
             m = {n},
@@ -18,14 +18,14 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
     ),
     %exists(
       #(a: %Element($"Natural numbers")),
-      %sub(
+      formula = %sub(
         M,
         $"Segment (less or equal)"(n = {a})
       )
     ),
     %exists(
       #(b: %Element($"Natural numbers")),
-      %sub(
+      formula = %sub(
         M,
         $"Segment (less)"(n = {b})
       )
@@ -67,7 +67,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                   parameters = #(k: %Element($"Natural numbers")),
                   value = %exists(
                     #(i: %Element(M)),
-                    %forall(
+                    formula = %forall(
                       #(j: %Element(M)),
                       $"less or equal"(
                         m = {j},
@@ -94,7 +94,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                         #(t: %Element(M)),
                         %exists(
                           #(s: %Element($"Segment (less)"(n = {$number(value = 0)}))),
-                          %equals(
+                          formula = %equals(
                             $../../Functions/value(
                               f = {f},
                               x = {s}
@@ -129,7 +129,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                 parameters = #(k: %Element($"Natural numbers")),
                 goal = %exists(
                   #(i: %Element(M)),
-                  %forall(
+                  formula = %forall(
                     #(j: %Element(M)),
                     $"less or equal"(
                       m = {j},
@@ -145,7 +145,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                   ),
                   %exists(
                     #(y: %Element(M)),
-                    %forall(
+                    formula = %forall(
                       #(z: %Element(M)),
                       $"less or equal"(
                         m = {z},
@@ -165,7 +165,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
         $../../Sets/empty(S = {M}),
         %exists(
           #(m: %Element(M)),
-          %forall(
+          formula = %forall(
             #(n: %Element(M)),
             $"less or equal"(
               m = {n},
@@ -263,7 +263,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       to = 4,
       parameters = #(@: %Constraint(%exists(
         #(a: %Element($"Natural numbers")),
-        %sub(
+        formula = %sub(
           M,
           $"Segment (less or equal)"(n = {a})
         )
@@ -287,7 +287,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       to = 1,
       parameters = #(@: %Constraint(%exists(
         #(b: %Element($"Natural numbers")),
-        %sub(
+        formula = %sub(
           M,
           $"Segment (less)"(n = {b})
         )

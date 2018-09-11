@@ -2,7 +2,10 @@
 
 $Cardinal: %Section {
   items = [
-    %item($"Natural cardinality lemma", type = 'lemma'),
+    %item(
+      $"Natural cardinality lemma",
+      type = 'lemma'
+    ),
     %item($"Cardinal numbers"),
     %item($Homomorphisms),
     %item($identity),

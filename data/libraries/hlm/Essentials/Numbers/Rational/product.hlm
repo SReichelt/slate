@@ -22,6 +22,13 @@ $product(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [a, b],
+    space = ' ',
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
   definition = [$"Rational numbers".quotient(
     n = {$../Integer/product(
       a = {n_a},
@@ -31,12 +38,5 @@ $product(
       m = {m_a},
       n = {m_b}
     )}
-  )],
-  display = [$Operator(
-    symbol = '⋅',
-    operands = [a, b],
-    space = ' ',
-    minParenLevel = 2,
-    maxParenLevel = 2
   )]
 }

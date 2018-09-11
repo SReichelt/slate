@@ -4,6 +4,10 @@ $"binomial coefficient"(
   n: %Element($"Natural numbers"),
   k: %Element(%previous)
 ): %ExplicitOperator {
+  display = [$BinomialCoefficient(
+    top = n,
+    bottom = k
+  )],
   definition = [
     %structuralCases(
       k,
@@ -47,7 +51,7 @@ $"binomial coefficient"(
         }
       ]
     ),
-    %cases(cases = [
+    %cases([
       {
         formula = $"less or equal"(
           n = {n},
@@ -72,9 +76,5 @@ $"binomial coefficient"(
         value = $number(value = 0)
       }
     ])
-  ],
-  display = [$BinomialCoefficient(
-    top = n,
-    bottom = k
-  )]
+  ]
 }

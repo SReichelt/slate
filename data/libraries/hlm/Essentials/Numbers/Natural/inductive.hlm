@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $inductive(M: %Subset($"Natural numbers")): %Predicate {
+  display = [$Property(
+    property = 'inductive',
+    operand = M
+  )],
   definition = [%and(
     %in(
       $number(value = 0),
@@ -16,9 +20,5 @@ $inductive(M: %Subset($"Natural numbers")): %Predicate {
         M
       )
     )
-  )],
-  display = [$Property(
-    property = 'inductive',
-    operand = M
   )]
 }

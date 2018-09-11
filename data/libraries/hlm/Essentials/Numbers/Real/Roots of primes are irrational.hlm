@@ -18,7 +18,7 @@ $"Roots of primes are irrational"(
           b = {b}
         ))
       ),
-      %equals(
+      formula = %equals(
         $root(
           a = {p},
           n = {n}
@@ -115,7 +115,7 @@ $"Roots of primes are irrational"(
           proof = {steps = #(_: %ProveDef(proof = {
             goal = %exists(
               #(x: %Element($../Integer/Integers)),
-              %equals(
+              formula = %equals(
                 $../Integer/product(
                   a = {p},
                   b = {x}
@@ -145,7 +145,7 @@ $"Roots of primes are irrational"(
         ),
         _3: %UseDef(result = %exists(
           #(y: %Element($../Integer/Integers)),
-          %equals(
+          formula = %equals(
             $../Integer/product(
               a = {p},
               b = {y}
@@ -163,7 +163,7 @@ $"Roots of primes are irrational"(
             )),
             _: %UseDef(result = %exists(
               #(m: %Element($../Natural/"Positive numbers")),
-              %equals(
+              formula = %equals(
                 $../Natural/sum(
                   m = {$../Natural/number(value = 1)},
                   n = {m}
@@ -177,7 +177,7 @@ $"Roots of primes are irrational"(
                 _: %Consider(m),
                 _: %UseDef(result = %exists(
                   #(l: %Element($../Natural/"Natural numbers")),
-                  %equals(
+                  formula = %equals(
                     $../Natural/sum(
                       m = {$../Natural/number(value = 1)},
                       n = {l}
@@ -305,7 +305,7 @@ $"Roots of primes are irrational"(
                       proof = {steps = #(_: %ProveDef(proof = {
                         goal = %exists(
                           #(z: %Element($../Integer/Integers)),
-                          %equals(
+                          formula = %equals(
                             $../Integer/product(
                               a = {p},
                               b = {z}
@@ -342,7 +342,7 @@ $"Roots of primes are irrational"(
                     _: %State(
                       %exists(
                         #(q: %Element($../Natural/Prime/"Prime numbers")),
-                        %and(
+                        formula = %and(
                           $../Integer/divisible(
                             a = {q},
                             b = {a}
@@ -358,7 +358,7 @@ $"Roots of primes are irrational"(
                     _: %Consider(_1),
                     _: %UseDef(result = %not(%exists(
                       #(r: %Element($../Natural/Prime/"Prime numbers")),
-                      %and(
+                      formula = %and(
                         $../Integer/divisible(
                           a = {r},
                           b = {a}

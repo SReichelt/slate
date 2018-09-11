@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $even(n: %Element($"Natural numbers")): %Predicate {
+  display = [$Property(
+    property = %neg('even', 'odd'),
+    operand = n
+  )],
   definition = [
     %structural(
       n,
@@ -23,9 +27,5 @@ $even(n: %Element($"Natural numbers")): %Predicate {
       m = {$number(value = 2)},
       n = {n}
     )
-  ],
-  display = [$Property(
-    property = %neg('even', 'odd'),
-    operand = n
-  )]
+  ]
 }

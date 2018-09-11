@@ -23,6 +23,12 @@ $union(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '∪',
+    operands = [≺, ⊂],
+    space = ' ',
+    maxParenLevel = 2
+  )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/Union(
     U = {$../Sets/"Cartesian product"(
       S = {S},
@@ -30,11 +36,5 @@ $union(
     )},
     S = {Q},
     T = {R}
-  )})],
-  display = [$Operator(
-    symbol = '∪',
-    operands = [≺, ⊂],
-    space = ' ',
-    maxParenLevel = 2
-  )]
+  )})]
 }

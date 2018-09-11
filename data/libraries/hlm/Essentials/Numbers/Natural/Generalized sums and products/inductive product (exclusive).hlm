@@ -7,6 +7,17 @@ $"inductive product (exclusive)"(
     #(a: %Element($../"Natural numbers"))
   )
 ): %ExplicitOperator {
+  display = [$LargeOperator(
+    symbol = '∏',
+    operand = a,
+    under = $Relation(
+      symbol = '<',
+      operands = [i, n],
+      space = ' '
+    ),
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
   definition = [%structuralCases(
     n,
     $../"Natural numbers",
@@ -32,16 +43,5 @@ $"inductive product (exclusive)"(
         rewrite = %true
       }
     ]
-  )],
-  display = [$LargeOperator(
-    symbol = '∏',
-    operand = a,
-    under = $Relation(
-      symbol = '<',
-      operands = [i, n],
-      space = ' '
-    ),
-    minParenLevel = 2,
-    maxParenLevel = 2
   )]
 }

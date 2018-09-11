@@ -4,6 +4,12 @@ $sum(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '+',
+    operands = [m, n],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [%structuralCases(
     n,
     $"Natural numbers",
@@ -21,11 +27,5 @@ $sum(
         )})
       }
     ]
-  )],
-  display = [$Operator(
-    symbol = '+',
-    operands = [m, n],
-    minParenLevel = 1,
-    maxParenLevel = 1
   )]
 }

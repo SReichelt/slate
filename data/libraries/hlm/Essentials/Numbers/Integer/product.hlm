@@ -24,6 +24,13 @@ $product(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [a, b],
+    space = ' ',
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
   definition = [$difference(
     b = {$../Natural/sum(
       m = {$../Natural/product(
@@ -45,12 +52,5 @@ $product(
         n = {n_b}
       )}
     )}
-  )],
-  display = [$Operator(
-    symbol = '⋅',
-    operands = [a, b],
-    space = ' ',
-    minParenLevel = 2,
-    maxParenLevel = 2
   )]
 }

@@ -14,6 +14,13 @@ $restriction(
   ),
   T: %Subset(S)
 ): %ExplicitOperator {
+  display = [$UnaryOperator(
+    symbol = $SubSup(
+      body = '∣',
+      sub = T
+    ),
+    operand = ≺
+  )],
   definition = [$Relations(S = {T}).relation(R = {$../Sets/Intersection(
     U = {$../Sets/"Cartesian product"(
       S = {S},
@@ -24,12 +31,5 @@ $restriction(
       S = {T},
       T = {T}
     )}
-  )})],
-  display = [$UnaryOperator(
-    symbol = $SubSup(
-      body = '∣',
-      sub = T
-    ),
-    operand = ≺
-  )]
+  )})]
 }

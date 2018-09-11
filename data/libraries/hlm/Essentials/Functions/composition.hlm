@@ -13,6 +13,13 @@ $composition(
     Y = {Z}
   ))
 ): %ExplicitOperator {
+  references = ['https://en.wikipedia.org/wiki/Function_composition'],
+  display = [$Operator(
+    symbol = '∘',
+    operands = [g, f],
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
   definition = [$Functions(
     X = {X},
     Y = {Z}
@@ -29,12 +36,5 @@ $composition(
         x = {x}
       )}
     )}}
-  })],
-  display = [$Operator(
-    symbol = '∘',
-    operands = [g, f],
-    minParenLevel = 2,
-    maxParenLevel = 2
-  )],
-  references = ['https://en.wikipedia.org/wiki/Function_composition']
+  })]
 }

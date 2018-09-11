@@ -22,6 +22,12 @@ $difference(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '−',
+    operands = [b, a],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [
     $"Rational numbers".quotient(
       n = {$../Integer/difference(
@@ -43,11 +49,5 @@ $difference(
       a = {b},
       b = {$inverse(a = {a})}
     )
-  ],
-  display = [$Operator(
-    symbol = '−',
-    operands = [b, a],
-    minParenLevel = 1,
-    maxParenLevel = 1
-  )]
+  ]
 }

@@ -6,7 +6,7 @@ $"Well-ordering principle"(
 ): %StandardTheorem {
   claim = %exists(
     #(m: %Element(M)),
-    %forall(
+    formula = %forall(
       #(n: %Element(M)),
       $"less or equal"(
         m = {m},
@@ -60,7 +60,7 @@ $"Well-ordering principle"(
       )),
       %exists(
         #(x: %Element(S)),
-        %not(%in(
+        formula = %not(%in(
           $sum(
             m = {x},
             n = {$number(value = 1)}
@@ -73,7 +73,7 @@ $"Well-ordering principle"(
       {steps = #(
         _: %UseDef(result = %exists(
           #(u: %Element(M)),
-          $"less or equal"(
+          formula = $"less or equal"(
             n = {$number(value = 0)},
             m = {u}
           )
@@ -134,7 +134,7 @@ $"Well-ordering principle"(
         steps = #(
           _: %UseDef(result = %exists(
             #(v: %Element(M)),
-            $"less or equal"(
+            formula = $"less or equal"(
               n = {$sum(
                 m = {x},
                 n = {$number(value = 1)}

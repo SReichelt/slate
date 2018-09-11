@@ -4,6 +4,10 @@ $coprime(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
 ): %Predicate {
+  display = [$MultiProperty(
+    operands = [m, n],
+    property = 'coprime'
+  )],
   definition = [
     %forall(
       #(
@@ -40,7 +44,7 @@ $coprime(
     ),
     %not(%exists(
       #(p: %Element($Prime/"Prime numbers")),
-      %and(
+      formula = %and(
         $divisible(
           m = {p},
           n = {m}
@@ -51,9 +55,5 @@ $coprime(
         )
       )
     ))
-  ],
-  display = [$MultiProperty(
-    operands = [m, n],
-    property = 'coprime'
-  )]
+  ]
 }

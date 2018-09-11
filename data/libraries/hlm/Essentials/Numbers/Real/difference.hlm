@@ -22,6 +22,12 @@ $difference(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '−',
+    operands = [b, a],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [
     $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
       β = {r_b},
@@ -31,11 +37,5 @@ $difference(
       a = {b},
       b = {$inverse(a = {a})}
     )
-  ],
-  display = [$Operator(
-    symbol = '−',
-    operands = [b, a],
-    minParenLevel = 1,
-    maxParenLevel = 1
-  )]
+  ]
 }

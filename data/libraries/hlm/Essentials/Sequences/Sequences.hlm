@@ -5,6 +5,14 @@ $Sequences(S: %Set): %Construction {
     $"../Numbers/Natural/Natural numbers",
     #(a: %Element(S))
   )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = a,
+        style = '()'
+      ),
+      sub = [n, '∈ℕ'],
+      sup = S
+    )],
     equalityDefinition = {
       leftParameters = #(n: %Binding(
         $"../Numbers/Natural/Natural numbers",
@@ -19,15 +27,7 @@ $Sequences(S: %Set): %Construction {
         %equals(a[n], "a'"[n])
       )],
       isomorphic = %true
-    },
-    display = [$SubSup(
-      body = $Parens(
-        body = a,
-        style = '()'
-      ),
-      sub = [n, '∈ℕ'],
-      sup = S
-    )]
+    }
   }
 
   display = [$Power(

@@ -63,7 +63,7 @@ $coprime(
     ),
     %not(%exists(
       #(p: %Element($../Natural/Prime/"Prime numbers")),
-      %and(
+      formula = %and(
         $divisible(
           a = {p},
           b = {a}

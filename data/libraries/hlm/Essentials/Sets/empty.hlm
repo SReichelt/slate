@@ -1,6 +1,10 @@
 %../../../../logics/hlm%
 
 $empty(S: %Set): %Predicate {
+  display = [$Property(
+    operand = S,
+    property = %neg('empty', 'nonempty')
+  )],
   definition = [
     %setEquals(
       S,
@@ -80,9 +84,5 @@ $empty(S: %Set): %Predicate {
         ))}
       ))
     }
-  ],
-  display = [$Property(
-    operand = S,
-    property = %neg('empty', 'nonempty')
-  )]
+  ]
 }

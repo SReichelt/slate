@@ -8,6 +8,10 @@ $bijective(
     Y = {Y}
   ))
 ): %Predicate {
+  display = [$Property(
+    operand = f,
+    property = 'bijective'
+  )],
   definition = [
     %and(
       $injective(
@@ -25,7 +29,7 @@ $bijective(
       #(y: %Element(Y)),
       %existsUnique(
         #(x: %Element(X)),
-        %equals(
+        formula = %equals(
           $value(
             X = {X},
             Y = {Y},
@@ -41,7 +45,7 @@ $bijective(
         X = {Y},
         Y = {X}
       ))),
-      %and(
+      formula = %and(
         %equals(
           $composition(
             X = {X},
@@ -69,7 +73,7 @@ $bijective(
         X = {Y},
         Y = {X}
       ))),
-      %and(
+      formula = %and(
         %equals(
           $composition(
             X = {X},
@@ -92,9 +96,5 @@ $bijective(
         )
       )
     )
-  ],
-  display = [$Property(
-    operand = f,
-    property = 'bijective'
-  )]
+  ]
 }

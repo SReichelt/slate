@@ -27,8 +27,14 @@ $Real: %Section {
     %item($root),
     %item($"square root"),
     %item($rational),
-    %item($"Roots of primes are irrational", type = 'theorem'),
-    %item($"Square root of two is irrational", type = 'corollary'),
+    %item(
+      $"Roots of primes are irrational",
+      type = 'theorem'
+    ),
+    %item(
+      $"Square root of two is irrational",
+      type = 'corollary'
+    ),
     %subsection(
       $"Generalized sums and products",
       title = {

@@ -8,19 +8,19 @@ $"Generalized intersection"(
     #(S: %Subset(U))
   )
 ): %SetOperator {
-  definition = [%subset(
-    #(x: %Element(U)),
-    %forall(
-      #(j: %Element(I)),
-      %in(x, S[j])
-    )
-  )],
   display = [$LargeOperator(
     symbol = '⋂',
     operand = S,
     under = $ElementParameter(
       element = i,
       set = I
+    )
+  )],
+  definition = [%subset(
+    #(x: %Element(U)),
+    %forall(
+      #(j: %Element(I)),
+      %in(x, S[j])
     )
   )]
 }

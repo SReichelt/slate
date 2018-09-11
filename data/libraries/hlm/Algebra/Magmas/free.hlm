@@ -18,7 +18,7 @@ $free(𝔐: %Element(
 )): %Predicate {
   definition = [%exists(
     #(S: %Subset(M)),
-    $"free on set"(
+    formula = $"free on set"(
       𝔐 = {𝔐},
       S = {S}
     )

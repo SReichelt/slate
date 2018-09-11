@@ -15,7 +15,7 @@ $cauchy(α: %Element(
     #(ε: %Element($../"Positive numbers")),
     %exists(
       #(n: %Element($../../Natural/"Natural numbers")),
-      %forall(
+      formula = %forall(
         #(
           l: %Element($../../Natural/"Segment (greater or equal)"(n = {n})),
           m: %Element(%previous)

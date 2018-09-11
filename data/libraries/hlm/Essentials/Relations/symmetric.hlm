@@ -4,6 +4,10 @@ $symmetric(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %Predicate {
+  display = [$Property(
+    operand = ≺,
+    property = 'symmetric'
+  )],
   definition = [%forall(
     #(
       s: %Element(S),
@@ -21,9 +25,5 @@ $symmetric(
       ≺ = {≺},
       t = {s}
     )
-  )],
-  display = [$Property(
-    operand = ≺,
-    property = 'symmetric'
   )]
 }

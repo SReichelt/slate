@@ -4,16 +4,6 @@ $"less or equal"(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
 ): %Predicate {
-  definition = [%exists(
-    #(x: %Element($"Natural numbers")),
-    %equals(
-      $sum(
-        m = {m},
-        n = {x}
-      ),
-      n
-    )
-  )],
   display = [
     $Relation(
       symbol = %neg('≤', '≰'),
@@ -23,5 +13,15 @@ $"less or equal"(
       symbol = %neg('≥', '≱'),
       operands = [n, m]
     )
-  ]
+  ],
+  definition = [%exists(
+    #(x: %Element($"Natural numbers")),
+    formula = %equals(
+      $sum(
+        m = {m},
+        n = {x}
+      ),
+      n
+    )
+  )]
 }

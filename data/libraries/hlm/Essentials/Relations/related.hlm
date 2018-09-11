@@ -15,6 +15,10 @@ $related(
   s: %Element(S),
   t: %Element(%previous)
 ): %Predicate {
+  display = [$Relation(
+    symbol = ≺,
+    operands = [s, t]
+  )],
   definition = [%in(
     $../Sets/"Cartesian product"(
       S = {S},
@@ -24,9 +28,5 @@ $related(
       t = {t}
     ),
     R
-  )],
-  display = [$Relation(
-    symbol = ≺,
-    operands = [s, t]
   )]
 }

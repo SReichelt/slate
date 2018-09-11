@@ -22,6 +22,12 @@ $sum(
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '+',
+    operands = [a, b],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [$Integers.difference(
     n = {$../Natural/sum(
       m = {n_a},
@@ -31,11 +37,5 @@ $sum(
       m = {m_a},
       n = {m_b}
     )}
-  )],
-  display = [$Operator(
-    symbol = '+',
-    operands = [a, b],
-    minParenLevel = 1,
-    maxParenLevel = 1
   )]
 }

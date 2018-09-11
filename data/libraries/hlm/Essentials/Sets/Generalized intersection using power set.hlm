@@ -4,6 +4,10 @@ $"Generalized intersection using power set"(
   U: %Set(auto = %true),
   S: %Subset($"Power set"(S = {U}))
 ): %SetOperator {
+  display = [$PrefixUnaryOperator(
+    symbol = '⋂',
+    operand = S
+  )],
   definition = [$"Generalized intersection"(
     i = {
       #(i: %Element(
@@ -18,9 +22,5 @@ $"Generalized intersection using power set"(
     },
     U = {U},
     I = {S}
-  )],
-  display = [$PrefixUnaryOperator(
-    symbol = '⋂',
-    operand = S
   )]
 }

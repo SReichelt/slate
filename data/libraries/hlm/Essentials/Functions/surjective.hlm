@@ -8,12 +8,16 @@ $surjective(
     Y = {Y}
   ))
 ): %Predicate {
+  display = [$Property(
+    operand = f,
+    property = 'surjective'
+  )],
   definition = [
     %forall(
       #(y: %Element(Y)),
       %exists(
         #(x: %Element(X)),
-        %equals(
+        formula = %equals(
           $value(
             X = {X},
             Y = {Y},
@@ -42,9 +46,5 @@ $surjective(
       ),
       Y
     )
-  ],
-  display = [$Property(
-    operand = f,
-    property = 'surjective'
-  )]
+  ]
 }

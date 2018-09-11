@@ -1,6 +1,11 @@
 %../../../../../logics/hlm%
 
 $"Segment (greater)"(n: %Element($"Natural numbers")): %SetOperator {
+  display = [$Segment(
+    set = 'ℕ',
+    symbol = '>',
+    limit = n
+  )],
   definition = [
     %subset(
       #(m: %Element($"Natural numbers")),
@@ -17,10 +22,5 @@ $"Segment (greater)"(n: %Element($"Natural numbers")): %SetOperator {
       m = {n},
       n = {$number(value = 1)}
     )})
-  ],
-  display = [$Segment(
-    set = 'ℕ',
-    symbol = '>',
-    limit = n
-  )]
+  ]
 }

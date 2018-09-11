@@ -37,7 +37,7 @@ $Magmas: %Construction {
           X = {S},
           Y = {"S'"}
         ))),
-        %equals(
+        formula = %equals(
           $../Isomorphisms/"inner operation transform"(
             X = {S},
             Y = {"S'"},

@@ -19,6 +19,15 @@ $"codomain restriction"(
     B
   ))
 ): %ExplicitOperator {
+  remarks = 'This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition.',
+  display = [$UnaryOperator(
+    symbol = $SubSup(
+      body = '∣',
+      sub = A,
+      sup = B
+    ),
+    operand = f
+  )],
   definition = [$Functions(
     X = {A},
     Y = {B}
@@ -30,14 +39,5 @@ $"codomain restriction"(
       f = {f},
       x = {x}
     )}}
-  })],
-  display = [$UnaryOperator(
-    symbol = $SubSup(
-      body = '∣',
-      sub = A,
-      sup = B
-    ),
-    operand = f
-  )],
-  remarks = 'This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition.'
+  })]
 }

@@ -4,6 +4,10 @@ $root(
   a: %Element($"Nonnegative numbers"),
   n: %Element($../Natural/"Natural numbers")
 ): %ImplicitOperator {
+  display = [$Radical(
+    radicand = a,
+    degree = n
+  )],
   parameter = #(r: %Element($"Nonnegative numbers")),
   definition = [%equals(
     a,
@@ -11,9 +15,5 @@ $root(
       a = {r},
       n = {n}
     )
-  )],
-  display = [$Radical(
-    radicand = a,
-    degree = n
   )]
 }

@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $rational(a: %Element($"Real numbers")): %Predicate {
+  display = [$Property(
+    operand = a,
+    property = %neg('rational', 'irrational')
+  )],
   definition = [
     %in(
       a,
@@ -11,7 +15,7 @@ $rational(a: %Element($"Real numbers")): %Predicate {
         b: %Element($../Integer/"Nonzero numbers"),
         c: %Element($../Integer/Integers)
       ),
-      %equals(
+      formula = %equals(
         a,
         $quotient(
           b = {c},
@@ -28,7 +32,7 @@ $rational(a: %Element($"Real numbers")): %Predicate {
           b = {e}
         ))
       ),
-      %equals(
+      formula = %equals(
         a,
         $quotient(
           b = {e},
@@ -36,9 +40,5 @@ $rational(a: %Element($"Real numbers")): %Predicate {
         )
       )
     )
-  ],
-  display = [$Property(
-    operand = a,
-    property = %neg('rational', 'irrational')
-  )]
+  ]
 }

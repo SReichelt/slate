@@ -3,7 +3,10 @@
 $Prime: %Section {
   items = [
     %item($prime),
-    %item($"Two is prime", type = 'example'),
+    %item(
+      $"Two is prime",
+      type = 'example'
+    ),
     %item($"Prime numbers"),
     %item($"Every number greater than one has a prime factor"),
     %item(

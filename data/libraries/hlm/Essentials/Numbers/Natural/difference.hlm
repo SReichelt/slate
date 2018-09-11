@@ -4,6 +4,12 @@ $difference(
   n: %Element($"Natural numbers"),
   m: %Element($"Segment (less or equal)"(n = {n}))
 ): %ImplicitOperator {
+  display = [$Operator(
+    symbol = '−',
+    operands = [n, m],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   parameter = #(x: %Element($"Segment (less or equal)"(n = {n}))),
   definition = [%equals(
     n,
@@ -11,11 +17,5 @@ $difference(
       m = {x},
       n = {m}
     )
-  )],
-  display = [$Operator(
-    symbol = '−',
-    operands = [n, m],
-    minParenLevel = 1,
-    maxParenLevel = 1
   )]
 }

@@ -8,6 +8,10 @@ $inverse(
     Y = {Y}
   ))
 ): %ImplicitOperator {
+  display = [$Power(
+    base = f,
+    exponent = '-1'
+  )],
   parameter = #(g: %Element($Bijections(
     X = {Y},
     Y = {X}
@@ -33,9 +37,5 @@ $inverse(
       ),
       $identity(X = {Y})
     )
-  ],
-  display = [$Power(
-    base = f,
-    exponent = '-1'
-  )]
+  ]
 }

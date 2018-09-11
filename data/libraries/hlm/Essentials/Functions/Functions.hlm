@@ -8,21 +8,6 @@ $Functions(
     X,
     #(y: %Element(Y))
   )): %Constructor {
-    equalityDefinition = {
-      leftParameters = #(x: %Binding(
-        X,
-        #(y: %Element(Y))
-      )),
-      rightParameters = #(x: %Binding(
-        X,
-        #("y'": %Element(Y))
-      )),
-      definition = [%forall(
-        #(x: %Element(X)),
-        %equals(y[x], "y'"[x])
-      )],
-      isomorphic = %true
-    },
     display = [$Parens(
       body = $Aligned(items = [
         [
@@ -62,9 +47,28 @@ $Functions(
           ])
         ]
       )]
+    },
+    equalityDefinition = {
+      leftParameters = #(x: %Binding(
+        X,
+        #(y: %Element(Y))
+      )),
+      rightParameters = #(x: %Binding(
+        X,
+        #("y'": %Element(Y))
+      )),
+      definition = [%forall(
+        #(x: %Element(X)),
+        %equals(y[x], "y'"[x])
+      )],
+      isomorphic = %true
     }
   }
 
+  remarks = 'Although it is possible to define functions in the usual set-theoretic way in HLM, the equivalent definition presented here uses a special HLM feature called “bindings.”\n'
+            '\n'
+            'Its major advantage is that given a specific function defined via bindings, the value at a given input can be determined purely syntactically.',
+  references = ['[https://en.wikipedia.org/wiki/Function_(mathematics)](https://en.wikipedia.org/wiki/Function_(mathematics))', 'http://mathworld.wolfram.com/Function.html', 'https://proofwiki.org/wiki/Definition:Mapping'],
   display = [$FunctionOperator(
     symbol = '→',
     operands = [X, Y]
@@ -79,9 +83,5 @@ $Functions(
     singularName = 'function',
     pluralName = 'functions',
     nameOptional = %true
-  },
-  remarks = 'Although it is possible to define functions in the usual set-theoretic way in HLM, the equivalent definition presented here uses a special HLM feature called “bindings.”\n'
-            '\n'
-            'Its major advantage is that given a specific function defined via bindings, the value at a given input can be determined purely syntactically.',
-  references = ['[https://en.wikipedia.org/wiki/Function_(mathematics)](https://en.wikipedia.org/wiki/Function_(mathematics))', 'http://mathworld.wolfram.com/Function.html', 'https://proofwiki.org/wiki/Definition:Mapping']
+  }
 }

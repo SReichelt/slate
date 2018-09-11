@@ -5,6 +5,10 @@ $Relations(S: %Set): %Construction {
     S = {S},
     T = {S}
   ))): %Constructor {
+    display = [$Parens(
+      body = R,
+      style = '()'
+    )],
     equalityDefinition = {
       leftParameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
@@ -16,11 +20,7 @@ $Relations(S: %Set): %Construction {
       ))),
       definition = [%setEquals(R, "R'")],
       isomorphic = %true
-    },
-    display = [$Parens(
-      body = R,
-      style = '()'
-    )]
+    }
   }
 
   display = [$Function(

@@ -9,13 +9,7 @@ $restriction(
     Y = {Y}
   ))
 ): %ExplicitOperator {
-  definition = [$"generalized restriction"(
-    X = {X},
-    Y = {Y},
-    A = {A},
-    B = {Y},
-    f = {f}
-  )],
+  references = ['[https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))'],
   display = [$UnaryOperator(
     symbol = $SubSup(
       body = '∣',
@@ -23,5 +17,11 @@ $restriction(
     ),
     operand = f
   )],
-  references = ['[https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))']
+  definition = [$"generalized restriction"(
+    X = {X},
+    Y = {Y},
+    A = {A},
+    B = {Y},
+    f = {f}
+  )]
 }

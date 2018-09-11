@@ -10,7 +10,7 @@ $"Finiteness criterion lemma"(
 ): %StandardTheorem {
   claim = %exists(
     #(m: %Element(M)),
-    %forall(
+    formula = %forall(
       #(n: %Element(M)),
       $"less or equal"(
         m = {n},
@@ -27,7 +27,7 @@ $"Finiteness criterion lemma"(
           constructor = $"Natural numbers".zero,
           value = %exists(
             #(a: %Element(M)),
-            %forall(
+            formula = %forall(
               #(b: %Element(M)),
               $"less or equal"(
                 m = {b},
@@ -41,7 +41,7 @@ $"Finiteness criterion lemma"(
           parameters = #(x: %Element($"Natural numbers")),
           value = %exists(
             #(c: %Element(M)),
-            %forall(
+            formula = %forall(
               #(d: %Element(M)),
               $"less or equal"(
                 m = {d},
@@ -57,7 +57,7 @@ $"Finiteness criterion lemma"(
       {
         goal = %exists(
           #(a: %Element(M)),
-          %forall(
+          formula = %forall(
             #(b: %Element(M)),
             $"less or equal"(
               m = {b},
@@ -74,7 +74,7 @@ $"Finiteness criterion lemma"(
         parameters = #(x: %Element($"Natural numbers")),
         goal = %exists(
           #(c: %Element(M)),
-          %forall(
+          formula = %forall(
             #(d: %Element(M)),
             $"less or equal"(
               m = {d},
@@ -98,7 +98,7 @@ $"Finiteness criterion lemma"(
             ),
             %exists(
               #(i: %Element(M)),
-              %forall(
+              formula = %forall(
                 #(j: %Element($../../Functions/Image(
                   f = {f},
                   S = {S}

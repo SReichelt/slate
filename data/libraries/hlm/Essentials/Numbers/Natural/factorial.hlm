@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $factorial(n: %Element($"Natural numbers")): %ExplicitOperator {
+  display = [$UnaryOperator(
+    symbol = '!',
+    operand = n
+  )],
   definition = [%structuralCases(
     n,
     $"Natural numbers",
@@ -20,9 +24,5 @@ $factorial(n: %Element($"Natural numbers")): %ExplicitOperator {
         rewrite = %true
       }
     ]
-  )],
-  display = [$UnaryOperator(
-    symbol = '!',
-    operand = n
   )]
 }

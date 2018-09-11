@@ -3,7 +3,7 @@
 $"Every number greater than one has a prime factor"(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %StandardTheorem {
   claim = %exists(
     #(p: %Element($"Prime numbers")),
-    $../divisible(
+    formula = $../divisible(
       m = {p},
       n = {n}
     )

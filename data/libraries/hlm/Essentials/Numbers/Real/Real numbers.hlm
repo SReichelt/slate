@@ -44,7 +44,7 @@ $"Real numbers": %Construction {
           #(ε: %Element($../Rational/"Positive numbers")),
           %exists(
             #(n: %Element($../Natural/"Natural numbers")),
-            %forall(
+            formula = %forall(
               #(m: %Element($../Natural/"Segment (greater or equal)"(n = {n}))),
               $../Rational/less(
                 a = {$../Rational/absolute(a = {$../Rational/difference(

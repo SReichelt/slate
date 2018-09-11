@@ -9,7 +9,7 @@ $"less or equal"(
       𝔵 = {𝔵},
       𝔶 = {𝔶}
     ))),
-    $../../Functions/injective(
+    formula = $../../Functions/injective(
       X = {%setStructuralCases(
         𝔵,
         $"Cardinal numbers",

@@ -8,6 +8,10 @@ $injective(
     Y = {Y}
   ))
 ): %Predicate {
+  display = [$Property(
+    operand = f,
+    property = 'injective'
+  )],
   definition = [
     %forall(
       #(
@@ -52,7 +56,7 @@ $injective(
       ))),
       %existsUnique(
         #(x: %Element(X)),
-        %equals(
+        formula = %equals(
           $value(
             X = {X},
             Y = {Y},
@@ -70,7 +74,7 @@ $injective(
           X = {Y},
           Y = {X}
         ))),
-        %equals(
+        formula = %equals(
           $composition(
             X = {X},
             Y = {Y},
@@ -82,9 +86,5 @@ $injective(
         )
       )
     )
-  ],
-  display = [$Property(
-    operand = f,
-    property = 'injective'
-  )]
+  ]
 }

@@ -14,6 +14,10 @@ $closure(
   ),
   P: %Subset($Relations(S = {S}))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = 'cl',
+    arguments = [≺, P]
+  )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
     U = {$../Sets/"Cartesian product"(
       S = {S},
@@ -45,9 +49,5 @@ $closure(
         )
       )
     )}
-  )})],
-  display = [$Function(
-    function = 'cl',
-    arguments = [≺, P]
-  )]
+  )})]
 }

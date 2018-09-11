@@ -9,6 +9,14 @@ $Preimage(
   )),
   S: %Subset(Y)
 ): %SetOperator {
+  references = ['https://en.wikipedia.org/wiki/Preimage'],
+  display = [$Function(
+    function = $Power(
+      base = f,
+      exponent = '-1'
+    ),
+    arguments = [S]
+  )],
   definition = [%subset(
     #(x: %Element(X)),
     %in(
@@ -20,13 +28,5 @@ $Preimage(
       ),
       S
     )
-  )],
-  display = [$Function(
-    function = $Power(
-      base = f,
-      exponent = '-1'
-    ),
-    arguments = [S]
-  )],
-  references = ['https://en.wikipedia.org/wiki/Preimage']
+  )]
 }

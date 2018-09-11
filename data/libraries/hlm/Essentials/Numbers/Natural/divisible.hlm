@@ -4,19 +4,19 @@ $divisible(
   m: %Element($"Positive numbers"),
   n: %Element($"Natural numbers")
 ): %Predicate {
+  display = [$Relation(
+    symbol = %neg('∣', '∤'),
+    operands = [m, n],
+    parenLevel = 1
+  )],
   definition = [%exists(
     #(x: %Element($"Natural numbers")),
-    %equals(
+    formula = %equals(
       $product(
         m = {m},
         n = {x}
       ),
       n
     )
-  )],
-  display = [$Relation(
-    symbol = %neg('∣', '∤'),
-    operands = [m, n],
-    parenLevel = 1
   )]
 }

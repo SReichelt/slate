@@ -4,6 +4,11 @@ $preorder(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %Predicate {
+  display = [$Property(
+    property = 'preorder',
+    operand = ≺,
+    article = 'a'
+  )],
   definition = [%and(
     $reflexive(
       S = {S},
@@ -13,10 +18,5 @@ $preorder(
       S = {S},
       ≺ = {≺}
     )
-  )],
-  display = [$Property(
-    property = 'preorder',
-    operand = ≺,
-    article = 'a'
   )]
 }

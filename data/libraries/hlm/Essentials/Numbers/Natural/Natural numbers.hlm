@@ -2,11 +2,15 @@
 
 $"Natural numbers": %Construction {
   $zero: %Constructor {
-    rewrite = {value = $number(value = 0)},
-    display = [$ConstructorName(name = 'O')]
+    display = [$ConstructorName(name = 'O')],
+    rewrite = {value = $number(value = 0)}
   }
 
   $successor(n: %Element($"Natural numbers")): %Constructor {
+    display = [$Constructor(
+      name = 'S',
+      arguments = [n]
+    )],
     equalityDefinition = {
       leftParameters = #(m: %Element($"Natural numbers")),
       rightParameters = #(n: %Element($"Natural numbers")),
@@ -19,11 +23,7 @@ $"Natural numbers": %Construction {
         n = {$number(value = 1)}
       ),
       theorem = $"Addition of one yields successor"
-    },
-    display = [$Constructor(
-      name = 'S',
-      arguments = [n]
-    )]
+    }
   }
 
   display = ['ℕ']

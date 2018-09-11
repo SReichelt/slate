@@ -4,6 +4,10 @@ $reflexive(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %Predicate {
+  display = [$Property(
+    operand = ≺,
+    property = 'reflexive'
+  )],
   definition = [%forall(
     #(s: %Element(S)),
     $related(
@@ -12,9 +16,5 @@ $reflexive(
       ≺ = {≺},
       t = {s}
     )
-  )],
-  display = [$Property(
-    operand = ≺,
-    property = 'reflexive'
   )]
 }

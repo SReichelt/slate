@@ -130,12 +130,7 @@ $Predicate: %DefinitionType($Formula) {
 }
 
 $Theorem: %DefinitionType {
-  superType = $Object,
-  members = #(
-    claim?: $Formula,
-    equivalence?: $Formula[],
-    equivalenceProofs: $Proof[] = []
-  )
+  superType = $Object
 }
 
 $StandardTheorem: %DefinitionType {

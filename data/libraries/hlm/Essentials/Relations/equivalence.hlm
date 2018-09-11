@@ -4,6 +4,11 @@ $equivalence(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %Predicate {
+  display = [$Property(
+    property = 'equivalence relation',
+    operand = ≺,
+    article = 'an'
+  )],
   definition = [%and(
     $preorder(
       S = {S},
@@ -13,10 +18,5 @@ $equivalence(
       S = {S},
       ≺ = {≺}
     )
-  )],
-  display = [$Property(
-    property = 'equivalence relation',
-    operand = ≺,
-    article = 'an'
   )]
 }

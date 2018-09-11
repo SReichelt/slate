@@ -4,17 +4,6 @@ $Bijections(
   X: %Set,
   Y: %Set
 ): %SetOperator {
-  definition = [%subset(
-    #(f: %Element($Functions(
-      X = {X},
-      Y = {Y}
-    ))),
-    $bijective(
-      X = {X},
-      Y = {Y},
-      f = {f}
-    )
-  )],
   display = [$FunctionOperator(
     symbol = '↔',
     operands = [X, Y]
@@ -29,5 +18,16 @@ $Bijections(
     singularName = 'bijection',
     pluralName = 'bijections',
     nameOptional = %true
-  }
+  },
+  definition = [%subset(
+    #(f: %Element($Functions(
+      X = {X},
+      Y = {Y}
+    ))),
+    $bijective(
+      X = {X},
+      Y = {Y},
+      f = {f}
+    )
+  )]
 }

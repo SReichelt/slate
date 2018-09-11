@@ -1,6 +1,10 @@
 %../../../../../../logics/hlm%
 
 $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Predicate {
+  display = [$Property(
+    property = %neg('prime', 'composite'),
+    operand = n
+  )],
   definition = [
     %forall(
       #(
@@ -98,9 +102,5 @@ $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Pred
         )
       )
     )
-  ],
-  display = [$Property(
-    property = %neg('prime', 'composite'),
-    operand = n
-  )]
+  ]
 }

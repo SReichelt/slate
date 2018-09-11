@@ -48,9 +48,13 @@ function checkValueImpl(definitions: Fmt.DefinitionList, type: Fmt.Expression, a
       checkValueImpl(definitions, type, arrayDimensions - 1, item);
     }
   } else if (type instanceof Fmt.MetaRefExpression) {
-    if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
-      if (!(value instanceof Fmt.ParameterExpression)) {
-        throw new Error('Parameter expression expected');
+    if (type instanceof FmtMeta.MetaRefExpression_Int) {
+      if (!(value instanceof Fmt.IntegerExpression)) {
+        throw new Error('Integer expected');
+      }
+    } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+      if (!(value instanceof Fmt.StringExpression)) {
+        throw new Error('String expected');
       }
     } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
       if (!(value instanceof Fmt.ParameterExpression)) {
@@ -59,10 +63,18 @@ function checkValueImpl(definitions: Fmt.DefinitionList, type: Fmt.Expression, a
       if (value.parameters.length !== 1) {
         throw new Error('Single parameter expected');
       }
+    } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+      if (!(value instanceof Fmt.ParameterExpression)) {
+        throw new Error('Parameter expression expected');
+      }
+    } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+      if (!(value instanceof Fmt.CompoundExpression)) {
+        throw new Error('Compound expression expected');
+      }
     }
   } else if (type instanceof Fmt.DefinitionRefExpression && !type.path.parentPath) {
     let metaDefinition = definitions.getDefinition(type.path.name);
-    if (hasObjectContents(definitions, metaDefinition)) {
+    if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(definitions, metaDefinition)) {
       if (!(value instanceof Fmt.CompoundExpression)) {
         throw new Error('Compound expression expected');
       }
@@ -83,9 +95,17 @@ class DynamicObjectContents extends Fmt.GenericObjectContents {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.checkMembers(argumentList, this.metaDefinition);
+    let foundMembers = new Set<Fmt.Parameter>();
     let argIndex = 0;
     for (let arg of argumentList) {
-      if (!findMember(this.definitions, this.metaDefinition, arg.name, argIndex).result) {
+      let member = findMember(this.definitions, this.metaDefinition, arg.name, argIndex).result;
+      if (member) {
+        if (foundMembers.has(member)) {
+          throw new Error(`Duplicate argument for "${member.name}"`);
+        } else {
+          foundMembers.add(member);
+        }
+      } else {
         if (arg.name !== undefined) {
           throw new Error(`Member "${arg.name}" not found`);
         } else {
@@ -172,9 +192,15 @@ class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
         }
       }
     }
+    let foundParams = new Set<Fmt.Parameter>();
     let argIndex = 0;
     for (let arg of argumentList) {
-      this.metaDefinition.parameters.getParameter(arg.name, argIndex);
+      let param = this.metaDefinition.parameters.getParameter(arg.name, argIndex);
+      if (foundParams.has(param) && !param.list) {
+        throw new Error(`Duplicate argument for "${param.name}"`);
+      } else {
+        foundParams.add(param);
+      }
       argIndex++;
     }
   }

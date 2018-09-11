@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $"Positive numbers": %SetOperator {
+  display = [$SubSup(
+    body = 'ℕ',
+    sub = ['+']
+  )],
   definition = [
     $"Segment (greater)"(n = {$number(value = 0)}),
     %subset(
@@ -25,7 +29,7 @@ $"Positive numbers": %SetOperator {
       #(a: %Element($"Natural numbers")),
       %exists(
         #(b: %Element($"Natural numbers")),
-        %equals(
+        formula = %equals(
           $sum(
             m = {b},
             n = {$number(value = 1)}
@@ -38,7 +42,7 @@ $"Positive numbers": %SetOperator {
       #(c: %Element($"Natural numbers")),
       %existsUnique(
         #(d: %Element($"Natural numbers")),
-        %equals(
+        formula = %equals(
           $sum(
             m = {d},
             n = {$number(value = 1)}
@@ -47,9 +51,5 @@ $"Positive numbers": %SetOperator {
         )
       )
     )
-  ],
-  display = [$SubSup(
-    body = 'ℕ',
-    sub = ['+']
-  )]
+  ]
 }

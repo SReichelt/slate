@@ -5,21 +5,21 @@ $"Power set"(S: %Set(
   embedSubsets = %true
 )): %Construction {
   $subset(T: %Subset(S)): %Constructor {
+    display = [$Parens(
+      body = T,
+      style = '()'
+    )],
     equalityDefinition = {
       leftParameters = #(T: %Subset(S)),
       rightParameters = #("T'": %Subset(S)),
       definition = [%setEquals(T, "T'")],
       isomorphic = %true
-    },
-    display = [$Parens(
-      body = T,
-      style = '()'
-    )]
+    }
   }
 
+  references = ['https://en.wikipedia.org/wiki/Power_set', 'http://mathworld.wolfram.com/PowerSet.html', 'https://proofwiki.org/wiki/Definition:Power_Set'],
   display = [$Function(
     function = '𝒫',
     arguments = [S]
-  )],
-  references = ['https://en.wikipedia.org/wiki/Power_set', 'http://mathworld.wolfram.com/PowerSet.html', 'https://proofwiki.org/wiki/Definition:Power_Set']
+  )]
 }

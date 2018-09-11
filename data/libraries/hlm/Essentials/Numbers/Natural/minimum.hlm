@@ -4,6 +4,10 @@ $minimum(
   M: %Subset($"Natural numbers"),
   _1: %Constraint(%not($../../Sets/empty(S = {M})))
 ): %ImplicitOperator {
+  display = [$Function(
+    function = 'min',
+    arguments = [M]
+  )],
   parameter = #(m: %Element(M)),
   definition = [
     %forall(
@@ -25,7 +29,7 @@ $minimum(
     ),
     %not(%exists(
       #(k: %Element(M)),
-      $less(
+      formula = $less(
         m = {k},
         n = {m}
       )
@@ -80,7 +84,7 @@ $minimum(
       steps = #(_: %ProveNeg({
         parameters = #(_1: %Constraint(%exists(
           #(k: %Element(M)),
-          $less(
+          formula = $less(
             m = {k},
             n = {m}
           )
@@ -113,7 +117,7 @@ $minimum(
       steps = #(_: %ProveNeg({
         parameters = #(_1: %Constraint(%exists(
           #(n: %Element(M)),
-          $less(
+          formula = $less(
             n = {m},
             m = {n}
           )
@@ -134,7 +138,7 @@ $minimum(
           )
         ))
       ),
-      %forall(
+      formula = %forall(
         #(
           c: %Element(M),
           _5: %Constraint(%forall(
@@ -153,7 +157,7 @@ $minimum(
         $"Well-ordering principle"(M = {M}),
         %exists(
           #(x: %Element(M)),
-          %forall(
+          formula = %forall(
             #(y: %Element(M)),
             $"less or equal"(
               m = {x},
@@ -219,9 +223,5 @@ $minimum(
         ))
       })
     )
-  },
-  display = [$Function(
-    function = 'min',
-    arguments = [M]
-  )]
+  }
 }
