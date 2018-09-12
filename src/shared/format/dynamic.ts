@@ -303,6 +303,16 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+    if (this.getParentTypeDefinition(previousContext) || previousContext.parentObject instanceof DynamicMetaRefExpression) {
+      // Specific dependencies handled in getArgumentValueContext.
+      return previousContext;
+    } else {
+      // Unspecific compound expression; support arbitrary references to parameter lists in previous arguments.
+      return super.getNextArgumentContext(argument, argumentIndex, previousContext);
+    }
+  }
+
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
     let parentTypeDefinition = this.getParentTypeDefinition(parentContext);
     if (parentTypeDefinition) {
@@ -337,14 +347,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
           }
         }
         if (member.type.expression instanceof Fmt.DefinitionRefExpression) {
-          parentContext = new ArgumentTypeContext(member.type.expression.path.name, parentContext);
-          let parentPath = member.type.expression.path.parentPath;
-          if (parentPath instanceof Fmt.NamedPathItem) {
-            let metaModelPath = new Fmt.Path;
-            metaModelPath.parentPath = parentPath.parentPath;
-            metaModelPath.name = parentPath.name;
-            parentContext.metaModel = this.getReferencedMetaModel(metaModelPath);
-          }
+          parentContext = this.createArgumentTypeContext(member.type.expression, parentContext);
         }
       }
     }
@@ -361,9 +364,13 @@ export class DynamicMetaModel extends Fmt.MetaModel {
                   break;
                 }
               }
-              break;
+            } else if (dependency instanceof Fmt.VariableRefExpression) {
+              parentContext = this.getArgumentExports(previousArguments, parent.metaDefinition.parameters, dependency.variable, parentContext);
             }
           }
+        }
+        if (metaParameter.type.expression instanceof Fmt.DefinitionRefExpression) {
+          parentContext = this.createArgumentTypeContext(metaParameter.type.expression, parentContext);
         }
       } catch (error) {
       }
@@ -385,6 +392,18 @@ export class DynamicMetaModel extends Fmt.MetaModel {
       }
     }
     return undefined;
+  }
+
+  private createArgumentTypeContext(metaDefinitionRef: Fmt.DefinitionRefExpression, parentContext: Fmt.Context): Fmt.Context {
+    let context = new ArgumentTypeContext(metaDefinitionRef.path.name, parentContext);
+    let parentPath = metaDefinitionRef.path.parentPath;
+    if (parentPath instanceof Fmt.NamedPathItem) {
+      let metaModelPath = new Fmt.Path;
+      metaModelPath.parentPath = parentPath.parentPath;
+      metaModelPath.name = parentPath.name;
+      context.metaModel = this.getReferencedMetaModel(metaModelPath);
+    }
+    return context;
   }
 
   protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
