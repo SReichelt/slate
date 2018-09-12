@@ -1098,77 +1098,16 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Theorem extends ObjectContents_Object {
-  claim?: Fmt.Expression;
-  equivalence?: Fmt.Expression;
-  equivalenceProofs: ObjectContents_Proof[];
-
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.claim = argumentList.getOptionalValue('claim', 2);
-    this.equivalence = argumentList.getOptionalValue('equivalence', 3);
-    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 4);
-    if (equivalenceProofsRaw !== undefined) {
-      if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
-        this.equivalenceProofs = [];
-        for (let item of equivalenceProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item);
-            this.equivalenceProofs.push(newItem);
-          } else {
-            throw new Error('equivalenceProofs: Compound expression expected');
-          }
-        }
-      } else {
-        throw new Error('equivalenceProofs: Array expression expected');
-      }
-    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
-    if (this.claim !== undefined) {
-      argumentList.add(this.claim, 'claim');
-    }
-    if (this.equivalence !== undefined) {
-      argumentList.add(this.equivalence, 'equivalence');
-    }
-    if (this.equivalenceProofs !== undefined) {
-      let equivalenceProofsExpr = new Fmt.ArrayExpression;
-      equivalenceProofsExpr.items = [];
-      for (let item of this.equivalenceProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem);
-        equivalenceProofsExpr.items.push(newItem);
-      }
-      argumentList.add(equivalenceProofsExpr, 'equivalenceProofs');
-    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Theorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
-    if (this.claim) {
-      result.claim = this.claim.substitute(fn, replacedParameters);
-      if (result.claim !== this.claim) {
-        changed = true;
-      }
-    }
-    if (this.equivalence) {
-      result.equivalence = this.equivalence.substitute(fn, replacedParameters);
-      if (result.equivalence !== this.equivalence) {
-        changed = true;
-      }
-    }
-    if (this.equivalenceProofs) {
-      result.equivalenceProofs = [];
-      for (let item of this.equivalenceProofs) {
-        let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.equivalenceProofs.push(newItem);
-      }
-    }
     return changed;
   }
 }
@@ -1179,8 +1118,8 @@ export class ObjectContents_StandardTheorem extends ObjectContents_Theorem {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.claim = argumentList.getValue('claim', 5);
-    let proofsRaw = argumentList.getOptionalValue('proofs', 6);
+    this.claim = argumentList.getValue('claim', 2);
+    let proofsRaw = argumentList.getOptionalValue('proofs', 3);
     if (proofsRaw !== undefined) {
       if (proofsRaw instanceof Fmt.ArrayExpression) {
         this.proofs = [];
@@ -1259,8 +1198,8 @@ export class ObjectContents_EquivalenceTheorem extends ObjectContents_Theorem {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.conditions = argumentList.getValue('conditions', 5);
-    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 6);
+    this.conditions = argumentList.getValue('conditions', 2);
+    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 3);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
@@ -4149,15 +4088,57 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
   }
 }
 
+class DefinitionContentsContext extends Fmt.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ParameterTypeContext extends Fmt.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
 const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Symbol': MetaRefExpression_Symbol, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural};
 
-export const metaModel = new Fmt.MetaModel(
-  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
-  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
-  new Fmt.StandardMetaDefinitionFactory(functions)
-);
+export class MetaModel extends Fmt.MetaModel {
+  constructor() {
+    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+          new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+          new Fmt.StandardMetaDefinitionFactory(functions));
+  }
+
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+    return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
+  }
+
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+    return new ParameterTypeContext(parameter, parentContext);
+  }
+
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+    return super.getArgumentValueContext(argument, argumentIndex, previousArguments, parentContext);
+  }
+
+  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+    if (expression instanceof MetaRefExpression_Element) {
+      if (expression.shortcut !== undefined) {
+        if (expression.shortcut.parameters !== undefined) {
+          parentContext = this.getParameterListContext(expression.shortcut.parameters, parentContext);
+        }
+      }
+    }
+    if (expression instanceof MetaRefExpression_Binding) {
+      parentContext = this.getParameterListContext(expression.parameters, parentContext);
+    }
+    return super.getExports(expression, parentContext);
+  }
+}
+
+export const metaModel = new MetaModel;
 
 export function getMetaModel(path: Fmt.Path) {
   if (path.name !== 'hlm') {

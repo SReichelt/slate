@@ -8,11 +8,7 @@ export class HLMFormat implements LogicFormat {
 }
 
 // TODO remove after it is fully generated
-class HLMMetaModel extends Fmt.MetaModel {
-  constructor() {
-    super(FmtHLM.metaModel.definitionTypes, FmtHLM.metaModel.expressionTypes, FmtHLM.metaModel.functions);
-  }
-
+class HLMMetaModel extends FmtHLM.MetaModel {
   getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
     let definitionContext = new DefinitionContext(definition, parentContext);
     return super.getDefinitionContentsContext(definition, definitionContext);
@@ -45,16 +41,6 @@ class HLMMetaModel extends Fmt.MetaModel {
       }
     }
     return parentContext;
-  }
-
-  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
-    if (expression instanceof FmtHLM.MetaRefExpression_Element && expression.shortcut && expression.shortcut.parameters) {
-      return this.getParameterListContext(expression.shortcut.parameters, parentContext);
-    } else if (expression instanceof FmtHLM.MetaRefExpression_Binding) {
-      return this.getParameterListContext(expression.parameters, parentContext);
-    } else {
-      return parentContext;
-    }
   }
 }
 

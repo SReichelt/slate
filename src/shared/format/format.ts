@@ -550,7 +550,6 @@ export class MetaModel {
   }
 
   getNextArgumentContext(argument: Argument, argumentIndex: number, previousContext: Context): Context {
-    // TODO restrict variable references in metamodel
     if (argument.value instanceof ParameterExpression) {
       return this.getParameterListContext(argument.value.parameters, previousContext);
     } else {
@@ -559,7 +558,6 @@ export class MetaModel {
   }
 
   getArgumentValueContext(argument: Argument, argumentIndex: number, previousArguments: ArgumentList, parentContext: Context): Context {
-    // TODO look up dependencies in meta definitions
     return parentContext;
   }
 
