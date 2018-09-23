@@ -411,15 +411,182 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
   }
 }
 
+class DefinitionContentsContext extends Fmt.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ParameterTypeContext extends Fmt.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ArgumentTypeContext extends Fmt.DerivedContext {
+  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
 const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
 const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
 const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self};
 
-export const metaModel = new Fmt.MetaModel(
-  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
-  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
-  new Fmt.StandardMetaDefinitionFactory(functions)
-);
+export class MetaModel extends Fmt.MetaModel {
+  constructor() {
+    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+          new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+          new Fmt.StandardMetaDefinitionFactory(functions));
+  }
+
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+    return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
+  }
+
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+    return new ParameterTypeContext(parameter, parentContext);
+  }
+
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+    let parent = previousContext.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_MetaModel
+            || type instanceof MetaRefExpression_DefinitionType
+            || type instanceof MetaRefExpression_ExpressionType
+            || type instanceof MetaRefExpression_ParameterType) {
+          return previousContext;
+        }
+      }
+    }
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          return previousContext;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    if (parent instanceof Fmt.MetaRefExpression) {
+      return previousContext;
+    }
+    return super.getNextArgumentContext(argument, argumentIndex, previousContext);
+  }
+
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+    let context = parentContext;
+    let parent = context.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_DefinitionType) {
+          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+          }
+          if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+            let membersValue = previousArguments.getOptionalValue('members', 1);
+            if (membersValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(membersValue.parameters, context);
+            }
+          }
+          if (argument.name === 'innerDefinitionTypes' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_ExpressionType) {
+          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+          }
+          if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+            let membersValue = previousArguments.getOptionalValue('members', 1);
+            if (membersValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(membersValue.parameters, context);
+            }
+          }
+        }
+        if (type instanceof MetaRefExpression_ParameterType) {
+          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+          }
+          if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+            let membersValue = previousArguments.getOptionalValue('members', 1);
+            if (membersValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(membersValue.parameters, context);
+            }
+          }
+          if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
+          }
+        }
+      }
+    }
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          if (currentContext.objectContentsClass === ObjectContents_DefinedType) {
+            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+            }
+            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+              let membersValue = previousArguments.getOptionalValue('members', 1);
+              if (membersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(membersValue.parameters, context);
+              }
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_DefinitionType) {
+            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+            }
+            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+              let membersValue = previousArguments.getOptionalValue('members', 1);
+              if (membersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(membersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'innerDefinitionTypes' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ExpressionType) {
+            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+            }
+            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+              let membersValue = previousArguments.getOptionalValue('members', 1);
+              if (membersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(membersValue.parameters, context);
+              }
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ParameterType) {
+            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
+            }
+            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
+              let membersValue = previousArguments.getOptionalValue('members', 1);
+              if (membersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(membersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
+            }
+          }
+          break;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    return context;
+  }
+}
+
+export const metaModel = new MetaModel;
 
 export function getMetaModel(path: Fmt.Path) {
   if (path.name !== 'meta') {

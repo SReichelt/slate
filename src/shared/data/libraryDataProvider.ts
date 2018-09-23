@@ -165,8 +165,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
-    let format = this.logic.format;
-    return this.fetchDefinition(name, format.getMetaModel);
+    return this.fetchDefinition(name, this.logic.getMetaModel);
   }
 
   fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {

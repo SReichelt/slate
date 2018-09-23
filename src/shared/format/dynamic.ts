@@ -314,17 +314,18 @@ export class DynamicMetaModel extends Fmt.MetaModel {
   }
 
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
-    let parentTypeDefinition = this.getParentTypeDefinition(parentContext);
+    let context = parentContext;
+    let parentTypeDefinition = this.getParentTypeDefinition(context);
     if (parentTypeDefinition) {
       let member = findMember(this.definitions, parentTypeDefinition, argument.name, argumentIndex).result;
       if (member) {
-        while (parentContext instanceof Fmt.DerivedContext) {
-          if (parentContext instanceof DefinitionContentsContext || parentContext instanceof Fmt.ParentInfoContext) {
+        for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
+          if (context instanceof DefinitionContentsContext || context instanceof Fmt.ParentInfoContext) {
             let stop = true;
             if (member.dependencies) {
               for (let dependency of member.dependencies) {
                 if (dependency instanceof Fmt.DefinitionRefExpression) {
-                  let curParentTypeDefinition = this.getParentTypeDefinition(parentContext);
+                  let curParentTypeDefinition = this.getParentTypeDefinition(context);
                   if (curParentTypeDefinition && !dependency.path.parentPath && dependency.path.name === curParentTypeDefinition.name) {
                     stop = true;
                     break;
@@ -337,53 +338,48 @@ export class DynamicMetaModel extends Fmt.MetaModel {
               break;
             }
           }
-          parentContext = parentContext.parentContext;
         }
         if (member.dependencies) {
           for (let dependency of member.dependencies) {
             if (dependency instanceof Fmt.VariableRefExpression) {
-              parentContext = this.getMemberArgumentExports(previousArguments, parentTypeDefinition, dependency.variable, parentContext).result;
+              context = this.getMemberArgumentExports(previousArguments, parentTypeDefinition, dependency.variable, context).result;
             }
           }
         }
-        if (member.type.expression instanceof Fmt.DefinitionRefExpression) {
-          parentContext = this.createArgumentTypeContext(member.type.expression, parentContext);
-        }
+        context = this.getArgumentTypeContext(member.type, context);
       }
     }
-    let parent = parentContext.parentObject;
+    let parent = context.parentObject;
     if (parent instanceof DynamicMetaRefExpression) {
       try {
         let metaParameter = parent.metaDefinition.parameters.getParameter(argument.name, argumentIndex);
         if (metaParameter.dependencies) {
           for (let dependency of metaParameter.dependencies) {
             if (dependency instanceof FmtMeta.MetaRefExpression_self) {
-              for (let context = parentContext; context instanceof Fmt.DerivedContext; context = context.parentContext) {
-                if (context instanceof ParameterTypeContext) {
-                  parentContext = new Fmt.ParameterContext(context.parameter, parentContext);
+              for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+                if (currentContext instanceof ParameterTypeContext) {
+                  context = new Fmt.ParameterContext(currentContext.parameter, context);
                   break;
                 }
               }
             } else if (dependency instanceof Fmt.VariableRefExpression) {
-              parentContext = this.getArgumentExports(previousArguments, parent.metaDefinition.parameters, dependency.variable, parentContext);
+              context = this.getArgumentExports(previousArguments, parent.metaDefinition.parameters, dependency.variable, context);
             }
           }
         }
-        if (metaParameter.type.expression instanceof Fmt.DefinitionRefExpression) {
-          parentContext = this.createArgumentTypeContext(metaParameter.type.expression, parentContext);
-        }
+        context = this.getArgumentTypeContext(metaParameter.type, context);
       } catch (error) {
       }
     }
-    return super.getArgumentValueContext(argument, argumentIndex, previousArguments, parentContext);
+    return context;
   }
 
-  private getParentTypeDefinition(parentContext: Fmt.Context): Fmt.Definition | undefined {
-    let parent = parentContext.parentObject;
+  private getParentTypeDefinition(context: Fmt.Context): Fmt.Definition | undefined {
+    let parent = context.parentObject;
     if (parent instanceof Fmt.Definition && parent.type.expression instanceof DynamicMetaRefExpression) {
       return parent.type.expression.metaDefinition;
     } else if (parent instanceof Fmt.CompoundExpression) {
-      for (let context = parentContext; context instanceof Fmt.DerivedContext; context = context.parentContext) {
+      for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
         if (context instanceof ArgumentTypeContext) {
           return this.definitions.getDefinition(context.metaDefinitionName);
         } else if (context.parentObject !== parent && !(context.parentObject instanceof Fmt.ArrayExpression)) {
@@ -394,50 +390,56 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return undefined;
   }
 
-  private createArgumentTypeContext(metaDefinitionRef: Fmt.DefinitionRefExpression, parentContext: Fmt.Context): Fmt.Context {
-    let context = new ArgumentTypeContext(metaDefinitionRef.path.name, parentContext);
-    let parentPath = metaDefinitionRef.path.parentPath;
-    if (parentPath instanceof Fmt.NamedPathItem) {
-      let metaModelPath = new Fmt.Path;
-      metaModelPath.parentPath = parentPath.parentPath;
-      metaModelPath.name = parentPath.name;
-      context.metaModel = this.getReferencedMetaModel(metaModelPath);
+  private getArgumentTypeContext(type: Fmt.Type, parentContext: Fmt.Context): Fmt.Context {
+    if (type.expression instanceof Fmt.DefinitionRefExpression) {
+      let context = new ArgumentTypeContext(type.expression.path.name, parentContext);
+      let parentPath = type.expression.path.parentPath;
+      if (parentPath instanceof Fmt.NamedPathItem) {
+        let metaModelPath = new Fmt.Path;
+        metaModelPath.parentPath = parentPath.parentPath;
+        metaModelPath.name = parentPath.name;
+        context.metaModel = this.getReferencedMetaModel(metaModelPath);
+      }
+      return context;
     }
-    return context;
+    return parentContext;
   }
 
   protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+    let context = parentContext;
     if (expression instanceof DynamicMetaRefExpression) {
       let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
       if (metaContents.exports instanceof Fmt.ArrayExpression) {
         for (let metaExport of metaContents.exports.items) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
-            parentContext = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport.variable, parentContext);
+            context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport.variable, context);
           }
         }
       }
     }
-    return super.getExports(expression, parentContext);
+    return context;
   }
 
   private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+    let context = parentContext;
     let index = parameterList.indexOf(parameter);
     if (index >= 0) {
       let value = argumentList.getOptionalValue(parameter.name, index);
       if (value) {
-        parentContext = this.getValueExports(value, parameter.type.expression, parentContext);
+        context = this.getValueExports(value, parameter.type.expression, context);
       }
     }
-    return parentContext;
+    return context;
   }
 
   private getMemberArgumentExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, member: Fmt.Parameter, parentContext: Fmt.Context): {result: Fmt.Context, memberCount: number} {
+    let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
       let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
-      let parentExports = this.getMemberArgumentExports(argumentList, parentMetaDefinition, member, parentContext);
-      parentContext = parentExports.result;
+      let parentExports = this.getMemberArgumentExports(argumentList, parentMetaDefinition, member, context);
+      context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
@@ -445,20 +447,21 @@ export class DynamicMetaModel extends Fmt.MetaModel {
       if (index >= 0) {
         let value = argumentList.getOptionalValue(member.name, parentMemberCount + index);
         if (value) {
-          parentContext = this.getValueExports(value, member.type.expression, parentContext);
+          context = this.getValueExports(value, member.type.expression, context);
         }
       }
       parentMemberCount += metaContents.members.length;
     }
-    return {result: parentContext, memberCount: parentMemberCount};
+    return {result: context, memberCount: parentMemberCount};
   }
 
   private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
     if (expression instanceof Fmt.ArrayExpression) {
+      let context = parentContext;
       for (let item of expression.items) {
-        parentContext = this.getValueExports(item, metaType, parentContext);
+        context = this.getValueExports(item, metaType, context);
       }
-      return parentContext;
+      return context;
     } else if (expression instanceof Fmt.ParameterExpression) {
       return this.getParameterListContext(expression.parameters, parentContext);
     } else if (expression instanceof Fmt.CompoundExpression && metaType instanceof Fmt.DefinitionRefExpression && !metaType.path.parentPath) {
@@ -470,12 +473,13 @@ export class DynamicMetaModel extends Fmt.MetaModel {
   }
 
   private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Fmt.Context): {result: Fmt.Context, memberCount: number} {
+    let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
       let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
-      let parentExports = this.getTypeExports(argumentList, parentMetaDefinition, parentContext);
-      parentContext = parentExports.result;
+      let parentExports = this.getTypeExports(argumentList, parentMetaDefinition, context);
+      context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
@@ -486,7 +490,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
             if (index >= 0) {
               let value = argumentList.getOptionalValue(metaExport.variable.name, parentMemberCount + index);
               if (value) {
-                parentContext = this.getValueExports(value, metaExport.variable.type.expression, parentContext);
+                context = this.getValueExports(value, metaExport.variable.type.expression, context);
               }
             }
           }
@@ -494,6 +498,6 @@ export class DynamicMetaModel extends Fmt.MetaModel {
       }
       parentMemberCount += metaContents.members.length;
     }
-    return {result: parentContext, memberCount: parentMemberCount};
+    return {result: context, memberCount: parentMemberCount};
   }
 }

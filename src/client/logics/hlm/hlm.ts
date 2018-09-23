@@ -1,8 +1,10 @@
 import * as Logic from '../logic';
-import { HLMFormat } from '../../../shared/logics/hlm/format';
+import * as FmtHLM from '../../../shared/logics/hlm/meta';
 import { HLMDisplay } from './display';
 
 export class HLM implements Logic.Logic {
-  format: HLMFormat = new HLMFormat;
-  display: HLMDisplay = new HLMDisplay;
+  private display = new HLMDisplay;
+
+  getMetaModel = FmtHLM.getMetaModel;
+  getDisplay(): HLMDisplay { return this.display; }
 }

@@ -3,6 +3,7 @@
 // tslint:disable:variable-name
 
 import * as Fmt from '../../format/format';
+import * as FmtDisplay from '../../display/meta';
 
 export class ObjectContents_Object extends Fmt.ObjectContents {
   remarks?: string;
@@ -4100,6 +4101,12 @@ class ParameterTypeContext extends Fmt.DerivedContext {
   }
 }
 
+class ArgumentTypeContext extends Fmt.DerivedContext {
+  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
 const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Symbol': MetaRefExpression_Symbol, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural};
@@ -4119,22 +4126,641 @@ export class MetaModel extends Fmt.MetaModel {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+    let parent = previousContext.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_Construction
+            || type instanceof MetaRefExpression_SetOperator
+            || type instanceof MetaRefExpression_ExplicitOperator
+            || type instanceof MetaRefExpression_ImplicitOperator
+            || type instanceof MetaRefExpression_MacroOperator
+            || type instanceof MetaRefExpression_Predicate
+            || type instanceof MetaRefExpression_StandardTheorem
+            || type instanceof MetaRefExpression_EquivalenceTheorem) {
+          return previousContext;
+        }
+      }
+    }
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          return previousContext;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    if (parent instanceof Fmt.MetaRefExpression) {
+      return previousContext;
+    }
+    return super.getNextArgumentContext(argument, argumentIndex, previousContext);
+  }
+
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
-    return super.getArgumentValueContext(argument, argumentIndex, previousArguments, parentContext);
+    let context = parentContext;
+    let parent = context.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_Construction) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 5)) {
+            context = new ArgumentTypeContext(ObjectContents_Embedding, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_SetOperator) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 6)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 8)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_ExplicitOperator) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 6)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 8)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_ImplicitOperator) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 6)) {
+            let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+            if (parameterValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(parameterValue.parameters, context);
+            }
+          }
+          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 7)) {
+            let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+            if (parameterValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(parameterValue.parameters, context);
+            }
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+          if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 8)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_MacroOperator) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_Predicate) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Fmt.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 6)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_StandardTheorem) {
+          if (argument.name === 'proofs' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+        if (type instanceof MetaRefExpression_EquivalenceTheorem) {
+          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new ArgumentTypeContext(ObjectContents_Proof, context);
+          }
+        }
+      }
+    }
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          if (currentContext.objectContentsClass === ObjectContents_Definition) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_DefinitionDisplay) {
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'singularName' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'pluralName' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'nameOptional' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Construction) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 5)) {
+              context = new ArgumentTypeContext(ObjectContents_Embedding, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Embedding) {
+            if (argument.name === 'target' || (argument.name === undefined && argumentIndex === 1)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Constructor) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 5)) {
+              for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
+                if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_Construction) {
+                  break;
+                }
+                if (context instanceof ArgumentTypeContext && context.objectContentsClass === ObjectContents_Construction) {
+                  break;
+                }
+              }
+              context = new ArgumentTypeContext(ObjectContents_EqualityDefinition, context);
+            }
+            if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 6)) {
+              context = new ArgumentTypeContext(ObjectContents_RewriteDefinition, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_EqualityDefinition) {
+            if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 2)) {
+              let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
+              if (leftParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(leftParametersValue.parameters, context);
+              }
+              let rightParametersValue = previousArguments.getOptionalValue('rightParameters', 1);
+              if (rightParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(rightParametersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 3)) {
+              let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
+              if (leftParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(leftParametersValue.parameters, context);
+              }
+              let rightParametersValue = previousArguments.getOptionalValue('rightParameters', 1);
+              if (rightParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(rightParametersValue.parameters, context);
+              }
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'reflexivityProof' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'symmetryProof' || (argument.name === undefined && argumentIndex === 5)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'transitivityProof' || (argument.name === undefined && argumentIndex === 6)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_RewriteDefinition) {
+            if (argument.name === 'theorem' || (argument.name === undefined && argumentIndex === 1)) {
+              context = new ArgumentTypeContext(ObjectContents_Theorem, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_SetOperator) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 6)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 8)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Operator) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ExplicitOperator) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 6)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 8)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ImplicitOperator) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 6)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 7)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 8)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_MacroOperator) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Predicate) {
+            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Property, context);
+            }
+            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new Fmt.DerivedContext(context);
+              context.metaModel = FmtDisplay.metaModel;
+            }
+            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+            }
+            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 6)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_StandardTheorem) {
+            if (argument.name === 'proofs' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_EquivalenceTheorem) {
+            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 3)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Property) {
+            if (argument.name === 'theorem' || (argument.name === undefined && argumentIndex === 1)) {
+              context = new ArgumentTypeContext(ObjectContents_Theorem, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Shortcut) {
+            if (argument.name === 'constructor' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_Constructor, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_SubsetArg) {
+            if (argument.name === 'subsetProof' || (argument.name === undefined && argumentIndex === 1)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ElementArg) {
+            if (argument.name === 'elementProof' || (argument.name === undefined && argumentIndex === 1)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ConstraintArg) {
+            if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_BindingArg) {
+            if (argument.name === 'arguments' || (argument.name === undefined && argumentIndex === 1)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Case) {
+            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 2)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_StructuralCase) {
+            if (argument.name === 'constructor' || (argument.name === undefined && argumentIndex === 0)) {
+              context = new ArgumentTypeContext(ObjectContents_Constructor, context);
+            }
+            if (argument.name === 'value' || (argument.name === undefined && argumentIndex === 2)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 1);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 4)) {
+              context = new ArgumentTypeContext(ObjectContents_Proof, context);
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_Proof) {
+            if (argument.name === 'goal' || (argument.name === undefined && argumentIndex === 3)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'steps' || (argument.name === undefined && argumentIndex === 4)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+          }
+          break;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    if (parent instanceof Fmt.MetaRefExpression) {
+      if (parent instanceof MetaRefExpression_Element) {
+        if (argument.name === 'shortcut' || (argument.name === undefined && argumentIndex === 2)) {
+          context = new ArgumentTypeContext(ObjectContents_Shortcut, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_Binding) {
+        if (argument.name === 'parameters' || (argument.name === undefined && argumentIndex === 1)) {
+          for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+            if (currentContext instanceof ParameterTypeContext) {
+              context = new Fmt.ParameterContext(currentContext.parameter, context);
+              break;
+            }
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_subset) {
+        if (argument.name === 'formula' || (argument.name === undefined && argumentIndex === 1)) {
+          let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+          if (parameterValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(parameterValue.parameters, context);
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_extendedSubset) {
+        if (argument.name === 'term' || (argument.name === undefined && argumentIndex === 1)) {
+          let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+          if (parametersValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(parametersValue.parameters, context);
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_setStructuralCases) {
+        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Construction, context);
+        }
+        if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
+          context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_cases) {
+        if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Case, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_structuralCases) {
+        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Construction, context);
+        }
+        if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
+          context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_forall) {
+        if (argument.name === 'formula' || (argument.name === undefined && argumentIndex === 1)) {
+          let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+          if (parametersValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(parametersValue.parameters, context);
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_exists) {
+        if (argument.name === 'formula' || (argument.name === undefined && argumentIndex === 1)) {
+          let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+          if (parametersValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(parametersValue.parameters, context);
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_existsUnique) {
+        if (argument.name === 'formula' || (argument.name === undefined && argumentIndex === 1)) {
+          let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+          if (parametersValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(parametersValue.parameters, context);
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_structural) {
+        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Construction, context);
+        }
+        if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
+          context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_State) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_UseCases) {
+        if (argument.name === 'caseProofs' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_UseExists) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_Embed) {
+        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Construction, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_UseTheorem) {
+        if (argument.name === 'theorem' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Theorem, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveDef) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveNeg) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveForAll) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveExists) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveSetEquals) {
+        if (argument.name === 'subsetProof' || (argument.name === undefined && argumentIndex === 0)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+        if (argument.name === 'supersetProof' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveCases) {
+        if (argument.name === 'caseProofs' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveByInduction) {
+        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Construction, context);
+        }
+        if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
+          context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
+        }
+      }
+    }
+    return context;
   }
 
   protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+    let context = parentContext;
     if (expression instanceof MetaRefExpression_Element) {
       if (expression.shortcut !== undefined) {
         if (expression.shortcut.parameters !== undefined) {
-          parentContext = this.getParameterListContext(expression.shortcut.parameters, parentContext);
+          context = this.getParameterListContext(expression.shortcut.parameters, context);
         }
       }
     }
     if (expression instanceof MetaRefExpression_Binding) {
-      parentContext = this.getParameterListContext(expression.parameters, parentContext);
+      context = this.getParameterListContext(expression.parameters, context);
     }
-    return super.getExports(expression, parentContext);
+    return context;
   }
 }
 

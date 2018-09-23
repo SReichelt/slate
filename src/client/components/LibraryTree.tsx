@@ -124,9 +124,10 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       if (this.state.definition) {
         let logic = this.props.libraryDataProvider.logic;
-        icon = <span>{logic.display.getDefinitionIcon(this.state.definition, this.props.itemInfo)}{icon}</span>;
+        let logicDisplay = logic.getDisplay();
+        icon = <span>{logicDisplay.getDefinitionIcon(this.state.definition, this.props.itemInfo)}{icon}</span>;
         if (this.props.templates) {
-          let renderer = logic.display.getRenderer(this.props.libraryDataProvider, this.props.templates);
+          let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates);
           if (display === undefined) {
             let summary = renderer.renderDefinitionSummary(this.state.definition);
             if (summary) {

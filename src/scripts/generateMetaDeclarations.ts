@@ -51,6 +51,37 @@ function getMemberCount(inFile: Fmt.File, definition: Fmt.Definition): number {
   return result;
 }
 
+function getMemberIndex(inFile: Fmt.File, definition: Fmt.Definition, member: Fmt.Parameter): number | undefined {
+  let superDefinition = getSuperDefinition(inFile, definition);
+  if (superDefinition) {
+    let result = getMemberIndex(inFile, superDefinition, member);
+    if (result !== undefined) {
+      return result;
+    }
+  }
+  if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+    let result = definition.contents.members.indexOf(member);
+    if (result >= 0) {
+      return result;
+    }
+  }
+  return undefined;
+}
+
+function getAllMembers(inFile: Fmt.File, definition: Fmt.Definition): Fmt.Parameter[] {
+  let result: Fmt.Parameter[];
+  let superDefinition = getSuperDefinition(inFile, definition);
+  if (superDefinition) {
+    result = getAllMembers(inFile, superDefinition);
+  } else {
+    result = [];
+  }
+  if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+    result.push(...definition.contents.members);
+  }
+  return result;
+}
+
 function getMemberContentType(inFile: Fmt.File, type: Fmt.Type): string | undefined {
   if (type.expression instanceof Fmt.MetaRefExpression) {
     if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
@@ -579,9 +610,11 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
     } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
       let path = type.expression.path;
       if (!path.parentPath) {
-        let definition = inFile.definitions.getDefinition(path.name);
-        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.exports instanceof Fmt.ArrayExpression) {
-          outFileStr += outputDefinitionExportCode(inFile, definition.contents.exports, source, context, indent);
+        let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
+        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+          for (; definition; definition = getSuperDefinition(inFile, definition)) {
+            outFileStr += outputDefinitionExportCode(inFile, definition, source, context, indent);
+          }
         }
       }
     }
@@ -605,14 +638,200 @@ function outputExportCode(inFile: Fmt.File, argName: string, source: string, con
   return outFileStr;
 }
 
-function outputDefinitionExportCode(inFile: Fmt.File, exports: Fmt.ArrayExpression, source: string, context: string, indent: string): string {
+function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition, source: string, context: string, indent: string): string {
   let outFileStr = '';
-  for (let item of exports.items) {
-    if (item instanceof Fmt.VariableRefExpression) {
-      let member = item.variable;
-      let memberName = translateMemberName(member.name);
-      let optional = member.optional || member.defaultValue !== undefined;
-      outFileStr += outputExportCode(inFile, member.name, `${source}.${memberName}`, context, member.type, optional, member.list, indent);
+  if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
+    let exports = definition.contents.exports;
+    if (exports instanceof Fmt.ArrayExpression) {
+      for (let item of exports.items) {
+        if (item instanceof Fmt.VariableRefExpression) {
+          let member = item.variable;
+          let memberName = translateMemberName(member.name);
+          let optional = member.optional || member.defaultValue !== undefined;
+          outFileStr += outputExportCode(inFile, member.name, `${source}.${memberName}`, context, member.type, optional, member.list, indent);
+        }
+      }
+    }
+  }
+  return outFileStr;
+}
+
+function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+  let outFileStr = '';
+  if (remainingArrayDimensions) {
+    let item = 'item';
+    if (remainingArrayDimensions - 1) {
+      item += remainingArrayDimensions - 1;
+    }
+    let exportValueCode = outputRawExportValueCode(inFile, argName, item, context, type, remainingArrayDimensions - 1, `${indent}    `);
+    if (exportValueCode) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.ArrayExpression) {\n`;
+      outFileStr += `${indent}  for (let ${item} of ${source}.items) {\n`;
+      outFileStr += exportValueCode;
+      outFileStr += `${indent}  }\n`;
+      outFileStr += `${indent}}\n`;
+    }
+  } else {
+    if (type.expression instanceof Fmt.MetaRefExpression) {
+      if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter || type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
+        outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression) {\n`;
+        outFileStr += `${indent}  ${context} = this.getParameterListContext(${source}.parameters, ${context});\n`;
+        outFileStr += `${indent}}\n`;
+      }
+    } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
+      let path = type.expression.path;
+      if (!path.parentPath) {
+        let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
+        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+          for (; definition; definition = getSuperDefinition(inFile, definition)) {
+            let definitionExportCode = outputRawDefinitionExportCode(inFile, definition, `${source}.arguments`, context, `${indent}  `);
+            if (definitionExportCode) {
+              outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
+              outFileStr += definitionExportCode;
+              outFileStr += `${indent}}\n`;
+            }
+          }
+        }
+      }
+    }
+  }
+  return outFileStr;
+}
+
+function outputRawExportCode(inFile: Fmt.File, argName: string, argIndex: number, source: string, context: string, type: Fmt.Type, list: boolean, indent: string): string {
+  let outFileStr = '';
+  let arrayDimensions = getMemberContentType(inFile, type) ? type.arrayDimensions : 0;
+  if (list) {
+    arrayDimensions++;
+  }
+  let value = `${argName}Value`;
+  let exportValueCode = outputRawExportValueCode(inFile, argName, value, context, type, arrayDimensions, indent);
+  if (exportValueCode) {
+    outFileStr += `${indent}let ${value} = ${source}.getOptionalValue('${argName}', ${argIndex});\n`;
+    outFileStr += exportValueCode;
+  }
+  return outFileStr;
+}
+
+function outputRawDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition, source: string, context: string, indent: string): string {
+  let outFileStr = '';
+  if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
+    let exports = definition.contents.exports;
+    if (exports instanceof Fmt.ArrayExpression) {
+      for (let item of exports.items) {
+        if (item instanceof Fmt.VariableRefExpression) {
+          let member = item.variable;
+          let memberIndex = getMemberIndex(inFile, definition, member);
+          if (memberIndex !== undefined) {
+            outFileStr += outputRawExportCode(inFile, member.name, memberIndex, source, context, member.type, member.list, indent);
+          }
+        }
+      }
+    }
+  }
+  return outFileStr;
+}
+
+function outputMemberDependencyCode(inFile: Fmt.File, visibleTypeNames: string[], definition: Fmt.Definition, argumentVar: string, argumentIndexVar: string, source: string, context: string, indent: string): string {
+  let outFileStr = '';
+  let memberIndex = 0;
+  for (let member of getAllMembers(inFile, definition)) {
+    let argumentTypeStr = outputArgumentTypeContext(inFile, member, `${indent}  `);
+    if (member.dependencies || argumentTypeStr) {
+      outFileStr += `${indent}if (${argumentVar}.name === '${member.name}' || (${argumentVar}.name ${member.list ? '>=' : '==='} undefined && ${argumentIndexVar} === ${memberIndex})) {\n`;
+      if (member.dependencies) {
+        let hasParentRestriction = false;
+        for (let dependency of member.dependencies) {
+          if (dependency instanceof Fmt.DefinitionRefExpression && !dependency.path.parentPath) {
+            if (!hasParentRestriction) {
+              outFileStr += `${indent}  for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {\n`;
+              hasParentRestriction = true;
+            }
+            let dependencyDefinition = inFile.definitions.getDefinition(dependency.path.name);
+            if (isVisibleType(visibleTypeNames, dependencyDefinition)) {
+              outFileStr += `${indent}    if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_${dependency.path.name}) {\n`;
+              outFileStr += `${indent}      break;\n`;
+              outFileStr += `${indent}    }\n`;
+            }
+            if (hasObjectContents(inFile, dependencyDefinition)) {
+              outFileStr += `${indent}    if (context instanceof ArgumentTypeContext && context.objectContentsClass === ObjectContents_${dependency.path.name}) {\n`;
+              outFileStr += `${indent}      break;\n`;
+              outFileStr += `${indent}    }\n`;
+            }
+          }
+        }
+        if (hasParentRestriction) {
+          outFileStr += `${indent}  }\n`;
+        }
+        for (let dependency of member.dependencies) {
+          if (dependency instanceof Fmt.VariableRefExpression) {
+            let variable = dependency.variable;
+            let variableIndex = getMemberIndex(inFile, definition, variable);
+            if (variableIndex !== undefined) {
+              outFileStr += outputRawExportCode(inFile, variable.name, variableIndex, source, context, variable.type, variable.list, `${indent}  `);
+            }
+          }
+        }
+      }
+      outFileStr += argumentTypeStr;
+      outFileStr += `${indent}}\n`;
+    }
+    memberIndex++;
+  }
+  return outFileStr;
+}
+
+function outputParameterDependencyCode(inFile: Fmt.File, parameters: Fmt.ParameterList, argumentVar: string, argumentIndexVar: string, source: string, context: string, indent: string): string {
+  let outFileStr = '';
+  let paramIndex = 0;
+  for (let param of parameters) {
+    let argumentTypeStr = outputArgumentTypeContext(inFile, param, `${indent}  `);
+    if (param.dependencies || argumentTypeStr) {
+      outFileStr += `${indent}if (${argumentVar}.name === '${param.name}' || (${argumentVar}.name === undefined && ${argumentIndexVar} ${param.list ? '>=' : '==='} ${paramIndex})) {\n`;
+      if (param.dependencies) {
+        for (let dependency of param.dependencies) {
+          if (dependency instanceof FmtMeta.MetaRefExpression_self) {
+            outFileStr += `${indent}  for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+            outFileStr += `${indent}    if (currentContext instanceof ParameterTypeContext) {\n`;
+            outFileStr += `${indent}      context = new Fmt.ParameterContext(currentContext.parameter, context);\n`;
+            outFileStr += `${indent}      break;\n`;
+            outFileStr += `${indent}    }\n`;
+            outFileStr += `${indent}  }\n`;
+          } else if (dependency instanceof Fmt.VariableRefExpression) {
+            let variable = dependency.variable;
+            let variableIndex = parameters.indexOf(variable);
+            if (variableIndex >= 0) {
+              outFileStr += outputRawExportCode(inFile, variable.name, variableIndex, source, context, variable.type, variable.list, `${indent}  `);
+            }
+          }
+        }
+      }
+      outFileStr += argumentTypeStr;
+      outFileStr += `${indent}}\n`;
+    }
+    paramIndex++;
+  }
+  return outFileStr;
+}
+
+function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, indent: string): string {
+  let outFileStr = '';
+  if (param.type.expression instanceof Fmt.DefinitionRefExpression) {
+    let path = param.type.expression.path;
+    if (path.parentPath) {
+      if (path.parentPath instanceof Fmt.NamedPathItem) {
+        outFileStr += `${indent}context = new Fmt.DerivedContext(context);\n`;
+        let metaModelName = path.parentPath.name;
+        if (metaModelName) {
+          metaModelName = metaModelName.charAt(0).toUpperCase() + metaModelName.substring(1);
+          outFileStr += `${indent}context.metaModel = Fmt${metaModelName}.metaModel;\n`;
+        }
+      }
+    } else {
+      let typeDefinition = inFile.definitions.getDefinition(path.name);
+      if (hasObjectContents(inFile, typeDefinition)) {
+        outFileStr += `${indent}context = new ArgumentTypeContext(ObjectContents_${path.name}, context);\n`;
+      }
     }
   }
   return outFileStr;
@@ -630,6 +849,12 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `\n`;
     outFileStr += `class ParameterTypeContext extends Fmt.DerivedContext {\n`;
     outFileStr += `  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {\n`;
+    outFileStr += `    super(parentContext);\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `}\n`;
+    outFileStr += `\n`;
+    outFileStr += `class ArgumentTypeContext extends Fmt.DerivedContext {\n`;
+    outFileStr += `  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {\n`;
     outFileStr += `    super(parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `}\n`;
@@ -653,23 +878,143 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `    return new ParameterTypeContext(parameter, parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {\n`;
-    outFileStr += `    return super.getArgumentValueContext(argument, argumentIndex, previousArguments, parentContext);\n`;
+    outFileStr += `  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `    let parent = previousContext.parentObject;\n`;
+    outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
+    if (metaModel.contents.definitionTypes instanceof Fmt.ArrayExpression) {
+      let hasDefinitionTypes = false;
+      for (let definitionType of metaModel.contents.definitionTypes.items) {
+        if (definitionType instanceof Fmt.DefinitionRefExpression) {
+          if (hasDefinitionTypes) {
+            outFileStr += `\n            || `;
+          } else {
+            outFileStr += `      let type = parent.type.expression;\n`;
+            outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
+            outFileStr += `        if (`;
+            hasDefinitionTypes = true;
+          }
+          outFileStr += `type instanceof MetaRefExpression_${definitionType.path.name}`;
+        }
+      }
+      if (hasDefinitionTypes) {
+        outFileStr += `) {\n`;
+        outFileStr += `          return previousContext;\n`;
+        outFileStr += `        }\n`;
+        outFileStr += `      }\n`;
+      }
+    }
+    outFileStr += `    }\n`;
+    outFileStr += `    if (parent instanceof Fmt.CompoundExpression) {\n`;
+    outFileStr += `      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+    outFileStr += `        if (currentContext instanceof ArgumentTypeContext) {\n`;
+    outFileStr += `          return previousContext;\n`;
+    outFileStr += `        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {\n`;
+    outFileStr += `          break;\n`;
+    outFileStr += `        }\n`;
+    outFileStr += `      }\n`;
+    outFileStr += `    }\n`;
+    outFileStr += `    if (parent instanceof Fmt.MetaRefExpression) {\n`;
+    outFileStr += `      return previousContext;\n`;
+    outFileStr += `    }\n`;
+    outFileStr += `    return super.getNextArgumentContext(argument, argumentIndex, previousContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `    let context = parentContext;\n`;
+    outFileStr += `    let parent = context.parentObject;\n`;
+    if (metaModel.contents.definitionTypes instanceof Fmt.ArrayExpression) {
+      let hasMemberDependencies = false;
+      for (let definitionType of metaModel.contents.definitionTypes.items) {
+        if (definitionType instanceof Fmt.DefinitionRefExpression) {
+          let definition = inFile.definitions.getDefinition(definitionType.path.name);
+          let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', '          ');
+          if (memberDependencyCode) {
+            if (!hasMemberDependencies) {
+              outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
+              outFileStr += `      let type = parent.type.expression;\n`;
+              outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
+              hasMemberDependencies = true;
+            }
+            outFileStr += `        if (type instanceof MetaRefExpression_${definitionType.path.name}) {\n`;
+            outFileStr += memberDependencyCode;
+            outFileStr += `        }\n`;
+          }
+        }
+      }
+      if (hasMemberDependencies) {
+        outFileStr += `      }\n`;
+        outFileStr += `    }\n`;
+      }
+    }
+    outFileStr += `    if (parent instanceof Fmt.CompoundExpression) {\n`;
+    outFileStr += `      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+    outFileStr += `        if (currentContext instanceof ArgumentTypeContext) {\n`;
     for (let definition of inFile.definitions) {
       if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
         continue;
       }
-      if (isVisibleType(visibleTypeNames, definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.exports instanceof Fmt.ArrayExpression) {
-        outFileStr += `    if (expression instanceof MetaRefExpression_${definition.name}) {\n`;
-        outFileStr += outputDefinitionExportCode(inFile, definition.contents.exports, 'expression', 'parentContext', '      ');
-        outFileStr += `    }\n`;
+      if (hasObjectContents(inFile, definition)) {
+        let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', '            ');
+        if (memberDependencyCode) {
+          outFileStr += `          if (currentContext.objectContentsClass === ObjectContents_${definition.name}) {\n`;
+          outFileStr += memberDependencyCode;
+          outFileStr += `          }\n`;
+        }
       }
     }
-    outFileStr += `    return super.getExports(expression, parentContext);\n`;
+    outFileStr += `          break;\n`;
+    outFileStr += `        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {\n`;
+    outFileStr += `          break;\n`;
+    outFileStr += `        }\n`;
+    outFileStr += `      }\n`;
+    outFileStr += `    }\n`;
+    let hasParameterDependencies = false;
+    for (let definition of inFile.definitions) {
+      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+        continue;
+      }
+      if (isVisibleType(visibleTypeNames, definition)) {
+        let parameterDependencyCode = outputParameterDependencyCode(inFile, definition.parameters, 'argument', 'argumentIndex', 'previousArguments', 'context', '        ');
+        if (parameterDependencyCode) {
+          if (!hasParameterDependencies) {
+            outFileStr += `    if (parent instanceof Fmt.MetaRefExpression) {\n`;
+            hasParameterDependencies = true;
+          }
+          outFileStr += `      if (parent instanceof MetaRefExpression_${definition.name}) {\n`;
+          outFileStr += parameterDependencyCode;
+          outFileStr += `      }\n`;
+        }
+      }
+    }
+    if (hasParameterDependencies) {
+      outFileStr += `    }\n`;
+    }
+    outFileStr += `    return context;\n`;
     outFileStr += `  }\n`;
+    let hasExports = false;
+    for (let definition of inFile.definitions) {
+      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+        continue;
+      }
+      if (isVisibleType(visibleTypeNames, definition)) {
+        let definitionExportCode = outputDefinitionExportCode(inFile, definition, 'expression', 'context', '      ');
+        if (definitionExportCode) {
+          if (!hasExports) {
+            outFileStr += `\n`;
+            outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {\n`;
+            outFileStr += `    let context = parentContext;\n`;
+            hasExports = true;
+          }
+          outFileStr += `    if (expression instanceof MetaRefExpression_${definition.name}) {\n`;
+          outFileStr += definitionExportCode;
+          outFileStr += `    }\n`;
+        }
+      }
+    }
+    if (hasExports) {
+      outFileStr += `    return context;\n`;
+      outFileStr += `  }\n`;
+    }
     outFileStr += `}\n`;
     outFileStr += `\n`;
     outFileStr += `export const metaModel = new MetaModel;\n`;
@@ -684,7 +1029,12 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
   return outFileStr;
 }
 
-function generate(inFileName: string, outFileName: string): void {
+interface ReferencedMetaModel {
+  inFileName: string;
+  outFileName: string;
+}
+
+function generate(inFileName: string, outFileName: string, ReferencedMetaModels: ReferencedMetaModel[]): void {
   let inFileStr: string = fs.readFileSync(inFileName, 'utf8');
   let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, FmtMeta.getMetaModel);
 
@@ -707,7 +1057,28 @@ function generate(inFileName: string, outFileName: string): void {
   for (let item of dstPath) {
     relPathStr += item + '/';
   }
-  outFileStr += `import * as Fmt from '${relPathStr}format';\n\n`;
+  outFileStr += `import * as Fmt from '${relPathStr}format';\n`;
+  for (let ref of ReferencedMetaModels) {
+    let refName = ref.inFileName.split('/').pop()!.split('.')[0]!;
+    refName = refName[0].toUpperCase() + refName.substring(1);
+    srcPath = outFileName.split('/');
+    srcPath.pop();
+    dstPath = ref.outFileName.split('/');
+    let dstName = dstPath.pop()!.split('.')[0]!;
+    while (srcPath.length && dstPath.length && srcPath[0] === dstPath[0]) {
+      srcPath.splice(0, 1);
+      dstPath.splice(0, 1);
+    }
+    relPathStr = srcPath.length ? '' : './';
+    for (let _item of srcPath) {
+      relPathStr += '../';
+    }
+    for (let item of dstPath) {
+      relPathStr += item + '/';
+    }
+    outFileStr += `import * as Fmt${refName} from '${relPathStr}${dstName}';\n`;
+  }
+  outFileStr += `\n`;
 
   let visibleTypeNames: string[] = [];
   let metaDefinitions = outputMetaDefinitions(inFile, visibleTypeNames);
@@ -718,9 +1089,13 @@ function generate(inFileName: string, outFileName: string): void {
   fs.writeFileSync(outFileName, outFileStr, 'utf8');
 }
 
-if (process.argv.length !== 4) {
-  console.error('usage: src/scripts/generateMetaDeclarations.sh <infile> <outfile>');
+if (process.argv.length < 4) {
+  console.error('usage: src/scripts/generateMetaDeclarations.sh <infile> <outfile> [<refinfile> <refoutfile> [...]]');
   process.exit(1);
 }
 
-generate(process.argv[2], process.argv[3]);
+let refs: ReferencedMetaModel[] = [];
+for (let argIndex = 4; argIndex + 1 < process.argv.length; argIndex++) {
+  refs.push({inFileName: process.argv[argIndex], outFileName: process.argv[argIndex + 1]});
+}
+generate(process.argv[2], process.argv[3], refs);

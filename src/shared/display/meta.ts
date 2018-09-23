@@ -335,15 +335,85 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   }
 }
 
+class DefinitionContentsContext extends Fmt.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ParameterTypeContext extends Fmt.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ArgumentTypeContext extends Fmt.DerivedContext {
+  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
 const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_Template};
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg};
 
-export const metaModel = new Fmt.MetaModel(
-  new Fmt.StandardMetaDefinitionFactory(definitionTypes),
-  new Fmt.StandardMetaDefinitionFactory(expressionTypes),
-  new Fmt.StandardMetaDefinitionFactory(functions)
-);
+export class MetaModel extends Fmt.MetaModel {
+  constructor() {
+    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+          new Fmt.StandardMetaDefinitionFactory(expressionTypes),
+          new Fmt.StandardMetaDefinitionFactory(functions));
+  }
+
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+    return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
+  }
+
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+    return new ParameterTypeContext(parameter, parentContext);
+  }
+
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+    let parent = previousContext.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_Template) {
+          return previousContext;
+        }
+      }
+    }
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          return previousContext;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    if (parent instanceof Fmt.MetaRefExpression) {
+      return previousContext;
+    }
+    return super.getNextArgumentContext(argument, argumentIndex, previousContext);
+  }
+
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+    let context = parentContext;
+    let parent = context.parentObject;
+    if (parent instanceof Fmt.CompoundExpression) {
+      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+        if (currentContext instanceof ArgumentTypeContext) {
+          break;
+        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
+          break;
+        }
+      }
+    }
+    return context;
+  }
+}
+
+export const metaModel = new MetaModel;
 
 export function getMetaModel(path: Fmt.Path) {
   if (path.name !== 'display') {

@@ -89,7 +89,8 @@ interface LibraryItemProps {
 
 function LibraryItem(props: LibraryItemProps): any {
   let logic = props.libraryDataProvider.logic;
-  let renderer = logic.display.getRenderer(props.libraryDataProvider, props.templates);
+  let logicDisplay = logic.getDisplay();
+  let renderer = logicDisplay.getRenderer(props.libraryDataProvider, props.templates);
   let interactionHandler = props.interactive ? new LibraryItemInteractionHandler(props.libraryDataProvider, props.templates, props.definition, props.onLinkClicked) : undefined;
 
   let render = props.definition.then((definition: Fmt.Definition) => {
