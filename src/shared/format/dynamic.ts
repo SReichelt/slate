@@ -1,287 +1,10 @@
 import * as Fmt from './format';
 import * as FmtMeta from './meta';
 
-function hasObjectContents(definitions: Fmt.DefinitionList, metaDefinition: Fmt.Definition): boolean {
-  if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
-    if (metaDefinition.contents.members) {
-      return true;
-    }
-    if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression && !metaDefinition.contents.superType.path.parentPath) {
-      let parentMetaDefinition = definitions.getDefinition(metaDefinition.contents.superType.path.name);
-      return hasObjectContents(definitions, parentMetaDefinition);
-    }
-  }
-  return false;
-}
-
-function findMember(definitions: Fmt.DefinitionList, metaDefinition: Fmt.Definition, name?: string, index?: number): {result: Fmt.Parameter | undefined, memberCount: number} {
-  let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
-  let result: Fmt.Parameter | undefined = undefined;
-  let parentMemberCount = 0;
-  if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
-    let parentMetaDefinition = definitions.getDefinition(metaContents.superType.path.name);
-    let parentMember = findMember(definitions, parentMetaDefinition, name, index);
-    result = parentMember.result;
-    parentMemberCount = parentMember.memberCount;
-  }
-  if (metaContents.members) {
-    if (name !== undefined) {
-      for (let member of metaContents.members) {
-        if (member.name === name) {
-          result = member;
-        }
-      }
-    } else if (index !== undefined && !result && index >= parentMemberCount && index < parentMemberCount + metaContents.members.length) {
-      result = metaContents.members[index - parentMemberCount];
-    }
-    parentMemberCount += metaContents.members.length;
-  }
-  return {result: result, memberCount: parentMemberCount};
-}
-
-function checkValueImpl(definitions: Fmt.DefinitionList, type: Fmt.Expression, arrayDimensions: number, value: Fmt.Expression): void {
-  if (arrayDimensions) {
-    if (!(value instanceof Fmt.ArrayExpression)) {
-      throw new Error('Array expression expected');
-    }
-    for (let item of value.items) {
-      checkValueImpl(definitions, type, arrayDimensions - 1, item);
-    }
-  } else if (type instanceof Fmt.MetaRefExpression) {
-    if (type instanceof FmtMeta.MetaRefExpression_Int) {
-      if (!(value instanceof Fmt.IntegerExpression)) {
-        throw new Error('Integer expected');
-      }
-    } else if (type instanceof FmtMeta.MetaRefExpression_String) {
-      if (!(value instanceof Fmt.StringExpression)) {
-        throw new Error('String expected');
-      }
-    } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-      if (!(value instanceof Fmt.ParameterExpression)) {
-        throw new Error('Parameter expression expected');
-      }
-      if (value.parameters.length !== 1) {
-        throw new Error('Single parameter expected');
-      }
-    } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
-      if (!(value instanceof Fmt.ParameterExpression)) {
-        throw new Error('Parameter expression expected');
-      }
-    } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
-      if (!(value instanceof Fmt.CompoundExpression)) {
-        throw new Error('Compound expression expected');
-      }
-    }
-  } else if (type instanceof Fmt.DefinitionRefExpression && !type.path.parentPath) {
-    let metaDefinition = definitions.getDefinition(type.path.name);
-    if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(definitions, metaDefinition)) {
-      if (!(value instanceof Fmt.CompoundExpression)) {
-        throw new Error('Compound expression expected');
-      }
-      let objectContents = new DynamicObjectContents(definitions, metaDefinition, false);
-      objectContents.fromCompoundExpression(value);
-    }
-  }
-}
-
-function checkValue(definitions: Fmt.DefinitionList, type: Fmt.Type, value: Fmt.Expression): void {
-  checkValueImpl(definitions, type.expression, type.arrayDimensions, value);
-}
-
-class DynamicObjectContents extends Fmt.GenericObjectContents {
-  constructor(private definitions: Fmt.DefinitionList, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
-    super();
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.checkMembers(argumentList, this.metaDefinition);
-    let foundMembers = new Set<Fmt.Parameter>();
-    let argIndex = 0;
-    for (let arg of argumentList) {
-      let member = findMember(this.definitions, this.metaDefinition, arg.name, argIndex).result;
-      if (member) {
-        if (foundMembers.has(member)) {
-          throw new Error(`Duplicate argument for "${member.name}"`);
-        } else {
-          foundMembers.add(member);
-        }
-      } else {
-        if (arg.name !== undefined) {
-          throw new Error(`Member "${arg.name}" not found`);
-        } else {
-          throw new Error(`Too many arguments`);
-        }
-      }
-      argIndex++;
-    }
-  }
-
-  private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
-    let memberIndex = 0;
-    let hadOptionalMembers = !this.isDefinition;
-    if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
-      let superType = metaDefinition.contents.superType;
-      if (superType instanceof Fmt.DefinitionRefExpression && !superType.path.parentPath) {
-        let superTypeMetaDefinition = this.definitions.getDefinition(superType.path.name);
-        let superTypeResult = this.checkMembers(argumentList, superTypeMetaDefinition);
-        memberIndex = superTypeResult.memberCount;
-        hadOptionalMembers = superTypeResult.hadOptionalMembers;
-      }
-      if (metaDefinition.contents.members) {
-        for (let member of metaDefinition.contents.members) {
-          let memberName: string | undefined = member.name;
-          let value: Fmt.Expression | undefined;
-          if (member.optional || member.defaultValue) {
-            hadOptionalMembers = true;
-            value = argumentList.getOptionalValue(memberName, memberIndex);
-          } else {
-            value = argumentList.getValue(memberName, memberIndex);
-            if (!hadOptionalMembers) {
-              memberName = undefined;
-            }
-          }
-          if (value) {
-            checkValue(this.definitions, member.type, value);
-            this.arguments.add(value, memberName);
-          }
-          memberIndex++;
-        }
-      }
-    }
-    return {
-      memberCount: memberIndex,
-      hadOptionalMembers: hadOptionalMembers
-    };
-  }
-}
-
-class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
-  constructor(private definitions: Fmt.DefinitionList, public metaDefinition: Fmt.Definition) {
-    super();
-    this.name = metaDefinition.name;
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    let paramIndex = 0;
-    let hadOptionalParams = false;
-    for (let param of this.metaDefinition.parameters) {
-      let paramName = param.list ? undefined : param.name;
-      let value: Fmt.Expression | undefined;
-      if (param.optional || param.defaultValue) {
-        hadOptionalParams = true;
-        value = argumentList.getOptionalValue(paramName, paramIndex);
-      } else {
-        value = argumentList.getValue(paramName, paramIndex);
-        if (!hadOptionalParams) {
-          paramName = undefined;
-        }
-      }
-      if (value) {
-        checkValue(this.definitions, param.type, value);
-        this.arguments.add(value, paramName);
-      }
-      paramIndex++;
-      if (param.list) {
-        while (value) {
-          value = argumentList.getOptionalValue(paramName, paramIndex);
-          if (value) {
-            checkValue(this.definitions, param.type, value);
-            this.arguments.add(value, paramName);
-          }
-          paramIndex++;
-        }
-      }
-    }
-    let foundParams = new Set<Fmt.Parameter>();
-    let argIndex = 0;
-    for (let arg of argumentList) {
-      let param = this.metaDefinition.parameters.getParameter(arg.name, argIndex);
-      if (foundParams.has(param) && !param.list) {
-        throw new Error(`Duplicate argument for "${param.name}"`);
-      } else {
-        foundParams.add(param);
-      }
-      argIndex++;
-    }
-  }
-
-  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
-    if (this.metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
-      let metaModelDefinition = this.definitions[0];
-      let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
-      return new DynamicMetaDefinitionFactory(this.definitions, this.metaDefinition.contents.innerDefinitionTypes, metaModelDefinitionContents.expressionTypes);
-    } else {
-      return undefined;
-    }
-  }
-
-  createDefinitionContents(): Fmt.ObjectContents | undefined {
-    if (hasObjectContents(this.definitions, this.metaDefinition)) {
-      return new DynamicObjectContents(this.definitions, this.metaDefinition, true);
-    } else {
-      return super.createDefinitionContents();
-    }
-  }
-}
-
-class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
-  private metaDefinitions = new Map<string, Fmt.Definition>();
-  private includesAny = false;
-
-  constructor(private definitions: Fmt.DefinitionList, list: Fmt.Expression | undefined, secondaryList?: Fmt.Expression) {
-    if (list instanceof Fmt.ArrayExpression) {
-      for (let item of list.items) {
-        if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
-          this.metaDefinitions.set(item.path.name, definitions.getDefinition(item.path.name));
-        } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
-          this.includesAny = true;
-          if (secondaryList instanceof Fmt.ArrayExpression) {
-            for (let secondaryItem of secondaryList.items) {
-              if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
-                this.metaDefinitions.set(secondaryItem.path.name, definitions.getDefinition(secondaryItem.path.name));
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  createMetaRefExpression(name: string): Fmt.MetaRefExpression {
-    let metaDefinition = this.metaDefinitions.get(name);
-    if (metaDefinition) {
-      return new DynamicMetaRefExpression(this.definitions, metaDefinition);
-    } else {
-      throw new Error(`Meta object "${name}" not found`);
-    }
-  }
-
-  allowDefinitionRefs(): boolean {
-    return this.includesAny;
-  }
-}
-
-class DefinitionContentsContext extends Fmt.DerivedContext {
-  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
-    super(parentContext);
-  }
-}
-
-class ParameterTypeContext extends Fmt.DerivedContext {
-  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
-    super(parentContext);
-  }
-}
-
-class ArgumentTypeContext extends Fmt.DerivedContext {
-  constructor(public metaDefinitionName: string, parentContext: Fmt.Context) {
-    super(parentContext);
-  }
-}
-
 export class DynamicMetaModel extends Fmt.MetaModel {
-  private definitions: Fmt.DefinitionList;
+  definitions: Fmt.DefinitionList;
   private getReferencedMetaModel: Fmt.MetaModelGetter;
+  objectContentsMap: Map<Fmt.ArgumentList, DynamicObjectContents>;
 
   constructor(file: Fmt.File, getReferencedMetaModel: Fmt.MetaModelGetter) {
     let definitions = file.definitions;
@@ -293,6 +16,10 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     super(definitionTypes, expressionTypes, functions);
     this.definitions = definitions;
     this.getReferencedMetaModel = getReferencedMetaModel;
+    this.objectContentsMap = new Map<Fmt.ArgumentList, DynamicObjectContents>();
+    definitionTypes.metaModel = this;
+    expressionTypes.metaModel = this;
+    functions.metaModel = this;
   }
 
   getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
@@ -317,7 +44,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     let context = parentContext;
     let parentTypeDefinition = this.getParentTypeDefinition(context);
     if (parentTypeDefinition) {
-      let member = findMember(this.definitions, parentTypeDefinition, argument.name, argumentIndex).result;
+      let member = this.findMember(parentTypeDefinition, argument.name, argumentIndex).result;
       if (member) {
         for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
           if (context instanceof DefinitionContentsContext || context instanceof Fmt.ParentInfoContext) {
@@ -499,5 +226,293 @@ export class DynamicMetaModel extends Fmt.MetaModel {
       parentMemberCount += metaContents.members.length;
     }
     return {result: context, memberCount: parentMemberCount};
+  }
+
+  hasObjectContents(metaDefinition: Fmt.Definition): boolean {
+    if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
+      if (metaDefinition.contents.members) {
+        return true;
+      }
+      if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression && !metaDefinition.contents.superType.path.parentPath) {
+        let parentMetaDefinition = this.definitions.getDefinition(metaDefinition.contents.superType.path.name);
+        return this.hasObjectContents(parentMetaDefinition);
+      }
+    }
+    return false;
+  }
+
+  findMember(metaDefinition: Fmt.Definition, name?: string, index?: number): {result: Fmt.Parameter | undefined, memberCount: number} {
+    let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
+    let result: Fmt.Parameter | undefined = undefined;
+    let parentMemberCount = 0;
+    if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
+      let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
+      let parentMember = this.findMember(parentMetaDefinition, name, index);
+      result = parentMember.result;
+      parentMemberCount = parentMember.memberCount;
+    }
+    if (metaContents.members) {
+      if (name !== undefined) {
+        for (let member of metaContents.members) {
+          if (member.name === name) {
+            result = member;
+          }
+        }
+      } else if (index !== undefined && !result && index >= parentMemberCount && index < parentMemberCount + metaContents.members.length) {
+        result = metaContents.members[index - parentMemberCount];
+      }
+      parentMemberCount += metaContents.members.length;
+    }
+    return {result: result, memberCount: parentMemberCount};
+  }
+
+  private checkValueImpl(type: Fmt.Expression, arrayDimensions: number, value: Fmt.Expression): void {
+    if (arrayDimensions) {
+      if (!(value instanceof Fmt.ArrayExpression)) {
+        throw new Error('Array expression expected');
+      }
+      for (let item of value.items) {
+        this.checkValueImpl(type, arrayDimensions - 1, item);
+      }
+    } else if (type instanceof Fmt.MetaRefExpression) {
+      if (type instanceof FmtMeta.MetaRefExpression_Int) {
+        if (!(value instanceof Fmt.IntegerExpression)) {
+          throw new Error('Integer expected');
+        }
+      } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+        if (!(value instanceof Fmt.StringExpression)) {
+          throw new Error('String expected');
+        }
+      } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+        if (!(value instanceof Fmt.ParameterExpression)) {
+          throw new Error('Parameter expression expected');
+        }
+        if (value.parameters.length !== 1) {
+          throw new Error('Single parameter expected');
+        }
+      } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+        if (!(value instanceof Fmt.ParameterExpression)) {
+          throw new Error('Parameter expression expected');
+        }
+      } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+        if (!(value instanceof Fmt.CompoundExpression)) {
+          throw new Error('Compound expression expected');
+        }
+      }
+    } else if (type instanceof Fmt.DefinitionRefExpression && !type.path.parentPath) {
+      let metaDefinition = this.definitions.getDefinition(type.path.name);
+      if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(metaDefinition)) {
+        if (!(value instanceof Fmt.CompoundExpression)) {
+          throw new Error('Compound expression expected');
+        }
+        let objectContents = new DynamicObjectContents(this, metaDefinition, false);
+        objectContents.fromCompoundExpression(value);
+      }
+    }
+  }
+
+  checkValue(type: Fmt.Type, value: Fmt.Expression): void {
+    this.checkValueImpl(type.expression, type.arrayDimensions, value);
+  }
+}
+
+class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
+  metaModel: DynamicMetaModel;
+  private metaDefinitions = new Map<string, Fmt.Definition>();
+  private includesAny = false;
+
+  constructor(definitions: Fmt.DefinitionList, list: Fmt.Expression | undefined, secondaryList?: Fmt.Expression) {
+    if (list instanceof Fmt.ArrayExpression) {
+      for (let item of list.items) {
+        if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
+          this.metaDefinitions.set(item.path.name, definitions.getDefinition(item.path.name));
+        } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
+          this.includesAny = true;
+          if (secondaryList instanceof Fmt.ArrayExpression) {
+            for (let secondaryItem of secondaryList.items) {
+              if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
+                this.metaDefinitions.set(secondaryItem.path.name, definitions.getDefinition(secondaryItem.path.name));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  createMetaRefExpression(name: string): Fmt.MetaRefExpression {
+    let metaDefinition = this.metaDefinitions.get(name);
+    if (metaDefinition) {
+      return new DynamicMetaRefExpression(this.metaModel, metaDefinition);
+    } else {
+      throw new Error(`Meta object "${name}" not found`);
+    }
+  }
+
+  allowDefinitionRefs(): boolean {
+    return this.includesAny;
+  }
+}
+
+export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
+  originalArguments?: Fmt.ArgumentList;
+
+  constructor(private metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition) {
+    super();
+    this.name = metaDefinition.name;
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.originalArguments = argumentList;
+    let paramIndex = 0;
+    let hadOptionalParams = false;
+    for (let param of this.metaDefinition.parameters) {
+      let paramName = param.list ? undefined : param.name;
+      let value: Fmt.Expression | undefined;
+      if (param.optional || param.defaultValue) {
+        hadOptionalParams = true;
+        value = argumentList.getOptionalValue(paramName, paramIndex);
+      } else {
+        value = argumentList.getValue(paramName, paramIndex);
+        if (!hadOptionalParams) {
+          paramName = undefined;
+        }
+      }
+      if (value) {
+        this.metaModel.checkValue(param.type, value);
+        this.arguments.add(value, paramName);
+      }
+      paramIndex++;
+      if (param.list) {
+        while (value) {
+          value = argumentList.getOptionalValue(paramName, paramIndex);
+          if (value) {
+            this.metaModel.checkValue(param.type, value);
+            this.arguments.add(value, paramName);
+          }
+          paramIndex++;
+        }
+      }
+    }
+    let foundParams = new Set<Fmt.Parameter>();
+    let argIndex = 0;
+    for (let arg of argumentList) {
+      let param = this.metaDefinition.parameters.getParameter(arg.name, argIndex);
+      if (foundParams.has(param) && !param.list) {
+        throw new Error(`Duplicate argument for "${param.name}"`);
+      } else {
+        foundParams.add(param);
+      }
+      argIndex++;
+    }
+  }
+
+  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
+    if (this.metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
+      let metaModelDefinition = this.metaModel.definitions[0];
+      let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
+      let factory = new DynamicMetaDefinitionFactory(this.metaModel.definitions, this.metaDefinition.contents.innerDefinitionTypes, metaModelDefinitionContents.expressionTypes);
+      factory.metaModel = this.metaModel;
+      return factory;
+    } else {
+      return undefined;
+    }
+  }
+
+  createDefinitionContents(): Fmt.ObjectContents | undefined {
+    if (this.metaModel.hasObjectContents(this.metaDefinition)) {
+      return new DynamicObjectContents(this.metaModel, this.metaDefinition, true);
+    } else {
+      return super.createDefinitionContents();
+    }
+  }
+}
+
+export class DynamicObjectContents extends Fmt.GenericObjectContents {
+  originalArguments?: Fmt.ArgumentList;
+
+  constructor(private metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
+    super();
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.originalArguments = argumentList;
+    this.metaModel.objectContentsMap.set(argumentList, this);
+    this.checkMembers(argumentList, this.metaDefinition);
+    let foundMembers = new Set<Fmt.Parameter>();
+    let argIndex = 0;
+    for (let arg of argumentList) {
+      let member = this.metaModel.findMember(this.metaDefinition, arg.name, argIndex).result;
+      if (member) {
+        if (foundMembers.has(member)) {
+          throw new Error(`Duplicate argument for "${member.name}"`);
+        } else {
+          foundMembers.add(member);
+        }
+      } else {
+        if (arg.name !== undefined) {
+          throw new Error(`Member "${arg.name}" not found`);
+        } else {
+          throw new Error(`Too many arguments`);
+        }
+      }
+      argIndex++;
+    }
+  }
+
+  private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
+    let memberIndex = 0;
+    let hadOptionalMembers = !this.isDefinition;
+    if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
+      let superType = metaDefinition.contents.superType;
+      if (superType instanceof Fmt.DefinitionRefExpression && !superType.path.parentPath) {
+        let superTypeMetaDefinition = this.metaModel.definitions.getDefinition(superType.path.name);
+        let superTypeResult = this.checkMembers(argumentList, superTypeMetaDefinition);
+        memberIndex = superTypeResult.memberCount;
+        hadOptionalMembers = superTypeResult.hadOptionalMembers;
+      }
+      if (metaDefinition.contents.members) {
+        for (let member of metaDefinition.contents.members) {
+          let memberName: string | undefined = member.name;
+          let value: Fmt.Expression | undefined;
+          if (member.optional || member.defaultValue) {
+            hadOptionalMembers = true;
+            value = argumentList.getOptionalValue(memberName, memberIndex);
+          } else {
+            value = argumentList.getValue(memberName, memberIndex);
+            if (!hadOptionalMembers) {
+              memberName = undefined;
+            }
+          }
+          if (value) {
+            this.metaModel.checkValue(member.type, value);
+            this.arguments.add(value, memberName);
+          }
+          memberIndex++;
+        }
+      }
+    }
+    return {
+      memberCount: memberIndex,
+      hadOptionalMembers: hadOptionalMembers
+    };
+  }
+}
+
+class DefinitionContentsContext extends Fmt.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ParameterTypeContext extends Fmt.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+    super(parentContext);
+  }
+}
+
+class ArgumentTypeContext extends Fmt.DerivedContext {
+  constructor(public metaDefinitionName: string, parentContext: Fmt.Context) {
+    super(parentContext);
   }
 }
