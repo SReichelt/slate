@@ -357,7 +357,7 @@ class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
 export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
   originalArguments?: Fmt.ArgumentList;
 
-  constructor(private metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition) {
+  constructor(public metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition) {
     super();
     this.name = metaDefinition.name;
   }
@@ -431,7 +431,7 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
 export class DynamicObjectContents extends Fmt.GenericObjectContents {
   originalArguments?: Fmt.ArgumentList;
 
-  constructor(private metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
+  constructor(public metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
     super();
   }
 

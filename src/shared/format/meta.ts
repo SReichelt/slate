@@ -8,11 +8,13 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   definitionTypes: Fmt.Expression;
   expressionTypes?: Fmt.Expression;
   functions?: Fmt.Expression;
+  lookup?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.definitionTypes = argumentList.getValue('definitionTypes', 0);
     this.expressionTypes = argumentList.getOptionalValue('expressionTypes', 1);
     this.functions = argumentList.getOptionalValue('functions', 2);
+    this.lookup = argumentList.getOptionalValue('lookup', 3);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -23,6 +25,9 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     }
     if (this.functions !== undefined) {
       argumentList.add(this.functions, 'functions');
+    }
+    if (this.lookup !== undefined) {
+      argumentList.add(this.lookup, 'lookup');
     }
   }
 
@@ -43,6 +48,12 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     if (this.functions) {
       result.functions = this.functions.substitute(fn, replacedParameters);
       if (result.functions !== this.functions) {
+        changed = true;
+      }
+    }
+    if (this.lookup) {
+      result.lookup = this.lookup.substitute(fn, replacedParameters);
+      if (result.lookup !== this.lookup) {
         changed = true;
       }
     }

@@ -40,9 +40,19 @@ export class Writer {
   }
 
   writePath(path: Fmt.Path, indent: IndentInfo): void {
+    let argumentListIndent = indent;
+    let lastArgumentListIndent = indent;
+    if (path.parentPath instanceof Fmt.Path) {
+      argumentListIndent = this.indent(indent);
+      lastArgumentListIndent = this.indent(indent, true);
+    }
+    this.writeFullPath(path, argumentListIndent, lastArgumentListIndent);
+  }
+
+  private writeFullPath(path: Fmt.Path, argumentListIndent: IndentInfo, lastArgumentListIndent: IndentInfo): void {
     if (path.parentPath) {
       if (path.parentPath instanceof Fmt.Path) {
-        this.writePath(path.parentPath, indent);
+        this.writeFullPath(path.parentPath, argumentListIndent, argumentListIndent);
         this.write('.');
       } else {
         this.writePathItem(path.parentPath);
@@ -50,10 +60,10 @@ export class Writer {
       }
     }
     this.writeIdentifier(path.name);
-    this.writeOptionalArgumentList(path.arguments, indent, true);
+    this.writeOptionalArgumentList(path.arguments, lastArgumentListIndent, true);
   }
 
-  writePathItem(path: Fmt.PathItem): void {
+  private writePathItem(path: Fmt.PathItem): void {
     if (path.parentPath) {
       this.writePathItem(path.parentPath);
       this.write('/');

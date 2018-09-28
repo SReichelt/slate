@@ -96,42 +96,41 @@ export class Reader {
 
   readPath(context: Fmt.Context | undefined): Fmt.Path {
     let pathStart = this.markStart();
-    let path: Fmt.PathItem | undefined = undefined;
+    let nameStart = pathStart;
+    let parentPath: Fmt.PathItem | undefined = undefined;
     for (;;) {
       this.skipWhitespace();
       if (this.tryReadChar('.')) {
         let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
-        item.parentPath = path;
-        path = item;
+        item.parentPath = parentPath;
+        parentPath = item;
         this.readChar('/');
       } else {
         this.skipWhitespace();
-        let identifierStart = this.markStart();
         let identifier = this.readIdentifier();
-        let identifierRange = this.markEnd(identifierStart);
         this.skipWhitespace();
         if (this.tryReadChar('/')) {
           let item = new Fmt.NamedPathItem;
           item.name = identifier;
-          item.parentPath = path;
-          path = item;
+          item.parentPath = parentPath;
+          parentPath = item;
         } else {
           for (;;) {
-            let item = new Fmt.Path;
-            item.name = identifier;
+            let nameRange = this.markEnd(nameStart);
+            let path = new Fmt.Path;
+            path.name = identifier;
             if (context) {
-              this.readOptionalArgumentList(item.arguments, context);
+              this.readOptionalArgumentList(path.arguments, context);
             }
-            item.parentPath = path;
-            this.markEnd(pathStart, item, identifierRange);
+            path.parentPath = parentPath;
+            this.markEnd(pathStart, path, nameRange);
             if (!this.tryReadChar('.')) {
-              return item;
+              return path;
             }
-            path = item;
+            parentPath = path;
             this.skipWhitespace();
-            identifierStart = this.markStart();
+            nameStart = this.markStart();
             identifier = this.readIdentifier();
-            identifierRange = this.markEnd(identifierStart);
           }
         }
       }

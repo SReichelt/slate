@@ -3,14 +3,16 @@
 $meta: %MetaModel {
   definitionTypes = [$MetaModel, $DefinitionType, $ExpressionType, $ParameterType, %Any],
   expressionTypes = [$Any, $Type, $Int, $String, $ParameterList, $SingleParameter, $ArgumentList, %Any],
-  functions = [$Any, $self]
+  functions = [$Any, $self],
+  lookup = %self
 }
 
 $MetaModel: %DefinitionType {
   members = #(
     definitionTypes: %Any[],
     expressionTypes: %Any[] = [],
-    functions: %Any[] = []
+    functions: %Any[] = [],
+    lookup?: %Any
   )
 }
 

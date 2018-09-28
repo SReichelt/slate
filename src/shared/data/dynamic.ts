@@ -5,18 +5,25 @@ import * as FmtDynamic from '../format/dynamic';
 import * as FmtMeta from '../format/meta';
 import * as FmtReader from '../format/read';
 
-export function getMetaModelFileName(sourceFileName: string, metaModelPath: Fmt.Path): string {
-  let pathStr = metaModelPath.name + '.hlm';
-  for (let pathItem = metaModelPath.parentPath; pathItem; pathItem = pathItem.parentPath) {
+export function getFileNameFromPathStr(sourceFileName: string, pathStr: string): string {
+  pathStr = path.join(path.dirname(sourceFileName), pathStr);
+  pathStr = path.normalize(pathStr);
+  return pathStr;
+}
+
+export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.Path): string {
+  while (targetPath.parentPath instanceof Fmt.Path) {
+    targetPath = targetPath.parentPath;
+  }
+  let pathStr = targetPath.name + '.hlm';
+  for (let pathItem = targetPath.parentPath; pathItem; pathItem = pathItem.parentPath) {
     if (pathItem instanceof Fmt.NamedPathItem) {
       pathStr = path.join(pathItem.name, pathStr);
     } else if (pathItem instanceof Fmt.ParentPathItem) {
       pathStr = path.join('..', pathStr);
     }
   }
-  pathStr = path.join(path.dirname(sourceFileName), pathStr);
-  pathStr = path.normalize(pathStr);
-  return pathStr;
+  return getFileNameFromPathStr(sourceFileName, pathStr);
 }
 
 export function readMetaModel(fileName: string, reportRange?: FmtReader.RangeHandler): Fmt.File {
@@ -29,7 +36,7 @@ export function createDynamicMetaModel(file: Fmt.File, fileName: string): FmtDyn
 }
 
 export function getMetaModel(sourceFileName: string, metaModelPath: Fmt.Path): FmtDynamic.DynamicMetaModel {
-  let fileName = getMetaModelFileName(sourceFileName, metaModelPath);
+  let fileName = getFileNameFromPath(sourceFileName, metaModelPath);
   let file = readMetaModel(fileName);
   return createDynamicMetaModel(file, fileName);
 }
