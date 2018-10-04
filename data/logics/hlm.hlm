@@ -183,14 +183,19 @@ $Symbol: %ParameterType($SymbolTerm) {
   argumentType = $SymbolArg
 }
 $Constraint(formula: $Formula): %ParameterType($Formula) {
+  optional = %true,
   argumentType = $ConstraintArg
 }
 $Binding(set: $SetTerm, parameters[%self]: %ParameterList): %ParameterType {
   argumentType = $BindingArg,
   exports = [parameters]
 }
-$SetDef(set: $SetTerm): %ParameterType($SetTerm) {}
-$Def(element: $ElementTerm): %ParameterType($ElementTerm) {}
+$SetDef(set: $SetTerm): %ParameterType($SetTerm) {
+  optional = %true
+}
+$Def(element: $ElementTerm): %ParameterType($ElementTerm) {
+  optional = %true
+}
 
 $Shortcut: %ExpressionType {
   members = #(

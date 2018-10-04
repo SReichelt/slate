@@ -233,15 +233,20 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_ParameterType extends ObjectContents_ExpressionType {
+  optional?: Fmt.Expression;
   argumentType?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.argumentType = argumentList.getOptionalValue('argumentType', 3);
+    this.optional = argumentList.getOptionalValue('optional', 3);
+    this.argumentType = argumentList.getOptionalValue('argumentType', 4);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
+    if (this.optional !== undefined) {
+      argumentList.add(this.optional, 'optional');
+    }
     if (this.argumentType !== undefined) {
       argumentList.add(this.argumentType, 'argumentType');
     }
@@ -249,6 +254,12 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
+    if (this.optional) {
+      result.optional = this.optional.substitute(fn, replacedParameters);
+      if (result.optional !== this.optional) {
+        changed = true;
+      }
+    }
     if (this.argumentType) {
       result.argumentType = this.argumentType.substitute(fn, replacedParameters);
       if (result.argumentType !== this.argumentType) {
@@ -310,9 +321,48 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
   }
 }
 
+export class MetaRefExpression_self extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'self';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+}
+
 export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
   getName(): string {
     return 'Type';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+}
+
+export class MetaRefExpression_true extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'true';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+}
+
+export class MetaRefExpression_false extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'false';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -409,19 +459,6 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
   }
 }
 
-export class MetaRefExpression_self extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'self';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-}
-
 class DefinitionContentsContext extends Fmt.DerivedContext {
   constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
     super(parentContext);
@@ -442,7 +479,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
 const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
-const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self};
+const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self, 'true': MetaRefExpression_true, 'false': MetaRefExpression_false};
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {
@@ -528,7 +565,7 @@ export class MetaModel extends Fmt.MetaModel {
               context = this.getParameterListContext(membersValue.parameters, context);
             }
           }
-          if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 3)) {
+          if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 4)) {
             context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
           }
         }
@@ -583,7 +620,7 @@ export class MetaModel extends Fmt.MetaModel {
                 context = this.getParameterListContext(membersValue.parameters, context);
               }
             }
-            if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 3)) {
+            if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 4)) {
               context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
             }
           }

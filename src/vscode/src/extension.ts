@@ -1,19 +1,22 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import * as fs from 'fs';
 import * as Fmt from '../../shared/format/format';
+import { escapeIdentifier } from '../../shared/format/common';
 import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
-import { getFileNameFromPathStr, getFileNameFromPath, readMetaModel, createDynamicMetaModel, getMetaModelWithFallback } from '../../shared/data/dynamic';
+import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, readMetaModel, getMetaModelWithFallback } from '../../shared/data/dynamic';
 
 const languageId = 'hlm';
 const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
 
 interface RangeInfo {
     object: Object;
+    context?: Fmt.Context;
     range: vscode.Range;
     nameRange?: vscode.Range;
     signatureRange?: vscode.Range;
@@ -25,10 +28,16 @@ interface ParsedDocument {
     rangeList: RangeInfo[];
     rangeMap: Map<Object, RangeInfo>;
     metaModelDocument?: ParsedDocument;
-    metaModel?: FmtDynamic.DynamicMetaModel;
+    metaModelDocuments?: Map<FmtDynamic.DynamicMetaModel, ParsedDocument>;
 }
 
-type ParsedDocumentMap = Map<vscode.Uri, ParsedDocument>;
+type ParsedDocumentMap = Map<vscode.TextDocument, ParsedDocument>;
+
+interface ParsedMetaModel {
+    metaModel: FmtDynamic.DynamicMetaModel;
+    metaModelDocument: ParsedDocument;
+    metaModelDocuments: Map<FmtDynamic.DynamicMetaModel, ParsedDocument>;
+}
 
 function convertLocation(location: FmtReader.Location): vscode.Position {
     return new vscode.Position(location.line, location.col);
@@ -40,34 +49,53 @@ function convertRange(range: FmtReader.Range): vscode.Range {
     return new vscode.Range(start, end);
 }
 
-function convertRangeInfo(object: Object, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range): RangeInfo {
+function convertRangeInfo(object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range): RangeInfo {
     return {
         object: object,
+        context: context,
         range: convertRange(range),
         nameRange: nameRange ? convertRange(nameRange) : undefined,
         signatureRange: signatureRange ? convertRange(signatureRange) : undefined
     };
 }
 
+function areUrisEqual(uri1: vscode.Uri, uri2: vscode.Uri): boolean {
+    return uri1.toString() === uri2.toString();
+}
+
 let lastReadFileName: string | undefined = undefined;
 let lastReadFileContents: string | undefined = undefined;
 
 function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vscode.TextDocument): string | undefined {
+    if (sourceDocument && areUrisEqual(uri, sourceDocument.uri)) {
+        return sourceDocument.getText(range);
+    }
+    for (let document of vscode.workspace.textDocuments) {
+        if (areUrisEqual(uri, document.uri)) {
+            return document.getText(range);
+        }
+    }
     try {
         let fileName = uri.fsPath;
-        if (sourceDocument !== undefined && fileName === sourceDocument.uri.fsPath) {
-            return sourceDocument.getText(range);
-        } else {
-            if (lastReadFileName !== fileName) {
-                lastReadFileName = undefined;
-                lastReadFileContents = fs.readFileSync(fileName, 'utf8');
-                lastReadFileName = fileName;
+        if (lastReadFileName !== fileName) {
+            lastReadFileName = undefined;
+            lastReadFileContents = fs.readFileSync(fileName, 'utf8');
+            lastReadFileName = fileName;
+        }
+        let contents = lastReadFileContents!;
+        if (range) {
+            let position = 0;
+            let line = 0;
+            for (; line < range.start.line; line++) {
+                position = contents.indexOf('\n', position);
+                if (position < 0) {
+                    break;
+                }
+                position++;
             }
-            let contents = lastReadFileContents!;
-            if (range) {
-                let position = 0;
-                let line = 0;
-                for (; line < range.start.line; line++) {
+            if (position >= 0) {
+                let start = position + range.start.character;
+                for (; line < range.end.line; line++) {
                     position = contents.indexOf('\n', position);
                     if (position < 0) {
                         break;
@@ -75,22 +103,12 @@ function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vs
                     position++;
                 }
                 if (position >= 0) {
-                    let start = position + range.start.character;
-                    for (; line < range.end.line; line++) {
-                        position = contents.indexOf('\n', position);
-                        if (position < 0) {
-                            break;
-                        }
-                        position++;
-                    }
-                    if (position >= 0) {
-                        let end = position + range.end.character;
-                        return contents.substring(start, end);
-                    }
+                    let end = position + range.end.character;
+                    return contents.substring(start, end);
                 }
-            } else {
-                return contents;
             }
+        } else {
+            return contents;
         }
     } catch (error) {
     }
@@ -168,27 +186,34 @@ interface ReferencedDefinition {
     arguments?: Fmt.ArgumentList;
 }
 
-function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, sourceDocument?: vscode.TextDocument): ReferencedDefinition | undefined {
-    if (object instanceof FmtDynamic.DynamicMetaRefExpression && parsedDocument.metaModelDocument) {
-        return {
-            parsedDocument: parsedDocument.metaModelDocument,
-            definition: object.metaDefinition,
-            arguments: object.originalArguments
-        };
+function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, context?: Fmt.Context, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): ReferencedDefinition | null | undefined {
+    if (object instanceof FmtDynamic.DynamicMetaRefExpression && parsedDocument.metaModelDocuments) {
+        let metaModelDocument = parsedDocument.metaModelDocuments.get(object.metaModel);
+        if (metaModelDocument && (!restrictToUri || areUrisEqual(restrictToUri, metaModelDocument.uri))) {
+            return {
+                parsedDocument: metaModelDocument,
+                definition: object.metaDefinition,
+                arguments: object.originalArguments
+            };
+        }
     } else if (object instanceof Fmt.Path) {
-        if (parsedDocument.metaModelDocument && parsedDocument.metaModelDocument.file && parsedDocument.metaModelDocument.file.definitions.length) {
+        if (parsedDocument.metaModelDocument && parsedDocument.metaModelDocument.file && parsedDocument.metaModelDocument.file.definitions.length && (!restrictToUri || areUrisEqual(restrictToUri, parsedDocument.metaModelDocument.uri))) {
             let metaModelDefinition = parsedDocument.metaModelDocument.file.definitions[0];
             if (parsedDocument.file && object === parsedDocument.file.metaModelPath) {
                 return {
                     parsedDocument: parsedDocument.metaModelDocument,
                     definition: metaModelDefinition
                 };
-            } else {
-                // TODO metamodel is context dependent
-                if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-                    let lookup = metaModelDefinition.contents.lookup;
-                    if (lookup instanceof FmtMeta.MetaRefExpression_self) {
-                        // TODO metamodels can actually reference other metamodels via paths
+            }
+        }
+        if (context && context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
+            let metaModelDefinition = context.metaModel.definitions[0];
+            if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
+                let lookup = metaModelDefinition.contents.lookup;
+                let fileName: string;
+                if (lookup instanceof FmtMeta.MetaRefExpression_self) {
+                    fileName = getFileNameFromPath(parsedDocument.uri.fsPath, object, true);
+                    if (!fileName) {
                         if (parsedDocument.file) {
                             let definition = findDefinitionInFile(parsedDocument.file, object, false);
                             if (definition) {
@@ -199,22 +224,26 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
                                 };
                             }
                         }
-                    } else if (lookup instanceof FmtMeta.MetaRefExpression_Any || (lookup instanceof Fmt.StringExpression && parsedDocument.metaModelDocument)) {
-                        let fileName = lookup instanceof Fmt.StringExpression ? getFileNameFromPathStr(parsedDocument.metaModelDocument.uri.fsPath, lookup.value) : getFileNameFromPath(parsedDocument.uri.fsPath, object);
-                        let uri = vscode.Uri.file(fileName);
-                        let fileContents = readRange(uri, undefined, false, sourceDocument);
-                        if (fileContents) {
-                            let referencedDocument = parseFile(uri, fileContents, undefined, sourceDocument);
-                            if (referencedDocument.file) {
-                                let definition = findDefinitionInFile(referencedDocument.file, object, true);
-                                if (definition) {
-                                    return {
-                                        parsedDocument: referencedDocument,
-                                        definition: definition,
-                                        arguments: object.arguments
-                                    };
-                                }
-                            }
+                        return undefined;
+                    }
+                } else if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
+                    fileName = getFileNameFromPath(parsedDocument.uri.fsPath, object);
+                } else if (lookup instanceof Fmt.StringExpression) {
+                    fileName = getFileNameFromPathStr(context.metaModel.fileName, lookup.value);
+                } else {
+                    return null;
+                }
+                let uri = vscode.Uri.file(fileName);
+                if (!restrictToUri || areUrisEqual(restrictToUri, uri)) {
+                    let referencedDocument = parseFile(uri, undefined, undefined, sourceDocument);
+                    if (referencedDocument.file) {
+                        let definition = findDefinitionInFile(referencedDocument.file, object, true);
+                        if (definition) {
+                            return {
+                                parsedDocument: referencedDocument,
+                                definition: definition,
+                                arguments: object.arguments
+                            };
                         }
                     }
                 }
@@ -227,8 +256,13 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
 function findObjectContents(parsedDocument: ParsedDocument, object: Object, sourceDocument?: vscode.TextDocument): FmtDynamic.DynamicObjectContents | undefined {
     if (object instanceof Fmt.Definition && object.contents instanceof FmtDynamic.DynamicObjectContents) {
         return object.contents;
-    } else if (object instanceof Fmt.CompoundExpression && parsedDocument.metaModel) {
-        return parsedDocument.metaModel.objectContentsMap.get(object.arguments);
+    } else if (object instanceof Fmt.CompoundExpression && parsedDocument.metaModelDocuments) {
+        for (let [metaModel] of parsedDocument.metaModelDocuments) {
+            let objectContents = metaModel.objectContentsMap.get(object.arguments);
+            if (objectContents) {
+                return objectContents;
+            }
+        }
     }
     return undefined;
 }
@@ -241,10 +275,10 @@ interface SignatureInfo {
     arguments?: Fmt.Argument[];
 }
 
-function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position, sourceDocument?: vscode.TextDocument): SignatureInfo | undefined {
-    let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, sourceDocument);
+function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, readSignatureCode: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): SignatureInfo | undefined {
+    let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument, restrictToUri);
     if (referencedDefinition) {
-        if (rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
+        if (position && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
             return {
                 referencedDefinition: referencedDefinition,
                 parsedDocument: referencedDefinition.parsedDocument
@@ -252,7 +286,7 @@ function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, 
         }
         let definitionRangeInfo = referencedDefinition.parsedDocument.rangeMap.get(referencedDefinition.definition);
         if (definitionRangeInfo && definitionRangeInfo.signatureRange) {
-            let signatureCode = readRange(referencedDefinition.parsedDocument.uri, definitionRangeInfo.signatureRange, true, sourceDocument);
+            let signatureCode = readSignatureCode ? readRange(referencedDefinition.parsedDocument.uri, definitionRangeInfo.signatureRange, true, sourceDocument) : undefined;
             return {
                 signatureCode: signatureCode,
                 referencedDefinition: referencedDefinition,
@@ -262,52 +296,118 @@ function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, 
             };
         }
     }
-    let objectContents = findObjectContents(parsedDocument, rangeInfo.object, sourceDocument);
-    if (objectContents) {
-        if (rangeInfo.object instanceof Fmt.Definition) {
-            if (rangeInfo.signatureRange && rangeInfo.signatureRange.contains(position)) {
-                return undefined;
-            }
-            let innerDefinitionRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.innerDefinitions);
-            if (innerDefinitionRangeInfo && innerDefinitionRangeInfo.range.contains(position)) {
-                return undefined;
-            }
-        }
-        let signatureCode = '';
-        let allMembers: Fmt.Parameter[] = [];
-        if (parsedDocument.metaModelDocument) {
-            let metaContents = objectContents.metaDefinition.contents;
-            while (metaContents instanceof FmtMeta.ObjectContents_DefinedType) {
-                if (metaContents.members) {
-                    allMembers.unshift(...metaContents.members);
-                    let definitionRangeInfo = parsedDocument.metaModelDocument.rangeMap.get(metaContents.members);
-                    if (definitionRangeInfo) {
-                        if (signatureCode) {
-                            signatureCode = ', ' + signatureCode;
-                        }
-                        signatureCode = '#' + readRange(parsedDocument.metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument) + signatureCode;
+    if (parsedDocument.metaModelDocuments) {
+        let objectContents = findObjectContents(parsedDocument, rangeInfo.object, sourceDocument);
+        if (objectContents) {
+            let metaModelDocument = parsedDocument.metaModelDocuments.get(objectContents.metaModel);
+            if (metaModelDocument && (!restrictToUri || areUrisEqual(restrictToUri, metaModelDocument.uri))) {
+                if (rangeInfo.object instanceof Fmt.Definition) {
+                    if (position && rangeInfo.signatureRange && rangeInfo.signatureRange.contains(position)) {
+                        return undefined;
+                    }
+                    let innerDefinitionRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.innerDefinitions);
+                    if (position && innerDefinitionRangeInfo && innerDefinitionRangeInfo.range.contains(position)) {
+                        return undefined;
                     }
                 }
-                if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath && parsedDocument.metaModel) {
-                    try {
-                        let superTypeDefinition = parsedDocument.metaModel.definitions.getDefinition(metaContents.superType.path.name);
-                        metaContents = superTypeDefinition.contents;
-                    } catch (error) {
+                let signatureCode = readSignatureCode ? '' : undefined;
+                let allMembers: Fmt.Parameter[] = [];
+                let metaContents = objectContents.metaDefinition.contents;
+                while (metaContents instanceof FmtMeta.ObjectContents_DefinedType) {
+                    if (metaContents.members) {
+                        allMembers.unshift(...metaContents.members);
+                        if (readSignatureCode) {
+                            let definitionRangeInfo = metaModelDocument.rangeMap.get(metaContents.members);
+                            if (definitionRangeInfo) {
+                                if (signatureCode) {
+                                    signatureCode = ', ' + signatureCode;
+                                }
+                                signatureCode = '#' + readRange(metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument) + signatureCode;
+                            }
+                        }
+                    }
+                    if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
+                        try {
+                            let superTypeDefinition = objectContents.metaModel.definitions.getDefinition(metaContents.superType.path.name);
+                            metaContents = superTypeDefinition.contents;
+                        } catch (error) {
+                            break;
+                        }
+                    } else {
                         break;
                     }
-                } else {
-                    break;
                 }
+                return {
+                    signatureCode: signatureCode,
+                    parsedDocument: metaModelDocument,
+                    parameters: allMembers,
+                    arguments: objectContents.originalArguments
+                };
             }
-            return {
-                signatureCode: signatureCode,
-                parsedDocument: parsedDocument.metaModelDocument,
-                parameters: allMembers,
-                arguments: objectContents.originalArguments
-            };
         }
     }
     return undefined;
+}
+
+function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, preferSignature: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): vscode.DefinitionLink[] {
+    let result: vscode.DefinitionLink[] = [];
+    let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, sourceDocument, restrictToUri);
+    if (signatureInfo) {
+        if (signatureInfo.referencedDefinition && rangeInfo.nameRange && (!position || rangeInfo.nameRange.contains(position))) {
+            let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(signatureInfo.referencedDefinition.definition);
+            if (targetRangeInfo) {
+                result.push({
+                    originSelectionRange: rangeInfo.nameRange,
+                    targetUri: signatureInfo.parsedDocument.uri,
+                    targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
+                    targetSelectionRange: targetRangeInfo.nameRange
+                });
+                if (position) {
+                    return result;
+                }
+            }
+        }
+        if (signatureInfo.parameters && signatureInfo.arguments) {
+            for (let arg of signatureInfo.arguments) {
+                if (arg.name) {
+                    let argRangeInfo = parsedDocument.rangeMap.get(arg);
+                    if (argRangeInfo && argRangeInfo.nameRange && (!position || argRangeInfo.nameRange.contains(position))) {
+                        for (let param of signatureInfo.parameters) {
+                            if (arg.name === param.name) {
+                                let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
+                                if (targetRangeInfo) {
+                                    result.push({
+                                        originSelectionRange: argRangeInfo.nameRange,
+                                        targetUri: signatureInfo.parsedDocument.uri,
+                                        targetRange: targetRangeInfo.range,
+                                        targetSelectionRange: targetRangeInfo.nameRange
+                                    });
+                                    if (position) {
+                                        return result;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (rangeInfo.object instanceof Fmt.VariableRefExpression && rangeInfo.nameRange && (!position || rangeInfo.nameRange.contains(position)) && (!restrictToUri || areUrisEqual(restrictToUri, parsedDocument.uri))) {
+        let targetRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.variable);
+        if (targetRangeInfo) {
+            result.push({
+                originSelectionRange: rangeInfo.nameRange,
+                targetUri: parsedDocument.uri,
+                targetRange: targetRangeInfo.range,
+                targetSelectionRange: targetRangeInfo.nameRange
+            });
+            if (position) {
+                return result;
+            }
+        }
+    }
+    return result;
 }
 
 class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider {
@@ -336,59 +436,16 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
     }
 
     private getDefinitionLink(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, preferSignature: boolean): vscode.DefinitionLink | undefined {
-        let parsedDocument = this.parsedDocuments.get(document.uri);
+        let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             for (let rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 if (rangeInfo.range.contains(position)) {
-                    let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, document);
-                    if (signatureInfo) {
-                        if (signatureInfo.referencedDefinition && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
-                            let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(signatureInfo.referencedDefinition.definition);
-                            if (targetRangeInfo) {
-                                return {
-                                    originSelectionRange: rangeInfo.nameRange,
-                                    targetUri: signatureInfo.parsedDocument.uri,
-                                    targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
-                                    targetSelectionRange: targetRangeInfo.nameRange
-                                };
-                            }
-                        }
-                        if (signatureInfo.parameters && signatureInfo.arguments) {
-                            for (let arg of signatureInfo.arguments) {
-                                if (arg.name) {
-                                    let argRangeInfo = parsedDocument.rangeMap.get(arg);
-                                    if (argRangeInfo && argRangeInfo.nameRange && argRangeInfo.nameRange.contains(position)) {
-                                        for (let param of signatureInfo.parameters) {
-                                            if (arg.name === param.name) {
-                                                let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
-                                                if (targetRangeInfo) {
-                                                    return {
-                                                        originSelectionRange: argRangeInfo.nameRange,
-                                                        targetUri: signatureInfo.parsedDocument.uri,
-                                                        targetRange: targetRangeInfo.range,
-                                                        targetSelectionRange: targetRangeInfo.nameRange
-                                                    };
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (rangeInfo.object instanceof Fmt.VariableRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
-                        let targetRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.variable);
-                        if (targetRangeInfo) {
-                            return {
-                                originSelectionRange: rangeInfo.nameRange,
-                                targetUri: document.uri,
-                                targetRange: targetRangeInfo.range,
-                                targetSelectionRange: targetRangeInfo.nameRange
-                            };
-                        }
+                    let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, preferSignature, document);
+                    if (definitionLinks.length) {
+                        return definitionLinks[0];
                     }
                 }
             }
@@ -401,7 +458,7 @@ class HLMHighlightProvider implements vscode.DocumentHighlightProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideDocumentHighlights(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.DocumentHighlight[]> {
-        let parsedDocument = this.parsedDocuments.get(document.uri);
+        let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             let variable: Fmt.Parameter | undefined = undefined;
             for (let rangeInfo of parsedDocument.rangeList) {
@@ -443,14 +500,14 @@ class HLMSignatureHelpProvider implements vscode.SignatureHelpProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideSignatureHelp(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SignatureHelp> {
-        let parsedDocument = this.parsedDocuments.get(document.uri);
+        let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             for (let rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 if (rangeInfo.range.contains(position)) {
-                    let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, document);
+                    let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, true, document);
                     if (signatureInfo && signatureInfo.signatureCode && signatureInfo.parameters) {
                         let signature = new vscode.SignatureInformation(signatureInfo.signatureCode);
                         for (let param of signatureInfo.parameters) {
@@ -514,75 +571,370 @@ class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
-        let parsedDocument = this.parsedDocuments.get(document.uri);
+        let parsedDocument = this.parsedDocuments.get(document);
+        if (parsedDocument) {
+            let result: vscode.CompletionItem[] = [];
+            for (let rangeInfo of parsedDocument.rangeList) {
+                if (token.isCancellationRequested) {
+                    break;
+                }
+                if (rangeInfo.range.contains(position)) {
+                    let isEmptyExpression = rangeInfo.object instanceof FmtReader.EmptyExpression;
+                    let signatureInfo: SignatureInfo | undefined = undefined;
+                    if (context.triggerKind === vscode.CompletionTriggerKind.Invoke) {
+                        if (!(rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
+                            signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, document);
+                            if (signatureInfo) {
+                                if (signatureInfo.parameters) {
+                                    let filledParameters = new Set<Fmt.Parameter>();
+                                    if (signatureInfo.arguments) {
+                                        let argIndex = 0;
+                                        for (let arg of signatureInfo.arguments) {
+                                            let argRangeInfo = parsedDocument.rangeMap.get(arg);
+                                            if (argRangeInfo && !argRangeInfo.range.isEmpty) {
+                                                if (argRangeInfo.range.contains(position)) {
+                                                    signatureInfo = undefined;
+                                                    break;
+                                                }
+                                                let paramIndex = 0;
+                                                for (let param of signatureInfo.parameters) {
+                                                    let paramIsList = param.list;
+                                                    if (arg.name ? arg.name === param.name : paramIsList ? argIndex >= paramIndex : argIndex === paramIndex) {
+                                                        filledParameters.add(param);
+                                                        break;
+                                                    }
+                                                    paramIndex++;
+                                                }
+                                            }
+                                            argIndex++;
+                                        }
+                                    }
+                                    if (signatureInfo && signatureInfo.parameters) {
+                                        for (let param of signatureInfo.parameters) {
+                                            if (!filledParameters.has(param)) {
+                                                let paramRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
+                                                if (paramRangeInfo && paramRangeInfo.nameRange) {
+                                                    let paramCode = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.nameRange, false, document);
+                                                    if (paramCode) {
+                                                        let paramDefinition = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.range, true, document);
+                                                        let documentation: vscode.MarkdownString | undefined = undefined;
+                                                        if (paramDefinition) {
+                                                            documentation = new vscode.MarkdownString;
+                                                            documentation.appendCodeblock(paramDefinition);
+                                                        }
+                                                        result.push({
+                                                            label: paramCode + ' = ',
+                                                            documentation: documentation,
+                                                            kind: vscode.CompletionItemKind.Field
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (rangeInfo.object instanceof Fmt.MetaRefExpression) {
+                                            isEmptyExpression = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if ((isEmptyExpression || rangeInfo.object instanceof Fmt.VariableRefExpression) && rangeInfo.context) {
+                            for (let param of rangeInfo.context.getVariables()) {
+                                let paramRangeInfo = parsedDocument.rangeMap.get(param);
+                                if (paramRangeInfo && paramRangeInfo.nameRange) {
+                                    let paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
+                                    if (paramCode) {
+                                        let paramDefinition = readRange(parsedDocument.uri, paramRangeInfo.range, true, document);
+                                        let documentation: vscode.MarkdownString | undefined = undefined;
+                                        if (paramDefinition) {
+                                            documentation = new vscode.MarkdownString;
+                                            documentation.appendCodeblock(paramDefinition);
+                                        }
+                                        result.push({
+                                            label: paramCode,
+                                            range: rangeInfo.object instanceof Fmt.VariableRefExpression ? rangeInfo.nameRange || rangeInfo.range : undefined,
+                                            documentation: documentation,
+                                            kind: vscode.CompletionItemKind.Variable
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if ((isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) && rangeInfo.context && parsedDocument.metaModelDocuments) {
+                        let metaModel = rangeInfo.context.metaModel;
+                        if (metaModel instanceof FmtDynamic.DynamicMetaModel) {
+                            let metaModelDocument = parsedDocument.metaModelDocuments.get(metaModel);
+                            if (metaModelDocument) {
+                                let prefix = isEmptyExpression ? '%' : '';
+                                let range: vscode.Range | undefined = undefined;
+                                if (rangeInfo.object instanceof FmtDynamic.DynamicMetaRefExpression && rangeInfo.object.name && rangeInfo.nameRange && !isEmptyExpression) {
+                                    range = rangeInfo.nameRange;
+                                }
+                                // TODO check allowed meta ref expressions
+                                for (let definition of metaModel.definitions) {
+                                    let definitionRangeInfo = metaModelDocument.rangeMap.get(definition);
+                                    if (definitionRangeInfo) {
+                                        let signature = definitionRangeInfo.signatureRange ? readRange(metaModelDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+                                        let documentation: vscode.MarkdownString | undefined = undefined;
+                                        if (signature) {
+                                            documentation = new vscode.MarkdownString;
+                                            documentation.appendCodeblock(signature);
+                                        }
+                                        result.push({
+                                            label: prefix + escapeIdentifier(definition.name),
+                                            range: range,
+                                            documentation: documentation,
+                                            kind: vscode.CompletionItemKind.Keyword
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (isEmptyExpression || (rangeInfo.object instanceof Fmt.Path && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
+                        let prefix = rangeInfo.object instanceof Fmt.Path ? '' : '$';
+                        let range: vscode.Range | undefined = undefined;
+                        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.name && rangeInfo.nameRange) {
+                            let start = rangeInfo.nameRange.start;
+                            let end = rangeInfo.nameRange.end;
+                            if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath) {
+                                let parentRange = parsedDocument.rangeMap.get(rangeInfo.object.parentPath);
+                                if (parentRange) {
+                                    start = parentRange.range.end.translate(0, 1);
+                                }
+                            }
+                            if (end.isAfter(start)) {
+                                range = new vscode.Range(start, end);
+                            }
+                        }
+                        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath instanceof Fmt.Path) {
+                            let parentDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object.parentPath, rangeInfo.context, document);
+                            if (parentDefinition) {
+                                for (let definition of parentDefinition.definition.innerDefinitions) {
+                                    let definitionRangeInfo = parentDefinition.parsedDocument.rangeMap.get(definition);
+                                    let signature = definitionRangeInfo ? readRange(parentDefinition.parsedDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+                                    let documentation: vscode.MarkdownString | undefined = undefined;
+                                    if (signature) {
+                                        documentation = new vscode.MarkdownString;
+                                        documentation.appendCodeblock(signature);
+                                    }
+                                    result.push({
+                                        label: escapeIdentifier(definition.name),
+                                        range: range,
+                                        documentation: documentation,
+                                        kind: vscode.CompletionItemKind.Reference
+                                    });
+                                }
+                            }
+                        } else {
+                            let addParent = true;
+                            if (parsedDocument.file && rangeInfo.object instanceof Fmt.Path && rangeInfo.object === parsedDocument.file.metaModelPath) {
+                                let currentPath = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, false, true);
+                                try {
+                                    for (let fileName of fs.readdirSync(currentPath)) {
+                                        let fullPath = path.join(currentPath, fileName);
+                                        let stat = fs.statSync(fullPath);
+                                        if (stat.isDirectory()) {
+                                            result.push({
+                                                label: prefix + escapeIdentifier(fileName),
+                                                range: range,
+                                                kind: vscode.CompletionItemKind.Folder
+                                            });
+                                        } else if (stat.isFile() && fileName.endsWith(fileExtension)) {
+                                            result.push({
+                                                label: prefix + escapeIdentifier(fileName.substring(0, fileName.length - fileExtension.length)),
+                                                range: range,
+                                                kind: vscode.CompletionItemKind.File
+                                            });
+                                        }
+                                    }
+                                } catch (error) {
+                                }
+                            }
+                            if (rangeInfo.context && rangeInfo.context.metaModel instanceof FmtDynamic.DynamicMetaModel && rangeInfo.context.metaModel.definitions.length) {
+                                let metaModelDefinition = rangeInfo.context.metaModel.definitions[0];
+                                if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
+                                    let lookup = metaModelDefinition.contents.lookup;
+                                    let currentFile: string | undefined = undefined;
+                                    let currentDirectory: string | undefined = undefined;
+                                    let referencedDocument: ParsedDocument | undefined = undefined;
+                                    if (lookup instanceof FmtMeta.MetaRefExpression_self) {
+                                        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath) {
+                                            let fileName = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, true);
+                                            if (fs.existsSync(fileName)) {
+                                                currentFile = fileName;
+                                            } else {
+                                                currentDirectory = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, false, true);
+                                            }
+                                        } else {
+                                            result.push({
+                                                label: prefix + '.',
+                                                range: range,
+                                                kind: vscode.CompletionItemKind.Folder
+                                            });
+                                            referencedDocument = parsedDocument;
+                                        }
+                                    } else if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
+                                        if (rangeInfo.object instanceof Fmt.Path) {
+                                            currentDirectory = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, false, true);
+                                        } else {
+                                            currentDirectory = path.dirname(parsedDocument.uri.fsPath);
+                                        }
+                                    } else if (lookup instanceof Fmt.StringExpression) {
+                                        currentFile = getFileNameFromPathStr(rangeInfo.context.metaModel.fileName, lookup.value);
+                                        addParent = false;
+                                    }
+                                    try {
+                                        if (currentFile) {
+                                            referencedDocument = parseFile(vscode.Uri.file(currentFile));
+                                        }
+                                        if (currentDirectory) {
+                                            for (let fileName of fs.readdirSync(currentDirectory)) {
+                                                let fullPath = path.join(currentDirectory, fileName);
+                                                let stat = fs.statSync(fullPath);
+                                                if (stat.isDirectory()) {
+                                                    result.push({
+                                                        label: prefix + escapeIdentifier(fileName),
+                                                        range: range,
+                                                        kind: vscode.CompletionItemKind.Folder
+                                                    });
+                                                } else if (stat.isFile() && fileName.endsWith(fileExtension)) {
+                                                    if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
+                                                        try {
+                                                            let fileDocument = parseFile(vscode.Uri.file(fullPath));
+                                                            if (fileDocument.file && fileDocument.file.definitions.length) {
+                                                                let definition = fileDocument.file.definitions[0];
+                                                                if (definition.name + fileExtension === fileName) {
+                                                                    let definitionRangeInfo = fileDocument.rangeMap.get(definition);
+                                                                    let signature = definitionRangeInfo ? readRange(fileDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+                                                                    let documentation: vscode.MarkdownString | undefined = undefined;
+                                                                    if (signature) {
+                                                                        documentation = new vscode.MarkdownString;
+                                                                        documentation.appendCodeblock(signature);
+                                                                    }
+                                                                    result.push({
+                                                                        label: prefix + escapeIdentifier(definition.name),
+                                                                        range: range,
+                                                                        documentation: documentation,
+                                                                        kind: vscode.CompletionItemKind.Reference
+                                                                    });
+                                                                }
+                                                            }
+                                                        } catch (error) {
+                                                        }
+                                                    } else {
+                                                        result.push({
+                                                            label: prefix + escapeIdentifier(fileName.substring(0, fileName.length - fileExtension.length)),
+                                                            range: range,
+                                                            kind: vscode.CompletionItemKind.File
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } catch (error) {
+                                    }
+                                    if (referencedDocument && referencedDocument.file) {
+                                        for (let definition of referencedDocument.file.definitions) {
+                                            let definitionRangeInfo = referencedDocument.rangeMap.get(definition);
+                                            let signature = definitionRangeInfo ? readRange(referencedDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+                                            let documentation: vscode.MarkdownString | undefined = undefined;
+                                            if (signature) {
+                                                documentation = new vscode.MarkdownString;
+                                                documentation.appendCodeblock(signature);
+                                            }
+                                            result.push({
+                                                label: prefix + escapeIdentifier(definition.name),
+                                                range: range,
+                                                documentation: documentation,
+                                                kind: vscode.CompletionItemKind.Reference
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                            if (addParent) {
+                                result.push({
+                                    label: prefix + '..',
+                                    range: range,
+                                    kind: vscode.CompletionItemKind.Folder
+                                });
+                            }
+                        }
+                    }
+                    if (rangeInfo.object instanceof Fmt.Expression || signatureInfo) {
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+        return undefined;
+    }
+}
+
+class HLMReferenceProvider implements vscode.ReferenceProvider {
+    constructor(private parsedDocuments: ParsedDocumentMap) {}
+
+    provideReferences(document: vscode.TextDocument, position: vscode.Position, context: vscode.ReferenceContext, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Location[]> {
+        let result: vscode.Location[] = [];
+        let targetLocation = new vscode.Location(document.uri, position);
+        let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             for (let rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 if (rangeInfo.range.contains(position)) {
-                    if (context.triggerCharacter === '(' || context.triggerCharacter === '{' || context.triggerCharacter === ',') {
-                        let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, document);
-                        if (signatureInfo && signatureInfo.parameters) {
-                            let filledParameters = new Set<Fmt.Parameter>();
-                            if (signatureInfo.arguments && signatureInfo.arguments.length) {
-                                let argIndex = 0;
-                                let paramIsList = false;
-                                for (let arg of signatureInfo.arguments) {
-                                    let paramIndex = 0;
-                                    for (let param of signatureInfo.parameters) {
-                                        paramIsList = param.list;
-                                        if (arg.name ? arg.name === param.name : paramIsList ? argIndex >= paramIndex : argIndex === paramIndex) {
-                                            filledParameters.add(param);
-                                            break;
-                                        }
-                                        paramIndex++;
-                                    }
-                                    argIndex++;
-                                }
+                    let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, document);
+                    if (definitionLinks.length) {
+                        let definitionLink = definitionLinks[0];
+                        if (definitionLink.targetSelectionRange) {
+                            targetLocation = new vscode.Location(definitionLink.targetUri, definitionLink.targetSelectionRange);
+                            if (context.includeDeclaration) {
+                                result.push(targetLocation);
                             }
-                            let result: vscode.CompletionItem[] = [];
-                            for (let param of signatureInfo.parameters) {
-                                if (!filledParameters.has(param)) {
-                                    let paramRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
-                                    if (paramRangeInfo && paramRangeInfo.nameRange) {
-                                        let paramName = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.nameRange, false, document);
-                                        let code = paramName + ' = ';
-                                        if (context.triggerCharacter === ',') {
-                                            code = ' ' + code;
-                                        }
-                                        result.push({
-                                            label: code,
-                                            kind: vscode.CompletionItemKind.Field
-                                        });
-                                    }
-                                }
-                            }
-                            return result;
+                            break;
                         }
                     }
                 }
             }
         }
-        return undefined;
+        return vscode.workspace.findFiles('**/*' + fileExtension, undefined, undefined, token).then((uris: vscode.Uri[]) => {
+            metaModelCache = new Map<string, ParsedMetaModel>();
+            try {
+                for (let uri of uris) {
+                    if (token.isCancellationRequested) {
+                        break;
+                    }
+                    let parsedDocument = parseFile(uri, undefined, undefined, document);
+                    for (let rangeInfo of parsedDocument.rangeList) {
+                        if (token.isCancellationRequested) {
+                            break;
+                        }
+                        for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, targetLocation.uri)) {
+                            if (areUrisEqual(definitionLink.targetUri, targetLocation.uri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.intersection(targetLocation.range)) {
+                                result.push(new vscode.Location(uri, definitionLink.originSelectionRange || rangeInfo.nameRange || rangeInfo.range));
+                            }
+                        }
+                    }
+                }
+            } finally {
+                metaModelCache = undefined;
+            }
+            return result;
+        });
     }
 }
 
 class HLMDocumentFormatter implements vscode.DocumentFormattingEditProvider {
-    constructor(private parsedDocuments: ParsedDocumentMap) {}
-
     provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
         let unformatted = document.getText();
-        let parsedDocument = this.parsedDocuments.get(document.uri);
         try {
-            let file: Fmt.File;
-            if (parsedDocument && parsedDocument.file) {
-                file = parsedDocument.file;
-            } else {
-                file = FmtReader.readString(unformatted, document.fileName, (path: Fmt.Path) => getMetaModelWithFallback(document.fileName, path));
-                if (token.isCancellationRequested) {
-                    return undefined;
-                }
+            let file: Fmt.File = FmtReader.readString(unformatted, document.fileName, (path: Fmt.Path) => getMetaModelWithFallback(document.fileName, path));
+            if (token.isCancellationRequested) {
+                return undefined;
             }
             let formatted = FmtWriter.writeString(file);
             if (formatted !== unformatted) {
@@ -615,7 +967,7 @@ function checkArguments(metaModel: FmtDynamic.DynamicMetaModel, parameterList: F
     for (let param of parameterList) {
         let paramName = param.list ? undefined : param.name;
         let value: Fmt.Expression | undefined;
-        if (param.optional || param.defaultValue) {
+        if (param.optional || param.defaultValue || (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression && param.type.expression.metaDefinition.contents instanceof FmtMeta.ObjectContents_ParameterType && param.type.expression.metaDefinition.contents.optional instanceof FmtMeta.MetaRefExpression_true)) {
             value = argumentList.getOptionalValue(paramName, paramIndex);
         } else {
             value = argumentList.getValue(paramName, paramIndex);
@@ -648,27 +1000,38 @@ function checkArguments(metaModel: FmtDynamic.DynamicMetaModel, parameterList: F
 }
 
 function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagnostics: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): void {
-    if (parsedDocument.metaModel) {
-        for (let rangeInfo of parsedDocument.rangeList) {
-            if (rangeInfo.object instanceof Fmt.Path) {
-                let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, sourceDocument);
-                if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
-                    try {
-                        checkArguments(parsedDocument.metaModel, referencedDefinition.definition.parameters, referencedDefinition.arguments);
-                    } catch (error) {
-                        diagnostics.push({
-                            message: error.message,
-                            range: rangeInfo.range,
-                            severity: vscode.DiagnosticSeverity.Error
-                        });
-                    }
+    for (let rangeInfo of parsedDocument.rangeList) {
+        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.context && rangeInfo.context.metaModel instanceof FmtDynamic.DynamicMetaModel) {
+            try {
+                let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument);
+                if (referencedDefinition === undefined) {
+                    throw new Error(`Definition "${rangeInfo.object.name}" not found`);
                 }
+                if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
+                    checkArguments(rangeInfo.context.metaModel, referencedDefinition.definition.parameters, referencedDefinition.arguments);
+                }
+            } catch (error) {
+                diagnostics.push({
+                    message: error.message,
+                    range: rangeInfo.range,
+                    severity: vscode.DiagnosticSeverity.Error
+                });
             }
         }
     }
 }
 
-function parseFile(uri: vscode.Uri, fileContents: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): ParsedDocument {
+let parsedFileCache = new Map<string, ParsedDocument>();
+let metaModelCache: Map<string, ParsedMetaModel> | undefined = undefined;
+
+function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): ParsedDocument {
+    let cachedDocument = parsedFileCache.get(uri.fsPath);
+    if (cachedDocument) {
+        return cachedDocument;
+    }
+    if (!fileContents) {
+        fileContents = readRange(uri, undefined, false, sourceDocument) || '';
+    }
     let stream = new FmtReader.StringInputStream(fileContents);
     let reportError = diagnostics ? (msg: string, range: FmtReader.Range) => {
         diagnostics.push({
@@ -680,27 +1043,52 @@ function parseFile(uri: vscode.Uri, fileContents: string, diagnostics?: vscode.D
     let parsedDocument: ParsedDocument = {
         uri: uri,
         rangeList: [],
-        rangeMap: new Map<Object, RangeInfo>()
+        rangeMap: new Map<Object, RangeInfo>(),
+        metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
     };
-    let getDocumentMetaModel = (path: Fmt.Path) => {
-        let metaModelFileName = getFileNameFromPath(uri.fsPath, path);
+    let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Fmt.MetaModel => {
+        let metaModelFileName = getFileNameFromPath(sourceFileName, path);
+        if (metaModelCache) {
+            let parsedMetaModel = metaModelCache.get(metaModelFileName);
+            if (parsedMetaModel) {
+                if (!parsedDocument.metaModelDocument) {
+                    parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
+                }
+                for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
+                    parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
+                }
+                return parsedMetaModel.metaModel;
+            }
+        }
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
             rangeList: [],
             rangeMap: new Map<Object, RangeInfo>()
         };
-        let reportMetaModelRange = (object: Object, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
-            let rangeInfo = convertRangeInfo(object, range, nameRange, signatureRange);
+        let metaModelFileContents = readRange(parsedMetaModelDocument.uri)!;
+        let reportMetaModelRange = (object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
+            let rangeInfo = convertRangeInfo(object, context, range, nameRange, signatureRange);
             parsedMetaModelDocument.rangeList.push(rangeInfo);
             parsedMetaModelDocument.rangeMap.set(object, rangeInfo);
         };
-        parsedMetaModelDocument.file = readMetaModel(metaModelFileName, reportMetaModelRange);
-        parsedDocument.metaModelDocument = parsedMetaModelDocument;
-        parsedDocument.metaModel = createDynamicMetaModel(parsedMetaModelDocument.file, metaModelFileName);
-        return parsedDocument.metaModel;
+        parsedMetaModelDocument.file = FmtReader.readString(metaModelFileContents, metaModelFileName, FmtMeta.getMetaModel, reportMetaModelRange);
+        if (!parsedDocument.metaModelDocument) {
+            parsedDocument.metaModelDocument = parsedMetaModelDocument;
+        }
+        let metaModel = new FmtDynamic.DynamicMetaModel(parsedMetaModelDocument.file, metaModelFileName, (otherPath: Fmt.Path) => getReferencedMetaModel(metaModelFileName, otherPath));
+        parsedDocument.metaModelDocuments!.set(metaModel, parsedMetaModelDocument);
+        if (metaModelCache) {
+            metaModelCache.set(metaModelFileName, {
+                metaModel: metaModel,
+                metaModelDocument: parsedMetaModelDocument,
+                metaModelDocuments: parsedDocument.metaModelDocuments!
+            });
+        }
+        return metaModel;
     };
-    let reportRange = (object: Object, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
-        let rangeInfo = convertRangeInfo(object, range, nameRange, signatureRange);
+    let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
+    let reportRange = (object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
+        let rangeInfo = convertRangeInfo(object, context, range, nameRange, signatureRange);
         parsedDocument.rangeList.push(rangeInfo);
         parsedDocument.rangeMap.set(object, rangeInfo);
     };
@@ -720,6 +1108,7 @@ function parseFile(uri: vscode.Uri, fileContents: string, diagnostics?: vscode.D
     if (diagnostics) {
         checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
     }
+    parsedFileCache.set(uri.fsPath, parsedDocument);
     return parsedDocument;
 }
 
@@ -728,26 +1117,60 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         let diagnostics: vscode.Diagnostic[] = [];
         let parsedDocument = parseFile(document.uri, document.getText(), diagnostics, document);
         diagnosticCollection.set(document.uri, diagnostics);
-        parsedDocuments.set(document.uri, parsedDocument);
+        parsedDocuments.set(document, parsedDocument);
     }
 }
+
+let parseAllTimer: NodeJS.Timer | undefined = undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
-    let parsedDocuments: ParsedDocumentMap = new Map<vscode.Uri, ParsedDocument>();
+    let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
     for (let document of vscode.workspace.textDocuments) {
         parseDocument(document, diagnosticCollection, parsedDocuments);
     }
-    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments)));
-    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((event) => parseDocument(event.document, diagnosticCollection, parsedDocuments)));
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments)),
+        vscode.workspace.onDidChangeTextDocument((event) => {
+            parsedFileCache.delete(event.document.uri.fsPath);
+            parseDocument(event.document, diagnosticCollection, parsedDocuments);
+            if (parseAllTimer) {
+                clearTimeout(parseAllTimer);
+                parseAllTimer = undefined;
+            }
+            parseAllTimer = setTimeout(() => {
+                // TODO only reparse affected documents (maintain a list of documents to reparse)
+                parsedFileCache.clear();
+                metaModelCache = new Map<string, ParsedMetaModel>();
+                try {
+                    for (let document of vscode.workspace.textDocuments) {
+                        if (document !== event.document) {
+                            parseDocument(document, diagnosticCollection, parsedDocuments);
+                        }
+                    }
+                } finally {
+                    metaModelCache = undefined;
+                }
+            }, 500);
+        })
+    );
     let definitionProvider = new HLMDefinitionProvider(parsedDocuments);
-    context.subscriptions.push(vscode.languages.registerDefinitionProvider(HLM_MODE, definitionProvider));
-    context.subscriptions.push(vscode.languages.registerHoverProvider(HLM_MODE, definitionProvider));
-    context.subscriptions.push(vscode.languages.registerDocumentHighlightProvider(HLM_MODE, new HLMHighlightProvider(parsedDocuments)));
-    context.subscriptions.push(vscode.languages.registerSignatureHelpProvider(HLM_MODE, new HLMSignatureHelpProvider(parsedDocuments), '(', '{', ','));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(HLM_MODE, new HLMCompletionItemProvider(parsedDocuments), '%', '$', '/', '(', '{', ','));
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(HLM_MODE, new HLMDocumentFormatter(parsedDocuments)));
+    context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(HLM_MODE, definitionProvider),
+        vscode.languages.registerHoverProvider(HLM_MODE, definitionProvider),
+        vscode.languages.registerDocumentHighlightProvider(HLM_MODE, new HLMHighlightProvider(parsedDocuments)),
+        vscode.languages.registerSignatureHelpProvider(HLM_MODE, new HLMSignatureHelpProvider(parsedDocuments), '(', '{', ','),
+        vscode.languages.registerCompletionItemProvider(HLM_MODE, new HLMCompletionItemProvider(parsedDocuments), '%', '$', '/', '.'),
+        vscode.languages.registerReferenceProvider(HLM_MODE, new HLMReferenceProvider(parsedDocuments)),
+        // TODO symbol and rename providers
+        vscode.languages.registerDocumentFormattingEditProvider(HLM_MODE, new HLMDocumentFormatter)
+    );
+    // TODO code lense provider
 }
 
 export function deactivate(): void {
+    if (parseAllTimer) {
+        clearTimeout(parseAllTimer);
+        parseAllTimer = undefined;
+    }
 }

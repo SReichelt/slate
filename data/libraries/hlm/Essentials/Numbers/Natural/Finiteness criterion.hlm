@@ -88,14 +88,24 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                     parameters = #(c: %Element(M)),
                     steps = #(
                       _: %Consider(f),
-                      _: %UseDef(result = $../../Functions/bijective(f = {f})),
-                      _: %UseDef(result = $../../Functions/surjective(f = {f})),
+                      _: %UseDef(result = $../../Functions/bijective(
+                        X = {$"Segment (less)"(n = {l})},
+                        Y = {M},
+                        f = {f}
+                      )),
+                      _: %UseDef(result = $../../Functions/surjective(
+                        X = {$"Segment (less)"(n = {l})},
+                        Y = {M},
+                        f = {f}
+                      )),
                       _: %UseDef(result = %forall(
                         #(t: %Element(M)),
                         %exists(
                           #(s: %Element($"Segment (less)"(n = {$number(value = 0)}))),
                           formula = %equals(
                             $../../Functions/value(
+                              X = {$"Segment (less)"(n = {l})},
+                              Y = {M},
                               f = {f},
                               x = {s}
                             ),

@@ -2,11 +2,12 @@ import * as Fmt from './format';
 import * as FmtMeta from './meta';
 
 export class DynamicMetaModel extends Fmt.MetaModel {
+  fileName: string;
   definitions: Fmt.DefinitionList;
   private getReferencedMetaModel: Fmt.MetaModelGetter;
   objectContentsMap: Map<Fmt.ArgumentList, DynamicObjectContents>;
 
-  constructor(file: Fmt.File, getReferencedMetaModel: Fmt.MetaModelGetter) {
+  constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Fmt.MetaModelGetter) {
     let definitions = file.definitions;
     let metaModelDefinition = definitions[0];
     let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
@@ -14,6 +15,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     let expressionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.expressionTypes);
     let functions = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.functions);
     super(definitionTypes, expressionTypes, functions);
+    this.fileName = fileName;
     this.definitions = definitions;
     this.getReferencedMetaModel = getReferencedMetaModel;
     this.objectContentsMap = new Map<Fmt.ArgumentList, DynamicObjectContents>();

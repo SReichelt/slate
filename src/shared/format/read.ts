@@ -11,6 +11,17 @@ export interface Range {
   end: Location;
 }
 
+function fixRange(range: Range): Range {
+  if (range.start.line > range.end.line || (range.start.line === range.end.line && range.start.col > range.end.col)) {
+    return {
+      start: range.end,
+      end: range.start
+    };
+  } else {
+    return range;
+  }
+}
+
 export interface InputStream {
   readChar(): string;
   peekChar(): string;
@@ -62,7 +73,10 @@ export class StringInputStream implements InputStream {
 }
 
 export type ErrorHandler = (msg: string, range: Range) => void;
-export type RangeHandler = (object: Object, objectRange: Range, nameRange?: Range, signatureRange?: Range) => void;
+export type RangeHandler = (object: Object, context: Fmt.Context | undefined, objectRange: Range, nameRange?: Range, signatureRange?: Range) => void;
+
+export class EmptyExpression extends Fmt.Expression {
+}
 
 export class Reader {
   private markedStart?: Location;
@@ -90,7 +104,7 @@ export class Reader {
     if (this.peekChar()) {
       this.error('Definition or end of file expected');
     }
-    this.markEnd(fileStart, file);
+    this.markEnd(fileStart, file, context);
     return file;
   }
 
@@ -100,20 +114,26 @@ export class Reader {
     let parentPath: Fmt.PathItem | undefined = undefined;
     for (;;) {
       this.skipWhitespace();
+      let itemStart = this.markStart();
       if (this.tryReadChar('.')) {
         let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
         item.parentPath = parentPath;
+        let nameRange = this.markEnd(itemStart);
+        this.markEnd(pathStart, item, context, nameRange);
         parentPath = item;
         this.readChar('/');
       } else {
         this.skipWhitespace();
         let identifier = this.readIdentifier();
         this.skipWhitespace();
-        if (this.tryReadChar('/')) {
+        if (this.peekChar() === '/') {
           let item = new Fmt.NamedPathItem;
           item.name = identifier;
           item.parentPath = parentPath;
+          let nameRange = this.markEnd(itemStart);
+          this.markEnd(pathStart, item, context, nameRange);
           parentPath = item;
+          this.readChar('/');
         } else {
           for (;;) {
             let nameRange = this.markEnd(nameStart);
@@ -123,7 +143,7 @@ export class Reader {
               this.readOptionalArgumentList(path.arguments, context);
             }
             path.parentPath = parentPath;
-            this.markEnd(pathStart, path, nameRange);
+            this.markEnd(pathStart, path, context, nameRange);
             if (!this.tryReadChar('.')) {
               return path;
             }
@@ -148,7 +168,7 @@ export class Reader {
         break;
       }
     }
-    this.markEnd(definitionsStart, definitions);
+    this.markEnd(definitionsStart, definitions, context);
   }
 
   tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
@@ -191,7 +211,7 @@ export class Reader {
       definition.contents = contents;
     }
     this.readChar('}');
-    this.markEnd(definitionStart, definition, nameRange, signatureRange);
+    this.markEnd(definitionStart, definition, context, nameRange, signatureRange);
     return definition;
   }
 
@@ -202,7 +222,7 @@ export class Reader {
     }
     this.readParameters(parameters, context);
     this.readChar(')');
-    this.markEnd(parameterListStart, parameters);
+    this.markEnd(parameterListStart, parameters, context);
     return true;
   }
 
@@ -260,7 +280,7 @@ export class Reader {
     if (this.tryReadChar('=')) {
       parameter.defaultValue = this.readExpression(false, context.metaModel.functions, context);
     }
-    this.markEnd(parameterStart, parameter, nameRange);
+    this.markEnd(parameterStart, parameter, context, nameRange);
     return parameter;
   }
 
@@ -276,7 +296,7 @@ export class Reader {
     }
     this.readArguments(args, context);
     this.readChar(')');
-    this.markEnd(argumentListStart, args);
+    this.markEnd(argumentListStart, args, context);
     return true;
   }
 
@@ -318,7 +338,7 @@ export class Reader {
       } else {
         let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         arg.value = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
-        this.markEnd(argStart, arg.value, identifierRange);
+        this.markEnd(argStart, arg.value, valueContext, identifierRange);
       }
     } else {
       let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
@@ -328,7 +348,7 @@ export class Reader {
       }
       arg.value = value;
     }
-    this.markEnd(argStart, arg, nameRange);
+    this.markEnd(argStart, arg, context, nameRange);
     return arg;
   }
 
@@ -353,7 +373,7 @@ export class Reader {
       } while (this.tryReadChar(','));
       this.readChar(']');
     }
-    this.markEnd(typeStart, type);
+    this.markEnd(typeStart, type, context);
     return type;
   }
 
@@ -452,7 +472,7 @@ export class Reader {
       }
     }
     if (expression) {
-      this.markEnd(expressionStart, expression, nameRange);
+      this.markEnd(expressionStart, expression, context, nameRange);
     }
     return expression;
   }
@@ -474,7 +494,13 @@ export class Reader {
 
   readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Expression {
     this.skipWhitespace();
-    return this.tryReadExpression(isType, metaDefinitions, context) || this.error('Expression expected') || new Fmt.StringExpression;
+    let expression = this.tryReadExpression(isType, metaDefinitions, context);
+    if (!expression) {
+      this.error('Expression expected');
+      expression = new EmptyExpression;
+      this.markEnd(this.markStart(), expression, context);
+    }
+    return expression;
   }
 
   tryReadString(quoteChar: string): string | undefined {
@@ -622,16 +648,22 @@ export class Reader {
     return this.markedStart;
   }
 
-  private markEnd(start: Location, object?: Object, nameRange?: Range, signatureRange?: Range): Range {
+  private markEnd(start: Location, object?: Object, context?: Fmt.Context, nameRange?: Range, signatureRange?: Range): Range {
     if (!this.markedEnd) {
       this.markedEnd = this.stream.getLocation();
     }
-    let range: Range = {
+    let range = fixRange({
       start: start,
       end: this.markedEnd
-    };
+    });
+    if (nameRange) {
+      nameRange = fixRange(nameRange);
+    }
+    if (signatureRange) {
+      signatureRange = fixRange(signatureRange);
+    }
     if (object !== undefined && this.reportRange !== undefined) {
-      this.reportRange(object, range, nameRange, signatureRange);
+      this.reportRange(object, context, range, nameRange, signatureRange);
     }
     return range;
   }
@@ -639,12 +671,7 @@ export class Reader {
   private error(msg: string, range?: Range): void {
     if (!this.atError) {
       if (range) {
-        if (range.start.line > range.end.line || (range.start.line === range.end.line && range.start.col > range.end.col)) {
-          range = {
-            start: range.end,
-            end: range.start
-          };
-        }
+        range = fixRange(range);
       } else {
         let start = this.stream.getLocation();
         let end = start;

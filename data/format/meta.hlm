@@ -3,7 +3,7 @@
 $meta: %MetaModel {
   definitionTypes = [$MetaModel, $DefinitionType, $ExpressionType, $ParameterType, %Any],
   expressionTypes = [$Any, $Type, $Int, $String, $ParameterList, $SingleParameter, $ArgumentList, %Any],
-  functions = [$Any, $self],
+  functions = [$Any, $self, $true, $false],
   lookup = %self
 }
 
@@ -38,13 +38,19 @@ $ExpressionType: %DefinitionType {
 $ParameterType(variableType?: $Type): %DefinitionType {
   superType = $ExpressionType,
   members = #(
+    optional: $Bool = $false,
     argumentType?: $ExpressionType
   )
 }
 
 $Any: %ExpressionType {}
+$self: %Any {}
 
 $Type: %ExpressionType {}
+
+$Bool: %ExpressionType {}
+$true: $Bool {}
+$false: $Bool {}
 
 $Int: %ExpressionType {}
 $String: %ExpressionType {}
@@ -55,5 +61,3 @@ $SingleParameter(type?: $Type): %ExpressionType {
 }
 
 $ArgumentList: %ExpressionType {}
-
-$self: %Any {}
