@@ -3,7 +3,7 @@
 $meta: %MetaModel {
   definitionTypes = [$MetaModel, $DefinitionType, $ExpressionType, $ParameterType, %Any],
   expressionTypes = [$Any, $Type, $Int, $String, $ParameterList, $SingleParameter, $ArgumentList, %Any],
-  functions = [$Any, $self, $true, $false],
+  functions = [$Any, $self, $true, $false, %Any],
   lookup = %self
 }
 

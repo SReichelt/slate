@@ -10,7 +10,8 @@ $hlm: %MetaModel {
                $empty, $previous,
                $enumeration, $subset, $extendedSubset, $setStructuralCases,
                $cases, $structuralCases,
-               $not, $and, $or, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural],
+               $not, $and, $or, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
+               %Any],
   lookup = %Any
 }
 

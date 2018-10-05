@@ -209,7 +209,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Library': MetaRefExpression_Library, 'Section': MetaRefExpression_Section};
 const expressionTypes: Fmt.MetaDefinitionList = {};
-const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection};
+const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {

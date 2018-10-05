@@ -495,7 +495,7 @@ export interface MetaDefinitionList {
 
 export interface MetaDefinitionFactory {
   createMetaRefExpression(name: string): MetaRefExpression;
-  allowDefinitionRefs(): boolean;
+  allowArbitraryReferences(): boolean;
 }
 
 export class StandardMetaDefinitionFactory implements MetaDefinitionFactory {
@@ -509,7 +509,7 @@ export class StandardMetaDefinitionFactory implements MetaDefinitionFactory {
     return new metaDefinitionClass;
   }
 
-  allowDefinitionRefs(): boolean {
+  allowArbitraryReferences(): boolean {
     return this.metaDefinitionList[''] !== undefined;
   }
 }
@@ -521,7 +521,7 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
     return result;
   }
 
-  allowDefinitionRefs(): boolean {
+  allowArbitraryReferences(): boolean {
     return true;
   }
 }

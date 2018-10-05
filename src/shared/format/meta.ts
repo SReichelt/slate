@@ -479,7 +479,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
 const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
-const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self, 'true': MetaRefExpression_true, 'false': MetaRefExpression_false};
+const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self, 'true': MetaRefExpression_true, 'false': MetaRefExpression_false, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {

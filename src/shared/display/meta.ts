@@ -355,7 +355,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_Template};
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
-const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {

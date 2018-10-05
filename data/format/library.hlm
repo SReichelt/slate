@@ -2,7 +2,7 @@
 
 $library: %MetaModel {
   definitionTypes = [$Library, $Section],
-  functions = [$item, $subsection],
+  functions = [$item, $subsection, %Any],
   lookup = %Any
 }
 

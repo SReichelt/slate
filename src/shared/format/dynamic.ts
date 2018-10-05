@@ -318,10 +318,10 @@ export class DynamicMetaModel extends Fmt.MetaModel {
   }
 }
 
-class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
+export class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
   metaModel: DynamicMetaModel;
-  private metaDefinitions = new Map<string, Fmt.Definition>();
-  private includesAny = false;
+  metaDefinitions = new Map<string, Fmt.Definition>();
+  includesAny = false;
 
   constructor(definitions: Fmt.DefinitionList, list: Fmt.Expression | undefined, secondaryList?: Fmt.Expression) {
     if (list instanceof Fmt.ArrayExpression) {
@@ -351,7 +351,7 @@ class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
     }
   }
 
-  allowDefinitionRefs(): boolean {
+  allowArbitraryReferences(): boolean {
     return this.includesAny;
   }
 }

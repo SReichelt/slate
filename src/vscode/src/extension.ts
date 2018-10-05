@@ -17,6 +17,7 @@ const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' }
 interface RangeInfo {
     object: Object;
     context?: Fmt.Context;
+    metaDefinitions?: Fmt.MetaDefinitionFactory;
     range: vscode.Range;
     nameRange?: vscode.Range;
     signatureRange?: vscode.Range;
@@ -49,10 +50,11 @@ function convertRange(range: FmtReader.Range): vscode.Range {
     return new vscode.Range(start, end);
 }
 
-function convertRangeInfo(object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range): RangeInfo {
+function convertRangeInfo(object: Object, context: Fmt.Context | undefined, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range): RangeInfo {
     return {
         object: object,
         context: context,
+        metaDefinitions: metaDefinitions,
         range: convertRange(range),
         nameRange: nameRange ? convertRange(nameRange) : undefined,
         signatureRange: signatureRange ? convertRange(signatureRange) : undefined
@@ -257,7 +259,7 @@ function findObjectContents(parsedDocument: ParsedDocument, object: Object, sour
     if (object instanceof Fmt.Definition && object.contents instanceof FmtDynamic.DynamicObjectContents) {
         return object.contents;
     } else if (object instanceof Fmt.CompoundExpression && parsedDocument.metaModelDocuments) {
-        for (let [metaModel] of parsedDocument.metaModelDocuments) {
+        for (let metaModel of parsedDocument.metaModelDocuments.keys()) {
             let objectContents = metaModel.objectContentsMap.get(object.arguments);
             if (objectContents) {
                 return objectContents;
@@ -579,7 +581,7 @@ class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
                     break;
                 }
                 if (rangeInfo.range.contains(position)) {
-                    let isEmptyExpression = rangeInfo.object instanceof FmtReader.EmptyExpression;
+                    let isEmptyExpression = rangeInfo.object instanceof FmtReader.EmptyExpression || (rangeInfo.object instanceof Fmt.ArrayExpression && !rangeInfo.object.items.length && position.isAfter(rangeInfo.range.start) && position.isBefore(rangeInfo.range.end));
                     let signatureInfo: SignatureInfo | undefined = undefined;
                     if (context.triggerKind === vscode.CompletionTriggerKind.Invoke) {
                         if (!(rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
@@ -638,7 +640,7 @@ class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
                                 }
                             }
                         }
-                        if ((isEmptyExpression || rangeInfo.object instanceof Fmt.VariableRefExpression) && rangeInfo.context) {
+                        if (((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || rangeInfo.object instanceof Fmt.VariableRefExpression) && rangeInfo.context) {
                             for (let param of rangeInfo.context.getVariables()) {
                                 let paramRangeInfo = parsedDocument.rangeMap.get(param);
                                 if (paramRangeInfo && paramRangeInfo.nameRange) {
@@ -661,38 +663,34 @@ class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
                             }
                         }
                     }
-                    if ((isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) && rangeInfo.context && parsedDocument.metaModelDocuments) {
-                        let metaModel = rangeInfo.context.metaModel;
-                        if (metaModel instanceof FmtDynamic.DynamicMetaModel) {
-                            let metaModelDocument = parsedDocument.metaModelDocuments.get(metaModel);
-                            if (metaModelDocument) {
-                                let prefix = isEmptyExpression ? '%' : '';
-                                let range: vscode.Range | undefined = undefined;
-                                if (rangeInfo.object instanceof FmtDynamic.DynamicMetaRefExpression && rangeInfo.object.name && rangeInfo.nameRange && !isEmptyExpression) {
-                                    range = rangeInfo.nameRange;
-                                }
-                                // TODO check allowed meta ref expressions
-                                for (let definition of metaModel.definitions) {
-                                    let definitionRangeInfo = metaModelDocument.rangeMap.get(definition);
-                                    if (definitionRangeInfo) {
-                                        let signature = definitionRangeInfo.signatureRange ? readRange(metaModelDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
-                                        let documentation: vscode.MarkdownString | undefined = undefined;
-                                        if (signature) {
-                                            documentation = new vscode.MarkdownString;
-                                            documentation.appendCodeblock(signature);
-                                        }
-                                        result.push({
-                                            label: prefix + escapeIdentifier(definition.name),
-                                            range: range,
-                                            documentation: documentation,
-                                            kind: vscode.CompletionItemKind.Keyword
-                                        });
+                    if ((isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) && rangeInfo.metaDefinitions instanceof FmtDynamic.DynamicMetaDefinitionFactory && parsedDocument.metaModelDocuments) {
+                        let metaModelDocument = parsedDocument.metaModelDocuments.get(rangeInfo.metaDefinitions.metaModel);
+                        if (metaModelDocument) {
+                            let prefix = isEmptyExpression ? '%' : '';
+                            let range: vscode.Range | undefined = undefined;
+                            if (rangeInfo.object instanceof FmtDynamic.DynamicMetaRefExpression && rangeInfo.object.name && rangeInfo.nameRange && !isEmptyExpression) {
+                                range = rangeInfo.nameRange;
+                            }
+                            for (let definition of rangeInfo.metaDefinitions.metaDefinitions.values()) {
+                                let definitionRangeInfo = metaModelDocument.rangeMap.get(definition);
+                                if (definitionRangeInfo) {
+                                    let signature = definitionRangeInfo.signatureRange ? readRange(metaModelDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+                                    let documentation: vscode.MarkdownString | undefined = undefined;
+                                    if (signature) {
+                                        documentation = new vscode.MarkdownString;
+                                        documentation.appendCodeblock(signature);
                                     }
+                                    result.push({
+                                        label: prefix + escapeIdentifier(definition.name),
+                                        range: range,
+                                        documentation: documentation,
+                                        kind: vscode.CompletionItemKind.Keyword
+                                    });
                                 }
                             }
                         }
                     }
-                    if (isEmptyExpression || (rangeInfo.object instanceof Fmt.Path && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
+                    if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || (rangeInfo.object instanceof Fmt.Path && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
                         let prefix = rangeInfo.object instanceof Fmt.Path ? '' : '$';
                         let range: vscode.Range | undefined = undefined;
                         if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.name && rangeInfo.nameRange) {
@@ -1066,8 +1064,8 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
             rangeMap: new Map<Object, RangeInfo>()
         };
         let metaModelFileContents = readRange(parsedMetaModelDocument.uri)!;
-        let reportMetaModelRange = (object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
-            let rangeInfo = convertRangeInfo(object, context, range, nameRange, signatureRange);
+        let reportMetaModelRange = (object: Object, context: Fmt.Context | undefined, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
+            let rangeInfo = convertRangeInfo(object, context, metaDefinitions, range, nameRange, signatureRange);
             parsedMetaModelDocument.rangeList.push(rangeInfo);
             parsedMetaModelDocument.rangeMap.set(object, rangeInfo);
         };
@@ -1087,8 +1085,8 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         return metaModel;
     };
     let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
-    let reportRange = (object: Object, context: Fmt.Context | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
-        let rangeInfo = convertRangeInfo(object, context, range, nameRange, signatureRange);
+    let reportRange = (object: Object, context: Fmt.Context | undefined, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, range: FmtReader.Range, nameRange?: FmtReader.Range, signatureRange?: FmtReader.Range) => {
+        let rangeInfo = convertRangeInfo(object, context, metaDefinitions, range, nameRange, signatureRange);
         parsedDocument.rangeList.push(rangeInfo);
         parsedDocument.rangeMap.set(object, rangeInfo);
     };

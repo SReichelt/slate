@@ -73,7 +73,7 @@ export class StringInputStream implements InputStream {
 }
 
 export type ErrorHandler = (msg: string, range: Range) => void;
-export type RangeHandler = (object: Object, context: Fmt.Context | undefined, objectRange: Range, nameRange?: Range, signatureRange?: Range) => void;
+export type RangeHandler = (object: Object, context: Fmt.Context | undefined, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, objectRange: Range, nameRange?: Range, signatureRange?: Range) => void;
 
 export class EmptyExpression extends Fmt.Expression {
 }
@@ -119,7 +119,7 @@ export class Reader {
         let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
         item.parentPath = parentPath;
         let nameRange = this.markEnd(itemStart);
-        this.markEnd(pathStart, item, context, nameRange);
+        this.markEnd(pathStart, item, context, undefined, nameRange);
         parentPath = item;
         this.readChar('/');
       } else {
@@ -131,7 +131,7 @@ export class Reader {
           item.name = identifier;
           item.parentPath = parentPath;
           let nameRange = this.markEnd(itemStart);
-          this.markEnd(pathStart, item, context, nameRange);
+          this.markEnd(pathStart, item, context, undefined, nameRange);
           parentPath = item;
           this.readChar('/');
         } else {
@@ -143,7 +143,7 @@ export class Reader {
               this.readOptionalArgumentList(path.arguments, context);
             }
             path.parentPath = parentPath;
-            this.markEnd(pathStart, path, context, nameRange);
+            this.markEnd(pathStart, path, context, undefined, nameRange);
             if (!this.tryReadChar('.')) {
               return path;
             }
@@ -168,7 +168,7 @@ export class Reader {
         break;
       }
     }
-    this.markEnd(definitionsStart, definitions, context);
+    this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
   tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
@@ -211,7 +211,7 @@ export class Reader {
       definition.contents = contents;
     }
     this.readChar('}');
-    this.markEnd(definitionStart, definition, context, nameRange, signatureRange);
+    this.markEnd(definitionStart, definition, context, metaDefinitions, nameRange, signatureRange);
     return definition;
   }
 
@@ -280,7 +280,7 @@ export class Reader {
     if (this.tryReadChar('=')) {
       parameter.defaultValue = this.readExpression(false, context.metaModel.functions, context);
     }
-    this.markEnd(parameterStart, parameter, context, nameRange);
+    this.markEnd(parameterStart, parameter, context, undefined, nameRange);
     return parameter;
   }
 
@@ -338,7 +338,7 @@ export class Reader {
       } else {
         let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         arg.value = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
-        this.markEnd(argStart, arg.value, valueContext, identifierRange);
+        this.markEnd(argStart, arg.value, valueContext, valueContext.metaModel.functions, identifierRange);
       }
     } else {
       let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
@@ -348,7 +348,7 @@ export class Reader {
       }
       arg.value = value;
     }
-    this.markEnd(argStart, arg, context, nameRange);
+    this.markEnd(argStart, arg, context, undefined, nameRange);
     return arg;
   }
 
@@ -373,7 +373,7 @@ export class Reader {
       } while (this.tryReadChar(','));
       this.readChar(']');
     }
-    this.markEnd(typeStart, type, context);
+    this.markEnd(typeStart, type, context, metaDefinitions);
     return type;
   }
 
@@ -425,7 +425,7 @@ export class Reader {
       } catch (error) {
         this.error(error.message, this.markEnd(expressionStart));
       }
-    } else if (isType && metaDefinitions && !metaDefinitions.allowDefinitionRefs()) {
+    } else if (metaDefinitions && !metaDefinitions.allowArbitraryReferences()) {
       // Other expressions not allowed in this case.
     } else if (this.tryReadChar('$')) {
       let definitionRefExpression = new Fmt.DefinitionRefExpression;
@@ -472,7 +472,7 @@ export class Reader {
       }
     }
     if (expression) {
-      this.markEnd(expressionStart, expression, context, nameRange);
+      this.markEnd(expressionStart, expression, context, metaDefinitions, nameRange);
     }
     return expression;
   }
@@ -498,7 +498,7 @@ export class Reader {
     if (!expression) {
       this.error('Expression expected');
       expression = new EmptyExpression;
-      this.markEnd(this.markStart(), expression, context);
+      this.markEnd(this.markStart(), expression, context, metaDefinitions);
     }
     return expression;
   }
@@ -648,7 +648,7 @@ export class Reader {
     return this.markedStart;
   }
 
-  private markEnd(start: Location, object?: Object, context?: Fmt.Context, nameRange?: Range, signatureRange?: Range): Range {
+  private markEnd(start: Location, object?: Object, context?: Fmt.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, signatureRange?: Range): Range {
     if (!this.markedEnd) {
       this.markedEnd = this.stream.getLocation();
     }
@@ -663,7 +663,7 @@ export class Reader {
       signatureRange = fixRange(signatureRange);
     }
     if (object !== undefined && this.reportRange !== undefined) {
-      this.reportRange(object, context, range, nameRange, signatureRange);
+      this.reportRange(object, context, metaDefinitions, range, nameRange, signatureRange);
     }
     return range;
   }

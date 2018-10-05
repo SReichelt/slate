@@ -3,7 +3,7 @@
 $display: %MetaModel {
   definitionTypes = [$Template],
   expressionTypes = [$Bool, $Int, $String, $Expr],
-  functions = [$true, $false, $opt, $add, $for, $neg],
+  functions = [$true, $false, $opt, $add, $for, $neg, %Any],
   lookup = 'templates.hlm'
 }
 
