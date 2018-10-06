@@ -13,24 +13,29 @@ export function getFileNameFromPathStr(sourceFileName: string, pathStr: string):
   return pathStr;
 }
 
-export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.Path, skipLastItem: boolean = false, directoryOnly: boolean = false): string {
+export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.Path, skipLastItem: boolean = false, addExtension: boolean = true): string {
   while (targetPath.parentPath instanceof Fmt.Path) {
     targetPath = targetPath.parentPath;
   }
-  let lastItem = skipLastItem ? targetPath.parentPath : targetPath;
-  if (lastItem instanceof Fmt.NamedPathItem) {
-    let pathStr = directoryOnly ? '' : lastItem.name + fileExtension;
-    for (let pathItem = lastItem.parentPath; pathItem; pathItem = pathItem.parentPath) {
-      if (pathItem instanceof Fmt.NamedPathItem) {
-        pathStr = path.join(pathItem.name, pathStr);
-      } else if (pathItem instanceof Fmt.ParentPathItem) {
-        pathStr = path.join('..', pathStr);
+  let pathStr = '';
+  for (let pathItem = skipLastItem ? targetPath.parentPath : targetPath; pathItem; pathItem = pathItem.parentPath) {
+    if (pathItem instanceof Fmt.NamedPathItem) {
+      let name = pathItem.name;
+      if (addExtension) {
+        name += fileExtension;
       }
+      pathStr = path.join(name, pathStr);
+    } else if (addExtension) {
+      return '';
+    } else if (pathItem instanceof Fmt.ParentPathItem) {
+      pathStr = path.join('..', pathStr);
     }
-    return getFileNameFromPathStr(sourceFileName, pathStr);
-  } else {
-    return '';
+    addExtension = false;
   }
+  if (addExtension) {
+      return '';
+  }
+  return getFileNameFromPathStr(sourceFileName, pathStr);
 }
 
 export function readMetaModel(fileName: string, reportRange?: FmtReader.RangeHandler): Fmt.File {

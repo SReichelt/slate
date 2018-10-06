@@ -385,15 +385,19 @@ export class Writer {
   }
 
   writeIdentifier(identifier: string): void {
-    let first = true;
-    for (let c of identifier) {
-      if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
-        this.writeString(identifier, '"');
-        return;
+    if (identifier) {
+      let first = true;
+      for (let c of identifier) {
+        if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
+          this.writeString(identifier, '"');
+          return;
+        }
+        first = false;
       }
-      first = false;
+      this.write(identifier);
+    } else {
+      this.write('""');
     }
-    this.write(identifier);
   }
 
   private write(str: string): void {

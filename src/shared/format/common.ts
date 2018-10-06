@@ -52,34 +52,36 @@ export function isNumericalCharacter(c: string): boolean {
 }
 
 export function escapeIdentifier(identifier: string): string {
-  let escape = false;
   let escaped = '"';
-  let first = true;
-  for (let c of identifier) {
-    if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
-      escape = true;
+  if (identifier) {
+    let escape = false;
+    let first = true;
+    for (let c of identifier) {
+      if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
+        escape = true;
+      }
+      switch (c) {
+      case '\\':
+      case '"':
+        escaped += '\\' + c;
+        break;
+      case '\t':
+        escaped += '\\t';
+        break;
+      case '\r':
+        escaped += '\\r';
+        break;
+      case '\n':
+        escaped += '\\n';
+        break;
+      default:
+        escaped += c;
+      }
+      first = false;
     }
-    switch (c) {
-    case '\\':
-    case '"':
-      escaped += '\\' + c;
-      break;
-    case '\t':
-      escaped += '\\t';
-      break;
-    case '\r':
-      escaped += '\\r';
-      break;
-    case '\n':
-      escaped += '\\n';
-      break;
-    default:
-      escaped += c;
+    if (!escape) {
+      return identifier;
     }
-    first = false;
-  }
-  if (!escape) {
-    return identifier;
   }
   escaped += '"';
   return escaped;

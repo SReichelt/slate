@@ -73,7 +73,18 @@ export class StringInputStream implements InputStream {
 }
 
 export type ErrorHandler = (msg: string, range: Range) => void;
-export type RangeHandler = (object: Object, context: Fmt.Context | undefined, metaDefinitions: Fmt.MetaDefinitionFactory | undefined, objectRange: Range, nameRange?: Range, signatureRange?: Range) => void;
+
+export interface ObjectRangeInfo {
+  object: Object;
+  context?: Fmt.Context;
+  metaDefinitions?: Fmt.MetaDefinitionFactory;
+  range: Range;
+  nameRange?: Range;
+  linkRange?: Range;
+  signatureRange?: Range;
+}
+
+export type RangeHandler = (info: ObjectRangeInfo) => void;
 
 export class EmptyExpression extends Fmt.Expression {
 }
@@ -110,7 +121,7 @@ export class Reader {
 
   readPath(context: Fmt.Context | undefined): Fmt.Path {
     let pathStart = this.markStart();
-    let nameStart = pathStart;
+    let linkStart = pathStart;
     let parentPath: Fmt.PathItem | undefined = undefined;
     for (;;) {
       this.skipWhitespace();
@@ -118,38 +129,38 @@ export class Reader {
       if (this.tryReadChar('.')) {
         let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
         item.parentPath = parentPath;
-        let nameRange = this.markEnd(itemStart);
-        this.markEnd(pathStart, item, context, undefined, nameRange);
+        let itemRange = this.markEnd(itemStart);
+        this.markEnd(pathStart, item, context, undefined, itemRange);
         parentPath = item;
         this.readChar('/');
       } else {
-        this.skipWhitespace();
         let identifier = this.readIdentifier();
         this.skipWhitespace();
         if (this.peekChar() === '/') {
           let item = new Fmt.NamedPathItem;
           item.name = identifier;
           item.parentPath = parentPath;
-          let nameRange = this.markEnd(itemStart);
-          this.markEnd(pathStart, item, context, undefined, nameRange);
+          let itemRange = this.markEnd(itemStart);
+          this.markEnd(pathStart, item, context, undefined, itemRange);
           parentPath = item;
           this.readChar('/');
         } else {
           for (;;) {
-            let nameRange = this.markEnd(nameStart);
+            let nameRange = this.markEnd(itemStart);
+            let linkRange = this.markEnd(linkStart);
             let path = new Fmt.Path;
             path.name = identifier;
             if (context) {
               this.readOptionalArgumentList(path.arguments, context);
             }
             path.parentPath = parentPath;
-            this.markEnd(pathStart, path, context, undefined, nameRange);
+            this.markEnd(pathStart, path, context, undefined, nameRange, linkRange);
             if (!this.tryReadChar('.')) {
               return path;
             }
             parentPath = path;
             this.skipWhitespace();
-            nameStart = this.markStart();
+            itemStart = linkStart = this.markStart();
             identifier = this.readIdentifier();
           }
         }
@@ -211,7 +222,7 @@ export class Reader {
       definition.contents = contents;
     }
     this.readChar('}');
-    this.markEnd(definitionStart, definition, context, metaDefinitions, nameRange, signatureRange);
+    this.markEnd(definitionStart, definition, context, metaDefinitions, nameRange, undefined, signatureRange);
     return definition;
   }
 
@@ -472,7 +483,7 @@ export class Reader {
       }
     }
     if (expression) {
-      this.markEnd(expressionStart, expression, context, metaDefinitions, nameRange);
+      this.markEnd(expressionStart, expression, context, metaDefinitions, nameRange, nameRange);
     }
     return expression;
   }
@@ -648,7 +659,7 @@ export class Reader {
     return this.markedStart;
   }
 
-  private markEnd(start: Location, object?: Object, context?: Fmt.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, signatureRange?: Range): Range {
+  private markEnd(start: Location, object?: Object, context?: Fmt.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, linkRange?: Range, signatureRange?: Range): Range {
     if (!this.markedEnd) {
       this.markedEnd = this.stream.getLocation();
     }
@@ -656,14 +667,26 @@ export class Reader {
       start: start,
       end: this.markedEnd
     });
-    if (nameRange) {
-      nameRange = fixRange(nameRange);
-    }
-    if (signatureRange) {
-      signatureRange = fixRange(signatureRange);
-    }
     if (object !== undefined && this.reportRange !== undefined) {
-      this.reportRange(object, context, metaDefinitions, range, nameRange, signatureRange);
+      if (nameRange) {
+        nameRange = fixRange(nameRange);
+      }
+      if (linkRange) {
+        linkRange = fixRange(linkRange);
+      }
+      if (signatureRange) {
+        signatureRange = fixRange(signatureRange);
+      }
+      let info: ObjectRangeInfo = {
+        object: object,
+        context: context,
+        metaDefinitions: metaDefinitions,
+        range: range,
+        nameRange: nameRange,
+        linkRange: linkRange,
+        signatureRange: signatureRange
+      };
+      this.reportRange(info);
     }
     return range;
   }
