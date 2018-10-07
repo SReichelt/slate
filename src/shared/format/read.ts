@@ -980,12 +980,3 @@ export function readStream(stream: InputStream, fileName: string, getMetaModel: 
 export function readString(str: string, fileName: string, getMetaModel: Fmt.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
   return readStream(new StringInputStream(str), fileName, getMetaModel, reportRange);
 }
-
-interface TextResponse {
-  url: string;
-  text(): Promise<string>;
-}
-
-export function readResponse(response: TextResponse, metaModelGetter: Fmt.MetaModelGetter): Promise<Fmt.File> {
-  return response.text().then((str: string) => readString(str, response.url, metaModelGetter));
-}

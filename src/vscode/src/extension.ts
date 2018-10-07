@@ -9,7 +9,7 @@ import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
-import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../shared/data/dynamic';
+import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../fs/format/dynamic';
 
 const languageId = 'hlm';
 const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };

@@ -1,4 +1,5 @@
 import { LibraryDataAccessor, LibraryItemInfo } from './libraryDataAccessor';
+import { FileAccessor } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
@@ -27,7 +28,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private definitionCache: DefinitionCache = {};
   private prefetchQueue: PrefetchQueueItem[] = [];
 
-  constructor(public logic: Logic.Logic, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
+  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }
@@ -54,7 +55,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           provider.itemNumber = itemNumber;
         }
       } else {
-        provider = new LibraryDataProvider(this.logic, this.uri + encodeURI(path.name) + '/', this, path.name, itemNumber);
+        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this, path.name, itemNumber);
         this.subsectionProviderCache[path.name] = provider;
       }
       return provider;
@@ -115,14 +116,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (cachedDefinition) {
       return CachedPromise.resolve(cachedDefinition);
     } else {
-      let promise = fetch(this.uri + encodeURI(name) + '.hlm')
-        .then((response: Response) => FmtReader.readResponse(response, getMetaModel))
+      let uri = this.uri + encodeURI(name) + '.hlm';
+      return this.fileAccessor.readFile(uri)
+        .then((str: string) => FmtReader.readString(str, uri, getMetaModel))
         .then((file: Fmt.File) => {
           let definition = file.definitions[0];
           this.definitionCache[name] = definition;
           return definition;
         });
-      return new CachedPromise(promise);
     }
   }
 

@@ -1,9 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import * as Fmt from '../format/format';
-import * as FmtDynamic from '../format/dynamic';
-import * as FmtMeta from '../format/meta';
-import * as FmtReader from '../format/read';
+import * as Fmt from '../../shared/format/format';
+import * as FmtDynamic from '../../shared/format/dynamic';
+import * as FmtMeta from '../../shared/format/meta';
+import * as FmtReader from '../../shared/format/read';
 
 export const fileExtension = '.hlm';
 

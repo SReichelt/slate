@@ -8,6 +8,7 @@ import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/format/library';
 import * as FmtDisplay from '../shared/display/meta';
+import { WebFileAccessor } from './data/webFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import { HLM } from '../shared/logics/hlm/hlm';
@@ -31,6 +32,7 @@ interface AppState extends SelectionState {
 
 class App extends React.Component<AppProps, AppState> {
   private logic: Logic.Logic;
+  private fileAccessor: WebFileAccessor;
   private libraryDataProvider: LibraryDataProvider;
   private library: CachedPromise<Fmt.Definition>;
   private treePaneNode: HTMLElement | null = null;
@@ -39,7 +41,8 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
 
     this.logic = new HLM;
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, '/libraries/hlm', undefined, 'Library');
+    this.fileAccessor = new WebFileAccessor;
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, '/libraries/hlm', undefined, 'Library');
 
     this.library = this.libraryDataProvider.fetchLocalSection();
 
@@ -85,8 +88,9 @@ class App extends React.Component<AppProps, AppState> {
       });
     };
 
-    fetch('/display/templates.hlm')
-      .then((response: Response) => FmtReader.readResponse(response, FmtDisplay.getMetaModel))
+    let templateUri = '/display/templates.hlm';
+    this.fileAccessor.readFile(templateUri)
+      .then((str: string) => FmtReader.readString(str, templateUri, FmtDisplay.getMetaModel))
       .then((templates: Fmt.File) => {
         this.setState({templates: templates});
       })
