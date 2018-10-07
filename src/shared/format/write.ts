@@ -444,6 +444,8 @@ export class Writer {
           this.writeNewLine();
           this.writeIndent(indent);
           this.write(' *');
+        } else if (c === '/' && textLine.endsWith('*')) {
+          textLine += ' /';
         } else {
           textLine += c;
         }

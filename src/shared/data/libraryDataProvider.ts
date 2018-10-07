@@ -3,9 +3,7 @@ import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
 import * as FmtLibrary from '../format/library';
-
-// TODO remove client dependency (also due to fetch)
-import * as Logic from '../../client/logics/logic';
+import * as Logic from '../logics/logic';
 
 export { LibraryDataAccessor, LibraryItemInfo };
 

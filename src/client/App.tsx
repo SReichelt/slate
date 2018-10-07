@@ -9,8 +9,8 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/format/library';
 import * as FmtDisplay from '../shared/display/meta';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
-import * as Logic from './logics/logic';
-import { HLM } from './logics/hlm/hlm';
+import * as Logic from '../shared/logics/logic';
+import { HLM } from '../shared/logics/hlm/hlm';
 
 interface AppProps {
 }

@@ -1,6 +1,6 @@
-import * as Fmt from '../../shared/format/format';
-import * as Display from '../../shared/display/display';
-import { LibraryDataAccessor } from '../../shared/data/libraryDataAccessor';
+import * as Fmt from '../format/format';
+import * as Display from '../display/display';
+import { LibraryDataAccessor } from '../data/libraryDataAccessor';
 
 export abstract class GenericRenderer {
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {

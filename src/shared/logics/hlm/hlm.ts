@@ -1,5 +1,5 @@
 import * as Logic from '../logic';
-import * as FmtHLM from '../../../shared/logics/hlm/meta';
+import * as FmtHLM from './meta';
 import { HLMDisplay } from './display';
 
 export class HLM implements Logic.Logic {

@@ -6,6 +6,7 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryD
 import Expression from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
+import { getDefinitionIcon } from '../utils/icons';
 
 const ToolTip = require('react-portal-tooltip').default;
 
@@ -125,7 +126,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (this.state.definition) {
         let logic = this.props.libraryDataProvider.logic;
         let logicDisplay = logic.getDisplay();
-        icon = <span>{logicDisplay.getDefinitionIcon(this.state.definition, this.props.itemInfo)}{icon}</span>;
+        let definitionType = logicDisplay.getDefinitionType(this.state.definition);
+        let definitionIcon = getDefinitionIcon(definitionType, this.props.itemInfo);
+        icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
           let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates);
           if (display === undefined) {

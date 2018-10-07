@@ -1,12 +1,12 @@
-import * as Fmt from '../../../shared/format/format';
-import * as FmtHLM from '../../../shared/logics/hlm/meta';
-import * as FmtDisplay from '../../../shared/display/meta';
+import * as Fmt from '../../format/format';
+import * as FmtHLM from './meta';
+import * as FmtDisplay from '../../display/meta';
 import * as Logic from '../logic';
 import * as Generic from '../generic';
-import * as Display from '../../../shared/display/display';
-import { HLMUtils } from '../../../shared/logics/hlm/utils';
-import { LibraryDataAccessor, LibraryItemInfo } from '../../../shared/data/libraryDataAccessor';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import * as Display from '../../display/display';
+import { HLMUtils } from './utils';
+import { LibraryDataAccessor, LibraryItemInfo } from '../../data/libraryDataAccessor';
+import CachedPromise from '../../data/cachedPromise';
 
 interface ParameterListState {
   sentence: boolean;

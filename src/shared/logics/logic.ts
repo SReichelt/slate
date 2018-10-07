@@ -1,15 +1,25 @@
-import * as Fmt from '../../shared/format/format';
-import * as Display from '../../shared/display/display';
-import { LibraryDataAccessor, LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as Fmt from '../format/format';
+import * as Display from '../display/display';
+import { LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataAccessor';
+import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
   getMetaModel: Fmt.MetaModelGetter;
   getDisplay(): LogicDisplay;
 }
 
+export enum LogicDefinitionType {
+  Unknown,
+  Construction,
+  Constructor,
+  SetOperator,
+  Operator,
+  Predicate,
+  Theorem
+}
+
 export interface LogicDisplay {
-  getDefinitionIcon(definition: Fmt.Definition, itemInfo: LibraryItemInfo): any;
+  getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
   getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): LogicRenderer;
 }
 
