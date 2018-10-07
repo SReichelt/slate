@@ -1,16 +1,18 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Identity_function
+ */
 $identity(X: %Set(auto = %true)): %ExplicitOperator {
-  references = ['https://en.wikipedia.org/wiki/Identity_function'],
   display = [$SubSup(
     body = 'id',
     sub = X
   )],
   definition = [$Functions(
-    X = {X},
-    Y = {X}
-  ).function(x = {
-    #(x: %Element(X)),
-    {y = {x}}
+      X = {X},
+      Y = {X}
+    ).function(x = {
+      #(x: %Element(X)),
+      {y = {x}}
   })]
 }

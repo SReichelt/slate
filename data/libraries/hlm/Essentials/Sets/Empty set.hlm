@@ -1,7 +1,11 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Empty_set
+ *             * http://mathworld.wolfram.com/EmptySet.html
+ *             * https://proofwiki.org/wiki/Definition:Empty_Set
+ */
 $"Empty set": %SetOperator {
-  references = ['https://en.wikipedia.org/wiki/Empty_set', 'http://mathworld.wolfram.com/EmptySet.html', 'https://proofwiki.org/wiki/Definition:Empty_Set'],
   display = ['∅'],
   definition = [%enumeration]
 }

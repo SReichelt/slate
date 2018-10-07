@@ -446,8 +446,8 @@ $Integers: %Construction {
   embedding = {
     parameter = #(x: %Element($../Natural/"Natural numbers")),
     target = $Integers.difference(
-      n = {x},
-      m = {$../Natural/number(value = 0)}
+        n = {x},
+        m = {$../Natural/number(value = 0)}
     ),
     wellDefinednessProof = {
       parameters = #(
@@ -455,12 +455,12 @@ $Integers: %Construction {
         y: %Element(%previous),
         _1: %Constraint(%equals(
           $Integers.difference(
-            n = {x},
-            m = {$../Natural/number(value = 0)}
+              n = {x},
+              m = {$../Natural/number(value = 0)}
           ),
           $Integers.difference(
-            n = {y},
-            m = {$../Natural/number(value = 0)}
+              n = {y},
+              m = {$../Natural/number(value = 0)}
           )
         ))
       ),

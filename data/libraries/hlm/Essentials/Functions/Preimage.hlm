@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Preimage
+ */
 $Preimage(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
@@ -9,7 +12,6 @@ $Preimage(
   )),
   S: %Subset(Y)
 ): %SetOperator {
-  references = ['https://en.wikipedia.org/wiki/Preimage'],
   display = [$Function(
     function = $Power(
       base = f,

@@ -10,45 +10,45 @@ $"relation transform"(
   ≺: %Element($../../Essentials/Relations/Relations(S = {X}))
 ): %ExplicitOperator {
   definition = [$../../Essentials/Relations/Relations(S = {Y}).relation(R = {%subset(
-    #(y: %Element(
-      $../../Essentials/Sets/"Cartesian product"(
-        S = {Y},
-        T = {Y}
-      ),
-      shortcut = {
+      #(y: %Element(
         $../../Essentials/Sets/"Cartesian product"(
           S = {Y},
           T = {Y}
-        ).pair,
-        #(
-          s: %Element(Y),
-          t: %Element(Y)
-        )
-      }
-    )),
-    $../../Essentials/Relations/related(
-      S = {X},
-      ≺ = {≺},
-      s = {$../../Essentials/Functions/value(
-        X = {Y},
-        Y = {X},
-        f = {$../../Essentials/Functions/inverse(
-          X = {X},
-          Y = {Y},
-          f = {φ}
+        ),
+        shortcut = {
+          $../../Essentials/Sets/"Cartesian product"(
+              S = {Y},
+              T = {Y}
+            ).pair,
+          #(
+            s: %Element(Y),
+            t: %Element(Y)
+          )
+        }
+      )),
+      $../../Essentials/Relations/related(
+        S = {X},
+        ≺ = {≺},
+        s = {$../../Essentials/Functions/value(
+          X = {Y},
+          Y = {X},
+          f = {$../../Essentials/Functions/inverse(
+            X = {X},
+            Y = {Y},
+            f = {φ}
+          )},
+          x = {s}
         )},
-        x = {s}
-      )},
-      t = {$../../Essentials/Functions/value(
-        X = {Y},
-        Y = {X},
-        f = {$../../Essentials/Functions/inverse(
-          X = {X},
-          Y = {Y},
-          f = {φ}
-        )},
-        x = {t}
-      )}
-    )
+        t = {$../../Essentials/Functions/value(
+          X = {Y},
+          Y = {X},
+          f = {$../../Essentials/Functions/inverse(
+            X = {X},
+            Y = {Y},
+            f = {φ}
+          )},
+          x = {t}
+        )}
+      )
   )})]
 }

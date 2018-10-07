@@ -93,6 +93,7 @@ export class Definition {
   parameters: ParameterList = Object.create(ParameterList.prototype);
   innerDefinitions: DefinitionList = Object.create(DefinitionList.prototype);
   contents?: ObjectContents;
+  documentation?: DocumentationComment;
 }
 
 export class DefinitionList extends Array<Definition> {
@@ -419,6 +420,16 @@ export class ArrayExpression extends Expression {
     }
     return fn(result);
   }
+}
+
+export class DocumentationComment {
+  items: DocumentationItem[];
+}
+
+export class DocumentationItem {
+  kind?: string;
+  name?: string;
+  text: string;
 }
 
 

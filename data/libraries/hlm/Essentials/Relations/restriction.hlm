@@ -22,14 +22,14 @@ $restriction(
     operand = ≺
   )],
   definition = [$Relations(S = {T}).relation(R = {$../Sets/Intersection(
-    U = {$../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    )},
-    S = {R},
-    T = {$../Sets/"Cartesian product"(
-      S = {T},
-      T = {T}
-    )}
+      U = {$../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )},
+      S = {R},
+      T = {$../Sets/"Cartesian product"(
+        S = {T},
+        T = {T}
+      )}
   )})]
 }

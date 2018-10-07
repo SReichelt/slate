@@ -29,13 +29,13 @@ $sum(
     maxParenLevel = 1
   )],
   definition = [$Integers.difference(
-    n = {$../Natural/sum(
-      m = {n_a},
-      n = {n_b}
-    )},
-    m = {$../Natural/sum(
-      m = {m_a},
-      n = {m_b}
-    )}
+      n = {$../Natural/sum(
+        m = {n_a},
+        n = {n_b}
+      )},
+      m = {$../Natural/sum(
+        m = {m_a},
+        n = {m_b}
+      )}
   )]
 }

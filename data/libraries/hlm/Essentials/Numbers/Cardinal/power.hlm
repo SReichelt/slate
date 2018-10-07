@@ -17,7 +17,7 @@ $power(
   )
 ): %ExplicitOperator {
   definition = [$"Cardinal numbers".cardinality(S = {$../../Functions/Functions(
-    X = {Y},
-    Y = {X}
+      X = {Y},
+      Y = {X}
   )})]
 }

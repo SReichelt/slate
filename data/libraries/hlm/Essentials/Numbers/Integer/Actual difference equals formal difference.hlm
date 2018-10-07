@@ -6,8 +6,8 @@ $"Actual difference equals formal difference"(
 ): %StandardTheorem {
   claim = %equals(
     $Integers.difference(
-      n = {n},
-      m = {m}
+        n = {n},
+        m = {m}
     ),
     $difference(
       b = {n},

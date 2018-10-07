@@ -63,8 +63,8 @@ $"Real numbers": %Construction {
   embedding = {
     parameter = #(x: %Element($../Rational/"Rational numbers")),
     target = $"Real numbers".class(r = {$../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence(n = {
-      #(k: %Element($../Natural/"Natural numbers")),
-      {a = {x}}
+          #(k: %Element($../Natural/"Natural numbers")),
+          {a = {x}}
     })})
   }
 }

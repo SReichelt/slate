@@ -1,5 +1,13 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks Although it is possible to define functions in the usual set-theoretic way in HLM, the equivalent definition presented here uses a special HLM feature called “bindings.”
+ *
+ *          Its major advantage is that given a specific function defined via bindings, the value at a given input can be determined purely syntactically.
+ * @references * [https://en.wikipedia.org/wiki/Function_(mathematics)](https://en.wikipedia.org/wiki/Function_(mathematics))
+ *             * http://mathworld.wolfram.com/Function.html
+ *             * https://proofwiki.org/wiki/Definition:Mapping
+ */
 $Functions(
   X: %Set,
   Y: %Set
@@ -65,10 +73,6 @@ $Functions(
     }
   }
 
-  remarks = 'Although it is possible to define functions in the usual set-theoretic way in HLM, the equivalent definition presented here uses a special HLM feature called “bindings.”\n'
-            '\n'
-            'Its major advantage is that given a specific function defined via bindings, the value at a given input can be determined purely syntactically.',
-  references = ['[https://en.wikipedia.org/wiki/Function_(mathematics)](https://en.wikipedia.org/wiki/Function_(mathematics))', 'http://mathworld.wolfram.com/Function.html', 'https://proofwiki.org/wiki/Definition:Mapping'],
   display = [$FunctionOperator(
     symbol = '→',
     operands = [X, Y]

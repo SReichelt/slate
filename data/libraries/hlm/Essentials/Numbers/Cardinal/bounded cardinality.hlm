@@ -20,11 +20,11 @@ $"bounded cardinality"(
           {
             formula = %not($../../Sets/empty(S = {M})),
             value = $../Natural/"Natural numbers".successor(n = {$"bounded cardinality"(
-              M = {$../../Sets/"Relative complement"(
-                S = {M},
-                T = {%enumeration($../Natural/minimum(M = {M}))}
-              )},
-              n = {x}
+                M = {$../../Sets/"Relative complement"(
+                  S = {M},
+                  T = {%enumeration($../Natural/minimum(M = {M}))}
+                )},
+                n = {x}
             )})
           },
           {

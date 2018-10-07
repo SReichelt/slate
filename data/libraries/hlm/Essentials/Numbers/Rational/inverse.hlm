@@ -18,7 +18,7 @@ $inverse(a: %Element(
     maxParenLevel = 1
   )],
   definition = [$"Rational numbers".quotient(
-    n = {$../Integer/inverse(a = {n_a})},
-    m = {m_a}
+      n = {$../Integer/inverse(a = {n_a})},
+      m = {m_a}
   )]
 }

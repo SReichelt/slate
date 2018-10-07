@@ -19,48 +19,48 @@ $"cartesian product"(
     operands = [f, g]
   )],
   definition = [$Functions(
-    X = {$../Sets/"Cartesian product"(
-      S = {V},
-      T = {X}
-    )},
-    Y = {$../Sets/"Cartesian product"(
-      S = {W},
-      T = {Y}
-    )}
-  ).function(x = {
-    #(z: %Element(
-      $../Sets/"Cartesian product"(
+      X = {$../Sets/"Cartesian product"(
         S = {V},
         T = {X}
-      ),
-      shortcut = {
+      )},
+      Y = {$../Sets/"Cartesian product"(
+        S = {W},
+        T = {Y}
+      )}
+    ).function(x = {
+      #(z: %Element(
         $../Sets/"Cartesian product"(
           S = {V},
           T = {X}
-        ).pair,
-        #(
-          v: %Element(V),
-          x: %Element(X)
         ),
-        override = %true
-      }
-    )),
-    {y = {$../Sets/"Cartesian product"(
-      S = {W},
-      T = {Y}
-    ).pair(
-      s = {$value(
-        X = {V},
-        Y = {W},
-        f = {f},
-        x = {v}
-      )},
-      t = {$value(
-        X = {X},
-        Y = {Y},
-        f = {g},
-        x = {x}
-      )}
-    )}}
+        shortcut = {
+          $../Sets/"Cartesian product"(
+              S = {V},
+              T = {X}
+            ).pair,
+          #(
+            v: %Element(V),
+            x: %Element(X)
+          ),
+          override = %true
+        }
+      )),
+      {y = {$../Sets/"Cartesian product"(
+          S = {W},
+          T = {Y}
+        ).pair(
+          s = {$value(
+            X = {V},
+            Y = {W},
+            f = {f},
+            x = {v}
+          )},
+          t = {$value(
+            X = {X},
+            Y = {Y},
+            f = {g},
+            x = {x}
+          )}
+      )}}
   })]
 }

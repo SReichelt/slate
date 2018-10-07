@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Power_set
+ *             * http://mathworld.wolfram.com/PowerSet.html
+ *             * https://proofwiki.org/wiki/Definition:Power_Set
+ */
 $"Power set"(S: %Set(
   auto = %true,
   embedSubsets = %true
@@ -17,7 +22,6 @@ $"Power set"(S: %Set(
     }
   }
 
-  references = ['https://en.wikipedia.org/wiki/Power_set', 'http://mathworld.wolfram.com/PowerSet.html', 'https://proofwiki.org/wiki/Definition:Power_Set'],
   display = [$Function(
     function = '𝒫',
     arguments = [S]

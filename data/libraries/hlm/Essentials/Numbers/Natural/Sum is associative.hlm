@@ -38,11 +38,11 @@ $"Sum is associative"(
             constructor = $"Natural numbers".successor,
             parameters = #(x: %Element($"Natural numbers")),
             value = $"Natural numbers".successor(n = {$sum(
-              m = {$sum(
-                m = {a},
-                n = {b}
-              )},
-              n = {x}
+                m = {$sum(
+                  m = {a},
+                  n = {b}
+                )},
+                n = {x}
             )})
           }
         ]
@@ -75,18 +75,18 @@ $"Sum is associative"(
           parameters = #(x: %Element($"Natural numbers")),
           goal = %equals(
             $"Natural numbers".successor(n = {$sum(
-              m = {$sum(
-                m = {a},
-                n = {b}
-              )},
-              n = {x}
+                m = {$sum(
+                  m = {a},
+                  n = {b}
+                )},
+                n = {x}
             )}),
             $"Natural numbers".successor(n = {$sum(
-              m = {a},
-              n = {$sum(
-                m = {b},
-                n = {x}
-              )}
+                m = {a},
+                n = {$sum(
+                  m = {b},
+                  n = {x}
+                )}
             )})
           ),
           steps = #(

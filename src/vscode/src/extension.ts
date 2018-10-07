@@ -377,6 +377,7 @@ function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, 
 interface DefinitionLink extends vscode.DefinitionLink {
     originNameRange: vscode.Range;
     name: string;
+    referencedDefinition?: ReferencedDefinition;
 }
 
 function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, preferSignature: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): DefinitionLink[] {
@@ -392,7 +393,8 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
                     targetUri: signatureInfo.parsedDocument.uri,
                     targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
                     targetSelectionRange: targetRangeInfo.nameRange,
-                    name: signatureInfo.referencedDefinition.definition.name
+                    name: signatureInfo.referencedDefinition.definition.name,
+                    referencedDefinition: signatureInfo.referencedDefinition
                 });
                 if (position) {
                     return result;
@@ -556,20 +558,37 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
     }
 
     provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
-        // TODO display comment
         let definitionLink = this.getDefinitionLink(document, position, token, true);
         if (definitionLink !== undefined && !token.isCancellationRequested) {
+            let hoverTexts: vscode.MarkdownString[] = [];
             let hoverCode: string | undefined = readRange(definitionLink.targetUri, definitionLink.targetRange, false, document);
             if (hoverCode) {
                 let hoverText = new vscode.MarkdownString;
                 hoverText.appendCodeblock(hoverCode);
-                return new vscode.Hover(hoverText, definitionLink.originSelectionRange);
+                hoverTexts.push(hoverText);
+            }
+            if (definitionLink.referencedDefinition && definitionLink.referencedDefinition.definition.documentation) {
+                let hoverText = new vscode.MarkdownString;
+                for (let item of definitionLink.referencedDefinition.definition.documentation.items) {
+                    if (item.kind) {
+                        hoverText.appendMarkdown(`_@${item.kind}_`);
+                        if (item.name) {
+                            hoverText.appendMarkdown(` \`${item.name}\``);
+                        }
+                        hoverText.appendMarkdown(' —\n');
+                    }
+                    hoverText.appendMarkdown(item.text + '\n\n');
+                }
+                hoverTexts.push(hoverText);
+            }
+            if (hoverTexts.length) {
+                return new vscode.Hover(hoverTexts, definitionLink.originSelectionRange);
             }
         }
         return undefined;
     }
 
-    private getDefinitionLink(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, preferSignature: boolean): vscode.DefinitionLink | undefined {
+    private getDefinitionLink(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, preferSignature: boolean): DefinitionLink | undefined {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             for (let rangeInfo of parsedDocument.rangeList) {

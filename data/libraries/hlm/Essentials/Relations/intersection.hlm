@@ -30,11 +30,11 @@ $intersection(
     maxParenLevel = 2
   )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/Intersection(
-    U = {$../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    )},
-    S = {Q},
-    T = {R}
+      U = {$../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )},
+      S = {Q},
+      T = {R}
   )})]
 }

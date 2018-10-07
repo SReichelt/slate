@@ -124,7 +124,7 @@ export class Reader {
     let linkStart = pathStart;
     let parentPath: Fmt.PathItem | undefined = undefined;
     for (;;) {
-      this.skipWhitespace();
+      this.skipWhitespace(false);
       let itemStart = this.markStart();
       if (this.tryReadChar('.')) {
         let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
@@ -135,7 +135,7 @@ export class Reader {
         this.readChar('/');
       } else {
         let identifier = this.readIdentifier();
-        this.skipWhitespace();
+        this.skipWhitespace(false);
         if (this.peekChar() === '/') {
           let item = new Fmt.NamedPathItem;
           item.name = identifier;
@@ -159,7 +159,7 @@ export class Reader {
               return path;
             }
             parentPath = path;
-            this.skipWhitespace();
+            this.skipWhitespace(false);
             itemStart = linkStart = this.markStart();
             identifier = this.readIdentifier();
           }
@@ -171,8 +171,8 @@ export class Reader {
   readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): void {
     let definitionsStart = this.markStart();
     for (;;) {
-      this.skipWhitespace();
-      let definition = this.tryReadDefinition(metaDefinitions, context);
+      let documentationComment = this.skipWhitespace();
+      let definition = this.tryReadDefinition(documentationComment, metaDefinitions, context);
       if (definition) {
         definitions.push(definition);
       } else {
@@ -182,12 +182,13 @@ export class Reader {
     this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
-  tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
+  tryReadDefinition(documentationComment: Fmt.DocumentationComment | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
     let definitionStart = this.markStart();
     if (!this.tryReadChar('$')) {
       return undefined;
     }
     let definition = new Fmt.Definition;
+    definition.documentation = documentationComment;
     let nameStart = this.markStart();
     definition.name = this.readIdentifier();
     let nameRange = this.markEnd(nameStart);
@@ -515,6 +516,7 @@ export class Reader {
   }
 
   tryReadString(quoteChar: string): string | undefined {
+    let stringStart = this.markStart();
     if (!this.tryReadChar(quoteChar)) {
       return undefined;
     }
@@ -523,35 +525,24 @@ export class Reader {
       for (;;) {
         let c = this.readAnyChar();
         if (!c) {
-          this.error('Unterminated string');
+          this.error('Unterminated string', this.markEnd(stringStart));
           break;
         } else if (c === quoteChar) {
           break;
         } else if (c === '\\') {
-          c = this.readAnyChar();
-          switch (c) {
-          case '\\':
-          case '"':
-          case '\'':
-            str += c;
-            break;
-          case 't':
-            str += '\t';
-            break;
-          case 'r':
-            str += '\r';
-            break;
-          case 'n':
-            str += '\n';
-            break;
-          default:
+          c = this.peekChar();
+          let escapedCharacter = this.getEscapedCharacter(c);
+          if (escapedCharacter) {
+            str += escapedCharacter;
+          } else {
             this.error('Unknown escape sequence');
           }
+          this.readAnyChar();
         } else {
           str += c;
         }
       }
-      this.skipWhitespace();
+      this.skipWhitespace(false);
     } while (this.tryReadChar(quoteChar));
     return str;
   }
@@ -594,18 +585,80 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
-  private skipWhitespace(): void {
+  private skipWhitespace(allowComments: boolean = true): Fmt.DocumentationComment | undefined {
+    let documentationComment: Fmt.DocumentationComment | undefined = undefined;
     let c = this.stream.peekChar();
-    if (isWhitespaceCharacter(c)) {
+    if (isWhitespaceCharacter(c) || (allowComments && c === '/')) {
       this.markedEnd = this.stream.getLocation();
       do {
-        this.stream.readChar();
+        if (allowComments && c === '/') {
+          let commentStart = this.stream.getLocation();
+          this.stream.readChar();
+          c = this.stream.peekChar();
+          switch (c) {
+          case '/':
+            this.stream.readChar();
+            do {
+              c = this.stream.readChar();
+            } while (c && c !== '\r' && c !== '\n');
+            break;
+          case '*':
+            this.stream.readChar();
+            let isDocumentationComment = false;
+            c = this.stream.peekChar();
+            if (c === '*') {
+              this.stream.readChar();
+              isDocumentationComment = true;
+            }
+            let atLineStart = false;
+            let afterAsterisk = true;
+            let commentText = '';
+            for (;;) {
+              c = this.stream.readChar();
+              if (!c) {
+                this.markedEnd = undefined;
+                this.error('Unterminated comment', this.markEnd(commentStart));
+                break;
+              } else if (c === '*') {
+                if (this.stream.peekChar() === '/') {
+                  this.stream.readChar();
+                  break;
+                }
+                if (atLineStart) {
+                  atLineStart = false;
+                  afterAsterisk = true;
+                } else {
+                  afterAsterisk = false;
+                  commentText += c;
+                }
+              } else if (c === '\r' || c === '\n') {
+                atLineStart = true;
+                afterAsterisk = false;
+                commentText += c;
+              } else if (!(isWhitespaceCharacter(c) && (atLineStart || afterAsterisk))) {
+                atLineStart = false;
+                afterAsterisk = false;
+                commentText += c;
+              }
+            }
+            if (isDocumentationComment) {
+              documentationComment = new Fmt.DocumentationComment;
+              documentationComment.items = this.parseCommentText(commentText);
+            }
+            break;
+          default:
+            this.error(`'/' or '*' expected`);
+          }
+        } else {
+          this.stream.readChar();
+        }
         c = this.stream.peekChar();
-      } while (isWhitespaceCharacter(c));
+      } while (isWhitespaceCharacter(c) || (allowComments && c === '/'));
       if (this.markedStart) {
         Object.assign(this.markedStart, this.stream.getLocation());
       }
     }
+    return documentationComment;
   }
 
   private tryReadChar(c: string): boolean {
@@ -619,7 +672,7 @@ export class Reader {
   }
 
   private readChar(c: string): void {
-    this.skipWhitespace();
+    this.skipWhitespace(c !== '/');
     if (!this.tryReadChar(c)) {
       let expected = '';
       let index = 0;
@@ -650,6 +703,110 @@ export class Reader {
     this.triedChars.length = 0;
     this.atError = false;
     return this.stream.readChar();
+  }
+
+  private getEscapedCharacter(escapeCharacter: string): string | undefined {
+    switch (escapeCharacter) {
+    case '\\':
+    case '"':
+    case '\'':
+      return escapeCharacter;
+    case 't':
+      return '\t';
+    case 'r':
+      return '\r';
+    case 'n':
+      return '\n';
+    default:
+      return undefined;
+    }
+  }
+
+  parseCommentText(commentText: string): Fmt.DocumentationItem[] {
+    let result: Fmt.DocumentationItem[] = [];
+    let atLineStart = true;
+    let inKind = false;
+    let atNameStart = false;
+    let inUnescapedName = false;
+    let inEscapedName = false;
+    let inEscapeSequence = false;
+    let kind: string | undefined = undefined;
+    let name: string | undefined = undefined;
+    let text = '';
+    for (let c of commentText) {
+      if (c === '\r' || c === '\n') {
+        if (text) {
+          text += c;
+        }
+        atLineStart = true;
+        inKind = false;
+        atNameStart = false;
+        inUnescapedName = false;
+        inEscapedName = false;
+        inEscapeSequence = false;
+      } else if (atLineStart && c === '@') {
+        if (kind || text) {
+          let item = new Fmt.DocumentationItem;
+          item.kind = kind;
+          item.name = name;
+          item.text = text.trimRight();
+          result.push(item);
+        }
+        kind = '';
+        name = undefined;
+        text = '';
+        inKind = true;
+      } else if (inKind) {
+        if (isWhitespaceCharacter(c)) {
+          inKind = false;
+          if (kind === 'param') {
+            atNameStart = true;
+          }
+        } else {
+          kind += c;
+        }
+      } else if (atNameStart) {
+        if (c === '"') {
+          name = '';
+          atNameStart = false;
+          inEscapedName = true;
+        } else if (!isWhitespaceCharacter(c)) {
+          atNameStart = false;
+          inUnescapedName = true;
+          name = c;
+        }
+      } else if (inUnescapedName) {
+        if (isWhitespaceCharacter(c)) {
+          inUnescapedName = false;
+        } else {
+          name += c;
+        }
+      } else if (inEscapedName) {
+        if (inEscapeSequence) {
+          let escapedCharacter = this.getEscapedCharacter(c);
+          if (escapedCharacter) {
+            name += escapedCharacter;
+          }
+          inEscapeSequence = false;
+        } else if (c === '\\') {
+          inEscapeSequence = true;
+        } else if (c === '"') {
+          inEscapedName = false;
+        } else {
+          name += c;
+        }
+      } else if (text || !isWhitespaceCharacter(c)) {
+        text += c;
+      }
+    }
+    if (kind || text) {
+      let item = new Fmt.DocumentationItem;
+      item.kind = kind;
+      item.name = name;
+      item.text = text.trimRight();
+      result.push(item);
+    }
+    return result;
   }
 
   private markStart(): Location {

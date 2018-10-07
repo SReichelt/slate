@@ -21,11 +21,11 @@ $related(
   )],
   definition = [%in(
     $../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    ).pair(
-      s = {s},
-      t = {t}
+        S = {S},
+        T = {S}
+      ).pair(
+        s = {s},
+        t = {t}
     ),
     R
   )]

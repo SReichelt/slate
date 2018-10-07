@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.
+ */
 $value(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
@@ -10,9 +13,9 @@ $value(
     ),
     shortcut = {
       $Functions(
-        X = {X},
-        Y = {Y}
-      ).function,
+          X = {X},
+          Y = {Y}
+        ).function,
       #(z: %Binding(
         X,
         #(y: %Element(Y))
@@ -21,7 +24,6 @@ $value(
   ),
   x: %Element(X)
 ): %ExplicitOperator {
-  remarks = 'This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.',
   display = [$Function(
     function = f,
     arguments = [x]

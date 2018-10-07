@@ -29,7 +29,7 @@ $sum(
     maxParenLevel = 1
   )],
   definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence sum"(
-    α = {r_a},
-    β = {r_b}
+      α = {r_a},
+      β = {r_b}
   )})]
 }

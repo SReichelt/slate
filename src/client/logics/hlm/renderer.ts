@@ -84,7 +84,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
   }
 
   renderDefinitionSummary(definition: Fmt.Definition): Display.RenderedExpression | undefined {
-    if (definition.contents instanceof FmtHLM.ObjectContents_Theorem) {
+    if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
       let claim: Display.RenderedExpression | undefined = undefined;
       if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
         claim = this.renderFormula(definition.contents.claim);
@@ -117,7 +117,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
       if (info.type) {
         text = info.type.charAt(0).toUpperCase() + info.type.slice(1);
       } else {
-        text = definition.contents instanceof FmtHLM.ObjectContents_Theorem ? 'Proposition' : 'Definition';
+        text = definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem ? 'Proposition' : 'Definition';
       }
       text += ' ';
       text += this.formatItemNumber(info.itemNumber);
@@ -1336,22 +1336,14 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
   }
 
   private addDefinitionRemarks(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[]): void {
-    if (definition.contents instanceof FmtHLM.ObjectContents_Object) {
-      if (definition.contents.remarks) {
-        let remarksHeading = new Display.TextExpression('Remarks.');
-        remarksHeading.styleClasses = ['sub-heading'];
-        paragraphs.push(remarksHeading);
-        paragraphs.push(new Display.MarkdownExpression(definition.contents.remarks));
-      }
-      if (definition.contents.references && definition.contents.references.length) {
-        let referencesHeading = new Display.TextExpression('References.');
-        referencesHeading.styleClasses = ['sub-heading'];
-        paragraphs.push(referencesHeading);
-        let items: Display.RenderedExpression[] = [];
-        for (let reference of definition.contents.references) {
-          items.push(new Display.MarkdownExpression(reference));
+    if (definition.documentation) {
+      for (let item of definition.documentation.items) {
+        if (item.kind === 'remarks' || item.kind === 'references') {
+          let heading = new Display.TextExpression(item.kind.charAt(0).toUpperCase() + item.kind.slice(1) + '.');
+          heading.styleClasses = ['sub-heading'];
+          paragraphs.push(heading);
+          paragraphs.push(new Display.MarkdownExpression(item.text));
         }
-        paragraphs.push(new Display.ListExpression(items, '*'));
       }
     }
   }

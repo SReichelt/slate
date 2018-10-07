@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously extends the codomain to a superset _B_ of _Y_.
+ *
+ *          It might seem tempting to remove the need for this definition by implicitly treating a function to _Y_ as a function to a superset _B_ of _Y_, without explicitly specifying _B_. However, this might lead to confusion as the resulting function may not be surjective even though the original function is.
+ */
 $"generalized restriction"(
   X: %Set(auto = %true),
   A: %Subset(X),
@@ -13,9 +18,6 @@ $"generalized restriction"(
     Y = {Y}
   ))
 ): %ExplicitOperator {
-  remarks = 'This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously extends the codomain to a superset _B_ of _Y_.\n'
-            '\n'
-            'It might seem tempting to remove the need for this definition by implicitly treating a function to _Y_ as a function to a superset _B_ of _Y_, without explicitly specifying _B_. However, this might lead to confusion as the resulting function may not be surjective even though the original function is.',
   display = [$UnaryOperator(
     symbol = $SubSup(
       body = '∣',
@@ -25,15 +27,15 @@ $"generalized restriction"(
     operand = f
   )],
   definition = [$Functions(
-    X = {A},
-    Y = {B}
-  ).function(x = {
-    #(x: %Element(A)),
-    {y = {$value(
-      X = {X},
-      Y = {Y},
-      f = {f},
-      x = {x}
-    )}}
+      X = {A},
+      Y = {B}
+    ).function(x = {
+      #(x: %Element(A)),
+      {y = {$value(
+        X = {X},
+        Y = {Y},
+        f = {f},
+        x = {x}
+      )}}
   })]
 }

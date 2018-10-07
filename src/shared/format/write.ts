@@ -93,6 +93,9 @@ export class Writer {
   }
 
   writeDefinition(definition: Fmt.Definition, indent: IndentInfo): void {
+    if (definition.documentation) {
+      this.writeDocumentationComment(definition.documentation, indent);
+    }
     this.write('$');
     this.writeIdentifier(definition.name);
     this.writeOptionalParameterList(definition.parameters, indent, true);
@@ -302,7 +305,7 @@ export class Writer {
     if (expression instanceof Fmt.IntegerExpression) {
       this.writeInteger(expression.value);
     } else if (expression instanceof Fmt.StringExpression) {
-      this.writeString(expression.value, '\'');
+      this.writeString(expression.value, '\'', true);
     } else if (expression instanceof Fmt.VariableRefExpression) {
       this.writeIdentifier(expression.variable.name);
       this.writeOptionalExpressionList(expression.indices, indent, true);
@@ -344,7 +347,7 @@ export class Writer {
             || expression instanceof Fmt.ArrayExpression);
   }
 
-  writeString(str: string, quoteChar: string): void {
+  writeString(str: string, quoteChar: string, breakLines: boolean): void {
     let indentLength = this.lineLength;
     let result = quoteChar;
     let insertLineBreak = false;
@@ -370,7 +373,9 @@ export class Writer {
         break;
       case '\n':
         result += '\\n';
-        insertLineBreak = true;
+        if (breakLines) {
+          insertLineBreak = true;
+        }
         break;
       default:
         result += c;
@@ -389,7 +394,7 @@ export class Writer {
       let first = true;
       for (let c of identifier) {
         if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
-          this.writeString(identifier, '"');
+          this.writeString(identifier, '"', false);
           return;
         }
         first = false;
@@ -398,6 +403,63 @@ export class Writer {
     } else {
       this.write('""');
     }
+  }
+
+  writeDocumentationComment(documentationComment: Fmt.DocumentationComment, indent: IndentInfo): void {
+    this.write('/**');
+    let needEmptyLine = false;
+    for (let item of documentationComment.items) {
+      if (needEmptyLine) {
+        this.writeNewLine();
+        this.writeIndent(indent);
+        this.write(' *');
+        needEmptyLine = false;
+      }
+      this.writeNewLine();
+      this.writeIndent(indent);
+      this.write(' *');
+      if (item.kind) {
+        this.write(' @');
+        this.write(item.kind);
+      } else {
+        needEmptyLine = true;
+      }
+      if (item.name) {
+        this.write(' ');
+        this.writeIdentifier(item.name);
+      }
+      let indentLength = this.lineLength + 1;
+      let textLine = '';
+      for (let c of item.text) {
+        if (c === '\r') {
+          // ignore
+        } else if (c === '\n') {
+          if (textLine) {
+            if (indentLength > this.lineLength) {
+              this.write(' '.repeat(indentLength - this.lineLength));
+            }
+            this.write(textLine);
+          }
+          textLine = '';
+          this.writeNewLine();
+          this.writeIndent(indent);
+          this.write(' *');
+        } else {
+          textLine += c;
+        }
+      }
+      if (textLine) {
+        if (indentLength > this.lineLength) {
+          this.write(' '.repeat(indentLength - this.lineLength));
+        }
+        this.write(textLine);
+      }
+    }
+    this.writeNewLine();
+    this.writeIndent(indent);
+    this.write(' */');
+    this.writeNewLine();
+    this.writeIndent(indent);
   }
 
   private write(str: string): void {

@@ -30,20 +30,20 @@ $difference(
   )],
   definition = [
     $"Rational numbers".quotient(
-      n = {$../Integer/difference(
-        b = {$../Integer/product(
-          a = {n_b},
-          b = {m_a}
+        n = {$../Integer/difference(
+          b = {$../Integer/product(
+            a = {n_b},
+            b = {m_a}
+          )},
+          a = {$../Integer/product(
+            a = {n_a},
+            b = {m_b}
+          )}
         )},
-        a = {$../Integer/product(
-          a = {n_a},
-          b = {m_b}
+        m = {$../Natural/product(
+          m = {m_b},
+          n = {m_a}
         )}
-      )},
-      m = {$../Natural/product(
-        m = {m_b},
-        n = {m_a}
-      )}
     ),
     $sum(
       a = {b},

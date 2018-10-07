@@ -26,11 +26,11 @@ $"sequence difference"(
 ): %ExplicitOperator {
   definition = [
     $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
-      #(n: %Element($../../Natural/"Natural numbers")),
-      {a = {$../difference(
-        b = {b[n]},
-        a = {a[n]}
-      )}}
+        #(n: %Element($../../Natural/"Natural numbers")),
+        {a = {$../difference(
+          b = {b[n]},
+          a = {a[n]}
+        )}}
     }),
     $"sequence sum"(
       α = {β},

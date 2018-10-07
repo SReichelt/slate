@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition of categories includes the requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). This makes sense because it ensures that two categories are equal if and only if they are equivalent, and because in HLM, all of the usual examples of categories are skeletal anyway.
+ */
 $Categories: %Construction {
   $category(
     O: %Set,
@@ -553,6 +556,4 @@ $Categories: %Construction {
       isomorphic = %true
     }
   }
-
-  remarks = 'This definition of categories includes the requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). This makes sense because it ensures that two categories are equal if and only if they are equivalent, and because in HLM, all of the usual examples of categories are skeletal anyway.'
 }

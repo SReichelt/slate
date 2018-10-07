@@ -30,8 +30,8 @@ $"Rational numbers": %Construction {
   embedding = {
     parameter = #(x: %Element($../Integer/Integers)),
     target = $"Rational numbers".quotient(
-      n = {x},
-      m = {$../Natural/number(value = 1)}
+        n = {x},
+        m = {$../Natural/number(value = 1)}
     )
   }
 }

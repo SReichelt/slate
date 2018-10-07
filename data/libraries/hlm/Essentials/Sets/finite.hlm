@@ -1,7 +1,11 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Finite_set
+ *             * http://mathworld.wolfram.com/FiniteSet.html
+ *             * https://proofwiki.org/wiki/Definition:Finite
+ */
 $finite(S: %Set): %Predicate {
-  references = ['https://en.wikipedia.org/wiki/Finite_set', 'http://mathworld.wolfram.com/FiniteSet.html', 'https://proofwiki.org/wiki/Definition:Finite'],
   display = [$Property(
     operand = S,
     property = %neg('finite', 'infinite')
@@ -280,17 +284,17 @@ $finite(S: %Set): %Predicate {
                 n = {x}
               )),
               v: %Def($../Functions/Functions(
-                X = {$../Numbers/Natural/"Segment (less)"(n = {o})},
-                Y = {T}
-              ).function(x = {
-                #(z: %Element($../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"bounded cardinality"(
-                  M = {T},
-                  n = {x}
-                )}))),
-                {y = {$../Numbers/Cardinal/"indexed element"(
-                  M = {T},
-                  n = {z}
-                )}}
+                  X = {$../Numbers/Natural/"Segment (less)"(n = {o})},
+                  Y = {T}
+                ).function(x = {
+                  #(z: %Element($../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"bounded cardinality"(
+                    M = {T},
+                    n = {x}
+                  )}))),
+                  {y = {$../Numbers/Cardinal/"indexed element"(
+                    M = {T},
+                    n = {z}
+                  )}}
               })),
               _: %ProveExists({
                 k = {o},

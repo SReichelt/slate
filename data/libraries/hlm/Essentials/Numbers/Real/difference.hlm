@@ -30,8 +30,8 @@ $difference(
   )],
   definition = [
     $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
-      β = {r_b},
-      α = {r_a}
+        β = {r_b},
+        α = {r_a}
     )}),
     $sum(
       a = {b},

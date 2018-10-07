@@ -394,7 +394,9 @@ function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression,
         }
         let name = item.path.name;
         outFileStr += `'${name}': MetaRefExpression_${name}`;
-        visibleTypeNames.push(name);
+        if (visibleTypeNames.indexOf(name) < 0) {
+          visibleTypeNames.push(name);
+        }
       } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
         if (secondaryList instanceof Fmt.ArrayExpression) {
           for (let secondaryItem of secondaryList.items) {
@@ -406,7 +408,9 @@ function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression,
               }
               let name = secondaryItem.path.name;
               outFileStr += `'${name}': MetaRefExpression_${name}`;
-              visibleTypeNames.push(name);
+              if (visibleTypeNames.indexOf(name) < 0) {
+                visibleTypeNames.push(name);
+              }
             }
           }
         }
@@ -423,6 +427,10 @@ function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression,
   return outFileStr;
 }
 
+function addVisibleTypes(visibleTypeNames: string[], list?: Fmt.Expression, secondaryList?: Fmt.Expression): void {
+  outputDefinitionList(visibleTypeNames, list, secondaryList);
+}
+
 function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): string {
   let outFileStr = '';
   let metaModel = inFile.definitions[0];
@@ -433,8 +441,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
     }
 
     if (hasObjectContents(inFile, definition)) {
-      let superName = getSuperName(definition);
-      let superClass = superName ? `ObjectContents_${superName}` : `Fmt.ObjectContents`;
+      let superDefinition = getSuperDefinition(inFile, definition);
+      if (superDefinition && !hasObjectContents(inFile, superDefinition)) {
+        superDefinition = undefined;
+      }
+      let superClass = superDefinition ? `ObjectContents_${superDefinition.name}` : `Fmt.ObjectContents`;
       outFileStr += `export class ObjectContents_${definition.name} extends ${superClass} {\n`;
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
@@ -447,12 +458,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `\n`;
       }
       outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
-      if (superName) {
+      if (superDefinition) {
         outFileStr += `    super.fromArgumentList(argumentList);\n`;
       }
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         let argIndex = 0;
-        let superDefinition = getSuperDefinition(inFile, definition);
         if (superDefinition) {
           argIndex += getMemberCount(inFile, superDefinition);
         }
@@ -466,7 +476,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `  }\n`;
       outFileStr += `\n`;
       outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
-      if (superName) {
+      if (superDefinition) {
         outFileStr += `    super.toArgumentList(argumentList);\n`;
       } else {
         outFileStr += `    argumentList.length = 0;\n`;
@@ -481,7 +491,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `  }\n`;
       outFileStr += `\n`;
       outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
-      if (superName) {
+      if (superDefinition) {
         outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
       } else {
         outFileStr += `    let changed = false;\n`;
@@ -863,6 +873,17 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `const expressionTypes: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.expressionTypes)};\n`;
     outFileStr += `const functions: Fmt.MetaDefinitionList = ${outputDefinitionList(visibleTypeNames, metaModel.contents.functions)};\n`;
     outFileStr += `\n`;
+    for (;;) {
+      let oldVisibleTypeCount = visibleTypeNames.length;
+      for (let definition of inFile.definitions) {
+        if (isVisibleType(visibleTypeNames, definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression) {
+          addVisibleTypes(visibleTypeNames, definition.contents.innerDefinitionTypes, metaModel.contents.expressionTypes);
+        }
+      }
+      if (visibleTypeNames.length === oldVisibleTypeCount) {
+        break;
+      }
+    }
     outFileStr += `export class MetaModel extends Fmt.MetaModel {\n`;
     outFileStr += `  constructor() {\n`;
     outFileStr += `    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),\n`;

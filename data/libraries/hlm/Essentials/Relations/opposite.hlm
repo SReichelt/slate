@@ -18,26 +18,26 @@ $opposite(
     exponent = 'op'
   )],
   definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
-    #(x: %Element(
-      R,
-      shortcut = {
-        $../Sets/"Cartesian product"(
+      #(x: %Element(
+        R,
+        shortcut = {
+          $../Sets/"Cartesian product"(
+              S = {S},
+              T = {S}
+            ).pair,
+          #(
+            s: %Element(S),
+            t: %Element(S)
+          ),
+          override = %true
+        }
+      )),
+      $../Sets/"Cartesian product"(
           S = {S},
           T = {S}
-        ).pair,
-        #(
-          s: %Element(S),
-          t: %Element(S)
-        ),
-        override = %true
-      }
-    )),
-    $../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    ).pair(
-      s = {t},
-      t = {s}
-    )
+        ).pair(
+          s = {t},
+          t = {s}
+      )
   )})]
 }

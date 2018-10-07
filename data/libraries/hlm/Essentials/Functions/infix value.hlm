@@ -26,11 +26,11 @@ $"infix value"(
     Y = {Z},
     f = {∗},
     x = {$../Sets/"Cartesian product"(
-      S = {X},
-      T = {Y}
-    ).pair(
-      s = {x},
-      t = {y}
+        S = {X},
+        T = {Y}
+      ).pair(
+        s = {x},
+        t = {y}
     )}
   )]
 }

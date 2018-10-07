@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * [https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))
+ */
 $restriction(
   X: %Set(auto = %true),
   A: %Subset(X),
@@ -9,7 +12,6 @@ $restriction(
     Y = {Y}
   ))
 ): %ExplicitOperator {
-  references = ['[https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))'],
   display = [$UnaryOperator(
     symbol = $SubSup(
       body = '∣',

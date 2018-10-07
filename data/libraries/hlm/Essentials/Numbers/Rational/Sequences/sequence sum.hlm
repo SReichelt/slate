@@ -25,10 +25,10 @@ $"sequence sum"(
   )
 ): %ExplicitOperator {
   definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
-    #(n: %Element($../../Natural/"Natural numbers")),
-    {a = {$../sum(
-      a = {a[n]},
-      b = {b[n]}
-    )}}
+      #(n: %Element($../../Natural/"Natural numbers")),
+      {a = {$../sum(
+        a = {a[n]},
+        b = {b[n]}
+      )}}
   })]
 }

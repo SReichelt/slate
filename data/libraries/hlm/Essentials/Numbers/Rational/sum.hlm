@@ -29,19 +29,19 @@ $sum(
     maxParenLevel = 1
   )],
   definition = [$"Rational numbers".quotient(
-    n = {$../Integer/sum(
-      a = {$../Integer/product(
-        a = {n_a},
-        b = {m_b}
+      n = {$../Integer/sum(
+        a = {$../Integer/product(
+          a = {n_a},
+          b = {m_b}
+        )},
+        b = {$../Integer/product(
+          a = {n_b},
+          b = {m_a}
+        )}
       )},
-      b = {$../Integer/product(
-        a = {n_b},
-        b = {m_a}
+      m = {$../Natural/product(
+        m = {m_a},
+        n = {m_b}
       )}
-    )},
-    m = {$../Natural/product(
-      m = {m_a},
-      n = {m_b}
-    )}
   )]
 }

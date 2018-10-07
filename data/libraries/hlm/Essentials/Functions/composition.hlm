@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Function_composition
+ */
 $composition(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
@@ -13,7 +16,6 @@ $composition(
     Y = {Z}
   ))
 ): %ExplicitOperator {
-  references = ['https://en.wikipedia.org/wiki/Function_composition'],
   display = [$Operator(
     symbol = '∘',
     operands = [g, f],
@@ -21,20 +23,20 @@ $composition(
     maxParenLevel = 2
   )],
   definition = [$Functions(
-    X = {X},
-    Y = {Z}
-  ).function(x = {
-    #(x: %Element(X)),
-    {y = {$value(
-      X = {Y},
-      Y = {Z},
-      f = {g},
-      x = {$value(
-        X = {X},
-        Y = {Y},
-        f = {f},
-        x = {x}
-      )}
-    )}}
+      X = {X},
+      Y = {Z}
+    ).function(x = {
+      #(x: %Element(X)),
+      {y = {$value(
+        X = {Y},
+        Y = {Z},
+        f = {g},
+        x = {$value(
+          X = {X},
+          Y = {Y},
+          f = {f},
+          x = {x}
+        )}
+      )}}
   })]
 }

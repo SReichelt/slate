@@ -22,8 +22,8 @@ $sum(
         constructor = $"Natural numbers".successor,
         parameters = #(x: %Element($"Natural numbers")),
         value = $"Natural numbers".successor(n = {$sum(
-          m = {m},
-          n = {x}
+            m = {m},
+            n = {x}
         )})
       }
     ]

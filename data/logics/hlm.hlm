@@ -15,15 +15,7 @@ $hlm: %MetaModel {
   lookup = %Any
 }
 
-$Object: %DefinitionType {
-  members = #(
-    remarks?: %String,
-    references: %String[] = []
-  )
-}
-
 $Definition: %DefinitionType {
-  superType = $Object,
   members = #(
     properties: $Property[] = [],
     display?: $../display/display/Expr[],
@@ -132,7 +124,6 @@ $Predicate: %DefinitionType($Formula) {
 }
 
 $Theorem: %DefinitionType {
-  superType = $Object
 }
 
 $StandardTheorem: %DefinitionType {

@@ -6,8 +6,8 @@ $limit(
     #(a: %Element($../"Rational numbers"))
   ),
   α: %Def($../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
-    #(m: %Element($../../Natural/"Natural numbers")),
-    {a = {a[m]}}
+      #(m: %Element($../../Natural/"Natural numbers")),
+      {a = {a[m]}}
   })),
   _1: %Constraint($convergent(α = {α}))
 ): %ExplicitOperator {

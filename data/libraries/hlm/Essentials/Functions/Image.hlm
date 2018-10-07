@@ -1,5 +1,9 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * [https://en.wikipedia.org/wiki/Image_(mathematics)](https://en.wikipedia.org/wiki/Image_(mathematics))
+ *             * [https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset](https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset)
+ */
 $Image(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
@@ -9,7 +13,6 @@ $Image(
   )),
   S: %Subset(X)
 ): %SetOperator {
-  references = ['[https://en.wikipedia.org/wiki/Image_(mathematics)](https://en.wikipedia.org/wiki/Image_(mathematics))', '[https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset](https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset)'],
   display = [$Function(
     function = f,
     arguments = [S]

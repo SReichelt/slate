@@ -42,6 +42,20 @@
 					"match": "\\\\."
 				}
 			]
+		},
+		{
+			"name": "comment.block.documentation",
+			"begin": "/\\*\\*",
+			"end": "\\*/"
+		},
+		{
+			"name": "comment.block",
+			"begin": "/\\*",
+			"end": "\\*/"
+		},
+		{
+			"name": "comment.line.double-slash",
+			"match": "//.*$"
 		}
 	],
 	"scopeName": "source.hlm"

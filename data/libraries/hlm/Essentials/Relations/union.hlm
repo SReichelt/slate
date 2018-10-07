@@ -30,11 +30,11 @@ $union(
     maxParenLevel = 2
   )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/Union(
-    U = {$../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    )},
-    S = {Q},
-    T = {R}
+      U = {$../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )},
+      S = {Q},
+      T = {R}
   )})]
 }

@@ -12,7 +12,7 @@ $"sequence inverse"(α: %Element(
   }
 )): %ExplicitOperator {
   definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
-    #(n: %Element($../../Natural/"Natural numbers")),
-    {a = {$../inverse(a = {a[n]})}}
+      #(n: %Element($../../Natural/"Natural numbers")),
+      {a = {$../inverse(a = {a[n]})}}
   })]
 }

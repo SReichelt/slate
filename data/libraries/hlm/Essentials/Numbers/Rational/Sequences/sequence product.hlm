@@ -25,10 +25,10 @@ $"sequence product"(
   )
 ): %ExplicitOperator {
   definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
-    #(n: %Element($../../Natural/"Natural numbers")),
-    {a = {$../product(
-      a = {a[n]},
-      b = {b[n]}
-    )}}
+      #(n: %Element($../../Natural/"Natural numbers")),
+      {a = {$../product(
+        a = {a[n]},
+        b = {b[n]}
+      )}}
   })]
 }

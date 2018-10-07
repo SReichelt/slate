@@ -17,7 +17,7 @@ $product(
   )
 ): %ExplicitOperator {
   definition = [$"Cardinal numbers".cardinality(S = {$../../Sets/"Cartesian product"(
-    S = {X},
-    T = {Y}
+      S = {X},
+      T = {Y}
   )})]
 }

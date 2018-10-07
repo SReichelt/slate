@@ -6,13 +6,13 @@ $equality(S: %Set): %ExplicitOperator {
     sub = S
   )],
   definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
-    #(s: %Element(S)),
-    $../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    ).pair(
-      s = {s},
-      t = {s}
-    )
+      #(s: %Element(S)),
+      $../Sets/"Cartesian product"(
+          S = {S},
+          T = {S}
+        ).pair(
+          s = {s},
+          t = {s}
+      )
   )})]
 }

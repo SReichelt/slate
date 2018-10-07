@@ -30,7 +30,7 @@ $product(
     maxParenLevel = 2
   )],
   definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence product"(
-    α = {r_a},
-    β = {r_b}
+      α = {r_a},
+      β = {r_b}
   )})]
 }

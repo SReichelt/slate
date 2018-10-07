@@ -5,35 +5,35 @@ $"free magma"(
   T: %SetDef($"Binary trees"(S = {S}))
 ): %ExplicitOperator {
   definition = [$Magmas.magma(
-    S = {T},
-    ∗ = {$../../Essentials/Functions/Functions(
-      X = {$../../Essentials/Sets/"Cartesian product"(
-        S = {T},
-        T = {T}
-      )},
-      Y = {T}
-    ).function(x = {
-      #(x: %Element(
-        $../../Essentials/Sets/"Cartesian product"(
-          S = {T},
-          T = {T}
-        ),
-        shortcut = {
-          $../../Essentials/Sets/"Cartesian product"(
+      S = {T},
+      ∗ = {$../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
             S = {T},
             T = {T}
-          ).pair,
-          #(
-            a: %Element(T),
-            b: %Element(T)
-          ),
-          override = %true
-        }
-      )),
-      {y = {$"Binary trees"(S = {S}).join(
-        a = {a},
-        b = {b}
-      )}}
-    })}
+          )},
+          Y = {T}
+        ).function(x = {
+          #(x: %Element(
+            $../../Essentials/Sets/"Cartesian product"(
+              S = {T},
+              T = {T}
+            ),
+            shortcut = {
+              $../../Essentials/Sets/"Cartesian product"(
+                  S = {T},
+                  T = {T}
+                ).pair,
+              #(
+                a: %Element(T),
+                b: %Element(T)
+              ),
+              override = %true
+            }
+          )),
+          {y = {$"Binary trees"(S = {S}).join(
+              a = {a},
+              b = {b}
+          )}}
+      })}
   )]
 }

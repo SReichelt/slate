@@ -29,8 +29,8 @@ $"Sum is commutative"(
             constructor = $"Natural numbers".successor,
             parameters = #(x: %Element($"Natural numbers")),
             value = $"Natural numbers".successor(n = {$sum(
-              m = {a},
-              n = {x}
+                m = {a},
+                n = {x}
             )}),
             rewrite = %true
           }
@@ -67,8 +67,8 @@ $"Sum is commutative"(
           parameters = #(x: %Element($"Natural numbers")),
           goal = %equals(
             $"Natural numbers".successor(n = {$sum(
-              m = {a},
-              n = {x}
+                m = {a},
+                n = {x}
             )}),
             $sum(
               m = {$"Natural numbers".successor(n = {x})},
@@ -87,8 +87,8 @@ $"Sum is commutative"(
                   n = {a}
                 ),
                 $"Natural numbers".successor(n = {$sum(
-                  m = {x},
-                  n = {a}
+                    m = {x},
+                    n = {a}
                 )})
               )
             ),
@@ -116,8 +116,8 @@ $"Sum is commutative"(
                   n = {a}
                 ),
                 $"Natural numbers".successor(n = {$sum(
-                  m = {a},
-                  n = {x}
+                    m = {a},
+                    n = {x}
                 )})
               )
             )

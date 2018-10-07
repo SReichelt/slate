@@ -30,13 +30,13 @@ $product(
     maxParenLevel = 2
   )],
   definition = [$"Rational numbers".quotient(
-    n = {$../Integer/product(
-      a = {n_a},
-      b = {n_b}
-    )},
-    m = {$../Natural/product(
-      m = {m_a},
-      n = {m_b}
-    )}
+      n = {$../Integer/product(
+        a = {n_a},
+        b = {n_b}
+      )},
+      m = {$../Natural/product(
+        m = {m_a},
+        n = {m_b}
+      )}
   )]
 }

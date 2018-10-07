@@ -19,35 +19,35 @@ $closure(
     arguments = [≺, P]
   )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
-    U = {$../Sets/"Cartesian product"(
-      S = {S},
-      T = {S}
-    )},
-    S = {%subset(
-      #(x: %Element(
-        $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
-          S = {S},
-          T = {S}
-        )}),
-        shortcut = {
+      U = {$../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      )},
+      S = {%subset(
+        #(x: %Element(
           $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
             S = {S},
             T = {S}
-          )}).subset,
-          #(X: %Subset($../Sets/"Cartesian product"(
-            S = {S},
-            T = {S}
-          ))),
-          override = %true
-        }
-      )),
-      %and(
-        %sub(R, X),
-        %in(
-          $Relations(S = {S}).relation(R = {X}),
-          P
+          )}),
+          shortcut = {
+            $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+                S = {S},
+                T = {S}
+              )}).subset,
+            #(X: %Subset($../Sets/"Cartesian product"(
+              S = {S},
+              T = {S}
+            ))),
+            override = %true
+          }
+        )),
+        %and(
+          %sub(R, X),
+          %in(
+            $Relations(S = {S}).relation(R = {X}),
+            P
+          )
         )
-      )
-    )}
+      )}
   )})]
 }
