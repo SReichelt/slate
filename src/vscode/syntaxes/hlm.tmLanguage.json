@@ -3,7 +3,7 @@
 	"name": "HLM",
 	"patterns": [
 		{
-			"name": "support.other.metamodel-ref.hlm",
+			"name": "header",
 			"match": "^%.*%$"
 		},
 		{
@@ -46,7 +46,13 @@
 		{
 			"name": "comment.block.documentation",
 			"begin": "/\\*\\*",
-			"end": "\\*/"
+			"end": "\\*/",
+			"patterns": [
+				{
+					"name": "keyword.other.documentation",
+					"match": "@\\w+\\b"
+				}
+			]
 		},
 		{
 			"name": "comment.block",

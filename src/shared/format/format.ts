@@ -428,7 +428,7 @@ export class DocumentationComment {
 
 export class DocumentationItem {
   kind?: string;
-  name?: string;
+  parameter?: Parameter;
   text: string;
 }
 

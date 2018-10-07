@@ -9,7 +9,7 @@ import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
-import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, readMetaModel, getMetaModelWithFallback } from '../../shared/data/dynamic';
+import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../shared/data/dynamic';
 
 const languageId = 'hlm';
 const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
@@ -429,19 +429,27 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
             }
         }
     }
-    if (rangeInfo.object instanceof Fmt.VariableRefExpression && rangeInfo.nameRange && (!position || rangeInfo.nameRange.contains(position)) && (!restrictToUri || areUrisEqual(restrictToUri, parsedDocument.uri))) {
-        let targetRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.variable);
-        if (targetRangeInfo) {
-            result.push({
-                originNameRange: rangeInfo.nameRange,
-                originSelectionRange: rangeInfo.nameRange,
-                targetUri: parsedDocument.uri,
-                targetRange: targetRangeInfo.range,
-                targetSelectionRange: targetRangeInfo.nameRange,
-                name: rangeInfo.object.variable.name
-            });
-            if (position) {
-                return result;
+    if (rangeInfo.nameRange && (!position || rangeInfo.nameRange.contains(position)) && (!restrictToUri || areUrisEqual(restrictToUri, parsedDocument.uri))) {
+        let variable: Fmt.Parameter | undefined = undefined;
+        if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
+            variable = rangeInfo.object.variable;
+        } else if (rangeInfo.object instanceof Fmt.DocumentationItem) {
+            variable = rangeInfo.object.parameter;
+        }
+        if (variable) {
+            let targetRangeInfo = parsedDocument.rangeMap.get(variable);
+            if (targetRangeInfo) {
+                result.push({
+                    originNameRange: rangeInfo.nameRange,
+                    originSelectionRange: rangeInfo.nameRange,
+                    targetUri: parsedDocument.uri,
+                    targetRange: targetRangeInfo.range,
+                    targetSelectionRange: targetRangeInfo.nameRange,
+                    name: variable.name
+                });
+                if (position) {
+                    return result;
+                }
             }
         }
     }
@@ -572,8 +580,8 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
                 for (let item of definitionLink.referencedDefinition.definition.documentation.items) {
                     if (item.kind) {
                         hoverText.appendMarkdown(`_@${item.kind}_`);
-                        if (item.name) {
-                            hoverText.appendMarkdown(` \`${item.name}\``);
+                        if (item.parameter) {
+                            hoverText.appendMarkdown(` \`${item.parameter.name}\``);
                         }
                         hoverText.appendMarkdown(' —\n');
                     }
@@ -625,6 +633,9 @@ class HLMHighlightProvider implements vscode.DocumentHighlightProvider {
                     } else if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
                         variable = rangeInfo.object.variable;
                         break;
+                    } else if (rangeInfo.object instanceof Fmt.DocumentationItem) {
+                        variable = rangeInfo.object.parameter;
+                        break;
                     }
                 }
             }
@@ -639,6 +650,8 @@ class HLMHighlightProvider implements vscode.DocumentHighlightProvider {
                             highlights.push(new vscode.DocumentHighlight(rangeInfo.nameRange, vscode.DocumentHighlightKind.Write));
                         } else if (rangeInfo.object instanceof Fmt.VariableRefExpression && rangeInfo.object.variable === variable) {
                             highlights.push(new vscode.DocumentHighlight(rangeInfo.nameRange, vscode.DocumentHighlightKind.Read));
+                        } else if (rangeInfo.object instanceof Fmt.DocumentationItem && rangeInfo.object.parameter === variable) {
+                            highlights.push(new vscode.DocumentHighlight(rangeInfo.nameRange, vscode.DocumentHighlightKind.Text));
                         }
                     }
                 }

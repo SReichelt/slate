@@ -89,6 +89,14 @@ export type RangeHandler = (info: ObjectRangeInfo) => void;
 export class EmptyExpression extends Fmt.Expression {
 }
 
+interface RawDocumentationItem {
+  kind?: string;
+  parameterName?: string;
+  text: string;
+  range: Range;
+  nameRange?: Range;
+}
+
 export class Reader {
   private markedStart?: Location;
   private markedEnd?: Location;
@@ -171,8 +179,8 @@ export class Reader {
   readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): void {
     let definitionsStart = this.markStart();
     for (;;) {
-      let documentationComment = this.skipWhitespace();
-      let definition = this.tryReadDefinition(documentationComment, metaDefinitions, context);
+      let documentationItems = this.skipWhitespace();
+      let definition = this.tryReadDefinition(documentationItems, metaDefinitions, context);
       if (definition) {
         definitions.push(definition);
       } else {
@@ -182,13 +190,12 @@ export class Reader {
     this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
-  tryReadDefinition(documentationComment: Fmt.DocumentationComment | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
+  tryReadDefinition(documentationItems: RawDocumentationItem[] | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
     let definitionStart = this.markStart();
     if (!this.tryReadChar('$')) {
       return undefined;
     }
     let definition = new Fmt.Definition;
-    definition.documentation = documentationComment;
     let nameStart = this.markStart();
     definition.name = this.readIdentifier();
     let nameRange = this.markEnd(nameStart);
@@ -197,6 +204,32 @@ export class Reader {
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     definition.type = this.readType(metaDefinitions, typeContext);
     let signatureRange = this.markEnd(definitionStart);
+    if (documentationItems) {
+      definition.documentation = new Fmt.DocumentationComment;
+      definition.documentation.items = documentationItems.map((item) => {
+        let result = new Fmt.DocumentationItem;
+        result.kind = item.kind;
+        if (item.parameterName) {
+          try {
+            result.parameter = definition.parameters.getParameter(item.parameterName);
+          } catch (error) {
+            this.error(error.message, item.nameRange);
+          }
+        }
+        result.text = item.text;
+        if (this.reportRange !== undefined) {
+          this.reportRange({
+            object: result,
+            context: context,
+            metaDefinitions: metaDefinitions,
+            range: item.range,
+            nameRange: item.nameRange,
+            linkRange: item.nameRange
+          });
+        }
+        return result;
+      });
+    }
     this.readChar('{');
     let metaInnerDefinitionTypes: Fmt.MetaDefinitionFactory | undefined = undefined;
     let contents: Fmt.ObjectContents | undefined;
@@ -585,8 +618,8 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
-  private skipWhitespace(allowComments: boolean = true): Fmt.DocumentationComment | undefined {
-    let documentationComment: Fmt.DocumentationComment | undefined = undefined;
+  private skipWhitespace(allowComments: boolean = true): RawDocumentationItem[] | undefined {
+    let result: RawDocumentationItem[] | undefined = undefined;
     let c = this.stream.peekChar();
     if (isWhitespaceCharacter(c) || (allowComments && c === '/')) {
       this.markedEnd = this.stream.getLocation();
@@ -609,11 +642,29 @@ export class Reader {
             if (c === '*') {
               this.stream.readChar();
               isDocumentationComment = true;
+              result = [];
             }
             let atLineStart = false;
             let afterAsterisk = true;
-            let commentText = '';
+            let atCommentLineStart = true;
+            let inKind = false;
+            let atNameStart = false;
+            let inUnescapedName = false;
+            let inEscapedName = false;
+            let inEscapeSequence = false;
+            let kind: string | undefined = undefined;
+            let name: string | undefined = undefined;
+            let text = '';
+            let textStartCol = 0;
+            let commentLineStart: Location | undefined = undefined;
+            let itemStart: Location | undefined = undefined;
+            let itemEnd: Location | undefined = undefined;
+            let nameStart: Location | undefined = undefined;
+            let nameEnd: Location | undefined = undefined;
             for (;;) {
+              if (atLineStart || afterAsterisk) {
+                commentLineStart = this.stream.getLocation();
+              }
               c = this.stream.readChar();
               if (!c) {
                 this.markedEnd = undefined;
@@ -627,23 +678,149 @@ export class Reader {
                 if (atLineStart) {
                   atLineStart = false;
                   afterAsterisk = true;
+                  c = '';
                 } else {
                   afterAsterisk = false;
-                  commentText += c;
                 }
               } else if (c === '\r' || c === '\n') {
                 atLineStart = true;
                 afterAsterisk = false;
-                commentText += c;
-              } else if (!(isWhitespaceCharacter(c) && (atLineStart || afterAsterisk))) {
+              } else if (isWhitespaceCharacter(c) && (atLineStart || afterAsterisk)) {
+                c = '';
+                afterAsterisk = false;
+              } else {
                 atLineStart = false;
                 afterAsterisk = false;
-                commentText += c;
+              }
+              if (isDocumentationComment && c) {
+                if (c === '\r' || c === '\n') {
+                  if (text) {
+                    text += c;
+                  }
+                  atCommentLineStart = true;
+                  inKind = false;
+                  atNameStart = false;
+                  inUnescapedName = false;
+                  inEscapedName = false;
+                  inEscapeSequence = false;
+                } else if (atCommentLineStart && c === '@') {
+                  if (kind || text) {
+                    if (!itemStart) {
+                      itemStart = this.stream.getLocation();
+                    }
+                    if (!itemEnd) {
+                      itemEnd = this.stream.getLocation();
+                    }
+                    result!.push({
+                      kind: kind,
+                      parameterName: name,
+                      text: text.trimRight(),
+                      range: {
+                        start: itemStart,
+                        end: itemEnd
+                      },
+                      nameRange: nameStart && nameEnd ? {
+                        start: nameStart,
+                        end: nameEnd
+                      } : undefined
+                    });
+                  }
+                  kind = '';
+                  name = undefined;
+                  text = '';
+                  atCommentLineStart = false;
+                  inKind = true;
+                  textStartCol = 0;
+                  itemStart = commentLineStart;
+                  itemEnd = undefined;
+                  nameStart = undefined;
+                  nameEnd = undefined;
+                } else if (inKind) {
+                  if (isWhitespaceCharacter(c)) {
+                    inKind = false;
+                    if (kind === 'param') {
+                      atNameStart = true;
+                      nameStart = this.stream.getLocation();
+                    }
+                  } else {
+                    kind += c;
+                  }
+                } else if (atNameStart) {
+                  if (isWhitespaceCharacter(c)) {
+                    nameStart = this.stream.getLocation();
+                  } else if (c === '"') {
+                    name = '';
+                    atNameStart = false;
+                    inEscapedName = true;
+                  } else {
+                    atNameStart = false;
+                    inUnescapedName = true;
+                    name = c;
+                    nameEnd = this.stream.getLocation();
+                  }
+                } else if (inUnescapedName) {
+                  if (isWhitespaceCharacter(c)) {
+                    inUnescapedName = false;
+                  } else {
+                    name += c;
+                    nameEnd = this.stream.getLocation();
+                  }
+                } else if (inEscapedName) {
+                  if (inEscapeSequence) {
+                    let escapedCharacter = this.getEscapedCharacter(c);
+                    if (escapedCharacter) {
+                      name += escapedCharacter;
+                    }
+                    inEscapeSequence = false;
+                  } else if (c === '\\') {
+                    inEscapeSequence = true;
+                  } else if (c === '"') {
+                    inEscapedName = false;
+                    nameEnd = this.stream.getLocation();
+                  } else {
+                    name += c;
+                    itemEnd = this.stream.getLocation();
+                  }
+                } else {
+                  if (!text) {
+                    textStartCol = this.stream.getLocation().col;
+                  } else if (this.stream.getLocation().col >= textStartCol) {
+                    atCommentLineStart = false;
+                  }
+                  if ((!text || atCommentLineStart) && isWhitespaceCharacter(c)) {
+                    if (atCommentLineStart) {
+                      commentLineStart = this.stream.getLocation();
+                    }
+                  } else {
+                    text += c;
+                    if (!itemStart) {
+                      itemStart = commentLineStart;
+                    }
+                    itemEnd = this.stream.getLocation();
+                  }
+                }
               }
             }
-            if (isDocumentationComment) {
-              documentationComment = new Fmt.DocumentationComment;
-              documentationComment.items = this.parseCommentText(commentText);
+            if (isDocumentationComment && (kind || text)) {
+              if (!itemStart) {
+                itemStart = this.stream.getLocation();
+              }
+              if (!itemEnd) {
+                itemEnd = this.stream.getLocation();
+              }
+              result!.push({
+                kind: kind,
+                parameterName: name,
+                text: text.trimRight(),
+                range: {
+                  start: itemStart,
+                  end: itemEnd
+                },
+                nameRange: nameStart && nameEnd ? {
+                  start: nameStart,
+                  end: nameEnd
+                } : undefined
+              });
             }
             break;
           default:
@@ -658,7 +835,7 @@ export class Reader {
         Object.assign(this.markedStart, this.stream.getLocation());
       }
     }
-    return documentationComment;
+    return result;
   }
 
   private tryReadChar(c: string): boolean {
@@ -722,93 +899,6 @@ export class Reader {
     }
   }
 
-  parseCommentText(commentText: string): Fmt.DocumentationItem[] {
-    let result: Fmt.DocumentationItem[] = [];
-    let atLineStart = true;
-    let inKind = false;
-    let atNameStart = false;
-    let inUnescapedName = false;
-    let inEscapedName = false;
-    let inEscapeSequence = false;
-    let kind: string | undefined = undefined;
-    let name: string | undefined = undefined;
-    let text = '';
-    for (let c of commentText) {
-      if (c === '\r' || c === '\n') {
-        if (text) {
-          text += c;
-        }
-        atLineStart = true;
-        inKind = false;
-        atNameStart = false;
-        inUnescapedName = false;
-        inEscapedName = false;
-        inEscapeSequence = false;
-      } else if (atLineStart && c === '@') {
-        if (kind || text) {
-          let item = new Fmt.DocumentationItem;
-          item.kind = kind;
-          item.name = name;
-          item.text = text.trimRight();
-          result.push(item);
-        }
-        kind = '';
-        name = undefined;
-        text = '';
-        inKind = true;
-      } else if (inKind) {
-        if (isWhitespaceCharacter(c)) {
-          inKind = false;
-          if (kind === 'param') {
-            atNameStart = true;
-          }
-        } else {
-          kind += c;
-        }
-      } else if (atNameStart) {
-        if (c === '"') {
-          name = '';
-          atNameStart = false;
-          inEscapedName = true;
-        } else if (!isWhitespaceCharacter(c)) {
-          atNameStart = false;
-          inUnescapedName = true;
-          name = c;
-        }
-      } else if (inUnescapedName) {
-        if (isWhitespaceCharacter(c)) {
-          inUnescapedName = false;
-        } else {
-          name += c;
-        }
-      } else if (inEscapedName) {
-        if (inEscapeSequence) {
-          let escapedCharacter = this.getEscapedCharacter(c);
-          if (escapedCharacter) {
-            name += escapedCharacter;
-          }
-          inEscapeSequence = false;
-        } else if (c === '\\') {
-          inEscapeSequence = true;
-        } else if (c === '"') {
-          inEscapedName = false;
-        } else {
-          name += c;
-        }
-      } else if (text || !isWhitespaceCharacter(c)) {
-        text += c;
-      }
-    }
-    if (kind || text) {
-      let item = new Fmt.DocumentationItem;
-      item.kind = kind;
-      item.name = name;
-      item.text = text.trimRight();
-      result.push(item);
-    }
-    return result;
-  }
-
   private markStart(): Location {
     if (!this.markedStart) {
       this.markedStart = this.stream.getLocation();
@@ -834,7 +924,7 @@ export class Reader {
       if (signatureRange) {
         signatureRange = fixRange(signatureRange);
       }
-      let info: ObjectRangeInfo = {
+      this.reportRange({
         object: object,
         context: context,
         metaDefinitions: metaDefinitions,
@@ -842,8 +932,7 @@ export class Reader {
         nameRange: nameRange,
         linkRange: linkRange,
         signatureRange: signatureRange
-      };
-      this.reportRange(info);
+      });
     }
     return range;
   }

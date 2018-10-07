@@ -424,9 +424,9 @@ export class Writer {
       } else {
         needEmptyLine = true;
       }
-      if (item.name) {
+      if (item.parameter) {
         this.write(' ');
-        this.writeIdentifier(item.name);
+        this.writeIdentifier(item.parameter.name);
       }
       let indentLength = this.lineLength + 1;
       let textLine = '';
