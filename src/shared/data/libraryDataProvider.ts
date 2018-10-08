@@ -9,14 +9,6 @@ import * as Logic from '../logics/logic';
 export { LibraryDataAccessor, LibraryItemInfo };
 
 
-interface SubsectionProviderCache {
-  [name: string]: LibraryDataProvider;
-}
-
-interface DefinitionCache {
-  [name: string]: Fmt.Definition;
-}
-
 interface PrefetchQueueItem {
   path: Fmt.Path;
   isSubsection: boolean;
@@ -24,8 +16,8 @@ interface PrefetchQueueItem {
 }
 
 export class LibraryDataProvider implements LibraryDataAccessor {
-  private subsectionProviderCache: SubsectionProviderCache = {};
-  private definitionCache: DefinitionCache = {};
+  private subsectionProviderCache = new Map<string, LibraryDataProvider>();
+  private definitionCache = new Map<string, Fmt.Definition>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
@@ -49,14 +41,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private getProviderForSubsection(path: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
     if (path instanceof Fmt.NamedPathItem) {
-      let provider = this.subsectionProviderCache[path.name];
+      let provider = this.subsectionProviderCache.get(path.name);
       if (provider) {
         if (!provider.itemNumber) {
           provider.itemNumber = itemNumber;
         }
       } else {
         provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this, path.name, itemNumber);
-        this.subsectionProviderCache[path.name] = provider;
+        this.subsectionProviderCache.set(path.name, provider);
       }
       return provider;
     } else if (path instanceof Fmt.ParentPathItem) {
@@ -112,16 +104,16 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchDefinition(name: string, getMetaModel: Fmt.MetaModelGetter): CachedPromise<Fmt.Definition> {
-    let cachedDefinition = this.definitionCache[name];
+    let cachedDefinition = this.definitionCache.get(name);
     if (cachedDefinition) {
       return CachedPromise.resolve(cachedDefinition);
     } else {
       let uri = this.uri + encodeURI(name) + '.hlm';
-      return this.fileAccessor.readFile(uri)
+      return this.fileAccessor.readFile(uri, () => this.definitionCache.delete(name))
         .then((str: string) => FmtReader.readString(str, uri, getMetaModel))
         .then((file: Fmt.File) => {
           let definition = file.definitions[0];
-          this.definitionCache[name] = definition;
+          this.definitionCache.set(name, definition);
           return definition;
         });
     }
