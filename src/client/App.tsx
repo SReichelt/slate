@@ -11,7 +11,7 @@ import * as FmtDisplay from '../shared/display/meta';
 import { WebFileAccessor } from './data/webFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
-import { HLM } from '../shared/logics/hlm/hlm';
+import * as Logics from '../shared/logics/logics';
 
 interface AppProps {
 }
@@ -40,7 +40,7 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    this.logic = new HLM;
+    this.logic = Logics.hlm;
     this.fileAccessor = new WebFileAccessor;
     this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, '/libraries/hlm', undefined, 'Library');
 
