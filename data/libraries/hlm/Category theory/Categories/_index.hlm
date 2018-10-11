@@ -1,6 +1,7 @@
 %../../../../format/library%
 
 $Categories: %Section {
+  logic = 'hlm',
   items = [
     %item($Categories),
     %item($cardinals),

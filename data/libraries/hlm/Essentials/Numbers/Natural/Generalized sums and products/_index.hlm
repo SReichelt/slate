@@ -1,6 +1,7 @@
 %../../../../../../format/library%
 
 $"Generalized sums and products": %Section {
+  logic = 'hlm',
   items = [
     %item($"inductive sum (exclusive)"),
     %item($"Inductive sum is distributive over sum"),

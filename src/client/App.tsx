@@ -8,6 +8,7 @@ import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/format/library';
 import * as FmtDisplay from '../shared/display/meta';
+import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
 import { WebFileAccessor } from './data/webFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
@@ -32,7 +33,7 @@ interface AppState extends SelectionState {
 
 class App extends React.Component<AppProps, AppState> {
   private logic: Logic.Logic;
-  private fileAccessor: WebFileAccessor;
+  private fileAccessor: FileAccessor;
   private libraryDataProvider: LibraryDataProvider;
   private library: CachedPromise<Fmt.Definition>;
   private treePaneNode: HTMLElement | null = null;
@@ -90,8 +91,9 @@ class App extends React.Component<AppProps, AppState> {
 
     let templateUri = '/display/templates.hlm';
     this.fileAccessor.readFile(templateUri)
-      .then((str: string) => FmtReader.readString(str, templateUri, FmtDisplay.getMetaModel))
-      .then((templates: Fmt.File) => {
+      .then((contents: FileContents) => {
+        let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
+        contents.close();
         this.setState({templates: templates});
       })
       .catch((error) => {

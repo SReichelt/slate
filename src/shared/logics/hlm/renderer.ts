@@ -209,11 +209,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     let currentGroupDefinition: Fmt.Definition | undefined = undefined;
     while (remainingParameters.length) {
       let param = remainingParameters[0];
-      if (currentGroup.length
-          && !((param.type.expression instanceof FmtHLM.MetaRefExpression_Set && currentGroup[0].type.expression instanceof FmtHLM.MetaRefExpression_Set)
-               || (param.type.expression instanceof FmtHLM.MetaRefExpression_Subset && param.type.expression.superset instanceof FmtHLM.MetaRefExpression_previous)
-               || (param.type.expression instanceof FmtHLM.MetaRefExpression_Element && param.type.expression._set instanceof FmtHLM.MetaRefExpression_previous)
-               || (param.type.expression instanceof FmtHLM.MetaRefExpression_Symbol && currentGroup[0].type.expression instanceof FmtHLM.MetaRefExpression_Symbol))) {
+      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
         row.push(this.renderParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices));
         currentGroup.length = 0;
         currentGroupDefinition = undefined;
@@ -236,6 +232,15 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
       state.inConstraint = false;
     }
     return new Display.RowExpression(row);
+  }
+
+  private combineParameter(param: Fmt.Parameter, firstParam: Fmt.Parameter): boolean {
+    let paramType = param.type.expression;
+    let firstParamType = firstParam.type.expression;
+    return (paramType instanceof FmtHLM.MetaRefExpression_Set && firstParamType instanceof FmtHLM.MetaRefExpression_Set)
+            || (paramType instanceof FmtHLM.MetaRefExpression_Subset && paramType.superset instanceof FmtHLM.MetaRefExpression_previous)
+            || (paramType instanceof FmtHLM.MetaRefExpression_Element && paramType._set instanceof FmtHLM.MetaRefExpression_previous)
+            || (paramType instanceof FmtHLM.MetaRefExpression_Symbol && firstParamType instanceof FmtHLM.MetaRefExpression_Symbol);
   }
 
   private renderParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
@@ -1355,5 +1360,99 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     let text = new Display.TextExpression('if ');
     let formulaWithText = new Display.RowExpression([text, formula]);
     return [wrappedValue, formulaWithText];
+  }
+
+  getDefinitionParts(definition: Fmt.Definition, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    // TODO proofs
+    if (!(definition.contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
+      this.getParameterListParts(definition.parameters, includeProofs, result);
+      for (let innerDefinition of definition.innerDefinitions) {
+        this.getDefinitionParts(innerDefinition, includeProofs, result);
+      }
+      if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
+        if (definition.contents.display) {
+          result.set(definition.contents.display, () => this.renderDefinitionRef([definition]));
+        }
+        if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
+          if (definition.contents.embedding) {
+            let embedding = definition.contents.embedding;
+            result.set(embedding.parameter, () => this.renderParameter(embedding.parameter));
+            result.set(embedding.target, () => {
+              let target = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
+              return this.renderElementTerm(target);
+            });
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_Constructor) {
+          if (definition.contents.equalityDefinition) {
+            let equalityDefinition = definition.contents.equalityDefinition;
+            this.getParameterListParts(equalityDefinition.leftParameters, includeProofs, result);
+            this.getParameterListParts(equalityDefinition.rightParameters, includeProofs, result);
+            if (equalityDefinition.definition instanceof Fmt.ArrayExpression) {
+              for (let item of equalityDefinition.definition.items) {
+                result.set(item, () => this.renderFormula(item));
+              }
+            }
+          }
+          if (definition.contents.rewrite) {
+            let rewrite = definition.contents.rewrite;
+            result.set(rewrite.value, () => this.renderElementTerm(rewrite.value));
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
+          for (let item of definition.contents.definition.items) {
+            result.set(item, () => this.renderSetTerm(item));
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
+          for (let item of definition.contents.definition.items) {
+            result.set(item, () => this.renderElementTerm(item));
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
+          let parameter = definition.contents.parameter;
+          result.set(parameter, () => this.renderParameter(parameter));
+          for (let item of definition.contents.definition.items) {
+            result.set(item, () => this.renderFormula(item));
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.definition instanceof Fmt.ArrayExpression) {
+          for (let item of definition.contents.definition.items) {
+            result.set(item, () => this.renderFormula(item));
+          }
+        }
+      } else {
+        if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
+          let claim = definition.contents.claim;
+          result.set(claim, () => this.renderFormula(claim));
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem && definition.contents.conditions instanceof Fmt.ArrayExpression) {
+          for (let item of definition.contents.conditions.items) {
+            result.set(item, () => this.renderFormula(item));
+          }
+        }
+      }
+    }
+  }
+
+  getParameterListParts(parameters: Fmt.Parameter[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    let initialState: ParameterListState = {
+      sentence: false,
+      abbreviate: true,
+      inQuantifier: false,
+      forcePlural: false,
+      enableSpecializations: false,
+      started: false,
+      inLetExpr: false,
+      inConstraint: false,
+      inDefinitionDisplayGroup: false
+    };
+    let currentGroup: Fmt.Parameter[] = [];
+    for (let param of parameters) {
+      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
+        let group = currentGroup;
+        result.set(group[0], () => this.renderParameterGroup(group, undefined, undefined, undefined, Object.assign({}, initialState)));
+        currentGroup = [];
+      }
+      currentGroup.push(param);
+    }
+    if (currentGroup.length) {
+      let group = currentGroup;
+      result.set(group[0], () => this.renderParameterGroup(group, undefined, undefined, undefined, Object.assign({}, initialState)));
+    }
   }
 }

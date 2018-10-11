@@ -1,6 +1,7 @@
 %../../../../../format/library%
 
 $Rational: %Section {
+  logic = 'hlm',
   items = [
     %item($"Rational numbers"),
     %item($sum),

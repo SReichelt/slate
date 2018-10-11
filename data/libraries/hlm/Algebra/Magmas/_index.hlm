@@ -1,6 +1,7 @@
 %../../../../format/library%
 
 $Magmas: %Section {
+  logic = 'hlm',
   items = [
     %item($Magmas),
     %item($associative),

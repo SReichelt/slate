@@ -1,6 +1,7 @@
 %../../../../../format/library%
 
 $Integer: %Section {
+  logic = 'hlm',
   items = [
     %item($Integers),
     %item($sum),

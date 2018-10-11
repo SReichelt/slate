@@ -1,6 +1,7 @@
 %../../../../../format/library%
 
 $Natural: %Section {
+  logic = 'hlm',
   items = [
     %item($"Natural numbers"),
     %item(

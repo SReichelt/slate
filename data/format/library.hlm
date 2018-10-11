@@ -8,15 +8,13 @@ $library: %MetaModel {
 
 $Section: %DefinitionType {
   members = #(
+    logic: %String,
     items: $Item[] = []
   )
 }
 
 $Library: %DefinitionType {
-  superType = $Section,
-  members = #(
-    logic: %Any
-  )
+  superType = $Section
 }
 
 $Item: %ExpressionType {}

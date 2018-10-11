@@ -52,6 +52,9 @@ export abstract class GenericRenderer {
     if (suffixes) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': suffixes});
+      if (suffixes.length > 1) {
+        subExpression.sub = new Display.OuterParenExpression(subExpression.sub);
+      }
       result = subExpression;
     }
     result.styleClasses = ['var'];
@@ -59,6 +62,9 @@ export abstract class GenericRenderer {
     if (indices) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': indices});
+      if (indices.length > 1) {
+        subExpression.sub = new Display.OuterParenExpression(subExpression.sub);
+      }
       result = subExpression;
     }
     return result;

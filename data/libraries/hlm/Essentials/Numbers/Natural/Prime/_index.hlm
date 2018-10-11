@@ -1,6 +1,7 @@
 %../../../../../../format/library%
 
 $Prime: %Section {
+  logic = 'hlm',
   items = [
     %item($prime),
     %item(

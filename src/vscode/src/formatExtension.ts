@@ -10,19 +10,11 @@ import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
 import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../fs/format/dynamic';
+import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery } from './utils';
+import * as LogicExtension from './logicExtension';
 
 const languageId = 'hlm';
 const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
-
-interface RangeInfo {
-    object: Object;
-    context?: Fmt.Context;
-    metaDefinitions?: Fmt.MetaDefinitionFactory;
-    range: vscode.Range;
-    nameRange?: vscode.Range;
-    linkRange?: vscode.Range;
-    signatureRange?: vscode.Range;
-}
 
 interface ParsedDocument {
     uri: vscode.Uri;
@@ -39,43 +31,6 @@ interface ParsedMetaModel {
     metaModel: FmtDynamic.DynamicMetaModel;
     metaModelDocument: ParsedDocument;
     metaModelDocuments: Map<FmtDynamic.DynamicMetaModel, ParsedDocument>;
-}
-
-function convertLocation(location: FmtReader.Location): vscode.Position {
-    return new vscode.Position(location.line, location.col);
-}
-
-function convertRange(range: FmtReader.Range): vscode.Range {
-    let start = convertLocation(range.start);
-    let end = convertLocation(range.end);
-    return new vscode.Range(start, end);
-}
-
-function convertRangeInfo(info: FmtReader.ObjectRangeInfo): RangeInfo {
-    return {
-        object: info.object,
-        context: info.context,
-        metaDefinitions: info.metaDefinitions,
-        range: convertRange(info.range),
-        nameRange: info.nameRange ? convertRange(info.nameRange) : undefined,
-        linkRange: info.linkRange ? convertRange(info.linkRange) : undefined,
-        signatureRange: info.signatureRange ? convertRange(info.signatureRange) : undefined
-    };
-}
-
-function areUrisEqual(uri1: vscode.Uri, uri2: vscode.Uri): boolean {
-    return uri1.toString() === uri2.toString();
-}
-
-function matchesQuery(name: string, query: string): boolean {
-    let pos = 0;
-    for (let c of query) {
-        pos = name.indexOf(c, pos);
-        if (pos < 0) {
-            return false;
-        }
-    }
-    return true;
 }
 
 let lastReadFileName: string | undefined = undefined;
@@ -589,6 +544,7 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
                 }
                 hoverTexts.push(hoverText);
             }
+            // TODO add rendered text from logic extension if applicable
             if (hoverTexts.length) {
                 return new vscode.Hover(hoverTexts, definitionLink.originSelectionRange);
             }
@@ -1354,12 +1310,18 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     return parsedDocument;
 }
 
-function parseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap): void {
+function parseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter?: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>): ParsedDocument | undefined {
     if (document.languageId === languageId) {
         let diagnostics: vscode.Diagnostic[] = [];
         let parsedDocument = parseFile(document.uri, document.getText(), diagnostics, document);
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
+        if (parseEventEmitter && parsedDocument.file) {
+            parseEventEmitter.fire({document: document, metaModelName: parsedDocument.file.metaModelPath.name});
+        }
+        return parsedDocument;
+    } else {
+        return undefined;
     }
 }
 
@@ -1368,11 +1330,10 @@ let parseAllTimer: NodeJS.Timer | undefined = undefined;
 export function activate(context: vscode.ExtensionContext): void {
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
-    for (let document of vscode.workspace.textDocuments) {
-        parseDocument(document, diagnosticCollection, parsedDocuments);
-    }
+    let parseEventEmitter = new vscode.EventEmitter<LogicExtension.ParseDocumentEvent>();
+    context.subscriptions.push(parseEventEmitter);
     context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments)),
+        vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             parsedFileCache.delete(event.document.uri.fsPath);
             parseDocument(event.document, diagnosticCollection, parsedDocuments);
@@ -1409,10 +1370,14 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.languages.registerRenameProvider(HLM_MODE, new HLMRenameProvider(parsedDocuments)),
         vscode.languages.registerDocumentFormattingEditProvider(HLM_MODE, new HLMDocumentFormatter)
     );
-    // TODO code lense provider
+    LogicExtension.activate(context, parseEventEmitter.event);
+    for (let document of vscode.workspace.textDocuments) {
+        parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
+    }
 }
 
 export function deactivate(): void {
+    LogicExtension.deactivate();
     if (parseAllTimer) {
         clearTimeout(parseAllTimer);
         parseAllTimer = undefined;

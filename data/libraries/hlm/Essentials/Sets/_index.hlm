@@ -1,6 +1,7 @@
 %../../../../format/library%
 
 $Sets: %Section {
+  logic = 'hlm',
   items = [
     %item($"Empty set"),
     %item($"Empty set is subset of any set"),

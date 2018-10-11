@@ -516,9 +516,10 @@ $BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
 $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
   display = $SubSup(
     body = set,
-    sub = [symbol, $InnerParens(
-      body = limit,
-      maxLevel = 2
-    )]
+    sub = $PrefixUnaryOperator(
+      symbol = symbol,
+      operand = limit,
+      space = ''
+    )
   )
 }

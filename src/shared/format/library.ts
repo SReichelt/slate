@@ -5,14 +5,24 @@
 import * as Fmt from './format';
 
 export class ObjectContents_Section extends Fmt.ObjectContents {
+  logic: string;
   items?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.items = argumentList.getOptionalValue('items', 0);
+    let logicRaw = argumentList.getValue('logic', 0);
+    if (logicRaw instanceof Fmt.StringExpression) {
+      this.logic = logicRaw.value;
+    } else {
+      throw new Error('logic: String expected');
+    }
+    this.items = argumentList.getOptionalValue('items', 1);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+    let logicExpr = new Fmt.StringExpression;
+    logicExpr.value = this.logic;
+    argumentList.add(logicExpr, 'logic');
     if (this.items !== undefined) {
       argumentList.add(this.items, 'items');
     }
@@ -48,26 +58,16 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Library extends ObjectContents_Section {
-  logic: Fmt.Expression;
-
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.logic = argumentList.getValue('logic', 1);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
-    argumentList.add(this.logic, 'logic');
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
-    if (this.logic) {
-      result.logic = this.logic.substitute(fn, replacedParameters);
-      if (result.logic !== this.logic) {
-        changed = true;
-      }
-    }
     return changed;
   }
 }

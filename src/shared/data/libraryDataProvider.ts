@@ -1,5 +1,5 @@
 import { LibraryDataAccessor, LibraryItemInfo } from './libraryDataAccessor';
-import { FileAccessor } from './fileAccessor';
+import { FileAccessor, FileContents } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
@@ -109,9 +109,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       return CachedPromise.resolve(cachedDefinition);
     } else {
       let uri = this.uri + encodeURI(name) + '.hlm';
-      return this.fileAccessor.readFile(uri, () => this.definitionCache.delete(name))
-        .then((str: string) => FmtReader.readString(str, uri, getMetaModel))
-        .then((file: Fmt.File) => {
+      return this.fileAccessor.readFile(uri)
+        .then((contents: FileContents) => {
+          contents.onChange = () => {
+            this.definitionCache.delete(name);
+            contents.close();
+          };
+          let file = FmtReader.readString(contents.text, uri, getMetaModel);
           let definition = file.definitions[0];
           this.definitionCache.set(name, definition);
           return definition;

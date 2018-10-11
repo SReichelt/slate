@@ -23,7 +23,10 @@ export interface LogicDisplay {
   getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): LogicRenderer;
 }
 
+export type RenderFn = () => Display.RenderedExpression;
+
 export interface LogicRenderer {
   renderDefinition(definition: Fmt.Definition, itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeProofs: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
   renderDefinitionSummary(definition: Fmt.Definition): Display.RenderedExpression | undefined;
+  getDefinitionParts(definition: Fmt.Definition, includeProofs: boolean, result: Map<Object, RenderFn>): void;
 }

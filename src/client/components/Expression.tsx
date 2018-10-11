@@ -556,13 +556,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         result = `Error: ${error.message}`;
       }
     } else if (expression instanceof Display.PromiseExpression) {
-      let immediateResult = expression.promise.getImmediateResult();
-      if (immediateResult) {
-        return this.renderExpression(immediateResult, className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
-      } else {
-        let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
-        return renderPromise(render);
-      }
+      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
+      return renderPromise(render);
     } else if (expression instanceof Display.DecoratedExpression) {
       return this.renderExpression(expression.body, className, semanticLink);
     } else {

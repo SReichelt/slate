@@ -1,5 +1,6 @@
 %../../../../format/library%
 
 $Functions: %Section {
+  logic = 'hlm',
   items = [%item($Sequences)]
 }

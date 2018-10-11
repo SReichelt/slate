@@ -1,6 +1,7 @@
 %../../../../format/library%
 
 $Relations: %Section {
+  logic = 'hlm',
   items = [
     %item($Relations),
     %item($related),

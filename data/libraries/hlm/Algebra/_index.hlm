@@ -1,6 +1,7 @@
 %../../../format/library%
 
 $Algebra: %Section {
+  logic = 'hlm',
   items = [
     %subsection(
       $Isomorphisms,

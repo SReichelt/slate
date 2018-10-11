@@ -1,6 +1,7 @@
 %../../../../format/library%
 
 $Isomorphisms: %Section {
+  logic = 'hlm',
   items = [
     %item($"element transform"),
     %item($"function transform"),

@@ -1,6 +1,7 @@
 %../../../../../../format/library%
 
 $Sequences: %Section {
+  logic = 'hlm',
   items = [
     %item($converges),
     %item($convergent),
