@@ -407,8 +407,12 @@ export class Writer {
 
   writeDocumentationComment(documentationComment: Fmt.DocumentationComment, indent: IndentInfo): void {
     this.write('/**');
+    let first = true;
     let needEmptyLine = false;
     for (let item of documentationComment.items) {
+      if (!first && !item.parameter) {
+        needEmptyLine = true;
+      }
       if (needEmptyLine) {
         this.writeNewLine();
         this.writeIndent(indent);
@@ -421,12 +425,12 @@ export class Writer {
       if (item.kind) {
         this.write(' @');
         this.write(item.kind);
-      } else {
-        needEmptyLine = true;
       }
       if (item.parameter) {
         this.write(' ');
         this.writeIdentifier(item.parameter.name);
+      } else {
+        needEmptyLine = true;
       }
       let indentLength = this.lineLength + 1;
       let textLine = '';
@@ -456,6 +460,7 @@ export class Writer {
         }
         this.write(textLine);
       }
+      first = false;
     }
     this.writeNewLine();
     this.writeIndent(indent);

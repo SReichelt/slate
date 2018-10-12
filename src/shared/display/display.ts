@@ -156,6 +156,16 @@ export class AlignedExpression extends RenderedExpression {
   }
 }
 
+export class TableExpression extends RenderedExpression {
+  constructor(public items: RenderedExpression[][]) {
+    super();
+  }
+
+  getLineHeight(): CachedPromise<number> {
+    return CachedPromise.resolve(0);
+  }
+}
+
 export class DecoratedExpression extends RenderedExpression {
   constructor(public body: RenderedExpression) {
     super();
@@ -239,16 +249,6 @@ export class SubSupExpression extends DecoratedExpression {
 export class OverUnderExpression extends DecoratedExpression {
   over?: RenderedExpression;
   under?: RenderedExpression;
-}
-
-export class TableExpression extends RenderedExpression {
-  constructor(public items: RenderedExpression[][]) {
-    super();
-  }
-
-  getLineHeight(): CachedPromise<number> {
-    return CachedPromise.resolve(0);
-  }
 }
 
 export class FractionExpression extends RenderedExpression {
@@ -568,6 +568,19 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       expression = new DecoratedExpression(this.getExpressionArg('body'));
       expression.styleClasses = [this.getArg('styleClass')];
       break;
+    case 'Aligned':
+      {
+        let items = this.getExpressionListListArg('items');
+        let rows = items.map((row: RenderedExpression[]) => ({
+          left: new RowExpression(row.splice(0, row.length - 1)),
+          right: row[row.length - 1]
+        }));
+        expression = new AlignedExpression(rows);
+      }
+      break;
+    case 'Table':
+      expression = new TableExpression(this.getExpressionListListArg('items'));
+      break;
     case 'Parens':
       expression = new ParenExpression(this.getExpressionArg('body'), this.getArg('style'));
       break;
@@ -613,19 +626,6 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
         overUnderExpression.over = this.getOptionalExpressionArg('over');
         overUnderExpression.under = this.getOptionalExpressionArg('under');
         expression = overUnderExpression;
-      }
-      break;
-    case 'Table':
-      expression = new TableExpression(this.getExpressionListListArg('items'));
-      break;
-    case 'Aligned':
-      {
-        let items = this.getExpressionListListArg('items');
-        let rows = items.map((row: RenderedExpression[]) => ({
-          left: new RowExpression(row.splice(0, row.length - 1)),
-          right: row[row.length - 1]
-        }));
-        expression = new AlignedExpression(rows);
       }
       break;
     case 'Fraction':

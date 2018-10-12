@@ -1362,16 +1362,23 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     return [wrappedValue, formulaWithText];
   }
 
-  getDefinitionParts(definition: Fmt.Definition, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+  getDefinitionParts(definition: Fmt.Definition, includeProofs: boolean): Map<Object, Logic.RenderFn> {
+    let result = new Map<Object, Logic.RenderFn>();
+    this.addDefinitionParts([definition], includeProofs, result);
+    return result;
+  }
+
+  private addDefinitionParts(definitions: Fmt.Definition[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
     // TODO proofs
+    let definition = definitions[definitions.length - 1];
     if (!(definition.contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
       this.getParameterListParts(definition.parameters, includeProofs, result);
       for (let innerDefinition of definition.innerDefinitions) {
-        this.getDefinitionParts(innerDefinition, includeProofs, result);
+        this.addDefinitionParts(definitions.concat(innerDefinition), includeProofs, result);
       }
       if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
         if (definition.contents.display) {
-          result.set(definition.contents.display, () => this.renderDefinitionRef([definition]));
+          result.set(definition.contents.display, () => this.renderDefinitionRef(definitions));
         }
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
           if (definition.contents.embedding) {
@@ -1431,11 +1438,11 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
 
   getParameterListParts(parameters: Fmt.Parameter[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
     let initialState: ParameterListState = {
-      sentence: false,
-      abbreviate: true,
+      sentence: true,
+      abbreviate: false,
       inQuantifier: false,
       forcePlural: false,
-      enableSpecializations: false,
+      enableSpecializations: true,
       started: false,
       inLetExpr: false,
       inConstraint: false,
@@ -1445,14 +1452,14 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     for (let param of parameters) {
       if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
         let group = currentGroup;
-        result.set(group[0], () => this.renderParameterGroup(group, undefined, undefined, undefined, Object.assign({}, initialState)));
+        result.set(group[0], () => this.renderParameters(group, initialState));
         currentGroup = [];
       }
       currentGroup.push(param);
     }
     if (currentGroup.length) {
       let group = currentGroup;
-      result.set(group[0], () => this.renderParameterGroup(group, undefined, undefined, undefined, Object.assign({}, initialState)));
+      result.set(group[0], () => this.renderParameters(group, initialState));
     }
   }
 }

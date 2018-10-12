@@ -1,13 +1,13 @@
 %display%
 
 $Style(body: %Expr, styleClass: %String): %Template {}
+$Aligned(items: %Expr[,]): %Template {}
+$Table(items: %Expr[,]): %Template {}
 $Parens(body: %Expr, style: %String): %Template {}
 $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 $OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): %Template {}
 $OverUnder(body: %Expr, over?: %Expr, under?: %Expr): %Template {}
-$Table(items: %Expr[,]): %Template {}
-$Aligned(items: %Expr[,]): %Template {}
 $Fraction(numerator: %Expr, denominator: %Expr): %Template {}
 $Radical(radicand: %Expr, degree?: %Expr): %Template {}
 

@@ -182,6 +182,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
         </span>
       ));
+    } else if (expression instanceof Display.TableExpression) {
+      className += ' table';
+      result = expression.items.map((row: Display.RenderedExpression[], rowIndex: number) => (
+        <span className={'table-row'} key={rowIndex}>
+          {row.map((cell: Display.RenderedExpression, colIndex: number) => (
+            <span className={'table-cell'} key={colIndex}>
+              <Expression expression={cell} parent={this} hover={this.hover}/>
+            </span>
+          ))}
+        </span>
+      ));
     } else if (expression instanceof Display.ParenExpression) {
       className += ' paren';
       let parenExpression = expression;
@@ -485,17 +496,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
         )
       ];
-    } else if (expression instanceof Display.TableExpression) {
-      className += ' table';
-      result = expression.items.map((row: Display.RenderedExpression[], rowIndex: number) => (
-        <span className={'table-row'} key={rowIndex}>
-          {row.map((cell: Display.RenderedExpression, colIndex: number) => (
-            <span className={'table-cell'} key={colIndex}>
-              <Expression expression={cell} parent={this} hover={this.hover}/>
-            </span>
-          ))}
-        </span>
-      ));
     } else if (expression instanceof Display.FractionExpression) {
       className += ' fraction';
       result = [

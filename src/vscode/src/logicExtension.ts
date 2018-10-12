@@ -51,14 +51,14 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
                     let ranges: FmtReader.ObjectRangeInfo[] = [];
                     let reportRange = (info: FmtReader.ObjectRangeInfo) => ranges.push(info);
                     let file = FmtReader.readString(document.getText(), document.fileName, documentLibraryDataProvider.logic.getMetaModel, reportRange);
-                    let parts = new Map<Object, Logic.RenderFn>();
-                    for (let definition of file.definitions) {
-                        renderer.getDefinitionParts(definition, true, parts);
-                    }
-                    for (let info of ranges) {
-                        let part = parts.get(info.object);
-                        if (part) {
-                            result.push(new HLMCodeLens(convertRange(info.range), part));
+                    if (file.definitions.length) {
+                        let definition = file.definitions[0];
+                        let parts = renderer.getDefinitionParts(definition, true);
+                        for (let info of ranges) {
+                            let part = parts.get(info.object);
+                            if (part) {
+                                result.push(new HLMCodeLens(convertRange(info.range), part));
+                            }
                         }
                     }
                 }
