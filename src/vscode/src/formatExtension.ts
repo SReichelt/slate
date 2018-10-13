@@ -10,6 +10,7 @@ import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
 import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../fs/format/dynamic';
+import CachedPromise from '../../shared/data/cachedPromise';
 import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery } from './utils';
 import * as LogicExtension from './logicExtension';
 
@@ -331,6 +332,7 @@ function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, 
 
 interface DefinitionLink extends vscode.DefinitionLink {
     originNameRange: vscode.Range;
+    originObject: Object;
     name: string;
     referencedDefinition?: ReferencedDefinition;
 }
@@ -344,6 +346,7 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
             if (targetRangeInfo) {
                 result.push({
                     originNameRange: rangeInfo.nameRange,
+                    originObject: rangeInfo.object,
                     originSelectionRange: rangeInfo.linkRange,
                     targetUri: signatureInfo.parsedDocument.uri,
                     targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
@@ -367,6 +370,7 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
                                 if (targetRangeInfo) {
                                     result.push({
                                         originNameRange: argRangeInfo.nameRange,
+                                        originObject: rangeInfo.object,
                                         originSelectionRange: argRangeInfo.nameRange,
                                         targetUri: signatureInfo.parsedDocument.uri,
                                         targetRange: targetRangeInfo.range,
@@ -396,6 +400,7 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
             if (targetRangeInfo) {
                 result.push({
                     originNameRange: rangeInfo.nameRange,
+                    originObject: rangeInfo.object,
                     originSelectionRange: rangeInfo.nameRange,
                     targetUri: parsedDocument.uri,
                     targetRange: targetRangeInfo.range,
@@ -510,7 +515,7 @@ class HLMWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 }
 
 class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider {
-    constructor(private parsedDocuments: ParsedDocumentMap) {}
+    constructor(private parsedDocuments: ParsedDocumentMap, private hoverEventEmitter: vscode.EventEmitter<LogicExtension.HoverEvent>) {}
 
     provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
         let definitionLink = this.getDefinitionLink(document, position, token, false);
@@ -530,24 +535,34 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
                 hoverText.appendCodeblock(hoverCode);
                 hoverTexts.push(hoverText);
             }
-            if (definitionLink.referencedDefinition && definitionLink.referencedDefinition.definition.documentation) {
-                let hoverText = new vscode.MarkdownString;
-                for (let item of definitionLink.referencedDefinition.definition.documentation.items) {
-                    if (item.kind) {
-                        hoverText.appendMarkdown(`_@${item.kind}_`);
-                        if (item.parameter) {
-                            hoverText.appendMarkdown(` \`${item.parameter.name}\``);
+            let referencedDefinition = definitionLink.referencedDefinition;
+            let hoverEvent: LogicExtension.HoverEvent = {
+                document: document,
+                object: definitionLink.originObject,
+                hoverTexts: CachedPromise.resolve(hoverTexts)
+            };
+            this.hoverEventEmitter.fire(hoverEvent);
+            return hoverEvent.hoverTexts.then((finalHoverTexts: vscode.MarkdownString[]) => {
+                if (referencedDefinition && referencedDefinition.definition.documentation) {
+                    let hoverText = new vscode.MarkdownString;
+                    for (let item of referencedDefinition.definition.documentation.items) {
+                        if (item.kind) {
+                            hoverText.appendMarkdown(`_@${item.kind}_`);
+                            if (item.parameter) {
+                                hoverText.appendMarkdown(` \`${item.parameter.name}\``);
+                            }
+                            hoverText.appendMarkdown(' —\n');
                         }
-                        hoverText.appendMarkdown(' —\n');
+                        hoverText.appendMarkdown(item.text + '\n\n');
                     }
-                    hoverText.appendMarkdown(item.text + '\n\n');
+                    finalHoverTexts.push(hoverText);
                 }
-                hoverTexts.push(hoverText);
-            }
-            // TODO add rendered text from logic extension if applicable
-            if (hoverTexts.length) {
-                return new vscode.Hover(hoverTexts, definitionLink.originSelectionRange);
-            }
+                if (finalHoverTexts.length) {
+                    return new vscode.Hover(finalHoverTexts, definitionLink!.originSelectionRange);
+                } else {
+                    return undefined;
+                }
+            });
         }
         return undefined;
     }
@@ -1108,6 +1123,7 @@ class HLMRenameProvider implements vscode.RenameProvider {
                     if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
                         return {
                             originNameRange: rangeInfo.nameRange,
+                            originObject: rangeInfo.object,
                             originSelectionRange: rangeInfo.nameRange,
                             targetUri: document.uri,
                             targetRange: rangeInfo.range,
@@ -1331,7 +1347,11 @@ export function activate(context: vscode.ExtensionContext): void {
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
     let parseEventEmitter = new vscode.EventEmitter<LogicExtension.ParseDocumentEvent>();
-    context.subscriptions.push(parseEventEmitter);
+    let hoverEventEmitter = new vscode.EventEmitter<LogicExtension.HoverEvent>();
+    context.subscriptions.push(
+        parseEventEmitter,
+        hoverEventEmitter
+    );
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
@@ -1357,7 +1377,7 @@ export function activate(context: vscode.ExtensionContext): void {
             }, 500);
         })
     );
-    let definitionProvider = new HLMDefinitionProvider(parsedDocuments);
+    let definitionProvider = new HLMDefinitionProvider(parsedDocuments, hoverEventEmitter);
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(HLM_MODE, new HLMDocumentSymbolProvider(parsedDocuments)),
         vscode.languages.registerWorkspaceSymbolProvider(new HLMWorkspaceSymbolProvider),
@@ -1370,7 +1390,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.languages.registerRenameProvider(HLM_MODE, new HLMRenameProvider(parsedDocuments)),
         vscode.languages.registerDocumentFormattingEditProvider(HLM_MODE, new HLMDocumentFormatter)
     );
-    LogicExtension.activate(context, parseEventEmitter.event);
+    LogicExtension.activate(context, parseEventEmitter.event, hoverEventEmitter.event);
     for (let document of vscode.workspace.textDocuments) {
         parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
     }

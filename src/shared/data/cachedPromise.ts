@@ -39,9 +39,11 @@ class CachedPromise<R> {
     }
   }
 
-  catch(onRejected: (error: any) => void): void {
+  catch<U>(onRejected: (error: any) => U): CachedPromise<R | U> {
     if (this.sourceIsPromise) {
-      (this.source as Promise<R>).catch(onRejected);
+      return new CachedPromise<R | U>((this.source as Promise<R>).catch(onRejected));
+    } else {
+      return this;
     }
   }
 

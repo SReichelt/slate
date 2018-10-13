@@ -14,6 +14,7 @@ import { WorkspaceFileAccessor } from './workspaceFileAccessor';
 import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
 import { fileExtension } from '../../fs/format/dynamic';
 import { convertRange } from './utils';
+import CachedPromise from '../../shared/data/cachedPromise';
 
 const languageId = 'hlm';
 const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
@@ -25,7 +26,7 @@ class HLMCodeLens extends vscode.CodeLens {
 }
 
 class HLMCodeLensProvider implements vscode.CodeLensProvider {
-    private templates?: Fmt.File;
+    public templates?: Fmt.File;
 
     constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>, public onDidChangeCodeLenses: vscode.Event<void>) {}
 
@@ -71,7 +72,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
 
 	resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens> {
         if (codeLens instanceof HLMCodeLens) {
-            return renderAsText(codeLens.renderFn()).then((text: string) => {
+            return renderAsText(codeLens.renderFn(), false, true).then((text: string) => {
                 return new vscode.CodeLens(codeLens.range, {
                     title: text,
                     command: ''
@@ -81,11 +82,31 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
             return undefined;
         }
     }
+}
 
-    updateTemplates(fileContents: string, uri: string): void {
-        try {
-            this.templates = FmtReader.readString(fileContents, uri, FmtDisplay.getMetaModel);
-        } catch (error) {
+class HLMLogicHoverProvider {
+    public templates?: Fmt.File;
+
+    constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>) {}
+
+    provideHover(event: HoverEvent): void {
+        let documentLibraryDataProvider = this.documentLibraryDataProviders.get(event.document);
+        if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path) {
+            let targetDataProvider = documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
+            // TODO determine whether this makes sense instead of reacting to rejected promise
+            let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
+            let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates);
+            let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
+                let renderedDefinition = renderer.renderDefinition(definition, undefined, false, false, false, false);
+                return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
+            });
+            event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {
+                if (text) {
+                    return hoverTexts.concat(new vscode.MarkdownString(text));
+                } else {
+                    return hoverTexts;
+                }
+            }).catch(() => hoverTexts));
         }
     }
 }
@@ -95,15 +116,22 @@ export class ParseDocumentEvent {
     metaModelName: string;
 }
 
-export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>): void {
+export class HoverEvent {
+    document: vscode.TextDocument;
+    object: Object;
+    hoverTexts: Thenable<vscode.MarkdownString[]>;
+}
+
+export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onShowHover: vscode.Event<HoverEvent>): void {
     let fileAccessor = new WorkspaceFileAccessor;
     let rootLibraryDataProviders = new Map<string, LibraryDataProvider>();
     let documentLibraryDataProviders = new Map<vscode.TextDocument, LibraryDataProvider>();
     let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
     context.subscriptions.push(changeCodeLensesEventEmitter);
     let codeLensProvider = new HLMCodeLensProvider(documentLibraryDataProviders, changeCodeLensesEventEmitter.event);
+    let hoverProvider = new HLMLogicHoverProvider(documentLibraryDataProviders);
     context.subscriptions.push(
-        onDidParseDocument((event) => {
+        onDidParseDocument((event: ParseDocumentEvent) => {
             try {
                 let workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
                 if (!workspaceFolder) {
@@ -152,7 +180,8 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => fileAccessor.fileChanged(event.document.uri.toString())),
-        vscode.languages.registerCodeLensProvider(HLM_MODE, codeLensProvider)
+        vscode.languages.registerCodeLensProvider(HLM_MODE, codeLensProvider),
+        onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
         let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/display/templates' + fileExtension;
@@ -160,7 +189,12 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             .then((contents: FileContents) => {
                 context.subscriptions.push({ dispose() { contents.close(); } });
                 contents.onChange = () => {
-                    codeLensProvider.updateTemplates(contents.text, templatesUri);
+                    try {
+                        let templates = FmtReader.readString(contents.text, templatesUri, FmtDisplay.getMetaModel);
+                        codeLensProvider.templates = templates;
+                        hoverProvider.templates = templates;
+                    } catch (error) {
+                    }
                     changeCodeLensesEventEmitter.fire();
                 };
                 contents.onChange();
