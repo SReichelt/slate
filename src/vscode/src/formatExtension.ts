@@ -470,7 +470,7 @@ class HLMWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
                 try {
                     let contents = readRange(uri);
                     if (contents) {
-                        let file = FmtReader.readString(contents, uri.fsPath, () => new Fmt.DummyMetaModel);
+                        let file = FmtReader.readString(contents, uri.fsPath, (path: Fmt.Path) => new Fmt.DummyMetaModel(path.name));
                         let location = new vscode.Location(uri, undefined!);
                         for (let definition of file.definitions) {
                             if (matchesQuery(definition.name.toLowerCase(), query)) {
@@ -535,14 +535,19 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
                 hoverText.appendCodeblock(hoverCode);
                 hoverTexts.push(hoverText);
             }
+            let intermediateHoverTexts: Thenable<vscode.MarkdownString[]> = CachedPromise.resolve(hoverTexts);
             let referencedDefinition = definitionLink.referencedDefinition;
-            let hoverEvent: LogicExtension.HoverEvent = {
-                document: document,
-                object: definitionLink.originObject,
-                hoverTexts: CachedPromise.resolve(hoverTexts)
-            };
-            this.hoverEventEmitter.fire(hoverEvent);
-            return hoverEvent.hoverTexts.then((finalHoverTexts: vscode.MarkdownString[]) => {
+            if (referencedDefinition && referencedDefinition.parsedDocument.file) {
+                let hoverEvent: LogicExtension.HoverEvent = {
+                    document: document,
+                    object: definitionLink.originObject,
+                    targetMetaModelName: referencedDefinition.parsedDocument.file.metaModelPath.name,
+                    hoverTexts: intermediateHoverTexts
+                };
+                this.hoverEventEmitter.fire(hoverEvent);
+                intermediateHoverTexts = hoverEvent.hoverTexts;
+            }
+            return intermediateHoverTexts.then((finalHoverTexts: vscode.MarkdownString[]) => {
                 if (referencedDefinition && referencedDefinition.definition.documentation) {
                     let hoverText = new vscode.MarkdownString;
                     for (let item of referencedDefinition.definition.documentation.items) {

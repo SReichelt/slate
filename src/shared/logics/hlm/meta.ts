@@ -4040,7 +4040,8 @@ const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'fals
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {
-    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+    super('hlm',
+          new Fmt.StandardMetaDefinitionFactory(definitionTypes),
           new Fmt.StandardMetaDefinitionFactory(expressionTypes),
           new Fmt.StandardMetaDefinitionFactory(functions));
   }

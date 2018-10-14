@@ -91,9 +91,8 @@ class HLMLogicHoverProvider {
 
     provideHover(event: HoverEvent): void {
         let documentLibraryDataProvider = this.documentLibraryDataProviders.get(event.document);
-        if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path) {
+        if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === documentLibraryDataProvider.logic.name) {
             let targetDataProvider = documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
-            // TODO determine whether this makes sense instead of reacting to rejected promise
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
             let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates);
             let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
@@ -119,6 +118,7 @@ export class ParseDocumentEvent {
 export class HoverEvent {
     document: vscode.TextDocument;
     object: Object;
+    targetMetaModelName: string;
     hoverTexts: Thenable<vscode.MarkdownString[]>;
 }
 
@@ -162,7 +162,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
                 }
                 let rootLibraryDataProvider = rootLibraryDataProviders.get(libraryName);
                 if (!rootLibraryDataProvider) {
-                    let logic = Logics.logics.get(logicName);
+                    let logic = Logics.logics.find((value: Logic.Logic) => value.name === logicName);
                     if (!logic) {
                         return;
                     }

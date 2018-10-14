@@ -14,7 +14,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     let definitionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.definitionTypes, metaModelDefinitionContents.expressionTypes);
     let expressionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.expressionTypes);
     let functions = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.functions);
-    super(definitionTypes, expressionTypes, functions);
+    super(metaModelDefinition.name, definitionTypes, expressionTypes, functions);
     this.fileName = fileName;
     this.definitions = definitions;
     this.getReferencedMetaModel = getReferencedMetaModel;

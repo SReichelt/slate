@@ -538,7 +538,7 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
 }
 
 export class MetaModel {
-  constructor(public definitionTypes: MetaDefinitionFactory, public expressionTypes: MetaDefinitionFactory, public functions: MetaDefinitionFactory) {}
+  constructor(public name: string, public definitionTypes: MetaDefinitionFactory, public expressionTypes: MetaDefinitionFactory, public functions: MetaDefinitionFactory) {}
 
   getRootContext(): Context {
     return new EmptyContext(this);
@@ -591,9 +591,9 @@ export class MetaModel {
 }
 
 export class DummyMetaModel extends MetaModel {
-  constructor() {
+  constructor(name: string) {
     let dummyFactory = new GenericMetaDefinitionFactory;
-    super(dummyFactory, dummyFactory, dummyFactory);
+    super(name, dummyFactory, dummyFactory, dummyFactory);
   }
 
   getRootContext(): Context {

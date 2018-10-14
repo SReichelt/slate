@@ -483,7 +483,8 @@ const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self':
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {
-    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+    super('meta',
+          new Fmt.StandardMetaDefinitionFactory(definitionTypes),
           new Fmt.StandardMetaDefinitionFactory(expressionTypes),
           new Fmt.StandardMetaDefinitionFactory(functions));
   }

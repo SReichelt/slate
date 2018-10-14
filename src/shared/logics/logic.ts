@@ -4,6 +4,7 @@ import { LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataAccesso
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
+  name: string;
   getMetaModel: Fmt.MetaModelGetter;
   getDisplay(): LogicDisplay;
 }

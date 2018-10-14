@@ -53,6 +53,6 @@ export function getMetaModelWithFallback(sourceFileName: string, metaModelPath: 
   try {
     return getMetaModel(sourceFileName, metaModelPath);
   } catch (error) {
-    return new Fmt.DummyMetaModel;
+    return new Fmt.DummyMetaModel(metaModelPath.name);
   }
 }

@@ -5,6 +5,7 @@ import { HLMDisplay } from './display';
 export class HLM implements Logic.Logic {
   private display = new HLMDisplay;
 
+  name = FmtHLM.metaModel.name;
   getMetaModel = FmtHLM.getMetaModel;
   getDisplay(): HLMDisplay { return this.display; }
 }

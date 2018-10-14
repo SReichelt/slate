@@ -116,7 +116,7 @@ export class Reader {
       metaModel = this.getMetaModel(file.metaModelPath);
     } catch (error) {
       this.error(error.message, this.markEnd(fileStart));
-      metaModel = new Fmt.DummyMetaModel;
+      metaModel = new Fmt.DummyMetaModel(file.metaModelPath.name);
     }
     let context = metaModel.getRootContext();
     this.readDefinitions(file.definitions, metaModel.definitionTypes, context);

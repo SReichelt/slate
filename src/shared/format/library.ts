@@ -213,7 +213,8 @@ const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subs
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {
-    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),
+    super('library',
+          new Fmt.StandardMetaDefinitionFactory(definitionTypes),
           new Fmt.StandardMetaDefinitionFactory(expressionTypes),
           new Fmt.StandardMetaDefinitionFactory(functions));
   }

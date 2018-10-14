@@ -886,7 +886,8 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     }
     outFileStr += `export class MetaModel extends Fmt.MetaModel {\n`;
     outFileStr += `  constructor() {\n`;
-    outFileStr += `    super(new Fmt.StandardMetaDefinitionFactory(definitionTypes),\n`;
+    outFileStr += `    super('${metaModel.name}',\n`;
+    outFileStr += `          new Fmt.StandardMetaDefinitionFactory(definitionTypes),\n`;
     outFileStr += `          new Fmt.StandardMetaDefinitionFactory(expressionTypes),\n`;
     outFileStr += `          new Fmt.StandardMetaDefinitionFactory(functions));\n`;
     outFileStr += `  }\n`;
