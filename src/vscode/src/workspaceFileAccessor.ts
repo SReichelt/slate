@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as util from 'util';
+import { areUrisEqual } from './utils';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
@@ -10,26 +11,26 @@ export class WorkspaceFileAccessor implements FileAccessor {
     private registeredContents: WorkspaceFileContents[] = [];
 
     readFile(uri: string): CachedPromise<FileContents> {
+        let vscodeUri = vscode.Uri.parse(uri);
         for (let document of vscode.workspace.textDocuments) {
-            if (document.uri.toString() === uri) {
-                let contents = new WorkspaceFileContents(this.registeredContents, uri, document.getText());
+            if (areUrisEqual(document.uri, vscodeUri)) {
+                let contents = new WorkspaceFileContents(this.registeredContents, vscodeUri, document.getText());
                 this.registeredContents.push(contents);
                 return CachedPromise.resolve(contents);
             }
         }
-        let vscodeUri = vscode.Uri.parse(uri);
         let contents = util.promisify(fs.readFile)(vscodeUri.fsPath, 'utf8')
             .then((text) => {
-                let contents = new WorkspaceFileContents(this.registeredContents, uri, text);
+                let contents = new WorkspaceFileContents(this.registeredContents, vscodeUri, text);
                 this.registeredContents.push(contents);
                 return contents;
             });
         return new CachedPromise(contents);
     }
 
-    fileChanged(uri: string): void {
+    documentChanged(document: vscode.TextDocument): void {
         for (let contents of this.registeredContents) {
-            if (contents.uri === uri && contents.onChange) {
+            if (areUrisEqual(contents.uri, document.uri) && contents.onChange) {
                 contents.onChange();
             }
         }
@@ -39,7 +40,7 @@ export class WorkspaceFileAccessor implements FileAccessor {
 class WorkspaceFileContents implements FileContents {
     public onChange?: () => void;
 
-    constructor(private registeredContents: WorkspaceFileContents[], public uri: string, public text: string) {}
+    constructor(private registeredContents: WorkspaceFileContents[], public uri: vscode.Uri, public text: string) {}
 
     close(): void {
         for (let i = 0; i < this.registeredContents.length; i++) {

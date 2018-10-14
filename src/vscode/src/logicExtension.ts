@@ -96,7 +96,7 @@ class HLMLogicHoverProvider {
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
             let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates);
             let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
-                let renderedDefinition = renderer.renderDefinition(definition, undefined, false, false, false, false);
+                let renderedDefinition = renderer.renderDefinition(definition, undefined, false, true, false, false);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
             });
             event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {
@@ -179,7 +179,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             } catch (error) {
             }
         }),
-        vscode.workspace.onDidChangeTextDocument((event) => fileAccessor.fileChanged(event.document.uri.toString())),
+        vscode.workspace.onDidChangeTextDocument((event) => fileAccessor.documentChanged(event.document)),
         vscode.languages.registerCodeLensProvider(HLM_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
