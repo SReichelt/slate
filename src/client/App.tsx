@@ -3,6 +3,8 @@ import './App.css';
 import SplitPane from 'react-split-pane';
 import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
+import SourceCodeView from './components/SourceCodeView';
+import ToggleButton from './components/ToggleButton';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
@@ -29,6 +31,7 @@ interface AppState extends SelectionState {
   height: number;
   error?: string;
   templates?: Fmt.File;
+  extraContentsVisible: boolean;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -47,12 +50,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.library = this.libraryDataProvider.fetchLocalSection();
 
-    this.treeItemClicked = this.treeItemClicked.bind(this);
-    this.linkClicked = this.linkClicked.bind(this);
-
     let state: AppState = {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
+      extraContentsVisible: false
     };
     this.updateSelectionState(state);
     this.state = state;
@@ -112,35 +113,61 @@ class App extends React.Component<AppProps, AppState> {
       return <div className={'error'}>Error: {this.state.error}</div>;
     }
 
-    let contents: any = undefined;
+    let mainContents: any = undefined;
+    let extraContents: any = undefined;
     if (this.state.templates && this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-      contents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} itemInfo={this.state.selectedItemInfo} templates={this.state.templates} interactive={true} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} onLinkClicked={this.linkClicked}/>;
+      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} itemInfo={this.state.selectedItemInfo} templates={this.state.templates} interactive={true} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} onLinkClicked={this.linkClicked}/>;
+      extraContents = <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition}/>;
     } else {
-      contents = 'Please select an item from the tree.';
+      mainContents = 'Please select an item from the tree.';
     }
 
     let verticalWindow = this.state.height > this.state.width;
     let windowSize = verticalWindow ? this.state.height : this.state.width;
+    let defaultItemHeight = verticalWindow ? this.state.height / 3 : this.state.height / 2;
+
+    let contentsPane = (
+      <div className={'bottom-toolbar-container'}>
+        <div className={'app-pane'}>
+          <div className={'app-contents'}>
+            {mainContents}
+          </div>
+        </div>
+        <div className={'bottom-toolbar'}>
+          <ToggleButton selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
+            <div>{'{⋯}'}</div>
+          </ToggleButton>
+        </div>
+      </div>
+    );
+    if (extraContents && this.state.extraContentsVisible) {
+      contentsPane = (
+        <SplitPane split={'horizontal'} defaultSize={defaultItemHeight}>
+          {contentsPane}
+          <div className={'app-pane'}>
+            <div className={'app-contents'}>
+              {extraContents}
+            </div>
+          </div>
+        </SplitPane>
+      );
+    }
 
     return (
       <div className={'app'}>
-        <SplitPane split={verticalWindow ? 'horizontal' : 'vertical'} minSize={windowSize / 5} defaultSize={windowSize / 3}>
+        <SplitPane split={verticalWindow ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
           <div className={'app-pane'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
             <div className={'app-tree'}>
               <LibraryTree libraryDataProvider={this.libraryDataProvider} section={this.library} itemNumber={[]} templates={this.state.templates} parentScrollPane={this.treePaneNode} isLast={true} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>
             </div>
           </div>
-          <div className={'app-pane'}>
-            <div className={'app-contents'}>
-              {contents}
-            </div>
-          </div>
+          {contentsPane}
         </SplitPane>
       </div>
     );
   }
 
-  treeItemClicked(item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void {
+  private treeItemClicked = (item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void => {
     this.setState({
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
@@ -152,7 +179,7 @@ class App extends React.Component<AppProps, AppState> {
     history.pushState(null, 'HLM', uri);
   }
 
-  linkClicked(libraryDataProvider: LibraryDataProvider, path: Fmt.Path) {
+  private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => {
     let state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.setState(state);

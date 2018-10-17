@@ -1,0 +1,7 @@
+.button {
+  display: inline-block;
+  line-height: 100%;
+  padding: 0.25em;
+  background-color: #e0e0e0;
+  cursor: default;
+}

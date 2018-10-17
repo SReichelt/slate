@@ -27,8 +27,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (!this.parent) {
       this.itemNumber = [];
     }
-
-    this.prefetch = this.prefetch.bind(this);
   }
 
   getProviderForSection(path?: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
@@ -217,7 +215,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     setTimeout(prefetch, 0);
   }
 
-  private prefetch(): boolean {
+  private prefetch = (): boolean => {
     if (this.prefetchQueue.length) {
       let prefetchQueueItem = this.prefetchQueue.shift()!;
       if (prefetchQueueItem.isSubsection) {

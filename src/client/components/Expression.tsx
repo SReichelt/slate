@@ -97,13 +97,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.TextExpression) {
       let text = expression.text;
       if (text) {
-        text = text.replace('  ', ' \xa0');
-        if (text.startsWith(' ')) {
-          text = '\xa0' + text.substring(1);
-        }
-        if (text.endsWith(' ')) {
-          text = text.substring(0, text.length - 1) + '\xa0';
-        }
         let firstChar = text.charAt(0);
         let lastChar = text.charAt(text.length - 1);
         if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
@@ -631,37 +624,54 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private convertText(text: string): any {
     let curText = '';
     let curStyle: string | undefined = undefined;
-    let result = [];
+    let result: any[] = [];
+    let childIndex = 0;
+    let flush = () => {
+      if (curText) {
+        let addSpace = false;
+        if (curText.endsWith(' ')) {
+          curText = curText.substring(0, curText.length - 1);
+          addSpace = true;
+        }
+        result.push(curStyle ? <span className={curStyle} key={childIndex++}>{curText}</span> : curText);
+        if (addSpace) {
+          result.push(<span key={childIndex++}>&nbsp;</span>);
+        }
+        curText = '';
+      }
+      curStyle = undefined;
+    };
+    let setStyle = (style: string | undefined) => {
+      if (curStyle !== style) {
+        flush();
+        curStyle = style;
+      }
+    };
     let iterator = text[Symbol.iterator]();
     for (let next = iterator.next(); !next.done; next = iterator.next()) {
       let c = next.value;
       if (c === '\r') {
         // ignore
       } else if (c === '\n') {
-        result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-        result.push(<br/>);
-        curText = '';
-        curStyle = undefined;
+        flush();
+        result.push(<br key={childIndex++}/>);
+      } else if (c === ' ') {
+        if (curText) {
+          if (curText.endsWith(' ')) {
+            flush();
+          }
+          curText += c;
+        } else {
+          result.push(<span key={childIndex++}>&nbsp;</span>);
+        }
       } else {
         let cp = c.codePointAt(0)!;
         if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
-          if (curStyle !== 'sans') {
-            if (curText) {
-              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-              curText = '';
-            }
-            curStyle = 'sans';
-          }
+          setStyle('sans');
           curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
                                                          cp - 0x1d5ba + 0x61);
         } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
-          if (curStyle !== 'calligraphic') {
-            if (curText) {
-              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-              curText = '';
-            }
-            curStyle = 'calligraphic';
-          }
+          setStyle('calligraphic');
           switch (cp) {
             case 0x212c:
               curText += 'B';
@@ -703,13 +713,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                                                              cp - 0x1d4ea + 0x61);
           }
         } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
-          if (curStyle !== 'fraktur') {
-            if (curText) {
-              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-              curText = '';
-            }
-            curStyle = 'fraktur';
-          }
+          setStyle('fraktur');
           switch (cp) {
             case 0x212d:
               curText += 'C';
@@ -733,28 +737,18 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                                                              cp - 0x1d586 + 0x61);
           }
         } else if (cp >= 0x1d538 && cp < 0x1d56c) {
-          if (curStyle !== 'double-struck') {
-            if (curText) {
-              result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-              curText = '';
-            }
-            curStyle = 'double-struck';
-          }
+          setStyle('double-struck');
           curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
                                                          cp - 0x1d552 + 0x61);
         } else {
           if (curStyle) {
-            result.push(<span className={curStyle}>{curText}</span>);
-            curText = '';
-            curStyle = undefined;
+            flush();
           }
           curText += c;
         }
       }
     }
-    if (curText) {
-      result.push(curStyle ? <span className={curStyle}>{curText}</span> : curText);
-    }
+    flush();
     if (result.length === 1) {
       return result[0];
     } else {

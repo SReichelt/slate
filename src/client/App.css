@@ -1,5 +1,5 @@
 body {
-  font-family: sans;
+  font-family: sans-serif;
 }
 
 .error {
@@ -9,6 +9,22 @@ body {
   border: solid 1pt red;
   padding: 2pt;
   margin: 2pt;
+}
+
+.hoverable.selected {
+  background-color: #f2cd00;
+}
+
+.hoverable:hover {
+  background-color: #ffd700;
+}
+
+.expr.hover {
+  background-color: #ffd700;
+}
+
+.expr.definition.hover {
+  background-color: #80ff00;
 }
 
 .app {
@@ -35,6 +51,21 @@ body {
 
 .app-contents {
   padding: 1ex;
+}
+
+.bottom-toolbar-container>.app-pane {
+  bottom: 1.5em;
+}
+
+.bottom-toolbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5em;
+  border: solid 1pt gray;
+  background-color: #f0f0f0;
+  text-align: right;
 }
 
 .Resizer.vertical {

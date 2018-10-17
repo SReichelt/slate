@@ -11,14 +11,6 @@
   background-color: initial;
 }
 
-.tree-item:hover {
-  background-color: #ffd700;
-}
-
-.tree-item.selected {
-  background-color: #f2cd00;
-}
-
 .tree-item-contents {
   display: table-row;
 }

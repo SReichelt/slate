@@ -3,9 +3,7 @@ import * as Display from '../display/display';
 import { LibraryDataAccessor } from '../data/libraryDataAccessor';
 
 export abstract class GenericRenderer {
-  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
-    this.renderNegation = this.renderNegation.bind(this);
-  }
+  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {}
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;
@@ -28,7 +26,7 @@ export abstract class GenericRenderer {
     config.args = args;
     config.negationCount = negationCount;
     config.forceInnerNegations = forceInnerNegations;
-    config.negationFallbackFn = this.renderNegation;
+    config.negationFallbackFn = this.renderNegation.bind(this);
     return config;
   }
 

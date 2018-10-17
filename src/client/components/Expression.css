@@ -417,9 +417,14 @@ p {
   font-style: normal;
 }
 
-.monospace {
+.monospace, .source-code {
   font-family: 'Courier New', 'Courier', monospace;
   font-style: normal;
+}
+
+.source-code {
+  white-space: nowrap;
+  font-size: small;
 }
 
 .double-struck {
@@ -435,14 +440,6 @@ p {
 
 .baseline {
   vertical-align: baseline;
-}
-
-.hover {
-  background-color: #ffd700;
-}
-
-.definition.hover {
-  background-color: #80ff00;
 }
 
 .expr svg {

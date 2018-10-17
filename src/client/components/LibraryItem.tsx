@@ -74,7 +74,7 @@ class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
   }
 }
 
-interface LibraryItemProps {
+export interface LibraryItemProps {
   libraryDataProvider: LibraryDataProvider;
   templates: Fmt.File;
   definition: CachedPromise<Fmt.Definition>;

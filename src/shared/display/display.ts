@@ -372,22 +372,8 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     let expression: RenderedExpression;
     if (row.length === 1) {
       expression = row[0];
-      if (this.styleClasses) {
-        if (expression.styleClasses) {
-          expression.styleClasses = this.styleClasses.concat(expression.styleClasses);
-        } else {
-          expression.styleClasses = this.styleClasses;
-        }
-      }
-      expression.optionalParenStyle = this.optionalParenStyle;
-      if (this.semanticLink) {
-        expression.semanticLink = this.semanticLink;
-      }
     } else {
       expression = new RowExpression(row);
-      expression.styleClasses = this.styleClasses;
-      expression.optionalParenStyle = this.optionalParenStyle;
-      expression.semanticLink = this.semanticLink;
     }
     if (this.negationsSatisfied === undefined) {
       this.negationsSatisfied = 0;

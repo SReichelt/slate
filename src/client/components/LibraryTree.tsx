@@ -42,11 +42,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   constructor(props: LibraryTreeItemProps) {
     super(props);
 
-    this.itemClicked = this.itemClicked.bind(this);
-    this.mouseEntered = this.mouseEntered.bind(this);
-    this.mouseLeft = this.mouseLeft.bind(this);
-    this.scrollIntoView = this.scrollIntoView.bind(this);
-
     this.state = {
       opened: false,
       showPreview: false
@@ -112,7 +107,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
   render(): any {
     let item = this.props.item;
-    let className = 'tree-item';
+    let className = 'tree-item hoverable';
     let contents: any = null;
     let icon: any = '\u2001';
     let display: any = undefined;
@@ -194,7 +189,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     return result;
   }
 
-  private itemClicked(event: any): void {
+  private itemClicked = (event: any): void => {
     if (event.button < 1 || this.props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
       event.preventDefault();
       this.clicked = true;
@@ -209,7 +204,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     }
   }
 
-  private mouseEntered(): void {
+  private mouseEntered = (): void => {
     this.hovered = true;
     let show = () => {
       if (this.hovered) {
@@ -219,12 +214,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     setTimeout(show, 250);
   }
 
-  private mouseLeft(): void {
+  private mouseLeft = (): void => {
     this.hovered = false;
     this.setState({showPreview: false});
   }
 
-  private scrollIntoView(): void {
+  private scrollIntoView = (): void => {
     if (this.htmlNode) {
       this.htmlNode.scrollIntoView();
     }
