@@ -86,7 +86,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private clearHover(): void {
     this.permanentlyHighlighted = false;
     if (this.windowTouchListener) {
-      window.removeEventListener('touchStart', this.windowTouchListener);
+      window.removeEventListener('touchstart', this.windowTouchListener);
       this.windowTouchListener = undefined;
     }
     if (this.props.parent) {
@@ -862,11 +862,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         this.permanentlyHighlighted = false;
         this.removeFromHoveredChildren();
         if (this.windowTouchListener) {
-          window.removeEventListener('touchStart', this.windowTouchListener);
+          window.removeEventListener('touchstart', this.windowTouchListener);
           this.windowTouchListener = undefined;
         }
       };
-      window.addEventListener('touchStart', this.windowTouchListener);
+      window.addEventListener('touchstart', this.windowTouchListener);
     }
   }
 
