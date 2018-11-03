@@ -5,11 +5,13 @@ import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import ToggleButton from './components/ToggleButton';
+import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/format/library';
 import * as FmtDisplay from '../shared/display/meta';
+import * as Display from '../shared/display/display';
 import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
 import { WebFileAccessor } from './data/webFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
@@ -77,10 +79,15 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidMount(): void {
     window.onpopstate = () => {
-      let state: SelectionState = {};
-      if (this.updateSelectionState(state)) {
-        this.setState(state);
-      }
+      // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
+      let state: SelectionState = {
+        selectedItemPath: undefined,
+        selectedItemProvider: undefined,
+        selectedItemDefinition: undefined,
+        selectedItemInfo: undefined
+      };
+      this.updateSelectionState(state);
+      this.setState(state);
     };
 
     window.onresize = () => {
@@ -116,8 +123,9 @@ class App extends React.Component<AppProps, AppState> {
     let mainContents: any = undefined;
     let extraContents: any = undefined;
     if (this.state.templates && this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} itemInfo={this.state.selectedItemInfo} templates={this.state.templates} interactive={true} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} onLinkClicked={this.linkClicked}/>;
-      extraContents = <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition}/>;
+      let interactionHandler = new LibraryItemInteractionHandler(this.state.selectedItemProvider, this.state.templates, this.state.selectedItemDefinition, this.linkClicked);
+      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} interactionHandler={interactionHandler}/>;
+      extraContents = <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} templates={this.state.templates} definition={this.state.selectedItemDefinition} interactionHandler={interactionHandler}/>;
     } else {
       mainContents = 'Please select an item from the tree.';
     }
@@ -134,7 +142,7 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         </div>
         <div className={'bottom-toolbar'}>
-          <ToggleButton selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
+          <ToggleButton enabled={extraContents !== undefined} selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
             <div>{'{⋯}'}</div>
           </ToggleButton>
         </div>
@@ -179,7 +187,7 @@ class App extends React.Component<AppProps, AppState> {
     history.pushState(null, 'HLM', uri);
   }
 
-  private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => {
+  private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
     let state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.setState(state);

@@ -6,7 +6,12 @@ import * as ReactMarkdown from 'react-markdown';
 
 const ToolTip = require('react-portal-tooltip').default;
 
+export type OnHoverChanged = (hoveredObjects: Object[]) => void;
+
 export interface ExpressionInteractionHandler {
+  registerHoverChangeHandler(handler: OnHoverChanged): void;
+  unregisterHoverChangeHandler(handler: OnHoverChanged): void;
+  hoverChanged(hover: Display.SemanticLink[]): void;
   getURI(semanticLink: Display.SemanticLink): string | undefined;
   linkClicked(semanticLink: Display.SemanticLink): void;
   hasPreview(semanticLink: Display.SemanticLink): boolean;
@@ -19,38 +24,36 @@ interface ExpressionProps {
   expression: Display.RenderedExpression;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
-  hover?: Display.SemanticLink;
+  tooltipPosition?: string;
 }
 
 interface ExpressionState {
-  ownHover?: Display.SemanticLink;
+  hovered: boolean;
   showPreview: boolean;
 }
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
-  private interactionHandler?: ExpressionInteractionHandler;
   private htmlNode: HTMLElement | null = null;
-  private hover?: Display.SemanticLink;
-  private permanentHighlightExpression?: Expression;
+  private semanticLinks?: Display.SemanticLink[];
   private windowClickListener?: (this: Window, ev: MouseEvent) => any;
+  private hoveredChildren: Expression[] = [];
+  private permanentlyHighlighted = false;
+  private tooltipPosition: string;
 
   constructor(props: ExpressionProps) {
     super(props);
 
     this.state = {
+      hovered: false,
       showPreview: false
     };
 
-    if (!props.parent) {
-      this.windowClickListener = () => this.setPermanentHighlight(undefined);
-    }
-
-    this.updateInteraction(props, false);
+    this.updateOptionalProps(props);
   }
 
   componentDidMount(): void {
-    if (this.windowClickListener) {
-      window.addEventListener('click', this.windowClickListener);
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.registerHoverChangeHandler(this.onHoverChanged);
     }
   }
 
@@ -58,38 +61,56 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.windowClickListener) {
       window.removeEventListener('click', this.windowClickListener);
     }
+    this.clearHoveredChildren();
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
+    }
   }
 
   componentWillReceiveProps(props: ExpressionProps): void {
-    this.updateInteraction(props, true);
-    if (props.expression !== this.props.expression) {
-      this.permanentHighlightExpression = undefined;
+    if (props.parent !== this.props.parent) {
+      this.clearHoveredChildren();
     }
+    if (props.interactionHandler !== this.props.interactionHandler) {
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
+      }
+      if (props.interactionHandler) {
+        props.interactionHandler.registerHoverChangeHandler(this.onHoverChanged);
+      }
+    }
+    this.updateOptionalProps(props);
   }
 
-  private updateInteraction(props: ExpressionProps, mounted: boolean): void {
-    if (props.interactionHandler) {
-      this.interactionHandler = props.interactionHandler;
-    } else if (props.parent) {
-      this.interactionHandler = props.parent.interactionHandler;
+  private updateOptionalProps(props: ExpressionProps): void {
+    this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
+  }
+
+  private clearHoveredChildren(): void {
+    if (this.props.parent) {
+      for (let expression of this.hoveredChildren) {
+        this.props.parent.removeFromHoveredChildren(expression);
+      }
     }
-    if (props.parent) {
-      this.setGlobalHover(props.hover, mounted);
-    }
+    this.hoveredChildren = [];
   }
 
   render(): any {
     return this.renderExpression(this.props.expression, 'expr');
   }
 
-  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLink?: Display.SemanticLink, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): any {
+  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks?: Display.SemanticLink[], optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): any {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
         className += ' ' + styleClass;
       }
     }
-    if (!semanticLink) {
-      semanticLink = expression.semanticLink;
+    if (expression.semanticLinks) {
+      if (semanticLinks) {
+        semanticLinks = semanticLinks.concat(expression.semanticLinks);
+      } else {
+        semanticLinks = expression.semanticLinks;
+      }
     }
     let result: any = null;
     if (expression instanceof Display.EmptyExpression) {
@@ -117,11 +138,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
-        return this.renderExpression(expression.items[0], className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.items[0], className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
       } else {
         className += ' row';
         result = expression.items.map((item: Display.RenderedExpression, index: number) =>
-          <Expression expression={item} parent={this} hover={this.hover} key={index}/>);
+          <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler} key={index}/>);
       }
     } else if (expression instanceof Display.ParagraphExpression) {
       className += ' paragraph';
@@ -134,7 +155,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         return (
           <div className={paragraphClassName} key={index}>
-            <Expression expression={paragraph} parent={this} hover={this.hover}/>
+            <Expression expression={paragraph} parent={this} interactionHandler={this.props.interactionHandler}/>
           </div>
         );
       });
@@ -143,7 +164,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       className += ' list';
       let items = expression.items.map((item: Display.RenderedExpression, index: number) => (
         <li className={'list-item'} key={index}>
-          <Expression expression={item} parent={this} hover={this.hover}/>
+          <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
         </li>
       ));
       switch (expression.style) {
@@ -168,10 +189,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = expression.items.map((item: Display.RenderedExpressionPair, index: number) => (
         <span className={'aligned-row'} key={index}>
           <span className={'aligned-left'} key={'left'}>
-            <Expression expression={item.left} parent={this} hover={this.hover}/>
+            <Expression expression={item.left} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
           <span className={'aligned-right'} key={'right'}>
-            <Expression expression={item.right} parent={this} hover={this.hover}/>
+            <Expression expression={item.right} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
         </span>
       ));
@@ -181,7 +202,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         <span className={'table-row'} key={rowIndex}>
           {row.map((cell: Display.RenderedExpression, colIndex: number) => (
             <span className={'table-cell'} key={colIndex}>
-              <Expression expression={cell} parent={this} hover={this.hover}/>
+              <Expression expression={cell} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           ))}
         </span>
@@ -191,10 +212,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let parenExpression = expression;
       let render = parenExpression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
         if (surroundingParenStyle === parenExpression.style) {
-          return this.renderExpression(parenExpression.body, className, semanticLink);
+          return this.renderExpression(parenExpression.body, className, semanticLinks);
         } else {
           return parenExpression.body.getLineHeight().then((lineHeight: number) => {
-            let parenResult: any = <Expression expression={parenExpression.body} parent={this} hover={this.hover} key="body"/>;
+            let parenResult: any = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
             let handled = false;
             let openParen = '';
             let closeParen = '';
@@ -352,28 +373,28 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-        return this.renderExpression(new Display.ParenExpression(expression.body, expression.optionalParenStyle), className, semanticLink);
+        return this.renderExpression(new Display.ParenExpression(expression.body, expression.optionalParenStyle), className, semanticLinks);
       } else {
-        return this.renderExpression(expression.body, className, semanticLink);
+        return this.renderExpression(expression.body, className, semanticLinks);
       }
     } else if (expression instanceof Display.InnerParenExpression) {
-      return this.renderExpression(expression.body, className, semanticLink, expression.left, expression.right, expression.maxLevel);
+      return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
-        let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} hover={this.hover} key="body"/>];
+        let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>];
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (subSupExpression.sub) {
-            subSupResult.push(<sub key="sub"><Expression expression={subSupExpression.sub} parent={this} hover={this.hover}/></sub>);
+            subSupResult.push(<sub key="sub"><Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);
           }
           if (subSupExpression.sup) {
-            subSupResult.push(<sup key="sup"><Expression expression={subSupExpression.sup} parent={this} hover={this.hover}/></sup>);
+            subSupResult.push(<sup key="sup"><Expression expression={subSupExpression.sup} parent={this} interactionHandler={this.props.interactionHandler}/></sup>);
           }
           if (subSupExpression.preSub) {
-            subSupResult.unshift(<sub key="preSub"><Expression expression={subSupExpression.preSub} parent={this} hover={this.hover}/></sub>);
+            subSupResult.unshift(<sub key="preSub"><Expression expression={subSupExpression.preSub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);
           }
           if (subSupExpression.preSup) {
-            subSupResult.unshift(<sup key="preSup"><Expression expression={subSupExpression.preSup} parent={this} hover={this.hover}/></sup>);
+            subSupResult.unshift(<sup key="preSup"><Expression expression={subSupExpression.preSup} parent={this} interactionHandler={this.props.interactionHandler}/></sup>);
           }
         } else {
           let empty = <span className={'subsup-empty'} key="empty"/>;
@@ -382,14 +403,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           if (subSupExpression.sub) {
             rightSub = (
               <span className={'subsup-right-sub'} key="sub">
-                <Expression expression={subSupExpression.sub} parent={this} hover={this.hover}/>
+                <Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/>
               </span>
             );
           }
           if (subSupExpression.sup) {
             rightSup = (
               <span className={'subsup-right-sup'} key="sup">
-                <Expression expression={subSupExpression.sup} parent={this} hover={this.hover}/>
+                <Expression expression={subSupExpression.sup} parent={this} interactionHandler={this.props.interactionHandler}/>
               </span>
             );
           }
@@ -398,14 +419,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           if (subSupExpression.preSub) {
             leftSub = (
               <span className={'subsup-left-sub'} key="sub">
-                <Expression expression={subSupExpression.preSub} parent={this} hover={this.hover}/>
+                <Expression expression={subSupExpression.preSub} parent={this} interactionHandler={this.props.interactionHandler}/>
               </span>
             );
           }
           if (subSupExpression.preSup) {
             leftSup = (
               <span className={'subsup-left-sup'} key="sup">
-                <Expression expression={subSupExpression.preSup} parent={this} hover={this.hover}/>
+                <Expression expression={subSupExpression.preSup} parent={this} interactionHandler={this.props.interactionHandler}/>
               </span>
             );
           }
@@ -464,8 +485,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = renderPromise(render);
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
-      let over: any = expression.over ? <Expression expression={expression.over} parent={this} hover={this.hover}/> : null;
-      let under: any = expression.under ? <Expression expression={expression.under} parent={this} hover={this.hover}/> : null;
+      let over: any = expression.over ? <Expression expression={expression.over} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let under: any = expression.under ? <Expression expression={expression.under} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       result = [
         (
           <span className={'overunder-over-row'} key="over">
@@ -477,7 +498,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         (
           <span className={'overunder-body-row'} key="body">
             <span className={'overunder-body'}>
-              <Expression expression={expression.body} parent={this} hover={this.hover}/>
+              <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           </span>
         ),
@@ -495,14 +516,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         (
           <span className={'fraction-numerator-row'} key="numerator">
             <span className={'fraction-numerator'}>
-              <Expression expression={expression.numerator} parent={this} hover={this.hover}/>
+              <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           </span>
         ),
         (
           <span className={'fraction-denominator-row'} key="denominator">
             <span className={'fraction-denominator'}>
-              <Expression expression={expression.denominator} parent={this} hover={this.hover}/>
+              <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           </span>
         )
@@ -515,7 +536,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'radical-degree-table'}>
               <span className={'radical-degree-top-row'}>
                 <span className={'radical-degree'}>
-                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} parent={this} hover={this.hover}/>
+                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} parent={this} interactionHandler={this.props.interactionHandler}/>
                 </span>
               </span>
               <span className={'radical-degree-bottom-row'}>
@@ -534,7 +555,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             </svg>
           </span>
           <span className={'radical-radicand'}>
-            <Expression expression={expression.radicand} parent={this} hover={this.hover}/>
+            <Expression expression={expression.radicand} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
         </span>
       );
@@ -542,62 +563,66 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return <ReactMarkdown source={expression.text}/>;
     } else if (expression instanceof Display.IndirectExpression) {
       try {
-        return this.renderExpression(expression.resolve(), className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
       } catch (error) {
         console.log(error);
         className += ' error';
         result = `Error: ${error.message}`;
       }
     } else if (expression instanceof Display.PromiseExpression) {
-      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLink, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
+      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
       return renderPromise(render);
     } else if (expression instanceof Display.DecoratedExpression) {
-      return this.renderExpression(expression.body, className, semanticLink);
+      return this.renderExpression(expression.body, className, semanticLinks);
     } else {
       className += ' error';
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
       result = `Error: ${error}`;
     }
-    if (this.interactionHandler && semanticLink) {
+    this.semanticLinks = semanticLinks;
+    if (this.props.interactionHandler && semanticLinks && semanticLinks.length) {
       className += ' interactive';
-      if (semanticLink.isDefinition) {
+      if (semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
         className += ' definition';
       }
-      if (this.hover
-          && (this.state.ownHover === this.hover
-              || (this.hover.showAllReferences && semanticLink.linkedObject && this.hover.linkedObject === semanticLink.linkedObject))
-              || this.getPermanentHighlightExpression() === this) {
+      if (this.state.hovered) {
         className += ' hover';
       }
-      let uri = this.interactionHandler.getURI(semanticLink);
-      if (uri) {
-        className += ' link';
+      let uriLink: Display.SemanticLink | undefined = undefined;
+      let uri: string | undefined = undefined;
+      for (let semanticLink of semanticLinks) {
+        let linkUri = this.props.interactionHandler.getURI(semanticLink);
+        if (linkUri) {
+          uriLink = semanticLink;
+          uri = linkUri;
+          className += ' link';
+        }
       }
       if (uri && process.env.NODE_ENV !== 'development') {
         /* This causes nested anchors, which, strictly speaking, are illegal.
            However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
            So we do this anyway, but only in production mode, to prevent warnings from React. */
         result = (
-          <a className={className} href={uri} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </a>
         );
       } else {
         result = (
-          <span className={className} onMouseEnter={() => this.setOwnHover(semanticLink)} onMouseLeave={() => this.setOwnHover(undefined)} onTouchStart={(event) => this.setPermanentHighlight(semanticLink, event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(semanticLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             {result}
           </span>
         );
       }
-      if (this.interactionHandler.hasPreview(semanticLink) && this.htmlNode) {
+      if (uriLink && this.props.interactionHandler.hasPreview(uriLink) && this.htmlNode) {
         let showPreview = false;
         if (this.state.showPreview) {
-          previewContents = this.interactionHandler.getPreviewContents(semanticLink);
+          previewContents = this.props.interactionHandler.getPreviewContents(uriLink);
           if (previewContents) {
             showPreview = true;
           }
           if (uri) {
-            previewContents = <a href={uri} onClick={(event) => this.linkClicked(semanticLink, event)}>{previewContents}</a>;
+            previewContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{previewContents}</a>;
           }
         }
         let previewStyle = {
@@ -605,7 +630,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           arrowStyle: {'color': '#fff8c0'}
         };
         let preview = (
-          <ToolTip active={showPreview} position="bottom" arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">
+          <ToolTip active={showPreview} position={this.tooltipPosition} arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">
             <div className={'preview'}>{previewContents}</div>
           </ToolTip>
         );
@@ -756,81 +781,98 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private setOwnHover(hover: Display.SemanticLink | undefined): void {
-    this.setState({ownHover: hover});
-    this.updateGlobalHover(hover);
-  }
-
-  private updateGlobalHover(hover: Display.SemanticLink | undefined): void {
-    if (this.props.parent) {
-      if (!hover) {
-        hover = this.props.parent.state.ownHover;
-      }
-      this.props.parent.updateGlobalHover(hover);
-    } else {
-      this.setGlobalHover(hover, true);
-      this.forceUpdate();
+  private addToHoveredChildren(expression: Expression = this): void {
+    if (this.hoveredChildren.indexOf(expression) < 0) {
+      this.hoveredChildren.push(expression);
     }
+    if (this.props.parent) {
+      this.props.parent.addToHoveredChildren(expression);
+    }
+    this.updateHover();
   }
 
-  private setGlobalHover(hover: Display.SemanticLink | undefined, mounted: boolean): void {
-    if (this.hover !== hover) {
-      this.hover = hover;
-      if (mounted) {
-        this.setState((prevState) => {
-          if (hover && (prevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this)) {
-            let update = () => {
-              if (this.hover) {
-                this.setState((laterPrevState) => ({showPreview: laterPrevState.ownHover === this.hover || this.getPermanentHighlightExpression() === this}));
-              }
-            };
-            setTimeout(update, 250);
-            return {showPreview: prevState.showPreview};
-          } else {
-            return {showPreview: false};
+  private removeFromHoveredChildren(expression: Expression = this): void {
+    let index = this.hoveredChildren.indexOf(expression);
+    if (index >= 0) {
+      this.hoveredChildren.splice(index, 1);
+    }
+    if (this.props.parent) {
+      this.props.parent.removeFromHoveredChildren(expression);
+    }
+    this.updateHover();
+  }
+
+  private updateHover(): void {
+    if (this.props.interactionHandler) {
+      if (!this.props.parent) {
+        let hover: Display.SemanticLink[] = [];
+        for (let expression of this.hoveredChildren) {
+          if (expression.isDirectlyHovered() && expression.semanticLinks) {
+            hover.push(...expression.semanticLinks);
           }
-        });
+        }
+        this.props.interactionHandler.hoverChanged(hover);
+      }
+      if (this.isDirectlyHovered()) {
+        let update = () => {
+          if (this.isDirectlyHovered()) {
+            this.setState({showPreview: true});
+          }
+        };
+        setTimeout(update, 250);
+      } else {
+        this.setState({showPreview: false});
       }
     }
   }
 
-  private setPermanentHighlight(semanticLink: Display.SemanticLink | undefined, event?: React.SyntheticEvent<HTMLElement>): void {
-    this.stopPropagation(event);
-    this.updatePermanentHighlightExpression(semanticLink ? this : undefined);
-    this.updateGlobalHover(semanticLink);
+  private isDirectlyHovered(): boolean {
+    return (this.hoveredChildren.length === 1 && this.hoveredChildren[0] === this) || this.permanentlyHighlighted;
   }
 
-  private updatePermanentHighlightExpression(permanentHighlightExpression: Expression | undefined): void {
-    if (this.props.parent) {
-      this.props.parent.updatePermanentHighlightExpression(permanentHighlightExpression);
-    } else {
-      this.permanentHighlightExpression = permanentHighlightExpression;
-      this.forceUpdate();
+  private onHoverChanged = (hover: Object[]): void => {
+    this.setState({hovered: this.isHovered(hover)});
+  }
+
+  private isHovered(hover: Object[]): boolean {
+    if (hover.length && this.semanticLinks) {
+      for (let semanticLink of this.semanticLinks) {
+        if (hover.indexOf(semanticLink.linkedObject) >= 0) {
+          return true;
+        }
+      }
     }
+    return false;
   }
 
-  private getPermanentHighlightExpression(): Expression | undefined {
-    if (this.props.parent) {
-      return this.props.parent.getPermanentHighlightExpression();
-    } else {
-      return this.permanentHighlightExpression;
+  private highlightPermanently(event: React.SyntheticEvent<HTMLElement>): void {
+    this.stopPropagation(event);
+    this.permanentlyHighlighted = true;
+    this.updateHover();
+    if (!this.windowClickListener) {
+      this.windowClickListener = () => {
+        this.permanentlyHighlighted = false;
+        this.updateHover();
+        if (this.windowClickListener) {
+          window.removeEventListener('click', this.windowClickListener);
+        }
+      };
+      window.addEventListener('click', this.windowClickListener);
     }
   }
 
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {
     if (event.button < 1) {
       this.stopPropagation(event);
-      if (this.interactionHandler && semanticLink) {
-        this.interactionHandler.linkClicked(semanticLink);
+      if (this.props.interactionHandler && semanticLink) {
+        this.props.interactionHandler.linkClicked(semanticLink);
       }
     }
   }
 
-  private stopPropagation(event?: React.SyntheticEvent<HTMLElement>): void {
-    if (event !== undefined) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
+  private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {
+    event.stopPropagation();
+    event.preventDefault();
   }
 }
 

@@ -530,7 +530,9 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
             result = [];
           }
           let propertyExpression = new Display.TextExpression(property);
-          propertyExpression.semanticLink = new Display.SemanticLink(definitionRef, false, false);
+          if (definitionRef) {
+            propertyExpression.semanticLinks = [new Display.SemanticLink(definitionRef)];
+          }
           result.push(propertyExpression);
           remainingParameters.splice(0, parameters.length);
           remainingDefinitions.splice(0, parameters.length);
@@ -1070,12 +1072,12 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
       return new Display.ListExpression(items, '1.');
     } else {
       let definitionRef = this.renderDefinitionRef([definition]);
-      definitionRef.semanticLink = new Display.SemanticLink(definition, false, true);
+      definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
       if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
-          constructorDef.semanticLink = new Display.SemanticLink(innerDefinition, false, true);
+          constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;
@@ -1111,7 +1113,7 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
           'left': definitionRef,
           'right': this.renderVariable(contents.parameter)
         });
-        equality.semanticLink = new Display.SemanticLink(definition);
+        equality.semanticLinks = [new Display.SemanticLink(definition)];
         let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((formula) => this.renderFormula(formula));
         return this.renderMultiDefinitions('Equivalence', equality, items);

@@ -5,7 +5,7 @@ import CachedPromise from '../data/cachedPromise';
 export abstract class RenderedExpression {
   styleClasses?: string[];
   optionalParenStyle: string = '()';
-  semanticLink?: SemanticLink;
+  semanticLinks?: SemanticLink[];
 
   getLineHeight(): CachedPromise<number> {
     let lineHeight = 1;
@@ -631,18 +631,11 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     if (!expression) {
       expression = new EmptyExpression;
     }
-    if (expression.styleClasses && this.styleClasses) {
-      expression.styleClasses = expression.styleClasses.concat(this.styleClasses);
-    } else if (this.styleClasses) {
-      expression.styleClasses = this.styleClasses;
-    }
-    expression.optionalParenStyle = this.optionalParenStyle;
-    expression.semanticLink = this.semanticLink;
     return expression;
   }
 }
 
 
 export class SemanticLink {
-  constructor(public linkedObject?: Object, public showAllReferences: boolean = false, public isDefinition: boolean = false) {}
+  constructor(public linkedObject: Object, public isDefinition: boolean = false) {}
 }

@@ -385,7 +385,8 @@ p {
   font-size: 98%;
 }
 
-.var {
+.var, .source-code .expr.var {
+  font-family: 'TeX', serif;
   font-style: italic;
 }
 
@@ -417,14 +418,9 @@ p {
   font-style: normal;
 }
 
-.monospace, .source-code {
+.monospace, .source-code, .source-code .expr {
   font-family: 'Courier New', 'Courier', monospace;
   font-style: normal;
-}
-
-.source-code {
-  white-space: nowrap;
-  font-size: small;
 }
 
 .double-struck {
@@ -440,6 +436,27 @@ p {
 
 .baseline {
   vertical-align: baseline;
+}
+
+.source-code {
+  white-space: nowrap;
+}
+
+.arg {
+  color: gray;
+}
+
+.keyword, .keyword .expr, .comment .keyword, .comment .keyword .expr, .meta-ref, .meta-ref .expr {
+  color: blue;
+}
+
+.comment, .comment .expr {
+  color: green;
+}
+
+.source-code.string {
+  font-family: 'TeX', serif;
+  color: maroon;
 }
 
 .expr svg {

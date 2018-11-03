@@ -56,7 +56,7 @@ export abstract class GenericRenderer {
       result = subExpression;
     }
     result.styleClasses = ['var'];
-    result.semanticLink = new Display.SemanticLink(param, true, isDefinition);
+    result.semanticLinks = [new Display.SemanticLink(param, isDefinition)];
     if (indices) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': indices});
@@ -73,8 +73,11 @@ export abstract class GenericRenderer {
   }
 
   protected setSemanticLink(expression: Display.RenderedExpression, linkedObject: Object): Display.RenderedExpression {
-    if (!expression.semanticLink) {
-      expression.semanticLink = new Display.SemanticLink(linkedObject);
+    let semanticLink = new Display.SemanticLink(linkedObject);
+    if (expression.semanticLinks) {
+      expression.semanticLinks.unshift(semanticLink);
+    } else {
+      expression.semanticLinks = [semanticLink];
     }
     return expression;
   }
