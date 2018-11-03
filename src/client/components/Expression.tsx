@@ -794,6 +794,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private removeFromHoveredChildren(expression: Expression = this): void {
+    if (expression.permanentlyHighlighted) {
+      return;
+    }
     let index = this.hoveredChildren.indexOf(expression);
     if (index >= 0) {
       this.hoveredChildren.splice(index, 1);
@@ -808,15 +811,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.interactionHandler) {
       if (!this.props.parent) {
         let hover: Display.SemanticLink[] = [];
-        if (this.permanentlyHighlighted) {
-          if (this.semanticLinks) {
-            hover.push(...this.semanticLinks);
-          }
-        } else {
-          for (let expression of this.hoveredChildren) {
-            if (expression.isDirectlyHovered() && expression.semanticLinks) {
-              hover.push(...expression.semanticLinks);
-            }
+        for (let expression of this.hoveredChildren) {
+          if (expression.isDirectlyHovered() && expression.semanticLinks) {
+            hover.push(...expression.semanticLinks);
           }
         }
         this.props.interactionHandler.hoverChanged(hover);
@@ -854,13 +851,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private highlightPermanently(event: React.SyntheticEvent<HTMLElement>): void {
+    if (!this.semanticLinks) {
+      return;
+    }
     this.stopPropagation(event);
     this.permanentlyHighlighted = true;
-    this.updateHover();
+    this.addToHoveredChildren();
     if (!this.windowClickListener) {
       this.windowClickListener = () => {
         this.permanentlyHighlighted = false;
-        this.updateHover();
+        this.removeFromHoveredChildren();
         if (this.windowClickListener) {
           window.removeEventListener('click', this.windowClickListener);
           this.windowClickListener = undefined;
