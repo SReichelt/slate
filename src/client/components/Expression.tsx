@@ -35,7 +35,7 @@ interface ExpressionState {
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private semanticLinks?: Display.SemanticLink[];
-  private windowClickListener?: (this: Window, ev: MouseEvent) => any;
+  private windowTouchListener?: (this: Window, ev: TouchEvent) => any;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
   private tooltipPosition: string;
@@ -85,9 +85,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private clearHover(): void {
     this.permanentlyHighlighted = false;
-    if (this.windowClickListener) {
-      window.removeEventListener('click', this.windowClickListener);
-      this.windowClickListener = undefined;
+    if (this.windowTouchListener) {
+      window.removeEventListener('touchStart', this.windowTouchListener);
+      this.windowTouchListener = undefined;
     }
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
@@ -857,16 +857,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.stopPropagation(event);
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
-    if (!this.windowClickListener) {
-      this.windowClickListener = () => {
+    if (!this.windowTouchListener) {
+      this.windowTouchListener = () => {
         this.permanentlyHighlighted = false;
         this.removeFromHoveredChildren();
-        if (this.windowClickListener) {
-          window.removeEventListener('click', this.windowClickListener);
-          this.windowClickListener = undefined;
+        if (this.windowTouchListener) {
+          window.removeEventListener('touchStart', this.windowTouchListener);
+          this.windowTouchListener = undefined;
         }
       };
-      window.addEventListener('click', this.windowClickListener);
+      window.addEventListener('touchStart', this.windowTouchListener);
     }
   }
 
