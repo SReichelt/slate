@@ -58,10 +58,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   componentWillUnmount(): void {
-    if (this.windowClickListener) {
-      window.removeEventListener('click', this.windowClickListener);
-    }
-    this.clearHoveredChildren();
+    this.clearHover();
     if (this.props.interactionHandler) {
       this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
     }
@@ -69,7 +66,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   componentWillReceiveProps(props: ExpressionProps): void {
     if (props.parent !== this.props.parent) {
-      this.clearHoveredChildren();
+      this.clearHover();
     }
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
@@ -86,7 +83,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
   }
 
-  private clearHoveredChildren(): void {
+  private clearHover(): void {
+    this.permanentlyHighlighted = false;
+    if (this.windowClickListener) {
+      window.removeEventListener('click', this.windowClickListener);
+      this.windowClickListener = undefined;
+    }
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
         this.props.parent.removeFromHoveredChildren(expression);
@@ -806,9 +808,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.interactionHandler) {
       if (!this.props.parent) {
         let hover: Display.SemanticLink[] = [];
-        for (let expression of this.hoveredChildren) {
-          if (expression.isDirectlyHovered() && expression.semanticLinks) {
-            hover.push(...expression.semanticLinks);
+        if (this.permanentlyHighlighted) {
+          if (this.semanticLinks) {
+            hover.push(...this.semanticLinks);
+          }
+        } else {
+          for (let expression of this.hoveredChildren) {
+            if (expression.isDirectlyHovered() && expression.semanticLinks) {
+              hover.push(...expression.semanticLinks);
+            }
           }
         }
         this.props.interactionHandler.hoverChanged(hover);
@@ -855,6 +863,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         this.updateHover();
         if (this.windowClickListener) {
           window.removeEventListener('click', this.windowClickListener);
+          this.windowClickListener = undefined;
         }
       };
       window.addEventListener('click', this.windowClickListener);
