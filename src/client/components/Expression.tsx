@@ -35,7 +35,7 @@ interface ExpressionState {
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private semanticLinks?: Display.SemanticLink[];
-  private windowTouchListener?: (this: Window, ev: TouchEvent) => any;
+  private windowClickListener?: (this: Window, ev: MouseEvent) => any;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
   private tooltipPosition: string;
@@ -85,9 +85,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private clearHover(): void {
     this.permanentlyHighlighted = false;
-    if (this.windowTouchListener) {
-      window.removeEventListener('touchstart', this.windowTouchListener);
-      this.windowTouchListener = undefined;
+    if (this.windowClickListener) {
+      window.removeEventListener('click', this.windowClickListener);
+      this.windowClickListener = undefined;
     }
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
@@ -851,22 +851,37 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private highlightPermanently(event: React.SyntheticEvent<HTMLElement>): void {
+    this.clearAllPermanentHighlights();
     if (!this.semanticLinks) {
       return;
     }
     this.stopPropagation(event);
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
-    if (!this.windowTouchListener) {
-      this.windowTouchListener = () => {
-        this.permanentlyHighlighted = false;
-        this.removeFromHoveredChildren();
-        if (this.windowTouchListener) {
-          window.removeEventListener('touchstart', this.windowTouchListener);
-          this.windowTouchListener = undefined;
-        }
-      };
-      window.addEventListener('touchstart', this.windowTouchListener);
+    if (!this.windowClickListener) {
+      this.windowClickListener = () => this.clearPermanentHighlight();
+      window.addEventListener('click', this.windowClickListener);
+    }
+  }
+
+  private clearPermanentHighlight(): void {
+    if (this.permanentlyHighlighted) {
+      this.permanentlyHighlighted = false;
+      this.removeFromHoveredChildren();
+      if (this.windowClickListener) {
+        window.removeEventListener('click', this.windowClickListener);
+        this.windowClickListener = undefined;
+      }
+    }
+  }
+
+  private clearAllPermanentHighlights(): void {
+    if (this.props.parent) {
+      this.props.parent.clearAllPermanentHighlights();
+    } else {
+      for (let expression of this.hoveredChildren) {
+        expression.clearPermanentHighlight();
+      }
     }
   }
 
