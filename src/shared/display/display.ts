@@ -637,5 +637,5 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
 
 
 export class SemanticLink {
-  constructor(public linkedObject: Object, public isDefinition: boolean = false) {}
+  constructor(public linkedObject: Object, public isDefinition: boolean = false, public isMathematical: boolean = true) {}
 }

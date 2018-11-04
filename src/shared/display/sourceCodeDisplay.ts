@@ -2,28 +2,41 @@ import * as Fmt from '../format/format';
 import * as FmtWriter from '../format/write';
 import * as Display from './display';
 
+interface StackItem {
+  range: Display.RowExpression;
+  isMathematical: boolean;
+}
+
 export class SourceCodeStream implements FmtWriter.OutputStream {
-  private expressionStack: Display.RowExpression[];
+  private stack: StackItem[];
   result: Display.RenderedExpression;
 
   constructor() {
     let root = new Display.RowExpression([]);
     root.styleClasses = ['source-code'];
-    this.expressionStack = [root];
+    this.stack = [{
+      range: root,
+      isMathematical: true
+    }];
     this.result = root;
   }
 
   write(str: string): void {
+    let back = this.stack[this.stack.length - 1];
     let text = new Display.TextExpression(str);
-    this.expressionStack[this.expressionStack.length - 1].items.push(text);
+    back.range.items.push(text);
   }
 
   startRange(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean): void {
+    let back = this.stack[this.stack.length - 1];
+    let isMathematical = back.isMathematical;
+    if (object instanceof Fmt.Argument && object.name === 'display') {
+      isMathematical = false;
+    }
     let range = new Display.RowExpression([]);
     range.styleClasses = ['source-code'];
     if (((object instanceof Fmt.Expression || object instanceof Fmt.Definition || object instanceof Fmt.Argument || object instanceof Fmt.DocumentationComment) && !tag && !link && !tag && !signature) || (object instanceof Fmt.DocumentationItem && tag)) {
-      // TODO mark semantic link as non-mathematical inside "display" and "definitionDisplay" arguments
-      range.semanticLinks = [new Display.SemanticLink(object)];
+      range.semanticLinks = [new Display.SemanticLink(object, false, isMathematical)];
     }
     if (object instanceof Fmt.MetaRefExpression && tag) {
       range.styleClasses.push('meta-ref');
@@ -43,11 +56,14 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
     } else if (object instanceof Fmt.StringExpression) {
       range.styleClasses.push('string');
     }
-    this.expressionStack[this.expressionStack.length - 1].items.push(range);
-    this.expressionStack.push(range);
+    back.range.items.push(range);
+    this.stack.push({
+      range: range,
+      isMathematical: isMathematical
+    });
   }
 
   endRange(): void {
-    this.expressionStack.pop();
+    this.stack.pop();
   }
 }

@@ -49,7 +49,7 @@ export class LibraryItemInteractionHandler implements ExpressionInteractionHandl
   }
 
   hasPreview(semanticLink: Display.SemanticLink): boolean {
-    return semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression;
+    return semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression;
   }
 
   getPreviewContents(semanticLink: Display.SemanticLink): any {
@@ -74,7 +74,7 @@ export class LibraryItemInteractionHandler implements ExpressionInteractionHandl
   }
 
   private getPath(semanticLink: Display.SemanticLink): Fmt.Path | undefined {
-    if (semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression) {
+    if (semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression) {
       let path = semanticLink.linkedObject.path;
       while (path.parentPath instanceof Fmt.Path) {
         path = path.parentPath;
