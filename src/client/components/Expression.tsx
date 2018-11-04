@@ -65,7 +65,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   componentWillReceiveProps(props: ExpressionProps): void {
-    if (props.parent !== this.props.parent) {
+    if (props.parent !== this.props.parent || props.expression !== this.props.expression) {
       this.clearHover();
     }
     if (props.interactionHandler !== this.props.interactionHandler) {
@@ -95,6 +95,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     }
     this.hoveredChildren = [];
+    this.updateHover();
   }
 
   render(): any {
