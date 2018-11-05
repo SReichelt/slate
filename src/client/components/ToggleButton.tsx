@@ -2,6 +2,7 @@ import * as React from 'react';
 import './Button.css';
 
 interface ToggleButtonProps {
+  toolTipText: string;
   enabled: boolean;
   selected: boolean;
   onToggle: (selected: boolean) => void;
@@ -22,7 +23,7 @@ class ToggleButton extends React.Component<ToggleButtonProps> {
     if (this.props.selected) {
       className += ' selected';
     }
-    return <div className={className} onClick={() => this.props.enabled && this.props.onToggle(!this.props.selected)}>{this.props.children}</div>;
+    return <div className={className} title={this.props.toolTipText} onClick={() => this.props.enabled && this.props.onToggle(!this.props.selected)}>{this.props.children}</div>;
   }
 }
 

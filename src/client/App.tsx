@@ -33,6 +33,7 @@ interface SelectionState {
 interface AppState extends SelectionState {
   width: number;
   height: number;
+  verticalLayout: boolean;
   error?: string;
   templates?: Fmt.File;
   extraContentsVisible: boolean;
@@ -57,6 +58,7 @@ class App extends React.Component<AppProps, AppState> {
     let state: AppState = {
       width: window.innerWidth,
       height: window.innerHeight,
+      verticalLayout: window.innerHeight > window.innerWidth,
       editing: false,
       extraContentsVisible: false
     };
@@ -103,6 +105,15 @@ class App extends React.Component<AppProps, AppState> {
         width: window.innerWidth,
         height: window.innerHeight
       });
+      if (window.innerHeight > window.innerWidth * 1.125) {
+        this.setState({
+          verticalLayout: true
+        });
+      } else if (window.innerHeight * 1.125 < window.innerWidth) {
+        this.setState({
+          verticalLayout: false
+        });
+      }
     };
 
     let templateUri = '/display/templates.hlm';
@@ -140,9 +151,8 @@ class App extends React.Component<AppProps, AppState> {
       mainContents = 'Please select an item from the tree.';
     }
 
-    let verticalWindow = this.state.height > this.state.width;
-    let windowSize = verticalWindow ? this.state.height : this.state.width;
-    let defaultItemHeight = verticalWindow ? this.state.height / 3 : this.state.height / 2;
+    let windowSize = this.state.verticalLayout ? this.state.height : this.state.width;
+    let defaultItemHeight = this.state.verticalLayout ? this.state.height / 3 : this.state.height / 2;
 
     let contentsPane = (
       <div className={'bottom-toolbar-container'}>
@@ -152,10 +162,10 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         </div>
         <div className={'bottom-toolbar'}>
-          <ToggleButton enabled={this.state.selectedItemDefinition !== undefined} selected={this.state.editing} onToggle={(selected: boolean) => this.setState({editing: selected})}>
+          <ToggleButton toolTipText="Edit" enabled={this.state.selectedItemDefinition !== undefined} selected={this.state.editing} onToggle={(selected: boolean) => this.setState({editing: selected})}>
             {getButtonIcon(ButtonType.Edit, this.state.selectedItemDefinition !== undefined)}
           </ToggleButton>
-          <ToggleButton enabled={extraContents !== undefined} selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
+          <ToggleButton toolTipText="View Source" enabled={extraContents !== undefined} selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
             {getButtonIcon(ButtonType.ViewSource, extraContents !== undefined)}
           </ToggleButton>
         </div>
@@ -176,7 +186,7 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div className={'app'}>
-        <SplitPane split={verticalWindow ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
+        <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
           <div className={'app-pane'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
             <div className={'app-tree'}>
               <LibraryTree libraryDataProvider={this.libraryDataProvider} section={this.library} itemNumber={[]} templates={this.state.templates} parentScrollPane={this.treePaneNode} isLast={true} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>

@@ -578,7 +578,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             this.props.interactionHandler.sourceCodeChanged();
           }
         };
-        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={{status: false}}/>;
+        let options: SimpleMDE.Options = {
+          toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
+          status: false
+        };
+        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
       } else {
         return <ReactMarkdown source={expression.text}/>;
       }
