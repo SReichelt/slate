@@ -105,11 +105,11 @@ class App extends React.Component<AppProps, AppState> {
         width: window.innerWidth,
         height: window.innerHeight
       });
-      if (window.innerHeight > window.innerWidth * 1.125) {
+      if (window.innerHeight > window.innerWidth * 1.25) {
         this.setState({
           verticalLayout: true
         });
-      } else if (window.innerHeight * 1.125 < window.innerWidth) {
+      } else if (window.innerHeight * 1.25 < window.innerWidth) {
         this.setState({
           verticalLayout: false
         });

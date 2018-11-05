@@ -580,7 +580,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         };
         let options: SimpleMDE.Options = {
           toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
-          status: false
+          status: false,
+          forceSync: true /* does not work correctly on Android otherwise */
         };
         return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
       } else {
