@@ -24,7 +24,7 @@ export class HLMDisplay implements Logic.LogicDisplay {
     }
   }
 
-  getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): Logic.LogicRenderer {
-    return new HLMRenderer(libraryDataAccessor, templates);
+  getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): Logic.LogicRenderer {
+    return new HLMRenderer(libraryDataAccessor, templates, editing);
   }
 }

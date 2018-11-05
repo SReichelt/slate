@@ -3,12 +3,18 @@ import './Expression.css';
 import * as Display from '../../shared/display/display';
 import renderPromise from './PromiseHelper';
 import * as ReactMarkdown from 'react-markdown';
+import ReactMarkdownEditor from 'react-simplemde-editor';
+import 'simplemde/dist/simplemde.min.css';
 
 const ToolTip = require('react-portal-tooltip').default;
 
+export type OnSourceCodeChanged = () => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
 
 export interface ExpressionInteractionHandler {
+  registerSourceCodeChangeHandler(handler: OnSourceCodeChanged): void;
+  unregisterSourceCodeChangeHandler(handler: OnSourceCodeChanged): void;
+  sourceCodeChanged(): void;
   registerHoverChangeHandler(handler: OnHoverChanged): void;
   unregisterHoverChangeHandler(handler: OnHoverChanged): void;
   hoverChanged(hover: Display.SemanticLink[]): void;
@@ -563,7 +569,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         </span>
       );
     } else if (expression instanceof Display.MarkdownExpression) {
-      return <ReactMarkdown source={expression.text}/>;
+      if (this.props.interactionHandler && expression.onTextChanged) {
+        let onChange = (newText: string) => {
+          if (expression.onTextChanged) {
+            expression.onTextChanged(newText);
+          }
+          if (this.props.interactionHandler) {
+            this.props.interactionHandler.sourceCodeChanged();
+          }
+        };
+        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={{status: false}}/>;
+      } else {
+        return <ReactMarkdown source={expression.text}/>;
+      }
     } else if (expression instanceof Display.IndirectExpression) {
       try {
         return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);

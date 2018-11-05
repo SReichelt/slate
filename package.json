@@ -31,6 +31,7 @@
     "react-loading-animation": "^1.4.0",
     "react-markdown": "^3.4.1",
     "react-portal-tooltip": "^2.4.0",
+    "react-simplemde-editor": "^3.6.22",
     "react-split-pane": "^0.1.82",
     "tslib": "^1.9.2"
   },

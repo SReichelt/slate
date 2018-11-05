@@ -16,6 +16,8 @@ class ToggleButton extends React.Component<ToggleButtonProps> {
     let className = 'button';
     if (this.props.enabled) {
       className += ' hoverable';
+    } else {
+      className += ' disabled';
     }
     if (this.props.selected) {
       className += ' selected';

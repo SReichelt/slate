@@ -29,8 +29,8 @@ interface ReplacementParameters {
 export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicRenderer {
   private utils: HLMUtils;
 
-  constructor(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File) {
-    super(libraryDataAccessor, templates);
+  constructor(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean) {
+    super(libraryDataAccessor, templates, editing);
     this.utils = new HLMUtils(libraryDataAccessor);
   }
 
@@ -1113,7 +1113,6 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
           'left': definitionRef,
           'right': this.renderVariable(contents.parameter)
         });
-        equality.semanticLinks = [new Display.SemanticLink(definition)];
         let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((formula) => this.renderFormula(formula));
         return this.renderMultiDefinitions('Equivalence', equality, items);
@@ -1190,13 +1189,9 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
           let equalityDefinition = constructorContents.equalityDefinition;
           if (equalityDefinition) {
             // Unfortunately, normal concatenation doesn't seem to work with our derived arrays.
-            let combinedParameters = [];
-            for (let param of equalityDefinition.leftParameters) {
-              combinedParameters.push(param);
-            }
-            for (let param of equalityDefinition.rightParameters) {
-              combinedParameters.push(param);
-            }
+            let combinedParameters: Fmt.Parameter[] = [];
+            combinedParameters.push(...equalityDefinition.leftParameters);
+            combinedParameters.push(...equalityDefinition.rightParameters);
             let parameters = this.renderParameterList(combinedParameters, true, true, true);
             let leftParameters: ReplacementParameters = {
               parameters: equalityDefinition.leftParameters,
@@ -1337,19 +1332,6 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
           row.push(this.renderParameters([parameter], initialState));
           row.push(new Display.TextExpression('.”'));
           paragraphs.push(new Display.RowExpression(row));
-        }
-      }
-    }
-  }
-
-  private addDefinitionRemarks(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[]): void {
-    if (definition.documentation) {
-      for (let item of definition.documentation.items) {
-        if (item.kind === 'remarks' || item.kind === 'references') {
-          let heading = new Display.TextExpression(item.kind.charAt(0).toUpperCase() + item.kind.slice(1) + '.');
-          heading.styleClasses = ['sub-heading'];
-          paragraphs.push(heading);
-          paragraphs.push(new Display.MarkdownExpression(item.text));
         }
       }
     }

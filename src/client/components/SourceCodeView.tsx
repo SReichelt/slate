@@ -11,19 +11,57 @@ export interface SourceCodeViewProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-function SourceCodeView(props: SourceCodeViewProps): any {
-  let render = props.definition.then((definition: Fmt.Definition) => {
-    let stream = new SourceCodeDisplay.SourceCodeStream;
-    let writer = new FmtWriter.Writer(stream);
-    let indent = {
-      indent: '',
-      outerIndent: ''
-    };
-    writer.writeDefinition(definition, indent);
-    return <Expression expression={stream.result} interactionHandler={props.interactionHandler} tooltipPosition="top"/>;
-  });
+class SourceCodeView extends React.Component<SourceCodeViewProps> {
+  private timer: any;
 
-  return renderPromise(render);
+  componentDidMount(): void {
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.registerSourceCodeChangeHandler(this.sourceCodeChanged);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.unregisterSourceCodeChangeHandler(this.sourceCodeChanged);
+    }
+  }
+
+  componentWillReceiveProps(props: SourceCodeViewProps): void {
+    if (props.interactionHandler !== this.props.interactionHandler) {
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.unregisterSourceCodeChangeHandler(this.sourceCodeChanged);
+      }
+      if (props.interactionHandler) {
+        props.interactionHandler.registerSourceCodeChangeHandler(this.sourceCodeChanged);
+      }
+    }
+  }
+
+  render(): any {
+    let render = this.props.definition.then((definition: Fmt.Definition) => {
+      let stream = new SourceCodeDisplay.SourceCodeStream;
+      let writer = new FmtWriter.Writer(stream);
+      let indent = {
+        indent: '',
+        outerIndent: ''
+      };
+      writer.writeDefinition(definition, indent);
+      return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} tooltipPosition="top"/>;
+    });
+
+    return renderPromise(render);
+  }
+
+  private sourceCodeChanged = () => {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(() => this.forceUpdate(), 500);
+  }
 }
 
 export default SourceCodeView;

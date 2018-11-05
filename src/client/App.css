@@ -19,6 +19,10 @@ body {
   background-color: #ffd700;
 }
 
+.disabled {
+  color: gray;
+}
+
 .expr.hover {
   background-color: #ffd700;
 }
@@ -41,7 +45,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  border: solid 1pt gray;
+  border: solid 1px gray;
   overflow: auto;
 }
 
@@ -63,7 +67,7 @@ body {
   right: 0;
   bottom: 0;
   height: 1.5em;
-  border: solid 1pt gray;
+  border: solid 1px gray;
   background-color: #f0f0f0;
   text-align: right;
 }

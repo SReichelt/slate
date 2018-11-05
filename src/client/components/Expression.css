@@ -392,6 +392,8 @@ p {
 
 .var.charcorner-tr:last-child::after, .var.charcorner-tr+*::before {
   content: ' ';
+  font-family: 'TeX', serif;
+  font-style: italic;
   font-size: smaller;
 }
 
@@ -459,6 +461,11 @@ p {
   color: maroon;
 }
 
+.source-code.number {
+  font-family: 'TeX', serif;
+  color: teal;
+}
+
 .expr svg {
   position: absolute;
   width: 100%;
@@ -475,4 +482,16 @@ p {
 
 .preview>a {
   text-decoration: initial;
+}
+
+.expr .CodeMirror, .expr .CodeMirror-scroll {
+	min-height: 3em;
+}
+
+.expr .editor-toolbar:before {
+  margin-bottom: 1px;
+}
+
+.expr .editor-toolbar:after {
+  margin-top: 1px;
 }

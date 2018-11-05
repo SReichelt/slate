@@ -2,6 +2,27 @@ import * as Logic from '../../shared/logics/logic';
 import { LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
 import * as React from 'react';
 
+export enum ButtonType {
+  Edit,
+  ViewSource
+}
+
+export function getButtonIcon(buttonType: ButtonType, enabled: boolean): any {
+  switch (buttonType) {
+  case ButtonType.Edit:
+    return (
+      <svg height="1em" width="1.5em" viewBox="-8 -8 16 16">
+        <path d="M-7 7 L-6 4 L5 -7 L7 -5 L-4 6 Z" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+        <path d="M-6 4 L-4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+      </svg>
+    );
+  case ButtonType.ViewSource:
+    return '{⋯}';
+  default:
+    return null;
+  }
+}
+
 export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo: LibraryItemInfo): any {
   switch (definitionType) {
   case Logic.LogicDefinitionType.Construction:

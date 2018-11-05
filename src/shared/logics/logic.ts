@@ -21,7 +21,7 @@ export enum LogicDefinitionType {
 
 export interface LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
-  getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): LogicRenderer;
+  getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): LogicRenderer;
 }
 
 export type RenderFn = () => Display.RenderedExpression;

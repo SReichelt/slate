@@ -272,6 +272,8 @@ export class RadicalExpression extends RenderedExpression {
 }
 
 export class MarkdownExpression extends RenderedExpression {
+  public onTextChanged?: (newText: string) => void;
+
   constructor(public text: string) {
     super();
   }

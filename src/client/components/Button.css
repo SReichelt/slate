@@ -1,7 +1,9 @@
 .button {
   display: inline-block;
+  height: 1em;
   line-height: 100%;
   padding: 0.25em;
+  vertical-align: middle;
   background-color: #e0e0e0;
   cursor: default;
 }

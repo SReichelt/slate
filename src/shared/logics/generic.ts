@@ -3,7 +3,7 @@ import * as Display from '../display/display';
 import { LibraryDataAccessor } from '../data/libraryDataAccessor';
 
 export abstract class GenericRenderer {
-  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {}
+  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editing: boolean) {}
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;
@@ -166,5 +166,64 @@ export abstract class GenericRenderer {
 
   formatItemNumber(itemNumber: number[]): string {
     return itemNumber.join('.');
+  }
+
+  protected addDefinitionRemarks(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[]): void {
+    let allKinds = ['remarks', 'references'];
+    for (let kind of allKinds) {
+      this.addDefinitionRemarksOfKind(definition, paragraphs, allKinds, kind);
+    }
+  }
+
+  private addDefinitionRemarksOfKind(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[], allKinds: string[], kind: string): void {
+    let text = '';
+    if (definition.documentation) {
+      for (let item of definition.documentation.items) {
+        if (item.kind === kind) {
+          if (text) {
+            text += '\n\n';
+          }
+          text += item.text;
+        }
+      }
+    }
+    if (text || this.editing) {
+      let heading = new Display.TextExpression(kind.charAt(0).toUpperCase() + kind.slice(1) + '.');
+      heading.styleClasses = ['sub-heading'];
+      paragraphs.push(heading);
+      let markdown = new Display.MarkdownExpression(text);
+      if (this.editing) {
+        markdown.onTextChanged = (newText: string) => {
+          let newItems: Fmt.DocumentationItem[] = [];
+          for (let otherKind of allKinds) {
+            if (otherKind === kind) {
+              if (newText) {
+                let item = new Fmt.DocumentationItem;
+                item.kind = kind;
+                item.text = newText;
+                newItems.push(item);
+              }
+            } else {
+              if (definition.documentation) {
+                for (let item of definition.documentation.items) {
+                  if (item.kind === otherKind) {
+                    newItems.push(item);
+                  }
+                }
+              }
+            }
+          }
+          if (newItems.length) {
+            if (!definition.documentation) {
+              definition.documentation = new Fmt.DocumentationComment;
+            }
+            definition.documentation.items = newItems;
+          } else {
+            definition.documentation = undefined;
+          }
+        };
+      }
+      paragraphs.push(markdown);
+    }
   }
 }

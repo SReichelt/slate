@@ -125,7 +125,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         let definitionIcon = getDefinitionIcon(definitionType, this.props.itemInfo);
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
-          let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates);
+          let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates, false);
           if (display === undefined) {
             let summary = renderer.renderDefinitionSummary(this.state.definition);
             if (summary) {

@@ -11,7 +11,7 @@ import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/format/library';
 import * as FmtDisplay from '../shared/display/meta';
-import * as Display from '../shared/display/display';
+import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
 import { WebFileAccessor } from './data/webFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
@@ -26,6 +26,8 @@ interface SelectionState {
   selectedItemProvider?: LibraryDataProvider;
   selectedItemDefinition?: CachedPromise<Fmt.Definition>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
+  interactionHandler?: LibraryItemInteractionHandler;
+  editing: boolean;
 }
 
 interface AppState extends SelectionState {
@@ -55,6 +57,7 @@ class App extends React.Component<AppProps, AppState> {
     let state: AppState = {
       width: window.innerWidth,
       height: window.innerHeight,
+      editing: false,
       extraContentsVisible: false
     };
     this.updateSelectionState(state);
@@ -75,6 +78,9 @@ class App extends React.Component<AppProps, AppState> {
     state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
     state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name);
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
+    if (this.state && this.state.templates) {
+      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition, this.linkClicked);
+    }
   }
 
   componentDidMount(): void {
@@ -84,7 +90,9 @@ class App extends React.Component<AppProps, AppState> {
         selectedItemPath: undefined,
         selectedItemProvider: undefined,
         selectedItemDefinition: undefined,
-        selectedItemInfo: undefined
+        selectedItemInfo: undefined,
+        interactionHandler: undefined,
+        editing: false
       };
       this.updateSelectionState(state);
       this.setState(state);
@@ -103,6 +111,9 @@ class App extends React.Component<AppProps, AppState> {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
         contents.close();
         this.setState({templates: templates});
+        if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
+          this.setState({interactionHandler: new LibraryItemInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition, this.linkClicked)});
+        }
       })
       .catch((error) => {
         this.setState({error: error.message});
@@ -123,9 +134,8 @@ class App extends React.Component<AppProps, AppState> {
     let mainContents: any = undefined;
     let extraContents: any = undefined;
     if (this.state.templates && this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-      let interactionHandler = new LibraryItemInteractionHandler(this.state.selectedItemProvider, this.state.templates, this.state.selectedItemDefinition, this.linkClicked);
-      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} interactionHandler={interactionHandler}/>;
-      extraContents = <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} templates={this.state.templates} definition={this.state.selectedItemDefinition} interactionHandler={interactionHandler}/>;
+      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editing} interactionHandler={this.state.interactionHandler}/>;
+      extraContents = <SourceCodeView definition={this.state.selectedItemDefinition} interactionHandler={this.state.interactionHandler}/>;
     } else {
       mainContents = 'Please select an item from the tree.';
     }
@@ -142,8 +152,11 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         </div>
         <div className={'bottom-toolbar'}>
+          <ToggleButton enabled={this.state.selectedItemDefinition !== undefined} selected={this.state.editing} onToggle={(selected: boolean) => this.setState({editing: selected})}>
+            {getButtonIcon(ButtonType.Edit, this.state.selectedItemDefinition !== undefined)}
+          </ToggleButton>
           <ToggleButton enabled={extraContents !== undefined} selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
-            <div>{'{⋯}'}</div>
+            {getButtonIcon(ButtonType.ViewSource, extraContents !== undefined)}
           </ToggleButton>
         </div>
       </div>
@@ -180,7 +193,9 @@ class App extends React.Component<AppProps, AppState> {
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
       selectedItemDefinition: definitionPromise,
-      selectedItemInfo: CachedPromise.resolve(itemInfo)
+      selectedItemInfo: CachedPromise.resolve(itemInfo),
+      interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined,
+      editing: false
     });
 
     let uri = libraryDataProvider.pathToURI(path);
@@ -188,7 +203,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
-    let state: SelectionState = {};
+    let state: SelectionState = {
+      editing: false
+    };
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.setState(state);
 

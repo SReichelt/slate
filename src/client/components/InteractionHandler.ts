@@ -1,31 +1,49 @@
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
-import { ExpressionInteractionHandler, OnHoverChanged } from './Expression';
+import { ExpressionInteractionHandler, OnSourceCodeChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import LibraryItem, { LibraryItemProps } from './LibraryItem';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
 export class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
-  private handlers: OnHoverChanged[] = [];
+  private sourceCodeChangeHandlers: OnSourceCodeChanged[] = [];
+  private hoverChangeHandlers: OnHoverChanged[] = [];
 
   constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {}
 
+  registerSourceCodeChangeHandler(handler: OnSourceCodeChanged): void {
+    this.sourceCodeChangeHandlers.push(handler);
+  }
+
+  unregisterSourceCodeChangeHandler(handler: OnSourceCodeChanged): void {
+    let index = this.sourceCodeChangeHandlers.indexOf(handler);
+    if (index >= 0) {
+      this.sourceCodeChangeHandlers.splice(index, 1);
+    }
+  }
+
+  sourceCodeChanged(): void {
+    for (let handler of this.sourceCodeChangeHandlers) {
+      handler();
+    }
+  }
+
   registerHoverChangeHandler(handler: OnHoverChanged): void {
-    this.handlers.push(handler);
+    this.hoverChangeHandlers.push(handler);
   }
 
   unregisterHoverChangeHandler(handler: OnHoverChanged): void {
-    let index = this.handlers.indexOf(handler);
+    let index = this.hoverChangeHandlers.indexOf(handler);
     if (index >= 0) {
-      this.handlers.splice(index, 1);
+      this.hoverChangeHandlers.splice(index, 1);
     }
   }
 
   hoverChanged(hover: Display.SemanticLink[]): void {
     let objects = hover.map((semanticLink) => semanticLink.linkedObject);
-    for (let handler of this.handlers) {
+    for (let handler of this.hoverChangeHandlers) {
       handler(objects);
     }
   }
@@ -65,7 +83,8 @@ export class LibraryItemInteractionHandler implements ExpressionInteractionHandl
         includeLabel: false,
         includeExtras: true,
         includeProofs: false,
-        includeRemarks: false
+        includeRemarks: false,
+        editing: false
       };
       return LibraryItem(props);
     } else {

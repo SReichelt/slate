@@ -15,13 +15,14 @@ export interface LibraryItemProps {
   includeExtras: boolean;
   includeProofs: boolean;
   includeRemarks: boolean;
+  editing: boolean;
   interactionHandler?: ExpressionInteractionHandler;
 }
 
 function LibraryItem(props: LibraryItemProps): any {
   let logic = props.libraryDataProvider.logic;
   let logicDisplay = logic.getDisplay();
-  let renderer = logicDisplay.getRenderer(props.libraryDataProvider, props.templates);
+  let renderer = logicDisplay.getRenderer(props.libraryDataProvider, props.templates, props.editing);
 
   let render = props.definition.then((definition: Fmt.Definition) => {
     let expression = renderer.renderDefinition(definition, props.itemInfo, props.includeLabel, props.includeExtras, props.includeProofs, props.includeRemarks);
