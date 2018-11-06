@@ -484,6 +484,11 @@ p {
   text-decoration: initial;
 }
 
+.expr textarea {
+  width: 100%;
+	min-height: 3em;
+}
+
 .expr .CodeMirror, .expr .CodeMirror-scroll {
 	min-height: 3em;
 }

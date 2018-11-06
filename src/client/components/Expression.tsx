@@ -580,11 +580,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             this.props.interactionHandler.sourceCodeChanged();
           }
         };
-        let options: SimpleMDE.Options = {
-          toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
-          status: false
-        };
-        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
+        if ('ontouchstart' in window) {
+          /* SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device. */
+          return <textarea value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+        } else {
+          let options: SimpleMDE.Options = {
+            toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
+            status: false
+          };
+          return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
+        }
       } else {
         return <ReactMarkdown source={expression.text}/>;
       }
