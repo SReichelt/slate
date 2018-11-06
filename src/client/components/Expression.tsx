@@ -45,6 +45,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
   private tooltipPosition: string;
+  private editorChangeTimer: any;
 
   constructor(props: ExpressionProps) {
     super(props);
@@ -67,6 +68,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.clearHover();
     if (this.props.interactionHandler) {
       this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
+    }
+    if (this.editorChangeTimer) {
+      clearInterval(this.editorChangeTimer);
     }
   }
 
@@ -580,10 +584,22 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         };
         let options: SimpleMDE.Options = {
           toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
-          status: false,
-          forceSync: true /* does not work correctly on Android otherwise */
+          status: false
         };
-        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
+        if (this.editorChangeTimer) {
+          clearInterval(this.editorChangeTimer);
+        }
+        let ref = (mde: ReactMarkdownEditor) => {
+          this.editorChangeTimer = setInterval(() => {
+            if (mde.simpleMde) {
+              let newText = mde.simpleMde.value();
+              if (newText !== mde.state.value) {
+                onChange(newText);
+              }
+            }
+          });
+        };
+        return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} ref={ref}/>;
       } else {
         return <ReactMarkdown source={expression.text}/>;
       }
