@@ -3,12 +3,18 @@ import { LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
 import * as React from 'react';
 
 export enum ButtonType {
+  Submit,
+  Cancel,
   Edit,
   ViewSource
 }
 
-export function getButtonIcon(buttonType: ButtonType, enabled: boolean): any {
+export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): any {
   switch (buttonType) {
+  case ButtonType.Submit:
+    return <span className="submit">⌲</span>;
+  case ButtonType.Cancel:
+    return <span className="cancel">✗</span>;
   case ButtonType.Edit:
     return (
       <svg height="1em" width="1.5em" viewBox="-8 -8 16 16">

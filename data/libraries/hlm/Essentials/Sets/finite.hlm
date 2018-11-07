@@ -1,6 +1,8 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks This definition uses both the natural and cardinal numbers, which are defined later. That is not a problem as long as no circularities exist.
+ *
  * @references * https://en.wikipedia.org/wiki/Finite_set
  *             * http://mathworld.wolfram.com/FiniteSet.html
  *             * https://proofwiki.org/wiki/Definition:Finite

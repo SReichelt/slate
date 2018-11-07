@@ -15,12 +15,12 @@ body {
   background-color: #f2cd00;
 }
 
-.hoverable:hover {
-  background-color: #ffd700;
+.hoverable.pressed:hover {
+  background-color: #e0c000;
 }
 
-.disabled {
-  color: gray;
+.hoverable:hover {
+  background-color: #ffd700;
 }
 
 .expr.hover {
@@ -29,6 +29,18 @@ body {
 
 .expr.definition.hover {
   background-color: #80ff00;
+}
+
+.disabled {
+  color: gray;
+}
+
+.submit {
+  color: green;
+}
+
+.cancel {
+  color: red;
 }
 
 .app {
@@ -86,4 +98,11 @@ body {
 
 .Resizer:hover {
   background-color: #e0e0e0;
+}
+
+.submitting {
+  display: inline-block;
+  height: 1em;
+  width: 1.5em;
+  vertical-align: middle;
 }

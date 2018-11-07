@@ -1,9 +1,11 @@
 .button {
   display: inline-block;
   height: 1em;
+  min-width: 1.5em;
   line-height: 100%;
   padding: 0.25em;
   vertical-align: middle;
+  text-align: center;
   background-color: #e0e0e0;
   cursor: default;
 }

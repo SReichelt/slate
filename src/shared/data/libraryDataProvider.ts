@@ -3,6 +3,7 @@ import { FileAccessor, FileContents } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
+import * as FmtWriter from '../format/write';
 import * as FmtLibrary from '../format/library';
 import * as Logic from '../logics/logic';
 
@@ -166,6 +167,22 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.fetchLocalItem(path.name, prefetchContents);
   }
 
+  private submitLocalDefinition(name: string, definition: Fmt.Definition): CachedPromise<void> {
+    let uri = this.uri + encodeURI(name) + '.hlm';
+    let file = new Fmt.File;
+    file.metaModelPath = this.getLogicMetaModelPath();
+    file.definitions = new Fmt.DefinitionList;
+    file.definitions.push(definition);
+    let contents = FmtWriter.writeString(file);
+    let result = this.fileAccessor.writeFile!(uri, contents);
+    result.then(() => this.definitionCache.set(name, definition));
+    return result;
+  }
+
+  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<void> {
+    return this.submitLocalDefinition(name, definition);
+  }
+
   getLocalItemInfo(name: string): CachedPromise<LibraryItemInfo> {
     return this.fetchLocalSection()
       .then((definition: Fmt.Definition) => {
@@ -261,5 +278,23 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
     }
     return undefined;
+  }
+
+  private getLogicMetaModelPath(prefix?: Fmt.PathItem): Fmt.Path {
+    if (this.parent) {
+      let parentPrefix = new Fmt.ParentPathItem;
+      parentPrefix.parentPath = prefix;
+      return this.parent.getLogicMetaModelPath(parentPrefix);
+    } else {
+      let path = new Fmt.Path;
+      path.name = this.logic.name;
+      let parentPath = new Fmt.NamedPathItem;
+      parentPath.name = 'logics';
+      parentPath.parentPath = new Fmt.ParentPathItem;
+      parentPath.parentPath.parentPath = new Fmt.ParentPathItem;
+      parentPath.parentPath.parentPath.parentPath = prefix;
+      path.parentPath = parentPath;
+      return path;
+    }
   }
 }

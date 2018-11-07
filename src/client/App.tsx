@@ -4,7 +4,7 @@ import SplitPane from 'react-split-pane';
 import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
-import ToggleButton from './components/ToggleButton';
+import Button from './components/Button';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
@@ -18,6 +18,8 @@ import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryData
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 
+const Loading = require('react-loading-animation');
+
 interface AppProps {
 }
 
@@ -28,6 +30,7 @@ interface SelectionState {
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
   interactionHandler?: LibraryItemInteractionHandler;
   editing: boolean;
+  submitting: boolean;
 }
 
 interface AppState extends SelectionState {
@@ -60,6 +63,7 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
       verticalLayout: window.innerHeight > window.innerWidth,
       editing: false,
+      submitting: false,
       extraContentsVisible: false
     };
     this.updateSelectionState(state);
@@ -94,7 +98,8 @@ class App extends React.Component<AppProps, AppState> {
         selectedItemDefinition: undefined,
         selectedItemInfo: undefined,
         interactionHandler: undefined,
-        editing: false
+        editing: false,
+        submitting: false
       };
       this.updateSelectionState(state);
       this.setState(state);
@@ -154,6 +159,39 @@ class App extends React.Component<AppProps, AppState> {
     let windowSize = this.state.verticalLayout ? this.state.height : this.state.width;
     let defaultItemHeight = this.state.verticalLayout ? this.state.height / 3 : this.state.height / 2;
 
+    let buttons: any[] = [];
+    if (this.state.selectedItemDefinition) {
+      if (this.state.submitting) {
+        buttons.push(<div className="submitting" key="Submitting"><Loading width={'1em'} height={'1em'}/></div>);
+        buttons.push(' ');
+      } else if (this.state.editing) {
+        buttons.push(
+          <Button toolTipText="Submit" onClick={this.submit} key="Submit">
+            {getButtonIcon(ButtonType.Submit)}
+          </Button>
+        );
+        // TODO
+        /*buttons.push(
+          <Button toolTipText="Cancel" onClick={() => this.setState({editing: false})} key="Cancel">
+            {getButtonIcon(ButtonType.Cancel)}
+          </Button>
+        );*/
+        buttons.push(' ');
+      } else {
+        buttons.push(
+          <Button toolTipText="Edit" onClick={() => this.setState({editing: true})} key="Edit">
+            {getButtonIcon(ButtonType.Edit)}
+          </Button>
+        );
+      }
+    }
+    if (extraContents) {
+      buttons.push(
+        <Button toolTipText="View Source" selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key="ViewSource">
+          {getButtonIcon(ButtonType.ViewSource)}
+        </Button>
+      );
+    }
     let contentsPane = (
       <div className={'bottom-toolbar-container'}>
         <div className={'app-pane'}>
@@ -162,12 +200,7 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         </div>
         <div className={'bottom-toolbar'}>
-          <ToggleButton toolTipText="Edit" enabled={this.state.selectedItemDefinition !== undefined} selected={this.state.editing} onToggle={(selected: boolean) => this.setState({editing: selected})}>
-            {getButtonIcon(ButtonType.Edit, this.state.selectedItemDefinition !== undefined)}
-          </ToggleButton>
-          <ToggleButton toolTipText="View Source" enabled={extraContents !== undefined} selected={this.state.extraContentsVisible} onToggle={(selected: boolean) => this.setState({extraContentsVisible: selected})}>
-            {getButtonIcon(ButtonType.ViewSource, extraContents !== undefined)}
-          </ToggleButton>
+          {buttons}
         </div>
       </div>
     );
@@ -214,13 +247,36 @@ class App extends React.Component<AppProps, AppState> {
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
     let state: SelectionState = {
-      editing: false
+      editing: false,
+      submitting: false
     };
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.setState(state);
 
     let uri = libraryDataProvider.pathToURI(path);
     history.pushState(null, 'HLM', uri);
+  }
+
+  private submit = (): void => {
+    let libraryDataProvider = this.state.selectedItemProvider;
+    let path = this.state.selectedItemPath;
+    let definitionPromise = this.state.selectedItemDefinition;
+    if (libraryDataProvider && path && definitionPromise) {
+      this.setState({
+        editing: false,
+        submitting: true
+      });
+      definitionPromise.then((definition: Fmt.Definition) => {
+        if (libraryDataProvider && path) {
+          libraryDataProvider.submitLocalItem(path.name, definition)
+            .then(() => this.setState({submitting: false}))
+            .catch((error) => {
+              this.setState({submitting: false});
+              alert(error.message);
+            });
+        }
+      });
+    }
   }
 }
 

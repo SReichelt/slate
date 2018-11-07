@@ -470,10 +470,14 @@ export class Writer {
         }
         let indentLength = this.lineLength + 1;
         let textLine = '';
-        for (let c of item.text) {
+        for (let c of item.text.trim()) {
           if (c === '\r') {
             // ignore
           } else if (c === '\n') {
+            textLine = textLine.trimRight();
+            if (textLine.startsWith('@')) {
+              textLine = textLine.substring(1);
+            }
             if (textLine) {
               if (indentLength > this.lineLength) {
                 this.write(' '.repeat(indentLength - this.lineLength));
@@ -490,6 +494,7 @@ export class Writer {
             textLine += c;
           }
         }
+        textLine = textLine.trimRight();
         if (textLine) {
           if (indentLength > this.lineLength) {
             this.write(' '.repeat(indentLength - this.lineLength));

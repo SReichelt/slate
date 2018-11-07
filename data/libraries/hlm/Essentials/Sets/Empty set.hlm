@@ -1,6 +1,8 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks In this definition, the notation on the right is built into HLM.
+ *
  * @references * https://en.wikipedia.org/wiki/Empty_set
  *             * http://mathworld.wolfram.com/EmptySet.html
  *             * https://proofwiki.org/wiki/Definition:Empty_Set
