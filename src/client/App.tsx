@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './App.css';
 import SplitPane from 'react-split-pane';
+import { withAlert, InjectedAlertProp } from 'react-alert';
 import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
@@ -21,6 +22,7 @@ import * as Logics from '../shared/logics/logics';
 const Loading = require('react-loading-animation');
 
 interface AppProps {
+  alert: InjectedAlertProp;
 }
 
 interface SelectionState {
@@ -269,10 +271,15 @@ class App extends React.Component<AppProps, AppState> {
       definitionPromise.then((definition: Fmt.Definition) => {
         if (libraryDataProvider && path) {
           libraryDataProvider.submitLocalItem(path.name, definition)
-            .then(() => this.setState({submitting: false}))
+            .then((appliedImmediately: boolean) => {
+              this.setState({submitting: false});
+              if (!appliedImmediately) {
+                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+              }
+            })
             .catch((error) => {
               this.setState({submitting: false});
-              alert(error.message);
+              this.props.alert.error('Error submitting changes: ' + error.message);
             });
         }
       });
@@ -280,4 +287,4 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-export default App;
+export default withAlert(App);

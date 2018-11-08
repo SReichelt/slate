@@ -2,7 +2,7 @@ import CachedPromise from './cachedPromise';
 
 export interface FileAccessor {
     readFile(uri: string): CachedPromise<FileContents>;
-    writeFile?(uri: string, text: string): CachedPromise<void>;
+    writeFile?(uri: string, text: string): CachedPromise<boolean>;
 }
 
 export interface FileContents {

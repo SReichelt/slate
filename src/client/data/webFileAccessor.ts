@@ -15,7 +15,7 @@ export class WebFileAccessor implements FileAccessor {
     return new CachedPromise(contents);
   }
 
-  writeFile(uri: string, text: string): CachedPromise<void> {
+  writeFile(uri: string, text: string): CachedPromise<boolean> {
     let options = {
       method: 'PUT',
       body: text
@@ -25,6 +25,7 @@ export class WebFileAccessor implements FileAccessor {
         if (!response.ok) {
           throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
         }
+        return response.status === 200;
       });
     return new CachedPromise(result);
   }
