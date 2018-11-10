@@ -87,6 +87,9 @@ export interface ObjectRangeInfo {
 export type RangeHandler = (info: ObjectRangeInfo) => void;
 
 export class EmptyExpression extends Fmt.Expression {
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters?: Fmt.ReplacedParameter[]): Fmt.Expression {
+    return this;
+  }
 }
 
 interface RawDocumentationItem {
