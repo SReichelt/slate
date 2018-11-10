@@ -216,6 +216,14 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Construction;
+    }
+  }
+
   getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
     const innerDefinitionTypes: Fmt.MetaDefinitionList = {'Constructor': MetaRefExpression_Constructor};
     return new Fmt.StandardMetaDefinitionFactory(innerDefinitionTypes);
@@ -358,6 +366,14 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Constructor;
+    }
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -679,6 +695,14 @@ export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_SetOperator;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_SetOperator;
   }
@@ -807,6 +831,14 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_ExplicitOperator;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_ExplicitOperator;
   }
@@ -925,6 +957,14 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_ImplicitOperator;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_ImplicitOperator;
   }
@@ -955,6 +995,14 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_MacroOperator;
+    }
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1037,6 +1085,14 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Predicate;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_Predicate;
   }
@@ -1114,6 +1170,14 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_StandardTheorem;
+    }
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1195,6 +1259,14 @@ export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression 
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_EquivalenceTheorem;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_EquivalenceTheorem;
   }
@@ -1247,6 +1319,14 @@ export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Bool;
+    }
+  }
 }
 
 export class MetaRefExpression_true extends Fmt.MetaRefExpression {
@@ -1259,6 +1339,14 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_true;
+    }
   }
 }
 
@@ -1273,6 +1361,14 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_false;
+    }
+  }
 }
 
 export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
@@ -1285,6 +1381,14 @@ export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Nat;
+    }
   }
 }
 
@@ -1299,6 +1403,14 @@ export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Expr;
+    }
+  }
 }
 
 export class MetaRefExpression_left extends Fmt.MetaRefExpression {
@@ -1312,6 +1424,14 @@ export class MetaRefExpression_left extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_left;
+    }
+  }
 }
 
 export class MetaRefExpression_right extends Fmt.MetaRefExpression {
@@ -1324,6 +1444,14 @@ export class MetaRefExpression_right extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_right;
+    }
   }
 }
 
@@ -1365,10 +1493,7 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1419,10 +1544,7 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1484,10 +1606,7 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1501,6 +1620,14 @@ export class MetaRefExpression_Symbol extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Symbol;
+    }
   }
 }
 
@@ -1529,10 +1656,7 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1577,10 +1701,7 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1609,10 +1730,7 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1641,10 +1759,7 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1949,6 +2064,14 @@ export class MetaRefExpression_empty extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_empty;
+    }
+  }
 }
 
 export class MetaRefExpression_previous extends Fmt.MetaRefExpression {
@@ -1961,6 +2084,14 @@ export class MetaRefExpression_previous extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_previous;
+    }
   }
 }
 
@@ -2010,10 +2141,7 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
         result.terms.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2058,10 +2186,7 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2106,10 +2231,7 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2181,10 +2303,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
         result.cases.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2238,10 +2357,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
         result.cases.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2313,10 +2429,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
         result.cases.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2345,10 +2458,7 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2398,10 +2508,7 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
         result.formulae.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2451,10 +2558,7 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
         result.formulae.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2499,10 +2603,7 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2549,10 +2650,7 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2599,10 +2697,7 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2640,10 +2735,7 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2681,10 +2773,7 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2722,10 +2811,7 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2763,10 +2849,7 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -2838,10 +2921,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
         result.cases.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3115,10 +3195,7 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3169,10 +3246,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3212,10 +3286,7 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3280,10 +3351,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
         result.caseProofs.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3319,10 +3387,7 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3360,10 +3425,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3410,10 +3472,7 @@ export class MetaRefExpression_Embed extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3442,10 +3501,7 @@ export class MetaRefExpression_SetExtend extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3474,10 +3530,7 @@ export class MetaRefExpression_Extend extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3531,10 +3584,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3563,10 +3613,7 @@ export class MetaRefExpression_ResolveDef extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3604,10 +3651,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3656,10 +3700,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3697,10 +3738,7 @@ export class MetaRefExpression_ProveNeg extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3738,10 +3776,7 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3799,10 +3834,7 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3866,10 +3898,7 @@ export class MetaRefExpression_ProveSetEquals extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -3934,10 +3963,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
         result.caseProofs.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -4009,10 +4035,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
         result.cases.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 

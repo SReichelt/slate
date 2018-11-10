@@ -42,6 +42,14 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Template;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_Template;
   }
@@ -58,6 +66,14 @@ export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Bool;
+    }
+  }
 }
 
 export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
@@ -70,6 +86,14 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Int;
+    }
   }
 }
 
@@ -84,6 +108,14 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_String;
+    }
+  }
 }
 
 export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
@@ -96,6 +128,14 @@ export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Expr;
+    }
   }
 }
 
@@ -110,6 +150,14 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_true;
+    }
+  }
 }
 
 export class MetaRefExpression_false extends Fmt.MetaRefExpression {
@@ -122,6 +170,14 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_false;
+    }
   }
 }
 
@@ -172,10 +228,7 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -219,10 +272,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
         result.items.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -281,10 +331,7 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -328,10 +375,7 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
         result.items.push(newItem);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 

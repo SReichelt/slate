@@ -6,7 +6,7 @@ export class File {
   definitions: DefinitionList = Object.create(DefinitionList.prototype);
 }
 
-export type ExpressionSubstitutionFn = (expression: Expression) => Expression;
+export type ExpressionSubstitutionFn = ((expression: Expression) => Expression) | undefined;
 
 export interface ReplacedParameter {
   original: Parameter;
@@ -16,13 +16,13 @@ export interface ReplacedParameter {
 export abstract class PathItem {
   parentPath?: PathItem;
 
-  abstract substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): PathItem;
+  abstract substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): PathItem;
 }
 
 export class NamedPathItem extends PathItem {
   name: string;
 
-  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): NamedPathItem {
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): NamedPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath) {
@@ -37,7 +37,7 @@ export class NamedPathItem extends PathItem {
 }
 
 export class ParentPathItem extends PathItem {
-  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): ParentPathItem {
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): ParentPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath) {
@@ -51,7 +51,7 @@ export class ParentPathItem extends PathItem {
 }
 
 export class IdentityPathItem extends PathItem {
-  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): IdentityPathItem {
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): IdentityPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath) {
@@ -67,7 +67,7 @@ export class IdentityPathItem extends PathItem {
 export class Path extends NamedPathItem {
   arguments: ArgumentList = Object.create(ArgumentList.prototype);
 
-  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): Path {
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Path {
     let result = new Path;
     let changed = false;
     if (this.parentPath) {
@@ -184,7 +184,7 @@ export class Argument {
   name?: string;
   value: Expression;
 
-  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[]): Argument {
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Argument {
     let newValue = this.value.substitute(fn, replacedParameters);
     if (newValue !== this.value) {
       let result = new Argument;
@@ -236,7 +236,7 @@ export class ArgumentList extends Array<Argument> {
     this.push(arg);
   }
 
-  substituteExpression(fn: ExpressionSubstitutionFn, result: ArgumentList, replacedParameters: ReplacedParameter[]): boolean {
+  substituteExpression(fn: ExpressionSubstitutionFn, result: ArgumentList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let argument of this) {
       let newArgument = argument.substituteExpression(fn, replacedParameters);
@@ -282,17 +282,47 @@ export class GenericObjectContents extends ObjectContents {
 }
 
 export abstract class Expression {
-  substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    return fn(this);
+  clone(replacedParameters: ReplacedParameter[] = []): Expression {
+    return this.substitute(undefined, replacedParameters);
+  }
+
+  abstract substitute(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression;
+
+  protected getSubstitutionResult(fn: ExpressionSubstitutionFn, expression: Expression, changed: boolean): Expression {
+    if (fn) {
+      return fn(changed ? expression : this);
+    } else {
+      return expression;
+    }
   }
 }
 
 export class IntegerExpression extends Expression {
   value: BigInt;
+
+  substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      let result = new IntegerExpression;
+      result.value = this.value;
+      return result;
+    }
+  }
 }
 
 export class StringExpression extends Expression {
   value: string;
+
+  substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      let result = new StringExpression;
+      result.value = this.value;
+      return result;
+    }
+  }
 }
 
 export class VariableRefExpression extends Expression {
@@ -316,10 +346,7 @@ export class VariableRefExpression extends Expression {
         result.indices.push(newIndex);
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -360,6 +387,13 @@ export class GenericMetaRefExpression extends MetaRefExpression {
   createDefinitionContents(): ObjectContents | undefined {
     return new GenericObjectContents;
   }
+
+  substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
+    let result = new GenericMetaRefExpression;
+    result.name = this.name;
+    let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
+    return this.getSubstitutionResult(fn, result, changed);
+  }
 }
 
 export class DefinitionRefExpression extends ObjectRefExpression {
@@ -368,10 +402,8 @@ export class DefinitionRefExpression extends ObjectRefExpression {
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new DefinitionRefExpression;
     result.path = this.path.substituteExpression(fn, replacedParameters);
-    if (result.path === this.path) {
-      result = this;
-    }
-    return fn(result);
+    let changed = (result.path !== this.path);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -381,10 +413,7 @@ export class ParameterExpression extends Expression {
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new ParameterExpression;
     let changed = this.parameters.substituteExpression(fn, result.parameters, replacedParameters);
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -394,10 +423,7 @@ export class CompoundExpression extends Expression {
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new CompoundExpression;
     let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -415,10 +441,7 @@ export class ArrayExpression extends Expression {
       }
       result.items.push(newItem);
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 

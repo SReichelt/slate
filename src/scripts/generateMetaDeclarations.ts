@@ -555,9 +555,9 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += outputWriteCode(inFile, parameter.name, `this.${memberName}`, parameter.type, optional, parameter.list, named, `    `);
       }
       outFileStr += `  }\n`;
+      outFileStr += `\n`;
+      outFileStr += `  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
       if (definition.parameters.length) {
-        outFileStr += `\n`;
-        outFileStr += `  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
         outFileStr += `    let result = new MetaRefExpression_${definition.name};\n`;
         outFileStr += `    let changed = false;\n`;
         for (let parameter of definition.parameters) {
@@ -574,12 +574,15 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
           outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
           outFileStr += `    }\n`;
         }
-        outFileStr += `    if (!changed) {\n`;
-        outFileStr += `      result = this;\n`;
+        outFileStr += `    return this.getSubstitutionResult(fn, result, changed);\n`;
+      } else {
+        outFileStr += `    if (fn) {\n`;
+        outFileStr += `      return fn(this);\n`;
+        outFileStr += `    } else {\n`;
+        outFileStr += `      return new MetaRefExpression_${definition.name};\n`;
         outFileStr += `    }\n`;
-        outFileStr += `    return fn(result);\n`;
-        outFileStr += `  }\n`;
       }
+      outFileStr += `  }\n`;
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
         outFileStr += `\n`;
         outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;

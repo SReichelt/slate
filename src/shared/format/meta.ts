@@ -73,6 +73,14 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_MetaModel;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_MetaModel;
   }
@@ -189,10 +197,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -225,6 +230,14 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_ExpressionType;
+    }
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -297,10 +310,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -319,6 +329,14 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Any;
+    }
+  }
 }
 
 export class MetaRefExpression_self extends Fmt.MetaRefExpression {
@@ -331,6 +349,14 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_self;
+    }
   }
 }
 
@@ -345,6 +371,14 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Type;
+    }
+  }
 }
 
 export class MetaRefExpression_true extends Fmt.MetaRefExpression {
@@ -357,6 +391,14 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_true;
+    }
   }
 }
 
@@ -371,6 +413,14 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_false;
+    }
+  }
 }
 
 export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
@@ -383,6 +433,14 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Int;
+    }
   }
 }
 
@@ -397,6 +455,14 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
   }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_String;
+    }
+  }
 }
 
 export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
@@ -409,6 +475,14 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_ParameterList;
+    }
   }
 }
 
@@ -439,10 +513,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -456,6 +527,14 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_ArgumentList;
+    }
   }
 }
 

@@ -52,6 +52,14 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Section;
+    }
+  }
+
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_Section;
   }
@@ -82,6 +90,14 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_Library;
+    }
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -139,10 +155,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -182,10 +195,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (!changed) {
-      result = this;
-    }
-    return fn(result);
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
