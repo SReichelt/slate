@@ -185,6 +185,11 @@ class App extends React.Component<AppProps, AppState> {
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
+        buttons.push(
+          <Button toolTipText="Open in Visual Studio Code" onClick={this.openLocally} key="OpenLocally">
+            {getButtonIcon(ButtonType.OpenLocally)}
+          </Button>
+        );
       }
     }
     if (extraContents) {
@@ -260,14 +265,14 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private submit = (): void => {
-    let libraryDataProvider = this.state.selectedItemProvider;
-    let path = this.state.selectedItemPath;
     let definitionPromise = this.state.selectedItemDefinition;
-    if (libraryDataProvider && path && definitionPromise) {
+    if (definitionPromise) {
       this.setState({
         editing: false,
         submitting: true
       });
+      let libraryDataProvider = this.state.selectedItemProvider;
+      let path = this.state.selectedItemPath;
       definitionPromise.then((definition: Fmt.Definition) => {
         if (libraryDataProvider && path) {
           libraryDataProvider.submitLocalItem(path.name, definition)
@@ -283,6 +288,17 @@ class App extends React.Component<AppProps, AppState> {
             });
         }
       });
+    }
+  }
+
+  private openLocally = (): void => {
+    let libraryDataProvider = this.state.selectedItemProvider;
+    let path = this.state.selectedItemPath;
+    if (libraryDataProvider && path) {
+      libraryDataProvider.openLocalItem(path.name)
+        .catch((error) => {
+          this.props.alert.error('Error opening file: ' + error.message);
+        });
     }
   }
 }

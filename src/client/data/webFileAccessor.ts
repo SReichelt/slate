@@ -29,6 +29,19 @@ export class WebFileAccessor implements FileAccessor {
       });
     return new CachedPromise(result);
   }
+
+  openFile(uri: string): CachedPromise<void> {
+    let options = {
+      method: 'REPORT'
+    };
+    let result = fetch(uri, options)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
+        }
+      });
+    return new CachedPromise(result);
+  }
 }
 
 class WebFileContents implements FileContents {

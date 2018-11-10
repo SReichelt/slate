@@ -167,7 +167,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.fetchLocalItem(path.name, prefetchContents);
   }
 
-  private submitLocalDefinition(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
+  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
     let uri = this.uri + encodeURI(name) + '.hlm';
     let file = new Fmt.File;
     file.metaModelPath = this.getLogicMetaModelPath();
@@ -179,8 +179,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return result;
   }
 
-  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
-    return this.submitLocalDefinition(name, definition);
+  openLocalItem(name: string): CachedPromise<void> {
+    let uri = this.uri + encodeURI(name) + '.hlm';
+    return this.fileAccessor.openFile!(uri);
   }
 
   getLocalItemInfo(name: string): CachedPromise<LibraryItemInfo> {

@@ -6,6 +6,7 @@ export enum ButtonType {
   Submit,
   Cancel,
   Edit,
+  OpenLocally,
   ViewSource
 }
 
@@ -18,8 +19,15 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   case ButtonType.Edit:
     return (
       <svg height="1em" width="1.5em" viewBox="-8 -8 16 16">
-        <path d="M-7 7 L-6 4 L5 -7 L7 -5 L-4 6 Z" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
-        <path d="M-6 4 L-4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+        <path d="M -7 7 L -6 4 L 5 -7 L 7 -5 L -4 6 z" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+        <path d="M -6 4 L -4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+      </svg>
+    );
+  case ButtonType.OpenLocally:
+    return (
+      <svg height="1em" width="1.5em" viewBox="0 0 260 260">
+        <path d="M 195.47461 -0.005859375 L 195.47461 223.29688 L 0.49609375 194.33789 L 195.47461 259.99219 L 260.47461 232.95312 L 260.47461 31.064453 L 260.49609 31.054688 L 260.47461 31.011719 L 260.47461 27.035156 L 195.47461 -0.005859375 z" fill={enabled ? '#007acc' : 'gray'}/>
+        <path d="M 127.24219 38.037109 L 67.521484 97.070312 L 31.566406 69.992188 L 16.748047 74.941406 L 53.328125 111.10156 L 16.748047 147.25977 L 31.566406 152.21094 L 67.521484 125.13086 L 67.523438 125.13086 L 127.24023 184.16016 L 163.00781 168.96289 L 163.00781 53.234375 L 127.24219 38.037109 z M 127.24023 80.158203 L 127.24023 142.03711 L 86.154297 111.09766 L 127.24023 80.158203 z" fill={enabled ? '#007acc' : 'gray'}/>
       </svg>
     );
   case ButtonType.ViewSource:
