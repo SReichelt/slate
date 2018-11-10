@@ -31,7 +31,7 @@ interface SelectionState {
   selectedItemDefinition?: CachedPromise<Fmt.Definition>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
   interactionHandler?: LibraryItemInteractionHandler;
-  editing: boolean;
+  editedDefinition?: Fmt.Definition;
   submitting: boolean;
 }
 
@@ -64,7 +64,6 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
       verticalLayout: window.innerHeight > window.innerWidth,
-      editing: false,
       submitting: false,
       extraContentsVisible: false
     };
@@ -100,7 +99,6 @@ class App extends React.Component<AppProps, AppState> {
         selectedItemDefinition: undefined,
         selectedItemInfo: undefined,
         interactionHandler: undefined,
-        editing: false,
         submitting: false
       };
       this.updateSelectionState(state);
@@ -152,8 +150,9 @@ class App extends React.Component<AppProps, AppState> {
     let mainContents: any = undefined;
     let extraContents: any = undefined;
     if (this.state.templates && this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={this.state.selectedItemDefinition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editing} interactionHandler={this.state.interactionHandler}/>;
-      extraContents = <SourceCodeView definition={this.state.selectedItemDefinition} interactionHandler={this.state.interactionHandler}/>;
+      let definition = this.state.editedDefinition ? CachedPromise.resolve(this.state.editedDefinition) : this.state.selectedItemDefinition;
+      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition} interactionHandler={this.state.interactionHandler}/>;
+      extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler}/>;
     } else {
       mainContents = 'Please select an item from the tree.';
     }
@@ -166,22 +165,21 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.submitting) {
         buttons.push(<div className="submitting" key="Submitting"><Loading width={'1em'} height={'1em'}/></div>);
         buttons.push(' ');
-      } else if (this.state.editing) {
+      } else if (this.state.editedDefinition) {
         buttons.push(
           <Button toolTipText="Submit" onClick={this.submit} key="Submit">
             {getButtonIcon(ButtonType.Submit)}
           </Button>
         );
-        // TODO
-        /*buttons.push(
-          <Button toolTipText="Cancel" onClick={() => this.setState({editing: false})} key="Cancel">
+        buttons.push(
+          <Button toolTipText="Cancel" onClick={() => this.setState({editedDefinition: undefined})} key="Cancel">
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
-        );*/
+        );
         buttons.push(' ');
       } else {
         buttons.push(
-          <Button toolTipText="Edit" onClick={() => this.setState({editing: true})} key="Edit">
+          <Button toolTipText="Edit" onClick={this.edit} key="Edit">
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
@@ -245,7 +243,8 @@ class App extends React.Component<AppProps, AppState> {
       selectedItemDefinition: definitionPromise,
       selectedItemInfo: CachedPromise.resolve(itemInfo),
       interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined,
-      editing: false
+      editedDefinition: undefined,
+      submitting: false
     });
 
     let uri = libraryDataProvider.pathToURI(path);
@@ -254,7 +253,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
     let state: SelectionState = {
-      editing: false,
+      editedDefinition: undefined,
       submitting: false
     };
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
@@ -264,30 +263,35 @@ class App extends React.Component<AppProps, AppState> {
     history.pushState(null, 'HLM', uri);
   }
 
+  private edit = (): void => {
+    if (this.state.selectedItemDefinition) {
+      this.state.selectedItemDefinition.then((definition: Fmt.Definition) => this.setState({
+        editedDefinition: definition.clone()
+      }));
+    }
+  }
+
   private submit = (): void => {
-    let definitionPromise = this.state.selectedItemDefinition;
-    if (definitionPromise) {
+    let libraryDataProvider = this.state.selectedItemProvider;
+    let path = this.state.selectedItemPath;
+    if (this.state.editedDefinition && libraryDataProvider && path) {
       this.setState({
-        editing: false,
+        selectedItemDefinition: CachedPromise.resolve(this.state.editedDefinition),
+        editedDefinition: undefined,
         submitting: true
       });
-      let libraryDataProvider = this.state.selectedItemProvider;
-      let path = this.state.selectedItemPath;
-      definitionPromise.then((definition: Fmt.Definition) => {
-        if (libraryDataProvider && path) {
-          libraryDataProvider.submitLocalItem(path.name, definition)
-            .then((appliedImmediately: boolean) => {
-              this.setState({submitting: false});
-              if (!appliedImmediately) {
-                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
-              }
-            })
-            .catch((error) => {
-              this.setState({submitting: false});
-              this.props.alert.error('Error submitting changes: ' + error.message);
-            });
-        }
-      });
+      libraryDataProvider.submitLocalItem(path.name, this.state.editedDefinition)
+        .then((appliedImmediately: boolean) => {
+          this.setState({submitting: false});
+          if (!appliedImmediately) {
+            this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+          }
+        })
+        .catch((error) => {
+          this.setState({submitting: false});
+          this.props.alert.error('Error submitting changes: ' + error.message);
+        });
+      this.forceUpdate();
     }
   }
 

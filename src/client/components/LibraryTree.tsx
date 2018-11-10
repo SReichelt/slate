@@ -54,7 +54,8 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   componentWillReceiveProps(props: LibraryTreeItemProps): void {
-    if (props.item !== this.props.item) {
+    if (props.item !== this.props.item
+        || (props.item instanceof FmtLibrary.MetaRefExpression_item && this.definitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.definitionPromise))) {
       this.updateItem(props);
     }
     if (!props.libraryDataProvider.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {

@@ -28,6 +28,12 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
+    let result = new ObjectContents_Section;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Section, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.items) {
@@ -72,6 +78,12 @@ export class ObjectContents_Library extends ObjectContents_Section {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
+    let result = new ObjectContents_Library;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

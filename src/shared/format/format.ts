@@ -16,6 +16,10 @@ export interface ReplacedParameter {
 export abstract class PathItem {
   parentPath?: PathItem;
 
+  clone(replacedParameters: ReplacedParameter[] = []): PathItem {
+    return this.substituteExpression(undefined, replacedParameters);
+  }
+
   abstract substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): PathItem;
 }
 
@@ -25,12 +29,16 @@ export class NamedPathItem extends PathItem {
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): NamedPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
-      if (newParentPath !== this.parentPath) {
+      if (newParentPath !== this.parentPath || !fn) {
         let result = new NamedPathItem;
         result.parentPath = newParentPath;
         result.name = this.name;
         return result;
       }
+    } else if (!fn) {
+      let result = new NamedPathItem;
+      result.name = this.name;
+      return result;
     }
     return this;
   }
@@ -40,11 +48,13 @@ export class ParentPathItem extends PathItem {
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): ParentPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
-      if (newParentPath !== this.parentPath) {
+      if (newParentPath !== this.parentPath || !fn) {
         let result = new ParentPathItem;
         result.parentPath = newParentPath;
         return result;
       }
+    } else if (!fn) {
+      return new ParentPathItem;
     }
     return this;
   }
@@ -54,11 +64,13 @@ export class IdentityPathItem extends PathItem {
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): IdentityPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
-      if (newParentPath !== this.parentPath) {
+      if (newParentPath !== this.parentPath || !fn) {
         let result = new IdentityPathItem;
         result.parentPath = newParentPath;
         return result;
       }
+    } else if (!fn) {
+      return new IdentityPathItem;
     }
     return this;
   }
@@ -80,10 +92,10 @@ export class Path extends NamedPathItem {
     if (this.arguments.substituteExpression(fn, result.arguments, replacedParameters)) {
       changed = true;
     }
-    if (!changed) {
-      result = this;
+    if (changed || !fn) {
+      return result;
     }
-    return result;
+    return this;
   }
 }
 
@@ -94,6 +106,23 @@ export class Definition {
   innerDefinitions: DefinitionList = Object.create(DefinitionList.prototype);
   contents?: ObjectContents;
   documentation?: DocumentationComment;
+
+  clone(replacedParameters: ReplacedParameter[] = []): Definition {
+    let result = new Definition;
+    result.name = this.name;
+    result.type = this.type.clone(replacedParameters);
+    this.parameters.clone(result.parameters, replacedParameters);
+    for (let innerDefinition of this.innerDefinitions) {
+      result.innerDefinitions.push(innerDefinition.clone(replacedParameters));
+    }
+    if (this.contents) {
+      result.contents = this.contents.clone(replacedParameters);
+    }
+    if (this.documentation) {
+      result.documentation = this.documentation.clone(replacedParameters);
+    }
+    return result;
+  }
 }
 
 export class DefinitionList extends Array<Definition> {
@@ -125,10 +154,14 @@ export class Parameter {
     return result;
   }
 
+  clone(replacedParameters: ReplacedParameter[] = []): Parameter {
+    return this.substituteExpression(undefined, replacedParameters);
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Parameter {
     let newType = this.type.expression.substitute(fn, replacedParameters);
     let newDefaultValue = this.defaultValue ? this.defaultValue.substitute(fn, replacedParameters) : undefined;
-    if (newType !== this.type.expression || newDefaultValue !== this.defaultValue) {
+    if (newType !== this.type.expression || newDefaultValue !== this.defaultValue || !fn) {
       let result = new Parameter;
       result.name = this.name;
       result.type = new Type;
@@ -167,6 +200,10 @@ export class ParameterList extends Array<Parameter> {
     }
   }
 
+  clone(result: ParameterList, replacedParameters: ReplacedParameter[] = []): void {
+    this.substituteExpression(undefined, result, replacedParameters);
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let parameter of this) {
@@ -184,9 +221,13 @@ export class Argument {
   name?: string;
   value: Expression;
 
+  clone(replacedParameters: ReplacedParameter[] = []): Argument {
+    return this.substituteExpression(undefined, replacedParameters);
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Argument {
     let newValue = this.value.substitute(fn, replacedParameters);
-    if (newValue !== this.value) {
+    if (newValue !== this.value || !fn) {
       let result = new Argument;
       result.name = this.name;
       result.value = newValue;
@@ -236,6 +277,10 @@ export class ArgumentList extends Array<Argument> {
     this.push(arg);
   }
 
+  clone(result: ArgumentList, replacedParameters: ReplacedParameter[] = []): void {
+    this.substituteExpression(undefined, result, replacedParameters);
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, result: ArgumentList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let argument of this) {
@@ -252,6 +297,22 @@ export class ArgumentList extends Array<Argument> {
 export class Type {
   expression: ObjectRefExpression;
   arrayDimensions: number;
+
+  clone(replacedParameters: ReplacedParameter[] = []): Type {
+    return this.substituteExpression(undefined, replacedParameters);
+  }
+
+  substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Type {
+    let newExpression = this.expression.substitute(fn, replacedParameters);
+    if (newExpression !== this.expression || !fn) {
+      let result = new Type;
+      result.expression = newExpression;
+      result.arrayDimensions = this.arrayDimensions;
+      return result;
+    } else {
+      return this;
+    }
+  }
 }
 
 export abstract class ObjectContents {
@@ -265,6 +326,8 @@ export abstract class ObjectContents {
   toCompoundExpression(expression: CompoundExpression): void {
     this.toArgumentList(expression.arguments);
   }
+
+  abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
 }
 
 export class GenericObjectContents extends ObjectContents {
@@ -278,6 +341,16 @@ export class GenericObjectContents extends ObjectContents {
   toArgumentList(argumentList: ArgumentList): void {
     argumentList.length = 0;
     argumentList.push(...this.arguments);
+  }
+
+  clone(replacedParameters: ReplacedParameter[] = []): GenericObjectContents {
+    let result = new GenericObjectContents;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  substituteExpression(fn: ExpressionSubstitutionFn, result: GenericObjectContents, replacedParameters?: ReplacedParameter[]): boolean {
+    return this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
   }
 }
 
@@ -447,12 +520,31 @@ export class ArrayExpression extends Expression {
 
 export class DocumentationComment {
   items: DocumentationItem[];
+
+  clone(replacedParameters: ReplacedParameter[] = []): DocumentationComment {
+    let result = new DocumentationComment;
+    result.items = [];
+    for (let item of this.items) {
+      result.items.push(item.clone(replacedParameters));
+    }
+    return result;
+  }
 }
 
 export class DocumentationItem {
   kind?: string;
   parameter?: Parameter;
   text: string;
+
+  clone(replacedParameters: ReplacedParameter[] = []): DocumentationItem {
+    let result = new DocumentationItem;
+    result.kind = this.kind;
+    if (this.parameter) {
+      result.parameter = this.parameter.findReplacement(replacedParameters);
+    }
+    result.text = this.text;
+    return result;
+  }
 }
 
 

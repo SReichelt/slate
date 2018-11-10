@@ -167,16 +167,24 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.fetchLocalItem(path.name, prefetchContents);
   }
 
+  isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<Fmt.Definition>): boolean {
+    return definitionPromise.getImmediateResult() === this.definitionCache.get(name);
+  }
+
+  isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>): boolean {
+    let parentProvider = this.getProviderForSection(path.parentPath);
+    return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
+  }
+
   submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
+    this.definitionCache.set(name, definition);
     let uri = this.uri + encodeURI(name) + '.hlm';
     let file = new Fmt.File;
     file.metaModelPath = this.getLogicMetaModelPath();
     file.definitions = new Fmt.DefinitionList;
     file.definitions.push(definition);
     let contents = FmtWriter.writeString(file);
-    let result = this.fileAccessor.writeFile!(uri, contents);
-    result.then(() => this.definitionCache.set(name, definition));
-    return result;
+    return this.fileAccessor.writeFile!(uri, contents);
   }
 
   openLocalItem(name: string): CachedPromise<void> {

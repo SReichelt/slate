@@ -18,6 +18,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Template {
+    let result = new ObjectContents_Template;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.display) {

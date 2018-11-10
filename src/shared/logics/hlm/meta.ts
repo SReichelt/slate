@@ -63,6 +63,12 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Definition {
+    let result = new ObjectContents_Definition;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.properties) {
@@ -130,6 +136,12 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionDisplay {
+    let result = new ObjectContents_DefinitionDisplay;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionDisplay, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
@@ -190,6 +202,12 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
       this.embedding.toCompoundExpression(embeddingExpr);
       argumentList.add(embeddingExpr, 'embedding');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Construction {
+    let result = new ObjectContents_Construction;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -272,6 +290,12 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Embedding {
+    let result = new ObjectContents_Embedding;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Embedding, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
@@ -336,6 +360,12 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
       this.rewrite.toCompoundExpression(rewriteExpr);
       argumentList.add(rewriteExpr, 'rewrite');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Constructor {
+    let result = new ObjectContents_Constructor;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -494,6 +524,12 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EqualityDefinition {
+    let result = new ObjectContents_EqualityDefinition;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_EqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.leftParameters) {
@@ -567,6 +603,12 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     if (this.theorem !== undefined) {
       argumentList.add(this.theorem, 'theorem');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_RewriteDefinition {
+    let result = new ObjectContents_RewriteDefinition;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_RewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -649,6 +691,12 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetOperator {
+    let result = new ObjectContents_SetOperator;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SetOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.definition) {
@@ -717,6 +765,12 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
     super.toArgumentList(argumentList);
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Operator {
+    let result = new ObjectContents_Operator;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Operator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
@@ -783,6 +837,12 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       this.setRestrictionProof.toCompoundExpression(setRestrictionProofExpr);
       argumentList.add(setRestrictionProofExpr, 'setRestrictionProof');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExplicitOperator {
+    let result = new ObjectContents_ExplicitOperator;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ExplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -911,6 +971,12 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ImplicitOperator {
+    let result = new ObjectContents_ImplicitOperator;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ImplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.parameter) {
@@ -977,6 +1043,12 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MacroOperator {
+    let result = new ObjectContents_MacroOperator;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1049,6 +1121,12 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       }
       argumentList.add(equivalenceProofsExpr, 'equivalenceProofs');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Predicate {
+    let result = new ObjectContents_Predicate;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Predicate, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1138,6 +1216,12 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StandardTheorem {
+    let result = new ObjectContents_StandardTheorem;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StandardTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.claim) {
@@ -1225,6 +1309,12 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EquivalenceTheorem {
+    let result = new ObjectContents_EquivalenceTheorem;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.conditions) {
@@ -1294,6 +1384,12 @@ export class ObjectContents_Property extends Fmt.ObjectContents {
     if (this.theorem !== undefined) {
       argumentList.add(this.theorem, 'theorem');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Property {
+    let result = new ObjectContents_Property;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Property, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1799,6 +1895,12 @@ export class ObjectContents_Shortcut extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Shortcut {
+    let result = new ObjectContents_Shortcut;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Shortcut, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this._constructor) {
@@ -1841,6 +1943,12 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     argumentList.add(this._set, 'set');
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetArg {
+    let result = new ObjectContents_SetArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this._set) {
@@ -1879,6 +1987,12 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
       this.subsetProof.toCompoundExpression(subsetProofExpr);
       argumentList.add(subsetProofExpr, 'subsetProof');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SubsetArg {
+    let result = new ObjectContents_SubsetArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SubsetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1927,6 +2041,12 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ElementArg {
+    let result = new ObjectContents_ElementArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ElementArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.element) {
@@ -1955,6 +2075,12 @@ export class ObjectContents_SymbolArg extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     argumentList.add(this.symbol, 'symbol');
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SymbolArg {
+    let result = new ObjectContents_SymbolArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SymbolArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1992,6 +2118,12 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
       this.proof.toCompoundExpression(proofExpr);
       argumentList.add(proofExpr, 'proof');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstraintArg {
+    let result = new ObjectContents_ConstraintArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ConstraintArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -2033,6 +2165,12 @@ export class ObjectContents_BindingArg extends Fmt.ObjectContents {
     let argumentsExpr = new Fmt.CompoundExpression;
     argumentsExpr.arguments = this.arguments;
     argumentList.add(argumentsExpr, 'arguments');
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BindingArg {
+    let result = new ObjectContents_BindingArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_BindingArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -2956,6 +3094,12 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     }
   }
 
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
+    let result = new ObjectContents_Case;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.formula) {
@@ -3028,6 +3172,12 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr);
       argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof');
     }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
+    let result = new ObjectContents_StructuralCase;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -3130,6 +3280,12 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     let stepsExpr = new Fmt.ParameterExpression;
     stepsExpr.parameters.push(...this.steps);
     argumentList.add(stepsExpr, 'steps');
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Proof {
+    let result = new ObjectContents_Proof;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Proof, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

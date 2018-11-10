@@ -490,6 +490,12 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
+      outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
+      outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
+      outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
+      outFileStr += `    return result;\n`;
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
       outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
       if (superDefinition) {
         outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
