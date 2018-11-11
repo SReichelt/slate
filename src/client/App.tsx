@@ -183,11 +183,13 @@ class App extends React.Component<AppProps, AppState> {
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
-        buttons.push(
-          <Button toolTipText="Open in Visual Studio Code" onClick={this.openLocally} key="OpenLocally">
-            {getButtonIcon(ButtonType.OpenLocally)}
-          </Button>
-        );
+        if (process.env.NODE_ENV === 'development') {
+          buttons.push(
+            <Button toolTipText="Open in Visual Studio Code" onClick={this.openLocally} key="OpenLocally">
+              {getButtonIcon(ButtonType.OpenLocally)}
+            </Button>
+          );
+        }
       }
     }
     if (extraContents) {
