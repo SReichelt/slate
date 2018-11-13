@@ -3,7 +3,6 @@
     "displayName": "HLM",
     "description": "Provides syntax highlighting for the HLM proof assistant language.",
     "version": "0.0.1",
-    "publisher": "",
     "engines": {
         "vscode": "^1.26.0"
     },

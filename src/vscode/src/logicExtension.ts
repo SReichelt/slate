@@ -34,7 +34,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
         let documentLibraryDataProvider = this.documentLibraryDataProviders.get(document);
         if (documentLibraryDataProvider && this.templates) {
             try {
-                let renderer = documentLibraryDataProvider.logic.getDisplay().getRenderer(documentLibraryDataProvider, this.templates);
+                let renderer = documentLibraryDataProvider.logic.getDisplay().getRenderer(documentLibraryDataProvider, this.templates, false);
                 let result: vscode.CodeLens[] = [];
                 if (document.uri.toString().endsWith('_index' + fileExtension)) {
                     let reportRange = (info: FmtReader.ObjectRangeInfo) => {
@@ -94,7 +94,7 @@ class HLMLogicHoverProvider {
         if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === documentLibraryDataProvider.logic.name) {
             let targetDataProvider = documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
-            let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates);
+            let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates, false);
             let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
                 let renderedDefinition = renderer.renderDefinition(definition, undefined, false, true, false, false);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
