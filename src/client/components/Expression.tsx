@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './Expression.css';
 import * as Display from '../../shared/display/display';
+import * as Menu from '../../shared/display/menu';
 import renderPromise from './PromiseHelper';
 import * as ReactMarkdown from 'react-markdown';
 import ReactMarkdownEditor from 'react-simplemde-editor';
@@ -105,10 +106,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   render(): any {
-    return this.renderExpression(this.props.expression, 'expr');
+    return this.renderExpression(this.props.expression, 'expr', undefined, undefined);
   }
 
-  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks?: Display.SemanticLink[], optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): any {
+  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, onMenuOpened: (() => Menu.ExpressionMenu) | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): any {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
         className += ' ' + styleClass;
@@ -120,6 +121,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         semanticLinks = expression.semanticLinks;
       }
+    }
+    if (expression.onMenuOpened) {
+      onMenuOpened = expression.onMenuOpened;
     }
     let result: any = null;
     if (expression instanceof Display.EmptyExpression) {
@@ -147,7 +151,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
-        return this.renderExpression(expression.items[0], className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.items[0], className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
       } else {
         className += ' row';
         result = expression.items.map((item: Display.RenderedExpression, index: number) =>
@@ -221,7 +225,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let parenExpression = expression;
       let render = parenExpression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
         if (surroundingParenStyle === parenExpression.style) {
-          return this.renderExpression(parenExpression.body, className, semanticLinks);
+          return this.renderExpression(parenExpression.body, className, semanticLinks, onMenuOpened);
         } else {
           return parenExpression.body.getLineHeight().then((lineHeight: number) => {
             let parenResult: any = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
@@ -382,12 +386,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-        return this.renderExpression(new Display.ParenExpression(expression.body, expression.optionalParenStyle), className, semanticLinks);
+        return this.renderExpression(new Display.ParenExpression(expression.body, expression.optionalParenStyle), className, semanticLinks, onMenuOpened);
       } else {
-        return this.renderExpression(expression.body, className, semanticLinks);
+        return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
       }
     } else if (expression instanceof Display.InnerParenExpression) {
-      return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
+      return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
@@ -595,21 +599,32 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.IndirectExpression) {
       try {
-        return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.resolve(), className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
       } catch (error) {
         console.log(error);
         className += ' error';
         result = `Error: ${error.message}`;
       }
     } else if (expression instanceof Display.PromiseExpression) {
-      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
+      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
       return renderPromise(render);
     } else if (expression instanceof Display.DecoratedExpression) {
-      return this.renderExpression(expression.body, className, semanticLinks);
+      return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
     } else {
       className += ' error';
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
       result = `Error: ${error}`;
+    }
+    if (this.props.interactionHandler && onMenuOpened) {
+      result = (
+        <span className={'menu-row'}>
+          <span className={className + ' menu-cell'}>
+            {result}
+          </span>
+          <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
+        </span>
+      );
+      className = 'expr menu';
     }
     this.semanticLinks = semanticLinks;
     if (this.props.interactionHandler && semanticLinks && semanticLinks.length) {

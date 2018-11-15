@@ -484,6 +484,30 @@ p {
   text-decoration: initial;
 }
 
+.menu {
+  display: inline-table;
+  border: solid 1px #e0e0e0;
+}
+
+.menu-row {
+  display: table-row;
+}
+
+.menu-cell {
+  display: table-cell;
+  padding: 1px;
+  cursor: default;
+  background-color: #f0f0f0;
+}
+
+.menu-dropdown-cell {
+  display: table-cell;
+  font-size: 50%;
+  vertical-align: middle;
+  background-color: #e0e0e0;
+  cursor: default;
+}
+
 .expr textarea {
   width: 100%;
 	min-height: 3em;

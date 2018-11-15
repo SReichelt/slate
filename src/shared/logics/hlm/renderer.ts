@@ -1073,11 +1073,23 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
     } else {
       let definitionRef = this.renderDefinitionRef([definition]);
       definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
+      if (this.editing) {
+        // TODO
+        definitionRef.onMenuOpened = () => ({
+          items: []
+        });
+      }
       if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
           constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
+          if (this.editing) {
+            // TODO
+            constructorDef.onMenuOpened = () => ({
+              items: []
+            });
+          }
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;

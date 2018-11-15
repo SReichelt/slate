@@ -23,11 +23,11 @@ body {
   background-color: #ffd700;
 }
 
-.expr.hover {
+.expr.hover, .expr.hover span {
   background-color: #ffd700;
 }
 
-.expr.definition.hover {
+.expr.definition.hover, .expr.definition.hover span {
   background-color: #80ff00;
 }
 

@@ -1,11 +1,13 @@
 import * as Fmt from '../format/format';
 import * as FmtDisplay from './meta';
+import * as Menu from './menu';
 import CachedPromise from '../data/cachedPromise';
 
 export abstract class RenderedExpression {
   styleClasses?: string[];
   optionalParenStyle: string = '()';
   semanticLinks?: SemanticLink[];
+  onMenuOpened?: () => Menu.ExpressionMenu;
 
   getLineHeight(): CachedPromise<number> {
     let lineHeight = 1;
@@ -272,7 +274,7 @@ export class RadicalExpression extends RenderedExpression {
 }
 
 export class MarkdownExpression extends RenderedExpression {
-  public onTextChanged?: (newText: string) => void;
+  onTextChanged?: (newText: string) => void;
 
   constructor(public text: string) {
     super();
