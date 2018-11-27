@@ -18,7 +18,7 @@ interface PrefetchQueueItem {
 
 export class LibraryDataProvider implements LibraryDataAccessor {
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
-  private definitionCache = new Map<string, Fmt.Definition>();
+  private definitionCache = new Map<string, CachedPromise<Fmt.Definition>>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
@@ -103,23 +103,21 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchDefinition(name: string, getMetaModel: Fmt.MetaModelGetter): CachedPromise<Fmt.Definition> {
-    let cachedDefinition = this.definitionCache.get(name);
-    if (cachedDefinition) {
-      return CachedPromise.resolve(cachedDefinition);
-    } else {
+    let result = this.definitionCache.get(name);
+    if (!result) {
       let uri = this.uri + encodeURI(name) + '.hlm';
-      return this.fileAccessor.readFile(uri)
+      result = this.fileAccessor.readFile(uri)
         .then((contents: FileContents) => {
           contents.onChange = () => {
             this.definitionCache.delete(name);
             contents.close();
           };
           let file = FmtReader.readString(contents.text, uri, getMetaModel);
-          let definition = file.definitions[0];
-          this.definitionCache.set(name, definition);
-          return definition;
+          return file.definitions[0];
         });
+      this.definitionCache.set(name, result);
     }
+    return result;
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
@@ -177,7 +175,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
-    this.definitionCache.set(name, definition);
+    this.definitionCache.set(name, CachedPromise.resolve(definition));
     let uri = this.uri + encodeURI(name) + '.hlm';
     let file = new Fmt.File;
     file.metaModelPath = this.getLogicMetaModelPath();
