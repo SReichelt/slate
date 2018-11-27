@@ -19,16 +19,28 @@ body {
   background-color: #e0c000;
 }
 
-.hoverable:hover {
+.hoverable:hover, .editor-toolbar a.fa:hover {
   background-color: #ffd700;
 }
 
-.expr.hover, .expr.hover span {
+.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell {
   background-color: #ffd700;
 }
 
 .expr.definition.hover, .expr.definition.hover span {
   background-color: #80ff00;
+}
+
+.menu.hover {
+  border-color: #c0c0c0;
+}
+
+.menu.hover .menu-cell {
+  background-color: #fdefbd;
+}
+
+.menu.hover .menu-dropdown-cell {
+  color: #606060;
 }
 
 .disabled {

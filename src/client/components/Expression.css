@@ -405,6 +405,11 @@ p {
   content: '';
 }
 
+.var .prime {
+  vertical-align: super;
+  font-size: 70%;
+}
+
 .sans, .ctor {
   font-family: 'TeX-Sans', sans-serif;
   font-style: normal;
@@ -487,6 +492,7 @@ p {
 .menu {
   display: inline-table;
   border: solid 1px #e0e0e0;
+  border-radius: 2px;
 }
 
 .menu-row {
@@ -495,17 +501,18 @@ p {
 
 .menu-cell {
   display: table-cell;
-  padding: 1px;
+  padding: 1px 3px;
   cursor: default;
-  background-color: #f0f0f0;
+  background-color: #f8f8f8;
 }
 
 .menu-dropdown-cell {
   display: table-cell;
   font-size: 50%;
   vertical-align: middle;
+  color: #808080;
   background-color: #e0e0e0;
-  cursor: default;
+  cursor: pointer;
 }
 
 .expr textarea {

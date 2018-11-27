@@ -41,6 +41,7 @@ interface ExpressionState {
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
+  private hasMenu = false;
   private semanticLinks?: Display.SemanticLink[];
   private windowClickListener?: (this: Window, ev: MouseEvent) => any;
   private hoveredChildren: Expression[] = [];
@@ -106,6 +107,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   render(): any {
+    this.hasMenu = false;
     return this.renderExpression(this.props.expression, 'expr', undefined, undefined);
   }
 
@@ -124,6 +126,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     if (expression.onMenuOpened) {
       onMenuOpened = expression.onMenuOpened;
+      this.hasMenu = true;
     }
     let result: any = null;
     if (expression instanceof Display.EmptyExpression) {
@@ -615,80 +618,86 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
       result = `Error: ${error}`;
     }
+    this.semanticLinks = semanticLinks;
+    if (semanticLinks && semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
+      className += ' definition';
+    }
     if (this.props.interactionHandler && onMenuOpened) {
+      let menuClassName = 'menu interactive';
+      if (this.state.hovered) {
+        menuClassName += ' hover';
+      }
       result = (
-        <span className={'menu-row'}>
-          <span className={className + ' menu-cell'}>
-            {result}
+        <span className={menuClassName} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onMouseDown={(event) => this.menuOpened(onMenuOpened!(), event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={'menu-row'}>
+            <span className={className + ' menu-cell'}>
+              {result}
+            </span>
+            <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
           </span>
-          <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
         </span>
       );
-      className = 'expr menu';
-    }
-    this.semanticLinks = semanticLinks;
-    if (this.props.interactionHandler && semanticLinks && semanticLinks.length) {
-      className += ' interactive';
-      if (semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
-        className += ' definition';
-      }
+    } else {
       if (this.state.hovered) {
         className += ' hover';
       }
-      let uriLink: Display.SemanticLink | undefined = undefined;
-      let uri: string | undefined = undefined;
-      for (let semanticLink of semanticLinks) {
-        let linkUri = this.props.interactionHandler.getURI(semanticLink);
-        if (linkUri) {
-          uriLink = semanticLink;
-          uri = linkUri;
-          className += ' link';
+      if (this.props.interactionHandler && semanticLinks && semanticLinks.length && !this.interactionBlocked()) {
+        className += ' interactive';
+        let uriLink: Display.SemanticLink | undefined = undefined;
+        let uri: string | undefined = undefined;
+        for (let semanticLink of semanticLinks) {
+          let linkUri = this.props.interactionHandler.getURI(semanticLink);
+          if (linkUri) {
+            uriLink = semanticLink;
+            uri = linkUri;
+            className += ' link';
+          }
         }
-      }
-      if (uri && process.env.NODE_ENV !== 'development') {
-        /* This causes nested anchors, which, strictly speaking, are illegal.
-           However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
-           So we do this anyway, but only in production mode, to prevent warnings from React. */
-        result = (
-          <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-            {result}
-          </a>
-        );
+        if (uri && process.env.NODE_ENV !== 'development') {
+          /* This causes nested anchors, which, strictly speaking, are illegal.
+            However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+            So we do this anyway, but only in production mode, to prevent warnings from React. */
+          result = (
+            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+              {result}
+            </a>
+          );
+        } else {
+          result = (
+            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+              {result}
+            </span>
+          );
+        }
+        if (uriLink && this.props.interactionHandler.hasPreview(uriLink) && this.htmlNode) {
+          let showPreview = false;
+          if (this.state.showPreview) {
+            previewContents = this.props.interactionHandler.getPreviewContents(uriLink);
+            if (previewContents) {
+              showPreview = true;
+            }
+            if (uri) {
+              previewContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{previewContents}</a>;
+            }
+          }
+          let previewStyle = {
+            style: {'background': '#fff8c0'},
+            arrowStyle: {'color': '#fff8c0'}
+          };
+          let preview = (
+            <ToolTip active={showPreview} position={this.tooltipPosition} arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">
+              <div className={'preview'}>{previewContents}</div>
+            </ToolTip>
+          );
+          result = [result, preview];
+        }
       } else {
         result = (
-          <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={className}>
             {result}
           </span>
         );
       }
-      if (uriLink && this.props.interactionHandler.hasPreview(uriLink) && this.htmlNode) {
-        let showPreview = false;
-        if (this.state.showPreview) {
-          previewContents = this.props.interactionHandler.getPreviewContents(uriLink);
-          if (previewContents) {
-            showPreview = true;
-          }
-          if (uri) {
-            previewContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{previewContents}</a>;
-          }
-        }
-        let previewStyle = {
-          style: {'background': '#fff8c0'},
-          arrowStyle: {'color': '#fff8c0'}
-        };
-        let preview = (
-          <ToolTip active={showPreview} position={this.tooltipPosition} arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">
-            <div className={'preview'}>{previewContents}</div>
-          </ToolTip>
-        );
-        result = [result, preview];
-      }
-    } else {
-      result = (
-        <span className={className}>
-          {result}
-        </span>
-      );
     }
     return result;
   }
@@ -736,6 +745,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         } else {
           result.push(<span key={childIndex++}>&nbsp;</span>);
         }
+      } else if (c === '\'') {
+        flush();
+        result.push('\u2006');
+        result.push(<span className={'prime'} key={childIndex++}>′</span>);
       } else {
         let cp = c.codePointAt(0)!;
         if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
@@ -826,6 +839,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else {
       return result;
     }
+  }
+
+  private interactionBlocked(): boolean {
+    if (this.hasMenu) {
+      return true;
+    }
+    if (this.props.parent) {
+      return this.props.parent.interactionBlocked();
+    }
+    return false;
   }
 
   private addToHoveredChildren(expression: Expression = this): void {
@@ -936,6 +959,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.props.interactionHandler && semanticLink) {
         this.props.interactionHandler.linkClicked(semanticLink);
       }
+    }
+  }
+
+  private menuOpened(menu: Menu.ExpressionMenu, event: React.MouseEvent<HTMLElement>): void {
+    if (event.button < 1) {
+      this.stopPropagation(event);
+      // TODO
     }
   }
 
