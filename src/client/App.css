@@ -11,7 +11,7 @@ body {
   margin: 2pt;
 }
 
-.hoverable.selected {
+.hoverable.selected, .menu.open .menu-dropdown-cell {
   background-color: #f2cd00;
 }
 
@@ -23,7 +23,7 @@ body {
   background-color: #ffd700;
 }
 
-.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell {
+.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell, .open-menu .hover {
   background-color: #ffd700;
 }
 
@@ -35,11 +35,19 @@ body {
   border-color: #c0c0c0;
 }
 
+.menu.open {
+  border-color: #a0a0a0;
+}
+
 .menu.hover .menu-cell {
   background-color: #fdefbd;
 }
 
-.menu.hover .menu-dropdown-cell {
+.menu.open .menu-cell {
+  background-color: #f8e8a0;
+}
+
+.menu.hover .menu-dropdown-cell, .menu.open .menu-dropdown-cell {
   color: #606060;
 }
 

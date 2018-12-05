@@ -677,11 +677,12 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
 
   renderFormula(formula: Fmt.Expression): Display.RenderedExpression {
     let negationCount = 0;
-    while (formula instanceof FmtHLM.MetaRefExpression_not) {
+    let innerFormula = formula;
+    while (innerFormula instanceof FmtHLM.MetaRefExpression_not) {
       negationCount++;
-      formula = formula.formula;
+      innerFormula = innerFormula.formula;
     }
-    let result = this.setSemanticLink(this.renderFormulaInternal(formula, negationCount), formula);
+    let result = this.setSemanticLink(this.setSemanticLink(this.renderFormulaInternal(innerFormula, negationCount), formula), innerFormula);
     result.optionalParenStyle = '[]';
     return result;
   }
@@ -1072,24 +1073,16 @@ export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicR
       return new Display.ListExpression(items, '1.');
     } else {
       let definitionRef = this.renderDefinitionRef([definition]);
+      let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => ((definition.contents as FmtHLM.ObjectContents_Definition).display = display);
+      this.setDefinitionSemanticLink(definitionRef, definition, onSetDisplay);
       definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
-      if (this.editing) {
-        // TODO
-        definitionRef.onMenuOpened = () => ({
-          items: []
-        });
-      }
       if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
           constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
-          if (this.editing) {
-            // TODO
-            constructorDef.onMenuOpened = () => ({
-              items: []
-            });
-          }
+          let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => ((innerDefinition.contents as FmtHLM.ObjectContents_Definition).display = display);
+          this.setDefinitionSemanticLink(constructorDef, innerDefinition, onSetConstructorDisplay);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;

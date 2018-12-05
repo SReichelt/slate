@@ -166,7 +166,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<Fmt.Definition>): boolean {
-    return definitionPromise.getImmediateResult() === this.definitionCache.get(name);
+    return definitionPromise === this.definitionCache.get(name);
   }
 
   isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>): boolean {

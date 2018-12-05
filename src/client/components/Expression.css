@@ -489,6 +489,11 @@ p {
   text-decoration: initial;
 }
 
+.menu-container {
+  display: inline-block;
+  position: relative;
+}
+
 .menu {
   display: inline-table;
   border: solid 1px #e0e0e0;

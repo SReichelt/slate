@@ -1,0 +1,33 @@
+.open-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  display: block;
+  max-height: 20em;
+  overflow: auto;
+  border: solid 1px #a0a0a0;
+  border-collapse: collapse;
+  background-color: #f8f8f8;
+  font-family: sans-serif;
+  line-height: initial;
+  cursor: default;
+  box-shadow: 1pt 2pt 5pt silver;
+}
+
+.open-menu th {
+  font-weight: normal;
+}
+
+.open-menu-title-cell, .open-menu-content-cell, .open-menu-item {
+  border: solid 1px #a0a0a0;
+  padding: 2pt;
+}
+
+.open-menu-title-cell {
+  position: relative;
+}
+
+.open-menu-title-cell.clickable, .open-menu-item.clickable {
+  cursor: pointer;
+}

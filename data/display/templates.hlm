@@ -195,7 +195,12 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
 }
 
 $Property(operand: %Expr, property: %String, article?: %String): %Template {
-  display = [operand, %neg(' is ', ' is not '), %opt(article, [article, ' ']), property]
+  display = [
+    operand,
+    %neg(' is ', ' is not '),
+    %opt(article, [article, ' ']),
+    property
+  ]
 }
 
 $MultiProperty(operands: %Expr[], property: %String): %Template {

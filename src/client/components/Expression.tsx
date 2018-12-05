@@ -3,6 +3,7 @@ import './Expression.css';
 import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import renderPromise from './PromiseHelper';
+import ExpressionMenu from './ExpressionMenu';
 import * as ReactMarkdown from 'react-markdown';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
@@ -37,6 +38,7 @@ interface ExpressionProps {
 interface ExpressionState {
   hovered: boolean;
   showPreview: boolean;
+  openMenu?: Menu.ExpressionMenu;
 }
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
@@ -627,14 +629,24 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.state.hovered) {
         menuClassName += ' hover';
       }
+      if (this.state.openMenu) {
+        menuClassName += ' open';
+      }
+      let menu = undefined;
+      if (this.state.openMenu) {
+        menu = <ExpressionMenu menu={this.state.openMenu}/>;
+      }
       result = (
-        <span className={menuClassName} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onMouseDown={(event) => this.menuOpened(onMenuOpened!(), event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-          <span className={'menu-row'}>
-            <span className={className + ' menu-cell'}>
-              {result}
+        <span className={'menu-container'}>
+          <span className={menuClassName} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onMouseDown={(event) => this.menuClicked(onMenuOpened!, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <span className={'menu-row'}>
+              <span className={className + ' menu-cell'}>
+                {result}
+              </span>
+              <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
             </span>
-            <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
           </span>
+          {menu}
         </span>
       );
     } else {
@@ -962,10 +974,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private menuOpened(menu: Menu.ExpressionMenu, event: React.MouseEvent<HTMLElement>): void {
+  private menuClicked(onMenuOpened: () => Menu.ExpressionMenu, event: React.MouseEvent<HTMLElement>): void {
     if (event.button < 1) {
       this.stopPropagation(event);
-      // TODO
+      if (this.state.openMenu) {
+        this.setState({openMenu: undefined});
+      } else {
+        this.removeFromHoveredChildren();
+        this.setState({openMenu: onMenuOpened()});
+      }
     }
   }
 

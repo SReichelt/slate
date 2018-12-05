@@ -1,5 +1,6 @@
 import * as Fmt from '../format/format';
 import * as Display from '../display/display';
+import * as Menu from '../display/menu';
 import { LibraryDataAccessor } from '../data/libraryDataAccessor';
 
 export abstract class GenericRenderer {
@@ -78,6 +79,40 @@ export abstract class GenericRenderer {
       expression.semanticLinks.unshift(semanticLink);
     } else {
       expression.semanticLinks = [semanticLink];
+    }
+    return expression;
+  }
+
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void): Display.RenderedExpression {
+    expression.semanticLinks = [new Display.SemanticLink(linkedObject, true)];
+    if (this.editing) {
+      expression.onMenuOpened = () => {
+        let menu = new Menu.ExpressionMenu;
+        let defaultItem = new Menu.ExpressionMenuItem;
+        defaultItem.expression = new Display.TextExpression('Default');
+        defaultItem.onClick = () => onSetDisplay(undefined);
+        menu.rows = [
+          defaultItem,
+          new Menu.ExpressionMenuSeparator
+        ];
+        // TODO
+        if (true) {
+          let textItem = new Menu.ExpressionMenuItem;
+          textItem.expression = new Display.TextExpression('Symbol/Text');
+          textItem.onClick = () => {};
+          menu.rows.push(
+            textItem,
+            new Menu.ExpressionMenuSeparator
+          );
+        }
+        for (let template of this.templates.definitions) {
+          let item = new Menu.ExpressionMenuItem;
+          item.expression = new Display.TextExpression(template.name);
+          item.onClick = () => alert(template.name);
+          menu.rows.push(item);
+        }
+        return menu;
+      };
     }
     return expression;
   }

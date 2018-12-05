@@ -1,17 +1,26 @@
 import * as Display from './display';
 
-export interface ExpressionMenu {
+export class ExpressionMenu {
+  rows: ExpressionMenuRow[];
+}
+
+export abstract class ExpressionMenuRow {
+}
+
+export class ExpressionMenuItem extends ExpressionMenuRow {
+  expression: Display.RenderedExpression;
+  onClick: () => void;
+}
+
+export class ExpressionMenuItemList extends ExpressionMenuRow {
   items: ExpressionMenuItem[];
 }
 
-export interface ExpressionMenuItem {
+export class StandardExpressionMenuRow extends ExpressionMenuRow {
   title: string;
   onClick?: () => void;
-  selections: ExpressionMenuSelection[];
-  inline: boolean;
+  subMenu?: ExpressionMenu;
 }
 
-export interface ExpressionMenuSelection {
-  expression: Display.RenderedExpression;
-  onClick: () => void;
+export class ExpressionMenuSeparator extends ExpressionMenuRow {
 }
