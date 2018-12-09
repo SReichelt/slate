@@ -7,25 +7,32 @@
   max-height: 20em;
   overflow: auto;
   border: solid 1px #a0a0a0;
-  border-collapse: collapse;
   background-color: #f8f8f8;
-  font-family: sans-serif;
-  line-height: initial;
   cursor: default;
   box-shadow: 1pt 2pt 5pt silver;
 }
 
 .open-menu th {
+  font-family: sans-serif;
   font-weight: normal;
+  line-height: initial;
 }
 
-.open-menu-title-cell, .open-menu-content-cell, .open-menu-item {
-  border: solid 1px #a0a0a0;
+.open-menu-row>* {
   padding: 2pt;
+  border: none;
+}
+
+.open-menu-row:not(:last-child)>* {
+  border-bottom: solid 1px #a0a0a0;
+}
+
+.open-menu-row>*:not(:last-child) {
+  border-right: solid 1px #a0a0a0;
 }
 
 .open-menu-row.separated>* {
-  border-top: double 3px #a0a0a0;
+  border-top: solid 1px #a0a0a0;
 }
 
 .open-menu-title-cell {
