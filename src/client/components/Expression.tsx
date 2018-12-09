@@ -759,8 +759,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       } else if (c === '\'') {
         flush();
-        result.push('\u2006');
-        result.push(<span className={'prime'} key={childIndex++}>′</span>);
+        result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
       } else {
         let cp = c.codePointAt(0)!;
         if (cp >= 0x1d5a0 && cp < 0x1d5d4) {

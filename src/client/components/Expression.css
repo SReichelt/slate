@@ -406,7 +406,22 @@ p {
 }
 
 .var .prime {
-  vertical-align: super;
+  position: relative;
+  visibility: hidden;
+}
+
+.replacement {
+  display: none;
+}
+
+.var .prime .replacement {
+  display: initial;
+  position: absolute;
+  left: 0;
+  top: -0.5em;
+  visibility: initial;
+  overflow: visible;
+  white-space: nowrap;
   font-size: 70%;
 }
 
