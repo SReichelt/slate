@@ -7,38 +7,36 @@ export abstract class GenericEditHandler {
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
   }
 
-  addDisplayMenu(expression: Display.RenderedExpression, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void): void {
+  addDisplayMenu(expression: Display.RenderedExpression, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void, onGetDefault: () => Display.RenderedExpression): void {
     expression.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       let defaultAction = new Menu.ImmediateExpressionMenuAction;
       defaultAction.onExecute = () => onSetDisplay(undefined);
       let defaultItem = new Menu.ExpressionMenuItem;
-      defaultItem.expression = new Display.TextExpression('Default');
+      defaultItem.expression = onGetDefault();
       defaultItem.action = defaultAction;
+      let defaultRow = new Menu.StandardExpressionMenuRow;
+      defaultRow.title = 'Default';
+      defaultRow.subMenu = defaultItem;
       menu.rows = [
-        defaultItem,
+        defaultRow,
         new Menu.ExpressionMenuSeparator
       ];
-      // TODO
+      // TODO condition
       if (true) {
-        let textAction = new Menu.ImmediateExpressionMenuAction;
-        textAction.onExecute = () => {};
-        let textItem = new Menu.ExpressionMenuItem;
-        textItem.expression = new Display.TextExpression('Symbol/Text');
-        textItem.action = textAction;
+        let textRow = new Menu.StandardExpressionMenuRow;
+        textRow.title = 'Symbol/Text';
         menu.rows.push(
-          textItem,
+          textRow,
           new Menu.ExpressionMenuSeparator
         );
       }
       for (let template of this.templates.definitions) {
-        let templateAction = new Menu.ImmediateExpressionMenuAction;
-        templateAction.onExecute = () => {};
-        let item = new Menu.ExpressionMenuItem;
-        item.expression = new Display.TextExpression(template.name);
-        item.action = templateAction;
-        menu.rows.push(item);
+        let templateRow = new Menu.StandardExpressionMenuRow;
+        templateRow.title = template.name;
+        menu.rows.push(templateRow);
       }
+      // TODO multiple alternatives
       return menu;
     };
   }

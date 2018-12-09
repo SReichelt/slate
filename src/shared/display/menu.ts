@@ -19,7 +19,7 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
   title: string;
   titleAction?: ExpressionMenuAction;
-  subMenu?: ExpressionMenu;
+  subMenu?: ExpressionMenu | ExpressionMenuRow;
 }
 
 export class ExpressionMenuSeparator extends ExpressionMenuRow {

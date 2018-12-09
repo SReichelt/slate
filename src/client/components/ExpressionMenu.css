@@ -19,20 +19,19 @@
 }
 
 .open-menu-row>* {
-  padding: 2pt;
   border: none;
 }
 
 .open-menu-row:not(:last-child)>* {
-  border-bottom: solid 1px #a0a0a0;
+  border-bottom: solid 1px #e0e0e0;
 }
 
 .open-menu-row>*:not(:last-child) {
-  border-right: solid 1px #a0a0a0;
+  border-right: solid 1px #e0e0e0;
 }
 
 .open-menu-row.separated>* {
-  border-top: solid 1px #a0a0a0;
+  border-top: solid 1px #e0e0e0;
 }
 
 .open-menu-title-cell {

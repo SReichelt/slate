@@ -831,7 +831,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let definition = definitions[definitions.length - 1];
     let result: Display.RenderedExpression = new Display.TextExpression(definition.name);
     if (definition.contents instanceof FmtHLM.ObjectContents_Constructor) {
-      result.styleClasses = ['constructor'];
+      result.styleClasses = ['ctor'];
     }
     if (definitions.length > 1) {
       let subSupExpression = new Display.SubSupExpression(result);
@@ -1075,7 +1075,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else {
       let definitionRef = this.renderDefinitionRef([definition]);
       let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => ((definition.contents as FmtHLM.ObjectContents_Definition).display = display);
-      this.setDefinitionSemanticLink(definitionRef, definition, onSetDisplay);
+      let onGetDefault = () => this.renderDefaultDefinitionRef([definition]);
+      this.setDefinitionSemanticLink(definitionRef, definition, onSetDisplay, onGetDefault);
       definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
       if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
@@ -1083,7 +1084,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
           constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
           let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => ((innerDefinition.contents as FmtHLM.ObjectContents_Definition).display = display);
-          this.setDefinitionSemanticLink(constructorDef, innerDefinition, onSetConstructorDisplay);
+          let onGetConstructorDefault = () => this.renderDefaultDefinitionRef([definition, innerDefinition]);
+          this.setDefinitionSemanticLink(constructorDef, innerDefinition, onSetConstructorDisplay, onGetConstructorDefault);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;

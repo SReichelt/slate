@@ -49,8 +49,13 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps> {
       cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked}/>);
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
       let contentCell = undefined;
-      if (row.subMenu && row.subMenu.rows.length) {
-        let subMenuMainRow = row.subMenu.rows[0];
+      let subMenuMainRow: Menu.ExpressionMenuRow | undefined = undefined;
+      if (row.subMenu instanceof Menu.ExpressionMenu && row.subMenu.rows.length) {
+        subMenuMainRow = row.subMenu.rows[0];
+      } else if (row.subMenu instanceof Menu.ExpressionMenuRow) {
+        subMenuMainRow = row.subMenu;
+      }
+      if (subMenuMainRow) {
         if (subMenuMainRow instanceof Menu.ExpressionMenuItem) {
           contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked}/>;
         } else {
