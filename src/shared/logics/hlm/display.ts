@@ -2,6 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import { HLMRenderer } from './renderer';
+import { HLMEditHandler } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export class HLMDisplay implements Logic.LogicDisplay {
@@ -25,6 +26,7 @@ export class HLMDisplay implements Logic.LogicDisplay {
   }
 
   getRenderer(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): Logic.LogicRenderer {
-    return new HLMRenderer(libraryDataAccessor, templates, editing);
+    let editHandler = editing ? new HLMEditHandler(libraryDataAccessor, templates) : undefined;
+    return new HLMRenderer(libraryDataAccessor, templates, editHandler);
   }
 }

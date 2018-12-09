@@ -2,8 +2,9 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as FmtDisplay from '../../display/meta';
 import * as Logic from '../logic';
-import * as Generic from '../generic';
+import { GenericRenderer } from '../generic/renderer';
 import * as Display from '../../display/display';
+import { HLMEditHandler } from './editHandler';
 import { HLMUtils } from './utils';
 import { LibraryDataAccessor, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
@@ -26,11 +27,11 @@ interface ReplacementParameters {
   isDefinition: boolean;
 }
 
-export class HLMRenderer extends Generic.GenericRenderer implements Logic.LogicRenderer {
+export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
   private utils: HLMUtils;
 
-  constructor(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean) {
-    super(libraryDataAccessor, templates, editing);
+  constructor(libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editHandler?: HLMEditHandler) {
+    super(libraryDataAccessor, templates, editHandler);
     this.utils = new HLMUtils(libraryDataAccessor);
   }
 

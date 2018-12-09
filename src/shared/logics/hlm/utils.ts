@@ -1,4 +1,4 @@
-import { GenericUtils } from '../utils';
+import { GenericUtils } from '../generic/utils';
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import CachedPromise from '../../data/cachedPromise';

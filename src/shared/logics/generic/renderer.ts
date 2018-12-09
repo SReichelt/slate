@@ -1,10 +1,10 @@
-import * as Fmt from '../format/format';
-import * as Display from '../display/display';
-import * as Menu from '../display/menu';
-import { LibraryDataAccessor } from '../data/libraryDataAccessor';
+import * as Fmt from '../../format/format';
+import * as Display from '../../display/display';
+import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
+import { GenericEditHandler } from './editHandler';
 
 export abstract class GenericRenderer {
-  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editing: boolean) {}
+  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;
@@ -85,40 +85,8 @@ export abstract class GenericRenderer {
 
   protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void): Display.RenderedExpression {
     expression.semanticLinks = [new Display.SemanticLink(linkedObject, true)];
-    if (this.editing) {
-      expression.onMenuOpened = () => {
-        let menu = new Menu.ExpressionMenu;
-        let defaultAction = new Menu.ImmediateExpressionMenuAction;
-        defaultAction.onExecute = () => onSetDisplay(undefined);
-        let defaultItem = new Menu.ExpressionMenuItem;
-        defaultItem.expression = new Display.TextExpression('Default');
-        defaultItem.action = defaultAction;
-        menu.rows = [
-          defaultItem,
-          new Menu.ExpressionMenuSeparator
-        ];
-        // TODO
-        if (true) {
-          let textAction = new Menu.ImmediateExpressionMenuAction;
-          textAction.onExecute = () => {};
-          let textItem = new Menu.ExpressionMenuItem;
-          textItem.expression = new Display.TextExpression('Symbol/Text');
-          textItem.action = textAction;
-          menu.rows.push(
-            textItem,
-            new Menu.ExpressionMenuSeparator
-          );
-        }
-        for (let template of this.templates.definitions) {
-          let templateAction = new Menu.ImmediateExpressionMenuAction;
-          templateAction.onExecute = () => {};
-          let item = new Menu.ExpressionMenuItem;
-          item.expression = new Display.TextExpression(template.name);
-          item.action = templateAction;
-          menu.rows.push(item);
-        }
-        return menu;
-      };
+    if (this.editHandler) {
+      this.editHandler.addDisplayMenu(expression, onSetDisplay);
     }
     return expression;
   }
@@ -228,41 +196,13 @@ export abstract class GenericRenderer {
         }
       }
     }
-    if (text || this.editing) {
+    if (text || this.editHandler) {
       let heading = new Display.TextExpression(kind.charAt(0).toUpperCase() + kind.slice(1) + '.');
       heading.styleClasses = ['sub-heading'];
       paragraphs.push(heading);
       let markdown = new Display.MarkdownExpression(text);
-      if (this.editing) {
-        markdown.onTextChanged = (newText: string) => {
-          let newItems: Fmt.DocumentationItem[] = [];
-          for (let otherKind of allKinds) {
-            if (otherKind === kind) {
-              if (newText) {
-                let item = new Fmt.DocumentationItem;
-                item.kind = kind;
-                item.text = newText;
-                newItems.push(item);
-              }
-            } else {
-              if (definition.documentation) {
-                for (let item of definition.documentation.items) {
-                  if (item.kind === otherKind) {
-                    newItems.push(item);
-                  }
-                }
-              }
-            }
-          }
-          if (newItems.length) {
-            if (!definition.documentation) {
-              definition.documentation = new Fmt.DocumentationComment;
-            }
-            definition.documentation.items = newItems;
-          } else {
-            definition.documentation = undefined;
-          }
-        };
+      if (this.editHandler) {
+        this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
       }
       paragraphs.push(markdown);
     }

@@ -1,5 +1,5 @@
-import * as Fmt from '../format/format';
-import { LibraryDataAccessor } from '../data/libraryDataAccessor';
+import * as Fmt from '../../format/format';
+import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export class GenericUtils {
   constructor(protected libraryDataAccessor: LibraryDataAccessor) {}
