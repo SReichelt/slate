@@ -113,11 +113,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return this.renderExpression(this.props.expression, 'expr', undefined, undefined);
   }
 
-  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, onMenuOpened: (() => Menu.ExpressionMenu) | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): any {
+  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, onMenuOpened: (() => Menu.ExpressionMenu) | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): any {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
         className += ' ' + styleClass;
       }
+    }
+    if (!optionalParenStyle) {
+      optionalParenStyle = expression.optionalParenStyle;
     }
     if (expression.semanticLinks) {
       if (semanticLinks) {
@@ -156,7 +159,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
-        return this.renderExpression(expression.items[0], className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.items[0], className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } else {
         className += ' row';
         result = expression.items.map((item: Display.RenderedExpression, index: number) =>
@@ -391,7 +394,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-        return this.renderExpression(new Display.ParenExpression(expression.body, expression.optionalParenStyle), className, semanticLinks, onMenuOpened);
+        return this.renderExpression(new Display.ParenExpression(expression.body, optionalParenStyle), className, semanticLinks, onMenuOpened);
       } else {
         return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
       }
@@ -604,14 +607,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.IndirectExpression) {
       try {
-        return this.renderExpression(expression.resolve(), className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+        return this.renderExpression(expression.resolve(), className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } catch (error) {
         console.log(error);
         className += ' error';
         result = `Error: ${error.message}`;
       }
     } else if (expression instanceof Display.PromiseExpression) {
-      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
+      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
       return renderPromise(render);
     } else if (expression instanceof Display.DecoratedExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
