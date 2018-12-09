@@ -19,7 +19,7 @@ export interface LibraryItemProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-function LibraryItem(props: LibraryItemProps): any {
+export function renderLibraryItem(props: LibraryItemProps): any {
   let logic = props.libraryDataProvider.logic;
   let logicDisplay = logic.getDisplay();
   let renderer = logicDisplay.getRenderer(props.libraryDataProvider, props.templates, props.editing);
@@ -34,6 +34,41 @@ function LibraryItem(props: LibraryItemProps): any {
   });
 
   return renderPromise(render);
+}
+
+class LibraryItem extends React.Component<LibraryItemProps> {
+  componentDidMount(): void {
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+    }
+  }
+
+  componentWillReceiveProps(props: LibraryItemProps): void {
+    if (props.interactionHandler !== this.props.interactionHandler) {
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+      }
+      if (props.interactionHandler) {
+        props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+      }
+    }
+  }
+
+  render(): any {
+    return renderLibraryItem(this.props);
+  }
+
+  private onExpressionChanged = (editorUpdateRequired: boolean) => {
+    if (editorUpdateRequired) {
+      this.forceUpdate();
+    }
+  }
 }
 
 export default LibraryItem;

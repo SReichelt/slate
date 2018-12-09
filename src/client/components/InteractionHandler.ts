@@ -1,32 +1,32 @@
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
-import { ExpressionInteractionHandler, OnSourceCodeChanged, OnHoverChanged } from './Expression';
+import { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
-import LibraryItem, { LibraryItemProps } from './LibraryItem';
+import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
 export class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
-  private sourceCodeChangeHandlers: OnSourceCodeChanged[] = [];
+  private expressionChangeHandlers: OnExpressionChanged[] = [];
   private hoverChangeHandlers: OnHoverChanged[] = [];
 
   constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {}
 
-  registerSourceCodeChangeHandler(handler: OnSourceCodeChanged): void {
-    this.sourceCodeChangeHandlers.push(handler);
+  registerExpressionChangeHandler(handler: OnExpressionChanged): void {
+    this.expressionChangeHandlers.push(handler);
   }
 
-  unregisterSourceCodeChangeHandler(handler: OnSourceCodeChanged): void {
-    let index = this.sourceCodeChangeHandlers.indexOf(handler);
+  unregisterExpressionChangeHandler(handler: OnExpressionChanged): void {
+    let index = this.expressionChangeHandlers.indexOf(handler);
     if (index >= 0) {
-      this.sourceCodeChangeHandlers.splice(index, 1);
+      this.expressionChangeHandlers.splice(index, 1);
     }
   }
 
-  sourceCodeChanged(): void {
-    for (let handler of this.sourceCodeChangeHandlers) {
-      handler();
+  expressionChanged(editorUpdateRequired: boolean = true): void {
+    for (let handler of this.expressionChangeHandlers) {
+      handler(editorUpdateRequired);
     }
   }
 
@@ -86,7 +86,7 @@ export class LibraryItemInteractionHandler implements ExpressionInteractionHandl
         includeRemarks: false,
         editing: false
       };
-      return LibraryItem(props);
+      return renderLibraryItem(props);
     } else {
       return null;
     }

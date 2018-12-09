@@ -88,27 +88,33 @@ export abstract class GenericRenderer {
     if (this.editing) {
       expression.onMenuOpened = () => {
         let menu = new Menu.ExpressionMenu;
+        let defaultAction = new Menu.ImmediateExpressionMenuAction;
+        defaultAction.onExecute = () => onSetDisplay(undefined);
         let defaultItem = new Menu.ExpressionMenuItem;
         defaultItem.expression = new Display.TextExpression('Default');
-        defaultItem.onClick = () => onSetDisplay(undefined);
+        defaultItem.action = defaultAction;
         menu.rows = [
           defaultItem,
           new Menu.ExpressionMenuSeparator
         ];
         // TODO
         if (true) {
+          let textAction = new Menu.ImmediateExpressionMenuAction;
+          textAction.onExecute = () => {};
           let textItem = new Menu.ExpressionMenuItem;
           textItem.expression = new Display.TextExpression('Symbol/Text');
-          textItem.onClick = () => {};
+          textItem.action = textAction;
           menu.rows.push(
             textItem,
             new Menu.ExpressionMenuSeparator
           );
         }
         for (let template of this.templates.definitions) {
+          let templateAction = new Menu.ImmediateExpressionMenuAction;
+          templateAction.onExecute = () => {};
           let item = new Menu.ExpressionMenuItem;
           item.expression = new Display.TextExpression(template.name);
-          item.onClick = () => alert(template.name);
+          item.action = templateAction;
           menu.rows.push(item);
         }
         return menu;

@@ -151,7 +151,7 @@ class App extends React.Component<AppProps, AppState> {
     let extraContents: any = undefined;
     if (this.state.templates && this.state.selectedItemProvider && this.state.selectedItemDefinition) {
       let definition = this.state.editedDefinition ? CachedPromise.resolve(this.state.editedDefinition) : this.state.selectedItemDefinition;
-      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition} interactionHandler={this.state.interactionHandler}/>;
+      mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler}/>;
       extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler}/>;
     } else {
       mainContents = 'Please select an item from the tree.';

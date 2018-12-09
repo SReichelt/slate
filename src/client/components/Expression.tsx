@@ -10,13 +10,13 @@ import 'simplemde/dist/simplemde.min.css';
 
 const ToolTip = require('react-portal-tooltip').default;
 
-export type OnSourceCodeChanged = () => void;
+export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
 
 export interface ExpressionInteractionHandler {
-  registerSourceCodeChangeHandler(handler: OnSourceCodeChanged): void;
-  unregisterSourceCodeChangeHandler(handler: OnSourceCodeChanged): void;
-  sourceCodeChanged(): void;
+  registerExpressionChangeHandler(handler: OnExpressionChanged): void;
+  unregisterExpressionChangeHandler(handler: OnExpressionChanged): void;
+  expressionChanged(editorUpdateRequired?: boolean): void;
   registerHoverChangeHandler(handler: OnHoverChanged): void;
   unregisterHoverChangeHandler(handler: OnHoverChanged): void;
   hoverChanged(hover: Display.SemanticLink[]): void;
@@ -586,7 +586,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             expression.onTextChanged(newText);
           }
           if (this.props.interactionHandler) {
-            this.props.interactionHandler.sourceCodeChanged();
+            this.props.interactionHandler.expressionChanged(false);
           }
         };
         if ('ontouchstart' in window) {
@@ -634,7 +634,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let menu = undefined;
       if (this.state.openMenu) {
-        menu = <ExpressionMenu menu={this.state.openMenu}/>;
+        menu = <ExpressionMenu menu={this.state.openMenu}  onItemClicked={this.onMenuItemClicked}/>;
       }
       result = (
         <span className={'menu-container'}>
@@ -982,6 +982,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         this.removeFromHoveredChildren();
         this.setState({openMenu: onMenuOpened()});
+      }
+    }
+  }
+
+  private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {
+    if (action instanceof Menu.ImmediateExpressionMenuAction) {
+      action.onExecute();
+      this.setState({openMenu: undefined});
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.expressionChanged();
       }
     }
   }

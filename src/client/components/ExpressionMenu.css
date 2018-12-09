@@ -24,6 +24,10 @@
   padding: 2pt;
 }
 
+.open-menu-row.separated>* {
+  border-top: double 3px #a0a0a0;
+}
+
 .open-menu-title-cell {
   position: relative;
 }

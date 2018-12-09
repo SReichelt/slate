@@ -9,7 +9,7 @@ export abstract class ExpressionMenuRow {
 
 export class ExpressionMenuItem extends ExpressionMenuRow {
   expression: Display.RenderedExpression;
-  onClick: () => void;
+  action: ExpressionMenuAction;
 }
 
 export class ExpressionMenuItemList extends ExpressionMenuRow {
@@ -18,9 +18,16 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
   title: string;
-  onClick?: () => void;
+  titleAction?: ExpressionMenuAction;
   subMenu?: ExpressionMenu;
 }
 
 export class ExpressionMenuSeparator extends ExpressionMenuRow {
+}
+
+export abstract class ExpressionMenuAction {
+}
+
+export class ImmediateExpressionMenuAction extends ExpressionMenuAction {
+  onExecute: () => void;
 }
