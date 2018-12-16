@@ -2,10 +2,10 @@ import * as React from 'react';
 import './Button.css';
 
 interface ButtonProps {
-  toolTipText: string;
+  toolTipText?: string;
   enabled?: boolean;
   selected?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 interface ButtonState {

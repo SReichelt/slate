@@ -11,7 +11,7 @@ body {
   margin: 2pt;
 }
 
-.hoverable.selected, .menu.open .menu-dropdown-cell {
+.hoverable.selected, .menu.open .menu-dropdown-cell, .open-menu .selected {
   background-color: #f2cd00;
 }
 
@@ -23,7 +23,7 @@ body {
   background-color: #ffd700;
 }
 
-.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell, .open-menu .hover {
+.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
   background-color: #ffd700;
 }
 
@@ -55,7 +55,7 @@ body {
   color: gray;
 }
 
-.submit {
+.ok, .submit {
   color: green;
 }
 

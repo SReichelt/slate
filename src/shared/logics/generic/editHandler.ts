@@ -7,7 +7,8 @@ export abstract class GenericEditHandler {
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
   }
 
-  addDisplayMenu(expression: Display.RenderedExpression, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void, onGetDefault: () => Display.RenderedExpression): void {
+  addDisplayMenu(expression: Display.RenderedExpression, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression): void {
+    let displayItem = display instanceof Fmt.ArrayExpression && display.items.length === 1 ? display.items[0] : undefined;
     expression.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       let defaultAction = new Menu.ImmediateExpressionMenuAction;
@@ -18,14 +19,36 @@ export abstract class GenericEditHandler {
       let defaultRow = new Menu.StandardExpressionMenuRow;
       defaultRow.title = 'Default';
       defaultRow.subMenu = defaultItem;
+      if (!display) {
+        defaultItem.selected = true;
+        defaultRow.selected = true;
+      }
       menu.rows = [
         defaultRow,
         new Menu.ExpressionMenuSeparator
       ];
       // TODO condition
       if (true) {
+        let textItem = new Menu.ExpressionMenuTextInput;
         let textRow = new Menu.StandardExpressionMenuRow;
         textRow.title = 'Symbol/Text';
+        textRow.subMenu = textItem;
+        if (displayItem instanceof Fmt.StringExpression) {
+          textItem.selected = true;
+          textRow.selected = true;
+          textItem.text = displayItem.value;
+        } else {
+          textItem.text = '';
+        }
+        let textAction = new Menu.ImmediateExpressionMenuAction;
+        textAction.onExecute = () => {
+          let newDisplay = new Fmt.ArrayExpression;
+          let newText = new Fmt.StringExpression;
+          newText.value = textItem.text;
+          newDisplay.items = [newText];
+          onSetDisplay(newDisplay);
+        };
+        textItem.action = textAction;
         menu.rows.push(
           textRow,
           new Menu.ExpressionMenuSeparator
@@ -33,7 +56,10 @@ export abstract class GenericEditHandler {
       }
       for (let template of this.templates.definitions) {
         let templateRow = new Menu.StandardExpressionMenuRow;
-        templateRow.title = template.name;
+        templateRow.title = template.name + '...';
+        if (displayItem instanceof Fmt.DefinitionRefExpression && displayItem.path.name === template.name) {
+          templateRow.selected = true;
+        }
         menu.rows.push(templateRow);
       }
       // TODO multiple alternatives

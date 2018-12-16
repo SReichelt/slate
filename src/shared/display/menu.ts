@@ -5,6 +5,7 @@ export class ExpressionMenu {
 }
 
 export abstract class ExpressionMenuRow {
+  selected: boolean = false;
 }
 
 export class ExpressionMenuItem extends ExpressionMenuRow {
@@ -23,6 +24,11 @@ export class StandardExpressionMenuRow extends ExpressionMenuRow {
 }
 
 export class ExpressionMenuSeparator extends ExpressionMenuRow {
+}
+
+export class ExpressionMenuTextInput extends ExpressionMenuRow {
+  text: string;
+  action: ExpressionMenuAction;
 }
 
 export abstract class ExpressionMenuAction {

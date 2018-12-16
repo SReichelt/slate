@@ -1072,20 +1072,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let conditions = definition.contents.conditions as Fmt.ArrayExpression;
       let items = conditions.items.map((formula) => this.renderFormula(formula));
       return new Display.ListExpression(items, '1.');
-    } else {
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
+      let contents = definition.contents;
       let definitionRef = this.renderDefinitionRef([definition]);
-      let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => ((definition.contents as FmtHLM.ObjectContents_Definition).display = display);
+      let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => (contents.display = display);
       let onGetDefault = () => this.renderDefaultDefinitionRef([definition]);
-      this.setDefinitionSemanticLink(definitionRef, definition, onSetDisplay, onGetDefault);
+      this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault);
       definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
-      if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
+      if (contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
+          let innerContents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
           constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
-          let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => ((innerDefinition.contents as FmtHLM.ObjectContents_Definition).display = display);
+          let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => (innerContents.display = display);
           let onGetConstructorDefault = () => this.renderDefaultDefinitionRef([definition, innerDefinition]);
-          this.setDefinitionSemanticLink(constructorDef, innerDefinition, onSetConstructorDisplay, onGetConstructorDefault);
+          this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;
@@ -1107,16 +1109,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           'left': definitionRef,
           'right': construction
         });
-      } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
-        let definitions = definition.contents.definition as Fmt.ArrayExpression;
+      } else if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
+        let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((term) => this.renderSetTerm(term));
         return this.renderMultiDefinitions('Equality', definitionRef, items);
-      } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-        let definitions = definition.contents.definition as Fmt.ArrayExpression;
+      } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+        let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((term) => this.renderElementTerm(term));
         return this.renderMultiDefinitionsWithSpecializations('Equality', definitionRef, items, definitions.items);
-      } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-        let contents = definition.contents;
+      } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
         let equality = this.renderTemplate('EqualityRelation', {
           'left': definitionRef,
           'right': this.renderVariable(contents.parameter)
@@ -1124,13 +1125,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((formula) => this.renderFormula(formula));
         return this.renderMultiDefinitions('Equivalence', equality, items);
-      } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
-        let definitions = definition.contents.definition as Fmt.ArrayExpression;
+      } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
+        let definitions = contents.definition as Fmt.ArrayExpression;
         let items = definitions.items.map((formula) => this.renderFormula(formula));
         return this.renderMultiDefinitions('Equivalence', definitionRef, items);
       } else {
         return new Display.EmptyExpression;
       }
+    } else {
+      return new Display.EmptyExpression;
     }
   }
 

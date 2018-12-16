@@ -83,10 +83,10 @@ export abstract class GenericRenderer {
     return expression;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, onSetDisplay: (display: Fmt.ArrayExpression | undefined) => void, onGetDefault: () => Display.RenderedExpression): Display.RenderedExpression {
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression): Display.RenderedExpression {
     expression.semanticLinks = [new Display.SemanticLink(linkedObject, true)];
     if (this.editHandler) {
-      this.editHandler.addDisplayMenu(expression, onSetDisplay, onGetDefault);
+      this.editHandler.addDisplayMenu(expression, display, onSetDisplay, onGetDefault);
     }
     return expression;
   }

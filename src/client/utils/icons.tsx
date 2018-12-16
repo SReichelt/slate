@@ -3,6 +3,7 @@ import { LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
 import * as React from 'react';
 
 export enum ButtonType {
+  OK,
   Submit,
   Cancel,
   Edit,
@@ -12,6 +13,8 @@ export enum ButtonType {
 
 export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): any {
   switch (buttonType) {
+  case ButtonType.OK:
+    return <span className="ok">✓</span>;
   case ButtonType.Submit:
     return <span className="submit">⌲</span>;
   case ButtonType.Cancel:
