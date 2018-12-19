@@ -4,6 +4,7 @@ import * as React from 'react';
 
 export enum ButtonType {
   OK,
+  Save,
   Submit,
   Cancel,
   Edit,
@@ -14,6 +15,7 @@ export enum ButtonType {
 export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): any {
   switch (buttonType) {
   case ButtonType.OK:
+  case ButtonType.Save:
     return <span className="ok">✓</span>;
   case ButtonType.Submit:
     return <span className="submit">⌲</span>;

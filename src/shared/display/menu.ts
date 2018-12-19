@@ -1,14 +1,20 @@
 import * as Display from './display';
 
-export class ExpressionMenu {
+export abstract class ExpressionMenuBase {
+}
+
+export class ExpressionMenu extends ExpressionMenuBase {
   rows: ExpressionMenuRow[];
 }
 
-export abstract class ExpressionMenuRow {
+export abstract class ExpressionMenuRow extends ExpressionMenuBase {
   selected: boolean = false;
 }
 
-export class ExpressionMenuItem extends ExpressionMenuRow {
+export abstract class ExpressionMenuCell extends ExpressionMenuRow {
+}
+
+export class ExpressionMenuItem extends ExpressionMenuCell {
   expression: Display.RenderedExpression;
   action: ExpressionMenuAction;
 }
@@ -20,13 +26,13 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
   title: string;
   titleAction?: ExpressionMenuAction;
-  subMenu?: ExpressionMenu | ExpressionMenuRow;
+  subMenu?: ExpressionMenuBase;
 }
 
 export class ExpressionMenuSeparator extends ExpressionMenuRow {
 }
 
-export class ExpressionMenuTextInput extends ExpressionMenuRow {
+export class ExpressionMenuTextInput extends ExpressionMenuCell {
   text: string;
   action: ExpressionMenuAction;
 }

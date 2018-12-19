@@ -45,7 +45,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private hasMenu = false;
   private semanticLinks?: Display.SemanticLink[];
-  private windowClickListener?: (this: Window, ev: MouseEvent) => any;
+  private windowClickListener?: () => void;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
   private tooltipPosition: string;
@@ -68,7 +68,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   componentWillUnmount(): void {
-    this.clearHover();
+    this.clearHoverAndMenu();
     if (this.props.interactionHandler) {
       this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
     }
@@ -76,7 +76,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   componentWillReceiveProps(props: ExpressionProps): void {
     if (props.parent !== this.props.parent || props.expression !== this.props.expression) {
-      this.clearHover();
+      this.clearHoverAndMenu();
     }
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
@@ -93,12 +93,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
   }
 
-  private clearHover(): void {
+  private clearHoverAndMenu(): void {
     this.permanentlyHighlighted = false;
-    if (this.windowClickListener) {
-      window.removeEventListener('click', this.windowClickListener);
-      this.windowClickListener = undefined;
-    }
+    this.setState({openMenu: undefined});
+    this.disableWindowClickListener();
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
         this.props.parent.removeFromHoveredChildren(expression);
@@ -106,6 +104,20 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     this.hoveredChildren = [];
     this.updateHover();
+  }
+
+  private enableWindowClickListener(): void {
+    if (!this.windowClickListener) {
+      this.windowClickListener = () => this.clearPermanentHighlight();
+      window.addEventListener('mousedown', this.windowClickListener);
+    }
+  }
+
+  private disableWindowClickListener(): void {
+    if (this.windowClickListener) {
+      window.removeEventListener('mousedown', this.windowClickListener);
+      this.windowClickListener = undefined;
+    }
   }
 
   render(): any {
@@ -637,7 +649,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let menu = undefined;
       if (this.state.openMenu) {
-        menu = <ExpressionMenu menu={this.state.openMenu}  onItemClicked={this.onMenuItemClicked}/>;
+        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked}/>;
       }
       result = (
         <span className={'menu-container'}>
@@ -940,21 +952,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.stopPropagation(event);
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
-    if (!this.windowClickListener) {
-      this.windowClickListener = () => this.clearPermanentHighlight();
-      window.addEventListener('click', this.windowClickListener);
-    }
+    this.enableWindowClickListener();
   }
 
   private clearPermanentHighlight(): void {
     if (this.permanentlyHighlighted) {
       this.permanentlyHighlighted = false;
       this.removeFromHoveredChildren();
-      if (this.windowClickListener) {
-        window.removeEventListener('click', this.windowClickListener);
-        this.windowClickListener = undefined;
-      }
     }
+    this.setState({openMenu: undefined});
+    this.disableWindowClickListener();
   }
 
   private clearAllPermanentHighlights(): void {
@@ -981,9 +988,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       this.stopPropagation(event);
       if (this.state.openMenu) {
         this.setState({openMenu: undefined});
+        if (!this.permanentlyHighlighted) {
+          this.disableWindowClickListener();
+        }
       } else {
         this.removeFromHoveredChildren();
         this.setState({openMenu: onMenuOpened()});
+        this.enableWindowClickListener();
       }
     }
   }
@@ -991,7 +1002,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {
     if (action instanceof Menu.ImmediateExpressionMenuAction) {
       action.onExecute();
-      this.setState({openMenu: undefined});
+      this.clearPermanentHighlight();
       if (this.props.interactionHandler) {
         this.props.interactionHandler.expressionChanged();
       }

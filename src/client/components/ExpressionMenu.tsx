@@ -2,8 +2,6 @@ import * as React from 'react';
 import './ExpressionMenu.css';
 import * as Menu from '../../shared/display/menu';
 import Expression from './Expression';
-import Button from './Button';
-import { getButtonIcon, ButtonType } from '../utils/icons';
 
 interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
@@ -26,7 +24,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps> {
       }
     }
     return (
-      <table className={'open-menu'}>
+      <table className={'open-menu'} onMouseDown={(event) => event.stopPropagation()}>
         <tbody>
           {rows}
         </tbody>
@@ -43,14 +41,22 @@ interface ExpressionMenuRowProps {
 
 interface ExpressionMenuRowState {
   titleHovered: boolean;
+  contentsHoveredOrOpen: boolean;
+}
+
+interface ExpressionMenuInputRefHolder {
+  inputRef?: HTMLElement;
 }
 
 class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, ExpressionMenuRowState> {
+  inputRefHolder: ExpressionMenuInputRefHolder = {};
+
   constructor(props: ExpressionMenuRowProps) {
     super(props);
 
     this.state = {
-      titleHovered: false
+      titleHovered: false,
+      contentsHoveredOrOpen: false
     };
   }
 
@@ -63,6 +69,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} hoveredExternally={false}/>);
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
       let contentCell = undefined;
+      let onClick = undefined;
       let subMenuMainRow: Menu.ExpressionMenuRow | undefined = undefined;
       if (row.subMenu instanceof Menu.ExpressionMenu && row.subMenu.rows.length) {
         subMenuMainRow = row.subMenu.rows[0];
@@ -72,12 +79,18 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       if (subMenuMainRow) {
         let itemHovered = this.state.titleHovered && !row.titleAction;
         if (subMenuMainRow instanceof Menu.ExpressionMenuItem) {
-          contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} hoveredExternally={itemHovered}/>;
+          contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={() => this.setState({contentsHoveredOrOpen: true})} onLeave={() => this.setState({contentsHoveredOrOpen: false})} hoveredExternally={itemHovered}/>;
         } else if (subMenuMainRow instanceof Menu.ExpressionMenuTextInput) {
-          contentCell = <ExpressionMenuTextInput item={subMenuMainRow} onItemClicked={this.props.onItemClicked} hoveredExternally={itemHovered}/>;
+          contentCell = <ExpressionMenuTextInput item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={() => this.setState({contentsHoveredOrOpen: true})} onLeave={() => this.setState({contentsHoveredOrOpen: false})} hoveredExternally={itemHovered} inputRefHolder={this.inputRefHolder}/>;
+          onClick = () => {
+            let input = this.inputRefHolder.inputRef;
+            if (input) {
+              input.focus();
+            }
+          };
         } else {
           contentCell = (
-            <td className={'open-menu-content-cell'} key={'content'}>
+            <td className={'open-menu-content-cell'} key={'content'} onMouseEnter={() => this.setState({contentsHoveredOrOpen: true})} onMouseLeave={() => this.setState({contentsHoveredOrOpen: false})}>
               <table className={'open-menu-content-cell-table'}>
                 <tbody>
                   <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked}/>
@@ -88,7 +101,6 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         }
       }
       let titleCellClassName = 'open-menu-title-cell';
-      let onMouseUp = undefined;
       let titleAction: Menu.ExpressionMenuAction | undefined = undefined;
       if (row.titleAction) {
         titleAction = row.titleAction;
@@ -97,20 +109,20 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       }
       if (titleAction) {
         titleCellClassName += ' clickable';
-        onMouseUp = () => this.props.onItemClicked(titleAction!);
+        onClick = () => this.props.onItemClicked(titleAction!);
       }
-      if (this.state.titleHovered) {
+      if (this.state.titleHovered || this.state.contentsHoveredOrOpen) {
         titleCellClassName += ' hover';
       }
       if (row.selected) {
         titleCellClassName += ' selected';
       }
-      cells = <th className={titleCellClassName} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} onMouseUp={onMouseUp} key={'title'}>{row.title}</th>;
+      cells = <th className={titleCellClassName} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} onClick={onClick} key={'title'}>{row.title}</th>;
       if (contentCell) {
         cells = [cells, contentCell];
       }
     } else if (row instanceof Menu.ExpressionMenuTextInput) {
-      cells = <ExpressionMenuTextInput item={row} colSpan={2} onItemClicked={this.props.onItemClicked} hoveredExternally={false}/>;
+      cells = <ExpressionMenuTextInput item={row} colSpan={2} onItemClicked={this.props.onItemClicked} hoveredExternally={false} inputRefHolder={this.inputRefHolder}/>;
     }
     let className = 'open-menu-row';
     if (this.props.separated) {
@@ -128,6 +140,8 @@ interface ExpressionMenuItemProps {
   item: Menu.ExpressionMenuItem;
   colSpan?: number;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
+  onEnter?: () => void;
+  onLeave?: () => void;
   hoveredExternally: boolean;
 }
 
@@ -152,8 +166,21 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
     if (this.props.item.selected) {
       className += ' selected';
     }
+    let onMouseEnter = () => {
+      this.setState({hovered: true});
+      if (this.props.onEnter) {
+        this.props.onEnter();
+      }
+    };
+    let onMouseLeave = () => {
+      this.setState({hovered: false});
+      if (this.props.onLeave) {
+        this.props.onLeave();
+      }
+    };
+    let onClick = () => this.props.onItemClicked(this.props.item.action);
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={() => this.setState({hovered: true})} onMouseLeave={() => this.setState({hovered: false})} onMouseUp={() => this.props.onItemClicked(this.props.item.action)}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick}>
         <Expression expression={this.props.item.expression} tooltipPosition={'right'}/>
       </td>
     );
@@ -164,10 +191,15 @@ interface ExpressionMenuTextInputProps {
   item: Menu.ExpressionMenuTextInput;
   colSpan?: number;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
+  onEnter?: () => void;
+  onLeave?: () => void;
   hoveredExternally: boolean;
+  inputRefHolder: ExpressionMenuInputRefHolder;
 }
 
 interface ExpressionMenuTextInputState {
+  hovered: boolean;
+  editing: boolean;
   text: string;
 }
 
@@ -176,6 +208,8 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
     super(props);
 
     this.state = {
+      hovered: false,
+      editing: false,
       text: props.item.text
     };
   }
@@ -188,7 +222,7 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
 
   render(): any {
     let className = 'open-menu-item';
-    if (this.props.hoveredExternally) {
+    if (this.state.hovered || this.state.editing || this.props.hoveredExternally) {
       className += ' hover';
     }
     if (this.props.item.selected) {
@@ -200,10 +234,40 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
       this.props.onItemClicked(this.props.item.action);
       event.preventDefault();
     };
+    let onMouseEnter = () => {
+      this.setState({hovered: true});
+      if (this.props.onEnter) {
+        this.props.onEnter();
+      }
+    };
+    let onMouseLeave = () => {
+      this.setState({hovered: false});
+      if (this.props.onLeave && !this.state.editing) {
+        this.props.onLeave();
+      }
+    };
+    let onFocus = () => {
+      this.setState({editing: true});
+      if (this.props.onEnter) {
+        this.props.onEnter();
+      }
+    };
+    let onBlur = () => {
+      this.setState({editing: false});
+      if (this.props.onLeave && !this.state.hovered) {
+        this.props.onLeave();
+      }
+    };
+    let onClick = () => {
+      let input = this.props.inputRefHolder.inputRef;
+      if (input) {
+        input.focus();
+      }
+    };
     return (
-      <td colSpan={this.props.colSpan} className={className}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onClick}>
         <form onSubmit={onSubmit}>
-          <input type={'text'} value={this.state.text} size={4} onChange={onChange}/>
+          <input type={'text'} value={this.state.text} size={4} onChange={onChange} onFocus={onFocus} onBlur={onBlur} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
         </form>
       </td>
     );

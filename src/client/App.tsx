@@ -162,30 +162,31 @@ class App extends React.Component<AppProps, AppState> {
 
     let buttons: any[] = [];
     if (this.state.selectedItemDefinition) {
+      let runningLocally = (process.env.NODE_ENV === 'development');
       if (this.state.submitting) {
-        buttons.push(<div className="submitting" key="Submitting"><Loading width={'1em'} height={'1em'}/></div>);
+        buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
         buttons.push(' ');
       } else if (this.state.editedDefinition) {
         buttons.push(
-          <Button toolTipText="Submit" onClick={this.submit} key="Submit">
-            {getButtonIcon(ButtonType.Submit)}
+          <Button toolTipText={runningLocally ? 'Save' : 'Submit'} onClick={this.submit} key={'Submit'}>
+            {getButtonIcon(runningLocally ? ButtonType.Save : ButtonType.Submit)}
           </Button>
         );
         buttons.push(
-          <Button toolTipText="Cancel" onClick={() => this.setState({editedDefinition: undefined})} key="Cancel">
+          <Button toolTipText={'Cancel'} onClick={() => this.setState({editedDefinition: undefined})} key={'Cancel'}>
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
         );
         buttons.push(' ');
       } else {
         buttons.push(
-          <Button toolTipText="Edit" onClick={this.edit} key="Edit">
+          <Button toolTipText={'Edit'} onClick={this.edit} key={'Edit'}>
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
-        if (process.env.NODE_ENV === 'development') {
+        if (runningLocally) {
           buttons.push(
-            <Button toolTipText="Open in Visual Studio Code" onClick={this.openLocally} key="OpenLocally">
+            <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
               {getButtonIcon(ButtonType.OpenLocally)}
             </Button>
           );
@@ -194,7 +195,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (extraContents) {
       buttons.push(
-        <Button toolTipText="View Source" selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key="ViewSource">
+        <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key={'ViewSource'}>
           {getButtonIcon(ButtonType.ViewSource)}
         </Button>
       );
