@@ -1,4 +1,5 @@
 import * as Display from './display';
+import * as Dialog from './dialog';
 
 export abstract class ExpressionMenuBase {
 }
@@ -42,4 +43,8 @@ export abstract class ExpressionMenuAction {
 
 export class ImmediateExpressionMenuAction extends ExpressionMenuAction {
   onExecute: () => void;
+}
+
+export class DialogExpressionMenuAction extends ExpressionMenuAction {
+  onOpen: () => Dialog.ExpressionDialog;
 }

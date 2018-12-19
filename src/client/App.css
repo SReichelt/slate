@@ -64,7 +64,7 @@ body {
 }
 
 .app {
-  position: absolute;
+  position: fixed;
   top: 1ex;
   bottom: 1ex;
   left: 1ex;

@@ -2,10 +2,13 @@ import * as React from 'react';
 import './Expression.css';
 import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
+import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
+import ExpressionDialog from './ExpressionDialog';
 import * as ReactMarkdown from 'react-markdown';
 import ReactMarkdownEditor from 'react-simplemde-editor';
+import Modal from 'react-responsive-modal';
 import 'simplemde/dist/simplemde.min.css';
 
 const ToolTip = require('react-portal-tooltip').default;
@@ -39,6 +42,7 @@ interface ExpressionState {
   hovered: boolean;
   showPreview: boolean;
   openMenu?: Menu.ExpressionMenu;
+  openDialog?: Dialog.ExpressionDialog;
 }
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
@@ -95,7 +99,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private clearHoverAndMenu(): void {
     this.permanentlyHighlighted = false;
-    this.setState({openMenu: undefined});
+    this.setState({
+      openMenu: undefined,
+      openDialog: undefined
+    });
     this.disableWindowClickListener();
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
@@ -648,7 +655,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         menuClassName += ' open';
       }
       let menu = undefined;
-      if (this.state.openMenu) {
+      if (this.state.openDialog) {
+        menu = (
+          <Modal open={true} onClose={this.onDialogClosed}>
+            <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK}/>
+          </Modal>
+        );
+      } else if (this.state.openMenu) {
         menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked}/>;
       }
       result = (
@@ -960,7 +973,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       this.permanentlyHighlighted = false;
       this.removeFromHoveredChildren();
     }
-    this.setState({openMenu: undefined});
+    this.setState({
+      openMenu: undefined,
+      openDialog: undefined
+    });
     this.disableWindowClickListener();
   }
 
@@ -1006,7 +1022,25 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.props.interactionHandler) {
         this.props.interactionHandler.expressionChanged();
       }
+    } else if (action instanceof Menu.DialogExpressionMenuAction) {
+      this.clearPermanentHighlight();
+      this.setState({
+        openDialog: action.onOpen()
+      });
     }
+  }
+
+  private onDialogOK = () => {
+    if (this.state.openDialog) {
+      this.state.openDialog.onOK();
+    }
+    if (this.props.interactionHandler) {
+      this.props.interactionHandler.expressionChanged();
+    }
+  }
+
+  private onDialogClosed = () => {
+    this.clearPermanentHighlight();
   }
 
   private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {

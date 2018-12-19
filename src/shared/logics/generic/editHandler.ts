@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
+import * as Dialog from '../../display/dialog';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export abstract class GenericEditHandler {
@@ -55,11 +56,28 @@ export abstract class GenericEditHandler {
         );
       }
       for (let template of this.templates.definitions) {
+        let templateAction = new Menu.DialogExpressionMenuAction;
+        templateAction.onOpen = () => {
+          let dialog = new Dialog.ExpressionDialog;
+          dialog.items = [];
+          for (let param of template.parameters) {
+            let paramItem = new Dialog.ExpressionDialogParameterItem;
+            paramItem.parameter = new Display.TextExpression(param.name);
+            // TODO fill from defaults
+            // TODO fill values from displayItem
+            paramItem.value = new Display.EmptyExpression;
+            dialog.items.push(paramItem);
+          }
+          // TODO
+          dialog.onOK = () => {};
+          return dialog;
+        };
         let templateRow = new Menu.StandardExpressionMenuRow;
         templateRow.title = template.name + '...';
         if (displayItem instanceof Fmt.DefinitionRefExpression && displayItem.path.name === template.name) {
           templateRow.selected = true;
         }
+        templateRow.titleAction = templateAction;
         menu.rows.push(templateRow);
       }
       // TODO multiple alternatives

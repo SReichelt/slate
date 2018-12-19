@@ -513,6 +513,7 @@ p {
   display: inline-table;
   border: solid 1px #e0e0e0;
   border-radius: 2px;
+  vertical-align: middle;
 }
 
 .menu-row {
