@@ -25,7 +25,7 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 }
 
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
-  title: string;
+  title: string | Display.RenderedExpression;
   titleAction?: ExpressionMenuAction;
   subMenu?: ExpressionMenuBase;
 }

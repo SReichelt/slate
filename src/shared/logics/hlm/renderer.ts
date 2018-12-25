@@ -2,7 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as FmtDisplay from '../../display/meta';
 import * as Logic from '../logic';
-import { GenericRenderer } from '../generic/renderer';
+import { GenericRenderer, RenderedVariable } from '../generic/renderer';
 import * as Display from '../../display/display';
 import { HLMEditHandler } from './editHandler';
 import { HLMUtils } from './utils';
@@ -1077,7 +1077,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let definitionRef = this.renderDefinitionRef([definition]);
       let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => (contents.display = display);
       let onGetDefault = () => this.renderDefaultDefinitionRef([definition]);
-      this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault);
+      let onGetVariables = () => {
+        let variables: RenderedVariable[] = [];
+        this.addRenderedVariables(definition.parameters, variables);
+        return variables;
+      };
+      this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault, onGetVariables);
       definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
@@ -1087,7 +1092,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
           let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => (innerContents.display = display);
           let onGetConstructorDefault = () => this.renderDefaultDefinitionRef([definition, innerDefinition]);
-          this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault);
+          let onGetConstructorVariables = () => {
+            let variables: RenderedVariable[] = [];
+            this.addRenderedVariables(definition.parameters, variables);
+            this.addRenderedVariables(innerDefinition.parameters, variables);
+            return variables;
+          };
+          this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault, onGetConstructorVariables);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;
@@ -1455,6 +1466,29 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (currentGroup.length) {
       let group = currentGroup;
       result.set(group[0], () => this.renderParameters(group, initialState));
+    }
+  }
+
+  private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Display.RenderedExpression[]): void {
+    for (let param of parameters) {
+      let paramType = param.type.expression;
+      if (paramType instanceof FmtHLM.MetaRefExpression_Constraint) {
+        continue;
+      }
+      let renderedVariable = this.renderVariable(param, indices);
+      variables.push({
+        name: param.name,
+        display: renderedVariable
+      });
+      if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
+        if (paramType.shortcut) {
+          this.addRenderedVariables(paramType.shortcut.parameters, variables, indices);
+        }
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+        let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
+        newIndices.push(renderedVariable);
+        this.addRenderedVariables(paramType.parameters, variables, newIndices);
+      }
     }
   }
 }

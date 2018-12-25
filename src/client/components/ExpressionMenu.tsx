@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './ExpressionMenu.css';
+import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import Expression from './Expression';
 
@@ -100,6 +101,12 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
           );
         }
       }
+      let title: any;
+      if (row.title instanceof Display.RenderedExpression) {
+        title = <Expression expression={row.title}/>;
+      } else {
+        title = row.title;
+      }
       let titleCellClassName = 'open-menu-title-cell';
       let titleAction: Menu.ExpressionMenuAction | undefined = undefined;
       if (row.titleAction) {
@@ -110,6 +117,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       if (titleAction) {
         titleCellClassName += ' clickable';
         onClick = () => this.props.onItemClicked(titleAction!);
+        if (titleAction instanceof Menu.DialogExpressionMenuAction) {
+          title = [title, '...'];
+        }
       }
       if (this.state.titleHovered || this.state.contentsHoveredOrOpen) {
         titleCellClassName += ' hover';
@@ -117,7 +127,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       if (row.selected) {
         titleCellClassName += ' selected';
       }
-      cells = <th className={titleCellClassName} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} onClick={onClick} key={'title'}>{row.title}</th>;
+      cells = <th className={titleCellClassName} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} onClick={onClick} key={'title'}>{title}</th>;
       if (contentCell) {
         cells = [cells, contentCell];
       }
