@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Fmt from '../../shared/format/format';
-import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';

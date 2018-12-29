@@ -4,7 +4,7 @@ import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { GenericEditHandler } from './editHandler';
 
 export interface RenderedVariable {
-  name: string;
+  param: Fmt.Parameter;
   display: Display.RenderedExpression;
 }
 

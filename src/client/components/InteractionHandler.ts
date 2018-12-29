@@ -7,11 +7,9 @@ import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
-export class LibraryItemInteractionHandler implements ExpressionInteractionHandler {
+export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHandler {
   private expressionChangeHandlers: OnExpressionChanged[] = [];
   private hoverChangeHandlers: OnHoverChanged[] = [];
-
-  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {}
 
   registerExpressionChangeHandler(handler: OnExpressionChanged): void {
     this.expressionChangeHandlers.push(handler);
@@ -46,6 +44,27 @@ export class LibraryItemInteractionHandler implements ExpressionInteractionHandl
     for (let handler of this.hoverChangeHandlers) {
       handler(objects);
     }
+  }
+
+  getURI(semanticLink: Display.SemanticLink): string | undefined {
+    return undefined;
+  }
+
+  linkClicked(semanticLink: Display.SemanticLink): void {
+  }
+
+  hasPreview(semanticLink: Display.SemanticLink): boolean {
+    return false;
+  }
+
+  getPreviewContents(semanticLink: Display.SemanticLink): any {
+    return null;
+  }
+}
+
+export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerImpl {
+  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {
+    super();
   }
 
   getURI(semanticLink: Display.SemanticLink): string | undefined {

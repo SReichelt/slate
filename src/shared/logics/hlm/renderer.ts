@@ -1477,7 +1477,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       let renderedVariable = this.renderVariable(param, indices);
       variables.push({
-        name: param.name,
+        param: param,
         display: renderedVariable
       });
       if (paramType instanceof FmtHLM.MetaRefExpression_Element) {

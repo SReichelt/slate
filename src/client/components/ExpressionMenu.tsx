@@ -103,7 +103,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       }
       let title: any;
       if (row.title instanceof Display.RenderedExpression) {
-        title = <Expression expression={row.title}/>;
+        title = <Expression expression={row.title} key={'title'}/>;
       } else {
         title = row.title;
       }
