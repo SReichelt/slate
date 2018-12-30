@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
@@ -9,7 +10,7 @@ export abstract class GenericEditHandler {
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
   }
 
-  addDisplayMenu(expression: Display.RenderedExpression, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], renderer: GenericRenderer): void {
+  addDisplayMenu(expression: Display.RenderedExpression, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], renderer: GenericRenderer): void {
     let displayItem = display instanceof Fmt.ArrayExpression && display.items.length === 1 ? display.items[0] : undefined;
     let onSetDisplayItem = (newDisplayItem: Fmt.Expression | undefined) => {
       if (newDisplayItem) {
@@ -20,43 +21,82 @@ export abstract class GenericEditHandler {
         onSetDisplay(undefined);
       }
     };
-    let isDefault = (display === undefined);
-    this.addGenericDisplayMenu(expression, displayItem, onSetDisplayItem, onGetDefault, onGetVariables, isDefault, renderer);
+    let type = new FmtDisplay.MetaRefExpression_Expr;
+    this.addGenericDisplayMenu(expression, displayItem, onSetDisplayItem, onGetDefault, onGetVariables, type, !display, true, renderer);
   }
 
-  private addGenericDisplayMenu(expression: Display.RenderedExpression, displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isDefault: boolean, renderer: GenericRenderer): void {
+  private addGenericDisplayMenu(expression: Display.RenderedExpression, displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, renderer: GenericRenderer): void {
     expression.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
-      menu.rows = [
-        this.getDisplayMenuDefaultRow(onGetDefault(), onSetDisplayItem, isDefault)
-      ];
-      let variables = onGetVariables();
-      // TODO condition
-      if (true) {
-        menu.rows.push(
-          new Menu.ExpressionMenuSeparator,
-          this.getDisplayMenuTextRow(displayItem, onSetDisplayItem)
-        );
-        // TODO condition
-        if (variables.length) {
-          menu.rows.push(
-            this.getDisplayMenuVariablesRow(variables, displayItem, onSetDisplayItem)
-          );
-        }
+      menu.rows = [];
+      let defaultValue = onGetDefault();
+      if (defaultValue) {
+        menu.rows.push(this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault));
       }
-      if (this.templates.definitions.length) {
-        menu.rows.push(
-          new Menu.ExpressionMenuSeparator
-        );
-        for (let template of this.templates.definitions) {
-          menu.rows.push(
-            this.getDisplayMenuTemplateRow(template, variables, displayItem, onSetDisplayItem, renderer)
-          );
+      if (type instanceof FmtDisplay.MetaRefExpression_Expr) {
+        let variables = onGetVariables();
+        if (!variables.length || !isTopLevel) {
+          if (menu.rows.length) {
+            menu.rows.push(new Menu.ExpressionMenuSeparator);
+          }
+          menu.rows.push(this.getDisplayMenuTextRow(displayItem, onSetDisplayItem));
+          if (variables.length && !isTopLevel) {
+            menu.rows.push(this.getDisplayMenuVariablesRow(variables, displayItem, onSetDisplayItem));
+          }
         }
+        if (this.templates.definitions.length) {
+          if (menu.rows.length) {
+            menu.rows.push(new Menu.ExpressionMenuSeparator);
+          }
+          for (let template of this.templates.definitions) {
+            menu.rows.push(this.getDisplayMenuTemplateRow(template, variables, displayItem, onSetDisplayItem, renderer));
+          }
+        }
+        // TODO multiple alternatives
+      } else if (type instanceof FmtDisplay.MetaRefExpression_Bool) {
+        if (menu.rows.length) {
+          menu.rows.push(new Menu.ExpressionMenuSeparator);
+        }
+        menu.rows.push(this.getDisplayMenuFalseRow(displayItem, onSetDisplayItem));
+        menu.rows.push(this.getDisplayMenuTrueRow(displayItem, onSetDisplayItem));
+      } else if (type instanceof FmtDisplay.MetaRefExpression_Int) {
+        if (menu.rows.length) {
+          menu.rows.push(new Menu.ExpressionMenuSeparator);
+        }
+        menu.rows.push(this.getDisplayMenuIntegerRow(displayItem, onSetDisplayItem));
+      } else if (type instanceof FmtDisplay.MetaRefExpression_String) {
+        if (menu.rows.length) {
+          menu.rows.push(new Menu.ExpressionMenuSeparator);
+        }
+        menu.rows.push(this.getDisplayMenuTextRow(displayItem, onSetDisplayItem, 'String'));
       }
-      // TODO multiple alternatives
+      // TODO negations
       return menu;
     };
+  }
+
+  private getDisplayMenuFalseRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+    let falseRow = new Menu.StandardExpressionMenuRow;
+    falseRow.title = 'False';
+    if (displayItem instanceof FmtDisplay.MetaRefExpression_false) {
+      falseRow.selected = true;
+    }
+    let falseAction = new Menu.ImmediateExpressionMenuAction;
+    falseAction.onExecute = () => onSetDisplayItem(new FmtDisplay.MetaRefExpression_false);
+    falseRow.titleAction = falseAction;
+    return falseRow;
+  }
+
+  private getDisplayMenuTrueRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+    let trueRow = new Menu.StandardExpressionMenuRow;
+    trueRow.title = 'True';
+    if (displayItem instanceof FmtDisplay.MetaRefExpression_true) {
+      trueRow.selected = true;
+    }
+    let trueAction = new Menu.ImmediateExpressionMenuAction;
+    trueAction.onExecute = () => onSetDisplayItem(new FmtDisplay.MetaRefExpression_true);
+    trueRow.titleAction = trueAction;
+    return trueRow;
   }
 
   private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, isDefault: boolean): Menu.ExpressionMenuRow {
@@ -75,10 +115,32 @@ export abstract class GenericEditHandler {
     return defaultRow;
   }
 
-  private getDisplayMenuTextRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+  private getDisplayMenuIntegerRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+    let integerItem = new Menu.ExpressionMenuTextInput;
+    let integerRow = new Menu.StandardExpressionMenuRow;
+    integerRow.title = 'Number';
+    integerRow.subMenu = integerItem;
+    if (displayItem instanceof Fmt.IntegerExpression) {
+      integerItem.selected = true;
+      integerRow.selected = true;
+      integerItem.text = displayItem.value.toString();
+    } else {
+      integerItem.text = '';
+    }
+    let integerAction = new Menu.ImmediateExpressionMenuAction;
+    integerAction.onExecute = () => {
+      let newDisplayItem = new Fmt.IntegerExpression;
+      newDisplayItem.value = new Fmt.BN(integerItem.text, 10);
+      onSetDisplayItem(newDisplayItem);
+    };
+    integerItem.action = integerAction;
+    return integerRow;
+  }
+
+  private getDisplayMenuTextRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
     let textItem = new Menu.ExpressionMenuTextInput;
     let textRow = new Menu.StandardExpressionMenuRow;
-    textRow.title = 'Symbol/Text';
+    textRow.title = title;
     textRow.subMenu = textItem;
     if (displayItem instanceof Fmt.StringExpression) {
       textItem.selected = true;
@@ -129,8 +191,14 @@ export abstract class GenericEditHandler {
       for (let variable of variables) {
         renderedVariables[variable.param.name] = variable.display;
       }
+      let titleItem = new Dialog.ExpressionDialogInfoItem;
+      titleItem.info = new Display.TextExpression(template.name);
+      titleItem.info.styleClasses = ['source-code'];
       let dialog = new Dialog.ExpressionDialog;
-      dialog.items = [];
+      dialog.items = [
+        titleItem,
+        new Dialog.ExpressionDialogSeparatorItem
+      ];
       let newDisplayItem: Fmt.DefinitionRefExpression;
       if (displayItem instanceof Fmt.DefinitionRefExpression && !displayItem.path.parentPath && displayItem.path.name === template.name) {
         newDisplayItem = displayItem.clone() as Fmt.DefinitionRefExpression;
@@ -141,24 +209,20 @@ export abstract class GenericEditHandler {
         newDisplayItem.path = newPath;
       }
       let paramIndex = 0;
+      let previousParamNames: string[] = [];
       for (let param of template.parameters) {
         let paramItem = new Dialog.ExpressionDialogParameterItem;
         paramItem.parameter = new Display.TextExpression(param.name);
         paramItem.parameter.styleClasses = ['source-code'];
-        let value = newDisplayItem.path.arguments.getOptionalValue(param.name, paramIndex);
-        let isDefault = false;
-        if (!value) {
-          value = param.defaultValue;
-          isDefault = true;
-        }
-        paramItem.value = this.renderDisplayExpression(value, renderedVariables, renderer);
-        let onSetParamDisplay = (paramDisplay: Fmt.Expression | undefined) => {
-          let args = newDisplayItem.path.arguments;
-          // TODO
+        paramItem.onGetValue = () => {
+          let value = newDisplayItem.path.arguments.getOptionalValue(param.name, paramIndex);
+          let onSetParamDisplay = (newValue: Fmt.Expression | undefined) => {
+            newDisplayItem.path.arguments.setValue(newValue, param.name, paramIndex, previousParamNames);
+          };
+          return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamDisplay, variables, renderedVariables, renderer);
         };
-        let onGetParamDefault = () => this.renderDisplayExpression(param.defaultValue, renderedVariables, renderer);
-        this.addGenericDisplayMenu(paramItem.value, value, onSetParamDisplay, onGetParamDefault, () => variables, isDefault, renderer);
         dialog.items.push(paramItem);
+        previousParamNames = previousParamNames.concat(param.name);
         paramIndex++;
       }
       dialog.onOK = () => onSetDisplayItem(newDisplayItem);
@@ -175,16 +239,31 @@ export abstract class GenericEditHandler {
     return templateRow;
   }
 
-  private renderDisplayExpression(value: Fmt.Expression | undefined, renderedVariables: Display.RenderedTemplateArguments, renderer: GenericRenderer): Display.RenderedExpression {
-    if (value) {
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], renderedVariables: Display.RenderedTemplateArguments, renderer: GenericRenderer): Display.RenderedExpression {
+    if (arrayDimensions) {
       if (value instanceof Fmt.ArrayExpression) {
-        let items = value.items.map((item: Fmt.Expression) => this.renderDisplayExpression(item, renderedVariables, renderer));
+        let items: Display.RenderedExpression[] = [];
+        for (let index = 0; index < value.items.length; index++) {
+          let item = value.items[index];
+          let onSetItem = (newValue: Fmt.Expression | undefined) => {
+            if (newValue) {
+              value.items[index] = newValue;
+            } else {
+              value.items.splice(index, 1);
+            }
+          };
+          items.push(this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, variables, renderedVariables, renderer));
+        }
         return renderer.renderTemplate('Group', {'items': items});
       } else {
-        return renderer.renderDisplayExpression(value, renderedVariables);
+        return new Display.EmptyExpression;
       }
     } else {
-      return new Display.EmptyExpression;
+      let valueOrDefault = value || defaultValue;
+      let renderedValue = valueOrDefault ? renderer.renderDisplayExpression(valueOrDefault, renderedVariables) : new Display.EmptyExpression;
+      let onGetDefault = () => defaultValue ? renderer.renderDisplayExpression(defaultValue, renderedVariables) : undefined;
+      this.addGenericDisplayMenu(renderedValue, value, onSetDisplayItem, onGetDefault, () => variables, type, !value, false, renderer);
+      return renderedValue;
     }
   }
 

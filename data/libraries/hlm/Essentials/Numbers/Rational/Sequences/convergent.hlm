@@ -1,16 +1,12 @@
 %../../../../../../logics/hlm%
 
 $convergent(α: %Element(
-  $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
-  shortcut = {
-    $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
-    #(n: %Binding(
-      $../../Natural/"Natural numbers",
-      #(a: %Element($../"Rational numbers"))
-    )),
-    override = %true
-  }
+  $../../../Sequences/Sequences(S = {$../"Rational numbers"})
 )): %Predicate {
+  display = [$Property(
+    operand = α,
+    property = %neg('convergent', 'divergent')
+  )],
   definition = [%exists(
     #(l: %Element($../"Rational numbers")),
     formula = $converges(

@@ -58,7 +58,7 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
   )
 }
 
-$Operator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+$Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = %for(
       param = operands,
@@ -73,7 +73,7 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', minParenLevel:
   )
 }
 
-$AssociativeOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int): %Template {
+$AssociativeOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int): %Template {
   display = $Operator(
     symbol = symbol,
     operands = operands,
@@ -83,7 +83,7 @@ $AssociativeOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', par
   )
 }
 
-$UnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = '', minParenLevel: %Int = 3, maxParenLevel: %Int = 2): %Template {
+$UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 3, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [$InnerParens(
       body = operand,
@@ -93,7 +93,7 @@ $UnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = '', minParenLevel: 
   )
 }
 
-$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [symbol, space, $InnerParens(
       body = operand,
@@ -103,7 +103,7 @@ $PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', minPar
   )
 }
 
-$Relation(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int = -1): %Template {
+$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
   display = $Operator(
     symbol = symbol,
     operands = operands,
@@ -113,7 +113,7 @@ $Relation(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int
   )
 }
 
-$BooleanOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLevel: %Int = -2): %Template {
+$BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -2): %Template {
   display = $OuterParens(
     body = %for(
       param = operands,
@@ -128,7 +128,7 @@ $BooleanOperator(symbol: %Expr, operands: %Expr[], space: %Expr = ' ', parenLeve
   )
 }
 
-$UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', parenLevel: %Int = -2): %Template {
+$UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
   display = $OuterParens(
     body = [symbol, space, $InnerParens(
       body = operand,
@@ -140,7 +140,7 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %Expr = ' ', parenLe
   )
 }
 
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
   display = $OuterParens(
     body = [
       $OverUnder(
@@ -161,7 +161,7 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
   )
 }
 
-$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
+$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
   display = $Operator(
     symbol = symbol,
     operands = operands,
@@ -368,7 +368,7 @@ $EmbeddingDefinition(subset: %Expr, superset: %Expr): %Template {
   )
 }
 
-$FunctionPrefix(function: %Expr, body: %Expr, space: %Expr = ' ', minParenLevel: %Int = 0): %Template {
+$FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLevel: %Int = 0): %Template {
   display = $Operator(
     symbol = ':',
     operands = [function, body],
@@ -378,7 +378,7 @@ $FunctionPrefix(function: %Expr, body: %Expr, space: %Expr = ' ', minParenLeve
   )
 }
 
-$FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %Expr = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
+$FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
   display = $FunctionPrefix(
     function = function,
     body = $FunctionOperator(

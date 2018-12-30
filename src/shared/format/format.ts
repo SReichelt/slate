@@ -1,5 +1,4 @@
-export const BN = require('bn.js');
-export type BigInt = any;  // BN
+export import BN = require('bn.js');
 
 export class File {
   metaModelPath: Path;
@@ -242,14 +241,8 @@ export class ArgumentList extends Array<Argument> {
   getOptionalValue(name?: string, index?: number): Expression | undefined {
     let curIndex = 0;
     for (let arg of this) {
-      if (arg.name !== undefined) {
-        if (arg.name === name) {
-          return arg.value;
-        }
-      } else {
-        if (curIndex === index) {
-          return arg.value;
-        }
+      if (arg.name !== undefined ? arg.name === name : curIndex === index) {
+        return arg.value;
       }
       curIndex++;
     }
@@ -275,6 +268,45 @@ export class ArgumentList extends Array<Argument> {
     arg.name = name;
     arg.value = value;
     this.push(arg);
+  }
+
+  setValue(value: Expression | undefined, name?: string, index?: number, insertAfter: string[] = []) {
+    let curIndex = 0;
+    let removeIndex: number | undefined = undefined;
+    let insertIndex = 0;
+    for (let arg of this) {
+      if (removeIndex !== undefined) {
+        if (arg.name === undefined) {
+          if (name !== undefined) {
+            throw new Error(`Argument for "${name}" cannot be removed because argument ${curIndex + 1} is unnamed`);
+          } else if (index !== undefined) {
+            throw new Error(`Argument "${index + 1}" cannot be removed because argument ${curIndex + 1} is unnamed`);
+          }
+        }
+      } else if (arg.name !== undefined ? arg.name === name : curIndex === index) {
+        if (value !== undefined) {
+          arg.value = value;
+          return;
+        } else {
+          removeIndex = curIndex;
+        }
+      }
+      curIndex++;
+      if (arg.name === undefined || insertAfter.indexOf(arg.name) >= 0) {
+        insertIndex = curIndex;
+      }
+    }
+    if (removeIndex !== undefined) {
+      this.splice(removeIndex, 1);
+    } else if (value !== undefined) {
+      if (name === undefined) {
+        throw new Error('Argument name required');
+      }
+      let arg = new Argument;
+      arg.name = name;
+      arg.value = value;
+      this.splice(insertIndex, 0, arg);
+    }
   }
 
   clone(result: ArgumentList, replacedParameters: ReplacedParameter[] = []): void {
@@ -371,7 +403,7 @@ export abstract class Expression {
 }
 
 export class IntegerExpression extends Expression {
-  value: BigInt;
+  value: BN;
 
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     if (fn) {

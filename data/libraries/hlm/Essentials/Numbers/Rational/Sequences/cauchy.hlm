@@ -3,14 +3,18 @@
 $cauchy(α: %Element(
   $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
   shortcut = {
-    $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
-    #(n: %Binding(
+    constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+    parameters = #(n: %Binding(
       $../../Natural/"Natural numbers",
       #(a: %Element($../"Rational numbers"))
     )),
     override = %true
   }
 )): %Predicate {
+  display = [$Property(
+    operand = α,
+    property = 'cauchy'
+  )],
   definition = [%forall(
     #(ε: %Element($../"Positive numbers")),
     %exists(

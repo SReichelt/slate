@@ -284,7 +284,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
 
 export class MetaRefExpression_for extends Fmt.MetaRefExpression {
   param: Fmt.Expression;
-  dimension: Fmt.BigInt;
+  dimension: Fmt.BN;
   item: Fmt.Expression;
   separator?: Fmt.Expression;
 

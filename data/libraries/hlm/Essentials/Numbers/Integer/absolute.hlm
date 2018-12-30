@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $absolute(a: %Element($Integers)): %ExplicitOperator {
+  display = [$Parens(
+    style = '||',
+    body = a
+  )],
   definition = [%cases([
     {
       formula = $"less or equal"(

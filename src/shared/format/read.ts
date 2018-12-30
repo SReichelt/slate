@@ -583,7 +583,7 @@ export class Reader {
     return str;
   }
 
-  tryReadInteger(): Fmt.BigInt | undefined {
+  tryReadInteger(): Fmt.BN | undefined {
     let c = this.peekChar();
     if (isNumericalCharacter(c) || c === '+' || c === '-') {
       let numStr = '';

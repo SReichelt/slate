@@ -415,7 +415,7 @@ export class Writer {
     this.write(result);
   }
 
-  writeInteger(value: Fmt.BigInt): void {
+  writeInteger(value: Fmt.BN): void {
     this.write(value.toString());
   }
 

@@ -27,6 +27,7 @@ $"Rational numbers": %Construction {
     }
   }
 
+  display = ['ℚ'],
   embedding = {
     parameter = #(x: %Element($../Integer/Integers)),
     target = $"Rational numbers".quotient(

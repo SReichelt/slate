@@ -16,6 +16,7 @@
   font-family: sans-serif;
   font-weight: normal;
   line-height: initial;
+  text-align: left;
 }
 
 .open-menu-row>* {
@@ -40,4 +41,9 @@
 
 .open-menu-title-cell.clickable, .open-menu-item.clickable {
   cursor: pointer;
+}
+
+.open-menu-item input {
+  font-family: 'TeX', serif;
+  font-size: initial;
 }

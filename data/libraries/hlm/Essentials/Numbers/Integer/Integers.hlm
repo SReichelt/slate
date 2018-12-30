@@ -443,6 +443,7 @@ $Integers: %Construction {
     }
   }
 
+  display = ['ℤ'],
   embedding = {
     parameter = #(x: %Element($../Natural/"Natural numbers")),
     target = $Integers.difference(

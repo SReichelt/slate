@@ -4,18 +4,22 @@ $power(
   𝔵: %Element(
     $"Cardinal numbers",
     shortcut = {
-      $"Cardinal numbers".cardinality,
-      #(X: %Set)
+      constructor = $"Cardinal numbers".cardinality,
+      parameters = #(X: %Set)
     }
   ),
   𝔶: %Element(
     %previous,
     shortcut = {
-      $"Cardinal numbers".cardinality,
-      #(Y: %Set)
+      constructor = $"Cardinal numbers".cardinality,
+      parameters = #(Y: %Set)
     }
   )
 ): %ExplicitOperator {
+  display = [$Power(
+    base = 𝔵,
+    exponent = 𝔶
+  )],
   definition = [$"Cardinal numbers".cardinality(S = {$../../Functions/Functions(
       X = {Y},
       Y = {X}

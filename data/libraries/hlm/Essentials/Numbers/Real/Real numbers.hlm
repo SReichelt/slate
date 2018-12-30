@@ -10,8 +10,8 @@ $"Real numbers": %Construction {
         r: %Element(
           $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
-            #(n: %Binding(
+            constructor = $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            parameters = #(n: %Binding(
               $../Natural/"Natural numbers",
               #(a: %Element($../Rational/"Rational numbers"))
             ))
@@ -23,8 +23,8 @@ $"Real numbers": %Construction {
         "r'": %Element(
           $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
-            #(n: %Binding(
+            constructor = $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            parameters = #(n: %Binding(
               $../Natural/"Natural numbers",
               #("a'": %Element($../Rational/"Rational numbers"))
             ))
@@ -60,6 +60,7 @@ $"Real numbers": %Construction {
     }
   }
 
+  display = ['ℝ'],
   embedding = {
     parameter = #(x: %Element($../Rational/"Rational numbers")),
     target = $"Real numbers".class(r = {$../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence(n = {

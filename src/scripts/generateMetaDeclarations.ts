@@ -85,7 +85,7 @@ function getAllMembers(inFile: Fmt.File, definition: Fmt.Definition): Fmt.Parame
 function getMemberContentType(inFile: Fmt.File, type: Fmt.Type): string | undefined {
   if (type.expression instanceof Fmt.MetaRefExpression) {
     if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
-      return 'Fmt.BigInt';
+      return 'Fmt.BN';
     } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
       return 'string';
     } else if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {

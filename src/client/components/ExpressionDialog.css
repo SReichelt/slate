@@ -1,0 +1,40 @@
+.dialog {
+  padding: 0;
+  border-radius: 2pt;
+}
+
+.dialog-contents {
+  border-collapse: collapse;
+}
+
+.dialog-row.separated {
+  border-top: solid 1px gray;
+}
+
+.dialog-row.separated-above>* {
+  padding-top: 1em;
+}
+
+.dialog-row.separated-below>* {
+  padding-bottom: 1em;
+}
+
+.dialog-cell {
+  padding: 2pt;
+  font-weight: normal;
+  text-align: left;
+}
+
+.dialog-cell:first-child {
+  padding-left: 1em;
+}
+
+.dialog-cell:last-child {
+  padding-right: 1em;
+}
+
+.dialog-button-row {
+  border-top: solid 1px gray;
+  background-color: #f0f0f0;
+  text-align: right;
+}

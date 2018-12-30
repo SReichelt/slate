@@ -18,6 +18,7 @@ interface ParameterListState {
   started: boolean;
   inLetExpr: boolean;
   inConstraint: boolean;
+  inDefinition: boolean;
   inDefinitionDisplayGroup: boolean;
 }
 
@@ -148,6 +149,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       started: false,
       inLetExpr: false,
       inConstraint: false,
+      inDefinition: false,
       inDefinitionDisplayGroup: false
     };
     return this.renderParameters(parameters, initialState);
@@ -163,6 +165,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       started: false,
       inLetExpr: false,
       inConstraint: false,
+      inDefinition: false,
       inDefinitionDisplayGroup: false
     };
     return this.renderParameters([parameter], initialState);
@@ -251,6 +254,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       state.inLetExpr = false;
       state.inConstraint = false;
+      state.inDefinition = false;
 
       for (let param of parameters) {
         row.push(new Display.TextExpression(state.abbreviate ? ' f.e. ' : ' for each '));
@@ -291,24 +295,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
         state.inLetExpr = false;
         state.inConstraint = false;
+        state.inDefinition = false;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      if (state.abbreviate && !state.inQuantifier) {
-        if (state.started) {
-          row.push(new Display.TextExpression(', '));
+      if (state.started && state.inLetExpr && !state.inDefinition) {
+        if (state.inConstraint) {
+          row.push(new Display.TextExpression(' and '));
+        } else {
+          row.push(new Display.TextExpression(state.abbreviate ? ' s.t. ' : ' such that '));
         }
       } else {
         if (state.started) {
-          if (state.inConstraint) {
-            row.push(new Display.TextExpression(' and '));
-          } else {
-            row.push(new Display.TextExpression(state.abbreviate ? ' s.t. ' : ' such that '));
-          }
-        } else if (!state.abbreviate) {
-          row.push(new Display.TextExpression(state.sentence ? 'Assume ' : 'assume '));
+          row.push(new Display.TextExpression(', '));
         }
-        state.inConstraint = true;
+        if (!state.abbreviate) {
+          row.push(new Display.TextExpression(state.sentence && !state.started ? 'Assume ' : 'assume '));
+        }
       }
+      state.inConstraint = true;
+      state.inDefinition = false;
 
       row.push(this.renderFormula(type.formula));
     } else {
@@ -325,9 +330,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else {
           row.push(new Display.TextExpression(state.sentence ? 'Let ' : 'let '));
         }
-        state.inLetExpr = true;
       }
+      state.inLetExpr = true;
       state.inConstraint = false;
+      state.inDefinition = false;
 
       let variableDefinitions = this.renderVariableDefinitions(parameters, indices);
       let variableDisplay: Display.RenderedExpression | undefined;
@@ -465,11 +471,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                        'left': variableDefinitions,
                                        'right': this.renderSetTerm(type._set)
                                      }));
+        state.inDefinition = true;
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
         row.push(this.renderTemplate('VariableDefinition', {
                                        'left': variableDefinitions,
                                        'right': this.renderElementTerm(type.element)
                                      }));
+        state.inDefinition = true;
       } else {
         row.push(new Display.ErrorExpression('Unknown parameter type'));
       }
@@ -1306,6 +1314,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         started: false,
         inLetExpr: false,
         inConstraint: false,
+        inDefinition: false,
         inDefinitionDisplayGroup: false
       };
       row.push(this.renderParameters([parameter], initialState));
@@ -1346,6 +1355,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             started: false,
             inLetExpr: false,
             inConstraint: false,
+            inDefinition: false,
             inDefinitionDisplayGroup: false
           };
           row.push(this.renderParameters([parameter], initialState));
@@ -1504,6 +1514,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       started: false,
       inLetExpr: false,
       inConstraint: false,
+      inDefinition: false,
       inDefinitionDisplayGroup: false
     };
     let currentGroup: Fmt.Parameter[] = [];
@@ -1642,11 +1653,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         param: param,
         display: renderedVariable
       });
-      if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
-        if (paramType.shortcut) {
-          this.addRenderedVariables(paramType.shortcut.parameters, variables, indices);
-        }
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+      if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
         newIndices.push(renderedVariable);
         this.addRenderedVariables(paramType.parameters, variables, newIndices);

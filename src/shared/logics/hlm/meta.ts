@@ -3217,8 +3217,8 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_Proof extends Fmt.ObjectContents {
-  _from?: Fmt.BigInt;
-  _to?: Fmt.BigInt;
+  _from?: Fmt.BN;
+  _to?: Fmt.BN;
   parameters?: Fmt.ParameterList;
   goal?: Fmt.Expression;
   steps: Fmt.ParameterList;
@@ -3314,7 +3314,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
 
 export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
   variable: Fmt.Expression;
-  index?: Fmt.BigInt;
+  index?: Fmt.BN;
 
   getName(): string {
     return 'Consider';

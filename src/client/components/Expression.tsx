@@ -657,8 +657,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let menu = undefined;
       if (this.state.openDialog) {
         menu = (
-          <Modal open={true} onClose={this.onDialogClosed}>
-            <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK}/>
+          <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={{modal: 'dialog'}}>
+            <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>
           </Modal>
         );
       } else if (this.state.openMenu) {
@@ -860,10 +860,34 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                                               cp < 0x1d586 ? cp - 0x1d56c + 0x41 :
                                                              cp - 0x1d586 + 0x61);
           }
-        } else if (cp >= 0x1d538 && cp < 0x1d56c) {
+        } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
           setStyle('double-struck');
-          curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
-                                                         cp - 0x1d552 + 0x61);
+          switch (cp) {
+            case 0x2102:
+              curText += 'C';
+              break;
+            case 0x210d:
+              curText += 'H';
+              break;
+            case 0x2115:
+              curText += 'N';
+              break;
+            case 0x2119:
+              curText += 'P';
+              break;
+            case 0x211a:
+              curText += 'Q';
+              break;
+            case 0x211d:
+              curText += 'R';
+              break;
+            case 0x2124:
+              curText += 'Z';
+              break;
+            default:
+              curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
+                                                             cp - 0x1d552 + 0x61);
+          }
         } else {
           if (curStyle) {
             flush();
@@ -1034,6 +1058,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.state.openDialog) {
       this.state.openDialog.onOK();
     }
+    this.clearPermanentHighlight();
     if (this.props.interactionHandler) {
       this.props.interactionHandler.expressionChanged();
     }

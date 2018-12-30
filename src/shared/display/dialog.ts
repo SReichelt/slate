@@ -8,7 +8,14 @@ export class ExpressionDialog {
 export abstract class ExpressionDialogItem {
 }
 
+export class ExpressionDialogInfoItem extends ExpressionDialogItem {
+  info: Display.RenderedExpression;
+}
+
+export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
+}
+
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
   parameter: Display.RenderedExpression;
-  value: Display.RenderedExpression;
+  onGetValue: () => Display.RenderedExpression;
 }
