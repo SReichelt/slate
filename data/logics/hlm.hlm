@@ -62,7 +62,7 @@ $EqualityDefinition: %ExpressionType {
     leftParameters: %ParameterList,
     rightParameters: %ParameterList,
     definition[leftParameters, rightParameters]: $Formula[],
-    equivalenceProofs[leftParameters, rightParameters]?: $Proof[],
+    equivalenceProofs[leftParameters, rightParameters]: $Proof[] = [],
     reflexivityProof?: $Proof,
     symmetryProof?: $Proof,
     transitivityProof?: $Proof,

@@ -415,7 +415,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   leftParameters: Fmt.ParameterList;
   rightParameters: Fmt.ParameterList;
   definition: Fmt.Expression;
-  equivalenceProofs?: ObjectContents_Proof[];
+  equivalenceProofs: ObjectContents_Proof[];
   reflexivityProof?: ObjectContents_Proof;
   symmetryProof?: ObjectContents_Proof;
   transitivityProof?: ObjectContents_Proof;

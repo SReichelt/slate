@@ -1375,10 +1375,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addDefinitionParts(definitions: Fmt.Definition[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
-    // TODO proofs
     let definition = definitions[definitions.length - 1];
     if (!(definition.contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
-      this.getParameterListParts(definition.parameters, includeProofs, result);
+      this.addParameterListParts(definition.parameters, includeProofs, result);
       for (let innerDefinition of definition.innerDefinitions) {
         this.addDefinitionParts(definitions.concat(innerDefinition), includeProofs, result);
       }
@@ -1394,55 +1393,108 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               let target = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
               return this.renderElementTerm(target);
             });
+            if (embedding.wellDefinednessProof) {
+              this.addProofParts(embedding.wellDefinednessProof, includeProofs, result);
+            }
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_Constructor) {
           if (definition.contents.equalityDefinition) {
             let equalityDefinition = definition.contents.equalityDefinition;
-            this.getParameterListParts(equalityDefinition.leftParameters, includeProofs, result);
-            this.getParameterListParts(equalityDefinition.rightParameters, includeProofs, result);
+            this.addParameterListParts(equalityDefinition.leftParameters, includeProofs, result);
+            this.addParameterListParts(equalityDefinition.rightParameters, includeProofs, result);
             if (equalityDefinition.definition instanceof Fmt.ArrayExpression) {
               for (let item of equalityDefinition.definition.items) {
-                result.set(item, () => this.renderFormula(item));
+                this.addFormulaParts(item, includeProofs, result);
               }
+            }
+            this.addProofListParts(equalityDefinition.equivalenceProofs, includeProofs, result);
+            if (equalityDefinition.reflexivityProof) {
+              this.addProofParts(equalityDefinition.reflexivityProof, includeProofs, result);
+            }
+            if (equalityDefinition.symmetryProof) {
+              this.addProofParts(equalityDefinition.symmetryProof, includeProofs, result);
+            }
+            if (equalityDefinition.transitivityProof) {
+              this.addProofParts(equalityDefinition.transitivityProof, includeProofs, result);
             }
           }
           if (definition.contents.rewrite) {
             let rewrite = definition.contents.rewrite;
-            result.set(rewrite.value, () => this.renderElementTerm(rewrite.value));
+            this.addElementTermParts(rewrite.value, includeProofs, result);
+            if (rewrite.theorem) {
+              this.addGenericExpressionParts(rewrite.theorem, includeProofs, result);
+            }
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.definition.items) {
-            result.set(item, () => this.renderSetTerm(item));
+            this.addSetTermParts(item, includeProofs, result);
           }
+          this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.definition.items) {
-            result.set(item, () => this.renderElementTerm(item));
+            this.addElementTermParts(item, includeProofs, result);
           }
+          this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
-          let parameter = definition.contents.parameter;
-          result.set(parameter, () => this.renderParameter(parameter));
+          this.addParameterParts(definition.contents.parameter, includeProofs, result);
           for (let item of definition.contents.definition.items) {
-            result.set(item, () => this.renderFormula(item));
+            this.addFormulaParts(item, includeProofs, result);
           }
+          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.definition instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.definition.items) {
-            result.set(item, () => this.renderFormula(item));
+            this.addFormulaParts(item, includeProofs, result);
           }
+          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
         }
       } else {
         if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-          let claim = definition.contents.claim;
-          result.set(claim, () => this.renderFormula(claim));
+          this.addFormulaParts(definition.contents.claim, includeProofs, result);
+          this.addProofListParts(definition.contents.proofs, includeProofs, result);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem && definition.contents.conditions instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.conditions.items) {
-            result.set(item, () => this.renderFormula(item));
+            this.addFormulaParts(item, includeProofs, result);
           }
+          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
         }
       }
     }
   }
 
-  getParameterListParts(parameters: Fmt.Parameter[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+  private addSetTermParts(term: Fmt.Expression, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    result.set(term, () => this.renderSetTerm(term));
+    this.addGenericExpressionParts(term, includeProofs, result);
+  }
+
+  private addElementTermParts(term: Fmt.Expression, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    result.set(term, () => this.renderElementTerm(term));
+    this.addGenericExpressionParts(term, includeProofs, result);
+  }
+
+  private addSymbolTermParts(term: Fmt.Expression, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    result.set(term, () => this.renderSymbolTerm(term));
+    this.addGenericExpressionParts(term, includeProofs, result);
+  }
+
+  private addFormulaParts(formula: Fmt.Expression, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    result.set(formula, () => this.renderFormula(formula));
+    this.addGenericExpressionParts(formula, includeProofs, result);
+  }
+
+  private addGenericExpressionParts(expression: Fmt.Expression, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    if (expression instanceof Fmt.DefinitionRefExpression) {
+      this.addPathParts(expression.path, includeProofs, result);
+    }
+  }
+
+  private addPathParts(path: Fmt.Path, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    this.addArgumentListParts(path.arguments, includeProofs, result);
+    if (path.parentPath instanceof Fmt.Path) {
+      this.addPathParts(path.parentPath, includeProofs, result);
+    }
+  }
+
+  private addParameterListParts(parameters: Fmt.Parameter[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
     let initialState: ParameterListState = {
       sentence: true,
       abbreviate: false,
@@ -1466,6 +1518,116 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (currentGroup.length) {
       let group = currentGroup;
       result.set(group[0], () => this.renderParameters(group, initialState));
+    }
+  }
+
+  private addParameterParts(parameter: Fmt.Parameter, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    result.set(parameter, () => this.renderParameter(parameter));
+  }
+
+  private addArgumentListParts(args: Fmt.ArgumentList, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    for (let arg of args) {
+      if (arg.value instanceof Fmt.CompoundExpression) {
+        for (let item of arg.value.arguments) {
+          if (item.name) {
+            if (item.name === 'proof' || item.name.endsWith('Proof')) {
+              let value = item.value as Fmt.CompoundExpression;
+              let proof = new FmtHLM.ObjectContents_Proof;
+              proof.fromCompoundExpression(value);
+              this.addProofParts(proof, includeProofs, result);
+            } else if (item.name === 'arguments') {
+              let value = item.value as Fmt.CompoundExpression;
+              this.addArgumentListParts(value.arguments, includeProofs, result);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private addProofListParts(proofs: FmtHLM.ObjectContents_Proof[], includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    if (includeProofs) {
+      for (let proof of proofs) {
+        this.addProofParts(proof, includeProofs, result);
+      }
+    }
+  }
+
+  private addProofParts(proof: FmtHLM.ObjectContents_Proof, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    if (includeProofs) {
+      if (proof.parameters) {
+        this.addParameterListParts(proof.parameters, includeProofs, result);
+      }
+      if (proof.goal) {
+        let goal = proof.goal;
+        result.set(goal, () => this.renderFormula(goal));
+      }
+      for (let step of proof.steps) {
+        this.addProofStepParts(step, includeProofs, result);
+      }
+    }
+  }
+
+  private addProofStepParts(step: Fmt.Parameter, includeProofs: boolean, result: Map<Object, Logic.RenderFn>): void {
+    let type = step.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+      this.addSetTermParts(type._set, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
+      this.addElementTermParts(type.element, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_State) {
+      this.addFormulaParts(type.statement, includeProofs, result);
+      if (type.proof) {
+        this.addProofParts(type.proof, includeProofs, result);
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
+               || type instanceof FmtHLM.MetaRefExpression_ResolveDef) {
+      this.addFormulaParts(type.result, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
+               || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
+      this.addProofListParts(type.caseProofs, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
+      this.addArgumentListParts(type.arguments, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
+               || type instanceof FmtHLM.MetaRefExpression_ProveDef
+               || type instanceof FmtHLM.MetaRefExpression_ProveNeg
+               || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
+      this.addProofParts(type.proof, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
+      this.addGenericExpressionParts(type.construction, includeProofs, result);
+      this.addElementTermParts(type.input, includeProofs, result);
+      this.addElementTermParts(type.output, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
+      this.addSetTermParts(type.term, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
+      this.addElementTermParts(type.term, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
+      this.addGenericExpressionParts(type.theorem, includeProofs, result);
+      this.addFormulaParts(type.result, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
+      this.addArgumentListParts(type.arguments, includeProofs, result);
+      if (type.proof) {
+        this.addProofParts(type.proof, includeProofs, result);
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
+      if (type.subsetProof) {
+        this.addProofParts(type.subsetProof, includeProofs, result);
+      }
+      if (type.supersetProof) {
+        this.addProofParts(type.supersetProof, includeProofs, result);
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
+      this.addProofStepParts(type.source, includeProofs, result);
+      this.addFormulaParts(type.result, includeProofs, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
+      this.addElementTermParts(type.term, includeProofs, result);
+      this.addGenericExpressionParts(type.construction, includeProofs, result);
+      for (let structuralCase of type.cases) {
+        this.addGenericExpressionParts(structuralCase._constructor, includeProofs, result);
+        let value = structuralCase.value as Fmt.CompoundExpression;
+        let proof = new FmtHLM.ObjectContents_Proof;
+        proof.fromCompoundExpression(value);
+        this.addProofParts(proof, includeProofs, result);
+      }
     }
   }
 
