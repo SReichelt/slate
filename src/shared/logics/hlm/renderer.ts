@@ -23,7 +23,7 @@ interface ParameterListState {
 }
 
 interface ReplacementParameters {
-  parameters: Fmt.ParameterList;
+  parameters?: Fmt.ParameterList;
   indices?: Display.RenderedExpression[];
   isDefinition: boolean;
 }
@@ -939,7 +939,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     let index = 0;
     for (let param of parameters) {
-      let replacementParam = replacementParameters ? replacementParameters.parameters[index] : undefined;
+      let replacementParam = replacementParameters && replacementParameters.parameters ? replacementParameters.parameters[index] : undefined;
       let paramToDisplay = replacementParam || param;
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Binding) {
@@ -1417,7 +1417,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 this.addFormulaParts(item, includeProofs, result);
               }
             }
-            this.addProofListParts(equalityDefinition.equivalenceProofs, includeProofs, result);
+            if (equalityDefinition.equivalenceProofs) {
+              this.addProofListParts(equalityDefinition.equivalenceProofs, includeProofs, result);
+            }
             if (equalityDefinition.reflexivityProof) {
               this.addProofParts(equalityDefinition.reflexivityProof, includeProofs, result);
             }
@@ -1439,33 +1441,45 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           for (let item of definition.contents.definition.items) {
             this.addSetTermParts(item, includeProofs, result);
           }
-          this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
+          if (definition.contents.equalityProofs) {
+            this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
+          }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.definition.items) {
             this.addElementTermParts(item, includeProofs, result);
           }
-          this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
+          if (definition.contents.equalityProofs) {
+            this.addProofListParts(definition.contents.equalityProofs, includeProofs, result);
+          }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator && definition.contents.definition instanceof Fmt.ArrayExpression) {
           this.addParameterParts(definition.contents.parameter, includeProofs, result);
           for (let item of definition.contents.definition.items) {
             this.addFormulaParts(item, includeProofs, result);
           }
-          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          if (definition.contents.equivalenceProofs) {
+            this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.definition instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.definition.items) {
             this.addFormulaParts(item, includeProofs, result);
           }
-          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          if (definition.contents.equivalenceProofs) {
+            this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          }
         }
       } else {
         if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
           this.addFormulaParts(definition.contents.claim, includeProofs, result);
-          this.addProofListParts(definition.contents.proofs, includeProofs, result);
+          if (definition.contents.proofs) {
+            this.addProofListParts(definition.contents.proofs, includeProofs, result);
+          }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem && definition.contents.conditions instanceof Fmt.ArrayExpression) {
           for (let item of definition.contents.conditions.items) {
             this.addFormulaParts(item, includeProofs, result);
           }
-          this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          if (definition.contents.equivalenceProofs) {
+            this.addProofListParts(definition.contents.equivalenceProofs, includeProofs, result);
+          }
         }
       }
     }
@@ -1649,9 +1663,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         continue;
       }
       let renderedVariable = this.renderVariable(param, indices);
+      let auto = false;
+      if (paramType instanceof FmtHLM.MetaRefExpression_Set
+          || paramType instanceof FmtHLM.MetaRefExpression_Subset
+          || paramType instanceof FmtHLM.MetaRefExpression_Element
+          || paramType instanceof FmtHLM.MetaRefExpression_Symbol) {
+        auto = paramType.auto instanceof FmtHLM.MetaRefExpression_true;
+      }
       variables.push({
         param: param,
-        display: renderedVariable
+        display: renderedVariable,
+        required: !auto
       });
       if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];

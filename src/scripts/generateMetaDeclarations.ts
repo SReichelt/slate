@@ -451,8 +451,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
           let memberType = getMemberType(inFile, member.type);
-          let contentType = getMemberContentType(inFile, member.type);
-          let optional = member.optional || (!contentType && member.defaultValue !== undefined);
+          let optional = member.optional || member.defaultValue !== undefined;
           outFileStr += `  ${memberName}${optional ? '?' : ''}: ${memberType};\n`;
         }
         outFileStr += `\n`;
@@ -526,8 +525,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         for (let parameter of definition.parameters) {
           let memberName = translateMemberName(parameter.name);
           let memberType = getMemberType(inFile, parameter.type);
-          let contentType = getMemberContentType(inFile, parameter.type);
-          let optional = parameter.optional || (!contentType && parameter.defaultValue !== undefined);
+          let optional = parameter.optional || parameter.defaultValue !== undefined;
           if (parameter.list) {
             memberType += '[]';
           }

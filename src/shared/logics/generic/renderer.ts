@@ -6,6 +6,7 @@ import { GenericEditHandler } from './editHandler';
 export interface RenderedVariable {
   param: Fmt.Parameter;
   display: Display.RenderedExpression;
+  required: boolean;
 }
 
 export abstract class GenericRenderer {

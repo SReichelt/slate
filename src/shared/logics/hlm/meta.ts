@@ -6,7 +6,7 @@ import * as Fmt from '../../format/format';
 import * as FmtDisplay from '../../display/meta';
 
 export class ObjectContents_Definition extends Fmt.ObjectContents {
-  properties: ObjectContents_Property[];
+  properties?: ObjectContents_Property[];
   display?: Fmt.Expression;
   definitionDisplay?: ObjectContents_DefinitionDisplay;
 
@@ -415,7 +415,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   leftParameters: Fmt.ParameterList;
   rightParameters: Fmt.ParameterList;
   definition: Fmt.Expression;
-  equivalenceProofs: ObjectContents_Proof[];
+  equivalenceProofs?: ObjectContents_Proof[];
   reflexivityProof?: ObjectContents_Proof;
   symmetryProof?: ObjectContents_Proof;
   transitivityProof?: ObjectContents_Proof;
@@ -631,7 +631,7 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
 
 export class ObjectContents_SetOperator extends ObjectContents_Definition {
   definition: Fmt.Expression;
-  equalityProofs: ObjectContents_Proof[];
+  equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
 
@@ -779,7 +779,7 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
 
 export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
   definition: Fmt.Expression;
-  equalityProofs: ObjectContents_Proof[];
+  equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
 
@@ -907,7 +907,7 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
 export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
   parameter: Fmt.Parameter;
   definition: Fmt.Expression;
-  equivalenceProofs: ObjectContents_Proof[];
+  equivalenceProofs?: ObjectContents_Proof[];
   wellDefinednessProof?: ObjectContents_Proof;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -1084,7 +1084,7 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
 
 export class ObjectContents_Predicate extends ObjectContents_Definition {
   definition: Fmt.Expression;
-  equivalenceProofs: ObjectContents_Proof[];
+  equivalenceProofs?: ObjectContents_Proof[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
@@ -1178,7 +1178,7 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
 
 export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   claim: Fmt.Expression;
-  proofs: ObjectContents_Proof[];
+  proofs?: ObjectContents_Proof[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.claim = argumentList.getValue('claim', 0);
@@ -1271,7 +1271,7 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
 
 export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   conditions: Fmt.Expression;
-  equivalenceProofs: ObjectContents_Proof[];
+  equivalenceProofs?: ObjectContents_Proof[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.conditions = argumentList.getValue('conditions', 0);
@@ -1707,23 +1707,33 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Symbol extends Fmt.MetaRefExpression {
+  auto?: Fmt.Expression;
+
   getName(): string {
     return 'Symbol';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.auto = argumentList.getOptionalValue('auto', 0);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
+    if (this.auto !== undefined) {
+      argumentList.add(this.auto, 'auto');
+    }
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_Symbol;
+    let result = new MetaRefExpression_Symbol;
+    let changed = false;
+    if (this.auto) {
+      result.auto = this.auto.substitute(fn, replacedParameters);
+      if (result.auto !== this.auto) {
+        changed = true;
+      }
     }
+    return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
@@ -1861,7 +1871,7 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
 
 export class ObjectContents_Shortcut extends Fmt.ObjectContents {
   _constructor: Fmt.Expression;
-  parameters: Fmt.ParameterList;
+  parameters?: Fmt.ParameterList;
   rewrite?: Fmt.Expression;
   _override?: Fmt.Expression;
 
@@ -3126,7 +3136,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
 
 export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
   _constructor: Fmt.Expression;
-  parameters: Fmt.ParameterList;
+  parameters?: Fmt.ParameterList;
   value: Fmt.Expression;
   rewrite?: Fmt.Expression;
   wellDefinednessProof?: ObjectContents_Proof;

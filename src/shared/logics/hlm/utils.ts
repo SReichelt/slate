@@ -112,7 +112,7 @@ export class HLMUtils extends GenericUtils {
         result = resultRef;
       }
       if (constructorDefinition.parameters.length) {
-        result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters);
+        result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!);
       }
       return result;
     });

@@ -171,7 +171,7 @@ $Element(set: $SetTerm, auto: $Bool = $false, shortcut?: $Shortcut): %ParameterT
   argumentType = $ElementArg,
   exports = [shortcut]
 }
-$Symbol: %ParameterType($SymbolTerm) {
+$Symbol(auto: $Bool = $false): %ParameterType($SymbolTerm) {
   argumentType = $SymbolArg
 }
 $Constraint(formula: $Formula): %ParameterType($Formula) {
