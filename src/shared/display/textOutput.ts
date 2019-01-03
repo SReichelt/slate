@@ -145,6 +145,8 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
   } else if (expression instanceof Display.DecoratedExpression) {
     return renderAsText(expression.body, outputMarkdown, singleLine);
+  } else if (expression instanceof Display.PlaceholderExpression) {
+    return CachedPromise.resolve('?');
   } else {
     let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
     return CachedPromise.resolve(`Error: ${error}`);

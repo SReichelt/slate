@@ -5,6 +5,10 @@ $"Real numbers": %Construction {
     r: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
     _1: %Constraint($../Rational/Sequences/cauchy(α = {r}))
   ): %Constructor {
+    display = [$Parens(
+      body = r,
+      style = '[]'
+    )],
     equalityDefinition = {
       leftParameters = #(
         r: %Element(

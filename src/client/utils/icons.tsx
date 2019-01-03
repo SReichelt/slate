@@ -42,7 +42,7 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   }
 }
 
-export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo: LibraryItemInfo): any {
+export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): any {
   switch (definitionType) {
   case Logic.LogicDefinitionType.Construction:
     return (
@@ -72,14 +72,14 @@ export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, ite
     );
   case Logic.LogicDefinitionType.Theorem:
     let viewBox = '-8 -8 16 16';
-    if (itemInfo.type === 'lemma' || itemInfo.type === 'corollary' || itemInfo.type === 'example') {
+    if (itemInfo && (itemInfo.type === 'lemma' || itemInfo.type === 'corollary' || itemInfo.type === 'example')) {
       viewBox = '-10 -10 20 20';
     }
     let contents = [
       <circle cx="0" cy="-2" r="5" fill="yellow" stroke="black" strokeWidth="1" key="circle"/>,
       <rect x="-2" y="3" width="4" height="4" fill="gray" stroke="black" strokeWidth="1" key="rect"/>
     ];
-    if (itemInfo.type === 'theorem') {
+    if (itemInfo && itemInfo.type === 'theorem') {
       contents.unshift(<line x1="-7" y1="-6" x2="7" y2="2" stroke="gray" strokeWidth="1" key="line1"/>);
       contents.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="1" key="line2"/>);
       contents.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="1" key="line3"/>);

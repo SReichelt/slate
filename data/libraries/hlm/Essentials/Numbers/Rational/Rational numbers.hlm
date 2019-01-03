@@ -5,6 +5,16 @@ $"Rational numbers": %Construction {
     n: %Element($../Integer/Integers),
     m: %Element($../Natural/"Positive numbers")
   ): %Constructor {
+    display = [$Parens(
+      body = $Operator(
+        symbol = '/',
+        operands = [n, m],
+        space = '',
+        minParenLevel = 2,
+        maxParenLevel = 2
+      ),
+      style = '[]'
+    )],
     equalityDefinition = {
       leftParameters = #(
         n: %Element($../Integer/Integers),

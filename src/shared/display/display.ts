@@ -7,7 +7,6 @@ export abstract class RenderedExpression {
   styleClasses?: string[];
   optionalParenStyle: string = '()';
   semanticLinks?: SemanticLink[];
-  onMenuOpened?: () => Menu.ExpressionMenu;
 
   getLineHeight(): CachedPromise<number> {
     let lineHeight = 1;
@@ -71,6 +70,18 @@ export class PromiseExpression extends RenderedExpression {
 export class ErrorExpression extends RenderedExpression {
   constructor(public errorMessage: string) {
     super();
+  }
+}
+
+export class PlaceholderExpression extends RenderedExpression {
+  constructor(public placeholderType: any) {
+    super();
+  }
+}
+
+export class InsertPlaceholderExpression extends PlaceholderExpression {
+  constructor() {
+    super(InsertPlaceholderExpression);
   }
 }
 
@@ -641,5 +652,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
 
 
 export class SemanticLink {
+  onMenuOpened?: () => Menu.ExpressionMenu;
+
   constructor(public linkedObject: Object, public isDefinition: boolean = false, public isMathematical: boolean = true) {}
 }

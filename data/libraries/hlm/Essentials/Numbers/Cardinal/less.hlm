@@ -4,6 +4,16 @@ $less(
   𝔵: %Element($"Cardinal numbers"),
   𝔶: %Element(%previous)
 ): %Predicate {
+  display = [
+    $Relation(
+      symbol = %neg('<', '≮'),
+      operands = [𝔵, 𝔶]
+    ),
+    $Relation(
+      symbol = %neg('>', '≯'),
+      operands = [𝔶, 𝔵]
+    )
+  ],
   definition = [%and(
     $"less or equal"(
       𝔵 = {𝔵},

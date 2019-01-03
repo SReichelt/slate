@@ -5,6 +5,16 @@ $Integers: %Construction {
     n: %Element($../Natural/"Natural numbers"),
     m: %Element(%previous)
   ): %Constructor {
+    display = [$Parens(
+      body = $Operator(
+        symbol = '-',
+        operands = [n, m],
+        space = '',
+        minParenLevel = 1,
+        maxParenLevel = 1
+      ),
+      style = '[]'
+    )],
     equalityDefinition = {
       leftParameters = #(
         n: %Element($../Natural/"Natural numbers"),

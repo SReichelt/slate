@@ -23,7 +23,7 @@ body {
   background-color: #ffd700;
 }
 
-.expr.hover, .expr.hover span, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
+.expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
   background-color: #ffd700;
 }
 

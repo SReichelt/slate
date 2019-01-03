@@ -513,6 +513,9 @@ p {
   display: inline-table;
   border: solid 1px #e0e0e0;
   border-radius: 2px;
+  border-collapse: initial;
+  border-spacing: 0;
+  margin-bottom: 1px;
   vertical-align: middle;
 }
 
@@ -527,13 +530,20 @@ p {
   background-color: #f8f8f8;
 }
 
-.menu-dropdown-cell {
+.menu-placeholder-cell, .menu-dropdown-cell {
   display: table-cell;
-  font-size: 50%;
   vertical-align: middle;
   color: #808080;
   background-color: #e0e0e0;
   cursor: pointer;
+}
+
+.menu-placeholder-cell {
+  padding: 1px;
+}
+
+.menu-dropdown-cell {
+  font-size: 50%;
 }
 
 .expr textarea {

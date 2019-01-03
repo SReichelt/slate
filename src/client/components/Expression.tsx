@@ -6,6 +6,7 @@ import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
 import ExpressionDialog from './ExpressionDialog';
+import { getDefinitionIcon } from '../utils/icons';
 import * as ReactMarkdown from 'react-markdown';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import Modal from 'react-responsive-modal';
@@ -47,7 +48,6 @@ interface ExpressionState {
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
-  private hasMenu = false;
   private semanticLinks?: Display.SemanticLink[];
   private windowClickListener?: () => void;
   private hoveredChildren: Expression[] = [];
@@ -128,11 +128,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   render(): any {
-    this.hasMenu = false;
     return this.renderExpression(this.props.expression, 'expr', undefined, undefined);
   }
 
-  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, onMenuOpened: (() => Menu.ExpressionMenu) | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): any {
+  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): any {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
         className += ' ' + styleClass;
@@ -148,9 +147,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         semanticLinks = expression.semanticLinks;
       }
     }
-    if (expression.onMenuOpened) {
-      onMenuOpened = expression.onMenuOpened;
-      this.hasMenu = true;
+    let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
+    if (semanticLinks) {
+      for (let semanticLink of semanticLinks) {
+        if (semanticLink.onMenuOpened) {
+          onMenuOpened = semanticLink.onMenuOpened;
+        }
+      }
     }
     let result: any = null;
     if (expression instanceof Display.EmptyExpression) {
@@ -178,7 +181,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
-        return this.renderExpression(expression.items[0], className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+        return this.renderExpression(expression.items[0], className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } else {
         className += ' row';
         result = expression.items.map((item: Display.RenderedExpression, index: number) =>
@@ -252,7 +255,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let parenExpression = expression;
       let render = parenExpression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
         if (surroundingParenStyle === parenExpression.style) {
-          return this.renderExpression(parenExpression.body, className, semanticLinks, onMenuOpened);
+          return this.renderExpression(parenExpression.body, className, semanticLinks);
         } else {
           return parenExpression.body.getLineHeight().then((lineHeight: number) => {
             let parenResult: any = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
@@ -413,12 +416,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-        return this.renderExpression(new Display.ParenExpression(expression.body, optionalParenStyle), className, semanticLinks, onMenuOpened);
+        return this.renderExpression(new Display.ParenExpression(expression.body, optionalParenStyle), className, semanticLinks);
       } else {
-        return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
+        return this.renderExpression(expression.body, className, semanticLinks);
       }
     } else if (expression instanceof Display.InnerParenExpression) {
-      return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened, expression.left, expression.right, expression.maxLevel);
+      return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
@@ -626,17 +629,24 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.IndirectExpression) {
       try {
-        return this.renderExpression(expression.resolve(), className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+        return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } catch (error) {
         console.log(error);
         className += ' error';
         result = `Error: ${error.message}`;
       }
     } else if (expression instanceof Display.PromiseExpression) {
-      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, onMenuOpened, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
+      let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
       return renderPromise(render);
     } else if (expression instanceof Display.DecoratedExpression) {
-      return this.renderExpression(expression.body, className, semanticLinks, onMenuOpened);
+      return this.renderExpression(expression.body, className, semanticLinks);
+    } else if (expression instanceof Display.PlaceholderExpression) {
+      className += ' placeholder';
+      if (expression instanceof Display.InsertPlaceholderExpression) {
+        result = '+';
+      } else {
+        result = getDefinitionIcon(expression.placeholderType);
+      }
     } else {
       className += ' error';
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
@@ -646,15 +656,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (semanticLinks && semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
       className += ' definition';
     }
-    if (this.props.interactionHandler && onMenuOpened) {
-      let menuClassName = 'menu interactive';
+    let hasMenu = this.props.interactionHandler && onMenuOpened;
+    if (hasMenu || expression instanceof Display.PlaceholderExpression) {
+      let menuClassName = 'menu';
       if (this.state.hovered) {
         menuClassName += ' hover';
+      }
+      if (this.props.interactionHandler) {
+        menuClassName += ' interactive';
       }
       if (this.state.openMenu) {
         menuClassName += ' open';
       }
-      let menu = undefined;
+      let menu: any = undefined;
       if (this.state.openDialog) {
         menu = (
           <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={{modal: 'dialog'}}>
@@ -664,14 +678,23 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else if (this.state.openMenu) {
         menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked}/>;
       }
+      let onMouseEnter = hasMenu ? () => this.addToHoveredChildren() : undefined;
+      let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;
+      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
+      let cells: any;
+      if (expression instanceof Display.PlaceholderExpression) {
+        cells = <span className={className + ' menu-placeholder-cell'}>{result}</span>;
+      } else {
+        cells = [
+          <span className={className + ' menu-cell'} key={'content'}>{result}</span>,
+          <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
+        ];
+      }
       result = (
         <span className={'menu-container'}>
-          <span className={menuClassName} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onMouseDown={(event) => this.menuClicked(onMenuOpened!, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
-              <span className={className + ' menu-cell'}>
-                {result}
-              </span>
-              <span className={'menu-dropdown-cell'}>&nbsp;▼&nbsp;</span>
+              {cells}
             </span>
           </span>
           {menu}
@@ -905,8 +928,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private interactionBlocked(): boolean {
-    if (this.hasMenu) {
-      return true;
+    if (this.semanticLinks) {
+      for (let semanticLink of this.semanticLinks) {
+        if (semanticLink.onMenuOpened) {
+          return true;
+        }
+      }
     }
     if (this.props.parent) {
       return this.props.parent.interactionBlocked();

@@ -1091,13 +1091,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return variables;
       };
       this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault, onGetVariables);
-      definitionRef.semanticLinks = [new Display.SemanticLink(definition, true)];
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let innerContents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
-          constructorDef.semanticLinks = [new Display.SemanticLink(innerDefinition, true)];
           let onSetConstructorDisplay = (display: Fmt.ArrayExpression | undefined) => (innerContents.display = display);
           let onGetConstructorDefault = () => this.renderDefaultDefinitionRef([definition, innerDefinition]);
           let onGetConstructorVariables = () => {
