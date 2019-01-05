@@ -222,7 +222,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
   private scrollIntoView = (): void => {
     if (this.htmlNode) {
-      this.htmlNode.scrollIntoView();
+      this.htmlNode.scrollIntoView({block: 'nearest'});
     }
   }
 

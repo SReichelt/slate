@@ -28,55 +28,31 @@ export abstract class GenericEditHandler {
   private getDisplayMenu(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, renderer: GenericRenderer): Menu.ExpressionMenu {
     let menu = new Menu.ExpressionMenu;
     menu.rows = [];
-    if (defaultValue) {
-      menu.rows.push(this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault));
+    if (defaultValue || canRemove) {
+      menu.rows.push(
+        this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault, canRemove ? 'Remove' : 'Default'),
+        new Menu.ExpressionMenuSeparator
+      );
     }
     let complexExpressionRequired = isTopLevel && variables.some((variable) => variable.required);
     if (type instanceof FmtDisplay.MetaRefExpression_Expr) {
       if (!complexExpressionRequired) {
-        if (menu.rows.length) {
-          menu.rows.push(new Menu.ExpressionMenuSeparator);
-        }
         menu.rows.push(this.getDisplayMenuTextRow(displayItem, onSetDisplayItem));
         if (variables.length && !isTopLevel) {
           menu.rows.push(this.getDisplayMenuVariablesRow(variables, displayItem, onSetDisplayItem));
         }
       }
-      if (this.templates.definitions.length) {
-        if (menu.rows.length) {
-          menu.rows.push(new Menu.ExpressionMenuSeparator);
-        }
-        for (let template of this.templates.definitions) {
-          if (!complexExpressionRequired || template.parameters.length) {
-            menu.rows.push(this.getDisplayMenuTemplateRow(template, variables, displayItem, onSetDisplayItem, renderer));
-          }
-        }
-      }
+      menu.rows.push(this.getDisplayMenuTemplatesRow(complexExpressionRequired, variables, displayItem, onSetDisplayItem, renderer));
       // TODO multiple alternatives
     } else if (type instanceof FmtDisplay.MetaRefExpression_Bool) {
-      if (menu.rows.length) {
-        menu.rows.push(new Menu.ExpressionMenuSeparator);
-      }
       menu.rows.push(this.getDisplayMenuFalseRow(displayItem, onSetDisplayItem));
       menu.rows.push(this.getDisplayMenuTrueRow(displayItem, onSetDisplayItem));
     } else if (type instanceof FmtDisplay.MetaRefExpression_Int) {
-      if (menu.rows.length) {
-        menu.rows.push(new Menu.ExpressionMenuSeparator);
-      }
       menu.rows.push(this.getDisplayMenuIntegerRow(displayItem, onSetDisplayItem));
     } else if (type instanceof FmtDisplay.MetaRefExpression_String) {
-      if (menu.rows.length) {
-        menu.rows.push(new Menu.ExpressionMenuSeparator);
-      }
       menu.rows.push(this.getDisplayMenuTextRow(displayItem, onSetDisplayItem, 'String'));
     }
     // TODO negations
-    if (canRemove) {
-      if (menu.rows.length) {
-        menu.rows.push(new Menu.ExpressionMenuSeparator);
-      }
-      menu.rows.push(this.getDisplayMenuDefaultRow(undefined, onSetDisplayItem, false, 'Remove'));
-    }
     return menu;
   }
 
@@ -163,10 +139,9 @@ export abstract class GenericEditHandler {
   }
 
   private getDisplayMenuVariablesRow(variables: RenderedVariable[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
-    let variablesGroup = new Menu.ExpressionMenuItemList;
     let variablesRow = new Menu.StandardExpressionMenuRow;
     variablesRow.title = 'Variable';
-    variablesRow.subMenu = variablesGroup;
+    let variablesGroup = new Menu.ExpressionMenuItemList;
     variablesGroup.items = [];
     for (let variable of variables) {
       let variableItem = new Menu.ExpressionMenuItem;
@@ -184,7 +159,26 @@ export abstract class GenericEditHandler {
       variableItem.action = variableAction;
       variablesGroup.items.push(variableItem);
     }
+    variablesRow.subMenu = variablesGroup;
     return variablesRow;
+  }
+
+  private getDisplayMenuTemplatesRow(complexExpressionRequired: boolean, variables: RenderedVariable[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+    let templatesRow = new Menu.StandardExpressionMenuRow;
+    templatesRow.title = 'Template';
+    let templateMenu = new Menu.ExpressionMenu;
+    templateMenu.rows = [];
+    for (let template of this.templates.definitions) {
+      if (!complexExpressionRequired || template.parameters.length) {
+        let templateRow = this.getDisplayMenuTemplateRow(template, variables, displayItem, onSetDisplayItem, renderer);
+        templateMenu.rows.push(templateRow);
+        if (templateRow.selected) {
+          templatesRow.selected = true;
+        }
+      }
+    }
+    templatesRow.subMenu = templateMenu;
+    return templatesRow;
   }
 
   private getDisplayMenuTemplateRow(template: Fmt.Definition, variables: RenderedVariable[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, renderer: GenericRenderer): Menu.ExpressionMenuRow {
