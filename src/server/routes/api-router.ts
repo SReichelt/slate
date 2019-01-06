@@ -57,6 +57,7 @@ export function apiRouter() {
       let requestPath = decodeURI(request.url);
       let fileName = path.join(dataPath, requestPath);
       spawn('code', [fileName]);
+      response.sendStatus(200);
     });
   }
 
