@@ -1657,17 +1657,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Display.RenderedExpression[]): void {
     for (let param of parameters) {
       let paramType = param.type.expression;
-      if (paramType instanceof FmtHLM.MetaRefExpression_Constraint) {
-        continue;
-      }
-      let renderedVariable = this.renderVariable(param, indices);
       let auto = false;
       if (paramType instanceof FmtHLM.MetaRefExpression_Set
           || paramType instanceof FmtHLM.MetaRefExpression_Subset
           || paramType instanceof FmtHLM.MetaRefExpression_Element
           || paramType instanceof FmtHLM.MetaRefExpression_Symbol) {
         auto = paramType.auto instanceof FmtHLM.MetaRefExpression_true;
+      } else if (!(paramType instanceof FmtHLM.MetaRefExpression_Binding)) {
+        continue;
       }
+      let renderedVariable = this.renderVariable(param, indices);
       variables.push({
         param: param,
         display: renderedVariable,

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './ExpressionDialog.css';
+import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
 import Button from './Button';
 import Expression, { ExpressionInteractionHandler } from './Expression';
@@ -118,10 +119,15 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
         </tr>
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
+      let title: any = this.props.item.title;
+      if (title instanceof Display.RenderedExpression) {
+        title = <Expression expression={title}/>;
+      }
+      title = [title, ':'];
       return (
         <tr className={className}>
           <th className={'dialog-cell'}>
-            <Expression expression={this.props.item.parameter}/>
+            {title}
           </th>
           <td className={'dialog-cell'}>
             <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>

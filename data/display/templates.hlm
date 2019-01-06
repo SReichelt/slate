@@ -24,7 +24,7 @@ $Constraint(left: %Expr, right: %Expr): %Template {
   display = [left, ' : ', right]
 }
 
-$Function(function: %Expr, arguments: %Expr[], maxParenLevel: %Int = 2): %Template {
+$Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [
       $InnerParens(
@@ -35,7 +35,7 @@ $Function(function: %Expr, arguments: %Expr[], maxParenLevel: %Int = 2): %Templa
         body = $Group(
           items = arguments
         ),
-        style = '()'
+        style = style
       )
     ],
     minLevel = 3

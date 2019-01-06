@@ -16,6 +16,6 @@ export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
 }
 
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
-  parameter: Display.RenderedExpression;
+  title: string | Display.RenderedExpression;
   onGetValue: () => Display.RenderedExpression;
 }

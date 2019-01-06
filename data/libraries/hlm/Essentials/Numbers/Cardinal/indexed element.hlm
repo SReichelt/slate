@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks This definition is used to prove the equivalence of alternative definitions of [finiteness](../../Sets/finite).
+ */
 $"indexed element"(
   M: %Subset($../Natural/"Natural numbers"),
   n: %Element($../Natural/"Natural numbers"),
@@ -9,6 +12,11 @@ $"indexed element"(
   )),
   m: %Def($../Natural/minimum(M = {M}))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = M,
+    arguments = [n],
+    style = '[]'
+  )],
   definition = [%structuralCases(
     n,
     $../Natural/"Natural numbers",

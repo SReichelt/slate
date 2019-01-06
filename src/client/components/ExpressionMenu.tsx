@@ -137,11 +137,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
           );
         }
       }
-      let title: any;
-      if (row.title instanceof Display.RenderedExpression) {
-        title = <Expression expression={row.title} key={'title'}/>;
-      } else {
-        title = row.title;
+      let title: any = row.title;
+      if (title instanceof Display.RenderedExpression) {
+        title = <Expression expression={title} key={'title'}/>;
       }
       let titleCellClassName = 'open-menu-title-cell';
       let titleAction: Menu.ExpressionMenuAction | undefined = undefined;
