@@ -89,10 +89,10 @@ export abstract class GenericRenderer {
     return expression;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[]): Display.RenderedExpression {
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.RenderedExpression {
     let semanticLink = new Display.SemanticLink(linkedObject, true);
     if (this.editHandler) {
-      this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, this);
+      this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, isPredicate, this);
     }
     expression.semanticLinks = [semanticLink];
     return expression;

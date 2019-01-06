@@ -50,6 +50,7 @@
 
 .open-menu-title-cell {
   position: relative;
+  white-space: nowrap;
 }
 
 .open-menu-title-cell.clickable, .open-menu-item.clickable {

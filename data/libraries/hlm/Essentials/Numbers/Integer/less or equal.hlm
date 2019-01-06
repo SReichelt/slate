@@ -4,8 +4,8 @@ $"less or equal"(
   a: %Element(
     $Integers,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_a: %Element($../Natural/"Natural numbers"),
         m_a: %Element(%previous)
       ),
@@ -15,8 +15,8 @@ $"less or equal"(
   b: %Element(
     %previous,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_b: %Element($../Natural/"Natural numbers"),
         m_b: %Element(%previous)
       ),
@@ -24,6 +24,16 @@ $"less or equal"(
     }
   )
 ): %Predicate {
+  display = [
+    $Relation(
+      symbol = %neg('≤', '≰'),
+      operands = [a, b]
+    ),
+    $Relation(
+      symbol = %neg('≥', '≱'),
+      operands = [b, a]
+    )
+  ],
   definition = [$../Natural/"less or equal"(
     m = {$../Natural/sum(
       m = {n_a},

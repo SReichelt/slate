@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks This definition is used to prove the equivalence of alternative definitions of [finiteness](../../Sets/finite).
+ * @remarks This definition is used to prove the equivalence of alternative definitions of [finiteness](../../Sets/finite). It should probably be refactored into an operator that produces a finite sequence from a finite set of natural numbers.
  */
 $"indexed element"(
   M: %Subset($../Natural/"Natural numbers"),

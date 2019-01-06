@@ -1,6 +1,10 @@
 %../../../../../logics/hlm%
 
 $Divisors(b: %Element($Integers)): %SetOperator {
+  display = [$Function(
+    function = 'Div',
+    arguments = [b]
+  )],
   definition = [%subset(
     #(a: %Element($"Nonzero numbers")),
     $divisible(

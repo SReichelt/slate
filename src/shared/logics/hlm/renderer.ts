@@ -1090,7 +1090,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addRenderedVariables(definition.parameters, variables);
         return variables;
       };
-      this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault, onGetVariables);
+      let isPredicate = contents instanceof FmtHLM.ObjectContents_Predicate;
+      this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault, onGetVariables, isPredicate);
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
         let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
@@ -1104,7 +1105,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             this.addRenderedVariables(innerDefinition.parameters, variables);
             return variables;
           };
-          this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault, onGetConstructorVariables);
+          this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault, onGetConstructorVariables, false);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;

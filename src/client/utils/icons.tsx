@@ -9,7 +9,9 @@ export enum ButtonType {
   Cancel,
   Edit,
   OpenLocally,
-  ViewSource
+  ViewSource,
+  RightArrow,
+  DownArrow
 }
 
 export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): any {
@@ -37,6 +39,18 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
     );
   case ButtonType.ViewSource:
     return '{⋯}';
+  case ButtonType.RightArrow:
+    return (
+      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+        <path d="M -5 -6 L 5 0 L -5 6 z" fill={enabled ? 'black' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+      </svg>
+    );
+  case ButtonType.DownArrow:
+    return (
+      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+        <path d="M -6 -5 L 0 5 L 6 -5 z" fill={enabled ? 'black' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
+      </svg>
+    );
   default:
     return null;
   }

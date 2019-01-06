@@ -6,7 +6,7 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryD
 import Expression from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
-import { getDefinitionIcon } from '../utils/icons';
+import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
 
 const ToolTip = require('react-portal-tooltip').default;
 
@@ -160,12 +160,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       }
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       if (this.state.opened) {
-        icon = '▼';
+        icon = getButtonIcon(ButtonType.DownArrow);
         if (this.definitionPromise) {
           contents = <LibraryTree libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.definitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
         }
       } else {
-        icon = '▶';
+        icon = getButtonIcon(ButtonType.RightArrow);
       }
     }
     if (display === undefined) {

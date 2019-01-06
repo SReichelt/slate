@@ -33,5 +33,10 @@ $Sequences(S: %Set): %Construction {
   display = [$Power(
     base = S,
     exponent = 'ℕ'
-  )]
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    singularName = ['sequence on ', S],
+    pluralName = ['sequences on ', S]
+  }
 }

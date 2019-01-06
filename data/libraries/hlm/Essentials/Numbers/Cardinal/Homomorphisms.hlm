@@ -20,6 +20,16 @@ $Homomorphisms(
     function = 'Hom',
     arguments = [𝔵, 𝔶]
   )],
+  definitionDisplay = {
+    parameter = #(φ: %Expr),
+    display = [$FunctionDefinition(
+      function = φ,
+      symbol = '→',
+      operands = [𝔵, 𝔶]
+    )],
+    singularName = 'homomorphism',
+    pluralName = 'homomorphisms'
+  },
   definition = [$../../Functions/Functions(
     X = {X},
     Y = {Y}

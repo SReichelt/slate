@@ -121,7 +121,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
       let title: any = this.props.item.title;
       if (title instanceof Display.RenderedExpression) {
-        title = <Expression expression={title}/>;
+        title = <Expression expression={title} key={'title'}/>;
       }
       title = [title, ':'];
       return (
@@ -130,7 +130,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
             {title}
           </th>
           <td className={'dialog-cell'}>
-            <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
+            <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler} key={'value'}/>
           </td>
         </tr>
       );
