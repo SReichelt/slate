@@ -28,10 +28,12 @@ export abstract class GenericEditHandler {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
       this.addDisplayMenuRows(menu.rows, displayItem, onSetDisplayItem, defaultValue, variables, type, !display, true, false, isPredicate, renderer);
-      menu.rows.push(
-        new Menu.ExpressionMenuSeparator,
-        this.getDisplayMenuAlternativesRow(display, onSetDisplay, variables, true, isPredicate, renderer)
-      );
+      if (variables.length > 1) {
+        menu.rows.push(
+          new Menu.ExpressionMenuSeparator,
+          this.getDisplayMenuAlternativesRow(display, onSetDisplay, variables, true, isPredicate, renderer)
+        );
+      }
       return menu;
     };
   }
