@@ -13,9 +13,9 @@ $Preimage(
   S: %Subset(Y)
 ): %SetOperator {
   display = [$Function(
-    function = $Power(
-      base = f,
-      exponent = '-1'
+    function = $SubSup(
+      body = f,
+      sup = '-1'
     ),
     arguments = [S]
   )],

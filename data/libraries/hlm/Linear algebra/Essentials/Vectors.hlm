@@ -4,9 +4,9 @@ $Vectors(
   S: %Set,
   n: %Element($../../Essentials/Numbers/Natural/"Natural numbers")
 ): %SetOperator {
-  display = [$Power(
-    base = S,
-    exponent = n
+  display = [$SubSup(
+    body = S,
+    sup = n
   )],
   definition = [$Matrices(
     S = {S},

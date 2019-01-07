@@ -1,7 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers.
+ */
 $cardinals: %ExplicitOperator {
-  display = ['𝓒𝓻𝓭'],
+  display = ['𝓢𝓮𝓽'],
   definition = [$Categories.category(
       O = {$../../Essentials/Numbers/Cardinal/"Cardinal numbers"},
       a = {

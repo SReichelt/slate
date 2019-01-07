@@ -35,9 +35,9 @@ $Matrices(
     )]
   }
 
-  display = [$Power(
-    base = S,
-    exponent = $Operator(
+  display = [$SubSup(
+    body = S,
+    sup = $Operator(
       symbol = '×',
       operands = [m, n],
       space = ''

@@ -4,9 +4,9 @@ $"reflexive transitive closure"(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
 ): %ExplicitOperator {
-  display = [$Power(
-    base = ≺,
-    exponent = '∗'
+  display = [$SubSup(
+    body = ≺,
+    sup = '∗'
   )],
   definition = [
     $closure(

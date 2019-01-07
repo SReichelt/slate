@@ -13,9 +13,9 @@ $opposite(
     }
   )
 ): %ExplicitOperator {
-  display = [$Power(
-    base = ≺,
-    exponent = 'op'
+  display = [$SubSup(
+    body = ≺,
+    sup = 'op'
   )],
   definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
       #(x: %Element(

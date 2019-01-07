@@ -4,9 +4,9 @@ $power(
   a: %Element($"Real numbers"),
   n: %Element($../Natural/"Natural numbers")
 ): %ExplicitOperator {
-  display = [$Power(
-    base = a,
-    exponent = n
+  display = [$SubSup(
+    body = a,
+    sup = n
   )],
   definition = [%structuralCases(
     n,

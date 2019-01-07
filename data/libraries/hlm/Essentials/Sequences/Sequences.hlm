@@ -2,7 +2,7 @@
 
 $Sequences(S: %Set(auto = %true)): %Construction {
   $sequence(n: %Binding(
-    $"../Numbers/Natural/Natural numbers",
+    $../Numbers/Natural/"Natural numbers",
     #(a: %Element(S))
   )): %Constructor {
     display = [$SubSup(
@@ -15,24 +15,24 @@ $Sequences(S: %Set(auto = %true)): %Construction {
     )],
     equalityDefinition = {
       leftParameters = #(n: %Binding(
-        $"../Numbers/Natural/Natural numbers",
+        $../Numbers/Natural/"Natural numbers",
         #(a: %Element(S))
       )),
       rightParameters = #(n: %Binding(
-        $"../Numbers/Natural/Natural numbers",
+        $../Numbers/Natural/"Natural numbers",
         #("a'": %Element(S))
       )),
       definition = [%forall(
-        #(n: %Element($"../Numbers/Natural/Natural numbers")),
+        #(n: %Element($../Numbers/Natural/"Natural numbers")),
         %equals(a[n], "a'"[n])
       )],
       isomorphic = %true
     }
   }
 
-  display = [$Power(
-    base = S,
-    exponent = 'ℕ'
+  display = [$SubSup(
+    body = S,
+    sup = 'ℕ'
   )],
   definitionDisplay = {
     parameter = #(a: %Expr),

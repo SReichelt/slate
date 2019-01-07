@@ -141,30 +141,30 @@ $Categories: %Construction {
   ): %Constructor {
     display = [$Tuple(
       items = [
-        $EqualityDefinition(
-          left = 'Obj',
-          right = O
+        $Argument(
+          param = 'Obj',
+          value = O
         ),
-        $EqualityDefinition(
-          left = $SubSup(
+        $Argument(
+          param = $SubSup(
             body = 'Mor',
             sub = $Group(items = [a, b])
           ),
-          right = M
+          value = M
         ),
-        $EqualityDefinition(
-          left = $SubSup(
+        $Argument(
+          param = $SubSup(
             body = 'id',
             sub = c
           ),
-          right = i
+          value = i
         ),
-        $EqualityDefinition(
-          left = $SubSup(
+        $Argument(
+          param = $SubSup(
             body = '∘',
             sub = $Group(items = [d, e, f])
           ),
-          right = ∘
+          value = ∘
         )
       ],
       separator = ', ',

@@ -147,6 +147,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         semanticLinks = expression.semanticLinks;
       }
     }
+    if ((optionalParenLeft || optionalParenRight)
+        && optionalParenMaxLevel === undefined
+        && (expression instanceof Display.SubSupExpression || expression instanceof Display.OverUnderExpression || expression instanceof Display.FractionExpression)) {
+      return this.renderExpression(new Display.ParenExpression(expression, optionalParenStyle), className, semanticLinks);
+    }
     let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
     if (semanticLinks) {
       for (let semanticLink of semanticLinks) {
@@ -425,7 +430,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
-        let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>];
+        let bodyWithParens = new Display.InnerParenExpression(subSupExpression.body);
+        let subSupResult: any = [<Expression expression={bodyWithParens} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>];
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (subSupExpression.sub) {
             subSupResult.push(<sub key="sub"><Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);
@@ -528,6 +534,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = renderPromise(render);
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
+      let bodyWithParens = new Display.InnerParenExpression(expression.body);
       let over: any = expression.over ? <Expression expression={expression.over} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let under: any = expression.under ? <Expression expression={expression.under} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       result = [
@@ -541,7 +548,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         (
           <span className={'overunder-body-row'} key="body">
             <span className={'overunder-body'}>
-              <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
+              <Expression expression={bodyWithParens} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           </span>
         ),

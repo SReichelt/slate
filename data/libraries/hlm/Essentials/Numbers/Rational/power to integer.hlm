@@ -14,9 +14,9 @@ $"power to integer"(
     )
   ))
 ): %ExplicitOperator {
-  display = [$Power(
-    base = a,
-    exponent = b
+  display = [$SubSup(
+    body = a,
+    sup = b
   )],
   definition = [%cases([
     {

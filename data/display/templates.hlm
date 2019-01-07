@@ -68,6 +68,10 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
   )
 }
 
+$Argument(param: %Expr, value: %Expr): %Template {
+  display = [param, ': ', value]
+}
+
 $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = %for(
@@ -80,16 +84,6 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
       separator = [space, symbol, space]
     ),
     minLevel = minParenLevel
-  )
-}
-
-$AssociativeOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int): %Template {
-  display = $Operator(
-    symbol = symbol,
-    operands = operands,
-    space = space,
-    minParenLevel = parenLevel,
-    maxParenLevel = %add(parenLevel, -1)
   )
 }
 
@@ -244,53 +238,6 @@ $MultiProperty(operands: %Expr[], property: %String): %Template {
       ),
       property
     ]
-  )
-}
-
-$Sum(first: %Expr, second: %Expr): %Template {
-  display = $AssociativeOperator(
-    symbol = '+',
-    operands = [first, second],
-    parenLevel = 1
-  )
-}
-
-$Difference(minuend: %Expr, subtrahend: %Expr): %Template {
-  display = $AssociativeOperator(
-    symbol = '−',
-    operands = [minuend, subtrahend],
-    parenLevel = 1
-  )
-}
-
-$Product(first: %Expr, second: %Expr): %Template {
-  display = $AssociativeOperator(
-    symbol = '⋅',
-    operands = [first, second],
-    space = ' ',
-    parenLevel = 2
-  )
-}
-
-$Quotient(numerator: %Expr, denominator: %Expr): %Template {
-  display = $OuterParens(
-    body = $Fraction(
-      numerator = numerator,
-      denominator = denominator
-    ),
-    minLevel = 3
-  )
-}
-
-$Power(base: %Expr, exponent: %Expr): %Template {
-  display = $OuterParens(
-    body = $SubSup(
-      body = $InnerParens(
-        body = base
-      ),
-      sup = exponent
-    ),
-    minLevel = 3
   )
 }
 

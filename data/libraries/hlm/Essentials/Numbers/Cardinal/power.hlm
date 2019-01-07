@@ -16,9 +16,9 @@ $power(
     }
   )
 ): %ExplicitOperator {
-  display = [$Power(
-    base = 𝔵,
-    exponent = 𝔶
+  display = [$SubSup(
+    body = 𝔵,
+    sup = 𝔶
   )],
   definition = [$"Cardinal numbers".cardinality(S = {$../../Functions/Functions(
       X = {Y},
