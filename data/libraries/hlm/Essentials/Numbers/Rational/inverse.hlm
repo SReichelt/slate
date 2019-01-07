@@ -13,7 +13,6 @@ $inverse(a: %Element(
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
-    space = '',
     minParenLevel = 1,
     maxParenLevel = 1
   )],

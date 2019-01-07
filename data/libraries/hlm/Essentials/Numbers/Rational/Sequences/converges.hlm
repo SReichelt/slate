@@ -8,14 +8,13 @@ $converges(
       parameters = #(n: %Binding(
         $../../Natural/"Natural numbers",
         #(a: %Element($../"Rational numbers"))
-      )),
-      override = %true
+      ))
     }
   ),
   l: %Element($../"Rational numbers")
 ): %Predicate {
-  display = [$Relation(
-    symbol = '→',
+  display = [$TextualRelation(
+    symbol = %neg('converges to', 'does not converge to'),
     operands = [α, l]
   )],
   definition = [%forall(

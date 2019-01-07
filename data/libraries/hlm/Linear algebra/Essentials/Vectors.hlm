@@ -4,6 +4,10 @@ $Vectors(
   S: %Set,
   n: %Element($../../Essentials/Numbers/Natural/"Natural numbers")
 ): %SetOperator {
+  display = [$Power(
+    base = S,
+    exponent = n
+  )],
   definition = [$Matrices(
     S = {S},
     m = {$../../Essentials/Numbers/Natural/number(value = 1)},

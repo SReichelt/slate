@@ -7,6 +7,17 @@ $"inductive sum (exclusive)"(
     #(a: %Element($../"Real numbers"))
   )
 ): %ExplicitOperator {
+  display = [$LargeOperator(
+    symbol = '∑',
+    operand = a,
+    under = $Relation(
+      symbol = '<',
+      operands = [i, n],
+      space = ' '
+    ),
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [%structuralCases(
     n,
     $../../Natural/"Natural numbers",

@@ -360,7 +360,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 this.setSemanticLink(variableDisplay, definitionRef);
               }
               if (!(state.abbreviate && definitionDisplay.nameOptional instanceof FmtDisplay.MetaRefExpression_true)) {
-                if (definitionDisplay.singularName) {
+                if (definitionDisplay.singularName && (!state.abbreviate || definitionDisplay.singularName instanceof Fmt.StringExpression)) {
                   singular = this.renderDisplayExpression(definitionDisplay.singularName, args);
                   this.setSemanticLink(singular, definitionRef);
                   if (definitionDisplay.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
@@ -423,8 +423,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           } else {
             if (parameters.length === 1 && !state.inDefinitionDisplayGroup) {
               let singularStart = singular;
-              while (singularStart instanceof Display.RowExpression && singularStart.items.length) {
-                singularStart = singularStart.items[0];
+              for (;;) {
+                if (singularStart instanceof Display.RowExpression && singularStart.items.length) {
+                  singularStart = singularStart.items[0];
+                } else if (singularStart instanceof Display.IndirectExpression) {
+                  singularStart = singularStart.resolve();
+                } else {
+                  break;
+                }
               }
               let article = 'a';
               if (singularStart instanceof Display.TextExpression && singularStart.text.length) {
@@ -1658,16 +1664,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Display.RenderedExpression[]): void {
     for (let param of parameters) {
       let paramType = param.type.expression;
+      let renderedVariable: Display.RenderedExpression;
       let auto = false;
       if (paramType instanceof FmtHLM.MetaRefExpression_Set
           || paramType instanceof FmtHLM.MetaRefExpression_Subset
           || paramType instanceof FmtHLM.MetaRefExpression_Element
           || paramType instanceof FmtHLM.MetaRefExpression_Symbol) {
+        renderedVariable = this.renderVariable(param, indices);
         auto = paramType.auto instanceof FmtHLM.MetaRefExpression_true;
-      } else if (!(paramType instanceof FmtHLM.MetaRefExpression_Binding)) {
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+        renderedVariable = this.renderVariable(param);
+      } else {
         continue;
       }
-      let renderedVariable = this.renderVariable(param, indices);
       variables.push({
         param: param,
         display: renderedVariable,

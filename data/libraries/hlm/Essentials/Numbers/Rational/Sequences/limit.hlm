@@ -11,5 +11,14 @@ $limit(
   })),
   _1: %Constraint($convergent(α = {α}))
 ): %ExplicitOperator {
+  display = [$OverUnderOperator(
+    symbol = 'lim',
+    operand = a,
+    under = $Relation(
+      symbol = '→',
+      operands = [n, '∞'],
+      space = ''
+    )
+  )],
   definition = [$"sequence limit"(α = {α})]
 }

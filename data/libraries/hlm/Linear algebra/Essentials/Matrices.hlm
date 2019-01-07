@@ -14,5 +14,33 @@ $Matrices(
       $../../Essentials/Numbers/Natural/"Segment (less)"(n = {n}),
       #(a: %Element(S))
     ))
-  )): %Constructor {}
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = a,
+        style = '()'
+      ),
+      sub = $Group(items = [
+        $Relation(
+          symbol = '<',
+          operands = [i, m],
+          space = ''
+        ),
+        $Relation(
+          symbol = '<',
+          operands = [j, n],
+          space = ''
+        )
+      ])
+    )]
+  }
+
+  display = [$Power(
+    base = S,
+    exponent = $Operator(
+      symbol = '×',
+      operands = [m, n],
+      space = ''
+    )
+  )]
 }

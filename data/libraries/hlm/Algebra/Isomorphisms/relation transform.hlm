@@ -9,6 +9,11 @@ $"relation transform"(
   )),
   ≺: %Element($../../Essentials/Relations/Relations(S = {X}))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = φ,
+    arguments = [≺],
+    style = '[]'
+  )],
   definition = [$../../Essentials/Relations/Relations(S = {Y}).relation(R = {%subset(
       #(y: %Element(
         $../../Essentials/Sets/"Cartesian product"(
@@ -16,14 +21,15 @@ $"relation transform"(
           T = {Y}
         ),
         shortcut = {
-          $../../Essentials/Sets/"Cartesian product"(
+          constructor = $../../Essentials/Sets/"Cartesian product"(
               S = {Y},
               T = {Y}
             ).pair,
-          #(
+          parameters = #(
             s: %Element(Y),
             t: %Element(Y)
-          )
+          ),
+          override = %true
         }
       )),
       $../../Essentials/Relations/related(

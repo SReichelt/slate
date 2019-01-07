@@ -4,8 +4,8 @@ $Homomorphisms(
   𝔐: %Element(
     $Magmas,
     shortcut = {
-      $Magmas.magma,
-      #(
+      constructor = $Magmas.magma,
+      parameters = #(
         M: %Set,
         ∗: %Element($../../Essentials/Functions/Functions(
           X = {$../../Essentials/Sets/"Cartesian product"(
@@ -20,8 +20,8 @@ $Homomorphisms(
   𝔑: %Element(
     %previous,
     shortcut = {
-      $Magmas.magma,
-      #(
+      constructor = $Magmas.magma,
+      parameters = #(
         N: %Set,
         ⋆: %Element($../../Essentials/Functions/Functions(
           X = {$../../Essentials/Sets/"Cartesian product"(
@@ -34,6 +34,20 @@ $Homomorphisms(
     }
   )
 ): %SetOperator {
+  display = [$Function(
+    function = 'Hom',
+    arguments = [𝔐, 𝔑]
+  )],
+  definitionDisplay = {
+    parameter = #(φ: %Expr),
+    display = [$FunctionDefinition(
+      function = φ,
+      symbol = '→',
+      operands = [𝔐, 𝔑]
+    )],
+    singularName = 'homomorphism',
+    pluralName = 'homomorphisms'
+  },
   definition = [%subset(
     #(f: %Element($../../Essentials/Functions/Functions(
       X = {M},

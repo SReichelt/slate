@@ -1,6 +1,6 @@
 %../../../../logics/hlm%
 
-$Sequences(S: %Set): %Construction {
+$Sequences(S: %Set(auto = %true)): %Construction {
   $sequence(n: %Binding(
     $"../Numbers/Natural/Natural numbers",
     #(a: %Element(S))

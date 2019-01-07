@@ -19,7 +19,7 @@ $"morphism transform"(
     X = {X_3},
     Y = {Y_3}
   )),
-  ∘: %Element($../../Essentials/Functions/Functions(
+  ∙: %Element($../../Essentials/Functions/Functions(
     X = {$../../Essentials/Sets/"Cartesian product"(
       S = {X_1},
       T = {X_2}
@@ -27,6 +27,11 @@ $"morphism transform"(
     Y = {X_3}
   ))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = $Tuple(items = [φ_1, φ_2, φ_3]),
+    arguments = [∙],
+    style = '[]'
+  )],
   definition = [$../../Essentials/Functions/composition(
     X = {$../../Essentials/Sets/"Cartesian product"(
       S = {Y_1},
@@ -45,7 +50,7 @@ $"morphism transform"(
         T = {X_2}
       )},
       Z = {X_3},
-      g = {∘},
+      g = {∙},
       f = {$../../Essentials/Functions/inverse(
         X = {$../../Essentials/Sets/"Cartesian product"(
           S = {X_1},

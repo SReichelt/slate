@@ -3,8 +3,8 @@
 $identity(𝔐: %Element(
   $Magmas,
   shortcut = {
-    $Magmas.magma,
-    #(
+    constructor = $Magmas.magma,
+    parameters = #(
       M: %Set,
       ∗: %Element($../../Essentials/Functions/Functions(
         X = {$../../Essentials/Sets/"Cartesian product"(
@@ -16,5 +16,9 @@ $identity(𝔐: %Element(
     )
   }
 )): %ExplicitOperator {
+  display = [$SubSup(
+    body = 'id',
+    sub = 𝔐
+  )],
   definition = [$../../Essentials/Functions/identity(X = {M})]
 }

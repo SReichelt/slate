@@ -1,6 +1,11 @@
 %../../../../../logics/hlm%
 
 $"Segment (greater)"(a: %Element($Integers)): %SetOperator {
+  display = [$Segment(
+    set = 'ℤ',
+    symbol = '>',
+    limit = a
+  )],
   definition = [
     %subset(
       #(b: %Element($Integers)),

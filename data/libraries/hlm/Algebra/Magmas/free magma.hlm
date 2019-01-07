@@ -4,6 +4,13 @@ $"free magma"(
   S: %Set,
   T: %SetDef($"Binary trees"(S = {S}))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = $SubSup(
+      body = 'free',
+      sub = '𝓜𝓰𝓶'
+    ),
+    arguments = [S]
+  )],
   definition = [$Magmas.magma(
       S = {T},
       ∗ = {$../../Essentials/Functions/Functions(
@@ -19,11 +26,11 @@ $"free magma"(
               T = {T}
             ),
             shortcut = {
-              $../../Essentials/Sets/"Cartesian product"(
+              constructor = $../../Essentials/Sets/"Cartesian product"(
                   S = {T},
                   T = {T}
                 ).pair,
-              #(
+              parameters = #(
                 a: %Element(T),
                 b: %Element(T)
               ),

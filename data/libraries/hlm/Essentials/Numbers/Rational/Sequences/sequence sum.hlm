@@ -4,26 +4,30 @@ $"sequence sum"(
   α: %Element(
     $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
     shortcut = {
-      $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
-      #(n: %Binding(
+      constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+      parameters = #(n: %Binding(
         $../../Natural/"Natural numbers",
         #(a: %Element($../"Rational numbers"))
-      )),
-      override = %true
+      ))
     }
   ),
   β: %Element(
     %previous,
     shortcut = {
-      $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
-      #(n: %Binding(
+      constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+      parameters = #(n: %Binding(
         $../../Natural/"Natural numbers",
         #(b: %Element($../"Rational numbers"))
-      )),
-      override = %true
+      ))
     }
   )
 ): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '+',
+    operands = [α, β],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
   definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
       #(n: %Element($../../Natural/"Natural numbers")),
       {a = {$../sum(

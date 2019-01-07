@@ -139,6 +139,37 @@ $Categories: %Construction {
       %equals(s, t)
     ))
   ): %Constructor {
+    display = [$Tuple(
+      items = [
+        $EqualityDefinition(
+          left = 'Obj',
+          right = O
+        ),
+        $EqualityDefinition(
+          left = $SubSup(
+            body = 'Mor',
+            sub = $Group(items = [a, b])
+          ),
+          right = M
+        ),
+        $EqualityDefinition(
+          left = $SubSup(
+            body = 'id',
+            sub = c
+          ),
+          right = i
+        ),
+        $EqualityDefinition(
+          left = $SubSup(
+            body = '∘',
+            sub = $Group(items = [d, e, f])
+          ),
+          right = ∘
+        )
+      ],
+      separator = ', ',
+      style = '[]'
+    )],
     equalityDefinition = {
       leftParameters = #(
         O: %Set,
@@ -527,7 +558,7 @@ $Categories: %Construction {
                 φ_1 = {ψ[d,e]},
                 φ_2 = {ψ[e,f]},
                 φ_3 = {ψ[d,f]},
-                ∘ = {∘[d,e,f]}
+                ∙ = {∘[d,e,f]}
               ),
               "∘'"[
                 $../../Algebra/Isomorphisms/"element transform"(
@@ -556,4 +587,6 @@ $Categories: %Construction {
       isomorphic = %true
     }
   }
+
+  display = ['𝓒𝓪𝓽']
 }

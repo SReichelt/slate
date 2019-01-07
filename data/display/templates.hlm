@@ -20,6 +20,16 @@ $Group(items: %Expr[], separator: %Expr = ', '): %Template {
   )
 }
 
+$Tuple(items: %Expr[], separator: %Expr = ', ', style: %String = '()'): %Template {
+  display = $Parens(
+    body = $Group(
+      items = items,
+      separator = separator
+    ),
+    style = style
+  )
+}
+
 $Constraint(left: %Expr, right: %Expr): %Template {
   display = [left, ' : ', right]
 }
@@ -93,7 +103,7 @@ $UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel
   )
 }
 
-$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [symbol, space, $InnerParens(
       body = operand,
@@ -110,6 +120,15 @@ $Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %I
     space = space,
     minParenLevel = parenLevel,
     maxParenLevel = parenLevel
+  )
+}
+
+$TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Template {
+  display = $Relation(
+    symbol = symbol,
+    operands = operands,
+    space = ' ',
+    parenLevel = parenLevel
   )
 }
 
@@ -140,14 +159,11 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', paren
   )
 }
 
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
   display = $OuterParens(
     body = [
       $OverUnder(
-        body = $Style(
-          body = symbol,
-          styleClass = 'largesym'
-        ),
+        body = symbol,
         over = over,
         under = under
       ),
@@ -158,6 +174,21 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
       )
     ],
     minLevel = minParenLevel
+  )
+}
+
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+  display = $OverUnderOperator(
+    symbol = $Style(
+      body = symbol,
+      styleClass = 'largesym'
+    ),
+    operand = operand,
+    over = over,
+    under = under,
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
   )
 }
 
@@ -195,25 +226,25 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
 }
 
 $Property(operand: %Expr, property: %String, article?: %String): %Template {
-  display = [
-    operand,
-    %neg(' is ', ' is not '),
-    %opt(article, [article, ' ']),
-    property
-  ]
+  display = $TextualRelation(
+    symbol = [%neg('is', 'is not'), %opt(article, [' ', article])],
+    operands = [operand, property]
+  )
 }
 
 $MultiProperty(operands: %Expr[], property: %String): %Template {
-  display = [
-    %for(
-      param = operands,
-      dimension = 0,
-      item = operands,
-      separator = ' and '
-    ),
-    %neg(' are ', ' are not '),
-    property
-  ]
+  display = $TextualRelation(
+    symbol = %neg('are', 'are not'),
+    operands = [
+      %for(
+        param = operands,
+        dimension = 0,
+        item = operands,
+        separator = ' and '
+      ),
+      property
+    ]
+  )
 }
 
 $Sum(first: %Expr, second: %Expr): %Template {
@@ -523,8 +554,7 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
     body = set,
     sub = $PrefixUnaryOperator(
       symbol = symbol,
-      operand = limit,
-      space = ''
+      operand = limit
     )
   )
 }

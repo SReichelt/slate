@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks Strictly speaking, the elements of this set are not magmas but isomorphism classes of magmas. Due to the rules of HLM, it is not even possible to define magmas (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not less.
+ */
 $Magmas: %Construction {
   $magma(
     S: %Set,
@@ -11,6 +14,10 @@ $Magmas: %Construction {
       Y = {S}
     ))
   ): %Constructor {
+    display = [$Tuple(
+      items = [S, ∗],
+      style = '[]'
+    )],
     equalityDefinition = {
       leftParameters = #(
         S: %Set,
@@ -49,5 +56,12 @@ $Magmas: %Construction {
       )],
       isomorphic = %true
     }
+  }
+
+  display = ['𝓜𝓰𝓶'],
+  definitionDisplay = {
+    parameter = #(𝔐: %Expr),
+    singularName = ['magma'],
+    pluralName = ['magmas']
   }
 }

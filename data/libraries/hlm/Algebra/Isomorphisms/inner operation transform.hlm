@@ -15,6 +15,11 @@ $"inner operation transform"(
     Y = {X}
   ))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = φ,
+    arguments = [∗],
+    style = '[]'
+  )],
   definition = [$../../Essentials/Functions/composition(
     X = {$../../Essentials/Sets/"Cartesian product"(
       S = {Y},

@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Positional notation is implemented as a macro, i.e. using additional code that is injected into the proof checker.
+ */
 $number(value: %Nat): %MacroOperator {
   display = [value]
 }

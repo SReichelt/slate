@@ -28,7 +28,8 @@ $Homomorphisms(
       operands = [𝔵, 𝔶]
     )],
     singularName = 'homomorphism',
-    pluralName = 'homomorphisms'
+    pluralName = 'homomorphisms',
+    nameOptional = %true
   },
   definition = [$../../Functions/Functions(
     X = {X},

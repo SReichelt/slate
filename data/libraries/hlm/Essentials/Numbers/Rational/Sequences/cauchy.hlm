@@ -7,8 +7,7 @@ $cauchy(α: %Element(
     parameters = #(n: %Binding(
       $../../Natural/"Natural numbers",
       #(a: %Element($../"Rational numbers"))
-    )),
-    override = %true
+    ))
   }
 )): %Predicate {
   display = [$Property(

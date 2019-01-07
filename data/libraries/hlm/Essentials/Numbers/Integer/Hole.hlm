@@ -1,6 +1,11 @@
 %../../../../../logics/hlm%
 
 $Hole(a: %Element($Integers)): %SetOperator {
+  display = [$Segment(
+    set = 'ℤ',
+    symbol = '≠',
+    limit = a
+  )],
   definition = [
     %subset(
       #(b: %Element($Integers)),

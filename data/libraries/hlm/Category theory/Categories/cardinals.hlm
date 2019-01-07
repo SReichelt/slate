@@ -1,6 +1,7 @@
 %../../../../logics/hlm%
 
 $cardinals: %ExplicitOperator {
+  display = ['𝓒𝓻𝓭'],
   definition = [$Categories.category(
       O = {$../../Essentials/Numbers/Cardinal/"Cardinal numbers"},
       a = {
@@ -51,7 +52,7 @@ $cardinals: %ExplicitOperator {
                     )}
                   ),
                   shortcut = {
-                    $../../Essentials/Sets/"Cartesian product"(
+                    constructor = $../../Essentials/Sets/"Cartesian product"(
                         S = {$../../Essentials/Numbers/Cardinal/Homomorphisms(
                           𝔵 = {𝔢},
                           𝔶 = {𝔣}
@@ -61,7 +62,7 @@ $cardinals: %ExplicitOperator {
                           𝔶 = {𝔢}
                         )}
                       ).pair,
-                    #(
+                    parameters = #(
                       φ: %Element($../../Essentials/Numbers/Cardinal/Homomorphisms(
                         𝔵 = {𝔢},
                         𝔶 = {𝔣}

@@ -5,6 +5,10 @@ $"Binary trees"(S: %Set(
   embedSubsets = %true
 )): %Construction {
   $leaf(s: %Element(S)): %Constructor {
+    display = [$Parens(
+      body = s,
+      style = '()'
+    )],
     equalityDefinition = {
       leftParameters = #(s: %Element(S)),
       rightParameters = #("s'": %Element(S)),
@@ -17,6 +21,11 @@ $"Binary trees"(S: %Set(
     a: %Element($"Binary trees"(S = {S})),
     b: %Element(%previous)
   ): %Constructor {
+    display = [$Operator(
+      symbol = '^',
+      operands = [a, b],
+      space = ''
+    )],
     equalityDefinition = {
       leftParameters = #(
         a: %Element($"Binary trees"(S = {S})),
@@ -34,6 +43,10 @@ $"Binary trees"(S: %Set(
     }
   }
 
+  display = [$Function(
+    function = '𝓑𝓣',
+    arguments = [S]
+  )],
   embedding = {
     parameter = #(x: %Element(S)),
     target = $"Binary trees".leaf(s = {x})

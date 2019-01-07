@@ -14,10 +14,7 @@ $"Cartesian product"(
     s: %Element(S),
     t: %Element(T)
   ): %Constructor {
-    display = [$Parens(
-      body = $Group(items = [s, t]),
-      style = '()'
-    )],
+    display = [$Tuple(items = [s, t])],
     equalityDefinition = {
       leftParameters = #(
         s: %Element(S),

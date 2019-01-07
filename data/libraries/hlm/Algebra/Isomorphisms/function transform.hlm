@@ -12,6 +12,11 @@ $"function transform"(
     Y = {X}
   ))
 ): %ExplicitOperator {
+  display = [$Function(
+    function = φ,
+    arguments = [f],
+    style = '[]'
+  )],
   definition = [$../../Essentials/Functions/composition(
     X = {Y},
     Y = {X},

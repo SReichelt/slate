@@ -1,6 +1,7 @@
 %../../../../logics/hlm%
 
 $magmas: %ExplicitOperator {
+  display = ['𝓜𝓰𝓶'],
   definition = [$Categories.category(
       O = {$../../Algebra/Magmas/Magmas},
       a = {
@@ -51,7 +52,7 @@ $magmas: %ExplicitOperator {
                     )}
                   ),
                   shortcut = {
-                    $../../Essentials/Sets/"Cartesian product"(
+                    constructor = $../../Essentials/Sets/"Cartesian product"(
                         S = {%setStructuralCases(
                           𝔈,
                           $../../Algebra/Magmas/Magmas,
@@ -211,7 +212,7 @@ $magmas: %ExplicitOperator {
                           }]
                         )}
                       ).pair,
-                    #(
+                    parameters = #(
                       φ: %Element(%setStructuralCases(
                         𝔈,
                         $../../Algebra/Magmas/Magmas,

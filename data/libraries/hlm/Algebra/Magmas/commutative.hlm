@@ -3,8 +3,8 @@
 $commutative(𝔐: %Element(
   $Magmas,
   shortcut = {
-    $Magmas.magma,
-    #(
+    constructor = $Magmas.magma,
+    parameters = #(
       M: %Set,
       ∗: %Element($../../Essentials/Functions/Functions(
         X = {$../../Essentials/Sets/"Cartesian product"(
@@ -16,6 +16,10 @@ $commutative(𝔐: %Element(
     )
   }
 )): %Predicate {
+  display = [$Property(
+    operand = 𝔐,
+    property = 'commutative'
+  )],
   definition = [%forall(
     #(
       a: %Element(M),

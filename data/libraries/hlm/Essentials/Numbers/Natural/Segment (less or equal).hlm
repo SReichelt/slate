@@ -6,13 +6,6 @@ $"Segment (less or equal)"(n: %Element($"Natural numbers")): %SetOperator {
     symbol = '≤',
     limit = n
   )],
-  definitionDisplay = {
-    parameter = #(m: %Expr),
-    display = [$Relation(
-      symbol = '≤',
-      operands = [m, n]
-    )]
-  },
   definition = [
     %subset(
       #(m: %Element($"Natural numbers")),

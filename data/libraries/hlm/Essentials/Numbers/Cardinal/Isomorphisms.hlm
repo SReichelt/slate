@@ -28,7 +28,8 @@ $Isomorphisms(
       operands = [𝔵, 𝔶]
     )],
     singularName = 'isomorphism',
-    pluralName = 'isomorphisms'
+    pluralName = 'isomorphisms',
+    nameOptional = %true
   },
   definition = [
     %subset(

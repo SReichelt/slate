@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks The definitions in this section are somewhat technical. Their purpose is to implement a general notion of “isomorphism” that makes it easy to check whether the equality definition of a structure only identifies isomorphic objects. In that case, no well-definedness proofs are necessary in situations where objects are decomposed, e.g. a magma into a set and an operation.
+ *
+ *          Each of the definitions transforms an object defined on *X* into the equivalent object defined on *Y*, according to the given bijection. The first definition is rather trivial.
+ */
 $"element transform"(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
@@ -9,6 +14,11 @@ $"element transform"(
   )),
   x: %Element(X)
 ): %ExplicitOperator {
+  display = [$Function(
+    function = φ,
+    arguments = [x],
+    style = '[]'
+  )],
   definition = [$../../Essentials/Functions/value(
     X = {X},
     Y = {Y},

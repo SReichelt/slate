@@ -1,6 +1,11 @@
 %../../../../../logics/hlm%
 
 $"Nonnegative numbers": %SetOperator {
+  display = [$SubSup(
+    body = 'ℚ',
+    sub = '0',
+    sup = '+'
+  )],
   definition = [
     $"Segment (greater or equal)"(a = {$../Natural/number(value = 0)}),
     %subset(

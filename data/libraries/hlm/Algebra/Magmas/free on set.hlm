@@ -4,8 +4,8 @@ $"free on set"(
   𝔐: %Element(
     $Magmas,
     shortcut = {
-      $Magmas.magma,
-      #(
+      constructor = $Magmas.magma,
+      parameters = #(
         M: %Set,
         ∗: %Element($../../Essentials/Functions/Functions(
           X = {$../../Essentials/Sets/"Cartesian product"(
@@ -19,6 +19,10 @@ $"free on set"(
   ),
   S: %Subset(M)
 ): %Predicate {
+  display = [$Property(
+    operand = 𝔐,
+    property = ['free on ', S]
+  )],
   definition = [
     %equals(
       𝔐,
@@ -29,8 +33,8 @@ $"free on set"(
         𝔑: %Element(
           $Magmas,
           shortcut = {
-            $Magmas.magma,
-            #(
+            constructor = $Magmas.magma,
+            parameters = #(
               N: %Set,
               ⋆: %Element($../../Essentials/Functions/Functions(
                 X = {$../../Essentials/Sets/"Cartesian product"(

@@ -22,6 +22,16 @@ $"less or equal"(
     }
   )
 ): %Predicate {
+  display = [
+    $Relation(
+      symbol = %neg('≤', '≰'),
+      operands = [a, b]
+    ),
+    $Relation(
+      symbol = %neg('≥', '≱'),
+      operands = [b, a]
+    )
+  ],
   definition = [$../Integer/"less or equal"(
     a = {$../Integer/product(
       a = {n_a},

@@ -108,41 +108,35 @@ p {
   display: table-cell;
 }
 
-.subsup-left-sub {
+.subsup-left-sub, .subsup-left-sup, .subsup-right-sub, .subsup-right-sup {
   display: table-cell;
+  font-size: smaller;
+  position: relative;
+  line-height: 100%;
+}
+
+.subsup-left-sub, .subsup-left-sup {
   text-align: right;
-  vertical-align: top;
-  font-size: smaller;
 }
 
-.subsup-left-sup {
-  display: table-cell;
-  text-align: right;
-  vertical-align: bottom;
-  font-size: smaller;
-}
-
-.subsup-right-sub {
-  display: table-cell;
+.subsup-right-sub, .subsup-right-sup {
   text-align: left;
-  vertical-align: top;
-  font-size: smaller;
 }
 
-.subsup-right-sup {
-  display: table-cell;
-  text-align: left;
+.subsup-left-sub, .subsup-right-sub {
+  vertical-align: top;
+  bottom: 0.1em;
+}
+
+.subsup-left-sup, .subsup-right-sup {
   vertical-align: bottom;
-  font-size: smaller;
 }
 
 .subsup-full-row>.subsup-left-sub, .subsup-full-row>.subsup-right-sub {
-  position: relative;
   bottom: 0.5em;
 }
 
 .subsup-full-row>.subsup-left-sup, .subsup-full-row>.subsup-right-sup {
-  position: relative;
   top: 0.5em;
 }
 
