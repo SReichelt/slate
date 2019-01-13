@@ -1,0 +1,36 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks In this library, “mapping” and “[function](../Functions/Functions)” are not synonymous but interchangeable, via a [definition](../Functions/mapping%20as%20function) that turns a mapping into a function. The difference is not fundamental but a matter of convenience.
+ *
+ * @references * https://en.wikipedia.org/wiki/Function_(mathematics)
+ *             * http://mathworld.wolfram.com/Function.html
+ *             * https://proofwiki.org/wiki/Definition:Mapping
+ */
+$mapping(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  ))
+): %Predicate {
+  display = [$Property(
+    property = 'mapping',
+    operand = ≺,
+    article = 'a'
+  )],
+  definition = [%forall(
+    #(s: %Element(S)),
+    %existsUnique(
+      #(t: %Element(T)),
+      formula = $related(
+        S = {S},
+        T = {S},
+        s = {s},
+        ≺ = {≺},
+        t = {t}
+      )
+    )
+  )]
+}

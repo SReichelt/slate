@@ -6,7 +6,7 @@
  */
 $transitive(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %Predicate {
   display = [$Property(
     operand = ≺,
@@ -19,12 +19,14 @@ $transitive(
       u: %Element(%previous),
       _1: %Constraint($related(
         S = {S},
+        T = {S},
         s = {s},
         ≺ = {≺},
         t = {t}
       )),
       _2: %Constraint($related(
         S = {S},
+        T = {S},
         s = {t},
         ≺ = {≺},
         t = {u}
@@ -32,6 +34,7 @@ $transitive(
     ),
     $related(
       S = {S},
+      T = {S},
       s = {s},
       ≺ = {≺},
       t = {u}

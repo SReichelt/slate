@@ -6,13 +6,14 @@
  */
 $converse(
   S: %Set(auto = %true),
+  T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}),
+    $Relations(S = {S}, T = {T}),
     shortcut = {
-      constructor = $Relations(S = {S}).relation,
+      constructor = $Relations(S = {S}, T = {T}).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       )))
     }
   )
@@ -24,23 +25,23 @@ $converse(
       styleClass = 'sans'
     )
   )],
-  definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
+  definition = [$Relations(S = {T}, T = {S}).relation(R = {%extendedSubset(
       #(x: %Element(
         R,
         shortcut = {
           constructor = $../Sets/"Cartesian product"(
               S = {S},
-              T = {S}
+              T = {T}
             ).pair,
           parameters = #(
             s: %Element(S),
-            t: %Element(S)
+            t: %Element(T)
           ),
           override = %true
         }
       )),
       $../Sets/"Cartesian product"(
-          S = {S},
+          S = {T},
           T = {S}
         ).pair(
           s = {t},

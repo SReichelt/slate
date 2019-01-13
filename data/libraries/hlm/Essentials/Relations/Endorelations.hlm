@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
+ *             * http://mathworld.wolfram.com/Relation.html
+ *             * https://proofwiki.org/wiki/Definition:Endorelation
+ */
+$Endorelations(S: %Set): %SetOperator {
+  display = [$Function(
+    function = '𝓡𝓮𝓵',
+    arguments = [S]
+  )],
+  definitionDisplay = {
+    parameter = #(≺: %Expr),
+    singularName = ['relation on ', S],
+    pluralName = ['relations on ', S]
+  },
+  definition = [$Relations(
+    S = {S},
+    T = {S}
+  )]
+}

@@ -8,6 +8,7 @@ $Functions: %Section {
     %item($"infix value"),
     %item($Image),
     %item($Preimage),
+    %item($"mapping as function"),
     %item($identity),
     %item($"generalized restriction"),
     %item($"codomain restriction"),

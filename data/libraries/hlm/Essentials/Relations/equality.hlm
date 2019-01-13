@@ -9,7 +9,7 @@ $equality(S: %Set): %ExplicitOperator {
     body = '=',
     sub = S
   )],
-  definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
+  definition = [$Relations(S = {S}, T = {S}).relation(R = {%extendedSubset(
       #(s: %Element(S)),
       $../Sets/"Cartesian product"(
           S = {S},

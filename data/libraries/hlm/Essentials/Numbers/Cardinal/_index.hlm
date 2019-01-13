@@ -13,11 +13,10 @@ $Cardinal: %Section {
     %item($Isomorphisms),
     %item($"less or equal"),
     %item($less),
+    %item($"Equality criterion"),
     %item($sum),
     %item($product),
     %item($power),
-    %item($"Cardinality of power set"),
-    %item($"indexed element"),
-    %item($"bounded cardinality")
+    %item($"Cardinality of power set")
   ]
 }

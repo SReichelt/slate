@@ -1,0 +1,29 @@
+%../../../../../logics/hlm%
+
+/**
+ * @references * [https://en.wikipedia.org/wiki/Schröder-Bernstein_theorem](https://en.wikipedia.org/wiki/Schr%C3%B6der-Bernstein_theorem)
+ *             * http://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
+ *             * [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)
+ */
+$"Equality criterion"(
+  𝔵: %Element($"Cardinal numbers"),
+  𝔶: %Element(%previous)
+): %EquivalenceTheorem {
+  conditions = [
+    %and(
+      $"less or equal"(
+        𝔵 = {𝔵},
+        𝔶 = {𝔶}
+      ),
+      $"less or equal"(
+        𝔵 = {𝔶},
+        𝔶 = {𝔵}
+      )
+    ),
+    %not($../../../Essentials/Sets/empty(S = {$Isomorphisms(
+      𝔵 = {𝔵},
+      𝔶 = {𝔶}
+    )})),
+    %equals(𝔵, 𝔶)
+  ]
+}

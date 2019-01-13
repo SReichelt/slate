@@ -1,5 +1,21 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks In HLM, cardinal numbers have a very simple definition as a construction with one constructor, which can be conveniently equipped with a notation that matches mathematical practice.
+ *
+ *          Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the “deconstruction” of cardinal numbers into sets are automatically well-defined.
+ *
+ *          HLM does not distinguish between sets and proper classes; instead there are rules preventing certain circularities. Thus, the set of cardinals can be treated like any other set in most situations.
+ *
+ *          When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions, including e.g. the definition of [finiteness](../../Sets/finite).
+ *
+ *          In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as [magmas](../../../Algebra/Magmas/Magmas). This is especially visible in the use of this definition in the [category of sets](../../../Category%20theory/Categories/cardinals).
+ *
+ * @references * https://en.wikipedia.org/wiki/Cardinal_number
+ *             * http://mathworld.wolfram.com/CardinalNumber.html
+ *             * https://proofwiki.org/wiki/Definition:Cardinal
+ *             * https://ncatlab.org/nlab/show/cardinal+number
+ */
 $"Cardinal numbers": %Construction {
   $cardinality(S: %Set): %Constructor {
     display = [$Parens(

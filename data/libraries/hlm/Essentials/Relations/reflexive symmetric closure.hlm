@@ -2,7 +2,7 @@
 
 $"reflexive symmetric closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -14,7 +14,7 @@ $"reflexive symmetric closure"(
       ≺ = {≺},
       p = {$../Properties/Properties.property(
         P = {%subset(
-          #(⊂: %Element($Relations(S = {S}))),
+          #(⊂: %Element($Endorelations(S = {S}))),
           %and(
             $reflexive(
               S = {S},

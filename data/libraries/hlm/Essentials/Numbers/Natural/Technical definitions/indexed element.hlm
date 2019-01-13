@@ -1,0 +1,44 @@
+%../../../../../../logics/hlm%
+
+/**
+ * @remarks This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite).
+ */
+$"indexed element"(
+  M: %Subset($../"Natural numbers"),
+  n: %Element($../"Natural numbers"),
+  _1: %Constraint($../../Cardinal/less(
+    𝔵 = {n},
+    𝔶 = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}
+  )),
+  m: %Def($../minimum(M = {M}))
+): %ExplicitOperator {
+  display = [$Function(
+    function = M,
+    arguments = [n],
+    style = '[]'
+  )],
+  definition = [%structuralCases(
+    n,
+    $../"Natural numbers",
+    [
+      {
+        constructor = $../"Natural numbers".zero,
+        value = m,
+        rewrite = %true
+      },
+      {
+        constructor = $../"Natural numbers".successor,
+        parameters = #(x: %Element($../"Natural numbers")),
+        value = $"indexed element"(
+          M = {$../../../Sets/"Relative complement"(
+            U = {M},
+            S = {M},
+            T = {%enumeration(m)}
+          )},
+          n = {x}
+        ),
+        rewrite = %true
+      }
+    ]
+  )]
+}

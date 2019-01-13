@@ -8,16 +8,16 @@
 $closure(
   S: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}),
+    $Endorelations(S = {S}),
     shortcut = {
-      constructor = $Relations(S = {S}).relation,
+      constructor = $Relations(S = {S}, T = {S}).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
     }
   ),
-  p: %Element($../Properties/Properties(S = {$Relations(S = {S})}))
+  p: %Element($../Properties/Properties(S = {$Endorelations(S = {S})}))
 ): %ExplicitOperator {
   display = [$Function(
     function = $SubSup(
@@ -26,7 +26,7 @@ $closure(
     ),
     arguments = [≺]
   )],
-  definition = [$Relations(S = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
+  definition = [$Relations(S = {S}, T = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
       U = {$../Sets/"Cartesian product"(
         S = {S},
         T = {S}
@@ -52,9 +52,9 @@ $closure(
         %and(
           %sub(R, X),
           $../Properties/"has property"(
-            S = {$Relations(S = {S})},
+            S = {$Endorelations(S = {S})},
             p = {p},
-            s = {$Relations(S = {S}).relation(R = {X})}
+            s = {$Relations(S = {S}, T = {S}).relation(R = {X})}
           )
         )
       )}

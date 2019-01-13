@@ -1,0 +1,32 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation
+ */
+$"mapping value"(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  )),
+  _1: %Constraint($mapping(
+    S = {S},
+    T = {T},
+    ≺ = {≺}
+  )),
+  s: %Element(S)
+): %ImplicitOperator {
+  display = [$Function(
+    function = ≺,
+    arguments = [s]
+  )],
+  parameter = #(t: %Element(T)),
+  definition = [$related(
+    S = {S},
+    T = {T},
+    ≺ = {≺},
+    s = {s},
+    t = {t}
+  )]
+}

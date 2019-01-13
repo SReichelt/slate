@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between their respective sets. Note that these sets are far from unique (except in the case of the empty set), but the type system prevents the ambiguities that could arise.
+ */
 $Homomorphisms(
   𝔵: %Element(
     $"Cardinal numbers",

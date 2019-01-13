@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks This lemma is part of the well-definedness proof of the embedding of the natural numbers into the cardinal numbers.
+ */
 $"Natural cardinality lemma"(
   m: %Element($../Natural/"Natural numbers"),
   n: %Element(%previous),

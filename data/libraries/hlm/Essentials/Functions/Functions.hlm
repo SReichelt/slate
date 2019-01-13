@@ -1,9 +1,9 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks Although it is possible to define functions in the usual set-theoretic way in HLM, the equivalent definition presented here uses a special HLM feature called “bindings.”
+ * @remarks This definition uses a feature of the HLM logic called “bindings.” It is [equivalent](mapping%20as%function) to the usual set-theoretic definition, which is called “[mapping](../Relations/mapping)” in this library to distinguish the two definitions.
  *
- *          Its major advantage is that given a specific function defined via bindings, the value at a specific input can be determined purely syntactically.
+ *          The major advantage of the definition using bindings is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
  *
  *          Function [extensionality](https://en.wikipedia.org/wiki/Extensionality) is a consequence of the requirement to specify an equality definition for the constructor.
  *

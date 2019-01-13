@@ -2,6 +2,13 @@
 
 /**
  * @remarks Note that this definition presupposes that _n_ is greater than 1. Otherwise, not all equivalences would hold.
+ *
+ *          In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the [set of prime numbers](Prime%20numbers), no such explicit exclusion of 1 is necessary.
+ *
+ * @references * https://en.wikipedia.org/wiki/Prime_number
+ *             * https://en.wikipedia.org/wiki/Euclid%27s_lemma
+ *             * http://mathworld.wolfram.com/PrimeNumber.html
+ *             * https://proofwiki.org/wiki/Definition:Prime_Number
  */
 $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Predicate {
   display = [$Property(

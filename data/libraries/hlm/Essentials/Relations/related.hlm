@@ -2,18 +2,19 @@
 
 $related(
   S: %Set(auto = %true),
+  T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}),
+    $Relations(S = {S}, T = {T}),
     shortcut = {
-      $Relations(S = {S}).relation,
+      $Relations(S = {S}, T = {T}).relation,
       #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       )))
     }
   ),
   s: %Element(S),
-  t: %Element(%previous)
+  t: %Element(T)
 ): %Predicate {
   display = [$Relation(
     symbol = ≺,
@@ -22,7 +23,7 @@ $related(
   definition = [%in(
     $../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       ).pair(
         s = {s},
         t = {t}

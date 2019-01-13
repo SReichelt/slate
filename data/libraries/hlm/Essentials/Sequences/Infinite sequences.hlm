@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This is obviously a definition of an infinite sequence, but we omit the word “infinite” because most of the time, it is implied.
+ * @remarks We omit the word “infinite” because infinite sequences are used much more frequently than finite ones.
  *
  *          We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily deconstruct a sequence into its elements and the ability to omit _S_ from the constructor.
  *

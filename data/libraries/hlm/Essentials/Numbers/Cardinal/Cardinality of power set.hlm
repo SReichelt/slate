@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
+ *             * http://mathworld.wolfram.com/CardinalExponentiation.html
+ */
 $"Cardinality of power set"(S: %Set): %StandardTheorem {
   claim = %equals(
     $"Cardinal numbers".cardinality(S = {$../../Sets/"Power set"(S = {S})}),

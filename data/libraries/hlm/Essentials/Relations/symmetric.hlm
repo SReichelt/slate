@@ -7,28 +7,40 @@
  */
 $symmetric(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %Predicate {
   display = [$Property(
     operand = ≺,
     property = 'symmetric'
   )],
-  definition = [%forall(
-    #(
-      s: %Element(S),
-      t: %Element(%previous),
-      _1: %Constraint($related(
+  definition = [
+    %forall(
+      #(
+        s: %Element(S),
+        t: %Element(%previous),
+        _1: %Constraint($related(
+          S = {S},
+          T = {S},
+          s = {s},
+          ≺ = {≺},
+          t = {t}
+        ))
+      ),
+      $related(
         S = {S},
-        s = {s},
+        T = {S},
+        s = {t},
         ≺ = {≺},
-        t = {t}
-      ))
+        t = {s}
+      )
     ),
-    $related(
-      S = {S},
-      s = {t},
-      ≺ = {≺},
-      t = {s}
+    %equals(
+      ≺,
+      $converse(
+        S = {S},
+        T = {S},
+        ≺ = {≺}
+      )
     )
-  )]
+  ]
 }

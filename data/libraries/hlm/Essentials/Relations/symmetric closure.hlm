@@ -6,7 +6,7 @@
  */
 $"symmetric closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -17,8 +17,8 @@ $"symmetric closure"(
       S = {S},
       ≺ = {≺},
       p = {$../Properties/predicate(
-        S = {$Relations(S = {S})},
-        parameter = #(_1: %Element($Relations(S = {S}))),
+        S = {$Endorelations(S = {S})},
+        parameter = #(_1: %Element($Endorelations(S = {S}))),
         predicate = $symmetric(
           S = {S},
           ≺ = {_1}

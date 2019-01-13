@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Cardinal_number
+ */
 $"less or equal"(
   𝔵: %Element($"Cardinal numbers"),
   𝔶: %Element(%previous)
@@ -15,7 +18,7 @@ $"less or equal"(
     )
   ],
   definition = [%exists(
-    #(f: %Element($Homomorphisms(
+    #(φ: %Element($Homomorphisms(
       𝔵 = {𝔵},
       𝔶 = {𝔶}
     ))),
@@ -38,7 +41,7 @@ $"less or equal"(
           value = Y
         }]
       )},
-      f = {f}
+      f = {φ}
     )
   )]
 }

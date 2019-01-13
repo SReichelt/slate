@@ -1,0 +1,53 @@
+%../../../../../../logics/hlm%
+
+/**
+ * @remarks This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite).
+ */
+$"bounded cardinality"(
+  M: %Subset($../"Natural numbers"),
+  n: %Element($../"Natural numbers")
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = $Parens(
+      body = M,
+      style = '||'
+    ),
+    sub = ['≤', n]
+  )],
+  definition = [%structuralCases(
+    n,
+    $../"Natural numbers",
+    [
+      {
+        constructor = $../"Natural numbers".zero,
+        value = $../number(value = 0),
+        rewrite = %true
+      },
+      {
+        constructor = $../"Natural numbers".successor,
+        parameters = #(x: %Element($../"Natural numbers")),
+        value = %cases([
+          {
+            formula = %not($../../../Sets/empty(S = {M})),
+            value = $../sum(
+              m = {$"bounded cardinality"(
+                M = {$../../../Sets/"Relative complement"(
+                  U = {M},
+                  S = {M},
+                  T = {%enumeration($../minimum(M = {M}))}
+                )},
+                n = {x}
+              )},
+              n = {$../number(value = 1)}
+            )
+          },
+          {
+            formula = $../../../Sets/empty(S = {M}),
+            value = $../number(value = 0)
+          }
+        ]),
+        rewrite = %true
+      }
+    ]
+  )]
+}

@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.
+ * @remarks This definition works due to the special way that functions are defined. The [corresponding definition](../Relations/mapping%20value) for mappings is an implicit definition.
  *
  * @references * https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation
  */

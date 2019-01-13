@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”.
+ */
 $less(
   𝔵: %Element($"Cardinal numbers"),
   𝔶: %Element(%previous)

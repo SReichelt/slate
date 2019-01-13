@@ -5,23 +5,24 @@
  */
 $intersection(
   S: %Set(auto = %true),
+  T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}),
+    $Relations(S = {S}, T = {T}),
     shortcut = {
-      constructor = $Relations(S = {S}).relation,
+      constructor = $Relations(S = {S}, T = {T}).relation,
       parameters = #(Q: %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       )))
     }
   ),
   ⊂: %Element(
     %previous,
     shortcut = {
-      constructor = $Relations(S = {S}).relation,
+      constructor = $Relations(S = {S}, T = {T}).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       )))
     }
   )
@@ -32,10 +33,10 @@ $intersection(
     space = ' ',
     maxParenLevel = 2
   )],
-  definition = [$Relations(S = {S}).relation(R = {$../Sets/Intersection(
+  definition = [$Relations(S = {S}, T = {T}).relation(R = {$../Sets/Intersection(
       U = {$../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       )},
       S = {Q},
       T = {R}

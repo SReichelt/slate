@@ -1,0 +1,35 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward.)
+ */
+$"mapping as function"(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ≺: %Element($../Relations/Relations(
+    S = {S},
+    T = {T}
+  )),
+  _1: %Constraint($../Relations/mapping(
+    S = {S},
+    T = {T},
+    ≺ = {≺}
+  ))
+): %ExplicitOperator {
+  display = [$Parens(
+    body = ≺,
+    style = '()'
+  )],
+  definition = [$Functions(
+      X = {S},
+      Y = {T}
+    ).function(x = {
+      #(s: %Element(S)),
+      {y = {$../Relations/"mapping value"(
+        S = {S},
+        T = {T},
+        ≺ = {≺},
+        s = {s}
+      )}}
+  })]
+}

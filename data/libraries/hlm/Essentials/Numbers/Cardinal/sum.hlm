@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_addition
+ *             * http://mathworld.wolfram.com/CardinalAddition.html
+ *             * https://proofwiki.org/wiki/Definition:Sum_of_Cardinals
+ */
 $sum(
   𝔵: %Element(
     $"Cardinal numbers",

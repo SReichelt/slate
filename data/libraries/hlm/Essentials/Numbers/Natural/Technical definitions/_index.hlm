@@ -1,0 +1,9 @@
+%../../../../../../format/library%
+
+$Cardinal: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"indexed element"),
+    %item($"bounded cardinality")
+  ]
+}

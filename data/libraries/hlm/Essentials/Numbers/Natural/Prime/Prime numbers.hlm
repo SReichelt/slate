@@ -1,5 +1,11 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Prime_number
+ *             * http://mathworld.wolfram.com/PrimeNumber.html
+ *             * https://proofwiki.org/wiki/Definition:Prime_Number#Notation
+ *             * http://oeis.org/A000040
+ */
 $"Prime numbers": %SetOperator {
   display = ['ℙ'],
   definition = [%subset(

@@ -7,14 +7,14 @@ $"relation transform"(
     X = {X},
     Y = {Y}
   )),
-  ≺: %Element($../../Essentials/Relations/Relations(S = {X}))
+  ≺: %Element($../../Essentials/Relations/Endorelations(S = {X}))
 ): %ExplicitOperator {
   display = [$Function(
     function = φ,
     arguments = [≺],
     style = '[]'
   )],
-  definition = [$../../Essentials/Relations/Relations(S = {Y}).relation(R = {%subset(
+  definition = [$../../Essentials/Relations/Relations(S = {Y}, T = {Y}).relation(R = {%subset(
       #(y: %Element(
         $../../Essentials/Sets/"Cartesian product"(
           S = {Y},
@@ -34,6 +34,7 @@ $"relation transform"(
       )),
       $../../Essentials/Relations/related(
         S = {X},
+        T = {X},
         ≺ = {≺},
         s = {$../../Essentials/Functions/value(
           X = {Y},

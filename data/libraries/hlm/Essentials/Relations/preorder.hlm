@@ -7,7 +7,7 @@
  */
 $preorder(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %Predicate {
   display = [$Property(
     property = 'preorder',

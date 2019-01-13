@@ -11,13 +11,6 @@ $Essentials: %Section {
       }
     ),
     %subsection(
-      $Functions,
-      title = {
-        de = 'Funktionen',
-        en = 'Functions'
-      }
-    ),
-    %subsection(
       $Properties,
       title = {
         de = 'Eigenschaften',
@@ -29,6 +22,13 @@ $Essentials: %Section {
       title = {
         de = 'Relationen',
         en = 'Relations'
+      }
+    ),
+    %subsection(
+      $Functions,
+      title = {
+        de = 'Funktionen',
+        en = 'Functions'
       }
     ),
     %subsection(

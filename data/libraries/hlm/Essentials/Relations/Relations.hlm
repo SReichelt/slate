@@ -1,16 +1,14 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition is limited to endorelations because they are used much more often than relations between two sets. (Especially given that functions are not defined as relations in this library.)
- *
- * @references * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
+ * @references * https://en.wikipedia.org/wiki/Binary_relation
  *             * http://mathworld.wolfram.com/Relation.html
- *             * https://proofwiki.org/wiki/Definition:Endorelation
+ *             * https://proofwiki.org/wiki/Definition:Relation
  */
-$Relations(S: %Set(auto = %true, embedSubsets = %true)): %Construction {
+$Relations(S: %Set(auto = %true, embedSubsets = %true), T: %Set(auto = %true, embedSubsets = %true)): %Construction {
   $relation(R: %Subset($../Sets/"Cartesian product"(
     S = {S},
-    T = {S}
+    T = {T}
   ))): %Constructor {
     display = [$Parens(
       body = R,
@@ -19,11 +17,11 @@ $Relations(S: %Set(auto = %true, embedSubsets = %true)): %Construction {
     equalityDefinition = {
       leftParameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       ))),
       rightParameters = #("R'": %Subset($../Sets/"Cartesian product"(
         S = {S},
-        T = {S}
+        T = {T}
       ))),
       definition = [%setEquals(R, "R'")],
       isomorphic = %true
@@ -32,11 +30,11 @@ $Relations(S: %Set(auto = %true, embedSubsets = %true)): %Construction {
 
   display = [$Function(
     function = '𝓡𝓮𝓵',
-    arguments = [S]
+    arguments = [S, T]
   )],
   definitionDisplay = {
     parameter = #(≺: %Expr),
-    singularName = ['relation on ', S],
-    pluralName = ['relations on ', S]
+    singularName = ['relation from ', S, ' to ', T],
+    pluralName = ['relations from ', S, ' to ', T]
   }
 }

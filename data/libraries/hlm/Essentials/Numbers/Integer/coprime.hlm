@@ -26,20 +26,33 @@ $coprime(
         $../Natural/number(value = 1)
       )
     ),
+    %not(%exists(
+      #(d: %Element($"Segment (greater)"(a = {$../Natural/number(value = 1)}))),
+      formula = %and(
+        $divisible(
+          a = {d},
+          b = {a}
+        ),
+        $divisible(
+          a = {d},
+          b = {b}
+        )
+      )
+    )),
     %forall(
       #(
-        d: %Element($"Nonzero numbers"),
+        e: %Element($"Nonzero numbers"),
         _3: %Constraint($divisible(
-          a = {d},
+          a = {e},
           b = {a}
         )),
         _4: %Constraint($divisible(
-          a = {d},
+          a = {e},
           b = {b}
         ))
       ),
       %equals(
-        $absolute(a = {d}),
+        $absolute(a = {e}),
         $../Natural/number(value = 1)
       )
     ),

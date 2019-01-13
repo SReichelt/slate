@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Coprime_integers
+ *             * http://mathworld.wolfram.com/RelativelyPrime.html
+ *             * https://proofwiki.org/wiki/Definition:Coprime/Integers
+ */
 $coprime(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)
@@ -26,6 +31,19 @@ $coprime(
         $number(value = 1)
       )
     ),
+    %not(%exists(
+      #(b: %Element($"Segment (greater)"(n = {$number(value = 1)}))),
+      formula = %and(
+        $divisible(
+          m = {b},
+          n = {m}
+        ),
+        $divisible(
+          m = {b},
+          n = {n}
+        )
+      )
+    )),
     %sub(
       $../../Sets/Intersection(
         U = {$"Natural numbers"},

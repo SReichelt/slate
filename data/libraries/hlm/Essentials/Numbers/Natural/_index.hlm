@@ -104,6 +104,13 @@ $Natural: %Section {
       }
     ),
     %item($coprime),
-    %item($"Coprime test")
+    %item($"Coprime test"),
+    %subsection(
+      $"Technical definitions",
+      title = {
+        de = 'Technische Definitionen',
+        en = 'Technical definitions'
+      }
+    )
   ]
 }

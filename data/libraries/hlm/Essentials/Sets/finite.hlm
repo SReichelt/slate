@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition uses function as well as the natural cardinal numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist.
+ * @remarks This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist.
  *
  * @references * https://en.wikipedia.org/wiki/Finite_set
  *             * http://mathworld.wolfram.com/FiniteSet.html
@@ -281,7 +281,7 @@ $finite(S: %Set): %Predicate {
               f = {u},
               S = {S}
             )),
-            o: %Def($../Numbers/Cardinal/"bounded cardinality"(
+            o: %Def($../Numbers/Natural/"Technical definitions"/"bounded cardinality"(
               M = {T},
               n = {x}
             )),
@@ -289,11 +289,11 @@ $finite(S: %Set): %Predicate {
                 X = {$../Numbers/Natural/"Segment (less)"(n = {o})},
                 Y = {T}
               ).function(x = {
-                #(z: %Element($../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"bounded cardinality"(
+                #(z: %Element($../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Technical definitions"/"bounded cardinality"(
                   M = {T},
                   n = {x}
                 )}))),
-                {y = {$../Numbers/Cardinal/"indexed element"(
+                {y = {$../Numbers/Natural/"Technical definitions"/"indexed element"(
                   M = {T},
                   n = {z}
                 )}}

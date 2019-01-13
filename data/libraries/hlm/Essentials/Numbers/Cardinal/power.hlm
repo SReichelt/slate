@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * http://mathworld.wolfram.com/CardinalExponentiation.html
+ *             * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
+ *             * https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals
+ */
 $power(
   𝔵: %Element(
     $"Cardinal numbers",
@@ -20,8 +25,21 @@ $power(
     body = 𝔵,
     sup = 𝔶
   )],
-  definition = [$"Cardinal numbers".cardinality(S = {$../../Functions/Functions(
-      X = {Y},
-      Y = {X}
-  )})]
+  definition = [
+    $"Cardinal numbers".cardinality(S = {$../../Functions/Functions(
+        X = {Y},
+        Y = {X}
+    )}),
+    $"Cardinal numbers".cardinality(S = {%subset(
+        #(≺: %Element($../../Relations/Relations(
+          S = {Y},
+          T = {X}
+        ))),
+        $../../Relations/mapping(
+          S = {Y},
+          T = {X},
+          ≺ = {≺}
+        )
+    )})
+  ]
 }

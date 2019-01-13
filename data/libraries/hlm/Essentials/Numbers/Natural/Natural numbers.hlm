@@ -8,6 +8,7 @@
  * @references * https://en.wikipedia.org/wiki/Natural_number
  *             * http://mathworld.wolfram.com/NonnegativeInteger.html
  *             * https://proofwiki.org/wiki/Definition:Natural_Numbers
+ *             * https://ncatlab.org/nlab/show/natural+number
  *             * http://oeis.org/A001477
  */
 $"Natural numbers": %Construction {

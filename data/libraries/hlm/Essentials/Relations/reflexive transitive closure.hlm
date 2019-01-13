@@ -6,7 +6,7 @@
  */
 $"reflexive transitive closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Relations(S = {S}))
+  ≺: %Element($Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -17,8 +17,8 @@ $"reflexive transitive closure"(
       S = {S},
       ≺ = {≺},
       p = {$../Properties/predicate(
-        S = {$Relations(S = {S})},
-        parameter = #(_1: %Element($Relations(S = {S}))),
+        S = {$Endorelations(S = {S})},
+        parameter = #(_1: %Element($Endorelations(S = {S}))),
         predicate = $preorder(
           S = {S},
           ≺ = {_1}
