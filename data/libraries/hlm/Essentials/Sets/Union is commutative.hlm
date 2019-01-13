@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Union_is_Commutative
+ */
 $"Union is commutative"(
   U: %Set,
   S: %Subset(U),

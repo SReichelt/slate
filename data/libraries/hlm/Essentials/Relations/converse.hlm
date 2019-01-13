@@ -1,12 +1,16 @@
 %../../../../logics/hlm%
 
-$opposite(
+/**
+ * @references * https://en.wikipedia.org/wiki/Converse_relation
+ *             * https://proofwiki.org/wiki/Definition:Inverse_Relation
+ */
+$converse(
   S: %Set(auto = %true),
   ≺: %Element(
     $Relations(S = {S}),
     shortcut = {
-      $Relations(S = {S}).relation,
-      #(R: %Subset($../Sets/"Cartesian product"(
+      constructor = $Relations(S = {S}).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
@@ -15,17 +19,20 @@ $opposite(
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
-    sup = 'op'
+    sup = $Style(
+      body = 'T',
+      styleClass = 'sans'
+    )
   )],
   definition = [$Relations(S = {S}).relation(R = {%extendedSubset(
       #(x: %Element(
         R,
         shortcut = {
-          $../Sets/"Cartesian product"(
+          constructor = $../Sets/"Cartesian product"(
               S = {S},
               T = {S}
             ).pair,
-          #(
+          parameters = #(
             s: %Element(S),
             t: %Element(S)
           ),

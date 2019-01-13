@@ -5,7 +5,7 @@ $inverse(a: %Element(
   shortcut = {
     $"Real numbers".class,
     #(
-      r_a: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+      r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
       _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
     )
   }

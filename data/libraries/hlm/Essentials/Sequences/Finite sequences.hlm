@@ -1,0 +1,62 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Sequence
+ *             * http://mathworld.wolfram.com/Sequence.html
+ *             * https://proofwiki.org/wiki/Definition:Finite_Sequence
+ */
+$"Finite sequences"(S: %Set(auto = %true)): %Construction {
+  $sequence(
+    n: %Element($../Numbers/Natural/"Natural numbers"),
+    k: %Binding(
+      $../Numbers/Natural/"Segment (less)"(n = {n}),
+      #(a: %Element(S))
+    )
+  ): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = a,
+        style = '()'
+      ),
+      sub = $Relation(
+        symbol = '<',
+        operands = [k, n],
+        space = ''
+      )
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        n: %Element($../Numbers/Natural/"Natural numbers"),
+        k: %Binding(
+          $../Numbers/Natural/"Segment (less)"(n = {n}),
+          #(a: %Element(S))
+        )
+      ),
+      rightParameters = #(
+        "n'": %Element($../Numbers/Natural/"Natural numbers"),
+        k: %Binding(
+          $../Numbers/Natural/"Segment (less)"(n = {"n'"}),
+          #("a'": %Element(S))
+        )
+      ),
+      definition = [%and(
+        %equals(n, "n'"),
+        %forall(
+          #(k: %Element($../Numbers/Natural/"Segment (less)"(n = {n}))),
+          %equals(a[k], "a'"[k])
+        )
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = [$SubSup(
+    body = S,
+    sup = '∗'
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    singularName = ['finite sequence on ', S],
+    pluralName = ['finite sequences on ', S]
+  }
+}

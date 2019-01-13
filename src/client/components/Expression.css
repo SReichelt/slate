@@ -2,8 +2,8 @@
   font-family: 'TeX', serif;
   line-height: 110%;
   text-decoration: initial;
-  color: initial;
-  background-color: initial;
+  color: inherit;
+  background-color: inherit;
   text-align: left;
 }
 
@@ -496,6 +496,7 @@ p {
 
 .preview>a {
   text-decoration: initial;
+  color: initial;
 }
 
 .menu-container {

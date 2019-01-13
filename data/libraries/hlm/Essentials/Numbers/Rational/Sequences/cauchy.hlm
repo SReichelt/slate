@@ -1,9 +1,9 @@
 %../../../../../../logics/hlm%
 
 $cauchy(α: %Element(
-  $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
+  $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
   shortcut = {
-    constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+    constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
     parameters = #(n: %Binding(
       $../../Natural/"Natural numbers",
       #(a: %Element($../"Rational numbers"))
@@ -12,7 +12,7 @@ $cauchy(α: %Element(
 )): %Predicate {
   display = [$Property(
     operand = α,
-    property = 'cauchy'
+    property = 'Cauchy'
   )],
   definition = [%forall(
     #(ε: %Element($../"Positive numbers")),

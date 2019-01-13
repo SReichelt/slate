@@ -1,22 +1,30 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This is an attempt at a general definition of the closure of a relation with respect to a property, i.e. the smallest relation that contains the original relation and satisfies the property. Note that it only works for properties that are closed under arbitrary intersections, which should probably be included as a requirement.
+ *
+ * @references * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures
+ */
 $closure(
   S: %Set(auto = %true),
   ≺: %Element(
     $Relations(S = {S}),
     shortcut = {
-      $Relations(S = {S}).relation,
-      #(R: %Subset($../Sets/"Cartesian product"(
+      constructor = $Relations(S = {S}).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
     }
   ),
-  P: %Subset($Relations(S = {S}))
+  p: %Element($../Properties/Properties(S = {$Relations(S = {S})}))
 ): %ExplicitOperator {
   display = [$Function(
-    function = 'cl',
-    arguments = [≺, P]
+    function = $SubSup(
+      body = 'cl',
+      sub = p
+    ),
+    arguments = [≺]
   )],
   definition = [$Relations(S = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
       U = {$../Sets/"Cartesian product"(
@@ -30,11 +38,11 @@ $closure(
             T = {S}
           )}),
           shortcut = {
-            $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+            constructor = $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
                 S = {S},
                 T = {S}
               )}).subset,
-            #(X: %Subset($../Sets/"Cartesian product"(
+            parameters = #(X: %Subset($../Sets/"Cartesian product"(
               S = {S},
               T = {S}
             ))),
@@ -43,9 +51,10 @@ $closure(
         )),
         %and(
           %sub(R, X),
-          %in(
-            $Relations(S = {S}).relation(R = {X}),
-            P
+          $../Properties/"has property"(
+            S = {$Relations(S = {S})},
+            p = {p},
+            s = {$Relations(S = {S}).relation(R = {X})}
           )
         )
       )}

@@ -1,5 +1,9 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Binary_relation#Particular_binary_relations: identity relation
+ *             * https://proofwiki.org/wiki/Definition:Diagonal_Relation
+ */
 $equality(S: %Set): %ExplicitOperator {
   display = [$SubSup(
     body = '=',

@@ -153,7 +153,7 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', paren
   )
 }
 
-$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
   display = $OuterParens(
     body = [
       $OverUnder(
@@ -171,7 +171,7 @@ $OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, s
   )
 }
 
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
   display = $OverUnderOperator(
     symbol = $Style(
       body = symbol,
@@ -356,7 +356,7 @@ $FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLe
   )
 }
 
-$FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel?: %Int = 0): %Template {
+$FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
   display = $FunctionPrefix(
     function = function,
     body = $FunctionOperator(

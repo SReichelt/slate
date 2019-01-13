@@ -132,6 +132,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
             if (summary) {
               display = <Expression expression={summary} key="summary"/>;
             }
+            if (this.props.itemInfo.type === 'lemma') {
+              display = <span className={'tree-item-minor'} key="minor">{display}</span>;
+            }
           }
           if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
             let showPreview = false;

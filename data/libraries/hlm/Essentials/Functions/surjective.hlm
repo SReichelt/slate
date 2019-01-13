@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Surjective_function
+ *             * http://mathworld.wolfram.com/Surjection.html
+ *             * https://proofwiki.org/wiki/Definition:Surjection
+ */
 $surjective(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),

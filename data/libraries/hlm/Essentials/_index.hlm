@@ -18,6 +18,13 @@ $Essentials: %Section {
       }
     ),
     %subsection(
+      $Properties,
+      title = {
+        de = 'Eigenschaften',
+        en = 'Properties'
+      }
+    ),
+    %subsection(
       $Relations,
       title = {
         de = 'Relationen',

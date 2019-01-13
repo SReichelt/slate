@@ -1,12 +1,15 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This is a technical definition: Since relations in this library are not themselves sets, their union must be defined explicitly.
+ */
 $union(
   S: %Set(auto = %true),
   ≺: %Element(
     $Relations(S = {S}),
     shortcut = {
-      $Relations(S = {S}).relation,
-      #(Q: %Subset($../Sets/"Cartesian product"(
+      constructor = $Relations(S = {S}).relation,
+      parameters = #(Q: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
@@ -15,8 +18,8 @@ $union(
   ⊂: %Element(
     %previous,
     shortcut = {
-      $Relations(S = {S}).relation,
-      #(R: %Subset($../Sets/"Cartesian product"(
+      constructor = $Relations(S = {S}).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))

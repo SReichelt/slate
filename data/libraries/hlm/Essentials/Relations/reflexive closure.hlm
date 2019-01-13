@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Reflexive_closure
+ *             * http://mathworld.wolfram.com/ReflexiveClosure.html
+ *             * https://proofwiki.org/wiki/Definition:Reflexive_Closure
+ */
 $"reflexive closure"(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
@@ -12,11 +17,12 @@ $"reflexive closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      P = {%subset(
-        #(⊂: %Element($Relations(S = {S}))),
-        $reflexive(
+      p = {$../Properties/predicate(
+        S = {$Relations(S = {S})},
+        parameter = #(_1: %Element($Relations(S = {S}))),
+        predicate = $reflexive(
           S = {S},
-          ≺ = {⊂}
+          ≺ = {_1}
         )
       )}
     ),

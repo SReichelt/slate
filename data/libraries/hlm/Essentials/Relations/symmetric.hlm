@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Symmetric_relation
+ *             * http://mathworld.wolfram.com/SymmetricRelation.html
+ *             * https://proofwiki.org/wiki/Definition:Symmetric_Relation
+ */
 $symmetric(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))

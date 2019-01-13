@@ -5,7 +5,9 @@
  *
  *          Its major advantage is that given a specific function defined via bindings, the value at a specific input can be determined purely syntactically.
  *
- * @references * [https://en.wikipedia.org/wiki/Function_(mathematics)](https://en.wikipedia.org/wiki/Function_(mathematics))
+ *          Function [extensionality](https://en.wikipedia.org/wiki/Extensionality) is a consequence of the requirement to specify an equality definition for the constructor.
+ *
+ * @references * https://en.wikipedia.org/wiki/Function_(mathematics)
  *             * http://mathworld.wolfram.com/Function.html
  *             * https://proofwiki.org/wiki/Definition:Mapping
  */

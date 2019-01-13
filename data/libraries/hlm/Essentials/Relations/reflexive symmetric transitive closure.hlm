@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive symmetric closure
+ */
 $"reflexive symmetric transitive closure"(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))
@@ -11,11 +14,12 @@ $"reflexive symmetric transitive closure"(
   definition = [$closure(
     S = {S},
     ≺ = {≺},
-    P = {%subset(
-      #(⊂: %Element($Relations(S = {S}))),
-      $equivalence(
+    p = {$../Properties/predicate(
+      S = {$Relations(S = {S})},
+      parameter = #(_1: %Element($Relations(S = {S}))),
+      predicate = $equivalence(
         S = {S},
-        ≺ = {⊂}
+        ≺ = {_1}
       )
     )}
   )]

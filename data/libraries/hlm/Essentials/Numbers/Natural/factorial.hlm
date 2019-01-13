@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Factorial
+ *             * http://mathworld.wolfram.com/Factorial.html
+ *             * https://proofwiki.org/wiki/Definition:Factorial
+ */
 $factorial(n: %Element($"Natural numbers")): %ExplicitOperator {
   display = [$UnaryOperator(
     symbol = '!',

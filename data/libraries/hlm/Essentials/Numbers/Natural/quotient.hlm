@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Quotient
+ */
 $quotient(
   n: %Element($"Natural numbers"),
   m: %Element($Divisors(n = {n}))

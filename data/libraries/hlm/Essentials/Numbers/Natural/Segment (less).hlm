@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * http://mathworld.wolfram.com/InitialSegment.html
+ *             * https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based
+ */
 $"Segment (less)"(n: %Element($"Natural numbers")): %SetOperator {
   display = [$Segment(
     set = 'ℕ',

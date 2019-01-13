@@ -1,16 +1,28 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
+ *             * http://mathworld.wolfram.com/SetDifference.html
+ *             * https://proofwiki.org/wiki/Definition:Set_Difference
+ */
 $"Relative complement"(
-  S: %Set,
-  T: %Subset(S)
+  U: %Set(auto = %true),
+  S: %Subset(U),
+  T: %Subset(%previous)
 ): %SetOperator {
   display = [$Operator(
     symbol = '∖',
     operands = [S, T],
     space = ' '
   )],
-  definition = [%subset(
-    #(x: %Element(S)),
-    %not(%in(x, T))
-  )]
+  definition = [
+    %subset(
+      #(x: %Element(U)),
+      %and(%in(x, S), %not(%in(x, T)))
+    ),
+    %subset(
+      #(x: %Element(S)),
+      %not(%in(x, T))
+    )
+  ]
 }

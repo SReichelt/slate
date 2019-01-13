@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Natural_number#Order
+ *             * https://proofwiki.org/wiki/Definition:Ordering_on_Natural_Numbers
+ */
 $"less or equal"(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)

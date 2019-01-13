@@ -2,7 +2,7 @@
 
 $"Real numbers": %Construction {
   $class(
-    r: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+    r: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
     _1: %Constraint($../Rational/Sequences/cauchy(α = {r}))
   ): %Constructor {
     display = [$Parens(
@@ -12,9 +12,9 @@ $"Real numbers": %Construction {
     equalityDefinition = {
       leftParameters = #(
         r: %Element(
-          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            constructor = $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
             parameters = #(n: %Binding(
               $../Natural/"Natural numbers",
               #(a: %Element($../Rational/"Rational numbers"))
@@ -25,9 +25,9 @@ $"Real numbers": %Construction {
       ),
       rightParameters = #(
         "r'": %Element(
-          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            constructor = $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
             parameters = #(n: %Binding(
               $../Natural/"Natural numbers",
               #("a'": %Element($../Rational/"Rational numbers"))
@@ -67,7 +67,7 @@ $"Real numbers": %Construction {
   display = ['ℝ'],
   embedding = {
     parameter = #(x: %Element($../Rational/"Rational numbers")),
-    target = $"Real numbers".class(r = {$../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence(n = {
+    target = $"Real numbers".class(r = {$../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence(n = {
           #(k: %Element($../Natural/"Natural numbers")),
           {a = {x}}
     })})

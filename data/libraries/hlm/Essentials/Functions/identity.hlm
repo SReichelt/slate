@@ -2,6 +2,7 @@
 
 /**
  * @references * https://en.wikipedia.org/wiki/Identity_function
+ *             * https://proofwiki.org/wiki/Definition:Identity_Mapping
  */
 $identity(X: %Set(auto = %true)): %ExplicitOperator {
   display = [$SubSup(

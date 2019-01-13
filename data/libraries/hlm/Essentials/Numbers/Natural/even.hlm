@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Parity_(mathematics)
+ *             * http://mathworld.wolfram.com/EvenNumber.html
+ *             * http://oeis.org/A005843
+ */
 $even(n: %Element($"Natural numbers")): %Predicate {
   display = [$Property(
     property = %neg('even', 'odd'),

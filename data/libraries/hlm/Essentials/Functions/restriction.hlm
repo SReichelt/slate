@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @references * [https://en.wikipedia.org/wiki/Restriction_(mathematics)](https://en.wikipedia.org/wiki/Restriction_(mathematics))
+ * @references * https://en.wikipedia.org/wiki/Restriction_(mathematics)
  */
 $restriction(
   X: %Set(auto = %true),

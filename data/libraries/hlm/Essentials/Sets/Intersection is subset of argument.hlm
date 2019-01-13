@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Intersection_is_Subset
+ */
 $"Intersection is subset of argument"(
   U: %Set,
   S: %Subset(U),

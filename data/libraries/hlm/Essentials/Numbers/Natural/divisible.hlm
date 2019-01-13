@@ -1,5 +1,12 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks The constraint that _m_ is nonzero is not really necessary but added for consistency with the definition of the [set of divisors](Divisors).
+ *
+ * @references * https://en.wikipedia.org/wiki/Divisor
+ *             * http://mathworld.wolfram.com/Divisor.html
+ *             * https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers
+ */
 $divisible(
   m: %Element($"Positive numbers"),
   n: %Element($"Natural numbers")

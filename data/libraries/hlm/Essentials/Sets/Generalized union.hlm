@@ -1,5 +1,9 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions
+ *             * https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets
+ */
 $"Generalized union"(
   U: %Set(auto = %true),
   I: %Set,

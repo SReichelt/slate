@@ -7,9 +7,9 @@ $"less or equal"(
       $"Real numbers".class,
       #(
         r_a: %Element(
-          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
             #(n: %Binding(
               $../Natural/"Natural numbers",
               #(x: %Element($../Rational/"Rational numbers"))
@@ -27,9 +27,9 @@ $"less or equal"(
       $"Real numbers".class,
       #(
         r_b: %Element(
-          $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}),
+          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
           shortcut = {
-            $../../Sequences/Sequences(S = {$../Rational/"Rational numbers"}).sequence,
+            $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
             #(n: %Binding(
               $../Natural/"Natural numbers",
               #(y: %Element($../Rational/"Rational numbers"))

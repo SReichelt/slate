@@ -32,6 +32,7 @@ $"bounded cardinality"(
             value = $../Natural/sum(
               m = {$"bounded cardinality"(
                 M = {$../../Sets/"Relative complement"(
+                  U = {M},
                   S = {M},
                   T = {%enumeration($../Natural/minimum(M = {M}))}
                 )},

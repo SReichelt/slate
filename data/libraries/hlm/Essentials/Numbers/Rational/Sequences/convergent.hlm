@@ -1,7 +1,7 @@
 %../../../../../../logics/hlm%
 
 $convergent(α: %Element(
-  $../../../Sequences/Sequences(S = {$../"Rational numbers"})
+  $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"})
 )): %Predicate {
   display = [$Property(
     operand = α,

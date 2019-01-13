@@ -1,5 +1,12 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks The cartesian product is, again, a “construction”. Note that HLM does not have any built-in notion of “tuple”; it is actually defined here as a constructor.
+ *
+ * @references * https://en.wikipedia.org/wiki/Cartesian_product
+ *             * http://mathworld.wolfram.com/CartesianProduct.html
+ *             * https://proofwiki.org/wiki/Definition:Cartesian_Product
+ */
 $"Cartesian product"(
   S: %Set(
     auto = %true,

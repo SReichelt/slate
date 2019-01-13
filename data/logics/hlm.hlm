@@ -2,7 +2,7 @@
 
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
-  expressionTypes = [$Expr, $Bool, $Nat,
+  expressionTypes = [$Expr, $Bool, $Nat, $ParameterList, $DefinitionRef,
                      $Set, $Subset, $Element, $Symbol, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
@@ -156,6 +156,9 @@ $false: $Bool {}
 $Nat: %ExpressionType {}
 
 $Expr: %ExpressionType {}
+
+$ParameterList: %ExpressionType {}
+$DefinitionRef: %ExpressionType {}
 
 $EquationSide: %ExpressionType {}
 $left: $EquationSide {}

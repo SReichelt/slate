@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Equivalence_relation
+ *             * http://mathworld.wolfram.com/EquivalenceRelation.html
+ *             * https://proofwiki.org/wiki/Definition:Equivalence_Relation
+ */
 $equivalence(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))

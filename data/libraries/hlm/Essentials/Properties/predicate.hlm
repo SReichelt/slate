@@ -1,0 +1,12 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This is a macro to convert a predicate taking an element of _S_ to a property on _S_.
+ */
+$predicate(
+  S: %Set(auto = %true),
+  parameter: %ParameterList,
+  predicate[parameter]: %DefinitionRef
+): %MacroOperator {
+  display = [predicate]
+}

@@ -71,6 +71,14 @@ $Natural: %Section {
       }
     ),
     %item(
+      $"Induction principle of property",
+      type = 'corollary',
+      title = {
+        de = 'Induktionsprinzip (eigenschaftsbasiert)',
+        en = 'Induction principle (property-based)'
+      }
+    ),
+    %item(
       $"Well-ordering principle",
       type = 'theorem',
       title = {

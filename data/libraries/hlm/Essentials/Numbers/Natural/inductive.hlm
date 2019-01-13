@@ -1,5 +1,12 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks This definition should be considered part of the [induction principle](Induction%20principle).
+ *
+ * @references * https://en.wikipedia.org/wiki/Inductive_set (but uses a 1-based definition)
+ *             * http://mathworld.wolfram.com/InductiveSet.html
+ *             * https://proofwiki.org/wiki/Definition:Inductive_Set (also uses a 1-based definition)
+ */
 $inductive(M: %Subset($"Natural numbers")): %Predicate {
   display = [$Property(
     property = 'inductive',

@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions
+ */
 $"Generalized union using power set"(
   U: %Set(auto = %true),
   S: %Subset($"Power set"(S = {U}))
@@ -13,8 +16,8 @@ $"Generalized union using power set"(
       #(i: %Element(
         S,
         shortcut = {
-          $"Power set"(S = {U}).subset,
-          #(T: %Subset(U)),
+          constructor = $"Power set"(S = {U}).subset,
+          parameters = #(T: %Subset(U)),
           override = %true
         }
       )),

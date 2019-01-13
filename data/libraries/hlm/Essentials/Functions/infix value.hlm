@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation
+ */
 $"infix value"(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),

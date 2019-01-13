@@ -7,12 +7,12 @@ import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
 import ExpressionDialog from './ExpressionDialog';
 import { getDefinitionIcon } from '../utils/icons';
-import * as ReactMarkdown from 'react-markdown';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import Modal from 'react-responsive-modal';
 import 'simplemde/dist/simplemde.min.css';
 
 const ToolTip = require('react-portal-tooltip').default;
+const ReactMarkdownRenderer = require('react-markdown-renderer').default;
 
 export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
@@ -632,7 +632,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
         }
       } else {
-        return <ReactMarkdown source={expression.text}/>;
+        return <ReactMarkdownRenderer markdown={expression.text} options={{linkify: true}}/>;
       }
     } else if (expression instanceof Display.IndirectExpression) {
       try {

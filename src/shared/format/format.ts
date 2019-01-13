@@ -160,7 +160,22 @@ export class Parameter {
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Parameter {
     let newType = this.type.expression.substitute(fn, replacedParameters);
     let newDefaultValue = this.defaultValue ? this.defaultValue.substitute(fn, replacedParameters) : undefined;
-    if (newType !== this.type.expression || newDefaultValue !== this.defaultValue || !fn) {
+    let newDependencies: Expression[] | undefined = undefined;
+    if (this.dependencies) {
+      newDependencies = [];
+      let dependenciesChanged = false;
+      for (let dependency of this.dependencies) {
+        let newDependency = dependency.substitute(fn, replacedParameters);
+        if (newDependency !== dependency) {
+          dependenciesChanged = true;
+        }
+        newDependencies.push(newDependency);
+      }
+      if (fn && !dependenciesChanged) {
+        newDependencies = this.dependencies;
+      }
+    }
+    if (newType !== this.type.expression || newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || !fn) {
       let result = new Parameter;
       result.name = this.name;
       result.type = new Type;
@@ -169,6 +184,7 @@ export class Parameter {
       result.defaultValue = newDefaultValue;
       result.optional = this.optional;
       result.list = this.list;
+      result.dependencies = newDependencies;
       replacedParameters.push({original: this, replacement: result});
       return result;
     } else {

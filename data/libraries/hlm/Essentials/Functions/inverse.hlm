@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Inverse_function
+ *             * http://mathworld.wolfram.com/InverseFunction.html
+ *             * https://proofwiki.org/wiki/Definition:Inverse_Mapping
+ */
 $inverse(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),

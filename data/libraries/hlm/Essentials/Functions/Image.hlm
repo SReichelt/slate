@@ -1,8 +1,8 @@
 %../../../../logics/hlm%
 
 /**
- * @references * [https://en.wikipedia.org/wiki/Image_(mathematics)](https://en.wikipedia.org/wiki/Image_(mathematics))
- *             * [https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset](https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset)
+ * @references * https://en.wikipedia.org/wiki/Image_(mathematics)
+ *             * https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset
  */
 $Image(
   X: %Set(auto = %true),

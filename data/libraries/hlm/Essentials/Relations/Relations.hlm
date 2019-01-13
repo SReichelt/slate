@@ -1,6 +1,13 @@
 %../../../../logics/hlm%
 
-$Relations(S: %Set): %Construction {
+/**
+ * @remarks This definition is limited to endorelations because they are used much more often than relations between two sets. (Especially given that functions are not defined as relations in this library.)
+ *
+ * @references * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
+ *             * http://mathworld.wolfram.com/Relation.html
+ *             * https://proofwiki.org/wiki/Definition:Endorelation
+ */
+$Relations(S: %Set(auto = %true, embedSubsets = %true)): %Construction {
   $relation(R: %Subset($../Sets/"Cartesian product"(
     S = {S},
     T = {S}

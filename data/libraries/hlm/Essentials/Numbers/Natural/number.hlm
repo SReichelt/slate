@@ -1,7 +1,9 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks Positional notation is implemented as a macro, i.e. using additional code that is injected into the proof checker.
+ * @remarks Positional notation is implemented as a macro, i.e. using additional code that is injected into the proof checker. Therefore, no definition is given here.
+ *
+ * @references * https://en.wikipedia.org/wiki/Positional_notation
  */
 $number(value: %Nat): %MacroOperator {
   display = [value]

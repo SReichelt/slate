@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Definition:Subtraction/Natural_Numbers
+ */
 $difference(
   n: %Element($"Natural numbers"),
   m: %Element($"Segment (less or equal)"(n = {n}))

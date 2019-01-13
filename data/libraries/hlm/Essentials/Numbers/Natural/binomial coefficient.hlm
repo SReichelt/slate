@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Binomial_coefficient
+ *             * http://mathworld.wolfram.com/BinomialCoefficient.html
+ *             * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
+ */
 $"binomial coefficient"(
   n: %Element($"Natural numbers"),
   k: %Element(%previous)

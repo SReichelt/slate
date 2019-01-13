@@ -5,7 +5,7 @@ $limit(
     $../../Natural/"Natural numbers",
     #(a: %Element($../"Rational numbers"))
   ),
-  α: %Def($../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
+  α: %Def($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
       #(m: %Element($../../Natural/"Natural numbers")),
       {a = {a[m]}}
   })),

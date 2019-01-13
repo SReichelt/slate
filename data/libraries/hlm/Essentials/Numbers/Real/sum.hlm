@@ -6,7 +6,7 @@ $sum(
     shortcut = {
       $"Real numbers".class,
       #(
-        r_a: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
         _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
       )
     }
@@ -16,7 +16,7 @@ $sum(
     shortcut = {
       $"Real numbers".class,
       #(
-        r_b: %Element($../../Sequences/Sequences(S = {$../Rational/"Rational numbers"})),
+        r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
         _2: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
       )
     }

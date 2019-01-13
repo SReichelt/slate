@@ -623,7 +623,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       indices: indices,
       isDefinition: isDefinition
     };
-    let shortcutDisplay = this.renderGenericExpression(shortcut._constructor, 0, replacementParameters);
+    let shortcutDisplay = this.renderGenericExpression(shortcut._constructor, false, 0, replacementParameters);
     this.setSemanticLink(shortcutDisplay, shortcut._constructor);
     if (shortcut._override instanceof FmtHLM.MetaRefExpression_true) {
       return shortcutDisplay;
@@ -780,7 +780,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       return this.renderStructuralCases(formula.term, formula.construction, formula.cases, this.renderFormula.bind(this));
     } else {
-      return this.renderGenericExpression(formula, negationCount);
+      return this.renderGenericExpression(formula, false, negationCount);
     }
   }
 
@@ -809,7 +809,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     });
   }
 
-  private renderGenericExpression(expression: Fmt.Expression, negationCount: number = 0, replacementParameters?: ReplacementParameters): Display.RenderedExpression {
+  private renderGenericExpression(expression: Fmt.Expression, omitArguments: boolean = false, negationCount: number = 0, replacementParameters?: ReplacementParameters): Display.RenderedExpression {
     if (expression instanceof Fmt.VariableRefExpression) {
       let indices = expression.indices ? expression.indices.map((term) => this.renderElementTerm(term)) : undefined;
       return this.renderVariable(expression.variable, indices);
@@ -821,7 +821,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let definitions: Fmt.Definition[] = [];
         let argumentLists: Fmt.ArgumentList[] = [];
         this.utils.analyzeDefinitionRefPath(childPaths, definition, definitions, argumentLists);
-        return this.renderDefinitionRef(definitions, argumentLists, false, negationCount, replacementParameters);
+        return this.renderDefinitionRef(definitions, argumentLists, omitArguments, negationCount, replacementParameters);
       });
       return new Display.PromiseExpression(expressionPromise);
     } else {
@@ -992,7 +992,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                  || type instanceof FmtHLM.MetaRefExpression_Subset
                  || type instanceof FmtHLM.MetaRefExpression_Element
                  || type instanceof FmtHLM.MetaRefExpression_Symbol
-                 || type instanceof FmtHLM.MetaRefExpression_Nat) {
+                 || type instanceof FmtHLM.MetaRefExpression_Nat
+                 || type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
         if (resultParams) {
           resultParams.push(param);
         }
@@ -1029,6 +1030,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let arg = this.getRawArgument(argumentLists, param);
             if (arg instanceof Fmt.IntegerExpression) {
               resultArgs.push(new Display.TextExpression(arg.value.toString()));
+            } else {
+              resultArgs.push(new Display.ErrorExpression('Undefined argument'));
+            }
+          } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
+            let arg = this.getRawArgument(argumentLists, param);
+            if (arg instanceof Fmt.DefinitionRefExpression) {
+              let definitionRef = this.renderGenericExpression(arg, true);
+              this.setSemanticLink(definitionRef, arg);
+              resultArgs.push(definitionRef);
             } else {
               resultArgs.push(new Display.ErrorExpression('Undefined argument'));
             }
@@ -1236,10 +1246,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               parameters: equalityDefinition.rightParameters,
               isDefinition: false
             };
+            let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftParameters);
+            this.setSemanticLink(leftConstructor, innerDefinition);
+            let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightParameters);
+            this.setSemanticLink(rightConstructor, innerDefinition);
             let equality = this.renderTemplate('EqualityRelation', {
-              'left': this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftParameters),
-              'right': this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightParameters)
+              'left': leftConstructor,
+              'right': rightConstructor
             });
+            this.setSemanticLink(equality, equalityDefinition);
             let definitions = equalityDefinition.definition as Fmt.ArrayExpression;
             let items = definitions.items.map((formula) => this.renderFormula(formula));
             let equivalenceDef = this.renderMultiDefinitions('Equivalence', equality, items);
@@ -1256,16 +1271,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let source = embedding.parameter.type.expression as FmtHLM.MetaRefExpression_Element;
         let rows: Display.RenderedExpressionPair[] = [];
         let subset = this.renderSetTerm(source._set);
-        let superset = this.renderTemplate('EmbeddingDefinition', {
+        let superset = this.renderDefinitionRef([definition]);
+        this.setSemanticLink(superset, definition);
+        let supersetDefinition = this.renderTemplate('EmbeddingDefinition', {
           'subset': new Display.EmptyExpression,
-          'superset': new Display.RowExpression([this.renderDefinitionRef([definition]), new Display.TextExpression(' via')])
+          'superset': superset
         });
-        rows.push({left: subset, right: superset});
+        let supersetWithText = new Display.RowExpression([supersetDefinition, new Display.TextExpression(' via')]);
+        rows.push({left: subset, right: supersetWithText});
         let subsetElement = this.renderVariableDefinitions([embedding.parameter]);
-        let target = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
+        let targetTerm = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
+        let target = this.renderElementTerm(targetTerm);
+        if (targetTerm instanceof Fmt.DefinitionRefExpression) {
+          let constructor = definition.innerDefinitions.getDefinition(targetTerm.path.name);
+          this.setSemanticLink(target, constructor);
+        }
         let supersetElement = this.renderTemplate('EqualityRelation', {
           'left': new Display.EmptyExpression,
-          'right': this.renderElementTerm(target)
+          'right': target
         });
         rows.push({left: subsetElement, right: supersetElement});
         paragraphs.push(new Display.AlignedExpression(rows));

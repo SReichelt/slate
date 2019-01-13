@@ -1,5 +1,8 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @remarks Note that this definition presupposes that _n_ is greater than 1. Otherwise, not all equivalences would hold.
+ */
 $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Predicate {
   display = [$Property(
     property = %neg('prime', 'composite'),

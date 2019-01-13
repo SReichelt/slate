@@ -2,9 +2,9 @@
 
 $"sequence sum"(
   α: %Element(
-    $../../../Sequences/Sequences(S = {$../"Rational numbers"}),
+    $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
     shortcut = {
-      constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+      constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
       parameters = #(n: %Binding(
         $../../Natural/"Natural numbers",
         #(a: %Element($../"Rational numbers"))
@@ -14,7 +14,7 @@ $"sequence sum"(
   β: %Element(
     %previous,
     shortcut = {
-      constructor = $../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence,
+      constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
       parameters = #(n: %Binding(
         $../../Natural/"Natural numbers",
         #(b: %Element($../"Rational numbers"))
@@ -28,7 +28,7 @@ $"sequence sum"(
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$../../../Sequences/Sequences(S = {$../"Rational numbers"}).sequence(n = {
+  definition = [$../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
       #(n: %Element($../../Natural/"Natural numbers")),
       {a = {$../sum(
         a = {a[n]},

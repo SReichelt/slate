@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative
+ */
 $"Composition is associative"(
   W: %Set(auto = %true),
   X: %Set(auto = %true),

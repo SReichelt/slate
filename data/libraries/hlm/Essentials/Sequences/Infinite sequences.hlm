@@ -1,0 +1,56 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This is obviously a definition of an infinite sequence, but we omit the word “infinite” because most of the time, it is implied.
+ *
+ *          We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily deconstruct a sequence into its elements and the ability to omit _S_ from the constructor.
+ *
+ *          Sequences of particular sets are treated in appropriate subsections concerning those sets.
+ *
+ * @references * https://en.wikipedia.org/wiki/Sequence
+ *             * http://mathworld.wolfram.com/Sequence.html
+ *             * https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
+ */
+$"Infinite sequences"(S: %Set(auto = %true)): %Construction {
+  $sequence(n: %Binding(
+    $../Numbers/Natural/"Natural numbers",
+    #(a: %Element(S))
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = a,
+        style = '()'
+      ),
+      sub = $Relation(
+        symbol = '∈',
+        operands = [n, 'ℕ'],
+        space = ''
+      )
+    )],
+    equalityDefinition = {
+      leftParameters = #(n: %Binding(
+        $../Numbers/Natural/"Natural numbers",
+        #(a: %Element(S))
+      )),
+      rightParameters = #(n: %Binding(
+        $../Numbers/Natural/"Natural numbers",
+        #("a'": %Element(S))
+      )),
+      definition = [%forall(
+        #(n: %Element($../Numbers/Natural/"Natural numbers")),
+        %equals(a[n], "a'"[n])
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = [$SubSup(
+    body = S,
+    sup = 'ω'
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    singularName = ['sequence on ', S],
+    pluralName = ['sequences on ', S]
+  }
+}

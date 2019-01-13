@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition is not standard in mathematics but convenient in some cases.
+ */
 $"cartesian product"(
   V: %Set(auto = %true),
   W: %Set(auto = %true),
@@ -34,11 +37,11 @@ $"cartesian product"(
           T = {X}
         ),
         shortcut = {
-          $../Sets/"Cartesian product"(
+          constructor = $../Sets/"Cartesian product"(
               S = {V},
               T = {X}
             ).pair,
-          #(
+          parameters = #(
             v: %Element(V),
             x: %Element(X)
           ),

@@ -1,0 +1,36 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks Although a property (or unary relation) on _S_ is merely a subset of _S_ (i.e. the subset of all elements for which the property holds), it makes sense to introduce a construction along with a macro that converts suitable predicates to properties.
+ *
+ *          Other than that, this definition is identical to that of the [power set](../Sets/Power%20set).
+ *
+ * @references * https://en.wikipedia.org/wiki/Property_(mathematics)
+ */
+$Properties(S: %Set(
+  auto = %true,
+  embedSubsets = %true
+)): %Construction {
+  $property(P: %Subset(S)): %Constructor {
+    display = [$Parens(
+      body = P,
+      style = '()'
+    )],
+    equalityDefinition = {
+      leftParameters = #(P: %Subset(S)),
+      rightParameters = #("P'": %Subset(S)),
+      definition = [%setEquals(P, "P'")],
+      isomorphic = %true
+    }
+  }
+
+  display = [$Function(
+    function = '𝓟𝓻𝓹',
+    arguments = [S]
+  )],
+  definitionDisplay = {
+    parameter = #(p: %Expr),
+    singularName = ['property on ', S],
+    pluralName = ['properties on ', S]
+  }
+}

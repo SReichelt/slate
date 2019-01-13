@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Natural_number#Multiplication
+ *             * https://proofwiki.org/wiki/Definition:Multiplication/Natural_Numbers
+ */
 $product(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)

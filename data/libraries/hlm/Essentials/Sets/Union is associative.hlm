@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Union_is_Associative
+ */
 $"Union is associative"(
   U: %Set,
   R: %Subset(U),

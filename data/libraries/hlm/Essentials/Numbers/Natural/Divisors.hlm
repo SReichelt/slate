@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks We specifically exclude 0 from the list of its own divisors in order to simplify the definition of [division](quotient).
+ *
+ * @references * http://oeis.org/A027750
+ */
 $Divisors(n: %Element($"Natural numbers")): %SetOperator {
   display = [$Function(
     function = 'Div',

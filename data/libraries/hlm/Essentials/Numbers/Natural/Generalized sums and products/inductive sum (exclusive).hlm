@@ -1,5 +1,10 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Summation
+ *             * http://mathworld.wolfram.com/Sum.html
+ *             * https://proofwiki.org/wiki/Definition:Summation
+ */
 $"inductive sum (exclusive)"(
   n: %Element($../"Natural numbers"),
   i: %Binding(

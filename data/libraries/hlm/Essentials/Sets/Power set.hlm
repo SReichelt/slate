@@ -1,6 +1,8 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks The power set is another example of a construction. It is slightly nonstandard in that its elements are not actual subsets but terms that are built using the constructor of this construction. To highlight this difference, parentheses are used.
+ *
  * @references * https://en.wikipedia.org/wiki/Power_set
  *             * http://mathworld.wolfram.com/PowerSet.html
  *             * https://proofwiki.org/wiki/Definition:Power_Set

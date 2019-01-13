@@ -1,5 +1,9 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Transitive_relation
+ *             * https://proofwiki.org/wiki/Definition:Transitive_Relation
+ */
 $transitive(
   S: %Set(auto = %true),
   ≺: %Element($Relations(S = {S}))

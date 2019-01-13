@@ -2,7 +2,7 @@
 
 $"Divisors are less or equal"(
   m: %Element($"Positive numbers"),
-  n: %Element($"Natural numbers"),
+  n: %Element(%previous),
   _1: %Constraint($divisible(
     m = {m},
     n = {n}

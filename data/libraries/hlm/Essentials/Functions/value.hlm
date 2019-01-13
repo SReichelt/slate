@@ -2,6 +2,8 @@
 
 /**
  * @remarks This definition works due to the special way that functions are defined. With the usual set-theoretic construction, an implicit definition would be needed here.
+ *
+ * @references * https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation
  */
 $value(
   X: %Set(auto = %true),
@@ -12,11 +14,11 @@ $value(
       Y = {Y}
     ),
     shortcut = {
-      $Functions(
+      constructor = $Functions(
           X = {X},
           Y = {Y}
         ).function,
-      #(z: %Binding(
+      parameters = #(z: %Binding(
         X,
         #(y: %Element(Y))
       ))

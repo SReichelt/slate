@@ -1,5 +1,12 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset _U_, although the intersection is, of course, independent of _U_. Since a suitable value for _U_ can always be inferred automatically, _U_ can be omitted from the notation.
+ *
+ * @references * https://en.wikipedia.org/wiki/Union_(set_theory)
+ *             * http://mathworld.wolfram.com/Union.html
+ *             * https://proofwiki.org/wiki/Definition:Set_Union
+ */
 $Union(
   U: %Set(auto = %true),
   S: %Subset(U),

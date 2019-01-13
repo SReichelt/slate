@@ -2,6 +2,8 @@
 
 /**
  * @references * https://en.wikipedia.org/wiki/Function_composition
+ *             * http://mathworld.wolfram.com/Composition.html
+ *             * https://proofwiki.org/wiki/Definition:Composition_of_Mappings
  */
 $composition(
   X: %Set(auto = %true),

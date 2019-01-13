@@ -1,5 +1,10 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
+ *             * http://mathworld.wolfram.com/Product.html
+ *             * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)
+ */
 $"inductive product (exclusive)"(
   n: %Element($../"Natural numbers"),
   i: %Binding(

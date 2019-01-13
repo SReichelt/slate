@@ -7,7 +7,7 @@ $Relations: %Section {
     %item($related),
     %item($restriction),
     %item($equality),
-    %item($opposite),
+    %item($converse),
     %item($reflexive),
     %item($symmetric),
     %item($transitive),

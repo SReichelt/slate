@@ -1,12 +1,15 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition is not exactly standard but very simple. The main reason to include it is that the result is known to be a relation on _T_ instead of _S_, which is sometimes needed.
+ */
 $restriction(
   S: %Set(auto = %true),
   ≺: %Element(
     $Relations(S = {S}),
     shortcut = {
-      $Relations(S = {S}).relation,
-      #(R: %Subset($../Sets/"Cartesian product"(
+      constructor = $Relations(S = {S}).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
@@ -21,15 +24,24 @@ $restriction(
     ),
     operand = ≺
   )],
-  definition = [$Relations(S = {T}).relation(R = {$../Sets/Intersection(
-      U = {$../Sets/"Cartesian product"(
-        S = {S},
-        T = {S}
-      )},
-      S = {R},
-      T = {$../Sets/"Cartesian product"(
-        S = {T},
-        T = {T}
-      )}
-  )})]
+  definition = [
+    $Relations(S = {T}).relation(R = {%subset(
+        #(t: %Element($../Sets/"Cartesian product"(
+          S = {T},
+          T = {T}
+        ))),
+        %in(t, R)
+    )}),
+    $Relations(S = {T}).relation(R = {$../Sets/Intersection(
+        U = {$../Sets/"Cartesian product"(
+          S = {S},
+          T = {S}
+        )},
+        S = {R},
+        T = {$../Sets/"Cartesian product"(
+          S = {T},
+          T = {T}
+        )}
+    )})
+  ]
 }

@@ -15,6 +15,7 @@ $"Segment (greater)"(a: %Element($Integers)): %SetOperator {
       )
     ),
     $../../Sets/"Relative complement"(
+      U = {$Integers},
       S = {$Integers},
       T = {$"Segment (less or equal)"(a = {a})}
     ),

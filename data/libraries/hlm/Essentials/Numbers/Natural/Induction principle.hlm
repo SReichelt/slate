@@ -1,14 +1,19 @@
 %../../../../../logics/hlm%
 
-$"Induction principle"(
-  M: %Subset($"Natural numbers"),
-  _1: %Constraint($inductive(M = {M}))
-): %StandardTheorem {
-  claim = %setEquals(
-    M,
-    $"Natural numbers"
-  ),
-  proofs = [{steps = #(_: %ProveSetEquals(supersetProof = {steps = #(_: %ProveDef(proof = {
+/**
+ * @remarks Structural induction on the natural numbers is a direct consequence of their definition as a construction. This set-theoretic form of the induction principle is provable from it.
+ *
+ * @references * https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Set
+ */
+$"Induction principle"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
+  conditions = [
+    $inductive(M = {M}),
+    %setEquals(
+      M,
+      $"Natural numbers"
+    )
+  ],
+  equivalenceProofs = [{steps = #(_: %ProveSetEquals(supersetProof = {steps = #(_: %ProveDef(proof = {
     goal = %forall(
       #(n: %Element($"Natural numbers")),
       %in(n, M)

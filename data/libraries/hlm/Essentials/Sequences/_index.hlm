@@ -2,5 +2,8 @@
 
 $Functions: %Section {
   logic = 'hlm',
-  items = [%item($Sequences)]
+  items = [
+    %item($"Finite sequences"),
+    %item($"Infinite sequences")
+  ]
 }

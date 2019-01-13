@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Intersection_is_Commutative
+ */
 $"Intersection is commutative"(
   U: %Set,
   S: %Subset(U),

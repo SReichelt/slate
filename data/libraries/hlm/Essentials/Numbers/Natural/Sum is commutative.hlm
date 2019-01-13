@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_commutativity
+ *             * https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative
+ */
 $"Sum is commutative"(
   a: %Element($"Natural numbers"),
   b: %Element(%previous)

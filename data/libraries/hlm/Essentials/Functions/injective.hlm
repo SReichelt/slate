@@ -1,5 +1,10 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Injective_function
+ *             * http://mathworld.wolfram.com/Injection.html
+ *             * https://proofwiki.org/wiki/Definition:Injection
+ */
 $injective(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),

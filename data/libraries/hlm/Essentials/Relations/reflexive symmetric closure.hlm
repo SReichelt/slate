@@ -12,18 +12,20 @@ $"reflexive symmetric closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      P = {%subset(
-        #(⊂: %Element($Relations(S = {S}))),
-        %and(
-          $reflexive(
-            S = {S},
-            ≺ = {⊂}
-          ),
-          $symmetric(
-            S = {S},
-            ≺ = {⊂}
+      p = {$../Properties/Properties.property(
+        P = {%subset(
+          #(⊂: %Element($Relations(S = {S}))),
+          %and(
+            $reflexive(
+              S = {S},
+              ≺ = {⊂}
+            ),
+            $symmetric(
+              S = {S},
+              ≺ = {⊂}
+            )
           )
-        )
+        )}
       )}
     ),
     $"symmetric closure"(

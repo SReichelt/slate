@@ -1,5 +1,11 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type).
+ *
+ * @references * https://en.wikipedia.org/wiki/Natural_number#Addition
+ *             * https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers
+ */
 $sum(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)

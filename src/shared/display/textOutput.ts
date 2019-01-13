@@ -3,7 +3,10 @@ import CachedPromise from '../data/cachedPromise';
 
 const escapeForMarkdown = require('markdown-escape');
 
-export function renderAsText(expression: Display.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number): CachedPromise<string> {
+export function renderAsText(expression: Display.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
+  if (!optionalParenStyle) {
+    optionalParenStyle = expression.optionalParenStyle;
+  }
   if (expression instanceof Display.EmptyExpression) {
     return CachedPromise.resolve('\u200b');
   } else if (expression instanceof Display.TextExpression) {
@@ -16,7 +19,11 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     }
     return CachedPromise.resolve(text);
   } else if (expression instanceof Display.RowExpression) {
-    return renderList(expression.items.map((item) => renderAsText(item, outputMarkdown, true)), '');
+    if (expression.items.length === 1) {
+      return renderAsText(expression.items[0], outputMarkdown, true, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+    } else {
+      return renderList(expression.items.map((item) => renderAsText(item, outputMarkdown, true)), '');
+    }
   } else if (expression instanceof Display.ParagraphExpression) {
     return renderList(expression.paragraphs.map((item) => renderAsText(item, outputMarkdown, singleLine)), singleLine ? ' ' : '\n\n');
   } else if (expression instanceof Display.ListExpression) {
@@ -73,7 +80,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
   } else if (expression instanceof Display.OuterParenExpression) {
     if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
         && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-      return renderAsText(new Display.ParenExpression(expression.body, expression.optionalParenStyle), outputMarkdown, true);
+      return renderAsText(new Display.ParenExpression(expression.body, optionalParenStyle), outputMarkdown, true);
     } else {
       return renderAsText(expression.body, outputMarkdown, true);
     }
@@ -97,7 +104,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       items.unshift(new Display.TextExpression('^'));
       items.unshift(new Display.InnerParenExpression(expression.preSup));
     }
-    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true, undefined, optionalParenStyle);
   } else if (expression instanceof Display.OverUnderExpression) {
     let items: Display.RenderedExpression[] = [new Display.InnerParenExpression(expression.body)];
     if (expression.under) {
@@ -108,7 +115,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       items.push(new Display.TextExpression('^'));
       items.push(new Display.InnerParenExpression(expression.over));
     }
-    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true, undefined, optionalParenStyle);
   } else if (expression instanceof Display.FractionExpression) {
     let items: Display.RenderedExpression[] = [
       new Display.InnerParenExpression(expression.numerator),
@@ -119,7 +126,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     if (optionalParenLeft || optionalParenRight) {
       resultExpression = new Display.ParenExpression(resultExpression, expression.optionalParenStyle);
     }
-    return renderAsText(resultExpression, outputMarkdown, true, true, true);
+    return renderAsText(resultExpression, outputMarkdown, true, true, true, undefined, optionalParenStyle);
   } else if (expression instanceof Display.RadicalExpression) {
     let items: Display.RenderedExpression[] = [
       new Display.TextExpression('√'),
@@ -137,12 +144,12 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return CachedPromise.resolve(expression.text);
   } else if (expression instanceof Display.IndirectExpression) {
     try {
-      return renderAsText(expression.resolve(), outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel);
+      return renderAsText(expression.resolve(), outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } catch (error) {
       return CachedPromise.resolve(`Error: ${error.message}`);
     }
   } else if (expression instanceof Display.PromiseExpression) {
-    return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel));
+    return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
   } else if (expression instanceof Display.DecoratedExpression) {
     return renderAsText(expression.body, outputMarkdown, singleLine);
   } else if (expression instanceof Display.PlaceholderExpression) {

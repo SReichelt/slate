@@ -1,5 +1,15 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type).
+ *
+ *          In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
+ *
+ * @references * https://en.wikipedia.org/wiki/Natural_number
+ *             * http://mathworld.wolfram.com/NonnegativeInteger.html
+ *             * https://proofwiki.org/wiki/Definition:Natural_Numbers
+ *             * http://oeis.org/A001477
+ */
 $"Natural numbers": %Construction {
   $zero: %Constructor {
     display = [$ConstructorName(name = 'O')],

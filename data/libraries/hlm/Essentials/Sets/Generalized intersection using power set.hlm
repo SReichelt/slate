@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections
+ */
 $"Generalized intersection using power set"(
   U: %Set(auto = %true),
   S: %Subset($"Power set"(S = {U}))
@@ -13,8 +16,8 @@ $"Generalized intersection using power set"(
       #(i: %Element(
         S,
         shortcut = {
-          $"Power set"(S = {U}).subset,
-          #(T: %Subset(U)),
+          constructor = $"Power set"(S = {U}).subset,
+          parameters = #(T: %Subset(U)),
           override = %true
         }
       )),
