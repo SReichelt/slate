@@ -1,8 +1,19 @@
 %../../../../../logics/hlm%
 
-$"Comparison is reflexive"(a: %Element($"Natural numbers")): %StandardTheorem {
-  claim = $"less or equal"(
-    m = {a},
-    n = {a}
+$"Comparison is reflexive": %StandardTheorem {
+  claim = $../../Relations/reflexive(
+    S = {$"Natural numbers"},
+    ≺ = {$../../Relations/predicate(
+      S = {$"Natural numbers"},
+      T = {$"Natural numbers"},
+      parameters = #(
+        m: %Element($"Natural numbers"),
+        n: %Element(%previous)
+      ),
+      predicate = $"less or equal"(
+        m = {m},
+        n = {n}
+      )
+    )}
   )
 }

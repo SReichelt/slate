@@ -23,12 +23,10 @@ $Categories: %Construction {
         %previous,
         #(f: %Binding(
           %previous,
-          #(∘: %Element($../../Essentials/Functions/Functions(
-            X = {$../../Essentials/Sets/"Cartesian product"(
-              S = {M[e,f]},
-              T = {M[d,e]}
-            )},
-            Y = {M[d,f]}
+          #(∘: %Element($../../Essentials/Functions/Operations/Operations(
+            X = {M[e,f]},
+            Y = {M[d,e]},
+            Z = {M[d,f]}
           )))
         ))
       ))
@@ -44,12 +42,12 @@ $Categories: %Construction {
         r: %Element(M[y,z])
       ),
       %equals(
-        $../../Essentials/Functions/"infix value"(
+        $../../Essentials/Functions/Operations/value(
           X = {M[x,z]},
           Y = {M[w,x]},
           Z = {M[w,z]},
           ∗ = {∘[w,x,z]},
-          x = {$../../Essentials/Functions/"infix value"(
+          x = {$../../Essentials/Functions/Operations/value(
             X = {M[y,z]},
             Y = {M[x,y]},
             Z = {M[x,z]},
@@ -59,13 +57,13 @@ $Categories: %Construction {
           )},
           y = {p}
         ),
-        $../../Essentials/Functions/"infix value"(
+        $../../Essentials/Functions/Operations/value(
           X = {M[y,z]},
           Y = {M[w,y]},
           Z = {M[w,z]},
           ∗ = {∘[w,y,z]},
           x = {r},
-          y = {$../../Essentials/Functions/"infix value"(
+          y = {$../../Essentials/Functions/Operations/value(
             X = {M[x,y]},
             Y = {M[w,x]},
             Z = {M[w,y]},
@@ -84,7 +82,7 @@ $Categories: %Construction {
       ),
       %and(
         %equals(
-          $../../Essentials/Functions/"infix value"(
+          $../../Essentials/Functions/Operations/value(
             X = {M[v,v]},
             Y = {M[u,v]},
             Z = {M[u,v]},
@@ -95,7 +93,7 @@ $Categories: %Construction {
           s
         ),
         %equals(
-          $../../Essentials/Functions/"infix value"(
+          $../../Essentials/Functions/Operations/value(
             X = {M[u,v]},
             Y = {M[u,u]},
             Z = {M[u,v]},
@@ -114,7 +112,7 @@ $Categories: %Construction {
         s: %Element(M[u,v]),
         t: %Element(M[v,u]),
         _4: %Constraint(%equals(
-          $../../Essentials/Functions/"infix value"(
+          $../../Essentials/Functions/Operations/value(
             X = {M[u,v]},
             Y = {M[v,u]},
             Z = {M[v,v]},
@@ -125,7 +123,7 @@ $Categories: %Construction {
           i[v]
         )),
         _5: %Constraint(%equals(
-          $../../Essentials/Functions/"infix value"(
+          $../../Essentials/Functions/Operations/value(
             X = {M[v,u]},
             Y = {M[u,v]},
             Z = {M[u,u]},
@@ -190,12 +188,10 @@ $Categories: %Construction {
             %previous,
             #(f: %Binding(
               %previous,
-              #(∘: %Element($../../Essentials/Functions/Functions(
-                X = {$../../Essentials/Sets/"Cartesian product"(
-                  S = {M[e,f]},
-                  T = {M[d,e]}
-                )},
-                Y = {M[d,f]}
+              #(∘: %Element($../../Essentials/Functions/Operations/Operations(
+                X = {M[e,f]},
+                Y = {M[d,e]},
+                Z = {M[d,f]}
               )))
             ))
           ))
@@ -211,12 +207,12 @@ $Categories: %Construction {
             r: %Element(M[y,z])
           ),
           %equals(
-            $../../Essentials/Functions/"infix value"(
+            $../../Essentials/Functions/Operations/value(
               X = {M[x,z]},
               Y = {M[w,x]},
               Z = {M[w,z]},
               ∗ = {∘[w,x,z]},
-              x = {$../../Essentials/Functions/"infix value"(
+              x = {$../../Essentials/Functions/Operations/value(
                 X = {M[y,z]},
                 Y = {M[x,y]},
                 Z = {M[x,z]},
@@ -226,13 +222,13 @@ $Categories: %Construction {
               )},
               y = {p}
             ),
-            $../../Essentials/Functions/"infix value"(
+            $../../Essentials/Functions/Operations/value(
               X = {M[y,z]},
               Y = {M[w,y]},
               Z = {M[w,z]},
               ∗ = {∘[w,y,z]},
               x = {r},
-              y = {$../../Essentials/Functions/"infix value"(
+              y = {$../../Essentials/Functions/Operations/value(
                 X = {M[x,y]},
                 Y = {M[w,x]},
                 Z = {M[w,y]},
@@ -251,7 +247,7 @@ $Categories: %Construction {
           ),
           %and(
             %equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {M[v,v]},
                 Y = {M[u,v]},
                 Z = {M[u,v]},
@@ -262,7 +258,7 @@ $Categories: %Construction {
               s
             ),
             %equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {M[u,v]},
                 Y = {M[u,u]},
                 Z = {M[u,v]},
@@ -281,7 +277,7 @@ $Categories: %Construction {
             s: %Element(M[u,v]),
             t: %Element(M[v,u]),
             _4: %Constraint(%equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {M[u,v]},
                 Y = {M[v,u]},
                 Z = {M[v,v]},
@@ -292,7 +288,7 @@ $Categories: %Construction {
               i[v]
             )),
             _5: %Constraint(%equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {M[v,u]},
                 Y = {M[u,v]},
                 Z = {M[u,u]},
@@ -325,12 +321,10 @@ $Categories: %Construction {
             %previous,
             #("f'": %Binding(
               %previous,
-              #("∘'": %Element($../../Essentials/Functions/Functions(
-                X = {$../../Essentials/Sets/"Cartesian product"(
-                  S = {"M'"["e'","f'"]},
-                  T = {"M'"["d'","e'"]}
-                )},
-                Y = {"M'"["d'","f'"]}
+              #("∘'": %Element($../../Essentials/Functions/Operations/Operations(
+                X = {"M'"["e'","f'"]},
+                Y = {"M'"["d'","e'"]},
+                Z = {"M'"["d'","f'"]}
               )))
             ))
           ))
@@ -346,12 +340,12 @@ $Categories: %Construction {
             "r'": %Element("M'"["y'","z'"])
           ),
           %equals(
-            $../../Essentials/Functions/"infix value"(
+            $../../Essentials/Functions/Operations/value(
               X = {"M'"["x'","z'"]},
               Y = {"M'"["w'","x'"]},
               Z = {"M'"["w'","z'"]},
               ∗ = {"∘'"["w'","x'","z'"]},
-              x = {$../../Essentials/Functions/"infix value"(
+              x = {$../../Essentials/Functions/Operations/value(
                 X = {"M'"["y'","z'"]},
                 Y = {"M'"["x'","y'"]},
                 Z = {"M'"["x'","z'"]},
@@ -361,13 +355,13 @@ $Categories: %Construction {
               )},
               y = {"p'"}
             ),
-            $../../Essentials/Functions/"infix value"(
+            $../../Essentials/Functions/Operations/value(
               X = {"M'"["y'","z'"]},
               Y = {"M'"["w'","y'"]},
               Z = {"M'"["w'","z'"]},
               ∗ = {"∘'"["w'","y'","z'"]},
               x = {"r'"},
-              y = {$../../Essentials/Functions/"infix value"(
+              y = {$../../Essentials/Functions/Operations/value(
                 X = {"M'"["x'","y'"]},
                 Y = {"M'"["w'","x'"]},
                 Z = {"M'"["w'","y'"]},
@@ -386,7 +380,7 @@ $Categories: %Construction {
           ),
           %and(
             %equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {"M'"["v'","v'"]},
                 Y = {"M'"["u'","v'"]},
                 Z = {"M'"["u'","v'"]},
@@ -397,7 +391,7 @@ $Categories: %Construction {
               "s'"
             ),
             %equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {"M'"["u'","v'"]},
                 Y = {"M'"["u'","u'"]},
                 Z = {"M'"["u'","v'"]},
@@ -416,7 +410,7 @@ $Categories: %Construction {
             "s'": %Element("M'"["u'","v'"]),
             "t'": %Element("M'"["v'","u'"]),
             "_4'": %Constraint(%equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {"M'"["u'","v'"]},
                 Y = {"M'"["v'","u'"]},
                 Z = {"M'"["v'","v'"]},
@@ -427,7 +421,7 @@ $Categories: %Construction {
               "i'"["v'"]
             )),
             "_5'": %Constraint(%equals(
-              $../../Essentials/Functions/"infix value"(
+              $../../Essentials/Functions/Operations/value(
                 X = {"M'"["v'","u'"]},
                 Y = {"M'"["u'","v'"]},
                 Z = {"M'"["u'","u'"]},

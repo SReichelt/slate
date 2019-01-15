@@ -7,12 +7,8 @@ $Isomorphisms(
       constructor = $Magmas.magma,
       parameters = #(
         M: %Set,
-        ∗: %Element($../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
-            S = {M},
-            T = {M}
-          )},
-          Y = {M}
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+          X = {M}
         ))
       )
     }
@@ -23,12 +19,8 @@ $Isomorphisms(
       constructor = $Magmas.magma,
       parameters = #(
         N: %Set,
-        ⋆: %Element($../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
-            S = {N},
-            T = {N}
-          )},
-          Y = {N}
+        ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+          X = {N}
         ))
       )
     }
@@ -75,7 +67,7 @@ $Isomorphisms(
             X = {M},
             Y = {N},
             f = {f},
-            x = {$../../Essentials/Functions/"infix value"(
+            x = {$../../Essentials/Functions/Operations/value(
               X = {M},
               Y = {M},
               Z = {M},
@@ -84,7 +76,7 @@ $Isomorphisms(
               y = {b}
             )}
           ),
-          $../../Essentials/Functions/"infix value"(
+          $../../Essentials/Functions/Operations/value(
             X = {N},
             Y = {N},
             Z = {N},

@@ -7,12 +7,8 @@ $"free on set"(
       constructor = $Magmas.magma,
       parameters = #(
         M: %Set,
-        ∗: %Element($../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
-            S = {M},
-            T = {M}
-          )},
-          Y = {M}
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+          X = {M}
         ))
       )
     }

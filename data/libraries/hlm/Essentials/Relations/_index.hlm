@@ -5,6 +5,13 @@ $Relations: %Section {
   items = [
     %item($Relations),
     %item($related),
+    %item(
+      $predicate,
+      title = {
+        de = 'Prädikat als Relation',
+        en = 'Predicate as relation'
+      }
+    ),
     %item($converse),
     %item($intersection),
     %item($union),
@@ -15,6 +22,7 @@ $Relations: %Section {
     %item($equality),
     %item($reflexive),
     %item($symmetric),
+    %item($antisymmetric),
     %item($transitive),
     %item($preorder),
     %item($equivalence),

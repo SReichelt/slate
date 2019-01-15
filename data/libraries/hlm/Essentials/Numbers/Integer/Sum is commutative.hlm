@@ -1,17 +1,21 @@
 %../../../../../logics/hlm%
 
-$"Sum is commutative"(
-  a: %Element($Integers),
-  b: %Element(%previous)
-): %StandardTheorem {
-  claim = %equals(
-    $sum(
-      a = {a},
-      b = {b}
-    ),
-    $sum(
-      a = {b},
-      b = {a}
-    )
+$"Sum is commutative": %StandardTheorem {
+  claim = $../../Functions/Operations/commutative(
+    X = {$Integers},
+    Z = {$Integers},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$Integers},
+      Y = {$Integers},
+      Z = {$Integers},
+      parameters = #(
+        a: %Element($Integers),
+        b: %Element(%previous)
+      ),
+      operator = $sum(
+        a = {a},
+        b = {b}
+      )
+    )}
   )
 }

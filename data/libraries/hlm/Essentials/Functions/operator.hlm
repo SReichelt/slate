@@ -1,0 +1,13 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This is a macro to convert an operator taking an element of _X_ and returning an element of _Y_ to a function from _X_ to _Y_.
+ */
+$operator(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  parameter: %ParameterList,
+  operator[parameter]: %DefinitionRef
+): %MacroOperator {
+  display = [operator]
+}

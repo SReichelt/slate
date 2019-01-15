@@ -27,9 +27,11 @@ $"symmetric closure"(
     ),
     $union(
       S = {S},
+      T = {S},
       ≺ = {≺},
       ⊂ = {$converse(
         S = {S},
+        T = {S},
         ≺ = {≺}
       )}
     )

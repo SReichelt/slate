@@ -4,123 +4,21 @@
  * @references * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_associativity
  *             * https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative
  */
-$"Sum is associative"(
-  a: %Element($"Natural numbers"),
-  b: %Element(%previous),
-  c: %Element(%previous)
-): %StandardTheorem {
-  claim = %equals(
-    $sum(
-      m = {$sum(
-        m = {a},
-        n = {b}
-      )},
-      n = {c}
-    ),
-    $sum(
-      m = {a},
-      n = {$sum(
-        m = {b},
-        n = {c}
-      )}
-    )
-  ),
-  proofs = [{
-    goal = %equals(
-      %structuralCases(
-        c,
-        $"Natural numbers",
-        [
-          {
-            constructor = $"Natural numbers".zero,
-            value = $sum(
-              m = {a},
-              n = {b}
-            )
-          },
-          {
-            constructor = $"Natural numbers".successor,
-            parameters = #(x: %Element($"Natural numbers")),
-            value = $"Natural numbers".successor(n = {$sum(
-                m = {$sum(
-                  m = {a},
-                  n = {b}
-                )},
-                n = {x}
-            )})
-          }
-        ]
+$"Sum is associative": %StandardTheorem {
+  claim = $../../Functions/Operations/associative(
+    X = {$"Natural numbers"},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$"Natural numbers"},
+      Y = {$"Natural numbers"},
+      Z = {$"Natural numbers"},
+      parameters = #(
+        m: %Element($"Natural numbers"),
+        n: %Element(%previous)
       ),
-      $sum(
-        m = {a},
-        n = {$sum(
-          m = {b},
-          n = {c}
-        )}
+      operator = $sum(
+        m = {m},
+        n = {n}
       )
-    ),
-    steps = #(_: %ProveCases(
-      side = %left,
-      caseProofs = [
-        {
-          goal = %equals(
-            $sum(
-              m = {a},
-              n = {b}
-            ),
-            $sum(
-              m = {a},
-              n = {b}
-            )
-          ),
-          steps = #()
-        },
-        {
-          parameters = #(x: %Element($"Natural numbers")),
-          goal = %equals(
-            $"Natural numbers".successor(n = {$sum(
-                m = {$sum(
-                  m = {a},
-                  n = {b}
-                )},
-                n = {x}
-            )}),
-            $"Natural numbers".successor(n = {$sum(
-                m = {a},
-                n = {$sum(
-                  m = {b},
-                  n = {x}
-                )}
-            )})
-          ),
-          steps = #(
-            _: %UseTheorem(
-              $"Sum is associative"(
-                a = {a},
-                b = {b},
-                c = {x}
-              ),
-              %equals(
-                $sum(
-                  m = {$sum(
-                    m = {a},
-                    n = {b}
-                  )},
-                  n = {x}
-                ),
-                $sum(
-                  m = {a},
-                  n = {$sum(
-                    m = {b},
-                    n = {x}
-                  )}
-                )
-              )
-            ),
-            _: %Extend($"Natural numbers".successor(n = {%previous}))
-          )
-        }
-      ]
-    ))
-  }]
+    )}
+  )
 }

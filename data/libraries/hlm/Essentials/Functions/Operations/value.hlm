@@ -1,18 +1,13 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
-/**
- * @references * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation
- */
-$"infix value"(
+$value(
   X: %Set(auto = %true),
   Y: %Set(auto = %true),
   Z: %Set(auto = %true),
-  ∗: %Element($Functions(
-    X = {$../Sets/"Cartesian product"(
-      S = {X},
-      T = {Y}
-    )},
-    Y = {Z}
+  ∗: %Element($Operations(
+    X = {X},
+    Y = {Y},
+    Z = {Z}
   )),
   x: %Element(X),
   y: %Element(Y)
@@ -21,14 +16,14 @@ $"infix value"(
     symbol = ∗,
     operands = [x, y]
   )],
-  definition = [$value(
-    X = {$../Sets/"Cartesian product"(
+  definition = [$../value(
+    X = {$../../Sets/"Cartesian product"(
       S = {X},
       T = {Y}
     )},
     Y = {Z},
     f = {∗},
-    x = {$../Sets/"Cartesian product"(
+    x = {$../../Sets/"Cartesian product"(
         S = {X},
         T = {Y}
       ).pair(

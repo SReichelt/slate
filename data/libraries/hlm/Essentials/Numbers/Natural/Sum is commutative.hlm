@@ -4,130 +4,22 @@
  * @references * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_commutativity
  *             * https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative
  */
-$"Sum is commutative"(
-  a: %Element($"Natural numbers"),
-  b: %Element(%previous)
-): %StandardTheorem {
-  claim = %equals(
-    $sum(
-      m = {a},
-      n = {b}
-    ),
-    $sum(
-      m = {b},
-      n = {a}
-    )
-  ),
-  proofs = [{
-    goal = %equals(
-      %structuralCases(
-        b,
-        $"Natural numbers",
-        [
-          {
-            constructor = $"Natural numbers".zero,
-            value = a,
-            rewrite = %true
-          },
-          {
-            constructor = $"Natural numbers".successor,
-            parameters = #(x: %Element($"Natural numbers")),
-            value = $"Natural numbers".successor(n = {$sum(
-                m = {a},
-                n = {x}
-            )}),
-            rewrite = %true
-          }
-        ]
+$"Sum is commutative": %StandardTheorem {
+  claim = $../../Functions/Operations/commutative(
+    X = {$"Natural numbers"},
+    Z = {$"Natural numbers"},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$"Natural numbers"},
+      Y = {$"Natural numbers"},
+      Z = {$"Natural numbers"},
+      parameters = #(
+        m: %Element($"Natural numbers"),
+        n: %Element(%previous)
       ),
-      $sum(
-        m = {b},
-        n = {a}
+      operator = $sum(
+        m = {m},
+        n = {n}
       )
-    ),
-    steps = #(_: %ProveCases(
-      side = %left,
-      caseProofs = [
-        {
-          goal = %equals(
-            a,
-            $sum(
-              m = {$number(value = 0)},
-              n = {a}
-            )
-          ),
-          steps = #(_: %UseTheorem(
-            $"Left-addition of zero is neutral"(n = {a}),
-            %equals(
-              $sum(
-                m = {$number(value = 0)},
-                n = {a}
-              ),
-              a
-            )
-          ))
-        },
-        {
-          parameters = #(x: %Element($"Natural numbers")),
-          goal = %equals(
-            $"Natural numbers".successor(n = {$sum(
-                m = {a},
-                n = {x}
-            )}),
-            $sum(
-              m = {$"Natural numbers".successor(n = {x})},
-              n = {a}
-            )
-          ),
-          steps = #(
-            _: %UseTheorem(
-              $"Successor can be pulled over addition"(
-                m = {x},
-                n = {a}
-              ),
-              %equals(
-                $sum(
-                  m = {$"Natural numbers".successor(n = {x})},
-                  n = {a}
-                ),
-                $"Natural numbers".successor(n = {$sum(
-                    m = {x},
-                    n = {a}
-                )})
-              )
-            ),
-            _: %Substitute(
-              #(_: %UseTheorem(
-                $"Sum is commutative"(
-                  a = {a},
-                  b = {x}
-                ),
-                %equals(
-                  $sum(
-                    m = {a},
-                    n = {x}
-                  ),
-                  $sum(
-                    m = {x},
-                    n = {a}
-                  )
-                )
-              )),
-              %right,
-              %equals(
-                $sum(
-                  m = {$"Natural numbers".successor(n = {x})},
-                  n = {a}
-                ),
-                $"Natural numbers".successor(n = {$sum(
-                    m = {a},
-                    n = {x}
-                )})
-              )
-            )
-          )
-        }
-      ]
-    ))
-  }]
+    )}
+  )
 }

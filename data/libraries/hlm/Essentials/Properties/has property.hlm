@@ -11,8 +11,8 @@ $"has property"(
   ),
   s: %Element(S)
 ): %Predicate {
-  display = [$Relation(
-    symbol = 'is',
+  display = [$TextualRelation(
+    symbol = %neg('is', 'is not'),
     operands = [s, p]
   )],
   definition = [%in(s, P)]

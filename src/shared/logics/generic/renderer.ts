@@ -37,7 +37,7 @@ export abstract class GenericRenderer {
     return config;
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false): Display.RenderedExpression {
     let name = param.name;
     let suffixes: Display.RenderedExpression[] | undefined = undefined;
     let underscorePos = name.indexOf('_');
@@ -63,6 +63,9 @@ export abstract class GenericRenderer {
       result = subExpression;
     }
     result.styleClasses = ['var'];
+    if (isDummy) {
+      result.styleClasses.push('dummy');
+    }
     result.semanticLinks = [new Display.SemanticLink(param, isDefinition)];
     if (indices) {
       let subExpression = new Display.SubSupExpression(result);

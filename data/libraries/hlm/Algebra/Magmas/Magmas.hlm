@@ -6,12 +6,8 @@
 $Magmas: %Construction {
   $magma(
     S: %Set,
-    ∗: %Element($../../Essentials/Functions/Functions(
-      X = {$../../Essentials/Sets/"Cartesian product"(
-        S = {S},
-        T = {S}
-      )},
-      Y = {S}
+    ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+      X = {S}
     ))
   ): %Constructor {
     display = [$Tuple(
@@ -21,22 +17,14 @@ $Magmas: %Construction {
     equalityDefinition = {
       leftParameters = #(
         S: %Set,
-        ∗: %Element($../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
-            S = {S},
-            T = {S}
-          )},
-          Y = {S}
-        ))
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+      X = {S}
+    ))
       ),
       rightParameters = #(
         "S'": %Set,
-        "∗'": %Element($../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
-            S = {"S'"},
-            T = {"S'"}
-          )},
-          Y = {"S'"}
+        "∗'": %Element($../../Essentials/Functions/Operations/"Inner operations"(
+          X = {"S'"}
         ))
       ),
       definition = [%exists(

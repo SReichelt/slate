@@ -1,0 +1,39 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Antisymmetric_relation
+ *             * http://mathworld.wolfram.com/AntisymmetricRelation.html
+ *             * https://proofwiki.org/wiki/Definition:Antisymmetric_Relation
+ */
+$antisymmetric(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S}))
+): %Predicate {
+  display = [$Property(
+    operand = ≺,
+    property = 'antisymmetric'
+  )],
+  definition = [
+    %forall(
+      #(
+        s: %Element(S),
+        t: %Element(%previous),
+        _1: %Constraint($related(
+          S = {S},
+          T = {S},
+          s = {s},
+          ≺ = {≺},
+          t = {t}
+        )),
+        _2: %Constraint($related(
+          S = {S},
+          T = {S},
+          s = {t},
+          ≺ = {≺},
+          t = {s}
+        ))
+      ),
+      %equals(s, t)
+    )
+  ]
+}

@@ -12,7 +12,6 @@ import CachedPromise from '../../data/cachedPromise';
 interface ParameterListState {
   sentence: boolean;
   abbreviate: boolean;
-  inQuantifier: boolean;
   forcePlural: boolean;
   enableSpecializations: boolean;
   started: boolean;
@@ -48,7 +47,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (row.length) {
           row.push(new Display.TextExpression('  '));
         }
-        row.push(this.renderParameterList(definition.parameters, false, false, false));
+        row.push(this.renderParameterList(definition.parameters, true, false, false));
         row.push(new Display.TextExpression(' '));
       }
       if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
@@ -99,15 +98,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (claim) {
         if (definition.parameters.length) {
-          let parameters = this.renderParameterList(definition.parameters, true, false, false);
+          let extractedConstraints: Display.RenderedExpression[] = [];
+          let parameters = this.renderParameterList(definition.parameters, false, false, false, extractedConstraints);
           let addendum = new Display.RowExpression([new Display.TextExpression('   if '), parameters]);
           addendum.styleClasses = ['addendum'];
+          if (extractedConstraints.length) {
+            let constraints = this.renderTemplate('Group', {
+              'items': extractedConstraints,
+              'separator': new Display.TextExpression(', ')
+            });
+            claim.optionalParenStyle = '[]';
+            claim = this.renderTemplate('ImplicationRelation', {
+                                          'left': constraints,
+                                          'right': claim
+                                        });
+          }
           return new Display.RowExpression([claim, addendum]);
         } else {
           return claim;
         }
       }
-    } else {
+    } else if (!(definition.contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
       return this.renderDefinitionRef([definition], undefined, true);
     }
     return undefined;
@@ -139,11 +150,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  renderParameterList(parameters: Fmt.Parameter[], abbreviate: boolean, inQuantifier: boolean, forcePlural: boolean): Display.RenderedExpression {
+  renderParameterList(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
     let initialState: ParameterListState = {
-      sentence: !abbreviate,
+      sentence: sentence,
       abbreviate: abbreviate,
-      inQuantifier: inQuantifier,
       forcePlural: forcePlural,
       enableSpecializations: true,
       started: false,
@@ -152,14 +162,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inDefinition: false,
       inDefinitionDisplayGroup: false
     };
-    return this.renderParameters(parameters, initialState);
+    return this.renderParameters(parameters, initialState, undefined, extractConstraints);
   }
 
   renderParameter(parameter: Fmt.Parameter): Display.RenderedExpression {
     let initialState: ParameterListState = {
       sentence: false,
       abbreviate: true,
-      inQuantifier: false,
       forcePlural: false,
       enableSpecializations: false,
       started: false,
@@ -171,7 +180,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderParameters([parameter], initialState);
   }
 
-  renderParameters(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
+  renderParameters(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Display.RenderedExpression[], extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
     let state = Object.assign({}, initialState);
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
     for (let param of parameters) {
@@ -201,11 +210,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       });
     }
-    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
+    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices, extractConstraints));
     return new Display.PromiseExpression(render);
   }
 
-  private renderParametersWithResolvedDefinitions(parameters: Fmt.Parameter[], constraintDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
+  private renderParametersWithResolvedDefinitions(parameters: Fmt.Parameter[], constraintDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices?: Display.RenderedExpression[], extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
     let row: Display.RenderedExpression[] = [];
     let remainingParameters = parameters.slice();
     let remainingDefinitions = constraintDefinitions.slice();
@@ -213,7 +222,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let currentGroupDefinition: Fmt.Definition | undefined = undefined;
     while (remainingParameters.length) {
       let param = remainingParameters[0];
-      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
+      if (extractConstraints && param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
+        extractConstraints.push(this.renderParameter(param));
+        remainingParameters.splice(0, 1);
+        remainingDefinitions.splice(0, 1);
+      } else if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
         row.push(this.renderParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices));
         currentGroup.length = 0;
         currentGroupDefinition = undefined;
@@ -308,8 +321,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (state.started) {
           row.push(new Display.TextExpression(', '));
         }
-        if (!state.abbreviate) {
-          row.push(new Display.TextExpression(state.sentence && !state.started ? 'Assume ' : 'assume '));
+        if (state.sentence) {
+          row.push(new Display.TextExpression(state.started ? 'assume ' : 'Assume '));
         }
       }
       state.inConstraint = true;
@@ -317,11 +330,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
       row.push(this.renderFormula(type.formula));
     } else {
-      if (state.abbreviate) {
-        if (state.started) {
-          row.push(new Display.TextExpression(', '));
-        }
-      } else {
+      if (state.sentence) {
         if (state.started) {
           row.push(new Display.TextExpression(', '));
           if (!state.inLetExpr) {
@@ -329,6 +338,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         } else {
           row.push(new Display.TextExpression(state.sentence ? 'Let ' : 'let '));
+        }
+      } else {
+        if (state.started) {
+          row.push(new Display.TextExpression(', '));
         }
       }
       state.inLetExpr = true;
@@ -412,7 +425,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (!variableDisplay) {
           variableDisplay = variableDefinitions;
         }
-        if (state.inQuantifier) {
+        if (state.abbreviate) {
           row.push(parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural);
           row.push(new Display.TextExpression(' '));
           row.push(variableDisplay);
@@ -441,19 +454,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   article = 'an';
                 }
               }
-              if (state.abbreviate) {
-                row.push(new Display.TextExpression(` is ${article} `));
+              if (state.sentence) {
+                row.push(new Display.TextExpression(` be ${article} `));
                 row.push(singular);
               } else {
-                row.push(new Display.TextExpression(` be ${article} `));
+                row.push(new Display.TextExpression(` is ${article} `));
                 row.push(singular);
               }
             } else {
-              if (state.abbreviate) {
-                row.push(new Display.TextExpression(' are '));
+              if (state.sentence) {
+                row.push(new Display.TextExpression(' be '));
                 row.push(plural);
               } else {
-                row.push(new Display.TextExpression(' be '));
+                row.push(new Display.TextExpression(' are '));
                 row.push(plural);
               }
             }
@@ -603,16 +616,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return undefined;
   }
 
-  renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Display.RenderedExpression[]): Display.RenderedExpression {
-    let items = parameters.map((param) => this.renderVariable(param, indices, true));
+  renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Display.RenderedExpression[], markAsDummy: boolean = false): Display.RenderedExpression {
+    let items = parameters.map((param) => this.renderVariable(param, indices, true, markAsDummy));
     return this.renderTemplate('Group', {'items': items});
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false): Display.RenderedExpression {
-    let result = super.renderVariable(param, indices, isDefinition);
-    let type = param.type.expression;
-    if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && (isDefinition || type.shortcut._override instanceof FmtHLM.MetaRefExpression_true)) {
-      result = this.renderShortcut(type.shortcut, result, indices, isDefinition);
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false): Display.RenderedExpression {
+    let result = super.renderVariable(param, indices, isDefinition, isDummy);
+    if (!isDummy) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && (isDefinition || type.shortcut._override instanceof FmtHLM.MetaRefExpression_true)) {
+        result = this.renderShortcut(type.shortcut, result, indices, isDefinition);
+      }
     }
     return result;
   }
@@ -652,7 +667,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
       return this.renderTemplate('SetBuilder', {
                                    'element': this.renderElementTerm(term.term),
-                                   'constraint': this.renderParameterList(term.parameters, true, false, false)
+                                   'constraint': this.renderParameterList(term.parameters, false, false, false)
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       return this.renderStructuralCases(term.term, term.construction, term.cases, this.renderSetTerm.bind(this));
@@ -723,33 +738,33 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       return this.renderTemplate('UniversalQuantification', {
-                                   'parameters': this.renderParameterList(formula.parameters, true, true, true),
+                                   'parameters': this.renderParameterList(formula.parameters, false, true, true),
                                    'formula': this.renderFormula(formula.formula)
                                  },
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
       if (formula.formula) {
         return this.renderTemplate('ExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, true, true, false),
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false),
                                      'formula': this.renderFormula(formula.formula)
                                    },
                                    negationCount);
       } else {
         return this.renderTemplate('PlainExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, true, true, false)
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false)
                                    },
                                    negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       if (formula.formula) {
         return this.renderTemplate('UniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, true, true, false),
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false),
                                      'formula': this.renderFormula(formula.formula)
                                    },
                                    negationCount);
       } else {
         return this.renderTemplate('PlainUniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, true, true, false)
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false)
                                    },
                                    negationCount);
       }
@@ -799,7 +814,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                         });
       let row = this.buildCaseRow(value, formula);
       if (caseExpr.parameters && caseExpr.parameters.length) {
-        let parameters = this.renderParameterList(caseExpr.parameters, true, false, false);
+        let parameters = this.renderParameterList(caseExpr.parameters, false, false, false);
         row.push(new Display.ParenExpression(parameters, '()'));
       }
       return row;
@@ -852,14 +867,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       subSupExpression.sub = this.renderDefinitionRef(definitions.slice(0, -1), argumentLists ? argumentLists.slice(0, -1) : undefined);
       result = subSupExpression;
     }
-    let args: Display.RenderedExpression[] = [];
-    let curArgumentLists = replacementParameters ? undefined : argumentLists;
-    this.fillArguments(definition.parameters, replacementParameters, curArgumentLists, undefined, true, undefined, args);
-    if (args.length && !omitArguments) {
-      result = this.renderTemplate('Function', {
-                                     'function': result,
-                                     'arguments': args
-                                   });
+    if (!omitArguments) {
+      let args: Display.RenderedExpression[] = [];
+      let curArgumentLists = replacementParameters ? undefined : argumentLists;
+      this.fillArguments(definition.parameters, replacementParameters, curArgumentLists, undefined, true, false, undefined, args);
+      if (args.length) {
+        result = this.renderTemplate('Function', {
+                                      'function': result,
+                                      'arguments': args
+                                    });
+      }
     }
     for (let i = 0; i < negationCount; i++) {
       result = this.renderNegation(result);
@@ -877,6 +894,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || display.path.name === 'AssociativeOperator'
             || display.path.name === 'UnaryOperator'
             || display.path.name === 'Relation'
+            || display.path.name === 'TextualRelation'
             || display.path.name === 'BooleanOperator'
             || display.path.name === 'UnaryBooleanOperator'
             || display.path.name === 'FunctionOperator') {
@@ -904,14 +922,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           display = abbr;
         }
       }
-      let args = this.getRenderedTemplateArguments(definitions, argumentLists, replacementParameters);
+      let args = this.getRenderedTemplateArguments(definitions, argumentLists, replacementParameters, omitArguments);
       return this.renderDisplayExpression(display, args, negationCount);
     } else {
       return undefined;
     }
   }
 
-  private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], replacementParameters?: ReplacementParameters): Display.RenderedTemplateArguments {
+  private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], replacementParameters?: ReplacementParameters, markAsDummy: boolean = false): Display.RenderedTemplateArguments {
     let args: Display.RenderedTemplateArguments = {};
     let index = 0;
     for (let curDefinition of definitions) {
@@ -919,7 +937,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let curArgs: Display.RenderedExpression[] = [];
       let curReplacementParameters = index === definitions.length - 1 ? replacementParameters : undefined;
       let curArgumentLists = argumentLists && !curReplacementParameters ? argumentLists.slice(0, index + 1) : undefined;
-      this.fillArguments(curDefinition.parameters, curReplacementParameters, curArgumentLists, undefined, false, curParams, curArgs);
+      this.fillArguments(curDefinition.parameters, curReplacementParameters, curArgumentLists, undefined, false, markAsDummy, curParams, curArgs);
       for (let paramIndex = 0; paramIndex < curParams.length; paramIndex++) {
         let curParam = curParams[paramIndex];
         args[curParam.name] = curArgs[paramIndex];
@@ -931,7 +949,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
     let args: Display.RenderedExpression[] = [];
-    this.fillArguments(parameters, undefined, argumentList ? [argumentList] : undefined, indices, true, undefined, args);
+    this.fillArguments(parameters, undefined, argumentList ? [argumentList] : undefined, indices, true, false, undefined, args);
     if (args.length === 1) {
       return args[0];
     } else {
@@ -939,7 +957,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private fillArguments(parameters: Fmt.ParameterList, replacementParameters: ReplacementParameters | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Display.RenderedExpression[] | undefined, combineBindings: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Display.RenderedExpression[]): void {
+  private fillArguments(parameters: Fmt.ParameterList, replacementParameters: ReplacementParameters | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Display.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Display.RenderedExpression[]): void {
     if (replacementParameters) {
       indices = replacementParameters.indices;
     }
@@ -961,19 +979,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else {
           parameter = paramToDisplay;
           newIndices = indices ? indices.slice() : [];
-          newIndices.push(this.renderVariable(parameter));
+          newIndices.push(this.renderVariable(parameter, undefined, false, markAsDummy));
         }
         if (resultParams) {
           resultParams.push(param);
         }
         if (parameter && (bindingArgumentList || !argumentLists)) {
+          let variableDefinition = this.renderVariableDefinitions([parameter], undefined, markAsDummy);
           if (combineBindings) {
             resultArgs.push(this.renderTemplate('Binding', {
-                                                  'variable': this.renderVariableDefinitions([parameter]),
+                                                  'variable': variableDefinition,
                                                   'value': this.renderArgumentList(type.parameters, bindingArgumentList, newIndices)
                                                 }));
           } else {
-            resultArgs.push(this.renderVariableDefinitions([parameter]));
+            resultArgs.push(variableDefinition);
             let replacementBindingParameters: ReplacementParameters | undefined = undefined;
             if (replacementParam) {
               let replacementParamType = replacementParam.type.expression as FmtHLM.MetaRefExpression_Binding;
@@ -983,7 +1002,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 isDefinition: replacementParameters!.isDefinition
               };
             }
-            this.fillArguments(type.parameters, replacementBindingParameters, bindingArgumentList ? [bindingArgumentList] : undefined, newIndices, combineBindings, resultParams, resultArgs);
+            this.fillArguments(type.parameters, replacementBindingParameters, bindingArgumentList ? [bindingArgumentList] : undefined, newIndices, combineBindings, markAsDummy, resultParams, resultArgs);
           }
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
@@ -1046,7 +1065,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             resultArgs.push(new Display.ErrorExpression('Unhandled parameter type'));
           }
         } else {
-          resultArgs.push(this.renderVariable(paramToDisplay, indices, replacementParameters && replacementParameters.isDefinition));
+          resultArgs.push(this.renderVariable(paramToDisplay, indices, replacementParameters && replacementParameters.isDefinition, markAsDummy));
         }
       }
       index++;
@@ -1125,7 +1144,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
             hasParameters = true;
-            row.push(this.renderParameterList(innerDefinition.parameters, true, false, false));
+            row.push(this.renderParameterList(innerDefinition.parameters, false, false, false));
           }
           return row;
         });
@@ -1237,7 +1256,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let combinedParameters: Fmt.Parameter[] = [];
             combinedParameters.push(...equalityDefinition.leftParameters);
             combinedParameters.push(...equalityDefinition.rightParameters);
-            let parameters = this.renderParameterList(combinedParameters, true, true, true);
+            let parameters = this.renderParameterList(combinedParameters, false, true, true);
             let leftParameters: ReplacementParameters = {
               parameters: equalityDefinition.leftParameters,
               isDefinition: false
@@ -1336,7 +1355,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let initialState: ParameterListState = {
         sentence: false,
         abbreviate: false,
-        inQuantifier: false,
         forcePlural: false,
         enableSpecializations: true,
         started: false,
@@ -1377,7 +1395,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let initialState: ParameterListState = {
             sentence: false,
             abbreviate: true,
-            inQuantifier: false,
             forcePlural: false,
             enableSpecializations: true,
             started: false,
@@ -1550,7 +1567,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let initialState: ParameterListState = {
       sentence: true,
       abbreviate: false,
-      inQuantifier: false,
       forcePlural: false,
       enableSpecializations: true,
       started: false,

@@ -1,0 +1,40 @@
+%../../../../../logics/hlm%
+
+$commutative(
+  X: %Set(auto = %true),
+  Z: %Set(auto = %true),
+  ∗: %Element($Operations(
+    X = {X},
+    Y = {X},
+    Z = {Z}
+  ))
+): %Predicate {
+  display = [$Property(
+    operand = ∗,
+    property = 'commutative'
+  )],
+  definition = [%forall(
+    #(
+      x: %Element(X),
+      y: %Element(%previous)
+    ),
+    %equals(
+      $value(
+        X = {X},
+        Y = {X},
+        Z = {Z},
+        ∗ = {∗},
+        x = {x},
+        y = {y}
+      ),
+      $value(
+        X = {X},
+        Y = {X},
+        Z = {Z},
+        ∗ = {∗},
+        x = {y},
+        y = {x}
+      )
+    )
+  )]
+}

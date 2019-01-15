@@ -1,24 +1,20 @@
 %../../../../../logics/hlm%
 
-$"Sum is associative"(
-  a: %Element($Integers),
-  b: %Element(%previous),
-  c: %Element(%previous)
-): %StandardTheorem {
-  claim = %equals(
-    $sum(
-      a = {$sum(
+$"Sum is associative": %StandardTheorem {
+  claim = $../../Functions/Operations/associative(
+    X = {$Integers},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$Integers},
+      Y = {$Integers},
+      Z = {$Integers},
+      parameters = #(
+        a: %Element($Integers),
+        b: %Element(%previous)
+      ),
+      operator = $sum(
         a = {a},
         b = {b}
-      )},
-      b = {c}
-    ),
-    $sum(
-      a = {a},
-      b = {$sum(
-        a = {b},
-        b = {c}
-      )}
-    )
+      )
+    )}
   )
 }

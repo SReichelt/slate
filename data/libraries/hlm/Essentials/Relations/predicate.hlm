@@ -1,0 +1,13 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This is a macro to convert a predicate taking elements of _S_ and _T_ to a relation from _S_ to _T_.
+ */
+$predicate(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  parameters: %ParameterList,
+  predicate[parameters]: %DefinitionRef
+): %MacroOperator {
+  display = [predicate]
+}

@@ -1,24 +1,20 @@
 %../../../../../logics/hlm%
 
-$"Product is associative"(
-  a: %Element($"Natural numbers"),
-  b: %Element(%previous),
-  c: %Element(%previous)
-): %StandardTheorem {
-  claim = %equals(
-    $product(
-      m = {$product(
-        m = {a},
-        n = {b}
-      )},
-      n = {c}
-    ),
-    $product(
-      m = {a},
-      n = {$product(
-        m = {b},
-        n = {c}
-      )}
-    )
+$"Product is associative": %StandardTheorem {
+  claim = $../../Functions/Operations/associative(
+    X = {$"Natural numbers"},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$"Natural numbers"},
+      Y = {$"Natural numbers"},
+      Z = {$"Natural numbers"},
+      parameters = #(
+        m: %Element($"Natural numbers"),
+        n: %Element(%previous)
+      ),
+      operator = $product(
+        m = {m},
+        n = {n}
+      )
+    )}
   )
 }

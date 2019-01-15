@@ -1,7 +1,7 @@
 %../../../../../format/library%
 
 $Natural: %Section {
-  logic = 'hlm',
+  'hlm',
   items = [
     %item($"Natural numbers"),
     %item(
@@ -14,7 +14,10 @@ $Natural: %Section {
     %item($sum),
     %item($"Addition of one yields successor"),
     %item($"Sum is associative"),
-    %item($"Left-addition of zero is neutral"),
+    %item(
+      $"Left-addition of zero is neutral",
+      type = 'lemma'
+    ),
     %item(
       $"Successor can be pulled over addition",
       type = 'lemma'

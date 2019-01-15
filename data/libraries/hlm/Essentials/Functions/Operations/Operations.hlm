@@ -1,0 +1,37 @@
+%../../../../../logics/hlm%
+
+/**
+ * @references * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation
+ */
+$Operations(
+  X: %Set(auto = %true),
+  Y: %Set(auto = %true),
+  Z: %Set(auto = %true)
+): %SetOperator {
+  display = [$Function(
+    function = '𝓞𝓹',
+    arguments = [X, Y, Z]
+  )],
+  definitionDisplay = {
+    parameter = #(∗: %Expr),
+    display = [$FunctionDefinition(
+      function = ∗,
+      symbol = '→',
+      operands = [$Operator(
+        symbol = '×',
+        operands = [X, Y],
+        minParenLevel = 1
+      ), Z]
+    )],
+    singularName = 'operation',
+    pluralName = 'operations',
+    nameOptional = %true
+  },
+  definition = [$../Functions(
+    X = {$../../Sets/"Cartesian product"(
+      S = {X},
+      T = {Y}
+    )},
+    Y = {Z}
+  )]
+}

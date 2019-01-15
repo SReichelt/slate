@@ -1,16 +1,19 @@
 %../../../../../logics/hlm%
 
-$"Comparison is antisymmetric"(
-  a: %Element($"Natural numbers"),
-  b: %Element(%previous),
-  _1: %Constraint($"less or equal"(
-    m = {a},
-    n = {b}
-  )),
-  _2: %Constraint($"less or equal"(
-    m = {b},
-    n = {a}
-  ))
-): %StandardTheorem {
-  claim = %equals(a, b)
+$"Comparison is antisymmetric": %StandardTheorem {
+  claim = $../../Relations/antisymmetric(
+    S = {$"Natural numbers"},
+    ≺ = {$../../Relations/predicate(
+      S = {$"Natural numbers"},
+      T = {$"Natural numbers"},
+      parameters = #(
+        m: %Element($"Natural numbers"),
+        n: %Element(%previous)
+      ),
+      predicate = $"less or equal"(
+        m = {m},
+        n = {n}
+      )
+    )}
+  )
 }

@@ -5,7 +5,13 @@ $Functions: %Section {
   items = [
     %item($Functions),
     %item($value),
-    %item($"infix value"),
+    %item(
+      $operator,
+      title = {
+        de = 'Operator als Funktion',
+        en = 'Operator as function'
+      }
+    ),
     %item($Image),
     %item($Preimage),
     %item($"mapping as function"),
@@ -28,6 +34,13 @@ $Functions: %Section {
     %item($inverse),
     %item($"Inverse of inverse yields original"),
     %item($"Application of function and inverse is neutral", type = 'corollary'),
-    %item($"Application of function after inverse is neutral", type = 'corollary')
+    %item($"Application of function after inverse is neutral", type = 'corollary'),
+    %subsection(
+      $Operations,
+      title = {
+        de = 'Operationen',
+        en = 'Operations'
+      }
+    )
   ]
 }

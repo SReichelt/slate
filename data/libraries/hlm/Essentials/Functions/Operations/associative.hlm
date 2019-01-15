@@ -1,0 +1,52 @@
+%../../../../../logics/hlm%
+
+$associative(
+  X: %Set(auto = %true),
+  ∗: %Element($"Inner operations"(
+    X = {X}
+  ))
+): %Predicate {
+  display = [$Property(
+    operand = ∗,
+    property = 'associative'
+  )],
+  definition = [%forall(
+    #(
+      x: %Element(X),
+      y: %Element(%previous),
+      z: %Element(%previous)
+    ),
+    %equals(
+      $value(
+        X = {X},
+        Y = {X},
+        Z = {X},
+        ∗ = {∗},
+        x = {$value(
+          X = {X},
+          Y = {X},
+          Z = {X},
+          ∗ = {∗},
+          x = {x},
+          y = {y}
+        )},
+        y = {z}
+      ),
+      $value(
+        X = {X},
+        Y = {X},
+        Z = {X},
+        ∗ = {∗},
+        x = {x},
+        y = {$value(
+          X = {X},
+          Y = {X},
+          Z = {X},
+          ∗ = {∗},
+          x = {y},
+          y = {z}
+        )}
+      )
+    )
+  )]
+}

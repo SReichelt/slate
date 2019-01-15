@@ -127,13 +127,13 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
           let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates, false);
-          if (display === undefined) {
-            let summary = renderer.renderDefinitionSummary(this.state.definition);
-            if (summary) {
-              display = <Expression expression={summary} key="summary"/>;
-            }
-            if (this.props.itemInfo.type === 'lemma') {
-              display = <span className={'tree-item-minor'} key="minor">{display}</span>;
+          let summary = renderer.renderDefinitionSummary(this.state.definition);
+          if (summary) {
+            let summaryExpression = <Expression expression={summary} key="summary"/>;
+            if (display === undefined) {
+              display = summaryExpression;
+            } else {
+              display = [display, ': ', summaryExpression];
             }
           }
           if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
@@ -173,6 +173,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     }
     if (display === undefined) {
       display = this.props.path.name;
+    }
+    if (this.props.itemInfo.type === 'lemma') {
+      display = <span className={'tree-item-minor'} key="minor">{display}</span>;
     }
     let href = this.props.libraryDataProvider.pathToURI(this.props.path);
     let result: any = (

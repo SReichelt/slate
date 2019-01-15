@@ -9,6 +9,7 @@
  *             * https://en.wikipedia.org/wiki/Euclid%27s_lemma
  *             * http://mathworld.wolfram.com/PrimeNumber.html
  *             * https://proofwiki.org/wiki/Definition:Prime_Number
+ *             * https://ncatlab.org/nlab/show/prime+number
  */
 $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Predicate {
   display = [$Property(
@@ -89,26 +90,39 @@ $prime(n: %Element($../"Segment (greater)"(n = {$../number(value = 1)}))): %Pred
         )
       )
     ),
+    %not(%exists(
+      #(
+        c: %Element($../"Segment (less)"(n = {n})),
+        d: %Element(%previous)
+      ),
+      formula = %equals(
+        n,
+        $../product(
+          m = {c},
+          n = {d}
+        )
+      )
+    )),
     %forall(
       #(
-        c: %Element($../"Natural numbers"),
-        d: %Element(%previous),
-        _4: %Constraint($../divisible(
+        e: %Element($../"Natural numbers"),
+        f: %Element(%previous),
+        _5: %Constraint($../divisible(
           m = {n},
           n = {$../product(
-            m = {c},
-            n = {d}
+            m = {e},
+            n = {f}
           )}
         ))
       ),
       %or(
         $../divisible(
           m = {n},
-          n = {c}
+          n = {e}
         ),
         $../divisible(
           m = {n},
-          n = {d}
+          n = {f}
         )
       )
     )

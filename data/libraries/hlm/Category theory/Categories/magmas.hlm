@@ -24,416 +24,76 @@ $magmas: %ExplicitOperator {
           #(𝔈: %Element($../../Algebra/Magmas/Magmas)),
           {f = {
             #(𝔉: %Element($../../Algebra/Magmas/Magmas)),
-            {∘ = {$../../Essentials/Functions/Functions(
-                X = {$../../Essentials/Sets/"Cartesian product"(
-                  S = {$../../Algebra/Magmas/Homomorphisms(
-                    𝔐 = {𝔈},
-                    𝔑 = {𝔉}
-                  )},
-                  T = {$../../Algebra/Magmas/Homomorphisms(
-                    𝔐 = {𝔇},
-                    𝔑 = {𝔈}
-                  )}
-                )},
-                Y = {$../../Algebra/Magmas/Homomorphisms(
-                  𝔐 = {𝔇},
+            {∘ = {$../../Essentials/Functions/Operations/operator(
+              X = {$../../Algebra/Magmas/Homomorphisms(
+                𝔐 = {𝔈},
+                𝔑 = {𝔉}
+              )},
+              Y = {$../../Algebra/Magmas/Homomorphisms(
+                𝔐 = {𝔇},
+                𝔑 = {𝔈}
+              )},
+              Z = {$../../Algebra/Magmas/Homomorphisms(
+                𝔐 = {𝔇},
+                𝔑 = {𝔉}
+              )},
+              parameters = #(
+                φ: %Element($../../Algebra/Magmas/Homomorphisms(
+                  𝔐 = {𝔈},
                   𝔑 = {𝔉}
-                )}
-              ).function(x = {
-                #(h: %Element(
-                  $../../Essentials/Sets/"Cartesian product"(
-                    S = {$../../Algebra/Magmas/Homomorphisms(
-                      𝔐 = {𝔈},
-                      𝔑 = {𝔉}
-                    )},
-                    T = {$../../Algebra/Magmas/Homomorphisms(
-                      𝔐 = {𝔇},
-                      𝔑 = {𝔈}
-                    )}
-                  ),
-                  shortcut = {
-                    constructor = $../../Essentials/Sets/"Cartesian product"(
-                        S = {%setStructuralCases(
-                          𝔈,
-                          $../../Algebra/Magmas/Magmas,
-                          [{
-                            constructor = $../../Algebra/Magmas/Magmas.magma,
-                            parameters = #(
-                              M: %Set,
-                              ∗: %Element($../../Essentials/Functions/Functions(
-                                X = {$../../Essentials/Sets/"Cartesian product"(
-                                  S = {M},
-                                  T = {M}
-                                )},
-                                Y = {M}
-                              ))
-                            ),
-                            value = %setStructuralCases(
-                              𝔉,
-                              $../../Algebra/Magmas/Magmas,
-                              [{
-                                constructor = $../../Algebra/Magmas/Magmas.magma,
-                                parameters = #(
-                                  N: %Set,
-                                  ⋆: %Element($../../Essentials/Functions/Functions(
-                                    X = {$../../Essentials/Sets/"Cartesian product"(
-                                      S = {N},
-                                      T = {N}
-                                    )},
-                                    Y = {N}
-                                  ))
-                                ),
-                                value = %subset(
-                                  #(g: %Element($../../Essentials/Functions/Functions(
-                                    X = {M},
-                                    Y = {N}
-                                  ))),
-                                  %forall(
-                                    #(
-                                      a: %Element(M),
-                                      b: %Element(%previous)
-                                    ),
-                                    %equals(
-                                      $../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {$../../Essentials/Functions/"infix value"(
-                                          X = {M},
-                                          Y = {M},
-                                          Z = {M},
-                                          ∗ = {∗},
-                                          x = {a},
-                                          y = {b}
-                                        )}
-                                      ),
-                                      $../../Essentials/Functions/"infix value"(
-                                        X = {N},
-                                        Y = {N},
-                                        Z = {N},
-                                        ∗ = {⋆},
-                                        x = {$../../Essentials/Functions/value(
-                                          X = {M},
-                                          Y = {N},
-                                          f = {g},
-                                          x = {a}
-                                        )},
-                                        y = {$../../Essentials/Functions/value(
-                                          X = {M},
-                                          Y = {N},
-                                          f = {g},
-                                          x = {b}
-                                        )}
-                                      )
-                                    )
-                                  )
-                                )
-                              }]
-                            )
-                          }]
-                        )},
-                        T = {%setStructuralCases(
-                          𝔇,
-                          $../../Algebra/Magmas/Magmas,
-                          [{
-                            constructor = $../../Algebra/Magmas/Magmas.magma,
-                            parameters = #(
-                              M: %Set,
-                              ∗: %Element($../../Essentials/Functions/Functions(
-                                X = {$../../Essentials/Sets/"Cartesian product"(
-                                  S = {M},
-                                  T = {M}
-                                )},
-                                Y = {M}
-                              ))
-                            ),
-                            value = %setStructuralCases(
-                              𝔈,
-                              $../../Algebra/Magmas/Magmas,
-                              [{
-                                constructor = $../../Algebra/Magmas/Magmas.magma,
-                                parameters = #(
-                                  N: %Set,
-                                  ⋆: %Element($../../Essentials/Functions/Functions(
-                                    X = {$../../Essentials/Sets/"Cartesian product"(
-                                      S = {N},
-                                      T = {N}
-                                    )},
-                                    Y = {N}
-                                  ))
-                                ),
-                                value = %subset(
-                                  #(g: %Element($../../Essentials/Functions/Functions(
-                                    X = {M},
-                                    Y = {N}
-                                  ))),
-                                  %forall(
-                                    #(
-                                      a: %Element(M),
-                                      b: %Element(%previous)
-                                    ),
-                                    %equals(
-                                      $../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {$../../Essentials/Functions/"infix value"(
-                                          X = {M},
-                                          Y = {M},
-                                          Z = {M},
-                                          ∗ = {∗},
-                                          x = {a},
-                                          y = {b}
-                                        )}
-                                      ),
-                                      $../../Essentials/Functions/"infix value"(
-                                        X = {N},
-                                        Y = {N},
-                                        Z = {N},
-                                        ∗ = {⋆},
-                                        x = {$../../Essentials/Functions/value(
-                                          X = {M},
-                                          Y = {N},
-                                          f = {g},
-                                          x = {a}
-                                        )},
-                                        y = {$../../Essentials/Functions/value(
-                                          X = {M},
-                                          Y = {N},
-                                          f = {g},
-                                          x = {b}
-                                        )}
-                                      )
-                                    )
-                                  )
-                                )
-                              }]
-                            )
-                          }]
-                        )}
-                      ).pair,
+                )),
+                ψ: %Element($../../Algebra/Magmas/Homomorphisms(
+                  𝔐 = {𝔇},
+                  𝔑 = {𝔈}
+                ))
+              ),
+              operator = $../../Essentials/Functions/composition(
+                X = {%setStructuralCases(
+                  𝔇,
+                  $../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../Algebra/Magmas/Magmas.magma,
                     parameters = #(
-                      φ: %Element(%setStructuralCases(
-                        𝔈,
-                        $../../Algebra/Magmas/Magmas,
-                        [{
-                          constructor = $../../Algebra/Magmas/Magmas.magma,
-                          parameters = #(
-                            M: %Set,
-                            ∗: %Element($../../Essentials/Functions/Functions(
-                              X = {$../../Essentials/Sets/"Cartesian product"(
-                                S = {M},
-                                T = {M}
-                              )},
-                              Y = {M}
-                            ))
-                          ),
-                          value = %setStructuralCases(
-                            𝔉,
-                            $../../Algebra/Magmas/Magmas,
-                            [{
-                              constructor = $../../Algebra/Magmas/Magmas.magma,
-                              parameters = #(
-                                N: %Set,
-                                ⋆: %Element($../../Essentials/Functions/Functions(
-                                  X = {$../../Essentials/Sets/"Cartesian product"(
-                                    S = {N},
-                                    T = {N}
-                                  )},
-                                  Y = {N}
-                                ))
-                              ),
-                              value = %subset(
-                                #(g: %Element($../../Essentials/Functions/Functions(
-                                  X = {M},
-                                  Y = {N}
-                                ))),
-                                %forall(
-                                  #(
-                                    a: %Element(M),
-                                    b: %Element(%previous)
-                                  ),
-                                  %equals(
-                                    $../../Essentials/Functions/value(
-                                      X = {M},
-                                      Y = {N},
-                                      f = {g},
-                                      x = {$../../Essentials/Functions/"infix value"(
-                                        X = {M},
-                                        Y = {M},
-                                        Z = {M},
-                                        ∗ = {∗},
-                                        x = {a},
-                                        y = {b}
-                                      )}
-                                    ),
-                                    $../../Essentials/Functions/"infix value"(
-                                      X = {N},
-                                      Y = {N},
-                                      Z = {N},
-                                      ∗ = {⋆},
-                                      x = {$../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {a}
-                                      )},
-                                      y = {$../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {b}
-                                      )}
-                                    )
-                                  )
-                                )
-                              )
-                            }]
-                          )
-                        }]
-                      )),
-                      ψ: %Element(%setStructuralCases(
-                        𝔇,
-                        $../../Algebra/Magmas/Magmas,
-                        [{
-                          constructor = $../../Algebra/Magmas/Magmas.magma,
-                          parameters = #(
-                            M: %Set,
-                            ∗: %Element($../../Essentials/Functions/Functions(
-                              X = {$../../Essentials/Sets/"Cartesian product"(
-                                S = {M},
-                                T = {M}
-                              )},
-                              Y = {M}
-                            ))
-                          ),
-                          value = %setStructuralCases(
-                            𝔈,
-                            $../../Algebra/Magmas/Magmas,
-                            [{
-                              constructor = $../../Algebra/Magmas/Magmas.magma,
-                              parameters = #(
-                                N: %Set,
-                                ⋆: %Element($../../Essentials/Functions/Functions(
-                                  X = {$../../Essentials/Sets/"Cartesian product"(
-                                    S = {N},
-                                    T = {N}
-                                  )},
-                                  Y = {N}
-                                ))
-                              ),
-                              value = %subset(
-                                #(g: %Element($../../Essentials/Functions/Functions(
-                                  X = {M},
-                                  Y = {N}
-                                ))),
-                                %forall(
-                                  #(
-                                    a: %Element(M),
-                                    b: %Element(%previous)
-                                  ),
-                                  %equals(
-                                    $../../Essentials/Functions/value(
-                                      X = {M},
-                                      Y = {N},
-                                      f = {g},
-                                      x = {$../../Essentials/Functions/"infix value"(
-                                        X = {M},
-                                        Y = {M},
-                                        Z = {M},
-                                        ∗ = {∗},
-                                        x = {a},
-                                        y = {b}
-                                      )}
-                                    ),
-                                    $../../Essentials/Functions/"infix value"(
-                                      X = {N},
-                                      Y = {N},
-                                      Z = {N},
-                                      ∗ = {⋆},
-                                      x = {$../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {a}
-                                      )},
-                                      y = {$../../Essentials/Functions/value(
-                                        X = {M},
-                                        Y = {N},
-                                        f = {g},
-                                        x = {b}
-                                      )}
-                                    )
-                                  )
-                                )
-                              )
-                            }]
-                          )
-                        }]
+                      M: %Set,
+                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+                        X = {M}
                       ))
                     ),
-                    override = %true
-                  }
-                )),
-                {y = {$../../Essentials/Functions/composition(
-                  X = {%setStructuralCases(
-                    𝔇,
-                    $../../Algebra/Magmas/Magmas,
-                    [{
-                      constructor = $../../Algebra/Magmas/Magmas.magma,
-                      parameters = #(
-                        M: %Set,
-                        ∗: %Element($../../Essentials/Functions/Functions(
-                          X = {$../../Essentials/Sets/"Cartesian product"(
-                            S = {M},
-                            T = {M}
-                          )},
-                          Y = {M}
-                        ))
-                      ),
-                      value = M
-                    }]
-                  )},
-                  Y = {%setStructuralCases(
-                    𝔈,
-                    $../../Algebra/Magmas/Magmas,
-                    [{
-                      constructor = $../../Algebra/Magmas/Magmas.magma,
-                      parameters = #(
-                        M: %Set,
-                        ∗: %Element($../../Essentials/Functions/Functions(
-                          X = {$../../Essentials/Sets/"Cartesian product"(
-                            S = {M},
-                            T = {M}
-                          )},
-                          Y = {M}
-                        ))
-                      ),
-                      value = M
-                    }]
-                  )},
-                  Z = {%setStructuralCases(
-                    𝔉,
-                    $../../Algebra/Magmas/Magmas,
-                    [{
-                      constructor = $../../Algebra/Magmas/Magmas.magma,
-                      parameters = #(
-                        N: %Set,
-                        ⋆: %Element($../../Essentials/Functions/Functions(
-                          X = {$../../Essentials/Sets/"Cartesian product"(
-                            S = {N},
-                            T = {N}
-                          )},
-                          Y = {N}
-                        ))
-                      ),
-                      value = N
-                    }]
-                  )},
-                  g = {φ},
-                  f = {ψ}
-                )}}
-            })}}
+                    value = M
+                  }]
+                )},
+                Y = {%setStructuralCases(
+                  𝔈,
+                  $../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../Algebra/Magmas/Magmas.magma,
+                    parameters = #(
+                      M: %Set,
+                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+                        X = {M}
+                      ))
+                    ),
+                    value = M
+                  }]
+                )},
+                Z = {%setStructuralCases(
+                  𝔉,
+                  $../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../Algebra/Magmas/Magmas.magma,
+                    parameters = #(
+                      N: %Set,
+                      ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+                        X = {N}
+                      ))
+                    ),
+                    value = N
+                  }]
+                )},
+                g = {φ},
+                f = {ψ}
+              )
+            )}}
           }}
         }}
       }

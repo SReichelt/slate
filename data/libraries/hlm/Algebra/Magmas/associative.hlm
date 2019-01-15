@@ -6,12 +6,8 @@ $associative(𝔐: %Element(
     constructor = $Magmas.magma,
     parameters = #(
       M: %Set,
-      ∗: %Element($../../Essentials/Functions/Functions(
-        X = {$../../Essentials/Sets/"Cartesian product"(
-          S = {M},
-          T = {M}
-        )},
-        Y = {M}
+      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+        X = {M}
       ))
     )
   }
@@ -20,43 +16,8 @@ $associative(𝔐: %Element(
     operand = 𝔐,
     property = 'associative'
   )],
-  definition = [%forall(
-    #(
-      a: %Element(M),
-      b: %Element(%previous),
-      c: %Element(%previous)
-    ),
-    %equals(
-      $../../Essentials/Functions/"infix value"(
-        X = {M},
-        Y = {M},
-        Z = {M},
-        ∗ = {∗},
-        x = {$../../Essentials/Functions/"infix value"(
-          X = {M},
-          Y = {M},
-          Z = {M},
-          ∗ = {∗},
-          x = {a},
-          y = {b}
-        )},
-        y = {c}
-      ),
-      $../../Essentials/Functions/"infix value"(
-        X = {M},
-        Y = {M},
-        Z = {M},
-        ∗ = {∗},
-        x = {a},
-        y = {$../../Essentials/Functions/"infix value"(
-          X = {M},
-          Y = {M},
-          Z = {M},
-          ∗ = {∗},
-          x = {b},
-          y = {c}
-        )}
-      )
-    )
+  definition = [$../../Essentials/Functions/Operations/associative(
+    X = {M},
+    ∗ = {∗}
   )]
 }

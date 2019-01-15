@@ -419,6 +419,11 @@ p {
   font-size: 70%;
 }
 
+.dummy {
+  color: #606060;
+  border: 1px dotted #e0e0a0;
+}
+
 .sans, .ctor {
   font-family: 'TeX-Sans', sans-serif;
   font-style: normal;

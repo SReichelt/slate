@@ -6,12 +6,8 @@ $commutative(𝔐: %Element(
     constructor = $Magmas.magma,
     parameters = #(
       M: %Set,
-      ∗: %Element($../../Essentials/Functions/Functions(
-        X = {$../../Essentials/Sets/"Cartesian product"(
-          S = {M},
-          T = {M}
-        )},
-        Y = {M}
+      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
+        X = {M}
       ))
     )
   }
@@ -20,28 +16,9 @@ $commutative(𝔐: %Element(
     operand = 𝔐,
     property = 'commutative'
   )],
-  definition = [%forall(
-    #(
-      a: %Element(M),
-      b: %Element(%previous)
-    ),
-    %equals(
-      $../../Essentials/Functions/"infix value"(
-        X = {M},
-        Y = {M},
-        Z = {M},
-        ∗ = {∗},
-        x = {a},
-        y = {b}
-      ),
-      $../../Essentials/Functions/"infix value"(
-        X = {M},
-        Y = {M},
-        Z = {M},
-        ∗ = {∗},
-        x = {b},
-        y = {a}
-      )
-    )
+  definition = [$../../Essentials/Functions/Operations/commutative(
+    X = {M},
+    Z = {M},
+    ∗ = {∗}
   )]
 }
