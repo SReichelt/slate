@@ -21,10 +21,10 @@ export interface LibraryItemProps {
 export function renderLibraryItem(props: LibraryItemProps): any {
   let logic = props.libraryDataProvider.logic;
   let logicDisplay = logic.getDisplay();
-  let renderer = logicDisplay.getRenderer(props.libraryDataProvider, props.templates, props.editing);
 
   let render = props.definition.then((definition: Fmt.Definition) => {
-    let expression = renderer.renderDefinition(definition, props.itemInfo, props.includeLabel, props.includeExtras, props.includeProofs, props.includeRemarks);
+    let renderer = logicDisplay.getDefinitionRenderer(definition, props.libraryDataProvider, props.templates, props.editing);
+    let expression = renderer.renderDefinition(props.itemInfo, props.includeLabel, props.includeExtras, props.includeProofs, props.includeRemarks);
     if (expression) {
       return <Expression expression={expression} interactionHandler={props.interactionHandler}/>;
     } else {

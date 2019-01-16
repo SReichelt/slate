@@ -57,6 +57,7 @@ p {
 
 .addendum {
   font-size: 75%;
+  color: gray;
 }
 
 .aligned {
@@ -227,12 +228,12 @@ p {
 }
 
 .paren-left-hairline {
-  border-left: dashed 1pt gray;
+  border-left: dashed 1px gray;
   padding-left: 1pt;
 }
 
 .paren-right-hairline {
-  border-right: dashed 1pt gray;
+  border-right: dashed 1px gray;
   padding-right: 1pt;
 }
 

@@ -34,6 +34,7 @@ let previewContents: any = null;
 
 interface ExpressionProps {
   expression: Display.RenderedExpression;
+  addInnerParens?: boolean;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
   tooltipPosition?: string;
@@ -128,7 +129,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   render(): any {
-    return this.renderExpression(this.props.expression, 'expr', undefined, undefined);
+    return this.renderExpression(this.props.expression, 'expr', undefined, this.props.addInnerParens, this.props.addInnerParens);
   }
 
   private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): any {
@@ -430,8 +431,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
-        let bodyWithParens = new Display.InnerParenExpression(subSupExpression.body);
-        let subSupResult: any = [<Expression expression={bodyWithParens} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>];
+        let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (subSupExpression.sub) {
             subSupResult.push(<sub key="sub"><Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);

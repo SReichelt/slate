@@ -2,6 +2,7 @@ import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { GenericEditHandler } from './editHandler';
+import CachedPromise from '../../data/cachedPromise';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
@@ -10,7 +11,15 @@ export interface RenderedVariable {
 }
 
 export abstract class GenericRenderer {
-  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
+
+  protected getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
+    if (!path.parentPath && path.name === this.definition.name) {
+      return CachedPromise.resolve(this.definition);
+    } else {
+      return this.libraryDataAccessor.fetchItem(path);
+    }
+  }
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;
@@ -57,9 +66,6 @@ export abstract class GenericRenderer {
     if (suffixes) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': suffixes});
-      if (suffixes.length > 1) {
-        subExpression.sub = new Display.OuterParenExpression(subExpression.sub);
-      }
       result = subExpression;
     }
     result.styleClasses = ['var'];
@@ -70,9 +76,6 @@ export abstract class GenericRenderer {
     if (indices) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': indices});
-      if (indices.length > 1) {
-        subExpression.sub = new Display.OuterParenExpression(subExpression.sub);
-      }
       result = subExpression;
     }
     return result;
@@ -187,14 +190,15 @@ export abstract class GenericRenderer {
     return itemNumber.join('.');
   }
 
-  protected addDefinitionRemarks(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[]): void {
+  protected addDefinitionRemarks(paragraphs: Display.RenderedExpression[]): void {
     let allKinds = ['remarks', 'references'];
     for (let kind of allKinds) {
-      this.addDefinitionRemarksOfKind(definition, paragraphs, allKinds, kind);
+      this.addDefinitionRemarksOfKind(paragraphs, allKinds, kind);
     }
   }
 
-  private addDefinitionRemarksOfKind(definition: Fmt.Definition, paragraphs: Display.RenderedExpression[], allKinds: string[], kind: string): void {
+  private addDefinitionRemarksOfKind(paragraphs: Display.RenderedExpression[], allKinds: string[], kind: string): void {
+    let definition = this.definition;
     let text = '';
     if (definition.documentation) {
       for (let item of definition.documentation.items) {

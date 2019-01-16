@@ -126,8 +126,8 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         let definitionIcon = getDefinitionIcon(definitionType, this.props.itemInfo);
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
-          let renderer = logicDisplay.getRenderer(this.props.libraryDataProvider, this.props.templates, false);
-          let summary = renderer.renderDefinitionSummary(this.state.definition);
+          let renderer = logicDisplay.getDefinitionRenderer(this.state.definition, this.props.libraryDataProvider, this.props.templates, false);
+          let summary = renderer.renderDefinitionSummary();
           if (summary) {
             let summaryExpression = <Expression expression={summary} key="summary"/>;
             if (display === undefined) {
@@ -139,7 +139,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
           if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
             let showPreview = false;
             if (this.state.showPreview) {
-              let definition = renderer.renderDefinition(this.state.definition, undefined, false, true, false, false);
+              let definition = renderer.renderDefinition(undefined, false, true, false, false);
               if (definition) {
                 previewContents = <Expression expression={definition}/>;
                 showPreview = true;

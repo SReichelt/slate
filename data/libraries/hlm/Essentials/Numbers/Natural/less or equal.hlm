@@ -18,14 +18,62 @@ $"less or equal"(
       operands = [n, m]
     )
   ],
-  definition = [%exists(
-    #(x: %Element($"Natural numbers")),
-    formula = %equals(
-      $sum(
-        m = {m},
-        n = {x}
-      ),
-      n
+  definition = [
+    %exists(
+      #(x: %Element($"Natural numbers")),
+      formula = %equals(
+        $sum(
+          m = {m},
+          n = {x}
+        ),
+        n
+      )
+    ),
+    %structural(
+      m,
+      $"Natural numbers",
+      [
+        {
+          constructor = $"Natural numbers".zero,
+          value = %and,
+          rewrite = %true
+        },
+        {
+          constructor = $"Natural numbers".successor,
+          parameters = #(x: %Element($"Natural numbers")),
+          value = %and(
+            $"less or equal"(
+              m = {x},
+              n = {n}
+            ),
+            %not(%equals(x, n))
+          ),
+          rewrite = %true
+        }
+      ]
+    ),
+    %or(
+      %equals(m, n),
+      %structural(
+        n,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = %or,
+            rewrite = %true
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(y: %Element($"Natural numbers")),
+            value = $"less or equal"(
+              m = {m},
+              n = {y}
+            ),
+            rewrite = %true
+          }
+        ]
+      )
     )
-  )]
+  ]
 }

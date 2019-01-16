@@ -2,7 +2,7 @@ import * as Fmt from '../../format/format';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export class GenericUtils {
-  constructor(protected libraryDataAccessor: LibraryDataAccessor) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor) {}
 
   getOuterDefinitionPath(expression: Fmt.DefinitionRefExpression): Fmt.Path {
     let path = expression.path;

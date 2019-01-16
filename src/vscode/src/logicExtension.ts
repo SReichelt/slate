@@ -33,16 +33,23 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
     provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
         let documentLibraryDataProvider = this.documentLibraryDataProviders.get(document);
         if (documentLibraryDataProvider && this.templates) {
+            let libraryDataProvider = documentLibraryDataProvider;
+            let templates = this.templates;
             try {
-                let renderer = documentLibraryDataProvider.logic.getDisplay().getRenderer(documentLibraryDataProvider, this.templates, false);
                 let result: vscode.CodeLens[] = [];
                 if (document.uri.toString().endsWith('_index' + fileExtension)) {
                     let reportRange = (info: FmtReader.ObjectRangeInfo) => {
+                        if (token.isCancellationRequested) {
+                            return;
+                        }
                         if (info.object instanceof FmtLibrary.MetaRefExpression_item && info.object.ref instanceof Fmt.DefinitionRefExpression) {
                             let ref = info.object.ref;
                             result.push(new HLMCodeLens(convertRange(info.range), () => {
-                                let item = documentLibraryDataProvider!.fetchItem(ref.path);
-                                let expression = item.then((definition) => renderer.renderDefinitionSummary(definition) || new Display.EmptyExpression);
+                                let item = libraryDataProvider.fetchItem(ref.path);
+                                let expression = item.then((definition) => {
+                                    let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, libraryDataProvider, templates, false);
+                                    return renderer.renderDefinitionSummary() || new Display.EmptyExpression;
+                                });
                                 return new Display.PromiseExpression(expression);
                             }));
                         }
@@ -54,8 +61,12 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
                     let file = FmtReader.readString(document.getText(), document.fileName, documentLibraryDataProvider.logic.getMetaModel, reportRange);
                     if (file.definitions.length) {
                         let definition = file.definitions[0];
-                        let parts = renderer.getDefinitionParts(definition, true);
+                        let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, libraryDataProvider, templates, false);
+                        let parts = renderer.getDefinitionParts(true);
                         for (let info of ranges) {
+                            if (token.isCancellationRequested) {
+                                break;
+                            }
                             let part = parts.get(info.object);
                             if (part) {
                                 result.push(new HLMCodeLens(convertRange(info.range), part));
@@ -94,9 +105,10 @@ class HLMLogicHoverProvider {
         if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === documentLibraryDataProvider.logic.name) {
             let targetDataProvider = documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
-            let renderer = targetDataProvider.logic.getDisplay().getRenderer(targetDataProvider, this.templates, false);
+            let templates = this.templates;
             let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
-                let renderedDefinition = renderer.renderDefinition(definition, undefined, false, true, false, false);
+                let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition, targetDataProvider, templates, false);
+                let renderedDefinition = renderer.renderDefinition(undefined, false, true, false, false);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
             });
             event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {

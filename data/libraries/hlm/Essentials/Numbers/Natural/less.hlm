@@ -42,6 +42,52 @@ $less(
         ),
         n
       )
+    ),
+    %and(
+      %not(%equals(m, n)),
+      %structural(
+        m,
+        $"Natural numbers",
+        [
+          {
+            constructor = $"Natural numbers".zero,
+            value = %and,
+            rewrite = %true
+          },
+          {
+            constructor = $"Natural numbers".successor,
+            parameters = #(y: %Element($"Natural numbers")),
+            value = $less(
+              m = {y},
+              n = {n}
+            ),
+            rewrite = %true
+          }
+        ]
+      )
+    ),
+    %structural(
+      n,
+      $"Natural numbers",
+      [
+        {
+          constructor = $"Natural numbers".zero,
+          value = %or,
+          rewrite = %true
+        },
+        {
+          constructor = $"Natural numbers".successor,
+          parameters = #(z: %Element($"Natural numbers")),
+          value = %or(
+            $less(
+              m = {m},
+              n = {z}
+            ),
+            %equals(m, z)
+          ),
+          rewrite = %true
+        }
+      ]
     )
   ]
 }
