@@ -36,8 +36,6 @@ interface SelectionState {
 }
 
 interface AppState extends SelectionState {
-  width: number;
-  height: number;
   verticalLayout: boolean;
   error?: string;
   templates?: Fmt.File;
@@ -61,8 +59,6 @@ class App extends React.Component<AppProps, AppState> {
     this.library = this.libraryDataProvider.fetchLocalSection();
 
     let state: AppState = {
-      width: window.innerWidth,
-      height: window.innerHeight,
       verticalLayout: window.innerHeight > window.innerWidth,
       submitting: false,
       extraContentsVisible: false
@@ -106,18 +102,16 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     window.onresize = () => {
-      this.setState({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-      if (window.innerHeight > window.innerWidth * 1.25) {
-        this.setState({
-          verticalLayout: true
-        });
-      } else if (window.innerHeight * 1.25 < window.innerWidth) {
-        this.setState({
-          verticalLayout: false
-        });
+      if (!(this.state.interactionHandler && this.state.interactionHandler.isUpdateBlocked())) {
+        if (window.innerHeight > window.innerWidth * 1.25) {
+          if (!this.state.verticalLayout) {
+            this.setState({verticalLayout: true});
+          }
+        } else if (window.innerHeight * 1.25 < window.innerWidth) {
+          if (this.state.verticalLayout) {
+            this.setState({verticalLayout: false});
+          }
+        }
       }
     };
 
@@ -157,8 +151,8 @@ class App extends React.Component<AppProps, AppState> {
       mainContents = 'Please select an item from the tree.';
     }
 
-    let windowSize = this.state.verticalLayout ? this.state.height : this.state.width;
-    let defaultItemHeight = this.state.verticalLayout ? this.state.height / 3 : this.state.height / 2;
+    let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
+    let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let buttons: any[] = [];
     if (this.state.selectedItemDefinition) {

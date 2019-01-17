@@ -2,7 +2,10 @@
 
 $Divisors(b: %Element($Integers)): %SetOperator {
   display = [$Function(
-    function = 'Div',
+    function = $SubSup(
+      body = 'Div',
+      sub = 'ℤ'
+    ),
     arguments = [b]
   )],
   definition = [%subset(

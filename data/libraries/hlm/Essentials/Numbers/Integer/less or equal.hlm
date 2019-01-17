@@ -34,14 +34,26 @@ $"less or equal"(
       operands = [b, a]
     )
   ],
-  definition = [$../Natural/"less or equal"(
-    m = {$../Natural/sum(
-      m = {n_a},
-      n = {m_b}
-    )},
-    n = {$../Natural/sum(
-      m = {n_b},
-      n = {m_a}
-    )}
-  )]
+  definition = [
+    $../Natural/"less or equal"(
+      m = {$../Natural/sum(
+        m = {n_a},
+        n = {m_b}
+      )},
+      n = {$../Natural/sum(
+        m = {n_b},
+        n = {m_a}
+      )}
+    ),
+    %exists(
+      #(x: %Element($../Natural/"Natural numbers")),
+      formula = %equals(
+        $sum(
+          a = {a},
+          b = {x}
+        ),
+        b
+      )
+    )
+  ]
 }

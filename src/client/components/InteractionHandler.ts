@@ -10,6 +10,7 @@ export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt
 export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHandler {
   private expressionChangeHandlers: OnExpressionChanged[] = [];
   private hoverChangeHandlers: OnHoverChanged[] = [];
+  private updateBlockCounter = 0;
 
   registerExpressionChangeHandler(handler: OnExpressionChanged): void {
     this.expressionChangeHandlers.push(handler);
@@ -59,6 +60,21 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 
   getPreviewContents(semanticLink: Display.SemanticLink): any {
     return null;
+  }
+
+  enterUpdateBlocker(): void {
+    this.updateBlockCounter++;
+  }
+
+  leaveUpdateBlocker(): void {
+    if (this.updateBlockCounter <= 0) {
+      throw new Error('Internal error: update block counter underflow');
+    }
+    this.updateBlockCounter--;
+  }
+
+  isUpdateBlocked(): boolean {
+    return this.updateBlockCounter !== 0;
   }
 }
 

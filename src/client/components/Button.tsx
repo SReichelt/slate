@@ -28,10 +28,27 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onMouseLeave = undefined;
     if (this.props.enabled === undefined || this.props.enabled) {
       className += ' hoverable';
-      onClick = this.props.onClick;
-      onMouseDown = () => this.setState({pressed: true});
-      onMouseUp = () => this.setState({pressed: false});
-      onMouseLeave = () => this.setState({pressed: false});
+      if (this.props.onClick) {
+        let propsOnClick = this.props.onClick;
+        onClick = (event: React.MouseEvent<HTMLElement>) => {
+          event.stopPropagation();
+          event.preventDefault();
+          propsOnClick();
+        };
+      }
+      onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.setState({pressed: true});
+      };
+      onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        event.preventDefault();
+        this.setState({pressed: false});
+      };
+      onMouseLeave = (event: React.MouseEvent<HTMLElement>) => {
+        this.setState({pressed: false});
+      };
     } else {
       className += ' disabled';
     }

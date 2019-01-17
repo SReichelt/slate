@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks The exponentiation on the right uses the previous definition, which is possible because the exponents are nonnegative.
+ */
 $"power to integer"(
   a: %Element($"Rational numbers"),
   b: %Element($../Integer/Integers),
