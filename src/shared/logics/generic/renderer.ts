@@ -72,12 +72,12 @@ export abstract class GenericRenderer {
     if (isDummy) {
       result.styleClasses.push('dummy');
     }
-    result.semanticLinks = [new Display.SemanticLink(param, isDefinition)];
     if (indices) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': indices});
       result = subExpression;
     }
+    result.semanticLinks = [new Display.SemanticLink(param, isDefinition)];
     return result;
   }
 
