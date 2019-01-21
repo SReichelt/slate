@@ -1,0 +1,18 @@
+%../../../../../../logics/hlm%
+
+$"Positive numbers": %SetOperator {
+  display = [$SubSup(
+    body = 'ℚ',
+    sub = '+'
+  )],
+  definition = [
+    $"Segment (greater)"(a = {$../../Natural/number(value = 0)}),
+    %subset(
+      #(a: %Element($../"Rational numbers")),
+      $../less(
+        b = {a},
+        a = {$../../Natural/number(value = 0)}
+      )
+    )
+  ]
+}

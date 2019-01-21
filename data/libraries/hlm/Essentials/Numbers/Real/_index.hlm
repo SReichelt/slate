@@ -9,16 +9,13 @@ $Real: %Section {
     %item($difference),
     %item($"less or equal"),
     %item($less),
-    %item($"Segment (less)"),
-    %item($"Segment (less or equal)"),
-    %item($"Segment (greater or equal)"),
-    %item($"Segment (greater)"),
-    %item($Hole),
-    %item($"Negative numbers"),
-    %item($"Nonpositive numbers"),
-    %item($"Nonnegative numbers"),
-    %item($"Positive numbers"),
-    %item($"Nonzero numbers"),
+    %subsection(
+      $Subsets,
+      title = {
+        de = 'Teilmengen',
+        en = 'Subsets'
+      }
+    ),
     %item($product),
     %item($quotient),
     %item($power),

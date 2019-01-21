@@ -12,16 +12,13 @@ $Integer: %Section {
     %item($"Actual difference equals formal difference"),
     %item($"less or equal"),
     %item($less),
-    %item($"Segment (less)"),
-    %item($"Segment (less or equal)"),
-    %item($"Segment (greater or equal)"),
-    %item($"Segment (greater)"),
-    %item($Hole),
-    %item($"Negative numbers"),
-    %item($"Nonpositive numbers"),
-    %item($"Nonnegative numbers"),
-    %item($"Positive numbers"),
-    %item($"Nonzero numbers"),
+    %subsection(
+      $Subsets,
+      title = {
+        de = 'Teilmengen',
+        en = 'Subsets'
+      }
+    ),
     %item($absolute),
     %item($product),
     %item($"Product is associative"),

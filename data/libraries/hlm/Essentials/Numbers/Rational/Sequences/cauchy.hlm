@@ -15,7 +15,7 @@ $cauchy(α: %Element(
     property = 'Cauchy'
   )],
   definition = [%forall(
-    #(ε: %Element($../"Positive numbers")),
+    #(ε: %Element($../Subsets/"Positive numbers")),
     %exists(
       #(n: %Element($../../Natural/"Natural numbers")),
       formula = %forall(

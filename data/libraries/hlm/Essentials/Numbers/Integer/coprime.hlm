@@ -17,7 +17,7 @@ $coprime(
   definition = [
     %forall(
       #(
-        c: %Element($"Positive numbers"),
+        c: %Element($Subsets/"Positive numbers"),
         _1: %Constraint($divisible(
           a = {c},
           b = {a}
@@ -33,7 +33,7 @@ $coprime(
       )
     ),
     %not(%exists(
-      #(d: %Element($"Segment (greater)"(a = {$../Natural/number(value = 1)}))),
+      #(d: %Element($Subsets/"Segment (greater)"(a = {$../Natural/number(value = 1)}))),
       formula = %and(
         $divisible(
           a = {d},
@@ -47,7 +47,7 @@ $coprime(
     )),
     %forall(
       #(
-        e: %Element($"Nonzero numbers"),
+        e: %Element($Subsets/"Nonzero numbers"),
         _3: %Constraint($divisible(
           a = {e},
           b = {a}

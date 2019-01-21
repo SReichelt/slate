@@ -1,0 +1,17 @@
+%../../../../../../format/library%
+
+$Subsets: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Segment (less)"),
+    %item($"Segment (less or equal)"),
+    %item($"Segment (greater or equal)"),
+    %item($"Segment (greater)"),
+    %item($Hole),
+    %item($"Negative numbers"),
+    %item($"Nonpositive numbers"),
+    %item($"Nonnegative numbers"),
+    %item($"Positive numbers"),
+    %item($"Nonzero numbers")
+  ]
+}

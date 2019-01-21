@@ -2,7 +2,7 @@
 
 $quotient(
   b: %Element($"Real numbers"),
-  a: %Element($"Nonzero numbers")
+  a: %Element($Subsets/"Nonzero numbers")
 ): %ImplicitOperator {
   display = [$Fraction(
     numerator = b,

@@ -12,7 +12,7 @@ $rational(a: %Element($"Real numbers")): %Predicate {
     ),
     %exists(
       #(
-        b: %Element($../Integer/"Nonzero numbers"),
+        b: %Element($../Integer/Subsets/"Nonzero numbers"),
         c: %Element($../Integer/Integers)
       ),
       formula = %equals(
@@ -25,7 +25,7 @@ $rational(a: %Element($"Real numbers")): %Predicate {
     ),
     %existsUnique(
       #(
-        d: %Element($../Integer/"Positive numbers"),
+        d: %Element($../Integer/Subsets/"Positive numbers"),
         e: %Element($../Integer/Integers),
         _1: %Constraint($../Integer/coprime(
           a = {d},

@@ -38,7 +38,7 @@ $less(
       %not(%equals(m, n))
     ),
     %exists(
-      #(x: %Element($"Positive numbers")),
+      #(x: %Element($Subsets/"Positive numbers")),
       formula = %equals(
         $sum(
           m = {m},

@@ -11,7 +11,7 @@ $"Roots of primes are irrational"(
   proofs = [{steps = #(_: %ProveNeg({steps = #(
     _: %UseDef(result = %exists(
       #(
-        a: %Element($../Integer/"Positive numbers"),
+        a: %Element($../Integer/Subsets/"Positive numbers"),
         b: %Element($../Integer/Integers),
         _1: %Constraint($../Integer/coprime(
           a = {a},
@@ -31,7 +31,7 @@ $"Roots of primes are irrational"(
     )),
     _: %UseExists({
       parameters = #(
-        a: %Element($../Integer/"Positive numbers"),
+        a: %Element($../Integer/Subsets/"Positive numbers"),
         b: %Element($../Integer/Integers),
         _1: %Constraint($../Integer/coprime(
           a = {a},

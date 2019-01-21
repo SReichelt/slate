@@ -3,7 +3,7 @@
 $"Multiplication of a nonzero number is injective"(
   a: %Element($Integers),
   b: %Element(%previous),
-  c: %Element($"Nonzero numbers"),
+  c: %Element($Subsets/"Nonzero numbers"),
   _1: %Constraint(%equals(
     $product(
       a = {a},

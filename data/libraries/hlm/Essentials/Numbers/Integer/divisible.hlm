@@ -2,7 +2,7 @@
 
 $divisible(
   a: %Element(
-    $"Nonzero numbers",
+    $Subsets/"Nonzero numbers",
     shortcut = {
       constructor = $Integers.difference,
       parameters = #(

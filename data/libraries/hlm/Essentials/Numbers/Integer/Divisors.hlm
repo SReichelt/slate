@@ -9,7 +9,7 @@ $Divisors(b: %Element($Integers)): %SetOperator {
     arguments = [b]
   )],
   definition = [%subset(
-    #(a: %Element($"Nonzero numbers")),
+    #(a: %Element($Subsets/"Nonzero numbers")),
     $divisible(
       a = {a},
       b = {b}

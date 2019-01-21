@@ -2,7 +2,7 @@
 
 $"Power base quotient law"(
   b: %Element($"Real numbers"),
-  a: %Element($"Nonzero numbers"),
+  a: %Element($Subsets/"Nonzero numbers"),
   n: %Element($../Natural/Subsets/"Positive numbers")
 ): %StandardTheorem {
   claim = %equals(

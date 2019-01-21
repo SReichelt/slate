@@ -45,7 +45,7 @@ $"Real numbers": %Construction {
           l = {$../Natural/number(value = 0)}
         ),
         %forall(
-          #(ε: %Element($../Rational/"Positive numbers")),
+          #(ε: %Element($../Rational/Subsets/"Positive numbers")),
           %exists(
             #(n: %Element($../Natural/"Natural numbers")),
             formula = %forall(

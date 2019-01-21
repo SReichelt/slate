@@ -1,14 +1,14 @@
 %../../../../../logics/hlm%
 
 $root(
-  a: %Element($"Nonnegative numbers"),
+  a: %Element($Subsets/"Nonnegative numbers"),
   n: %Element($../Natural/"Natural numbers")
 ): %ImplicitOperator {
   display = [$Radical(
     radicand = a,
     degree = n
   )],
-  parameter = #(r: %Element($"Nonnegative numbers")),
+  parameter = #(r: %Element($Subsets/"Nonnegative numbers")),
   definition = [%equals(
     a,
     $power(
