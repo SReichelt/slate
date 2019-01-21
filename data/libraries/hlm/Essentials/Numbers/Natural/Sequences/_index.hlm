@@ -1,0 +1,9 @@
+%../../../../../../format/library%
+
+$Sequences: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"finite sequence"),
+    %item($"infinite sequence")
+  ]
+}

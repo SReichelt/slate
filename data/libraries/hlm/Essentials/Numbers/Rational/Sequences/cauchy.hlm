@@ -20,7 +20,7 @@ $cauchy(α: %Element(
       #(n: %Element($../../Natural/"Natural numbers")),
       formula = %forall(
         #(
-          l: %Element($../../Natural/"Segment (greater or equal)"(n = {n})),
+          l: %Element($../../Natural/Subsets/"Segment (greater or equal)"(n = {n})),
           m: %Element(%previous)
         ),
         $../less(

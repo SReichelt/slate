@@ -2,7 +2,7 @@
 
 $"Roots of primes are irrational"(
   p: %Element($../Natural/Prime/"Prime numbers"),
-  n: %Element($../Natural/"Segment (greater)"(n = {$../Natural/number(value = 1)}))
+  n: %Element($../Natural/Subsets/"Segment (greater)"(n = {$../Natural/number(value = 1)}))
 ): %StandardTheorem {
   claim = %not($rational(a = {$root(
     a = {p},
@@ -162,7 +162,7 @@ $"Roots of primes are irrational"(
               m = {$../Natural/number(value = 1)}
             )),
             _: %UseDef(result = %exists(
-              #(m: %Element($../Natural/"Positive numbers")),
+              #(m: %Element($../Natural/Subsets/"Positive numbers")),
               formula = %equals(
                 $../Natural/sum(
                   m = {$../Natural/number(value = 1)},
@@ -172,7 +172,7 @@ $"Roots of primes are irrational"(
               )
             )),
             _: %UseExists({
-              parameters = #(m: %Element($../Natural/"Positive numbers")),
+              parameters = #(m: %Element($../Natural/Subsets/"Positive numbers")),
               steps = #(
                 _: %Consider(m),
                 _: %UseDef(result = %exists(

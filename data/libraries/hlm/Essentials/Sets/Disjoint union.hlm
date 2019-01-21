@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks In contrast to the definition of set union, the disjoint union of sets is a “construction”, which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two “constructors”.
+ * @remarks In contrast to the definition of set union, the disjoint union of sets is a “construction,” which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two “constructors.”
  *
  *          A construction always includes definitions of equality for each constructor. In this case, those definitions are trivial. Different constructors are never considered equal.
  *

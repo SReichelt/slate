@@ -1,6 +1,6 @@
 %../../../../../../format/library%
 
-$Cardinal: %Section {
+$"Technical definitions": %Section {
   logic = 'hlm',
   items = [
     %item($"indexed element"),

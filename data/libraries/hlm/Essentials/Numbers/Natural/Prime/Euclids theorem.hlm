@@ -6,12 +6,12 @@
  *             * https://proofwiki.org/wiki/Euclid%27s_Theorem
  */
 $"Euclids theorem": %StandardTheorem {
-  claim = %not($../../../Sets/finite(S = {$"Prime numbers"})),
+  %not($../../../Sets/finite(S = {$"Prime numbers"})),
   proofs = [{steps = #(_: %ProveNeg({steps = #(
     _: %UseDef(result = %exists(#(
       n: %Element($../"Natural numbers"),
       f: %Element($../../../Functions/Bijections(
-        X = {$../"Segment (less)"(n = {n})},
+        X = {$../Subsets/"Segment (less)"(n = {n})},
         Y = {$"Prime numbers"}
       ))
     ))),
@@ -19,7 +19,7 @@ $"Euclids theorem": %StandardTheorem {
       parameters = #(
         n: %Element($../"Natural numbers"),
         f: %Element($../../../Functions/Bijections(
-          X = {$../"Segment (less)"(n = {n})},
+          X = {$../Subsets/"Segment (less)"(n = {n})},
           Y = {$"Prime numbers"}
         ))
       ),
@@ -27,8 +27,10 @@ $"Euclids theorem": %StandardTheorem {
         a: %Def($../"Generalized sums and products"/"inductive product (exclusive)"(
           n = {n},
           i = {
-            #(i: %Element($../"Segment (less)"(n = {n}))),
+            #(i: %Element($../Subsets/"Segment (less)"(n = {n}))),
             {a = {$../../../Functions/value(
+              X = {$../Subsets/"Segment (less)"(n = {n})},
+              Y = {$"Prime numbers"},
               f = {f},
               x = {i}
             )}}
@@ -38,8 +40,10 @@ $"Euclids theorem": %StandardTheorem {
           $../"Generalized sums and products"/"Inductive product of positive numbers grows"(
             n = {n},
             i = {
-              #(j: %Element($../"Segment (less)"(n = {n}))),
+              #(j: %Element($../Subsets/"Segment (less)"(n = {n}))),
               {a = {$../../../Functions/value(
+                X = {$../Subsets/"Segment (less)"(n = {n})},
+                Y = {$"Prime numbers"},
                 f = {f},
                 x = {j}
               )}}
@@ -97,22 +101,38 @@ $"Euclids theorem": %StandardTheorem {
               $../"Generalized sums and products"/"Inductive product is a multiple of each element"(
                 n = {n},
                 i = {
-                  #(k: %Element($../"Segment (less)"(n = {n}))),
+                  #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
                   {a = {$../../../Functions/value(
+                    X = {$../Subsets/"Segment (less)"(n = {n})},
+                    Y = {$"Prime numbers"},
                     f = {f},
                     x = {k}
                   )}}
                 },
                 j = {$../../../Functions/value(
-                  f = {$../../../Functions/inverse(f = {f})},
+                  X = {$"Prime numbers"},
+                  Y = {$../Subsets/"Segment (less)"(n = {n})},
+                  f = {$../../../Functions/inverse(
+                    X = {$../Subsets/"Segment (less)"(n = {n})},
+                    Y = {$"Prime numbers"},
+                    f = {f}
+                  )},
                   x = {p}
                 )}
               ),
               $../divisible(
                 m = {$../../../Functions/value(
+                  X = {$../Subsets/"Segment (less)"(n = {n})},
+                  Y = {$"Prime numbers"},
                   f = {f},
                   x = {$../../../Functions/value(
-                    f = {$../../../Functions/inverse(f = {f})},
+                    X = {$"Prime numbers"},
+                    Y = {$../Subsets/"Segment (less)"(n = {n})},
+                    f = {$../../../Functions/inverse(
+                      X = {$../Subsets/"Segment (less)"(n = {n})},
+                      Y = {$"Prime numbers"},
+                      f = {f}
+                    )},
                     x = {p}
                   )}
                 )},
@@ -122,14 +142,24 @@ $"Euclids theorem": %StandardTheorem {
             _: %Substitute(
               #(_: %UseTheorem(
                 $../../../Functions/"Application of function after inverse is neutral"(
+                  X = {$../Subsets/"Segment (less)"(n = {n})},
+                  Y = {$"Prime numbers"},
                   f = {f},
                   y = {p}
                 ),
                 %equals(
                   $../../../Functions/value(
+                    X = {$../Subsets/"Segment (less)"(n = {n})},
+                    Y = {$"Prime numbers"},
                     f = {f},
                     x = {$../../../Functions/value(
-                      f = {$../../../Functions/inverse(f = {f})},
+                      X = {$"Prime numbers"},
+                      Y = {$../Subsets/"Segment (less)"(n = {n})},
+                      f = {$../../../Functions/inverse(
+                        X = {$../Subsets/"Segment (less)"(n = {n})},
+                        Y = {$"Prime numbers"},
+                        f = {f}
+                      )},
                       x = {p}
                     )}
                   ),

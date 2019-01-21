@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 $"Divisibility criterion"(
-  a: %Element($"Positive numbers"),
+  a: %Element($Subsets/"Positive numbers"),
   b: %Element($"Natural numbers"),
   _1: %Constraint($divisible(
     m = {a},

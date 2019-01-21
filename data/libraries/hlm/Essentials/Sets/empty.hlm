@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks In HLM, multiple alternative definitions can be given for an operator or predicate, if they can be shown to be equal/equivalent. In proofs, the most convenient alternative can be selected at will, which reduces the number of necessary steps. Sometimes, it also makes sense to prove a property according to one alternative and then use it according to another.
+ */
 $empty(S: %Set): %Predicate {
   display = [$Property(
     operand = S,
@@ -17,17 +20,11 @@ $empty(S: %Set): %Predicate {
     %not(%exists(#(x: %Element(S))))
   ],
   equivalenceProofs = [
+    {steps = #(_: %UseDef(result = %sub(
+      S,
+      $"Empty set"
+    )))},
     {
-      from = 1,
-      to = 2,
-      steps = #(_: %UseDef(result = %sub(
-        S,
-        $"Empty set"
-      )))
-    },
-    {
-      from = 2,
-      to = 3,
       parameters = #(@: %Constraint(%sub(
         S,
         $"Empty set"
@@ -51,38 +48,34 @@ $empty(S: %Set): %Predicate {
         }))
       }))
     },
-    {
-      from = 3,
-      to = 1,
-      steps = #(_: %ProveSetEquals(
-        subsetProof = {steps = #(_: %ProveDef(proof = {
-          goal = %forall(
-            #(a: %Element(S)),
-            %in(
-              a,
-              $"Empty set"
-            )
-          ),
-          steps = #(_: %ProveForAll({
-            parameters = #(a: %Element(S)),
-            goal = %in(
-              a,
-              $"Empty set"
-            ),
-            steps = #(_: %State(
-              %exists(#(x: %Element(S))),
-              proof = {steps = #(_: %ProveExists({x = {a}}))}
-            ))
-          }))
-        }))},
-        supersetProof = {steps = #(_: %UseTheorem(
-          $"Empty set is subset of any set"(S = {S}),
-          %sub(
-            $"Empty set",
-            S
+    {steps = #(_: %ProveSetEquals(
+      subsetProof = {steps = #(_: %ProveDef(proof = {
+        goal = %forall(
+          #(a: %Element(S)),
+          %in(
+            a,
+            $"Empty set"
           )
-        ))}
-      ))
-    }
+        ),
+        steps = #(_: %ProveForAll({
+          parameters = #(a: %Element(S)),
+          goal = %in(
+            a,
+            $"Empty set"
+          ),
+          steps = #(_: %State(
+            %exists(#(x: %Element(S))),
+            proof = {steps = #(_: %ProveExists({x = {a}}))}
+          ))
+        }))
+      }))},
+      supersetProof = {steps = #(_: %UseTheorem(
+        $"Empty set is subset of any set"(S = {S}),
+        %sub(
+          $"Empty set",
+          S
+        )
+      ))}
+    ))}
   ]
 }

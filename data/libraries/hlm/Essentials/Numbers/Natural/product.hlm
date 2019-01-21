@@ -3,6 +3,8 @@
 /**
  * @references * https://en.wikipedia.org/wiki/Natural_number#Multiplication
  *             * https://proofwiki.org/wiki/Definition:Multiplication/Natural_Numbers
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#mul
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.mul
  */
 $product(
   m: %Element($"Natural numbers"),

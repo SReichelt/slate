@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This is just an example proof. It could be rewritten in a very concise way as a proof about cardinals.
+ */
 $"Subsets of finite sets are finite"(
   S: %Set,
   _1: %Constraint($finite(S = {S})),
@@ -12,10 +15,14 @@ $"Subsets of finite sets are finite"(
         m: %Element($../Numbers/Natural/"Natural numbers"),
         f: %Element($../Functions/Functions(
           X = {T},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})}
         ))
       ),
-      formula = $../Functions/injective(f = {f})
+      formula = $../Functions/injective(
+        X = {T},
+        Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})},
+        f = {f}
+      )
     ),
     steps = #(
       _: %Consider(_1),
@@ -24,38 +31,56 @@ $"Subsets of finite sets are finite"(
           n: %Element($../Numbers/Natural/"Natural numbers"),
           g: %Element($../Functions/Functions(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {n})}
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})}
           ))
         ),
-        formula = $../Functions/injective(f = {g})
+        formula = $../Functions/injective(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
+          f = {g}
+        )
       )),
       _: %UseExists({
         parameters = #(
           n: %Element($../Numbers/Natural/"Natural numbers"),
           g: %Element($../Functions/Functions(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {n})}
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})}
           ))
         ),
         steps = #(_: %ProveExists(
           {
             m = {n},
             f = {$../Functions/restriction(
+              X = {S},
+              Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
               f = {g},
               A = {T}
             )}
           },
           proof = {
-            goal = $../Functions/injective(f = {g}),
+            goal = $../Functions/injective(
+              X = {S},
+              Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
+              f = {g}
+            ),
             steps = #(_: %UseTheorem(
               $../Functions/"Restriction preserves injectivity"(
+                X = {S},
+                Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
                 f = {g},
                 A = {T}
               ),
-              $../Functions/injective(f = {$../Functions/restriction(
-                f = {g},
-                A = {T}
-              )})
+              $../Functions/injective(
+                X = {T},
+                Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
+                f = {$../Functions/restriction(
+                  X = {S},
+                  Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
+                  f = {g},
+                  A = {T}
+                )}
+              )
             ))
           }
         ))

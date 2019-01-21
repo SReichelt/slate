@@ -4,20 +4,20 @@ $difference(
   b: %Element(
     $"Rational numbers",
     shortcut = {
-      $"Rational numbers".quotient,
-      #(
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
         n_b: %Element($../Integer/Integers),
-        m_b: %Element($../Natural/"Positive numbers")
+        d_b: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   ),
   a: %Element(
     %previous,
     shortcut = {
-      $"Rational numbers".quotient,
-      #(
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
         n_a: %Element($../Integer/Integers),
-        m_a: %Element($../Natural/"Positive numbers")
+        d_a: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   )
@@ -33,16 +33,16 @@ $difference(
         n = {$../Integer/difference(
           b = {$../Integer/product(
             a = {n_b},
-            b = {m_a}
+            b = {d_a}
           )},
           a = {$../Integer/product(
             a = {n_a},
-            b = {m_b}
+            b = {d_b}
           )}
         )},
-        m = {$../Natural/product(
-          m = {m_b},
-          n = {m_a}
+        d = {$../Natural/product(
+          m = {d_b},
+          n = {d_a}
         )}
     ),
     $sum(

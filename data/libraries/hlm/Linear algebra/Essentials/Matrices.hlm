@@ -9,9 +9,9 @@ $Matrices(
   n: %Element(%previous)
 ): %Construction {
   $matrix(i: %Binding(
-    $../../Essentials/Numbers/Natural/"Segment (less)"(n = {m}),
+    $../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = {m}),
     #(j: %Binding(
-      $../../Essentials/Numbers/Natural/"Segment (less)"(n = {n}),
+      $../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = {n}),
       #(a: %Element(S))
     ))
   )): %Constructor {

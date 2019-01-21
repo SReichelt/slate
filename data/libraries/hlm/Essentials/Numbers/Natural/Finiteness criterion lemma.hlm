@@ -4,7 +4,7 @@ $"Finiteness criterion lemma"(
   M: %Subset($"Natural numbers"),
   k: %Element($"Natural numbers"),
   f: %Element($../../Functions/Bijections(
-    X = {$"Segment (less or equal)"(n = {k})},
+    X = {$Subsets/"Segment (less or equal)"(n = {k})},
     Y = {M}
   ))
 ): %StandardTheorem {
@@ -34,7 +34,8 @@ $"Finiteness criterion lemma"(
                 n = {a}
               )
             )
-          )
+          ),
+          rewrite = %true
         },
         {
           constructor = $"Natural numbers".successor,
@@ -66,6 +67,8 @@ $"Finiteness criterion lemma"(
           )
         ),
         steps = #(_: %ProveExists({a = {$../../Functions/value(
+          X = {$Subsets/"Segment (less or equal)"(n = {k})},
+          Y = {M},
           f = {f},
           x = {$number(value = 0)}
         )}}))
@@ -83,15 +86,19 @@ $"Finiteness criterion lemma"(
           )
         ),
         steps = #(
-          S: %SetDef($"Segment (less or equal)"(n = {x})),
+          S: %SetDef($Subsets/"Segment (less or equal)"(n = {x})),
           _: %UseTheorem(
             $"Finiteness criterion lemma"(
               M = {$../../Functions/Image(
+                X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                Y = {M},
                 f = {f},
                 S = {S}
               )},
               k = {x},
               f = {$../../Functions/restriction(
+                X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                Y = {M},
                 f = {f},
                 A = {S}
               )}
@@ -100,6 +107,8 @@ $"Finiteness criterion lemma"(
               #(i: %Element(M)),
               formula = %forall(
                 #(j: %Element($../../Functions/Image(
+                  X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                  Y = {M},
                   f = {f},
                   S = {S}
                 ))),
@@ -116,12 +125,16 @@ $"Finiteness criterion lemma"(
               {
                 formula = $less(
                   n = {$../../Functions/value(
+                    X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                    Y = {M},
                     f = {f},
                     x = {k}
                   )},
                   m = {i}
                 ),
                 value = $../../Functions/value(
+                  X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                  Y = {M},
                   f = {f},
                   x = {k}
                 )
@@ -129,6 +142,8 @@ $"Finiteness criterion lemma"(
               {
                 formula = $"less or equal"(
                   m = {$../../Functions/value(
+                    X = {$Subsets/"Segment (less or equal)"(n = {k})},
+                    Y = {M},
                     f = {f},
                     x = {k}
                   )},

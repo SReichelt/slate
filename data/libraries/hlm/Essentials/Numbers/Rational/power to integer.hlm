@@ -2,6 +2,8 @@
 
 /**
  * @remarks The exponentiation on the right uses the previous definition, which is possible because the exponents are nonnegative.
+ *
+ * @references https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower
  */
 $"power to integer"(
   a: %Element($"Rational numbers"),

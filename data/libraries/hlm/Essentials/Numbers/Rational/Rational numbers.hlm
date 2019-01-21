@@ -1,14 +1,19 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks This definition is rather similar to the definition of integers. Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of [comparison](less%20or%20equal) would probably need to be split into several cases.
+ *
+ * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html
+ */
 $"Rational numbers": %Construction {
   $quotient(
     n: %Element($../Integer/Integers),
-    m: %Element($../Natural/"Positive numbers")
+    d: %Element($../Natural/Subsets/"Positive numbers")
   ): %Constructor {
     display = [$Parens(
       body = $Operator(
         symbol = '/',
-        operands = [n, m],
+        operands = [n, d],
         space = '',
         minParenLevel = 2,
         maxParenLevel = 2
@@ -18,20 +23,20 @@ $"Rational numbers": %Construction {
     equalityDefinition = {
       leftParameters = #(
         n: %Element($../Integer/Integers),
-        m: %Element($../Natural/"Positive numbers")
+        d: %Element($../Natural/Subsets/"Positive numbers")
       ),
       rightParameters = #(
         "n'": %Element($../Integer/Integers),
-        "m'": %Element($../Natural/"Positive numbers")
+        "d'": %Element($../Natural/Subsets/"Positive numbers")
       ),
       definition = [%equals(
         $../Integer/product(
           a = {n},
-          b = {"m'"}
+          b = {"d'"}
         ),
         $../Integer/product(
           a = {"n'"},
-          b = {m}
+          b = {d}
         )
       )]
     }
@@ -42,7 +47,7 @@ $"Rational numbers": %Construction {
     parameter = #(x: %Element($../Integer/Integers)),
     target = $"Rational numbers".quotient(
         n = {x},
-        m = {$../Natural/number(value = 1)}
+        d = {$../Natural/number(value = 1)}
     )
   }
 }

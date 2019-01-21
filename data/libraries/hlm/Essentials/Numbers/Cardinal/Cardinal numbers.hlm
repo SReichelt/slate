@@ -36,27 +36,27 @@ $"Cardinal numbers": %Construction {
   display = ['𝓒𝓻𝓭'],
   embedding = {
     parameter = #(n: %Element($../Natural/"Natural numbers")),
-    target = $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {n})}),
+    target = $"Cardinal numbers".cardinality(S = {$../Natural/Subsets/"Segment (less)"(n = {n})}),
     wellDefinednessProof = {
       parameters = #(
         m: %Element($../Natural/"Natural numbers"),
         n: %Element(%previous),
         _1: %Constraint(%equals(
-          $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {m})}),
-          $"Cardinal numbers".cardinality(S = {$../Natural/"Segment (less)"(n = {n})})
+          $"Cardinal numbers".cardinality(S = {$../Natural/Subsets/"Segment (less)"(n = {m})}),
+          $"Cardinal numbers".cardinality(S = {$../Natural/Subsets/"Segment (less)"(n = {n})})
         ))
       ),
       goal = %equals(m, n),
       steps = #(
         _: %Consider(_1),
         _: %UseDef(result = %exists(#(f: %Element($../../Functions/Bijections(
-          X = {$../Natural/"Segment (less)"(n = {m})},
-          Y = {$../Natural/"Segment (less)"(n = {n})}
+          X = {$../Natural/Subsets/"Segment (less)"(n = {m})},
+          Y = {$../Natural/Subsets/"Segment (less)"(n = {n})}
         ))))),
         _: %UseExists({
           parameters = #(f: %Element($../../Functions/Bijections(
-            X = {$../Natural/"Segment (less)"(n = {m})},
-            Y = {$../Natural/"Segment (less)"(n = {n})}
+            X = {$../Natural/Subsets/"Segment (less)"(n = {m})},
+            Y = {$../Natural/Subsets/"Segment (less)"(n = {n})}
           ))),
           steps = #(_: %UseTheorem(
             $"Natural cardinality lemma"(

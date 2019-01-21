@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks This proposition justifies the notation used for the constructor.
+ */
 $"Actual difference equals formal difference"(
   n: %Element($../Natural/"Natural numbers"),
   m: %Element(%previous)

@@ -2,6 +2,8 @@
 
 /**
  * @references * https://en.wikipedia.org/wiki/Quotient
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#div (truncated division, thus incompatible with division of rational numbers)
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)
  */
 $quotient(
   n: %Element($"Natural numbers"),

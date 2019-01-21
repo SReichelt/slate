@@ -1,5 +1,8 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime_2
+ */
 $"Two is prime": %StandardTheorem {
   claim = $prime(n = {$../number(value = 2)})
 }

@@ -3,23 +3,23 @@
 $"Inductive sum grows"(
   n: %Element($../"Natural numbers"),
   i: %Binding(
-    $../"Segment (less)"(n = {n}),
+    $../Subsets/"Segment (less)"(n = {n}),
     #(a: %Element($../"Natural numbers"))
   ),
-  m: %Element($../"Segment (less or equal)"(n = {n}))
+  m: %Element($../Subsets/"Segment (less or equal)"(n = {n}))
 ): %StandardTheorem {
   claim = $../"less or equal"(
     m = {$"inductive sum (exclusive)"(
       n = {m},
       i = {
-        #(j: %Element($../"Segment (less)"(n = {m}))),
+        #(j: %Element($../Subsets/"Segment (less)"(n = {m}))),
         {a = {a[j]}}
       }
     )},
     n = {$"inductive sum (exclusive)"(
       n = {n},
       i = {
-        #(k: %Element($../"Segment (less)"(n = {n}))),
+        #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
         {a = {a[k]}}
       }
     )}

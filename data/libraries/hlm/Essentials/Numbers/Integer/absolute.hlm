@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
+ */
 $absolute(a: %Element($Integers)): %ExplicitOperator {
   display = [$Parens(
     style = '||',

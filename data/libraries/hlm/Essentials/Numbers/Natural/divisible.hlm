@@ -8,7 +8,7 @@
  *             * https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers
  */
 $divisible(
-  m: %Element($"Positive numbers"),
+  m: %Element($Subsets/"Positive numbers"),
   n: %Element($"Natural numbers")
 ): %Predicate {
   display = [$Relation(

@@ -1,0 +1,26 @@
+%../../../../../../logics/hlm%
+
+/**
+ * @remarks This definition produces a sorted infinite sequence from an infinite subset of natural numbers.
+ */
+$"infinite sequence"(
+  M: %Subset($../"Natural numbers"),
+  _1: %Constraint(%not($../../../Sets/finite(S = {M})))
+): %ExplicitOperator {
+  display = [$Function(
+    function = $SubSup(
+      body = 'seq',
+      sub = 'inf'
+    ),
+    arguments = [M]
+  )],
+  definition = [$../../../Sequences/"Infinite sequences"(S = {$../"Natural numbers"}).sequence(
+      n = {
+        parameter = #(n: %Element($../"Natural numbers")),
+        arguments = {a = {$../"Technical definitions"/"indexed element"(
+          M = {M},
+          n = {n}
+        )}}
+      }
+  )]
+}

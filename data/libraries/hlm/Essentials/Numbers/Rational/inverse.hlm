@@ -1,12 +1,15 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qopp
+ */
 $inverse(a: %Element(
   $"Rational numbers",
   shortcut = {
-    $"Rational numbers".quotient,
-    #(
+    constructor = $"Rational numbers".quotient,
+    parameters = #(
       n_a: %Element($../Integer/Integers),
-      m_a: %Element($../Natural/"Positive numbers")
+      d_a: %Element($../Natural/Subsets/"Positive numbers")
     )
   }
 )): %ExplicitOperator {
@@ -18,6 +21,6 @@ $inverse(a: %Element(
   )],
   definition = [$"Rational numbers".quotient(
       n = {$../Integer/inverse(a = {n_a})},
-      m = {m_a}
+      d = {d_a}
   )]
 }

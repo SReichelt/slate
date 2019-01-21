@@ -1,6 +1,8 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks Finite sequences could alternatively be defined inductively (i.e. as lists). However, the given definition is closer to the definition of [infinite sequences](Infinite%20sequences), and often more useful.
+ *
  * @references * https://en.wikipedia.org/wiki/Sequence
  *             * http://mathworld.wolfram.com/Sequence.html
  *             * https://proofwiki.org/wiki/Definition:Finite_Sequence
@@ -9,7 +11,7 @@ $"Finite sequences"(S: %Set(auto = %true)): %Construction {
   $sequence(
     n: %Element($../Numbers/Natural/"Natural numbers"),
     k: %Binding(
-      $../Numbers/Natural/"Segment (less)"(n = {n}),
+      $../Numbers/Natural/Subsets/"Segment (less)"(n = {n}),
       #(a: %Element(S))
     )
   ): %Constructor {
@@ -28,21 +30,21 @@ $"Finite sequences"(S: %Set(auto = %true)): %Construction {
       leftParameters = #(
         n: %Element($../Numbers/Natural/"Natural numbers"),
         k: %Binding(
-          $../Numbers/Natural/"Segment (less)"(n = {n}),
+          $../Numbers/Natural/Subsets/"Segment (less)"(n = {n}),
           #(a: %Element(S))
         )
       ),
       rightParameters = #(
         "n'": %Element($../Numbers/Natural/"Natural numbers"),
         k: %Binding(
-          $../Numbers/Natural/"Segment (less)"(n = {"n'"}),
+          $../Numbers/Natural/Subsets/"Segment (less)"(n = {"n'"}),
           #("a'": %Element(S))
         )
       ),
       definition = [%and(
         %equals(n, "n'"),
         %forall(
-          #(k: %Element($../Numbers/Natural/"Segment (less)"(n = {n}))),
+          #(k: %Element($../Numbers/Natural/Subsets/"Segment (less)"(n = {n}))),
           %equals(a[k], "a'"[k])
         )
       )],

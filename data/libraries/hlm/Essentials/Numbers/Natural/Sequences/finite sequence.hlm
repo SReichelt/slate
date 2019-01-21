@@ -1,0 +1,27 @@
+%../../../../../../logics/hlm%
+
+/**
+ * @remarks This definition produces a sorted finite sequence from a finite subset of natural numbers.
+ */
+$"finite sequence"(
+  M: %Subset($../"Natural numbers"),
+  _1: %Constraint($../../../Sets/finite(S = {M}))
+): %ExplicitOperator {
+  display = [$Function(
+    function = $SubSup(
+      body = 'seq',
+      sub = 'fin'
+    ),
+    arguments = [M]
+  )],
+  definition = [$../../../Sequences/"Finite sequences"(S = {$../"Natural numbers"}).sequence(
+      n = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})},
+      k = {
+        parameter = #(n: %Element($../"Segment (less)"(n = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}))),
+        arguments = {a = {$../"Technical definitions"/"indexed element"(
+          M = {M},
+          n = {n}
+        )}}
+      }
+  )]
+}

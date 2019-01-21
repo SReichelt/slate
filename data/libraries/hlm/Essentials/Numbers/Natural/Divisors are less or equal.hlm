@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 $"Divisors are less or equal"(
-  m: %Element($"Positive numbers"),
+  m: %Element($Subsets/"Positive numbers"),
   n: %Element(%previous),
   _1: %Constraint($divisible(
     m = {m},

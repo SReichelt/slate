@@ -1,23 +1,26 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qplus
+ */
 $sum(
   a: %Element(
     $"Rational numbers",
     shortcut = {
-      $"Rational numbers".quotient,
-      #(
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
         n_a: %Element($../Integer/Integers),
-        m_a: %Element($../Natural/"Positive numbers")
+        d_a: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   ),
   b: %Element(
     %previous,
     shortcut = {
-      $"Rational numbers".quotient,
-      #(
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
         n_b: %Element($../Integer/Integers),
-        m_b: %Element($../Natural/"Positive numbers")
+        d_b: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   )
@@ -32,16 +35,16 @@ $sum(
       n = {$../Integer/sum(
         a = {$../Integer/product(
           a = {n_a},
-          b = {m_b}
+          b = {d_b}
         )},
         b = {$../Integer/product(
           a = {n_b},
-          b = {m_a}
+          b = {d_a}
         )}
       )},
-      m = {$../Natural/product(
-        m = {m_a},
-        n = {m_b}
+      d = {$../Natural/product(
+        m = {d_a},
+        n = {d_b}
       )}
   )]
 }

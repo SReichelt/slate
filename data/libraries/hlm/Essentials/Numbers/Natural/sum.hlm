@@ -5,6 +5,8 @@
  *
  * @references * https://en.wikipedia.org/wiki/Natural_number#Addition
  *             * https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#add
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.add
  */
 $sum(
   m: %Element($"Natural numbers"),

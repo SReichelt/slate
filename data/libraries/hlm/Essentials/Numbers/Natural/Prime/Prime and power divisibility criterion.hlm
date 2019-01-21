@@ -3,7 +3,7 @@
 $"Prime and power divisibility criterion"(
   p: %Element($"Prime numbers"),
   m: %Element($../"Natural numbers"),
-  n: %Element($../"Positive numbers")
+  n: %Element($../Subsets/"Positive numbers")
 ): %EquivalenceTheorem {
   conditions = [
     $../divisible(

@@ -1,5 +1,10 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Note that the comparison on the right is comparison on natural numbers.
+ *
+ * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.leb (but uses a different encoding)
+ */
 $"less or equal"(
   a: %Element(
     $Integers,

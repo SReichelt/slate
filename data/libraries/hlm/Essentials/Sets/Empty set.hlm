@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition may be somewhat surprising since in axiomatic set theories, there would have to be a reference to the appropriate axiom. However, sets are a built-in concept in the HLM logic, and the notation on the right is a special case of set comprehension.
+ * @remarks This defines the empty set as an enumeration with no elements. Note that sets are a built-in concept in the HLM logic.
  *
  * @references * https://en.wikipedia.org/wiki/Empty_set
  *             * http://mathworld.wolfram.com/EmptySet.html

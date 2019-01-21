@@ -3,6 +3,8 @@
 /**
  * @references * https://en.wikipedia.org/wiki/Exponentiation#Integer_exponents
  *             * https://proofwiki.org/wiki/Definition:Power_(Algebra)#Natural_Numbers
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#pow
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow
  */
 $power(
   m: %Element($"Natural numbers"),

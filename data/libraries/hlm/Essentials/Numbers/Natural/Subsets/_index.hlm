@@ -1,0 +1,15 @@
+%../../../../../../format/library%
+
+$Subsets: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Segment (less)"),
+    %item($"Segment (less or equal)"),
+    %item($"Segment (greater or equal)"),
+    %item($"Segment (greater)"),
+    %item($"Positive numbers"),
+    %item($"Exclusive initial segment is subset of inclusive segment"),
+    %item($"Initial segments are finite"),
+    %item($"Binary digits")
+  ]
+}

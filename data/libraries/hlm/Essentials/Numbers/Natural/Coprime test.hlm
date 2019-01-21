@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 $"Coprime test"(
-  m: %Element($"Segment (greater)"(n = {$number(value = 1)})),
+  m: %Element($Subsets/"Segment (greater)"(n = {$number(value = 1)})),
   n: %Element(%previous)
 ): %StandardTheorem {
   claim = %not($coprime(

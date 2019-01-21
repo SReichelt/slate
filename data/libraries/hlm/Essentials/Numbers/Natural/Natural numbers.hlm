@@ -3,12 +3,16 @@
 /**
  * @remarks The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type).
  *
+ *          Due to appropriate theorems, the two constructors can be rewritten as 0 and _n_ + 1, respectively.
+ *
  *          In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
  *
  * @references * https://en.wikipedia.org/wiki/Natural_number
  *             * http://mathworld.wolfram.com/NonnegativeInteger.html
  *             * https://proofwiki.org/wiki/Definition:Natural_Numbers
  *             * https://ncatlab.org/nlab/show/natural+number
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNat.html
  *             * http://oeis.org/A001477
  */
 $"Natural numbers": %Construction {

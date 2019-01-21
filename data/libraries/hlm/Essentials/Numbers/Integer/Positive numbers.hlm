@@ -14,6 +14,6 @@ $"Positive numbers": %SetOperator {
         a = {$../Natural/number(value = 0)}
       )
     ),
-    $../Natural/"Positive numbers"
+    $../Natural/Subsets/"Positive numbers"
   ]
 }

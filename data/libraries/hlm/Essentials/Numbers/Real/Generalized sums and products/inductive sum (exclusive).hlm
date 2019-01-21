@@ -3,7 +3,7 @@
 $"inductive sum (exclusive)"(
   n: %Element($../../Natural/"Natural numbers"),
   i: %Binding(
-    $../../Natural/"Segment (less)"(n = {n}),
+    $../../Natural/Subsets/"Segment (less)"(n = {n}),
     #(a: %Element($../"Real numbers"))
   )
 ): %ExplicitOperator {
@@ -24,7 +24,8 @@ $"inductive sum (exclusive)"(
     [
       {
         constructor = $../../Natural/"Natural numbers".zero,
-        value = $../../Natural/number(value = 0)
+        value = $../../Natural/number(value = 0),
+        rewrite = %true
       },
       {
         constructor = $../../Natural/"Natural numbers".successor,
@@ -33,7 +34,7 @@ $"inductive sum (exclusive)"(
           a = {$"inductive sum (exclusive)"(
             n = {m},
             i = {
-              #(j: %Element($../../Natural/"Segment (less)"(n = {m}))),
+              #(j: %Element($../../Natural/Subsets/"Segment (less)"(n = {m}))),
               {a = {a[j]}}
             }
           )},

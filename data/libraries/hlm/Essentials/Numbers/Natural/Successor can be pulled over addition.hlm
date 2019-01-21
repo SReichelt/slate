@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l
+ */
 $"Successor can be pulled over addition"(
   m: %Element($"Natural numbers"),
   n: %Element(%previous)

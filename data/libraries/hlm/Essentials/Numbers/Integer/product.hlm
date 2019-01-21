@@ -1,11 +1,16 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Note that the sums and products on the right are operations on natural numbers.
+ *
+ * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul (but uses a different encoding)
+ */
 $product(
   a: %Element(
     $Integers,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_a: %Element($../Natural/"Natural numbers"),
         m_a: %Element(%previous)
       ),
@@ -15,8 +20,8 @@ $product(
   b: %Element(
     %previous,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_b: %Element($../Natural/"Natural numbers"),
         m_b: %Element(%previous)
       ),
@@ -31,8 +36,8 @@ $product(
     minParenLevel = 2,
     maxParenLevel = 2
   )],
-  definition = [$difference(
-    b = {$../Natural/sum(
+  definition = [$Integers.difference(
+    n = {$../Natural/sum(
       m = {$../Natural/product(
         m = {n_a},
         n = {n_b}
@@ -42,7 +47,7 @@ $product(
         n = {m_b}
       )}
     )},
-    a = {$../Natural/sum(
+    m = {$../Natural/sum(
       m = {$../Natural/product(
         m = {n_a},
         n = {m_b}

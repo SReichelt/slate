@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower_positive
+ */
 $power(
   a: %Element($"Rational numbers"),
   n: %Element($../Natural/"Natural numbers")

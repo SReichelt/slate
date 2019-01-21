@@ -33,14 +33,13 @@ $Natural: %Section {
     %item($"Zero is the smallest number"),
     %item($"Zero is the only number less than or equal to zero"),
     %item($"Successor is always greater"),
-    %item($"Segment (less)"),
-    %item($"Segment (less or equal)"),
-    %item($"Segment (greater or equal)"),
-    %item($"Segment (greater)"),
-    %item($"Positive numbers"),
-    %item($"Exclusive initial segment is subset of inclusive segment"),
-    %item($"Initial segments are finite"),
-    %item($"Binary digits"),
+    %subsection(
+      $Subsets,
+      title = {
+        de = 'Teilmengen',
+        en = 'Subsets'
+      }
+    ),
     %item(
       $"Finiteness criterion lemma",
       type = 'lemma'
@@ -113,6 +112,13 @@ $Natural: %Section {
       title = {
         de = 'Technische Definitionen',
         en = 'Technical definitions'
+      }
+    ),
+    %subsection(
+      $Sequences,
+      title = {
+        de = 'Folgen',
+        en = 'Sequences'
       }
     )
   ]

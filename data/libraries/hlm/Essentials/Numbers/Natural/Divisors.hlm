@@ -14,7 +14,7 @@ $Divisors(n: %Element($"Natural numbers")): %SetOperator {
     arguments = [n]
   )],
   definition = [%subset(
-    #(m: %Element($"Positive numbers")),
+    #(m: %Element($Subsets/"Positive numbers")),
     $divisible(
       m = {m},
       n = {n}

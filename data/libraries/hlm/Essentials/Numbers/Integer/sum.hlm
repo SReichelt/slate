@@ -1,11 +1,18 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks Note that the sums on the right are sums of natural numbers.
+ *
+ * @references * https://en.wikipedia.org/wiki/Integer#Construction
+ *             * https://proofwiki.org/wiki/Definition:Addition/Integers
+ *             * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.add (but uses a different encoding)
+ */
 $sum(
   a: %Element(
     $Integers,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_a: %Element($../Natural/"Natural numbers"),
         m_a: %Element(%previous)
       )
@@ -14,8 +21,8 @@ $sum(
   b: %Element(
     %previous,
     shortcut = {
-      $Integers.difference,
-      #(
+      constructor = $Integers.difference,
+      parameters = #(
         n_b: %Element($../Natural/"Natural numbers"),
         m_b: %Element(%previous)
       )

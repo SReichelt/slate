@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist.
+ * @remarks This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
  *
  * @references * https://en.wikipedia.org/wiki/Finite_set
  *             * http://mathworld.wolfram.com/FiniteSet.html
@@ -19,36 +19,36 @@ $finite(S: %Set): %Predicate {
     ),
     %exists(
       #(x: %Element($../Numbers/Natural/"Natural numbers")),
-      formula = $../Numbers/Cardinal/"less or equal"(
-        𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
-        𝔶 = {x}
+      formula = %equals(
+        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
+        x
       )
     ),
     %exists(
       #(y: %Element($../Numbers/Natural/"Natural numbers")),
-      formula = $../Numbers/Cardinal/less(
+      formula = $../Numbers/Cardinal/"less or equal"(
         𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
         𝔶 = {y}
       )
     ),
     %exists(
       #(z: %Element($../Numbers/Natural/"Natural numbers")),
-      formula = %equals(
-        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
-        z
+      formula = $../Numbers/Cardinal/less(
+        𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+        𝔶 = {z}
       )
     ),
     %exists(#(
       k: %Element($../Numbers/Natural/"Natural numbers"),
       f: %Element($../Functions/Bijections(
         X = {S},
-        Y = {$../Numbers/Natural/"Segment (less)"(n = {k})}
+        Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
       ))
     )),
     %exists(#(
       l: %Element($../Numbers/Natural/"Natural numbers"),
       g: %Element($../Functions/Bijections(
-        X = {$../Numbers/Natural/"Segment (less)"(n = {l})},
+        X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})},
         Y = {S}
       ))
     )),
@@ -57,12 +57,12 @@ $finite(S: %Set): %Predicate {
         m: %Element($../Numbers/Natural/"Natural numbers"),
         h: %Element($../Functions/Functions(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})}
         ))
       ),
       formula = $../Functions/injective(
         X = {S},
-        Y = {$../Numbers/Natural/"Segment (less)"(n = {m})},
+        Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})},
         f = {h}
       )
     ),
@@ -71,12 +71,12 @@ $finite(S: %Set): %Predicate {
         n: %Element($../Numbers/Natural/"Natural numbers"),
         i: %Element($../Functions/Functions(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less or equal)"(n = {n})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})}
         ))
       ),
       formula = $../Functions/injective(
         X = {S},
-        Y = {$../Numbers/Natural/"Segment (less or equal)"(n = {n})},
+        Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})},
         f = {i}
       )
     )
@@ -86,16 +86,16 @@ $finite(S: %Set): %Predicate {
       _: %Embed(
         $../Numbers/Cardinal/"Cardinal numbers",
         $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
-        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})})
+        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})})
       ),
       _: %UseDef(result = %exists(#(r: %Element($../Functions/Bijections(
         X = {S},
-        Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})}
+        Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})}
       ))))),
       _: %UseExists({
         parameters = #(r: %Element($../Functions/Bijections(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})})}
         ))),
         steps = #(_: %ProveExists({
           k = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
@@ -108,14 +108,14 @@ $finite(S: %Set): %Predicate {
         k: %Element($../Numbers/Natural/"Natural numbers"),
         f: %Element($../Functions/Bijections(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {k})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
         ))
       ),
       steps = #(_: %ProveExists({
         l = {k},
         g = {$../Functions/inverse(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {k})},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})},
           f = {f}
         )}
       }))
@@ -124,20 +124,20 @@ $finite(S: %Set): %Predicate {
       parameters = #(
         l: %Element($../Numbers/Natural/"Natural numbers"),
         g: %Element($../Functions/Bijections(
-          X = {$../Numbers/Natural/"Segment (less)"(n = {l})},
+          X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})},
           Y = {S}
         ))
       ),
       steps = #(
         _: %State(
           %equals(
-            $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/"Segment (less)"(n = {l})}),
+            $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})}),
             $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})
           ),
           proof = {steps = #(_: %ProveDef(proof = {
             goal = %exists(#(s: %Element($../Functions/Bijections(
               X = {S},
-              Y = {$../Numbers/Natural/"Segment (less)"(n = {l})}
+              Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})}
             )))),
             steps = #(_: %ProveExists({s = {g}}))
           }))}
@@ -146,7 +146,7 @@ $finite(S: %Set): %Predicate {
           #(_: %Embed(
             $../Numbers/Cardinal/"Cardinal numbers",
             l,
-            $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/"Segment (less)"(n = {l})})
+            $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})})
           )),
           %right,
           %equals(
@@ -170,13 +170,13 @@ $finite(S: %Set): %Predicate {
         k: %Element($../Numbers/Natural/"Natural numbers"),
         f: %Element($../Functions/Bijections(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {k})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
         ))
       ),
       steps = #(
         _: %UseDef(result = $../Functions/injective(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {k})},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})},
           f = {f}
         )),
         _: %ProveExists({
@@ -190,15 +190,15 @@ $finite(S: %Set): %Predicate {
         m: %Element($../Numbers/Natural/"Natural numbers"),
         h: %Element($../Functions/Functions(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less)"(n = {m})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})}
         ))
       ),
       steps = #(
         _: %UseTheorem(
           $../Numbers/Natural/"Exclusive initial segment is subset of inclusive segment"(n = {m}),
           %sub(
-            $../Numbers/Natural/"Segment (less)"(n = {m}),
-            $../Numbers/Natural/"Segment (less or equal)"(n = {m})
+            $../Numbers/Natural/Subsets/"Segment (less)"(n = {m}),
+            $../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {m})
           )
         ),
         _: %ProveExists({
@@ -206,8 +206,8 @@ $finite(S: %Set): %Predicate {
           i = {$../Functions/"generalized restriction"(
             X = {S},
             A = {S},
-            B = {$../Numbers/Natural/"Segment (less or equal)"(n = {m})},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {m})},
+            B = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {m})},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})},
             f = {h}
           )}
         })
@@ -218,7 +218,7 @@ $finite(S: %Set): %Predicate {
         n: %Element($../Numbers/Natural/"Natural numbers"),
         i: %Element($../Functions/Functions(
           X = {S},
-          Y = {$../Numbers/Natural/"Segment (less or equal)"(n = {n})}
+          Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})}
         ))
       ),
       steps = #(
@@ -227,7 +227,7 @@ $finite(S: %Set): %Predicate {
           i,
           $../Functions/Functions(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})}
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})}
           )
         )),
         _: %ProveExists(
@@ -241,11 +241,11 @@ $finite(S: %Set): %Predicate {
               goal = %exists(
                 #(t: %Element($../Functions/Functions(
                   X = {S},
-                  Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})}
+                  Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})}
                 ))),
                 formula = $../Functions/injective(
                   X = {S},
-                  Y = {$../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})},
+                  Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Natural/"Natural numbers".successor(n = {n})})},
                   f = {t}
                 )
               ),
@@ -261,23 +261,23 @@ $finite(S: %Set): %Predicate {
         _: %UseDef(result = %exists(
           #(u: %Element($../Functions/Functions(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {x})}
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {x})}
           ))),
           formula = $../Functions/injective(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {x})},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {x})},
             f = {u}
           )
         )),
         _: %UseExists({
           parameters = #(u: %Element($../Functions/Functions(
             X = {S},
-            Y = {$../Numbers/Natural/"Segment (less)"(n = {x})}
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {x})}
           ))),
           steps = #(
             T: %SetDef($../Functions/Image(
               X = {S},
-              Y = {$../Numbers/Natural/"Segment (less)"(n = {x})},
+              Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {x})},
               f = {u},
               S = {S}
             )),
@@ -286,10 +286,10 @@ $finite(S: %Set): %Predicate {
               n = {x}
             )),
             v: %Def($../Functions/Functions(
-                X = {$../Numbers/Natural/"Segment (less)"(n = {o})},
+                X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {o})},
                 Y = {T}
               ).function(x = {
-                #(z: %Element($../Numbers/Natural/"Segment (less)"(n = {$../Numbers/Natural/"Technical definitions"/"bounded cardinality"(
+                #(z: %Element($../Numbers/Natural/Subsets/"Segment (less)"(n = {$../Numbers/Natural/"Technical definitions"/"bounded cardinality"(
                   M = {T},
                   n = {x}
                 )}))),
@@ -303,16 +303,16 @@ $finite(S: %Set): %Predicate {
               f = {$../Functions/composition(
                 X = {S},
                 Y = {T},
-                Z = {$../Numbers/Natural/"Segment (less)"(n = {o})},
+                Z = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {o})},
                 f = {$../Functions/"codomain restriction"(
                   X = {S},
                   A = {S},
                   B = {T},
-                  Y = {$../Numbers/Natural/"Segment (less)"(n = {x})},
+                  Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {x})},
                   f = {u}
                 )},
                 g = {$../Functions/inverse(
-                  X = {$../Numbers/Natural/"Segment (less)"(n = {o})},
+                  X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {o})},
                   Y = {T},
                   f = {v}
                 )}

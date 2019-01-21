@@ -22,7 +22,7 @@ $converges(
     %exists(
       #(n: %Element($../../Natural/"Natural numbers")),
       formula = %forall(
-        #(m: %Element($../../Natural/"Segment (greater or equal)"(n = {n}))),
+        #(m: %Element($../../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
         $../less(
           a = {$../absolute(a = {$../difference(
             b = {a[m]},

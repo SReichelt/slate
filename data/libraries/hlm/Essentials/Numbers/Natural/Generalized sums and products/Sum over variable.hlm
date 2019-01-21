@@ -4,7 +4,7 @@ $"Sum over variable"(n: %Element($../"Natural numbers")): %StandardTheorem {
   claim = %equals(
     $"inductive sum (exclusive)"(
       i = {
-        #(i: %Element($../"Segment (less)"(n = {n}))),
+        #(i: %Element($../Subsets/"Segment (less)"(n = {n}))),
         {a = {i}}
       },
       n = {n}

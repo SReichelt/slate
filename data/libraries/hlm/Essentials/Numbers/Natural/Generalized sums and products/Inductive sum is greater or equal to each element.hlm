@@ -3,17 +3,17 @@
 $"Inductive sum is greater or equal to each element"(
   n: %Element($../"Natural numbers"),
   i: %Binding(
-    $../"Segment (less)"(n = {n}),
+    $../Subsets/"Segment (less)"(n = {n}),
     #(a: %Element($../"Natural numbers"))
   ),
-  j: %Element($../"Segment (less)"(n = {n}))
+  j: %Element($../Subsets/"Segment (less)"(n = {n}))
 ): %StandardTheorem {
   claim = $../"less or equal"(
     m = {a[j]},
     n = {$"inductive sum (exclusive)"(
       n = {n},
       i = {
-        #(k: %Element($../"Segment (less)"(n = {n}))),
+        #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
         {a = {a[k]}}
       }
     )}

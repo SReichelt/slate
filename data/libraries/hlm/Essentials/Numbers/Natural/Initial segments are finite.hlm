@@ -1,5 +1,0 @@
-%../../../../../logics/hlm%
-
-$"Initial segments are finite"(n: %Element($"Natural numbers")): %StandardTheorem {
-  claim = $../../Sets/finite(S = {$"Segment (less)"(n = {n})})
-}

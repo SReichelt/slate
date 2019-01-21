@@ -3,6 +3,8 @@
 /**
  * @references * https://en.wikipedia.org/wiki/Natural_number#Order
  *             * https://proofwiki.org/wiki/Definition:Ordering_on_Natural_Numbers
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#leb
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.leb
  */
 $"less or equal"(
   m: %Element($"Natural numbers"),

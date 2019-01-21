@@ -1,8 +1,0 @@
-%../../../../../logics/hlm%
-
-$"Exclusive initial segment is subset of inclusive segment"(n: %Element($"Natural numbers")): %StandardTheorem {
-  claim = %sub(
-    $"Segment (less)"(n = {n}),
-    $"Segment (less or equal)"(n = {n})
-  )
-}

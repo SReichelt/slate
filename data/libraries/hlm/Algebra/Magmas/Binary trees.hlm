@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma.
+ */
 $"Binary trees"(S: %Set(
   auto = %true,
   embedSubsets = %true

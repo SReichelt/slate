@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.ltb (but uses a different encoding)
+ */
 $less(
   a: %Element($Integers),
   b: %Element(%previous)

@@ -3,6 +3,8 @@
 /**
  * @references * https://en.wikipedia.org/wiki/Parity_(mathematics)
  *             * http://mathworld.wolfram.com/EvenNumber.html
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#even
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.even
  *             * http://oeis.org/A005843
  */
 $even(n: %Element($"Natural numbers")): %Predicate {

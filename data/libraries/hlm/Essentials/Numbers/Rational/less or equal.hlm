@@ -7,7 +7,7 @@ $"less or equal"(
       $"Rational numbers".quotient,
       #(
         n_a: %Element($../Integer/Integers),
-        m_a: %Element($../Natural/"Positive numbers")
+        d_a: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   ),
@@ -17,7 +17,7 @@ $"less or equal"(
       $"Rational numbers".quotient,
       #(
         n_b: %Element($../Integer/Integers),
-        m_b: %Element($../Natural/"Positive numbers")
+        d_b: %Element($../Natural/Subsets/"Positive numbers")
       )
     }
   )
@@ -35,11 +35,11 @@ $"less or equal"(
   definition = [$../Integer/"less or equal"(
     a = {$../Integer/product(
       a = {n_a},
-      b = {m_b}
+      b = {d_b}
     )},
     b = {$../Integer/product(
       a = {n_b},
-      b = {m_a}
+      b = {d_a}
     )}
   )]
 }

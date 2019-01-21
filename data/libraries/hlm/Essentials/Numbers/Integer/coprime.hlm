@@ -1,5 +1,11 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://en.wikipedia.org/wiki/Coprime_integers
+ *             * http://mathworld.wolfram.com/RelativelyPrime.html
+ *             * https://proofwiki.org/wiki/Definition:Coprime/Integers
+ *             * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime
+ */
 $coprime(
   a: %Element($Integers),
   b: %Element(%previous)

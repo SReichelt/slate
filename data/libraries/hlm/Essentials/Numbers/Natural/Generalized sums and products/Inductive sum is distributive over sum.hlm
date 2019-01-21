@@ -3,7 +3,7 @@
 $"Inductive sum is distributive over sum"(
   n: %Element($../"Natural numbers"),
   i: %Binding(
-    $../"Segment (less)"(n = {n}),
+    $../Subsets/"Segment (less)"(n = {n}),
     #(
       a: %Element($../"Natural numbers"),
       b: %Element(%previous)
@@ -14,7 +14,7 @@ $"Inductive sum is distributive over sum"(
     $"inductive sum (exclusive)"(
       n = {n},
       i = {
-        #(j: %Element($../"Segment (less)"(n = {n}))),
+        #(j: %Element($../Subsets/"Segment (less)"(n = {n}))),
         {a = {$../sum(
           m = {a[j]},
           n = {b[j]}
@@ -25,14 +25,14 @@ $"Inductive sum is distributive over sum"(
       m = {$"inductive sum (exclusive)"(
         n = {n},
         i = {
-          #(k: %Element($../"Segment (less)"(n = {n}))),
+          #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
           {a = {a[k]}}
         }
       )},
       n = {$"inductive sum (exclusive)"(
         n = {n},
         i = {
-          #(l: %Element($../"Segment (less)"(n = {n}))),
+          #(l: %Element($../Subsets/"Segment (less)"(n = {n}))),
           {a = {b[l]}}
         }
       )}

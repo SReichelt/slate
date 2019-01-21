@@ -2,10 +2,12 @@
 
 /**
  * @references * https://proofwiki.org/wiki/Definition:Subtraction/Natural_Numbers
+ *             * https://coq.inria.fr/library/Coq.Init.Nat.html#sub (truncated subtraction, thus incompatible with integer subtraction)
+ *             * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.sub (ditto)
  */
 $difference(
   n: %Element($"Natural numbers"),
-  m: %Element($"Segment (less or equal)"(n = {n}))
+  m: %Element($Subsets/"Segment (less or equal)"(n = {n}))
 ): %ImplicitOperator {
   display = [$Operator(
     symbol = '−',
@@ -13,7 +15,7 @@ $difference(
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  parameter = #(x: %Element($"Segment (less or equal)"(n = {n}))),
+  parameter = #(x: %Element($Subsets/"Segment (less or equal)"(n = {n}))),
   definition = [%equals(
     n,
     $sum(

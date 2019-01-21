@@ -1,9 +1,12 @@
 %../../../../../logics/hlm%
 
 /**
+ * @remarks The first definition uses induction on both _n_ and _k_. It is more explicit because it does not rely on division of natural numbers.
+ *
  * @references * https://en.wikipedia.org/wiki/Binomial_coefficient
  *             * http://mathworld.wolfram.com/BinomialCoefficient.html
  *             * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
+ *             * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
  */
 $"binomial coefficient"(
   n: %Element($"Natural numbers"),

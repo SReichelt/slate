@@ -8,7 +8,7 @@
 $"inductive sum (exclusive)"(
   n: %Element($../"Natural numbers"),
   i: %Binding(
-    $../"Segment (less)"(n = {n}),
+    $../Subsets/"Segment (less)"(n = {n}),
     #(a: %Element($../"Natural numbers"))
   )
 ): %ExplicitOperator {
@@ -39,7 +39,7 @@ $"inductive sum (exclusive)"(
           m = {$"inductive sum (exclusive)"(
             n = {m},
             i = {
-              #(j: %Element($../"Segment (less)"(n = {m}))),
+              #(j: %Element($../Subsets/"Segment (less)"(n = {m}))),
               {a = {a[j]}}
             }
           )},
