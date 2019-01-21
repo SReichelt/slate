@@ -200,7 +200,7 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
                 } else if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
                     fileName = getFileNameFromPath(parsedDocument.uri.fsPath, object);
                     if (!fileName || !fs.existsSync(fileName)) {
-                        let dirName = getFileNameFromPath(parsedDocument.uri.fsPath, object, true, false);
+                        let dirName = getFileNameFromPath(parsedDocument.uri.fsPath, object, false, false);
                         if (fs.existsSync(dirName)) {
                             let dirStat = fs.statSync(dirName);
                             if (dirStat.isDirectory()) {

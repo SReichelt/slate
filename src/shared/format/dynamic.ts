@@ -464,7 +464,7 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
 
   private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
     let memberIndex = 0;
-    let hadOptionalMembers = !this.isDefinition;
+    let hadOptionalMembers = this.isDefinition;
     if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
       let superType = metaDefinition.contents.superType;
       if (superType instanceof Fmt.DefinitionRefExpression && !superType.path.parentPath) {

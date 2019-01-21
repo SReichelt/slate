@@ -1,8 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
-import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { GenericEditHandler } from './editHandler';
-import CachedPromise from '../../data/cachedPromise';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
@@ -11,15 +9,7 @@ export interface RenderedVariable {
 }
 
 export abstract class GenericRenderer {
-  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
-
-  protected getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
-    if (!path.parentPath && path.name === this.definition.name) {
-      return CachedPromise.resolve(this.definition);
-    } else {
-      return this.libraryDataAccessor.fetchItem(path);
-    }
-  }
+  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;

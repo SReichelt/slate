@@ -145,7 +145,7 @@ export class ParagraphExpression extends RenderedExpression {
 }
 
 export class ListExpression extends RenderedExpression {
-  constructor(public items: RenderedExpression[], public style: string) {
+  constructor(public items: RenderedExpression[], public style: string | string[]) {
     super();
   }
 

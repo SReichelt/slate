@@ -1,8 +1,17 @@
 import * as Fmt from '../../format/format';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
+import CachedPromise from '../../data/cachedPromise';
 
 export class GenericUtils {
   constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor) {}
+
+  getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
+    if (!path.parentPath && path.name === this.definition.name) {
+      return CachedPromise.resolve(this.definition);
+    } else {
+      return this.libraryDataAccessor.fetchItem(path);
+    }
+  }
 
   getOuterDefinitionPath(expression: Fmt.DefinitionRefExpression): Fmt.Path {
     let path = expression.path;

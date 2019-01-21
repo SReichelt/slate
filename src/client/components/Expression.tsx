@@ -213,42 +213,56 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Display.ParagraphExpression) {
       className += ' paragraph';
-      result = expression.paragraphs.map((paragraph: Display.RenderedExpression, index: number) => {
-        let paragraphClassName = className;
-        if (paragraph.styleClasses) {
-          for (let styleClass of paragraph.styleClasses) {
-            paragraphClassName += ' ' + styleClass;
-          }
-        }
-        return (
-          <div className={paragraphClassName} key={index}>
-            <Expression expression={paragraph} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </div>
-        );
-      });
-      return result;
+      return expression.paragraphs.map((paragraph: Display.RenderedExpression, index: number) => (
+        <div className={className} key={index}>
+          <Expression expression={paragraph} parent={this} interactionHandler={this.props.interactionHandler}/>
+        </div>
+      ));
     } else if (expression instanceof Display.ListExpression) {
       className += ' list';
-      let items = expression.items.map((item: Display.RenderedExpression, index: number) => (
-        <li className={'list-item'} key={index}>
-          <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
-        </li>
-      ));
-      switch (expression.style) {
-      case '1.':
+      if (expression.style instanceof Array) {
+        className += ' custom';
+        let rows = expression.items.map((item: Display.RenderedExpression, index: number) => {
+          return (
+            <span className={'list-item'} key={index}>
+              <span className={'list-item-header'}>
+                {expression.style[index]}
+              </span>
+              <span className={'list-item-contents'}>
+                <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
+              </span>
+            </span>
+          );
+        });
         result = (
-          <ol className={className}>
-            {items}
-          </ol>
+          <span className={className}>
+            {rows}
+          </span>
         );
-        break;
-      default:
-        result = (
-          <ul className={className}>
-            {items}
-          </ul>
-        );
-        break;
+      } else {
+        let items = expression.items.map((item: Display.RenderedExpression, index: number) => {
+          return (
+            <li className={'list-item'} key={index}>
+              <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
+            </li>
+          );
+        });
+        switch (expression.style) {
+        case '1.':
+          result = (
+            <ol className={className}>
+              {items}
+            </ol>
+          );
+          break;
+        default:
+          result = (
+            <ul className={className}>
+              {items}
+            </ul>
+          );
+          break;
+        }
       }
       return result;
     } else if (expression instanceof Display.AlignedExpression) {

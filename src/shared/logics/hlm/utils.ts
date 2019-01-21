@@ -180,4 +180,95 @@ export class HLMUtils extends GenericUtils {
     }
     return expression;
   }
+
+  substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
+    if (variable.indices) {
+      for (let index of variable.indices) {
+        // TODO
+        //let bindingVariable = (the parent binding of variable.variable that belongs to index);
+        //expression = this.substituteVariable(expression, bindingVariable, () => index);
+      }
+    }
+    return expression;
+  }
+
+  getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression {
+    let type = step.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+      let result = new FmtHLM.MetaRefExpression_setEquals;
+      let left = new Fmt.VariableRefExpression;
+      left.variable = step;
+      result.left = left;
+      result.right = type._set;
+      return result;
+    } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
+      let result = new FmtHLM.MetaRefExpression_equals;
+      let left = new Fmt.VariableRefExpression;
+      left.variable = step;
+      result.left = left;
+      result.right = type.element;
+      return result;
+    } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
+      if (type.variable instanceof Fmt.VariableRefExpression) {
+        let variable = type.variable.variable;
+        let variableType = variable.type.expression;
+        if (variableType instanceof FmtHLM.MetaRefExpression_Subset) {
+          let result = new FmtHLM.MetaRefExpression_sub;
+          result.subset = type.variable;
+          result.superset = this.substituteIndices(variableType.superset, type.variable);
+          return result;
+        } else if (variableType instanceof FmtHLM.MetaRefExpression_Element) {
+          let result = new FmtHLM.MetaRefExpression_in;
+          result.element = type.variable;
+          result._set = this.substituteIndices(variableType._set, type.variable);
+          return result;
+        } else {
+          // TODO allow all proof steps that have a result
+          throw new Error('Unknown result to consider');
+        }
+      } else {
+        throw new Error('Variable reference expected');
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_State) {
+      return type.statement;
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
+               || type instanceof FmtHLM.MetaRefExpression_ResolveDef
+               || type instanceof FmtHLM.MetaRefExpression_UseTheorem
+               || type instanceof FmtHLM.MetaRefExpression_Substitute) {
+      return type.result;
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
+      if (previousResult instanceof FmtHLM.MetaRefExpression_forall) {
+        return this.substituteArguments(previousResult.formula, previousResult.parameters, type.arguments);
+      } else {
+        throw new Error('Previous result is not a universally quantified expression');
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
+      let result = new FmtHLM.MetaRefExpression_equals;
+      result.left = type.input;
+      result.right = type.output;
+      return result;
+    } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
+      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals) {
+        let result = new FmtHLM.MetaRefExpression_setEquals;
+        // TODO substitute %setPrevious
+        result.left = type.term;
+        result.right = type.term;
+        return result;
+      } else {
+        throw new Error('Previous result is not a set equality expression');
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
+      if (previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+        let result = new FmtHLM.MetaRefExpression_equals;
+        // TODO substitute %previous
+        result.left = type.term;
+        result.right = type.term;
+        return result;
+      } else {
+        throw new Error('Previous result is not an equality expression');
+      }
+    } else {
+      throw new Error('Proof step does not have a result');
+    }
+  }
 }

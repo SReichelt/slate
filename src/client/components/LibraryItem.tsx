@@ -23,8 +23,8 @@ export function renderLibraryItem(props: LibraryItemProps): any {
   let logicDisplay = logic.getDisplay();
 
   let render = props.definition.then((definition: Fmt.Definition) => {
-    let renderer = logicDisplay.getDefinitionRenderer(definition, props.libraryDataProvider, props.templates, props.editing);
-    let expression = renderer.renderDefinition(props.itemInfo, props.includeLabel, props.includeExtras, props.includeProofs, props.includeRemarks);
+    let renderer = logicDisplay.getDefinitionRenderer(definition, props.includeProofs, props.libraryDataProvider, props.templates, props.editing);
+    let expression = renderer.renderDefinition(props.itemInfo, props.includeLabel, props.includeExtras, props.includeRemarks);
     if (expression) {
       return <Expression expression={expression} interactionHandler={props.interactionHandler}/>;
     } else {

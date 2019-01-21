@@ -25,8 +25,8 @@ export class HLMDisplay implements Logic.LogicDisplay {
     }
   }
 
-  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): Logic.LogicRenderer {
+  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): Logic.LogicRenderer {
     let editHandler = editing ? new HLMEditHandler(libraryDataAccessor, templates) : undefined;
-    return new HLMRenderer(definition, libraryDataAccessor, templates, editHandler);
+    return new HLMRenderer(definition, includeProofs, libraryDataAccessor, templates, editHandler);
   }
 }

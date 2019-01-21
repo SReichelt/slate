@@ -28,7 +28,12 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return renderList(expression.paragraphs.map((item) => renderAsText(item, outputMarkdown, singleLine)), singleLine ? ' ' : '\n\n');
   } else if (expression instanceof Display.ListExpression) {
     let items = expression.items.map((item: Display.RenderedExpression, index: number) => {
-      let prefix = expression.style.replace('1', (index + 1).toString());
+      let prefix: string;
+      if (expression.style instanceof Array) {
+        prefix = expression.style[index];
+      } else {
+        prefix = expression.style.replace('1', (index + 1).toString());
+      }
       return renderAsText(item, outputMarkdown, singleLine).then((text) => prefix + ' ' + text);
     });
     return renderList(items, singleLine ? ', ' : outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n');

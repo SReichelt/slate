@@ -21,13 +21,13 @@ export enum LogicDefinitionType {
 
 export interface LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
-  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): LogicRenderer;
+  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): LogicRenderer;
 }
 
 export type RenderFn = () => Display.RenderedExpression;
 
 export interface LogicRenderer {
-  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeProofs: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
+  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
   renderDefinitionSummary(): Display.RenderedExpression | undefined;
-  getDefinitionParts(includeProofs: boolean): Map<Object, RenderFn>;
+  getDefinitionParts(): Map<Object, RenderFn>;
 }
