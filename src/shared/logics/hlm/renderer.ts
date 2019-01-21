@@ -101,13 +101,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (claim) {
         if (definition.parameters.length) {
-          let extractedConstraints: Display.RenderedExpression[] = [];
-          let parameters = this.renderParameterList(definition.parameters, false, false, false, extractedConstraints);
+          let extractedConstraints: Fmt.Parameter[] = [];
+          let reducedParameters = this.extractConstraints(definition.parameters, extractedConstraints);
+          let parameters = this.renderParameterList(reducedParameters, false, false, false);
           let addendum = new Display.RowExpression([new Display.TextExpression('   if '), parameters]);
           addendum.styleClasses = ['addendum'];
           if (extractedConstraints.length) {
+            let items = extractedConstraints.map((param: Fmt.Parameter) => this.renderParameter(param));
             let constraints = this.renderTemplate('Group', {
-              'items': extractedConstraints,
+              'items': items,
               'separator': new Display.TextExpression(', ')
             });
             claim.optionalParenStyle = '[]';
@@ -153,7 +155,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  renderParameterList(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
+  renderParameterList(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean): Display.RenderedExpression {
     let initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
@@ -166,7 +168,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inDefinition: false,
       inDefinitionDisplayGroup: false
     };
-    return this.renderParameters(parameters, initialState, undefined, extractConstraints);
+    return this.renderParameters(parameters, initialState, undefined);
   }
 
   renderParameter(parameter: Fmt.Parameter): Display.RenderedExpression {
@@ -185,7 +187,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderParameters([parameter], initialState);
   }
 
-  renderParameters(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Display.RenderedExpression[], extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
+  renderParameters(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
     let state = Object.assign({}, initialState);
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
     for (let param of parameters) {
@@ -215,11 +217,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       });
     }
-    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices, extractConstraints));
+    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
     return new Display.PromiseExpression(render);
   }
 
-  private renderParametersWithResolvedDefinitions(parameters: Fmt.Parameter[], constraintDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices?: Display.RenderedExpression[], extractConstraints?: Display.RenderedExpression[]): Display.RenderedExpression {
+  private renderParametersWithResolvedDefinitions(parameters: Fmt.Parameter[], constraintDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
     let row: Display.RenderedExpression[] = [];
     let remainingParameters = parameters.slice();
     let remainingDefinitions = constraintDefinitions.slice();
@@ -227,11 +229,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let currentGroupDefinition: Fmt.Definition | undefined = undefined;
     while (remainingParameters.length) {
       let param = remainingParameters[0];
-      if (extractConstraints && param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
-        extractConstraints.push(this.renderParameter(param));
-        remainingParameters.splice(0, 1);
-        remainingDefinitions.splice(0, 1);
-      } else if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
+      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
         row.push(this.renderParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices));
         currentGroup.length = 0;
         currentGroupDefinition = undefined;
@@ -619,6 +617,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     return undefined;
+  }
+
+  private extractConstraints(parameters: Fmt.Parameter[], extractedConstraints: Fmt.Parameter[]): Fmt.Parameter[] {
+    let result: Fmt.Parameter[] = [];
+    for (let param of parameters) {
+      if (param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
+        extractedConstraints.push(param);
+      } else {
+        result.push(param);
+      }
+    }
+    return result;
   }
 
   renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Display.RenderedExpression[], markAsDummy: boolean = false): Display.RenderedExpression {

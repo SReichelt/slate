@@ -38,6 +38,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   private htmlNode: HTMLElement | null = null;
   private clicked: boolean = false;
   private hovered: boolean = false;
+  private refreshTooltip: boolean = false;
 
   constructor(props: LibraryTreeItemProps) {
     super(props);
@@ -49,11 +50,22 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   componentDidMount(): void {
+    if (this.props.parentScrollPane) {
+      this.props.parentScrollPane.addEventListener('scroll', this.onScroll);
+    }
     this.updateItem(this.props);
     this.updateSelection(this.props);
   }
 
   componentWillReceiveProps(props: LibraryTreeItemProps): void {
+    if (props.parentScrollPane !== this.props.parentScrollPane) {
+      if (this.props.parentScrollPane) {
+        this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
+      }
+      if (props.parentScrollPane) {
+        props.parentScrollPane.addEventListener('scroll', this.onScroll);
+      }
+    }
     if (props.item !== this.props.item
         || (props.item instanceof FmtLibrary.MetaRefExpression_item && this.definitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.definitionPromise))) {
       this.updateItem(props);
@@ -103,6 +115,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   componentWillUnmount(): void {
+    if (this.props.parentScrollPane) {
+      this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
+    }
     this.definitionPromise = undefined;
   }
 
@@ -136,7 +151,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
               display = [display, ': ', summaryExpression];
             }
           }
-          if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
+          if (this.refreshTooltip) {
+            this.refreshTooltip = false;
+          } else if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
             let showPreview = false;
             if (this.state.showPreview) {
               let definition = renderer.renderDefinition(undefined, false, true, false);
@@ -236,7 +253,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   // Calculate visible dimensions for tooltip.
-  getBoundingClientRect() {
+  getBoundingClientRect(): ClientRect {
     if (this.props.parentScrollPane && this.htmlNode) {
       let parentRect = this.props.parentScrollPane.getBoundingClientRect();
       let itemRect = this.htmlNode.getBoundingClientRect();
@@ -257,6 +274,13 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         bottom: 0,
         height: 0
       };
+    }
+  }
+
+  private onScroll = () => {
+    if (this.state.showPreview) {
+      this.refreshTooltip = true;
+      this.setState({showPreview: false});
     }
   }
 }
