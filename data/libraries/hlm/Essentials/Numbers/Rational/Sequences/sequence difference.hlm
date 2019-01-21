@@ -1,7 +1,7 @@
 %../../../../../../logics/hlm%
 
 $"sequence difference"(
-  β: %Element(
+  𝐛: %Element(
     $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
     shortcut = {
       constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -11,7 +11,7 @@ $"sequence difference"(
       ))
     }
   ),
-  α: %Element(
+  𝐚: %Element(
     %previous,
     shortcut = {
       constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -24,7 +24,7 @@ $"sequence difference"(
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '−',
-    operands = [β, α],
+    operands = [𝐛, 𝐚],
     minParenLevel = 1,
     maxParenLevel = 1
   )],
@@ -37,8 +37,8 @@ $"sequence difference"(
         )}}
     }),
     $"sequence sum"(
-      α = {β},
-      β = {$"sequence inverse"(α = {α})}
+      𝐚 = {𝐛},
+      𝐛 = {$"sequence inverse"(𝐚 = {𝐚})}
     )
   ]
 }

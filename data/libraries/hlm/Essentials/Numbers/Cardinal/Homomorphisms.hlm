@@ -4,14 +4,14 @@
  * @remarks The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between their respective sets. Note that these sets are far from unique (except in the case of the empty set), but the type system prevents the ambiguities that could arise.
  */
 $Homomorphisms(
-  𝔵: %Element(
+  𝐱: %Element(
     $"Cardinal numbers",
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
       parameters = #(X: %Set)
     }
   ),
-  𝔶: %Element(
+  𝐲: %Element(
     %previous,
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
@@ -21,14 +21,14 @@ $Homomorphisms(
 ): %SetOperator {
   display = [$Function(
     function = 'Hom',
-    arguments = [𝔵, 𝔶]
+    arguments = [𝐱, 𝐲]
   )],
   definitionDisplay = {
     parameter = #(φ: %Expr),
     display = [$FunctionDefinition(
       function = φ,
       symbol = '→',
-      operands = [𝔵, 𝔶]
+      operands = [𝐱, 𝐲]
     )],
     singularName = 'homomorphism',
     pluralName = 'homomorphisms',

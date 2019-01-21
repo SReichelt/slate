@@ -27,15 +27,15 @@ $finite(S: %Set): %Predicate {
     %exists(
       #(y: %Element($../Numbers/Natural/"Natural numbers")),
       formula = $../Numbers/Cardinal/"less or equal"(
-        𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
-        𝔶 = {y}
+        𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+        𝐲 = {y}
       )
     ),
     %exists(
       #(z: %Element($../Numbers/Natural/"Natural numbers")),
       formula = $../Numbers/Cardinal/less(
-        𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
-        𝔶 = {z}
+        𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+        𝐲 = {z}
       )
     ),
     %exists(#(
@@ -195,7 +195,7 @@ $finite(S: %Set): %Predicate {
       ),
       steps = #(
         _: %UseTheorem(
-          $../Numbers/Natural/"Exclusive initial segment is subset of inclusive segment"(n = {m}),
+          $../Numbers/Natural/Subsets/"Exclusive initial segment is subset of inclusive segment"(n = {m}),
           %sub(
             $../Numbers/Natural/Subsets/"Segment (less)"(n = {m}),
             $../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {m})
@@ -234,8 +234,8 @@ $finite(S: %Set): %Predicate {
           {x = {$../Numbers/Natural/"Natural numbers".successor(n = {n})}},
           proof = {
             goal = $../Numbers/Cardinal/"less or equal"(
-              𝔵 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
-              𝔶 = {$../Numbers/Natural/"Natural numbers".successor(n = {n})}
+              𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+              𝐲 = {$../Numbers/Natural/"Natural numbers".successor(n = {n})}
             ),
             steps = #(_: %ProveDef(proof = {
               goal = %exists(

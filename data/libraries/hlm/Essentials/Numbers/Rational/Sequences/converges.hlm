@@ -1,7 +1,7 @@
 %../../../../../../logics/hlm%
 
 $converges(
-  α: %Element(
+  𝐚: %Element(
     $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
     shortcut = {
       constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -15,7 +15,7 @@ $converges(
 ): %Predicate {
   display = [$TextualRelation(
     symbol = %neg('converges to', 'does not converge to'),
-    operands = [α, l]
+    operands = [𝐚, l]
   )],
   definition = [%forall(
     #(ε: %Element($../Subsets/"Positive numbers")),

@@ -1,6 +1,6 @@
 %../../../../logics/hlm%
 
-$identity(𝔐: %Element(
+$identity(𝐌: %Element(
   $Magmas,
   shortcut = {
     constructor = $Magmas.magma,
@@ -14,7 +14,7 @@ $identity(𝔐: %Element(
 )): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
-    sub = 𝔐
+    sub = 𝐌
   )],
   definition = [$../../Essentials/Functions/identity(X = {M})]
 }

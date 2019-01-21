@@ -4,27 +4,27 @@
  * @references * https://en.wikipedia.org/wiki/Cardinal_number
  */
 $"less or equal"(
-  𝔵: %Element($"Cardinal numbers"),
-  𝔶: %Element(%previous)
+  𝐱: %Element($"Cardinal numbers"),
+  𝐲: %Element(%previous)
 ): %Predicate {
   display = [
     $Relation(
       symbol = %neg('≤', '≰'),
-      operands = [𝔵, 𝔶]
+      operands = [𝐱, 𝐲]
     ),
     $Relation(
       symbol = %neg('≥', '≱'),
-      operands = [𝔶, 𝔵]
+      operands = [𝐲, 𝐱]
     )
   ],
   definition = [%exists(
     #(φ: %Element($Homomorphisms(
-      𝔵 = {𝔵},
-      𝔶 = {𝔶}
+      𝐱 = {𝐱},
+      𝐲 = {𝐲}
     ))),
     formula = $../../Functions/injective(
       X = {%setStructuralCases(
-        𝔵,
+        𝐱,
         $"Cardinal numbers",
         [{
           constructor = $"Cardinal numbers".cardinality,
@@ -33,7 +33,7 @@ $"less or equal"(
         }]
       )},
       Y = {%setStructuralCases(
-        𝔶,
+        𝐲,
         $"Cardinal numbers",
         [{
           constructor = $"Cardinal numbers".cardinality,

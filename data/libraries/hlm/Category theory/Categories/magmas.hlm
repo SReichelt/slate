@@ -5,51 +5,51 @@ $magmas: %ExplicitOperator {
   definition = [$Categories.category(
       O = {$../../Algebra/Magmas/Magmas},
       a = {
-        #(𝔄: %Element($../../Algebra/Magmas/Magmas)),
+        #(𝐀: %Element($../../Algebra/Magmas/Magmas)),
         {b = {
-          #(𝔅: %Element($../../Algebra/Magmas/Magmas)),
+          #(𝐁: %Element($../../Algebra/Magmas/Magmas)),
           {M = {$../../Algebra/Magmas/Homomorphisms(
-            𝔐 = {𝔄},
-            𝔑 = {𝔅}
+            𝐌 = {𝐀},
+            𝐍 = {𝐁}
           )}}
         }}
       },
       c = {
-        #(ℭ: %Element($../../Algebra/Magmas/Magmas)),
-        {i = {$../../Algebra/Magmas/identity(𝔐 = {ℭ})}}
+        #(𝐂: %Element($../../Algebra/Magmas/Magmas)),
+        {i = {$../../Algebra/Magmas/identity(𝐌 = {𝐂})}}
       },
       d = {
-        #(𝔇: %Element($../../Algebra/Magmas/Magmas)),
+        #(𝐃: %Element($../../Algebra/Magmas/Magmas)),
         {e = {
-          #(𝔈: %Element($../../Algebra/Magmas/Magmas)),
+          #(𝐄: %Element($../../Algebra/Magmas/Magmas)),
           {f = {
-            #(𝔉: %Element($../../Algebra/Magmas/Magmas)),
+            #(𝐅: %Element($../../Algebra/Magmas/Magmas)),
             {∘ = {$../../Essentials/Functions/Operations/operator(
               X = {$../../Algebra/Magmas/Homomorphisms(
-                𝔐 = {𝔈},
-                𝔑 = {𝔉}
+                𝐌 = {𝐄},
+                𝐍 = {𝐅}
               )},
               Y = {$../../Algebra/Magmas/Homomorphisms(
-                𝔐 = {𝔇},
-                𝔑 = {𝔈}
+                𝐌 = {𝐃},
+                𝐍 = {𝐄}
               )},
               Z = {$../../Algebra/Magmas/Homomorphisms(
-                𝔐 = {𝔇},
-                𝔑 = {𝔉}
+                𝐌 = {𝐃},
+                𝐍 = {𝐅}
               )},
               parameters = #(
                 φ: %Element($../../Algebra/Magmas/Homomorphisms(
-                  𝔐 = {𝔈},
-                  𝔑 = {𝔉}
+                  𝐌 = {𝐄},
+                  𝐍 = {𝐅}
                 )),
                 ψ: %Element($../../Algebra/Magmas/Homomorphisms(
-                  𝔐 = {𝔇},
-                  𝔑 = {𝔈}
+                  𝐌 = {𝐃},
+                  𝐍 = {𝐄}
                 ))
               ),
               operator = $../../Essentials/Functions/composition(
                 X = {%setStructuralCases(
-                  𝔇,
+                  𝐃,
                   $../../Algebra/Magmas/Magmas,
                   [{
                     constructor = $../../Algebra/Magmas/Magmas.magma,
@@ -63,7 +63,7 @@ $magmas: %ExplicitOperator {
                   }]
                 )},
                 Y = {%setStructuralCases(
-                  𝔈,
+                  𝐄,
                   $../../Algebra/Magmas/Magmas,
                   [{
                     constructor = $../../Algebra/Magmas/Magmas.magma,
@@ -77,7 +77,7 @@ $magmas: %ExplicitOperator {
                   }]
                 )},
                 Z = {%setStructuralCases(
-                  𝔉,
+                  𝐅,
                   $../../Algebra/Magmas/Magmas,
                   [{
                     constructor = $../../Algebra/Magmas/Magmas.magma,

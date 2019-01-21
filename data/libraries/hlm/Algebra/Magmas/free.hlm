@@ -1,6 +1,6 @@
 %../../../../logics/hlm%
 
-$free(𝔐: %Element(
+$free(𝐌: %Element(
   $Magmas,
   shortcut = {
     constructor = $Magmas.magma,
@@ -13,13 +13,13 @@ $free(𝔐: %Element(
   }
 )): %Predicate {
   display = [$Property(
-    operand = 𝔐,
+    operand = 𝐌,
     property = 'free'
   )],
   definition = [%exists(
     #(S: %Subset(M)),
     formula = $"free on set"(
-      𝔐 = {𝔐},
+      𝐌 = {𝐌},
       S = {S}
     )
   )]

@@ -1,7 +1,7 @@
 %../../../../../../logics/hlm%
 
 $"sequence product"(
-  α: %Element(
+  𝐚: %Element(
     $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
     shortcut = {
       constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -11,7 +11,7 @@ $"sequence product"(
       ))
     }
   ),
-  β: %Element(
+  𝐛: %Element(
     %previous,
     shortcut = {
       constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -24,7 +24,7 @@ $"sequence product"(
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '⋅',
-    operands = [α, β],
+    operands = [𝐚, 𝐛],
     space = ' ',
     minParenLevel = 2,
     maxParenLevel = 2

@@ -1,16 +1,16 @@
 %../../../../../../logics/hlm%
 
 $"sequence limit"(
-  α: %Element($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"})),
-  _1: %Constraint($convergent(α = {α}))
+  𝐚: %Element($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"})),
+  _1: %Constraint($convergent(𝐚 = {𝐚}))
 ): %ImplicitOperator {
   display = [$Function(
     function = 'lim',
-    arguments = [α]
+    arguments = [𝐚]
   )],
   parameter = #(l: %Element($../"Rational numbers")),
   definition = [$converges(
-    α = {α},
+    𝐚 = {𝐚},
     l = {l}
   )]
 }

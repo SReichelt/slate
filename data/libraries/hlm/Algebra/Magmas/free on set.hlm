@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 $"free on set"(
-  𝔐: %Element(
+  𝐌: %Element(
     $Magmas,
     shortcut = {
       constructor = $Magmas.magma,
@@ -16,17 +16,17 @@ $"free on set"(
   S: %Subset(M)
 ): %Predicate {
   display = [$Property(
-    operand = 𝔐,
+    operand = 𝐌,
     property = ['free on ', S]
   )],
   definition = [
     %equals(
-      𝔐,
+      𝐌,
       $"free magma"(S = {S})
     ),
     %forall(
       #(
-        𝔑: %Element(
+        𝐍: %Element(
           $Magmas,
           shortcut = {
             constructor = $Magmas.magma,
@@ -49,8 +49,8 @@ $"free on set"(
       ),
       %existsUnique(
         #(φ: %Element($Homomorphisms(
-          𝔐 = {𝔐},
-          𝔑 = {𝔑}
+          𝐌 = {𝐌},
+          𝐍 = {𝐍}
         ))),
         formula = %equals(
           $../../Essentials/Functions/restriction(

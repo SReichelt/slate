@@ -6,14 +6,14 @@
  *             * https://proofwiki.org/wiki/Definition:Product_of_Cardinals
  */
 $product(
-  𝔵: %Element(
+  𝐱: %Element(
     $"Cardinal numbers",
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
       parameters = #(X: %Set)
     }
   ),
-  𝔶: %Element(
+  𝐲: %Element(
     %previous,
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
@@ -23,7 +23,7 @@ $product(
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '⋅',
-    operands = [𝔵, 𝔶],
+    operands = [𝐱, 𝐲],
     space = ' ',
     minParenLevel = 1,
     maxParenLevel = 1

@@ -17,7 +17,7 @@ $"less or equal"(
             override = %true
           }
         ),
-        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
       )
     }
   ),
@@ -37,7 +37,7 @@ $"less or equal"(
             override = %true
           }
         ),
-        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
       )
     }
   )

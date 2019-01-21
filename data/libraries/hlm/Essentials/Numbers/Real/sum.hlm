@@ -7,7 +7,7 @@ $sum(
       $"Real numbers".class,
       #(
         r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
       )
     }
   ),
@@ -17,7 +17,7 @@ $sum(
       $"Real numbers".class,
       #(
         r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
       )
     }
   )
@@ -29,7 +29,7 @@ $sum(
     maxParenLevel = 1
   )],
   definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence sum"(
-      α = {r_a},
-      β = {r_b}
+      𝐚 = {r_a},
+      𝐛 = {r_b}
   )})]
 }

@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 $Isomorphisms(
-  𝔐: %Element(
+  𝐌: %Element(
     $Magmas,
     shortcut = {
       constructor = $Magmas.magma,
@@ -13,7 +13,7 @@ $Isomorphisms(
       )
     }
   ),
-  𝔑: %Element(
+  𝐍: %Element(
     %previous,
     shortcut = {
       constructor = $Magmas.magma,
@@ -28,14 +28,14 @@ $Isomorphisms(
 ): %SetOperator {
   display = [$Function(
     function = 'Iso',
-    arguments = [𝔐, 𝔑]
+    arguments = [𝐌, 𝐍]
   )],
   definitionDisplay = {
     parameter = #(φ: %Expr),
     display = [$FunctionDefinition(
       function = φ,
       symbol = '↔',
-      operands = [𝔐, 𝔑]
+      operands = [𝐌, 𝐍]
     )],
     singularName = 'isomorphism',
     pluralName = 'isomorphisms'
@@ -43,8 +43,8 @@ $Isomorphisms(
   definition = [
     %subset(
       #(φ: %Element($Homomorphisms(
-        𝔐 = {𝔐},
-        𝔑 = {𝔑}
+        𝐌 = {𝐌},
+        𝐍 = {𝐍}
       ))),
       $../../Essentials/Functions/bijective(
         X = {M},

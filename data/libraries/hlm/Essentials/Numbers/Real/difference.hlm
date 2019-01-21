@@ -7,7 +7,7 @@ $difference(
       $"Real numbers".class,
       #(
         r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _1: %Constraint($../Rational/Sequences/cauchy(α = {r_b}))
+        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
       )
     }
   ),
@@ -17,7 +17,7 @@ $difference(
       $"Real numbers".class,
       #(
         r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _2: %Constraint($../Rational/Sequences/cauchy(α = {r_a}))
+        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
       )
     }
   )
@@ -30,8 +30,8 @@ $difference(
   )],
   definition = [
     $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
-        β = {r_b},
-        α = {r_a}
+        𝐛 = {r_b},
+        𝐚 = {r_a}
     )}),
     $sum(
       a = {b},

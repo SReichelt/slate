@@ -1,16 +1,16 @@
 %../../../../../../logics/hlm%
 
-$convergent(α: %Element(
+$convergent(𝐚: %Element(
   $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"})
 )): %Predicate {
   display = [$Property(
-    operand = α,
+    operand = 𝐚,
     property = %neg('convergent', 'divergent')
   )],
   definition = [%exists(
     #(l: %Element($../"Rational numbers")),
     formula = $converges(
-      α = {α},
+      𝐚 = {𝐚},
       l = {l}
     )
   )]

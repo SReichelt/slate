@@ -64,6 +64,7 @@ p {
 }
 
 .display-math, .indented {
+  display: block;
   margin-left: 2em;
 }
 
@@ -392,14 +393,14 @@ p {
   font-size: 98%;
 }
 
-.var, .source-code .expr.var {
-  font-family: 'TeX', serif;
+.var {
+  font-family: 'TeX-Var', serif;
   font-style: italic;
 }
 
 .var.charcorner-tr:last-child::after, .var.charcorner-tr+*::before {
   content: ' ';
-  font-family: 'TeX', serif;
+  font-family: 'TeX-Var', serif;
   font-style: italic;
   font-size: smaller;
 }
@@ -435,6 +436,12 @@ p {
 .dummy {
   color: #606060;
   border: 1px dotted #e0e0a0;
+}
+
+.bold {
+  font-family: 'TeX', serif;
+  font-weight: bold;
+  font-style: normal;
 }
 
 .sans, .ctor {
@@ -486,6 +493,11 @@ p {
 
 .comment, .comment .expr {
   color: green;
+}
+
+.source-code .var {
+  font-family: 'TeX', serif;
+  font-style: italic;
 }
 
 .source-code.string {

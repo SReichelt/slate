@@ -1,6 +1,6 @@
 %../../../../../../logics/hlm%
 
-$cauchy(α: %Element(
+$cauchy(𝐚: %Element(
   $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
   shortcut = {
     constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -11,7 +11,7 @@ $cauchy(α: %Element(
   }
 )): %Predicate {
   display = [$Property(
-    operand = α,
+    operand = 𝐚,
     property = 'Cauchy'
   )],
   definition = [%forall(

@@ -17,7 +17,7 @@ $"finite sequence"(
   definition = [$../../../Sequences/"Finite sequences"(S = {$../"Natural numbers"}).sequence(
       n = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})},
       k = {
-        parameter = #(n: %Element($../"Segment (less)"(n = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}))),
+        parameter = #(n: %Element($../Subsets/"Segment (less)"(n = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}))),
         arguments = {a = {$../"Technical definitions"/"indexed element"(
           M = {M},
           n = {n}

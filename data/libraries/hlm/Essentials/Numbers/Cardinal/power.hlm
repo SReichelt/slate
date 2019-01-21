@@ -6,14 +6,14 @@
  *             * https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals
  */
 $power(
-  𝔵: %Element(
+  𝐱: %Element(
     $"Cardinal numbers",
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
       parameters = #(X: %Set)
     }
   ),
-  𝔶: %Element(
+  𝐲: %Element(
     %previous,
     shortcut = {
       constructor = $"Cardinal numbers".cardinality,
@@ -22,8 +22,8 @@ $power(
   )
 ): %ExplicitOperator {
   display = [$SubSup(
-    body = 𝔵,
-    sup = 𝔶
+    body = 𝐱,
+    sup = 𝐲
   )],
   definition = [
     $"Cardinal numbers".cardinality(S = {$../../Functions/Functions(

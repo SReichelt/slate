@@ -5,11 +5,11 @@ $limit(
     $../../Natural/"Natural numbers",
     #(a: %Element($../"Rational numbers"))
   ),
-  α: %Def($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
+  𝐚: %Def($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
       #(m: %Element($../../Natural/"Natural numbers")),
       {a = {a[m]}}
   })),
-  _1: %Constraint($convergent(α = {α}))
+  _1: %Constraint($convergent(𝐚 = {𝐚}))
 ): %ExplicitOperator {
   display = [$OverUnderOperator(
     symbol = 'lim',
@@ -20,5 +20,5 @@ $limit(
       space = ''
     )
   )],
-  definition = [$"sequence limit"(α = {α})]
+  definition = [$"sequence limit"(𝐚 = {𝐚})]
 }

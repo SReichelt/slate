@@ -1,6 +1,6 @@
 %../../../../logics/hlm%
 
-$commutative(𝔐: %Element(
+$commutative(𝐌: %Element(
   $Magmas,
   shortcut = {
     constructor = $Magmas.magma,
@@ -13,7 +13,7 @@ $commutative(𝔐: %Element(
   }
 )): %Predicate {
   display = [$Property(
-    operand = 𝔐,
+    operand = 𝐌,
     property = 'commutative'
   )],
   definition = [$../../Essentials/Functions/Operations/commutative(

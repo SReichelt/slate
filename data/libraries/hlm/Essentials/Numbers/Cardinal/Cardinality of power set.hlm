@@ -8,8 +8,8 @@ $"Cardinality of power set"(S: %Set): %StandardTheorem {
   claim = %equals(
     $"Cardinal numbers".cardinality(S = {$../../Sets/"Power set"(S = {S})}),
     $power(
-      𝔵 = {$../Natural/number(value = 2)},
-      𝔶 = {$"Cardinal numbers".cardinality(S = {S})}
+      𝐱 = {$../Natural/number(value = 2)},
+      𝐲 = {$"Cardinal numbers".cardinality(S = {S})}
     )
   )
 }

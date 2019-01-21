@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 $Homomorphisms(
-  𝔐: %Element(
+  𝐌: %Element(
     $Magmas,
     shortcut = {
       constructor = $Magmas.magma,
@@ -13,7 +13,7 @@ $Homomorphisms(
       )
     }
   ),
-  𝔑: %Element(
+  𝐍: %Element(
     %previous,
     shortcut = {
       constructor = $Magmas.magma,
@@ -28,14 +28,14 @@ $Homomorphisms(
 ): %SetOperator {
   display = [$Function(
     function = 'Hom',
-    arguments = [𝔐, 𝔑]
+    arguments = [𝐌, 𝐍]
   )],
   definitionDisplay = {
     parameter = #(φ: %Expr),
     display = [$FunctionDefinition(
       function = φ,
       symbol = '→',
-      operands = [𝔐, 𝔑]
+      operands = [𝐌, 𝐍]
     )],
     singularName = 'homomorphism',
     pluralName = 'homomorphisms'

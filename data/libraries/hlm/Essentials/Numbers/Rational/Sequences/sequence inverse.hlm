@@ -1,6 +1,6 @@
 %../../../../../../logics/hlm%
 
-$"sequence inverse"(α: %Element(
+$"sequence inverse"(𝐚: %Element(
   $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
   shortcut = {
     constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
@@ -12,7 +12,7 @@ $"sequence inverse"(α: %Element(
 )): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
-    operand = α,
+    operand = 𝐚,
     minParenLevel = 1,
     maxParenLevel = 1
   )],

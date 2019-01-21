@@ -7,8 +7,8 @@ $"indexed element"(
   M: %Subset($../"Natural numbers"),
   n: %Element($../"Natural numbers"),
   _1: %Constraint($../../Cardinal/less(
-    𝔵 = {n},
-    𝔶 = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}
+    𝐱 = {n},
+    𝐲 = {$../../Cardinal/"Cardinal numbers".cardinality(S = {M})}
   )),
   m: %Def($../minimum(M = {M}))
 ): %ExplicitOperator {

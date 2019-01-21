@@ -1,6 +1,6 @@
 %../../../../../logics/hlm%
 
-$identity(𝔵: %Element(
+$identity(𝐱: %Element(
   $"Cardinal numbers",
   shortcut = {
     constructor = $"Cardinal numbers".cardinality,
@@ -9,7 +9,7 @@ $identity(𝔵: %Element(
 )): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
-    sub = 𝔵
+    sub = 𝐱
   )],
   definition = [$../../Functions/identity(X = {X})]
 }

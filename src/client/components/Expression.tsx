@@ -852,7 +852,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
       } else {
         let cp = c.codePointAt(0)!;
-        if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
+        if (cp >= 0x1d400 && cp < 0x1d434) {
+          setStyle('bold');
+          curText += String.fromCodePoint(cp < 0x1d41a ? cp - 0x1d400 + 0x41 :
+                                                         cp - 0x1d41a + 0x61);
+        } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
           setStyle('sans');
           curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
                                                          cp - 0x1d5ba + 0x61);

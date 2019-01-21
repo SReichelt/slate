@@ -146,7 +146,7 @@ $Categories: %Construction {
         $Argument(
           param = $SubSup(
             body = 'Mor',
-            sub = $Group(items = [a, b])
+            sub = $Group(items = [a, b], separator = '')
           ),
           value = M
         ),
@@ -160,7 +160,7 @@ $Categories: %Construction {
         $Argument(
           param = $SubSup(
             body = '∘',
-            sub = $Group(items = [d, e, f])
+            sub = $Group(items = [d, e, f], separator = '')
           ),
           value = ∘
         )

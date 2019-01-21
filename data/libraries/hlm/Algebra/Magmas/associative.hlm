@@ -1,6 +1,6 @@
 %../../../../logics/hlm%
 
-$associative(𝔐: %Element(
+$associative(𝐌: %Element(
   $Magmas,
   shortcut = {
     constructor = $Magmas.magma,
@@ -13,7 +13,7 @@ $associative(𝔐: %Element(
   }
 )): %Predicate {
   display = [$Property(
-    operand = 𝔐,
+    operand = 𝐌,
     property = 'associative'
   )],
   definition = [$../../Essentials/Functions/Operations/associative(
