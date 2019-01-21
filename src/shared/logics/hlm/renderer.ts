@@ -1549,14 +1549,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         paragraphs.push(this.renderParameterList([step], true, false, false));
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider
-                || type instanceof FmtHLM.MetaRefExpression_UseDef
-                || type instanceof FmtHLM.MetaRefExpression_ResolveDef
-                || type instanceof FmtHLM.MetaRefExpression_UseForAll
-                || type instanceof FmtHLM.MetaRefExpression_Embed
-                || type instanceof FmtHLM.MetaRefExpression_SetExtend
-                || type instanceof FmtHLM.MetaRefExpression_Extend
-                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
-                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
+                 || type instanceof FmtHLM.MetaRefExpression_UseDef
+                 || type instanceof FmtHLM.MetaRefExpression_ResolveDef
+                 || type instanceof FmtHLM.MetaRefExpression_UseForAll
+                 || type instanceof FmtHLM.MetaRefExpression_Embed
+                 || type instanceof FmtHLM.MetaRefExpression_SetExtend
+                 || type instanceof FmtHLM.MetaRefExpression_Extend
+                 || type instanceof FmtHLM.MetaRefExpression_UseTheorem
+                 || type instanceof FmtHLM.MetaRefExpression_Substitute) {
         // TODO inference symbol (in some cases)
         let result = this.utils.getProofStepResult(step, previousResult);
         paragraphs.push(this.renderFormula(result));
@@ -1568,12 +1568,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         paragraphs.push(new Display.RowExpression(row));
         this.addIndentedSubProof(type.proof, paragraphs);
       } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
-                || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
+                 || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
         this.addSubProofList(type.caseProofs, undefined, paragraphs);
-      } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
-                || type instanceof FmtHLM.MetaRefExpression_ProveDef
-                || type instanceof FmtHLM.MetaRefExpression_ProveNeg
-                || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
+        // TODO
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
+                 || type instanceof FmtHLM.MetaRefExpression_ProveNeg
+                 || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
         this.addSubProof(type.proof, paragraphs);
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
         /*this.addArgumentListParts(type.arguments, result);
