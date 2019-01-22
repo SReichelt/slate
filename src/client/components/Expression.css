@@ -306,6 +306,7 @@ p {
 .construction>.table-row>.table-cell:not(:first-child) {
   border-left: solid 1pt;
   padding-left: 1ex;
+  white-space: initial;
 }
 
 .fraction {
