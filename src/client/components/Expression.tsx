@@ -811,15 +811,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     let childIndex = 0;
     let flush = () => {
       if (curText) {
-        let addSpace = false;
-        if (curText.endsWith(' ')) {
-          curText = curText.substring(0, curText.length - 1);
-          addSpace = true;
-        }
         result.push(curStyle ? <span className={curStyle} key={childIndex++}>{curText}</span> : curText);
-        if (addSpace) {
-          result.push(<span key={childIndex++}>{' '}</span>);
-        }
         curText = '';
       }
       curStyle = undefined;
@@ -839,12 +831,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         flush();
         result.push(<br key={childIndex++}/>);
       } else if (c === ' ') {
-        if (curText.endsWith(' ')) {
-          curText = curText.substring(0, curText.length - 1);
-          flush();
-          result.push(<span key={childIndex++}>&nbsp;</span>);
+        if (curText) {
+          if (curText.endsWith(' ')) {
+            curText = curText.substring(0, curText.length - 1);
+            flush();
+            result.push(<span key={childIndex++}>&nbsp;</span>);
+          }
+          curText += c;
+        } else {
+          result.push(<span key={childIndex++}>{'\u2008'}</span>);
         }
-        curText += c;
       } else if (c === '\'') {
         flush();
         result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
