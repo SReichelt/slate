@@ -4,6 +4,7 @@
  * @references * https://en.wikipedia.org/wiki/Preorder
  *             * http://mathworld.wolfram.com/Preorder.html
  *             * https://proofwiki.org/wiki/Definition:Preordering
+ *             * https://ncatlab.org/nlab/show/preorder
  */
 $preorder(
   S: %Set(auto = %true),

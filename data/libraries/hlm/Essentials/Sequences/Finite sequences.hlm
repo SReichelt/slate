@@ -1,11 +1,13 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks Finite sequences could alternatively be defined inductively (i.e. as lists). However, the given definition is closer to the definition of [infinite sequences](Infinite%20sequences), and often more useful.
+ * @remarks Finite sequences could alternatively be defined inductively (i.e. as lists). However, the given definition is closer to the definition of [infinite sequences](Infinite%20sequences), and often more useful in mathematical contexts.
  *
  * @references * https://en.wikipedia.org/wiki/Sequence
  *             * http://mathworld.wolfram.com/Sequence.html
  *             * https://proofwiki.org/wiki/Definition:Finite_Sequence
+ *             * https://ncatlab.org/nlab/show/free+monoid
+ *             * https://coq.inria.fr/library/Coq.Lists.List.html
  */
 $"Finite sequences"(S: %Set(auto = %true)): %Construction {
   $sequence(

@@ -10,6 +10,7 @@
  * @references * https://en.wikipedia.org/wiki/Sequence
  *             * http://mathworld.wolfram.com/Sequence.html
  *             * https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
+ *             * https://ncatlab.org/nlab/show/sequence
  */
 $"Infinite sequences"(S: %Set(auto = %true)): %Construction {
   $sequence(n: %Binding(

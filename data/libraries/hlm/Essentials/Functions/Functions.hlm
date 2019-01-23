@@ -10,6 +10,7 @@
  * @references * https://en.wikipedia.org/wiki/Function_(mathematics)
  *             * http://mathworld.wolfram.com/Function.html
  *             * https://proofwiki.org/wiki/Definition:Mapping
+ *             * https://ncatlab.org/nlab/show/function
  */
 $Functions(
   X: %Set,

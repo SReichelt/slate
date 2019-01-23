@@ -6,6 +6,7 @@
  * @references * https://en.wikipedia.org/wiki/Finite_set
  *             * http://mathworld.wolfram.com/FiniteSet.html
  *             * https://proofwiki.org/wiki/Definition:Finite_Set
+ *             * https://ncatlab.org/nlab/show/finite+set
  */
 $finite(S: %Set): %Predicate {
   display = [$Property(

@@ -4,8 +4,18 @@
  * @references * https://en.wikipedia.org/wiki/Binary_relation
  *             * http://mathworld.wolfram.com/Relation.html
  *             * https://proofwiki.org/wiki/Definition:Relation
+ *             * https://ncatlab.org/nlab/show/relation#binary_relations
  */
-$Relations(S: %Set(auto = %true, embedSubsets = %true), T: %Set(auto = %true, embedSubsets = %true)): %Construction {
+$Relations(
+  S: %Set(
+    auto = %true,
+    embedSubsets = %true
+  ),
+  T: %Set(
+    auto = %true,
+    embedSubsets = %true
+  )
+): %Construction {
   $relation(R: %Subset($../Sets/"Cartesian product"(
     S = {S},
     T = {T}

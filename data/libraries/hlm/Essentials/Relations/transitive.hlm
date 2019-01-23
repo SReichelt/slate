@@ -3,6 +3,7 @@
 /**
  * @references * https://en.wikipedia.org/wiki/Transitive_relation
  *             * https://proofwiki.org/wiki/Definition:Transitive_Relation
+ *             * https://ncatlab.org/nlab/show/transitive+relation
  */
 $transitive(
   S: %Set(auto = %true),
