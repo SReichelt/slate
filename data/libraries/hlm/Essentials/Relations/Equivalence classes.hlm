@@ -42,7 +42,7 @@ $"Equivalence classes"(
   }
 
   display = [$Operator(
-    symbol = '/',
+    symbol = '∕',
     operands = [S, ∼],
     space = ''
   )]
