@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks Similarly to the definition of the intersection of two sets, we have to specify a common superset _U_ for all sets. As a side effect, _I_ can be empty, in which case the result is simply _U_.
+ * @remarks Similarly to the definition of the intersection of two sets, we have to specify a common superset _U_ for all sets. As a side effect, _I_ is allowed to be empty, in which case the result is simply _U_.
  *
  * @references * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections
  *             * https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets

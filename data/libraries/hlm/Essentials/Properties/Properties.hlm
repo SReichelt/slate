@@ -30,7 +30,7 @@ $Properties(S: %Set(
   )],
   definitionDisplay = {
     parameter = #(p: %Expr),
-    singularName = ['property on ', S],
-    pluralName = ['properties on ', S]
+    singularName = ['property', ' on ', S],
+    pluralName = ['properties', ' on ', S]
   }
 }

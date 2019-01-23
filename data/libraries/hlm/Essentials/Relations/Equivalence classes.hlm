@@ -1,9 +1,9 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition uses the construction concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
+ * @remarks This definition uses the “construction” concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
  *
- *          A more traditional definition where equivalence classes are subsets of _S_ is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition.
+ *          A more traditional definition where equivalence classes are subsets of _S_ is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
  *
  *          In the end, there may need to be two different but interchangeable definitions of equivalence classes.
  *

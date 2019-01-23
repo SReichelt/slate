@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks Bijections are important enough to warrant their own notation. A bidirectional arrow seems appropriate, even though it does not seem to be standard.
+ * @remarks Bijections are important enough to warrant their own notation. A bidirectional arrow seems appropriate, even though it does not appear to be standard.
  *
  * @references * https://en.wikipedia.org/wiki/Bijective_function
  *             * http://mathworld.wolfram.com/Bijection.html

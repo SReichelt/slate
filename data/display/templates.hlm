@@ -241,6 +241,13 @@ $MultiProperty(operands: %Expr[], property: %String): %Template {
   )
 }
 
+$NounProperty(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
+  display = $TextualRelation(
+    symbol = [%neg('is', 'is not'), ' ', article],
+    operands = [operand, singular]
+  )
+}
+
 $SubsetParameter(subset: %Expr, superset: %Expr): %Template {
   display = $Relation(
     symbol = '⊆',

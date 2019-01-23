@@ -10,8 +10,9 @@ $equivalence(
   S: %Set(auto = %true),
   ≺: %Element($Endorelations(S = {S}))
 ): %Predicate {
-  display = [$Property(
-    property = 'equivalence relation',
+  display = [$NounProperty(
+    singular = 'equivalence relation',
+    plural = 'equivalence relations',
     operand = ≺,
     article = 'an'
   )],

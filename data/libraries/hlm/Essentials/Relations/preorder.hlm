@@ -10,10 +10,10 @@ $preorder(
   S: %Set(auto = %true),
   ≺: %Element($Endorelations(S = {S}))
 ): %Predicate {
-  display = [$Property(
-    property = 'preorder',
+  display = [$NounProperty(
     operand = ≺,
-    article = 'a'
+    singular = 'preorder',
+    plural = 'preorders'
   )],
   definition = [%and(
     $reflexive(

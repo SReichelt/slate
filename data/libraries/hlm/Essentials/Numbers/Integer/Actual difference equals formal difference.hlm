@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks This proposition justifies the notation used for the constructor.
+ * @remarks This proposition justifies the notation used for the constructor. Note that the subtraction on the right is subtraction on integers, even though _m_ and _n_ are natural numbers.
  */
 $"Actual difference equals formal difference"(
   n: %Element($../Natural/"Natural numbers"),

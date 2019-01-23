@@ -28,6 +28,15 @@ interface ReplacementParameters {
   isDefinition: boolean;
 }
 
+interface PropertyInfo {
+  property?: string;
+  singular?: string;
+  plural?: string;
+  article?: string;
+  definitionRef?: Fmt.DefinitionRefExpression;
+  extracted: boolean;
+}
+
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
   private utils: HLMUtils;
 
@@ -353,12 +362,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
       let variableDefinitions = this.renderVariableDefinitions(parameters, indices);
       let variableDisplay: Display.RenderedExpression | undefined;
-      let singular: Display.RenderedExpression | undefined = undefined;
-      let plural: Display.RenderedExpression | undefined = undefined;
+      let noun: PropertyInfo = {extracted: false};
+      let singular: Display.RenderedExpression[] = [];
+      let plural: Display.RenderedExpression[] = [];
       let combineWithNext = false;
       if (definition && state.enableSpecializations) {
         let definitionRef = this.getDisplayDefinitionRef(type);
         if (definitionRef instanceof Fmt.DefinitionRefExpression) {
+          noun.definitionRef = definitionRef;
           let definitions: Fmt.Definition[] = [];
           let argumentLists: Fmt.ArgumentList[] = [];
           this.utils.analyzeDefinitionRef(definitionRef, definition, definitions, argumentLists);
@@ -377,8 +388,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               }
               if (!(state.abbreviate && definitionDisplay.nameOptional instanceof FmtDisplay.MetaRefExpression_true)) {
                 if (definitionDisplay.singularName && (!state.abbreviate || definitionDisplay.singularName instanceof Fmt.StringExpression)) {
-                  singular = this.renderDisplayExpression(definitionDisplay.singularName, args);
-                  this.setSemanticLink(singular, definitionRef);
+                  noun.singular = this.applyName(definitionDisplay.singularName, args, definitionRef, singular);
                   if (definitionDisplay.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
                     let nextDefinitionRef = this.getDisplayDefinitionRef(remainingParameters[0].type.expression);
                     let nextDefinition = remainingDefinitions[0];
@@ -397,39 +407,37 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   }
                 }
                 if (definitionDisplay.pluralName) {
-                  plural = this.renderDisplayExpression(definitionDisplay.pluralName, args);
-                  this.setSemanticLink(plural, definitionRef);
+                  noun.plural = this.applyName(definitionDisplay.pluralName, args, definitionRef, plural);
                 }
               }
             }
           }
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        singular = new Display.TextExpression('set');
-        plural = new Display.TextExpression('sets');
+        noun.singular = 'set';
+        noun.plural = 'sets';
       } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
-        singular = new Display.TextExpression('symbol');
-        plural = new Display.TextExpression('symbols');
+        noun.singular = 'symbol';
+        noun.plural = 'symbols';
       }
-      if (singular && plural) {
-        let properties = this.extractProperties(parameters, remainingParameters, remainingDefinitions);
+      let properties = this.extractProperties(parameters, noun, remainingParameters, remainingDefinitions);
+      this.replaceName(noun.singular, noun.definitionRef, noun.extracted, singular);
+      this.replaceName(noun.plural, noun.definitionRef, noun.extracted, plural);
+      if (singular.length && plural.length) {
         if (properties && properties.length) {
-          let singularRow = [singular];
-          let pluralRow = [plural];
           for (let property of properties) {
-            singularRow.unshift(new Display.TextExpression(' '));
-            singularRow.unshift(property);
-            pluralRow.unshift(new Display.TextExpression(' '));
-            pluralRow.unshift(property);
+            singular.unshift(new Display.TextExpression(' '));
+            singular.unshift(property);
+            plural.unshift(new Display.TextExpression(' '));
+            plural.unshift(property);
           }
-          singular = new Display.RowExpression(singularRow);
-          plural = new Display.RowExpression(pluralRow);
         }
         if (!variableDisplay) {
           variableDisplay = variableDefinitions;
         }
         if (state.abbreviate) {
-          row.push(parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural);
+          let which = parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural;
+          row.push(...which);
           row.push(new Display.TextExpression(' '));
           row.push(variableDisplay);
         } else {
@@ -438,7 +446,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             state.inDefinitionDisplayGroup = true;
           } else {
             if (parameters.length === 1 && !state.inDefinitionDisplayGroup) {
-              let singularStart = singular;
+              let singularStart = singular[0];
               for (;;) {
                 if (singularStart instanceof Display.RowExpression && singularStart.items.length) {
                   singularStart = singularStart.items[0];
@@ -448,29 +456,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   break;
                 }
               }
-              let article = 'a';
-              if (singularStart instanceof Display.TextExpression && singularStart.text.length) {
-                let firstChar = singularStart.text.charAt(0);
-                if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
-                  // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
-                  // Other languages are even worse.
-                  article = 'an';
+              if (!noun.article) {
+                noun.article = 'a';
+                if (singularStart instanceof Display.TextExpression && singularStart.text.length) {
+                  let firstChar = singularStart.text.charAt(0);
+                  if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
+                    // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
+                    // Other languages are even worse.
+                    noun.article = 'an';
+                  }
                 }
               }
               if (state.sentence) {
-                row.push(new Display.TextExpression(` be ${article} `));
-                row.push(singular);
+                row.push(new Display.TextExpression(` be ${noun.article} `));
+                row.push(...singular);
               } else {
-                row.push(new Display.TextExpression(` is ${article} `));
-                row.push(singular);
+                row.push(new Display.TextExpression(` is ${noun.article} `));
+                row.push(...singular);
               }
             } else {
               if (state.sentence) {
                 row.push(new Display.TextExpression(' be '));
-                row.push(plural);
+                row.push(...plural);
               } else {
                 row.push(new Display.TextExpression(' are '));
-                row.push(plural);
+                row.push(...plural);
               }
             }
             state.inDefinitionDisplayGroup = false;
@@ -510,6 +520,38 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return new Display.RowExpression(row);
   }
 
+  private applyName(name: Fmt.Expression, args: Display.RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Display.RenderedExpression[]): string | undefined {
+    result.length = 0;
+    let expression = this.renderDisplayExpression(name, args);
+    while (expression instanceof Display.IndirectExpression) {
+      expression = expression.resolve();
+    }
+    if (expression instanceof Display.RowExpression && expression.items.length) {
+      result.push(...expression.items);
+    } else {
+      result.push(expression);
+    }
+    let firstItem = result[0];
+    this.setSemanticLink(firstItem, definitionRef);
+    if (firstItem instanceof Display.TextExpression) {
+      return firstItem.text;
+    } else {
+      return undefined;
+    }
+  }
+
+  private replaceName(name: string | undefined, definitionRef: Fmt.DefinitionRefExpression | undefined, alwaysApply: boolean, result: Display.RenderedExpression[]): void {
+    if (name && (alwaysApply || !result.length)) {
+      let newName = new Display.TextExpression(name);
+      this.setSemanticLink(newName, definitionRef || newName);
+      if (result.length) {
+        result[0] = newName;
+      } else {
+        result.push(newName);
+      }
+    }
+  }
+
   private getDisplayDefinitionRef(type: Fmt.Expression): Fmt.Expression | undefined {
     if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
       return type._set;
@@ -520,7 +562,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private extractProperties(parameters: Fmt.Parameter[], remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): Display.RenderedExpression[] | undefined {
+  private extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): Display.RenderedExpression[] | undefined {
     let result: Display.RenderedExpression[] | undefined = undefined;
     if (remainingParameters && remainingDefinitions) {
       while (remainingParameters.length >= parameters.length && remainingDefinitions.length >= parameters.length) {
@@ -537,34 +579,41 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (!definition) {
           break;
         }
-        let property: string | undefined = undefined;
-        let definitionRef: Fmt.DefinitionRefExpression | undefined = undefined;
+        let property: PropertyInfo | undefined = undefined;
         for (let index = 0; index < parameters.length; index++) {
           let currentProperty = this.getProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
-          if (currentProperty) {
-            if (property) {
-              if (currentProperty.property !== property) {
-                property = undefined;
-                break;
-              }
-            } else {
-              property = currentProperty.property;
-              definitionRef = currentProperty.definitionRef;
-            }
-          } else {
+          if (!currentProperty) {
             property = undefined;
             break;
           }
+          if (property) {
+            if (currentProperty.property !== property.property
+                || currentProperty.singular !== property.singular
+                || currentProperty.plural !== property.plural) {
+              property = undefined;
+              break;
+            }
+          } else {
+            property = currentProperty;
+          }
         }
         if (property) {
-          if (!result) {
-            result = [];
+          if (property.singular || property.plural) {
+            Object.assign(noun, property);
           }
-          let propertyExpression = new Display.TextExpression(property);
-          if (definitionRef) {
-            propertyExpression.semanticLinks = [new Display.SemanticLink(definitionRef)];
+          if (property.property) {
+            if (!(noun.singular && noun.plural)) {
+              break;
+            }
+            if (!result) {
+              result = [];
+            }
+            let propertyExpression = new Display.TextExpression(property.property);
+            if (property.definitionRef) {
+              this.setSemanticLink(propertyExpression, property.definitionRef);
+            }
+            result.push(propertyExpression);
           }
-          result.push(propertyExpression);
           remainingParameters.splice(0, parameters.length);
           remainingDefinitions.splice(0, parameters.length);
         } else {
@@ -575,7 +624,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  private getProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): {property: string, definitionRef: Fmt.DefinitionRefExpression} | undefined {
+  private getProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): PropertyInfo | undefined {
     if (constraintParam.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
       let negationCount = 0;
       let constraint = constraintParam.type.expression.formula;
@@ -590,31 +639,41 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           && definition.contents.display.items.length) {
         let display = definition.contents.display.items[0];
         if (display instanceof Fmt.DefinitionRefExpression) {
-          if (display.path.name === 'Property') {
-            if (!display.path.arguments.getOptionalValue('article')) {
-              let operand = display.path.arguments.getValue('operand');
-              if (operand instanceof Fmt.VariableRefExpression) {
-                let operandArg = constraint.path.arguments.getValue(operand.variable.name);
-                if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
-                  let operandArgValue = operandArg.arguments[0].value;
-                  if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
-                    let property = display.path.arguments.getValue('property');
-                    if (property instanceof FmtDisplay.MetaRefExpression_neg) {
-                      if (negationCount < property.items.length) {
-                        property = property.items[negationCount];
-                        negationCount = 0;
-                      }
-                    }
-                    if (property instanceof Fmt.StringExpression && !negationCount) {
-                      return {property: property.value, definitionRef: constraint};
-                    }
-                  }
+          if (display.path.name === 'Property' || display.path.name === 'NounProperty') {
+            let operand = display.path.arguments.getValue('operand');
+            if (operand instanceof Fmt.VariableRefExpression) {
+              let operandArg = constraint.path.arguments.getValue(operand.variable.name);
+              if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
+                let operandArgValue = operandArg.arguments[0].value;
+                if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
+                  return {
+                    property: this.getDisplayArgument(display, 'property', negationCount),
+                    singular: this.getDisplayArgument(display, 'singular', negationCount),
+                    plural: this.getDisplayArgument(display, 'plural', negationCount),
+                    article: this.getDisplayArgument(display, 'article', negationCount),
+                    definitionRef: constraint,
+                    extracted: true
+                  };
                 }
               }
             }
           }
         }
       }
+    }
+    return undefined;
+  }
+
+  private getDisplayArgument(display: Fmt.DefinitionRefExpression, paramName: string, negationCount: number): string | undefined {
+    let value = display.path.arguments.getOptionalValue(paramName);
+    if (value instanceof FmtDisplay.MetaRefExpression_neg) {
+      if (negationCount < value.items.length) {
+        value = value.items[negationCount];
+        negationCount = 0;
+      }
+    }
+    if (value instanceof Fmt.StringExpression && !negationCount) {
+      return value.value;
     }
     return undefined;
   }
@@ -935,6 +994,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             }
             abbr = negationList;
           }
+        } else if (display.path.name === 'NounProperty') {
+          abbr = display.path.arguments.getValue('singular');
         }
         if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {
           display = abbr;

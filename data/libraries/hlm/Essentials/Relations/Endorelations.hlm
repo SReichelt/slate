@@ -12,8 +12,8 @@ $Endorelations(S: %Set): %SetOperator {
   )],
   definitionDisplay = {
     parameter = #(≺: %Expr),
-    singularName = ['relation on ', S],
-    pluralName = ['relations on ', S]
+    singularName = ['relation', ' on ', S],
+    pluralName = ['relations', ' on ', S]
   },
   definition = [$Relations(
     S = {S},

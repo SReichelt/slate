@@ -51,7 +51,7 @@ $"Infinite sequences"(S: %Set(auto = %true)): %Construction {
   )],
   definitionDisplay = {
     parameter = #(a: %Expr),
-    singularName = ['sequence on ', S],
-    pluralName = ['sequences on ', S]
+    singularName = ['sequence', ' on ', S],
+    pluralName = ['sequences', ' on ', S]
   }
 }
