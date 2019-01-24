@@ -1,7 +1,7 @@
 {
-    "name": "hlm",
-    "displayName": "HLM",
-    "description": "Provides syntax highlighting for the HLM proof assistant language.",
+    "name": "slate",
+    "displayName": "Slate",
+    "description": "Provides syntax highlighting for the Slate proof assistant language.",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.26.0"
@@ -11,24 +11,24 @@
     ],
     "contributes": {
         "languages": [{
-            "id": "hlm",
-            "aliases": ["HLM", "hlm"],
-            "extensions": [".hlm"],
+            "id": "slate",
+            "aliases": ["Slate", "slate"],
+            "extensions": [".slate"],
             "configuration": "./language-configuration.json"
         }],
         "grammars": [{
-            "language": "hlm",
-            "scopeName": "source.hlm",
-            "path": "./syntaxes/hlm.tmLanguage.json"
+            "language": "slate",
+            "scopeName": "source.slate",
+            "path": "./syntaxes/slate.tmLanguage.json"
         }],
         "configurationDefaults": {
-            "hlm": {
+            "slate": {
                 "files.encoding": "utf-8"
             }
         }
     },
     "activationEvents": [
-        "onLanguage:hlm"
+        "onLanguage:slate"
     ],
     "main": "./out/vscode/src/formatExtension",
     "scripts": {

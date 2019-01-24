@@ -1,7 +1,7 @@
 {
-  "name": "hlm",
+  "name": "slate",
   "version": "0.1.0",
-  "description": "HLM Proof Assistant",
+  "description": "Slate Proof Assistant",
   "main": "index.js",
   "engines": {
     "node": ">=6.9.5"

@@ -1,44 +1,44 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "HLM",
+	"name": "Slate",
 	"patterns": [
 		{
 			"name": "header",
 			"match": "^%.*%$"
 		},
 		{
-			"name": "keyword.other.meta-ref.hlm.unquoted",
+			"name": "keyword.other.meta-ref.slate.unquoted",
 			"match": "%\\w+\\b"
 		},
 		{
-			"name": "keyword.other.meta-ref.hlm.quoted",
+			"name": "keyword.other.meta-ref.slate.quoted",
 			"begin": "%\"",
 			"end": "\"",
 			"patterns": [
 				{
-					"name": "constant.character.escape.hlm",
+					"name": "constant.character.escape.slate",
 					"match": "\\\\."
 				}
 			]
 		},
 		{
-			"name": "identifier.quoted.double.hlm",
+			"name": "identifier.quoted.double.slate",
 			"begin": "\"",
 			"end": "\"",
 			"patterns": [
 				{
-					"name": "constant.character.escape.hlm",
+					"name": "constant.character.escape.slate",
 					"match": "\\\\."
 				}
 			]
 		},
 		{
-			"name": "string.quoted.single.hlm",
+			"name": "string.quoted.single.slate",
 			"begin": "'",
 			"end": "'",
 			"patterns": [
 				{
-					"name": "constant.character.escape.hlm",
+					"name": "constant.character.escape.slate",
 					"match": "\\\\."
 				}
 			]
@@ -64,5 +64,5 @@
 			"match": "//.*$"
 		}
 	],
-	"scopeName": "source.hlm"
+	"scopeName": "source.slate"
 }

@@ -9,8 +9,8 @@ const projectRoot = path.join(__dirname, '..', '..');
 
 const plugins = [
   new HtmlWebpackPlugin({
-    title: 'HLM',
-    favicon: 'favicon.ico',
+    title: 'Slate',
+    favicon: 'slate.png',
     filename: 'index.html',
     template: 'index.ejs'
   })

@@ -1,4 +1,4 @@
-// Generated from data/display/display.hlm by generateMetaDeclarations.ts.
+// Generated from data/display/display.slate by generateMetaDeclarations.ts.
 // tslint:disable:class-name
 // tslint:disable:variable-name
 

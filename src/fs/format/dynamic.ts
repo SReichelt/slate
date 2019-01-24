@@ -5,7 +5,7 @@ import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 
-export const fileExtension = '.hlm';
+export const fileExtension = '.slate';
 
 export function getFileNameFromPathStr(sourceFileName: string, pathStr: string): string {
   pathStr = path.join(path.dirname(sourceFileName), pathStr);

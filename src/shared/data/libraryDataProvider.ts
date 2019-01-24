@@ -10,6 +10,8 @@ import * as Logic from '../logics/logic';
 export { LibraryDataAccessor, LibraryItemInfo };
 
 
+const fileExtension = '.slate';
+
 interface PrefetchQueueItem {
   path: Fmt.Path;
   isSubsection: boolean;
@@ -105,7 +107,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private fetchDefinition(name: string, getMetaModel: Fmt.MetaModelGetter): CachedPromise<Fmt.Definition> {
     let result = this.definitionCache.get(name);
     if (!result) {
-      let uri = this.uri + encodeURI(name) + '.hlm';
+      let uri = this.uri + encodeURI(name) + fileExtension;
       result = this.fileAccessor.readFile(uri)
         .then((contents: FileContents) => {
           contents.onChange = () => {
@@ -176,7 +178,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
     this.definitionCache.set(name, CachedPromise.resolve(definition));
-    let uri = this.uri + encodeURI(name) + '.hlm';
+    let uri = this.uri + encodeURI(name) + fileExtension;
     let file = new Fmt.File;
     file.metaModelPath = this.getLogicMetaModelPath();
     file.definitions = new Fmt.DefinitionList;
@@ -186,7 +188,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   openLocalItem(name: string): CachedPromise<void> {
-    let uri = this.uri + encodeURI(name) + '.hlm';
+    let uri = this.uri + encodeURI(name) + fileExtension;
     return this.fileAccessor.openFile!(uri);
   }
 

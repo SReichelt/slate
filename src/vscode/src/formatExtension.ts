@@ -14,8 +14,8 @@ import CachedPromise from '../../shared/data/cachedPromise';
 import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery } from './utils';
 import * as LogicExtension from './logicExtension';
 
-const languageId = 'hlm';
-const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
+const languageId = 'slate';
+const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
 
 interface ParsedDocument {
     uri: vscode.Uri;
@@ -416,7 +416,7 @@ function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo
     return result;
 }
 
-class HLMDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+class SlateDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
@@ -455,7 +455,7 @@ class HLMDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     }
 }
 
-class HLMWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
+class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
     provideWorkspaceSymbols(query: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[]> {
         if (!query) {
             return undefined;
@@ -514,7 +514,7 @@ class HLMWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
     }
 }
 
-class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider {
+class SlateDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider {
     constructor(private parsedDocuments: ParsedDocumentMap, private hoverEventEmitter: vscode.EventEmitter<LogicExtension.HoverEvent>) {}
 
     provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
@@ -591,7 +591,7 @@ class HLMDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverPr
     }
 }
 
-class HLMHighlightProvider implements vscode.DocumentHighlightProvider {
+class SlateHighlightProvider implements vscode.DocumentHighlightProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideDocumentHighlights(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.DocumentHighlight[]> {
@@ -638,7 +638,7 @@ class HLMHighlightProvider implements vscode.DocumentHighlightProvider {
     }
 }
 
-class HLMSignatureHelpProvider implements vscode.SignatureHelpProvider {
+class SlateSignatureHelpProvider implements vscode.SignatureHelpProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideSignatureHelp(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SignatureHelp> {
@@ -709,7 +709,7 @@ class HLMSignatureHelpProvider implements vscode.SignatureHelpProvider {
     }
 }
 
-class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
+class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
@@ -1008,7 +1008,7 @@ class HLMCompletionItemProvider implements vscode.CompletionItemProvider {
     }
 }
 
-class HLMReferenceProvider implements vscode.ReferenceProvider {
+class SlateReferenceProvider implements vscode.ReferenceProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideReferences(document: vscode.TextDocument, position: vscode.Position, context: vscode.ReferenceContext, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Location[]> {
@@ -1062,7 +1062,7 @@ class HLMReferenceProvider implements vscode.ReferenceProvider {
     }
 }
 
-class HLMRenameProvider implements vscode.RenameProvider {
+class SlateRenameProvider implements vscode.RenameProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.WorkspaceEdit> {
@@ -1147,7 +1147,7 @@ class HLMRenameProvider implements vscode.RenameProvider {
     }
 }
 
-class HLMDocumentFormatter implements vscode.DocumentFormattingEditProvider {
+class SlateDocumentFormatter implements vscode.DocumentFormattingEditProvider {
     provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
         let unformatted = document.getText();
         try {
@@ -1382,18 +1382,18 @@ export function activate(context: vscode.ExtensionContext): void {
             }, 500);
         })
     );
-    let definitionProvider = new HLMDefinitionProvider(parsedDocuments, hoverEventEmitter);
+    let definitionProvider = new SlateDefinitionProvider(parsedDocuments, hoverEventEmitter);
     context.subscriptions.push(
-        vscode.languages.registerDocumentSymbolProvider(HLM_MODE, new HLMDocumentSymbolProvider(parsedDocuments)),
-        vscode.languages.registerWorkspaceSymbolProvider(new HLMWorkspaceSymbolProvider),
-        vscode.languages.registerDefinitionProvider(HLM_MODE, definitionProvider),
-        vscode.languages.registerHoverProvider(HLM_MODE, definitionProvider),
-        vscode.languages.registerDocumentHighlightProvider(HLM_MODE, new HLMHighlightProvider(parsedDocuments)),
-        vscode.languages.registerSignatureHelpProvider(HLM_MODE, new HLMSignatureHelpProvider(parsedDocuments), '(', '{', ','),
-        vscode.languages.registerCompletionItemProvider(HLM_MODE, new HLMCompletionItemProvider(parsedDocuments), '%', '$', '/', '.'),
-        vscode.languages.registerReferenceProvider(HLM_MODE, new HLMReferenceProvider(parsedDocuments)),
-        vscode.languages.registerRenameProvider(HLM_MODE, new HLMRenameProvider(parsedDocuments)),
-        vscode.languages.registerDocumentFormattingEditProvider(HLM_MODE, new HLMDocumentFormatter)
+        vscode.languages.registerDocumentSymbolProvider(SLATE_MODE, new SlateDocumentSymbolProvider(parsedDocuments)),
+        vscode.languages.registerWorkspaceSymbolProvider(new SlateWorkspaceSymbolProvider),
+        vscode.languages.registerDefinitionProvider(SLATE_MODE, definitionProvider),
+        vscode.languages.registerHoverProvider(SLATE_MODE, definitionProvider),
+        vscode.languages.registerDocumentHighlightProvider(SLATE_MODE, new SlateHighlightProvider(parsedDocuments)),
+        vscode.languages.registerSignatureHelpProvider(SLATE_MODE, new SlateSignatureHelpProvider(parsedDocuments), '(', '{', ','),
+        vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.'),
+        vscode.languages.registerReferenceProvider(SLATE_MODE, new SlateReferenceProvider(parsedDocuments)),
+        vscode.languages.registerRenameProvider(SLATE_MODE, new SlateRenameProvider(parsedDocuments)),
+        vscode.languages.registerDocumentFormattingEditProvider(SLATE_MODE, new SlateDocumentFormatter)
     );
     LogicExtension.activate(context, parseEventEmitter.event, hoverEventEmitter.event);
     for (let document of vscode.workspace.textDocuments) {

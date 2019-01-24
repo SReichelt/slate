@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "src/vscode"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.tabSize": 4,
+		"editor.insertSpaces": true,
+		"typescript.tsc.autoDetect": "off"
+	}
+}

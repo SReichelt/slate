@@ -115,7 +115,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    let templateUri = '/display/templates.hlm';
+    let templateUri = '/display/templates.slate';
     this.fileAccessor.readFile(templateUri)
       .then((contents: FileContents) => {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
@@ -245,7 +245,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     let uri = libraryDataProvider.pathToURI(path);
-    history.pushState(null, 'HLM', uri);
+    history.pushState(null, 'Slate', uri);
   }
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
@@ -257,7 +257,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
 
     let uri = libraryDataProvider.pathToURI(path);
-    history.pushState(null, 'HLM', uri);
+    history.pushState(null, 'Slate', uri);
   }
 
   private edit = (): void => {

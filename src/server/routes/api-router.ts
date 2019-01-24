@@ -25,7 +25,7 @@ export function apiRouter() {
         let mail: any = {
           from: config.MAIL_FROM,
           to: config.MAIL_TO,
-          subject: 'HLM submission: ' + requestPath,
+          subject: 'Slate submission: ' + requestPath,
           text: requestPath,
           attachments: [{
             filename: path.basename(requestPath),

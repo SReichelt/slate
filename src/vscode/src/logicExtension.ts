@@ -16,16 +16,16 @@ import { fileExtension } from '../../fs/format/dynamic';
 import { convertRange } from './utils';
 import CachedPromise from '../../shared/data/cachedPromise';
 
-const languageId = 'hlm';
-const HLM_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
+const languageId = 'slate';
+const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
 
-class HLMCodeLens extends vscode.CodeLens {
+class SlateCodeLens extends vscode.CodeLens {
     constructor(range: vscode.Range, public renderFn: Logic.RenderFn) {
         super(range);
     }
 }
 
-class HLMCodeLensProvider implements vscode.CodeLensProvider {
+class SlateCodeLensProvider implements vscode.CodeLensProvider {
     public templates?: Fmt.File;
 
     constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>, public onDidChangeCodeLenses: vscode.Event<void>) {}
@@ -44,7 +44,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
                         }
                         if (info.object instanceof FmtLibrary.MetaRefExpression_item && info.object.ref instanceof Fmt.DefinitionRefExpression) {
                             let ref = info.object.ref;
-                            result.push(new HLMCodeLens(convertRange(info.range), () => {
+                            result.push(new SlateCodeLens(convertRange(info.range), () => {
                                 let item = libraryDataProvider.fetchItem(ref.path);
                                 let expression = item.then((definition) => {
                                     let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, false, libraryDataProvider, templates, false);
@@ -69,7 +69,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
                             }
                             let part = parts.get(info.object);
                             if (part) {
-                                result.push(new HLMCodeLens(convertRange(info.range), part));
+                                result.push(new SlateCodeLens(convertRange(info.range), part));
                             }
                         }
                     }
@@ -82,7 +82,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
     }
 
 	resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens> {
-        if (codeLens instanceof HLMCodeLens) {
+        if (codeLens instanceof SlateCodeLens) {
             return renderAsText(codeLens.renderFn(), false, true).then((text: string) => {
                 return new vscode.CodeLens(codeLens.range, {
                     title: text,
@@ -95,7 +95,7 @@ class HLMCodeLensProvider implements vscode.CodeLensProvider {
     }
 }
 
-class HLMLogicHoverProvider {
+class SlateLogicHoverProvider {
     public templates?: Fmt.File;
 
     constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>) {}
@@ -140,8 +140,8 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
     let documentLibraryDataProviders = new Map<vscode.TextDocument, LibraryDataProvider>();
     let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
     context.subscriptions.push(changeCodeLensesEventEmitter);
-    let codeLensProvider = new HLMCodeLensProvider(documentLibraryDataProviders, changeCodeLensesEventEmitter.event);
-    let hoverProvider = new HLMLogicHoverProvider(documentLibraryDataProviders);
+    let codeLensProvider = new SlateCodeLensProvider(documentLibraryDataProviders, changeCodeLensesEventEmitter.event);
+    let hoverProvider = new SlateLogicHoverProvider(documentLibraryDataProviders);
     context.subscriptions.push(
         onDidParseDocument((event: ParseDocumentEvent) => {
             try {
@@ -192,7 +192,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             }
         }),
         vscode.workspace.onDidChangeTextDocument((event) => fileAccessor.documentChanged(event.document)),
-        vscode.languages.registerCodeLensProvider(HLM_MODE, codeLensProvider),
+        vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {

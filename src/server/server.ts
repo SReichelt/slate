@@ -4,7 +4,7 @@ import { staticsRouter } from './routes/statics-router';
 import { staticsDevRouter } from './routes/statics-dev-router';
 import * as config from './config';
 
-express.static.mime.define({'text/plain': ['hlm']});
+express.static.mime.define({'text/plain': ['slate']});
 
 const app = express();
 
