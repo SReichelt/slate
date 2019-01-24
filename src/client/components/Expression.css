@@ -64,7 +64,7 @@ p {
 }
 
 .display-math, .indented {
-  display: block;
+  display: inline-block;
   margin-left: 2em;
 }
 
