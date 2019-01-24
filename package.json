@@ -21,6 +21,8 @@
   },
   "license": "MIT",
   "author": "Sebastian Reichelt",
+  "repository": "github:sreichelt/slate",
+  "homepage": "http://sreichelt.github.io/slate",
   "dependencies": {
     "express": "^4.16.4",
     "http-proxy-middleware": "^0.18.0",
