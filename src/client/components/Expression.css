@@ -63,8 +63,11 @@ p {
   display: table-cell;
 }
 
-.display-math, .indented {
+.display-math {
   display: inline-block;
+}
+
+.display-math, .indented {
   margin-left: 2em;
 }
 
@@ -394,7 +397,7 @@ p {
   font-size: 98%;
 }
 
-.var {
+.var, .var * {
   font-family: 'TeX-Var', serif;
   font-style: italic;
 }

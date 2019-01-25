@@ -68,7 +68,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private updateSelectionState(state: SelectionState): boolean {
-    let path = this.libraryDataProvider.uriToPath(location.pathname);
+    let path = this.libraryDataProvider.uriToPath(window.location.pathname);
     if (path) {
       this.fillSelectionState(state, path);
       return true;
@@ -245,7 +245,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     let uri = libraryDataProvider.pathToURI(path);
-    history.pushState(null, 'Slate', uri);
+    window.history.pushState(null, 'Slate', uri);
   }
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
@@ -257,7 +257,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
 
     let uri = libraryDataProvider.pathToURI(path);
-    history.pushState(null, 'Slate', uri);
+    window.history.pushState(null, 'Slate', uri);
   }
 
   private edit = (): void => {
