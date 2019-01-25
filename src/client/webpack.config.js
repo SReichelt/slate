@@ -19,7 +19,7 @@ const plugins = [
 if (!config.IS_PRODUCTION) {
   plugins.push(new OpenBrowserPlugin({
     url: `http://localhost:${config.SERVER_PORT}`,
-    browser: 'google-chrome --remote-debugging-port=9222'
+    browser: 'chrome-remote-debug'
   }));
 }
 
