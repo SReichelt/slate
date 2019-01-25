@@ -22,7 +22,6 @@
       }
       .loading-screen-loading {
         margin-top: 2em;
-        margin-bottom: 2em;
       }
       @font-face {
         font-family: 'TeX';
@@ -135,15 +134,15 @@
              url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
              url('/fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
       }
+      .preload-font {
+        visibility: hidden;
+      }
       .preload-font-1 {
         font-family: 'TeX';
       }
       .preload-font-2 {
         font-family: 'TeX-Var';
         font-style: italic;
-      }
-      .preload-font-3 {
-        font-family: 'TeX-Calligraphic';
       }
     </style>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
@@ -154,6 +153,7 @@
         <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> web-based interactive theorem prover.</p>
         <p>This website requires a modern web browser with JavaScript.</p>
         <p class="loading-screen-loading">Loading<span class="preload-font-1">.</span><span class="preload-font-2">.</span><span class="preload-font-3">.</span></p>
+        <p class="preload-font"><span class="preload-font-1">Preloading</span> <span class="preload-font-2">font</span>...</span></p>
       </div>
     </div>
   </body>
