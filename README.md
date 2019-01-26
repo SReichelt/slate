@@ -25,7 +25,7 @@ Local installation has been tested on Linux and Microsoft Windows.
 Please follow these steps:
 
 1. Install the following software:
-   * [GIT](https://git-scm.com/downloads)
+   * [Git](https://git-scm.com/downloads)
    * Microsoft [Visual Studio Code](https://code.visualstudio.com/Download)
    * [Node.js](https://nodejs.org/)
    * Google [Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/Home)
