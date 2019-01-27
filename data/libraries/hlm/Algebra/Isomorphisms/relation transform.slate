@@ -7,7 +7,19 @@ $"relation transform"(
     X = {X},
     Y = {Y}
   )),
-  ≺: %Element($../../Essentials/Relations/Endorelations(S = {X}))
+  ≺: %Element(
+    $../../Essentials/Relations/Endorelations(S = {X}),
+    shortcut = {
+      constructor = $../../Essentials/Relations/Relations(
+          S = {X},
+          T = {X}
+        ).relation,
+      parameters = #(R: %Subset($../../Essentials/Sets/"Cartesian product"(
+        S = {X},
+        T = {X}
+      )))
+    }
+  )
 ): %ExplicitOperator {
   display = [$Function(
     function = φ,
@@ -17,48 +29,37 @@ $"relation transform"(
   definition = [$../../Essentials/Relations/Relations(
       S = {Y},
       T = {Y}
-    ).relation(R = {%subset(
-      #(y: %Element(
-        $../../Essentials/Sets/"Cartesian product"(
-          S = {Y},
-          T = {Y}
-        ),
+    ).relation(R = {%extendedSubset(
+      #(r: %Element(
+        R,
         shortcut = {
           constructor = $../../Essentials/Sets/"Cartesian product"(
-              S = {Y},
-              T = {Y}
+              S = {X},
+              T = {X}
             ).pair,
           parameters = #(
-            s: %Element(Y),
-            t: %Element(Y)
+            s: %Element(X),
+            t: %Element(X)
           ),
           override = %true
         }
       )),
-      $../../Essentials/Relations/related(
-        S = {X},
-        T = {X},
-        ≺ = {≺},
-        s = {$../../Essentials/Functions/value(
-          X = {Y},
-          Y = {X},
-          f = {$../../Essentials/Functions/inverse(
+      $../../Essentials/Sets/"Cartesian product"(
+          S = {X},
+          T = {X}
+        ).pair(
+          s = {$../../Essentials/Functions/value(
             X = {X},
             Y = {Y},
-            f = {φ}
+            f = {φ},
+            x = {s}
           )},
-          x = {s}
-        )},
-        t = {$../../Essentials/Functions/value(
-          X = {Y},
-          Y = {X},
-          f = {$../../Essentials/Functions/inverse(
+          t = {$../../Essentials/Functions/value(
             X = {X},
             Y = {Y},
-            f = {φ}
-          )},
-          x = {t}
-        )}
+            f = {φ},
+            x = {t}
+          )}
       )
   )})]
 }

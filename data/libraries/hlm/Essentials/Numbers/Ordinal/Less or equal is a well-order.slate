@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$"Less or equal is a well-order": %StandardTheorem {
+  claim = $../../Relations/"well-order"(
+    S = {$"Ordinal numbers"},
+    ≺ = {$../../Relations/predicate(
+      S = {$"Ordinal numbers"},
+      T = {$"Ordinal numbers"},
+      parameters = #(
+        𝐱: %Element($"Ordinal numbers"),
+        𝐲: %Element(%previous)
+      ),
+      predicate = $"less or equal"(
+        𝐱 = {𝐱},
+        𝐲 = {𝐲}
+      )
+    )}
+  )
+}

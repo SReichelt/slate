@@ -1,0 +1,152 @@
+%../../../../logics/hlm%
+
+$succession(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ⪯: %Element($Endorelations(S = {S})),
+  _1: %Constraint($"partial order"(
+    S = {S},
+    ≺ = {⪯}
+  )),
+  ⊑: %Element($Endorelations(S = {T})),
+  _2: %Constraint($"partial order"(
+    S = {T},
+    ≺ = {⊑}
+  ))
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '≪',
+    operands = [⪯, ⊑]
+  )],
+  definition = [$Relations(
+      S = {$../Sets/"Disjoint union"(
+        S = {S},
+        T = {T}
+      )},
+      T = {$../Sets/"Disjoint union"(
+        S = {S},
+        T = {T}
+      )}
+    ).relation(R = {%subset(
+      #(x: %Element(
+        $../Sets/"Cartesian product"(
+          S = {$../Sets/"Disjoint union"(
+            S = {S},
+            T = {T}
+          )},
+          T = {$../Sets/"Disjoint union"(
+            S = {S},
+            T = {T}
+          )}
+        ),
+        shortcut = {
+          constructor = $../Sets/"Cartesian product"(
+              S = {$../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              )},
+              T = {$../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              )}
+            ).pair,
+          parameters = #(
+            a: %Element($../Sets/"Disjoint union"(
+              S = {S},
+              T = {T}
+            )),
+            b: %Element($../Sets/"Disjoint union"(
+              S = {S},
+              T = {T}
+            ))
+          ),
+          override = %true
+        }
+      )),
+      %structural(
+        b,
+        $../Sets/"Disjoint union"(
+          S = {S},
+          T = {T}
+        ),
+        [
+          {
+            constructor = $../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              ).left,
+            parameters = #(s_b: %Element(S)),
+            value = %structural(
+              a,
+              $../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              ),
+              [
+                {
+                  constructor = $../Sets/"Disjoint union"(
+                      S = {S},
+                      T = {T}
+                    ).left,
+                  parameters = #(s_a: %Element(S)),
+                  value = $related(
+                    S = {S},
+                    T = {S},
+                    ≺ = {⪯},
+                    s = {s_a},
+                    t = {s_b}
+                  )
+                },
+                {
+                  constructor = $../Sets/"Disjoint union"(
+                      S = {S},
+                      T = {T}
+                    ).right,
+                  parameters = #(t_a: %Element(T)),
+                  value = %or
+                }
+              ]
+            )
+          },
+          {
+            constructor = $../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              ).right,
+            parameters = #(t_b: %Element(T)),
+            value = %structural(
+              a,
+              $../Sets/"Disjoint union"(
+                S = {S},
+                T = {T}
+              ),
+              [
+                {
+                  constructor = $../Sets/"Disjoint union"(
+                      S = {S},
+                      T = {T}
+                    ).left,
+                  parameters = #(s_a: %Element(S)),
+                  value = %and
+                },
+                {
+                  constructor = $../Sets/"Disjoint union"(
+                      S = {S},
+                      T = {T}
+                    ).right,
+                  parameters = #(t_a: %Element(T)),
+                  value = $related(
+                    S = {T},
+                    T = {T},
+                    ≺ = {⊑},
+                    s = {t_a},
+                    t = {t_b}
+                  )
+                }
+              ]
+            )
+          }
+        ]
+      )
+  )})]
+}

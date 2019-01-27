@@ -1,0 +1,97 @@
+%../../../../../logics/hlm%
+
+$Isomorphisms(
+  𝐱: %Element(
+    $"Ordinal numbers",
+    shortcut = {
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        X: %Set,
+        ⪯: %Element($../../Relations/Endorelations(S = {X})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {X},
+          ≺ = {⪯}
+        ))
+      )
+    }
+  ),
+  𝐲: %Element(
+    %previous,
+    shortcut = {
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        Y: %Set,
+        ⊑: %Element($../../Relations/Endorelations(S = {Y})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {Y},
+          ≺ = {⊑}
+        ))
+      )
+    }
+  )
+): %SetOperator {
+  display = [$Function(
+    function = 'Iso',
+    arguments = [𝐱, 𝐲]
+  )],
+  definitionDisplay = {
+    parameter = #(φ: %Expr),
+    display = [$FunctionDefinition(
+      function = φ,
+      symbol = '↔',
+      operands = [𝐱, 𝐲]
+    )],
+    singularName = 'isomorphism',
+    pluralName = 'isomorphisms',
+    nameOptional = %true
+  },
+  definition = [
+    %subset(
+      #(φ: %Element($Homomorphisms(
+        𝐱 = {𝐱},
+        𝐲 = {𝐲}
+      ))),
+      $../../Functions/bijective(
+        X = {X},
+        Y = {Y},
+        f = {φ}
+      )
+    ),
+    %subset(
+      #(f: %Element($../../Functions/Bijections(
+        X = {X},
+        Y = {Y}
+      ))),
+      %forall(
+        #(
+          a: %Element(X),
+          b: %Element(%previous),
+          _1: %Constraint($../../Relations/related(
+            S = {X},
+            T = {X},
+            s = {a},
+            t = {b},
+            ≺ = {⪯}
+          ))
+        ),
+        $../../Relations/related(
+          S = {Y},
+          T = {Y},
+          s = {$../../Functions/value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {a}
+          )},
+          t = {$../../Functions/value(
+            X = {X},
+            Y = {Y},
+            f = {f},
+            x = {b}
+          )},
+          ≺ = {⊑}
+        )
+      )
+    )
+  ]
+}

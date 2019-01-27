@@ -1,0 +1,110 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers.
+ */
+$ordinals: %ExplicitOperator {
+  display = ['𝓦𝓸𝓼𝓮𝓽'],
+  definition = [$Categories.category(
+      O = {$../../Essentials/Numbers/Ordinal/"Ordinal numbers"},
+      a = {
+        #(𝐚: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {b = {
+          #(𝐛: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+          {M = {$../../Essentials/Numbers/Ordinal/Homomorphisms(
+            𝐱 = {𝐚},
+            𝐲 = {𝐛}
+          )}}
+        }}
+      },
+      c = {
+        #(𝐜: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {i = {$../../Essentials/Numbers/Ordinal/identity(𝐱 = {𝐜})}}
+      },
+      d = {
+        #(𝐝: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {e = {
+          #(𝐞: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+          {f = {
+            #(𝐟: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+            {∘ = {$../../Essentials/Functions/Operations/operator(
+              X = {$../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐞},
+                𝐲 = {𝐟}
+              )},
+              Y = {$../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐝},
+                𝐲 = {𝐞}
+              )},
+              Z = {$../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐝},
+                𝐲 = {𝐟}
+              )},
+              parameters = #(
+                φ: %Element($../../Essentials/Numbers/Ordinal/Homomorphisms(
+                  𝐱 = {𝐞},
+                  𝐲 = {𝐟}
+                )),
+                ψ: %Element($../../Essentials/Numbers/Ordinal/Homomorphisms(
+                  𝐱 = {𝐝},
+                  𝐲 = {𝐞}
+                ))
+              ),
+              operator = $../../Essentials/Functions/composition(
+                X = {%setStructuralCases(
+                  𝐝,
+                  $../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      X: %Set,
+                      ⪯: %Element($../../Essentials/Relations/Endorelations(S = {X})),
+                      _1: %Constraint($../../Essentials/Relations/"well-order"(
+                        S = {X},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = X
+                  }]
+                )},
+                Y = {%setStructuralCases(
+                  𝐞,
+                  $../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      Y: %Set,
+                      ⪯: %Element($../../Essentials/Relations/Endorelations(S = {Y})),
+                      _1: %Constraint($../../Essentials/Relations/"well-order"(
+                        S = {Y},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = Y
+                  }]
+                )},
+                Z = {%setStructuralCases(
+                  𝐟,
+                  $../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      Z: %Set,
+                      ⪯: %Element($../../Essentials/Relations/Endorelations(S = {Z})),
+                      _1: %Constraint($../../Essentials/Relations/"well-order"(
+                        S = {Z},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = Z
+                  }]
+                )},
+                g = {φ},
+                f = {ψ}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

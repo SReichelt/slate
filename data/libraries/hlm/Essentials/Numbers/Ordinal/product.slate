@@ -1,0 +1,52 @@
+%../../../../../logics/hlm%
+
+$product(
+  𝐱: %Element(
+    $"Ordinal numbers",
+    shortcut = {
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        X: %Set,
+        ⪯: %Element($../../Relations/Endorelations(S = {X})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {X},
+          ≺ = {⪯}
+        ))
+      )
+    }
+  ),
+  𝐲: %Element(
+    %previous,
+    shortcut = {
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        Y: %Set,
+        ⊑: %Element($../../Relations/Endorelations(S = {Y})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {Y},
+          ≺ = {⊑}
+        ))
+      )
+    }
+  )
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [𝐱, 𝐲],
+    space = ' ',
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
+  definition = [$"Ordinal numbers"."order type"(
+      S = {$../../Sets/"Cartesian product"(
+        S = {X},
+        T = {Y}
+      )},
+      ⪯ = {$../../Relations/"lexicographical order"(
+        S = {X},
+        T = {Y},
+        ⪯ = {⪯},
+        ⊑ = {⊑}
+      )}
+  )]
+}

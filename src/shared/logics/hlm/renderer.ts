@@ -74,7 +74,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           row.push(new Display.TextExpression(hasParameters ? 'Then the following are equivalent:' : 'The following are equivalent:'));
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           row.push(new Display.TextExpression('For '));
-          row.push(this.renderParameter(definition.contents.parameter));
+          row.push(this.renderParameter(definition.contents.parameter, false));
           row.push(new Display.TextExpression(', we define:'));
         } else {
           row.push(new Display.TextExpression('We define:'));
@@ -117,7 +117,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let addendum = new Display.RowExpression([new Display.TextExpression('   if '), parameters]);
           addendum.styleClasses = ['addendum'];
           if (extractedConstraints.length) {
-            let items = extractedConstraints.map((param: Fmt.Parameter) => this.renderParameter(param));
+            let items = extractedConstraints.map((param: Fmt.Parameter) => this.renderParameter(param, false));
             let constraints = this.renderTemplate('Group', {
               'items': items,
               'separator': new Display.TextExpression(', ')
@@ -178,12 +178,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderParameters(parameters, initialState, undefined);
   }
 
-  renderParameter(parameter: Fmt.Parameter): Display.RenderedExpression {
+  renderParameter(parameter: Fmt.Parameter, forcePlural: boolean): Display.RenderedExpression {
     let initialState: ParameterListState = {
       fullSentence: false,
       sentence: false,
       abbreviate: true,
-      forcePlural: false,
+      forcePlural: forcePlural,
       enableSpecializations: true,
       started: false,
       inLetExpr: false,
@@ -598,7 +598,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): PropertyInfo[] | undefined {
     let result: PropertyInfo[] | undefined = undefined;
     if (remainingParameters && remainingDefinitions) {
-      let nounAllowed = true;
+      let nounAllowed = noun.singular !== undefined;
       while (remainingParameters.length >= parameters.length && remainingDefinitions.length >= parameters.length) {
         let definition = remainingDefinitions[0];
         if (!definition) {
@@ -777,7 +777,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       return this.renderTemplate('SetBuilder', {
-                                   'element': this.renderParameter(term.parameter),
+                                   'element': this.renderParameter(term.parameter, true),
                                    'constraint': this.renderFormula(term.formula)
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
@@ -1725,7 +1725,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
           if (definition.contents.embedding) {
             let embedding = definition.contents.embedding;
-            result.set(embedding.parameter, () => this.renderParameter(embedding.parameter));
+            result.set(embedding.parameter, () => this.renderParameter(embedding.parameter, false));
             result.set(embedding.target, () => {
               let target = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
               return this.renderElementTerm(target);
@@ -1869,7 +1869,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addParameterParts(parameter: Fmt.Parameter, result: Map<Object, Logic.RenderFn>): void {
-    result.set(parameter, () => this.renderParameter(parameter));
+    result.set(parameter, () => this.renderParameter(parameter, false));
   }
 
   private addArgumentListParts(args: Fmt.ArgumentList, result: Map<Object, Logic.RenderFn>): void {

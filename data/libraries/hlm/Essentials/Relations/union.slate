@@ -39,8 +39,7 @@ $union(
   display = [$Operator(
     symbol = '∪',
     operands = [≺, ⊂],
-    space = ' ',
-    maxParenLevel = 2
+    space = ' '
   )],
   definition = [$Relations(
       S = {S},

@@ -34,7 +34,18 @@ $Relations: %Section {
     %item($"greatest element"),
     %item($"well-order"),
     %item($equivalence),
-    %item($"Equivalence classes"),
+    %item(
+      $"Equivalence classes",
+      title = 'Equivalence classes'
+    ),
+    %item(
+      $"succession",
+      title = 'Succession'
+    ),
+    %item(
+      $"lexicographical order",
+      title = 'Lexicographical order'
+    ),
     %subsection(
       $Closures,
       'Closures'

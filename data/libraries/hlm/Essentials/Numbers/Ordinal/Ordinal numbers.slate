@@ -1,0 +1,75 @@
+%../../../../../logics/hlm%
+
+$"Ordinal numbers": %Construction {
+  $"order type"(
+    S: %Set,
+    ⪯: %Element($../../Relations/Endorelations(S = {S})),
+    _1: %Constraint($../../Relations/"well-order"(
+      S = {S},
+      ≺ = {⪯}
+    ))
+  ): %Constructor {
+    display = [$Tuple(
+      items = [S, ⪯],
+      style = '[]'
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        S: %Set,
+        ⪯: %Element($../../Relations/Endorelations(S = {S})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {S},
+          ≺ = {⪯}
+        ))
+      ),
+      rightParameters = #(
+        T: %Set,
+        ⊑: %Element($../../Relations/Endorelations(S = {T})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {T},
+          ≺ = {⊑}
+        ))
+      ),
+      definition = [%exists(
+        #(φ: %Element($../../Functions/Bijections(
+          X = {S},
+          Y = {T}
+        ))),
+        formula = %equals(
+          $../../../Algebra/Isomorphisms/"relation transform"(
+            X = {S},
+            Y = {T},
+            φ = {φ},
+            ≺ = {⪯}
+          ),
+          ⊑
+        )
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = ['𝓞𝓻𝓭'],
+  embedding = {
+    parameter = #(n: %Element($../Natural/"Natural numbers")),
+    target = $"Ordinal numbers"."order type"(
+        S = {$../Natural/Subsets/"Segment (less)"(n = {n})},
+        ⪯ = {$../../Relations/restriction(
+          S = {$../Natural/"Natural numbers"},
+          T = {$../Natural/Subsets/"Segment (less)"(n = {n})},
+          ≺ = {$../../Relations/predicate(
+            S = {$../Natural/"Natural numbers"},
+            T = {$../Natural/"Natural numbers"},
+            parameters = #(
+              m: %Element($../Natural/"Natural numbers"),
+              n: %Element(%previous)
+            ),
+            predicate = $../Natural/"less or equal"(
+              m = {m},
+              n = {n}
+            )
+          )}
+        )}
+    )
+  }
+}

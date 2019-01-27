@@ -1,0 +1,17 @@
+%../../../../../logics/library%
+
+$Ordinal: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Ordinal numbers"),
+    %item($Homomorphisms),
+    %item($identity),
+    %item($Isomorphisms),
+    %item($"less or equal"),
+    %item($less),
+    %item($"Less or equal is a well-order"),
+    %item($"Equality criterion"),
+    %item($sum),
+    %item($product)
+  ]
+}

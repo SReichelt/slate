@@ -12,6 +12,10 @@ $Numbers: %Section {
       'Cardinal numbers'
     ),
     %subsection(
+      $Ordinal,
+      'Ordinal numbers'
+    ),
+    %subsection(
       $Integer,
       'Integers'
     ),

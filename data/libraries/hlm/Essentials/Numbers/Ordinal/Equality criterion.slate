@@ -1,0 +1,24 @@
+%../../../../../logics/hlm%
+
+$"Equality criterion"(
+  𝐱: %Element($"Ordinal numbers"),
+  𝐲: %Element(%previous)
+): %EquivalenceTheorem {
+  conditions = [
+    %and(
+      $"less or equal"(
+        𝐱 = {𝐱},
+        𝐲 = {𝐲}
+      ),
+      $"less or equal"(
+        𝐱 = {𝐲},
+        𝐲 = {𝐱}
+      )
+    ),
+    %not($../../../Essentials/Sets/empty(S = {$Isomorphisms(
+      𝐱 = {𝐱},
+      𝐲 = {𝐲}
+    )})),
+    %equals(𝐱, 𝐲)
+  ]
+}
