@@ -7,9 +7,15 @@ $union(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}, T = {T}),
+    $Relations(
+      S = {S},
+      T = {T}
+    ),
     shortcut = {
-      constructor = $Relations(S = {S}, T = {T}).relation,
+      constructor = $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
       parameters = #(Q: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}
@@ -19,7 +25,10 @@ $union(
   ⊂: %Element(
     %previous,
     shortcut = {
-      constructor = $Relations(S = {S}, T = {T}).relation,
+      constructor = $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}
@@ -33,7 +42,10 @@ $union(
     space = ' ',
     maxParenLevel = 2
   )],
-  definition = [$Relations(S = {S}, T = {T}).relation(R = {$../Sets/Union(
+  definition = [$Relations(
+      S = {S},
+      T = {T}
+    ).relation(R = {$../Sets/Union(
       U = {$../Sets/"Cartesian product"(
         S = {S},
         T = {T}

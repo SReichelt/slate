@@ -10,11 +10,14 @@ $"lower bound"(
     symbol = ['is a ', ≺, '-lower bound of'],
     operands = [s, T]
   )],
-  definition = [%forall(#(t: %Element(T)), $related(
-    S = {S},
-    T = {S},
-    ≺ = {≺},
-    s = {s},
-    t = {t}
-  ))]
+  definition = [%forall(
+    #(t: %Element(T)),
+    $related(
+      S = {S},
+      T = {S},
+      ≺ = {≺},
+      s = {s},
+      t = {t}
+    )
+  )]
 }

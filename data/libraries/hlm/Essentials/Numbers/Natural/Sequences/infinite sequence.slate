@@ -14,13 +14,11 @@ $"infinite sequence"(
     ),
     arguments = [M]
   )],
-  definition = [$../../../Sequences/"Infinite sequences"(S = {$../"Natural numbers"}).sequence(
-      n = {
-        parameter = #(n: %Element($../"Natural numbers")),
-        arguments = {a = {$../"Technical definitions"/"indexed element"(
-          M = {M},
-          n = {n}
-        )}}
-      }
-  )]
+  definition = [$../../../Sequences/"Infinite sequences"(S = {$../"Natural numbers"}).sequence(n = {
+      parameter = #(n: %Element($../"Natural numbers")),
+      arguments = {a = {$../"Technical definitions"/"indexed element"(
+        M = {M},
+        n = {n}
+      )}}
+  })]
 }

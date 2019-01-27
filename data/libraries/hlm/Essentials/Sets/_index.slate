@@ -25,6 +25,9 @@ $Sets: %Section {
     %item($"Generalized intersection using power set"),
     %item($"Generalized union"),
     %item($"Generalized union using power set"),
-    %subsection($Choice, 'Choice functions and axioms')
+    %subsection(
+      $Choice,
+      'Choice functions and axioms'
+    )
   ]
 }

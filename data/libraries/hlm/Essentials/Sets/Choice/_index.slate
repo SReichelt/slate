@@ -4,7 +4,7 @@ $Choice: %Section {
   logic = 'hlm',
   items = [
     %item($"Choice functions"),
-    %item($"choice"),
+    %item($choice),
     %item(
       $"axiom of choice",
       type = 'axiom',

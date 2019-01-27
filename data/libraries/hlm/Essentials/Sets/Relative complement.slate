@@ -18,7 +18,10 @@ $"Relative complement"(
   definition = [
     %subset(
       #(x: %Element(U)),
-      %and(%in(x, S), %not(%in(x, T)))
+      %and(
+        %in(x, S),
+        %not(%in(x, T))
+      )
     ),
     %subset(
       #(x: %Element(S)),

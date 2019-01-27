@@ -17,11 +17,14 @@ $Operations(
     display = [$FunctionDefinition(
       function = ∗,
       symbol = '→',
-      operands = [$Operator(
-        symbol = '×',
-        operands = [X, Y],
-        minParenLevel = 1
-      ), Z]
+      operands = [
+        $Operator(
+          symbol = '×',
+          operands = [X, Y],
+          minParenLevel = 1
+        ),
+        Z
+      ]
     )],
     singularName = 'operation',
     pluralName = 'operations',

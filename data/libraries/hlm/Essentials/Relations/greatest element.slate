@@ -13,12 +13,13 @@ $"greatest element"(
     symbol = ['is a ', ≺, '-greatest element of'],
     operands = [t, T]
   )],
-  definition = [$"upper bound"(
-    S = {S},
-    ≺ = {≺},
-    T = {T},
-    s = {t}
-  ),
+  definition = [
+    $"upper bound"(
+      S = {S},
+      ≺ = {≺},
+      T = {T},
+      s = {t}
+    ),
     $"least element"(
       S = {S},
       T = {T},

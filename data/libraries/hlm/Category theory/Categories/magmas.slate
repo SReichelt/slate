@@ -55,9 +55,7 @@ $magmas: %ExplicitOperator {
                     constructor = $../../Algebra/Magmas/Magmas.magma,
                     parameters = #(
                       M: %Set,
-                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-                        X = {M}
-                      ))
+                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
                     ),
                     value = M
                   }]
@@ -69,9 +67,7 @@ $magmas: %ExplicitOperator {
                     constructor = $../../Algebra/Magmas/Magmas.magma,
                     parameters = #(
                       M: %Set,
-                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-                        X = {M}
-                      ))
+                      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
                     ),
                     value = M
                   }]
@@ -83,9 +79,7 @@ $magmas: %ExplicitOperator {
                     constructor = $../../Algebra/Magmas/Magmas.magma,
                     parameters = #(
                       N: %Set,
-                      ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-                        X = {N}
-                      ))
+                      ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {N}))
                     ),
                     value = N
                   }]

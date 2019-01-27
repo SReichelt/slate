@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtWriter from '../shared/format/write';
-import { getMetaModelWithFallback } from '../shared/data/dynamic';
+import { getMetaModelWithFallback } from '../fs/format/dynamic';
 
 function tidy(fileName: string): void {
   let fileStr: string = fs.readFileSync(fileName, 'utf8');

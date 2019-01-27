@@ -6,7 +6,7 @@
  *             * https://proofwiki.org/wiki/Euclid%27s_Theorem
  */
 $"Euclids theorem": %StandardTheorem {
-  %not($../../../Sets/finite(S = {$"Prime numbers"})),
+  claim = %not($../../../Sets/finite(S = {$"Prime numbers"})),
   proofs = [{steps = #(_: %ProveNeg({steps = #(
     _: %UseDef(result = %exists(#(
       n: %Element($../"Natural numbers"),

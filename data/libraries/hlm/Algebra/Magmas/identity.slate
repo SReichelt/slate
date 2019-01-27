@@ -6,9 +6,7 @@ $identity(𝐌: %Element(
     constructor = $Magmas.magma,
     parameters = #(
       M: %Set,
-      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-        X = {M}
-      ))
+      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
     )
   }
 )): %ExplicitOperator {

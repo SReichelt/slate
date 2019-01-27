@@ -2,9 +2,7 @@
 
 $associative(
   X: %Set(auto = %true),
-  ∗: %Element($"Inner operations"(
-    X = {X}
-  ))
+  ∗: %Element($"Inner operations"(X = {X}))
 ): %Predicate {
   display = [$Property(
     operand = ∗,

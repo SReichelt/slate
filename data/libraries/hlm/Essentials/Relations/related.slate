@@ -4,9 +4,15 @@ $related(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}, T = {T}),
+    $Relations(
+      S = {S},
+      T = {T}
+    ),
     shortcut = {
-      $Relations(S = {S}, T = {T}).relation,
+      $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
       #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}

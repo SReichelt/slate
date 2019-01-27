@@ -13,27 +13,25 @@ $antisymmetric(
     operand = ≺,
     property = 'antisymmetric'
   )],
-  definition = [
-    %forall(
-      #(
-        s: %Element(S),
-        t: %Element(%previous),
-        _1: %Constraint($related(
-          S = {S},
-          T = {S},
-          s = {s},
-          ≺ = {≺},
-          t = {t}
-        )),
-        _2: %Constraint($related(
-          S = {S},
-          T = {S},
-          s = {t},
-          ≺ = {≺},
-          t = {s}
-        ))
-      ),
-      %equals(s, t)
-    )
-  ]
+  definition = [%forall(
+    #(
+      s: %Element(S),
+      t: %Element(%previous),
+      _1: %Constraint($related(
+        S = {S},
+        T = {S},
+        s = {s},
+        ≺ = {≺},
+        t = {t}
+      )),
+      _2: %Constraint($related(
+        S = {S},
+        T = {S},
+        s = {t},
+        ≺ = {≺},
+        t = {s}
+      ))
+    ),
+    %equals(s, t)
+  )]
 }

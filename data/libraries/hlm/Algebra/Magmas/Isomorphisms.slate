@@ -7,9 +7,7 @@ $Isomorphisms(
       constructor = $Magmas.magma,
       parameters = #(
         M: %Set,
-        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-          X = {M}
-        ))
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
       )
     }
   ),
@@ -19,9 +17,7 @@ $Isomorphisms(
       constructor = $Magmas.magma,
       parameters = #(
         N: %Set,
-        ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-          X = {N}
-        ))
+        ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {N}))
       )
     }
   )

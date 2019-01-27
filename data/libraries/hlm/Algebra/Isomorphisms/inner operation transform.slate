@@ -7,9 +7,7 @@ $"inner operation transform"(
     X = {X},
     Y = {Y}
   )),
-  ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-    X = {X}
-  ))
+  ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {X}))
 ): %ExplicitOperator {
   display = [$Function(
     function = φ,

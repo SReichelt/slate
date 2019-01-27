@@ -8,9 +8,15 @@ $converse(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
   ≺: %Element(
-    $Relations(S = {S}, T = {T}),
+    $Relations(
+      S = {S},
+      T = {T}
+    ),
     shortcut = {
-      constructor = $Relations(S = {S}, T = {T}).relation,
+      constructor = $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}
@@ -25,7 +31,10 @@ $converse(
       styleClass = 'sans'
     )
   )],
-  definition = [$Relations(S = {T}, T = {S}).relation(R = {%extendedSubset(
+  definition = [$Relations(
+      S = {T},
+      T = {S}
+    ).relation(R = {%extendedSubset(
       #(x: %Element(
         R,
         shortcut = {

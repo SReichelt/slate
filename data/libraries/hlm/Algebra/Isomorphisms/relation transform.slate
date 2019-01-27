@@ -14,7 +14,10 @@ $"relation transform"(
     arguments = [≺],
     style = '[]'
   )],
-  definition = [$../../Essentials/Relations/Relations(S = {Y}, T = {Y}).relation(R = {%subset(
+  definition = [$../../Essentials/Relations/Relations(
+      S = {Y},
+      T = {Y}
+    ).relation(R = {%subset(
       #(y: %Element(
         $../../Essentials/Sets/"Cartesian product"(
           S = {Y},

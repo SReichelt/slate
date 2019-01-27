@@ -8,7 +8,10 @@ $restriction(
   ≺: %Element(
     $Endorelations(S = {S}),
     shortcut = {
-      constructor = $Relations(S = {S}, T = {S}).relation,
+      constructor = $Relations(
+          S = {S},
+          T = {S}
+        ).relation,
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {S}
@@ -25,14 +28,20 @@ $restriction(
     operand = ≺
   )],
   definition = [
-    $Relations(S = {T}, T = {T}).relation(R = {%subset(
+    $Relations(
+        S = {T},
+        T = {T}
+      ).relation(R = {%subset(
         #(t: %Element($../Sets/"Cartesian product"(
           S = {T},
           T = {T}
         ))),
         %in(t, R)
     )}),
-    $Relations(S = {T}, T = {T}).relation(R = {$../Sets/Intersection(
+    $Relations(
+        S = {T},
+        T = {T}
+      ).relation(R = {$../Sets/Intersection(
         U = {$../Sets/"Cartesian product"(
           S = {S},
           T = {S}

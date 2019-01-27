@@ -17,9 +17,7 @@ $"Inverse of isomorphism is also isomorphism"(
           constructor = $Magmas.magma,
           parameters = #(
             M: %Set,
-            ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-              X = {M}
-            ))
+            ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
           ),
           value = M
         }]
@@ -31,9 +29,7 @@ $"Inverse of isomorphism is also isomorphism"(
           constructor = $Magmas.magma,
           parameters = #(
             N: %Set,
-            ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(
-              X = {N}
-            ))
+            ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {N}))
           ),
           value = N
         }]

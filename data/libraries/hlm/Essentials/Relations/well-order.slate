@@ -12,18 +12,25 @@ $"well-order"(
     singular = 'well-order',
     plural = 'well-orders'
   )],
-  definition = [
-    %and(
-      $"total order"(
-        S = {S},
-        ≺ = {≺}
+  definition = [%and(
+    $"total order"(
+      S = {S},
+      ≺ = {≺}
+    ),
+    %forall(
+      #(
+        T: %Subset(S),
+        _1: %Constraint(%not($../Sets/empty(S = {T})))
       ),
-      %forall(#(T: %Subset(S), _1: %Constraint(%not($../Sets/empty(S = {T})))), %exists(#(t: %Element(T)), $"least element"(
-        S = {S},
-        ≺ = {≺},
-        T = {T},
-        t = {t}
-      )))
+      %exists(
+        #(t: %Element(T)),
+        formula = $"least element"(
+          S = {S},
+          ≺ = {≺},
+          T = {T},
+          t = {t}
+        )
+      )
     )
-  ]
+  )]
 }
