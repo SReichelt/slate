@@ -1,15 +1,12 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Natural: %Section {
-  'hlm',
+  logic = 'hlm',
   items = [
     %item($"Natural numbers"),
     %item(
       $number,
-      title = {
-        de = 'Stellenwertsystem',
-        en = 'Positional notation'
-      }
+      title = 'Positional notation'
     ),
     %item($sum),
     %item($"Addition of one yields successor"),
@@ -25,9 +22,7 @@ $Natural: %Section {
     %item($"Sum is commutative"),
     %item($"less or equal"),
     %item($less),
-    %item($"Comparison is reflexive"),
-    %item($"Comparison is antisymmetric"),
-    %item($"Comparison is transitive"),
+    %item($"Less or equal is a total order"),
     %item($"Less and less or equal combine to less"),
     %item($"Less or equal and less combine to less"),
     %item($"Zero is the smallest number"),
@@ -35,10 +30,7 @@ $Natural: %Section {
     %item($"Successor is always greater"),
     %subsection(
       $Subsets,
-      title = {
-        de = 'Teilmengen',
-        en = 'Subsets'
-      }
+      'Subsets'
     ),
     %item(
       $"Finiteness criterion lemma",
@@ -67,59 +59,38 @@ $Natural: %Section {
     %item(
       $"Induction principle",
       type = 'theorem',
-      title = {
-        de = 'Induktionsprinzip',
-        en = 'Induction principle'
-      }
+      title = 'Induction principle'
     ),
     %item(
       $"Induction principle of property",
       type = 'corollary',
-      title = {
-        de = 'Induktionsprinzip (eigenschaftsbasiert)',
-        en = 'Induction principle (property-based)'
-      }
+      title = 'Induction principle (property-based)'
     ),
     %item(
       $"Well-ordering principle",
       type = 'theorem',
-      title = {
-        de = 'Wohlordnungssatz',
-        en = 'Well-ordering principle'
-      }
+      title = 'Well-ordering principle'
     ),
     %item($minimum),
     %item($factorial),
     %item($"binomial coefficient"),
     %subsection(
       $"Generalized sums and products",
-      title = {
-        de = 'Verallgemeinerte Summen und Produkte',
-        en = 'Generalized sums and products'
-      }
+      'Generalized sums and products'
     ),
     %subsection(
       $Prime,
-      title = {
-        de = 'Primzahlen',
-        en = 'Prime numbers'
-      }
+      'Prime numbers'
     ),
     %item($coprime),
     %item($"Coprime test"),
     %subsection(
       $"Technical definitions",
-      title = {
-        de = 'Technische Definitionen',
-        en = 'Technical definitions'
-      }
+      'Technical definitions'
     ),
     %subsection(
       $Sequences,
-      title = {
-        de = 'Folgen',
-        en = 'Sequences'
-      }
+      'Sequences'
     )
   ]
 }

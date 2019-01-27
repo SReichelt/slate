@@ -1,12 +1,9 @@
-%../../../format/library%
+%../../../logics/library%
 
 $"Linear algebra": %Section {
   logic = 'hlm',
   items = [%subsection(
     $Essentials,
-    title = {
-      de = 'Grundlagen',
-      en = 'Essentials'
-    }
+    'Essentials'
   )]
 }

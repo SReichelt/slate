@@ -1,8 +1,8 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 $"reflexive symmetric closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Endorelations(S = {S}))
+  ≺: %Element($../Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -12,15 +12,15 @@ $"reflexive symmetric closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      p = {$../Properties/Properties.property(
+      p = {$../../Properties/Properties.property(
         P = {%subset(
-          #(⊂: %Element($Endorelations(S = {S}))),
+          #(⊂: %Element($../Endorelations(S = {S}))),
           %and(
-            $reflexive(
+            $../reflexive(
               S = {S},
               ≺ = {⊂}
             ),
-            $symmetric(
+            $../symmetric(
               S = {S},
               ≺ = {⊂}
             )

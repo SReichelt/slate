@@ -1,42 +1,27 @@
-%../../../../format/library%
+%../../../../logics/library%
 
 $Numbers: %Section {
   logic = 'hlm',
   items = [
     %subsection(
       $Natural,
-      title = {
-        de = 'Natürliche Zahlen',
-        en = 'Natural numbers'
-      }
+      'Natural numbers'
     ),
     %subsection(
       $Cardinal,
-      title = {
-        de = 'Kardinalzahlen',
-        en = 'Cardinal numbers'
-      }
+      'Cardinal numbers'
     ),
     %subsection(
       $Integer,
-      title = {
-        de = 'Ganze Zahlen',
-        en = 'Integers'
-      }
+      'Integers'
     ),
     %subsection(
       $Rational,
-      title = {
-        de = 'Rationale Zahlen',
-        en = 'Rational numbers'
-      }
+      'Rational numbers'
     ),
     %subsection(
       $Real,
-      title = {
-        de = 'Reelle Zahlen',
-        en = 'Real numbers'
-      }
+      'Real numbers'
     )
   ]
 }

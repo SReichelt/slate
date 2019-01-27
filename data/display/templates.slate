@@ -226,6 +226,21 @@ $Property(operand: %Expr, property: %String, article?: %String): %Template {
   )
 }
 
+$NounProperty(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
+  display = $Property(
+    operand = operand,
+    property = singular,
+    article = article
+  )
+}
+
+$Feature(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
+  display = $TextualRelation(
+    symbol = [%neg('has', 'does not have'), ' ', article],
+    operands = [operand, singular]
+  )
+}
+
 $MultiProperty(operands: %Expr[], property: %String): %Template {
   display = $TextualRelation(
     symbol = %neg('are', 'are not'),
@@ -238,13 +253,6 @@ $MultiProperty(operands: %Expr[], property: %String): %Template {
       ),
       property
     ]
-  )
-}
-
-$NounProperty(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
-  display = $TextualRelation(
-    symbol = [%neg('is', 'is not'), ' ', article],
-    operands = [operand, singular]
   )
 }
 

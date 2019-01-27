@@ -1,11 +1,11 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 /**
  * @references * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive symmetric closure
  */
 $"reflexive symmetric transitive closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Endorelations(S = {S}))
+  ≺: %Element($../Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -14,10 +14,10 @@ $"reflexive symmetric transitive closure"(
   definition = [$closure(
     S = {S},
     ≺ = {≺},
-    p = {$../Properties/predicate(
-      S = {$Endorelations(S = {S})},
-      parameter = #(_1: %Element($Endorelations(S = {S}))),
-      predicate = $equivalence(
+    p = {$../../Properties/predicate(
+      S = {$../Endorelations(S = {S})},
+      parameter = #(_1: %Element($../Endorelations(S = {S}))),
+      predicate = $../equivalence(
         S = {S},
         ≺ = {_1}
       )

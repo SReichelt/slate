@@ -1,0 +1,33 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Greatest_and_least_elements
+ */
+$"greatest element"(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S})),
+  T: %Subset(S),
+  t: %Element(T)
+): %Predicate {
+  display = [$TextualRelation(
+    symbol = ['is a ', ≺, '-greatest element of'],
+    operands = [t, T]
+  )],
+  definition = [$"upper bound"(
+    S = {S},
+    ≺ = {≺},
+    T = {T},
+    s = {t}
+  ),
+    $"least element"(
+      S = {S},
+      T = {T},
+      ≺ = {$converse(
+        S = {S},
+        T = {S},
+        ≺ = {≺}
+      )},
+      t = {t}
+    )
+  ]
+}

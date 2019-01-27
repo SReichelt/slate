@@ -1,0 +1,36 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Connex_relation
+ */
+$connex(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S}))
+): %Predicate {
+  display = [$Property(
+    operand = ≺,
+    property = 'connex'
+  )],
+  definition = [%forall(
+    #(
+      s: %Element(S),
+      t: %Element(%previous)
+    ),
+    %or(
+      $related(
+        S = {S},
+        T = {S},
+        s = {s},
+        ≺ = {≺},
+        t = {t}
+      ),
+      $related(
+        S = {S},
+        T = {S},
+        s = {t},
+        ≺ = {≺},
+        t = {s}
+      )
+    )
+  )]
+}

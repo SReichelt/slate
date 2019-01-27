@@ -1,7 +1,13 @@
 %../../../../../../logics/hlm%
 
+/**
+ * @remarks There are, of course, many equivalent definitions of binary digits. The simplest definition would be a construction with two constructors. However, we also want the sets to be embedded in the natural numbers, and currently this requires everything to be mapped to a single constructor of the target set. So we simply define binary digits as a subset of the natural numbers.
+ *
+ * @references * https://en.wikipedia.org/wiki/Bit
+ *             * http://mathworld.wolfram.com/Bit.html
+ */
 $"Binary digits": %SetOperator {
-  display = ['Bin'],
+  display = ['Bit'],
   definition = [
     $"Segment (less or equal)"(n = {$../number(value = 1)}),
     %enumeration(

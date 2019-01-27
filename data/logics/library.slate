@@ -1,4 +1,4 @@
-%meta%
+%../format/meta%
 
 $library: %MetaModel {
   definitionTypes = [$Library, $Section],
@@ -19,5 +19,5 @@ $Library: %DefinitionType {
 
 $Item: %ExpressionType {}
 
-$item(ref: %Any, type?: %String, title?: %Any): $Item {}
-$subsection(ref: %Any, title?: %Any): $Item {}
+$item(ref: %Any, type?: %String, title?: %String): $Item {}
+$subsection(ref: %Any, title: %String): $Item {}

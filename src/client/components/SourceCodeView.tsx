@@ -6,7 +6,7 @@ import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
 
-export interface SourceCodeViewProps {
+interface SourceCodeViewProps {
   definition: CachedPromise<Fmt.Definition>;
   interactionHandler?: ExpressionInteractionHandler;
 }

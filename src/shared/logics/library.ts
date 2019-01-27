@@ -1,8 +1,8 @@
-// Generated from data/format/library.slate by generateMetaDeclarations.ts.
+// Generated from data/logics/library.slate by generateMetaDeclarations.ts.
 // tslint:disable:class-name
 // tslint:disable:variable-name
 
-import * as Fmt from './format';
+import * as Fmt from '../format/format';
 
 export class ObjectContents_Section extends Fmt.ObjectContents {
   logic: string;
@@ -120,7 +120,7 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
 export class MetaRefExpression_item extends Fmt.MetaRefExpression {
   ref: Fmt.Expression;
   type?: string;
-  title?: Fmt.Expression;
+  title?: string;
 
   getName(): string {
     return 'item';
@@ -136,7 +136,14 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
         throw new Error('type: String expected');
       }
     }
-    this.title = argumentList.getOptionalValue('title', 2);
+    let titleRaw = argumentList.getOptionalValue('title', 2);
+    if (titleRaw !== undefined) {
+      if (titleRaw instanceof Fmt.StringExpression) {
+        this.title = titleRaw.value;
+      } else {
+        throw new Error('title: String expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -148,7 +155,9 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
       argumentList.add(typeExpr, 'type');
     }
     if (this.title !== undefined) {
-      argumentList.add(this.title, 'title');
+      let titleExpr = new Fmt.StringExpression;
+      titleExpr.value = this.title;
+      argumentList.add(titleExpr, 'title');
     }
   }
 
@@ -161,19 +170,13 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    if (this.title) {
-      result.title = this.title.substitute(fn, replacedParameters);
-      if (result.title !== this.title) {
-        changed = true;
-      }
-    }
     return this.getSubstitutionResult(fn, result, changed);
   }
 }
 
 export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   ref: Fmt.Expression;
-  title?: Fmt.Expression;
+  title: string;
 
   getName(): string {
     return 'subsection';
@@ -181,15 +184,20 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.ref = argumentList.getValue('ref', 0);
-    this.title = argumentList.getOptionalValue('title', 1);
+    let titleRaw = argumentList.getValue('title', 1);
+    if (titleRaw instanceof Fmt.StringExpression) {
+      this.title = titleRaw.value;
+    } else {
+      throw new Error('title: String expected');
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     argumentList.add(this.ref);
-    if (this.title !== undefined) {
-      argumentList.add(this.title, 'title');
-    }
+    let titleExpr = new Fmt.StringExpression;
+    titleExpr.value = this.title;
+    argumentList.add(titleExpr);
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -198,12 +206,6 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     if (this.ref) {
       result.ref = this.ref.substitute(fn, replacedParameters);
       if (result.ref !== this.ref) {
-        changed = true;
-      }
-    }
-    if (this.title) {
-      result.title = this.title.substitute(fn, replacedParameters);
-      if (result.title !== this.title) {
         changed = true;
       }
     }

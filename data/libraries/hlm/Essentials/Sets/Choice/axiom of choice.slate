@@ -1,0 +1,29 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This is the simplest formulation of the axiom of choice that can be formalized in HLM. The standard formulation is not directly applicable because an indexed family of arbitrary sets cannot be defined as an object – there is no suitable equality definition.
+ *
+ *          It is possible to state, as a theorem, that AC implies that the [Cartesian product](../Generalized%20cartesian%20product) of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
+ *
+ *          HLM actually does not have “axioms” as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
+ *          * The simplest solution is to add “assume AC” as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
+ *          * A preferred method is to replace this with “assume _S_ has a choice function” for a suitable _S_.
+ *          * Better yet, build the result explicitly from a given choice function.
+ *
+ *          Hopefully this will not be too inconvenient. It does have a few advantages:
+ *          * In particular cases where the axiom of choice is not needed, this fact becomes clear immediately.
+ *          * It is possible to state and prove relationships between the axiom of choice and other statements. (Again, it is preferable to state these equivalences as theorems about particular sets.)
+ *
+ *          As a last resort, HLM could be extended in two different ways:
+ *          * A choice operator could be included in the logic. (This would likely imply global choice, though.)
+ *          * The user interface could provide a mode that hides all references to the axiom of choice, and manages them automatically based on dependencies.
+ *
+ * @references * https://en.wikipedia.org/wiki/Axiom_of_choice
+ */
+$"axiom of choice": %Predicate {
+  display = ['AC'],
+  definition = [%forall(
+    #(S: %Set),
+    $choice(S = {S})
+  )]
+}

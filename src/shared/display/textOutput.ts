@@ -7,6 +7,11 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
+  if ((optionalParenLeft || optionalParenRight)
+      && optionalParenMaxLevel === undefined
+      && (expression instanceof Display.SubSupExpression || expression instanceof Display.OverUnderExpression || expression instanceof Display.FractionExpression)) {
+    return renderAsText(new Display.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine);
+  }
   if (expression instanceof Display.EmptyExpression) {
     return CachedPromise.resolve('\u200b');
   } else if (expression instanceof Display.TextExpression) {

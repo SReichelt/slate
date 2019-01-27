@@ -1,21 +1,15 @@
-%../../../format/library%
+%../../../logics/library%
 
 $Algebra: %Section {
   logic = 'hlm',
   items = [
     %subsection(
       $Isomorphisms,
-      title = {
-        de = 'Isomorphismen',
-        en = 'Isomorphisms'
-      }
+      'Isomorphisms'
     ),
     %subsection(
       $Magmas,
-      title = {
-        de = 'Magmen',
-        en = 'Magmas'
-      }
+      'Magmas'
     )
   ]
 }

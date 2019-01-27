@@ -1,4 +1,4 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Cardinal: %Section {
   logic = 'hlm',
@@ -13,6 +13,8 @@ $Cardinal: %Section {
     %item($Isomorphisms),
     %item($"less or equal"),
     %item($less),
+    %item($"Less or equal is a partial order"),
+    %item($"AC is equivalent to total order"),
     %item($"Equality criterion"),
     %item($sum),
     %item($product),

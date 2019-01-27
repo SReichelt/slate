@@ -1,6 +1,9 @@
-%../../../format/library%
+%../../../logics/library%
 
 $"Category theory": %Section {
   logic = 'hlm',
-  items = [%subsection($Categories)]
+  items = [%subsection(
+    $Categories,
+    'Categories'
+  )]
 }

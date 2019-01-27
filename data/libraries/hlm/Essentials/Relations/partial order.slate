@@ -1,0 +1,41 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
+ */
+$"partial order"(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S}))
+): %Predicate {
+  display = [$NounProperty(
+    operand = ≺,
+    singular = 'partial order',
+    plural = 'partial orders'
+  )],
+  definition = [
+    %and(
+      $reflexive(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $antisymmetric(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $transitive(
+        S = {S},
+        ≺ = {≺}
+      )
+    ),
+    %and(
+      $preorder(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $antisymmetric(
+        S = {S},
+        ≺ = {≺}
+      )
+    )
+  ]
+}

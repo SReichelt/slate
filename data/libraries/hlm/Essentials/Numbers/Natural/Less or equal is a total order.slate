@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
-$"Comparison is antisymmetric": %StandardTheorem {
-  claim = $../../Relations/antisymmetric(
+$"Less or equal is a total order": %StandardTheorem {
+  claim = $../../Relations/"total order"(
     S = {$"Natural numbers"},
     ≺ = {$../../Relations/predicate(
       S = {$"Natural numbers"},

@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as Fmt from '../../shared/format/format';
 import * as FmtReader from '../../shared/format/read';
-import * as FmtLibrary from '../../shared/format/library';
+import * as FmtLibrary from '../../shared/logics/library';
 import * as FmtDisplay from '../../shared/display/meta';
 import * as Display from '../../shared/display/display';
 import { renderAsText } from '../../shared/display/textOutput';

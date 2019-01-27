@@ -1,0 +1,45 @@
+%../../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants
+ */
+$"Choice functions"(S: %Set): %SetOperator {
+  display = [$Function(
+    function = '𝓒𝓱𝓸𝓲𝓬𝓮',
+    arguments = [S]
+  )],
+  definitionDisplay = {
+    parameter = #(f: %Expr),
+    singularName = ['choice function', ' on ', S],
+    pluralName = ['choice functions', ' on ', S]
+  },
+  definition = [%subset(
+    #(f: %Element($../../Functions/Functions(
+      X = {$../"Relative complement"(
+        U = {$../"Power set"(S = {S})},
+        S = {$../"Power set"(S = {S})},
+        T = {%enumeration($../"Power set"(S = {S}).subset(T = {$../"Empty set"}))}
+      )},
+      Y = {S}
+    ))),
+    %forall(
+      #(
+        T: %Subset(S),
+        _1: %Constraint(%not($../empty(S = {T})))
+      ),
+      %in(
+        $../../Functions/value(
+          X = {$../"Relative complement"(
+            U = {$../"Power set"(S = {S})},
+            S = {$../"Power set"(S = {S})},
+            T = {%enumeration($../"Power set"(S = {S}).subset(T = {$../"Empty set"}))}
+          )},
+          Y = {S},
+          f = {f},
+          x = {$../"Power set"(S = {S}).subset(T = {T})}
+        ),
+        T
+      )
+    )
+  )]
+}

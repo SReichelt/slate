@@ -33,6 +33,7 @@ interface PropertyInfo {
   singular?: string;
   plural?: string;
   article?: string;
+  isFeature: boolean;
   definitionRef?: Fmt.DefinitionRefExpression;
   extracted: boolean;
 }
@@ -148,13 +149,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       text += ' ';
       text += this.formatItemNumber(info.itemNumber);
-      if (info.title instanceof Fmt.CompoundExpression) {
-        let englishTitle = info.title.arguments.getOptionalValue('en');
-        if (englishTitle instanceof Fmt.StringExpression) {
-          let title = new Display.TextExpression(' (' + englishTitle.value + ')');
-          title.styleClasses = ['title'];
-          return new Display.RowExpression([new Display.TextExpression(text), title, new Display.TextExpression('.')]);
-        }
+      if (info.title) {
+        let title = new Display.TextExpression(' (' + info.title + ')');
+        title.styleClasses = ['title'];
+        return new Display.RowExpression([new Display.TextExpression(text), title, new Display.TextExpression('.')]);
       }
       text += '.';
       return new Display.TextExpression(text);
@@ -186,7 +184,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       sentence: false,
       abbreviate: true,
       forcePlural: false,
-      enableSpecializations: false,
+      enableSpecializations: true,
       started: false,
       inLetExpr: false,
       inConstraint: false,
@@ -362,7 +360,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
       let variableDefinitions = this.renderVariableDefinitions(parameters, indices);
       let variableDisplay: Display.RenderedExpression | undefined;
-      let noun: PropertyInfo = {extracted: false};
+      let noun: PropertyInfo = {
+        isFeature: false,
+        extracted: false
+      };
       let singular: Display.RenderedExpression[] = [];
       let plural: Display.RenderedExpression[] = [];
       let combineWithNext = false;
@@ -425,11 +426,39 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.replaceName(noun.plural, noun.definitionRef, noun.extracted, plural);
       if (singular.length && plural.length) {
         if (properties && properties.length) {
+          noun.article = undefined;
           for (let property of properties) {
-            singular.unshift(new Display.TextExpression(' '));
-            singular.unshift(property);
-            plural.unshift(new Display.TextExpression(' '));
-            plural.unshift(property);
+            let space = new Display.TextExpression(' ');
+            if (property.property) {
+              let renderedProperty = new Display.TextExpression(property.property);
+              if (property.definitionRef) {
+                this.setSemanticLink(renderedProperty, property.definitionRef);
+              }
+              singular.unshift(space);
+              singular.unshift(renderedProperty);
+              plural.unshift(space);
+              plural.unshift(renderedProperty);
+            } else if (property.singular) {
+              let preposition = new Display.TextExpression(' with ');
+              singular.push(preposition);
+              plural.push(preposition);
+              if (property.article) {
+                singular.push(new Display.TextExpression(property.article));
+                singular.push(space);
+              }
+              let renderedProperty = new Display.TextExpression(property.singular);
+              if (property.definitionRef) {
+                this.setSemanticLink(renderedProperty, property.definitionRef);
+              }
+              singular.push(renderedProperty);
+              if (property.plural) {
+                renderedProperty = new Display.TextExpression(property.plural);
+                if (property.definitionRef) {
+                  this.setSemanticLink(renderedProperty, property.definitionRef);
+                }
+              }
+              plural.push(renderedProperty);
+            }
           }
         }
         if (!variableDisplay) {
@@ -457,15 +486,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 }
               }
               if (!noun.article) {
-                noun.article = 'a';
-                if (singularStart instanceof Display.TextExpression && singularStart.text.length) {
-                  let firstChar = singularStart.text.charAt(0);
-                  if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
-                    // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
-                    // Other languages are even worse.
-                    noun.article = 'an';
-                  }
-                }
+                noun.article = this.getSingularArticle(singularStart instanceof Display.TextExpression ? singularStart.text : undefined);
               }
               if (state.sentence) {
                 row.push(new Display.TextExpression(` be ${noun.article} `));
@@ -552,6 +573,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
+  private getSingularArticle(nextWord?: string): string {
+    if (nextWord) {
+      let firstChar = nextWord.charAt(0);
+      if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
+        // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
+        // Other languages are even worse.
+        return 'an';
+      }
+    }
+    return 'a';
+  }
+
   private getDisplayDefinitionRef(type: Fmt.Expression): Fmt.Expression | undefined {
     if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
       return type._set;
@@ -562,9 +595,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): Display.RenderedExpression[] | undefined {
-    let result: Display.RenderedExpression[] | undefined = undefined;
+  private extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): PropertyInfo[] | undefined {
+    let result: PropertyInfo[] | undefined = undefined;
     if (remainingParameters && remainingDefinitions) {
+      let nounAllowed = true;
       while (remainingParameters.length >= parameters.length && remainingDefinitions.length >= parameters.length) {
         let definition = remainingDefinitions[0];
         if (!definition) {
@@ -589,7 +623,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (property) {
             if (currentProperty.property !== property.property
                 || currentProperty.singular !== property.singular
-                || currentProperty.plural !== property.plural) {
+                || currentProperty.plural !== property.plural
+                || currentProperty.isFeature !== property.isFeature) {
               property = undefined;
               break;
             }
@@ -597,28 +632,32 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             property = currentProperty;
           }
         }
-        if (property) {
-          if (property.singular || property.plural) {
-            Object.assign(noun, property);
-          }
-          if (property.property) {
-            if (!(noun.singular && noun.plural)) {
-              break;
-            }
-            if (!result) {
-              result = [];
-            }
-            let propertyExpression = new Display.TextExpression(property.property);
-            if (property.definitionRef) {
-              this.setSemanticLink(propertyExpression, property.definitionRef);
-            }
-            result.push(propertyExpression);
-          }
-          remainingParameters.splice(0, parameters.length);
-          remainingDefinitions.splice(0, parameters.length);
-        } else {
+        if (!property) {
           break;
         }
+        if (property.singular || property.plural) {
+          if (property.article === undefined) {
+            property.article = 'a';
+          }
+          if (!property.isFeature) {
+            if (!nounAllowed) {
+              break;
+            }
+            Object.assign(noun, property);
+          }
+        }
+        if (property.property || property.isFeature) {
+          if (!(noun.singular && noun.plural)) {
+            break;
+          }
+          if (!result) {
+            result = [];
+          }
+          result.push(property);
+        }
+        remainingParameters.splice(0, parameters.length);
+        remainingDefinitions.splice(0, parameters.length);
+        nounAllowed = false;
       }
     }
     return result;
@@ -639,7 +678,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           && definition.contents.display.items.length) {
         let display = definition.contents.display.items[0];
         if (display instanceof Fmt.DefinitionRefExpression) {
-          if (display.path.name === 'Property' || display.path.name === 'NounProperty') {
+          if (display.path.name === 'Property'
+              || display.path.name === 'NounProperty'
+              || display.path.name === 'Feature') {
             let operand = display.path.arguments.getValue('operand');
             if (operand instanceof Fmt.VariableRefExpression) {
               let operandArg = constraint.path.arguments.getValue(operand.variable.name);
@@ -651,6 +692,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                     singular: this.getDisplayArgument(display, 'singular', negationCount),
                     plural: this.getDisplayArgument(display, 'plural', negationCount),
                     article: this.getDisplayArgument(display, 'article', negationCount),
+                    isFeature: display.path.name === 'Feature',
                     definitionRef: constraint,
                     extracted: true
                   };
@@ -994,7 +1036,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             }
             abbr = negationList;
           }
-        } else if (display.path.name === 'NounProperty') {
+        } else if (display.path.name === 'NounProperty'
+                   || display.path.name === 'Feature') {
           abbr = display.path.arguments.getValue('singular');
         }
         if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {

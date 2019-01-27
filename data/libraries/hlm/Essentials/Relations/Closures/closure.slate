@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 /**
  * @remarks This is an attempt at a general definition of the closure of a relation with respect to a property, i.e. the smallest relation that contains the original relation and satisfies the property. Note that it only works for properties that are closed under arbitrary intersections, which should probably be included as a requirement.
@@ -8,16 +8,16 @@
 $closure(
   S: %Set(auto = %true),
   ≺: %Element(
-    $Endorelations(S = {S}),
+    $../Endorelations(S = {S}),
     shortcut = {
-      constructor = $Relations(S = {S}, T = {S}).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
+      constructor = $../Relations(S = {S}, T = {S}).relation,
+      parameters = #(R: %Subset($../../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )))
     }
   ),
-  p: %Element($../Properties/Properties(S = {$Endorelations(S = {S})}))
+  p: %Element($../../Properties/Properties(S = {$../Endorelations(S = {S})}))
 ): %ExplicitOperator {
   display = [$Function(
     function = $SubSup(
@@ -26,23 +26,23 @@ $closure(
     ),
     arguments = [≺]
   )],
-  definition = [$Relations(S = {S}, T = {S}).relation(R = {$../Sets/"Generalized intersection using power set"(
-      U = {$../Sets/"Cartesian product"(
+  definition = [$../Relations(S = {S}, T = {S}).relation(R = {$../../Sets/"Generalized intersection using power set"(
+      U = {$../../Sets/"Cartesian product"(
         S = {S},
         T = {S}
       )},
       S = {%subset(
         #(x: %Element(
-          $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+          $../../Sets/"Power set"(S = {$../../Sets/"Cartesian product"(
             S = {S},
             T = {S}
           )}),
           shortcut = {
-            constructor = $../Sets/"Power set"(S = {$../Sets/"Cartesian product"(
+            constructor = $../../Sets/"Power set"(S = {$../../Sets/"Cartesian product"(
                 S = {S},
                 T = {S}
               )}).subset,
-            parameters = #(X: %Subset($../Sets/"Cartesian product"(
+            parameters = #(X: %Subset($../../Sets/"Cartesian product"(
               S = {S},
               T = {S}
             ))),
@@ -51,10 +51,10 @@ $closure(
         )),
         %and(
           %sub(R, X),
-          $../Properties/"has property"(
-            S = {$Endorelations(S = {S})},
+          $../../Properties/"has property"(
+            S = {$../Endorelations(S = {S})},
             p = {p},
-            s = {$Relations(S = {S}, T = {S}).relation(R = {X})}
+            s = {$../Relations(S = {S}, T = {S}).relation(R = {X})}
           )
         )
       )}

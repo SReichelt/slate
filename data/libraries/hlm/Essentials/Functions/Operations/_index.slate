@@ -1,18 +1,18 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Operations: %Section {
   logic = 'hlm',
   items = [
     %item($Operations),
-    %item($"value"),
+    %item($value),
     %item(
       $operator,
-      title = {
-        de = 'Operator als Operation',
-        en = 'Operator as operation'
-      }
+      title = 'Operator as operation'
     ),
-    %item($"Inner operations"),
+    %item(
+      $"Inner operations",
+      title = 'Inner operations'
+    ),
     %item($associative),
     %item($commutative)
   ]

@@ -1,0 +1,10 @@
+%../../../../../logics/hlm%
+
+$choice(S: %Set): %Predicate {
+  display = [$Feature(
+    operand = S,
+    singular = 'choice function',
+    plural = 'choice functions'
+  )],
+  definition = [%not($../empty(S = {$"Choice functions"(S = {S})}))]
+}

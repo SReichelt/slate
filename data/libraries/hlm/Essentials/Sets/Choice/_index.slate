@@ -1,0 +1,14 @@
+%../../../../../logics/library%
+
+$Choice: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Choice functions"),
+    %item($"choice"),
+    %item(
+      $"axiom of choice",
+      type = 'axiom',
+      title = 'Axiom of choice'
+    )
+  ]
+}

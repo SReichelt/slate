@@ -1,49 +1,31 @@
-%../../../format/library%
+%../../../logics/library%
 
 $Essentials: %Section {
   logic = 'hlm',
   items = [
     %subsection(
       $Sets,
-      title = {
-        de = 'Mengen',
-        en = 'Sets'
-      }
+      'Sets'
     ),
     %subsection(
       $Properties,
-      title = {
-        de = 'Eigenschaften',
-        en = 'Properties'
-      }
+      'Properties'
     ),
     %subsection(
       $Relations,
-      title = {
-        de = 'Relationen',
-        en = 'Relations'
-      }
+      'Relations'
     ),
     %subsection(
       $Functions,
-      title = {
-        de = 'Funktionen',
-        en = 'Functions'
-      }
+      'Functions'
     ),
     %subsection(
       $Sequences,
-      title = {
-        de = 'Folgen',
-        en = 'Sequences'
-      }
+      'Sequences'
     ),
     %subsection(
       $Numbers,
-      title = {
-        de = 'Zahlen',
-        en = 'Numbers'
-      }
+      'Numbers'
     )
   ]
 }

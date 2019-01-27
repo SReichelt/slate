@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 /**
  * @references * https://en.wikipedia.org/wiki/Reflexive_closure
@@ -7,7 +7,7 @@
  */
 $"reflexive closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Endorelations(S = {S}))
+  ≺: %Element($../Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -17,20 +17,20 @@ $"reflexive closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      p = {$../Properties/predicate(
-        S = {$Endorelations(S = {S})},
-        parameter = #(_1: %Element($Endorelations(S = {S}))),
-        predicate = $reflexive(
+      p = {$../../Properties/predicate(
+        S = {$../Endorelations(S = {S})},
+        parameter = #(_1: %Element($../Endorelations(S = {S}))),
+        predicate = $../reflexive(
           S = {S},
           ≺ = {_1}
         )
       )}
     ),
-    $union(
+    $../union(
       S = {S},
       T = {S},
       ≺ = {≺},
-      ⊂ = {$equality(S = {S})}
+      ⊂ = {$../equality(S = {S})}
     )
   ]
 }

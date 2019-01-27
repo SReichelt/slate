@@ -1,4 +1,4 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Rational: %Section {
   logic = 'hlm',
@@ -11,10 +11,7 @@ $Rational: %Section {
     %item($less),
     %subsection(
       $Subsets,
-      title = {
-        de = 'Teilmengen',
-        en = 'Subsets'
-      }
+      'Subsets'
     ),
     %item($absolute),
     %item($product),
@@ -23,10 +20,7 @@ $Rational: %Section {
     %item($"power to integer"),
     %subsection(
       $Sequences,
-      title = {
-        de = 'Folgen',
-        en = 'Sequences'
-      }
+      'Sequences'
     )
   ]
 }

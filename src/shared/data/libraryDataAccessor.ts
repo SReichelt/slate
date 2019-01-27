@@ -9,5 +9,5 @@ export interface LibraryDataAccessor {
 export interface LibraryItemInfo {
   itemNumber: number[];
   type?: string;
-  title?: Fmt.Expression;
+  title?: string;
 }

@@ -1,4 +1,4 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Real: %Section {
   logic = 'hlm',
@@ -11,10 +11,7 @@ $Real: %Section {
     %item($less),
     %subsection(
       $Subsets,
-      title = {
-        de = 'Teilmengen',
-        en = 'Subsets'
-      }
+      'Subsets'
     ),
     %item($product),
     %item($quotient),
@@ -35,10 +32,7 @@ $Real: %Section {
     ),
     %subsection(
       $"Generalized sums and products",
-      title = {
-        de = 'Verallgemeinerte Summen und Produkte',
-        en = 'Generalized sums and products'
-      }
+      'Generalized sums and products'
     )
   ]
 }

@@ -7,12 +7,22 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       $../../Sets/empty(S = {M}),
       %exists(
         #(m: %Element(M)),
-        formula = %forall(
-          #(n: %Element(M)),
-          $"less or equal"(
-            m = {n},
-            n = {m}
-          )
+        formula = $../../Relations/"greatest element"(
+          S = {$"Natural numbers"},
+          ≺ = {$../../Relations/predicate(
+            S = {$"Natural numbers"},
+            T = {$"Natural numbers"},
+            parameters = #(
+              m: %Element($"Natural numbers"),
+              n: %Element(%previous)
+            ),
+            predicate = $"less or equal"(
+              m = {m},
+              n = {n}
+            )
+          )},
+          T = {M},
+          t = {m}
         )
       )
     ),
@@ -306,7 +316,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
         parameters = #(b: %Element($"Natural numbers")),
         steps = #(
           _: %UseTheorem(
-            $"Initial segments are finite"(n = {b}),
+            $Subsets/"Initial segments are finite"(n = {b}),
             $../../Sets/finite(S = {$Subsets/"Segment (less)"(n = {b})})
           ),
           _: %UseTheorem(

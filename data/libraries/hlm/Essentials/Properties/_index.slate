@@ -1,4 +1,4 @@
-%../../../../format/library%
+%../../../../logics/library%
 
 $Properties: %Section {
   logic = 'hlm',
@@ -7,10 +7,7 @@ $Properties: %Section {
     %item($"has property"),
     %item(
       $predicate,
-      title = {
-        de = 'Prädikat als Eigenschaft',
-        en = 'Predicate as property'
-      }
+      title = 'Predicate as property'
     )
   ]
 }

@@ -1,4 +1,4 @@
-%../../../../../format/library%
+%../../../../../logics/library%
 
 $Integer: %Section {
   logic = 'hlm',
@@ -14,10 +14,7 @@ $Integer: %Section {
     %item($less),
     %subsection(
       $Subsets,
-      title = {
-        de = 'Teilmengen',
-        en = 'Subsets'
-      }
+      'Subsets'
     ),
     %item($absolute),
     %item($product),
@@ -32,10 +29,7 @@ $Integer: %Section {
     %item($"Power base product law"),
     %subsection(
       $Prime,
-      title = {
-        de = 'Primzahlen',
-        en = 'Prime Numbers'
-      }
+      'Prime Numbers'
     ),
     %item($coprime)
   ]

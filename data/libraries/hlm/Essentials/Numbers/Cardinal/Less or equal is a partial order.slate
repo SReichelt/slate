@@ -1,0 +1,19 @@
+%../../../../../logics/hlm%
+
+$"Less or equal is a partial order": %StandardTheorem {
+  claim = $../../Relations/"partial order"(
+    S = {$"Cardinal numbers"},
+    ≺ = {$../../Relations/predicate(
+      S = {$"Cardinal numbers"},
+      T = {$"Cardinal numbers"},
+      parameters = #(
+        𝐱: %Element($"Cardinal numbers"),
+        𝐲: %Element(%previous)
+      ),
+      predicate = $"less or equal"(
+        𝐱 = {𝐱},
+        𝐲 = {𝐲}
+      )
+    )}
+  )
+}

@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 /**
  * @references * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive closure
@@ -6,7 +6,7 @@
  */
 $"reflexive transitive closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Endorelations(S = {S}))
+  ≺: %Element($../Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -16,10 +16,10 @@ $"reflexive transitive closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      p = {$../Properties/predicate(
-        S = {$Endorelations(S = {S})},
-        parameter = #(_1: %Element($Endorelations(S = {S}))),
-        predicate = $preorder(
+      p = {$../../Properties/predicate(
+        S = {$../Endorelations(S = {S})},
+        parameter = #(_1: %Element($../Endorelations(S = {S}))),
+        predicate = $../preorder(
           S = {S},
           ≺ = {_1}
         )

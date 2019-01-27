@@ -1,4 +1,4 @@
-%../../../../format/library%
+%../../../../logics/library%
 
 $Relations: %Section {
   logic = 'hlm',
@@ -7,32 +7,37 @@ $Relations: %Section {
     %item($related),
     %item(
       $predicate,
-      title = {
-        de = 'Prädikat als Relation',
-        en = 'Predicate as relation'
-      }
+      title = 'Predicate as relation'
     ),
     %item($converse),
     %item($intersection),
     %item($union),
     %item($mapping),
     %item($"mapping value"),
-    %item($Endorelations),
+    %item(
+      $Endorelations,
+      title = 'Endorelations'
+    ),
     %item($restriction),
     %item($equality),
     %item($reflexive),
+    %item($connex),
     %item($symmetric),
     %item($antisymmetric),
     %item($transitive),
     %item($preorder),
+    %item($"partial order"),
+    %item($"total order"),
+    %item($"lower bound"),
+    %item($"upper bound"),
+    %item($"least element"),
+    %item($"greatest element"),
+    %item($"well-order"),
     %item($equivalence),
     %item($"Equivalence classes"),
-    %item($closure),
-    %item($"reflexive closure"),
-    %item($"symmetric closure"),
-    %item($"reflexive symmetric closure"),
-    %item($"transitive closure"),
-    %item($"reflexive transitive closure"),
-    %item($"reflexive symmetric transitive closure")
+    %subsection(
+      $Closures,
+      'Closures'
+    )
   ]
 }

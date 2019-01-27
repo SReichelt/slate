@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 /**
  * @references * https://en.wikipedia.org/wiki/Transitive_closure
@@ -7,7 +7,7 @@
  */
 $"transitive closure"(
   S: %Set(auto = %true),
-  ≺: %Element($Endorelations(S = {S}))
+  ≺: %Element($../Endorelations(S = {S}))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -16,10 +16,10 @@ $"transitive closure"(
   definition = [$closure(
     S = {S},
     ≺ = {≺},
-    p = {$../Properties/predicate(
-      S = {$Endorelations(S = {S})},
-      parameter = #(_1: %Element($Endorelations(S = {S}))),
-      predicate = $transitive(
+    p = {$../../Properties/predicate(
+      S = {$../Endorelations(S = {S})},
+      parameter = #(_1: %Element($../Endorelations(S = {S}))),
+      predicate = $../transitive(
         S = {S},
         ≺ = {_1}
       )

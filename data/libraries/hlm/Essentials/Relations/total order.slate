@@ -1,0 +1,41 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Total_order
+ */
+$"total order"(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S}))
+): %Predicate {
+  display = [$NounProperty(
+    operand = ≺,
+    singular = 'total order',
+    plural = 'total orders'
+  )],
+  definition = [
+    %and(
+      $connex(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $antisymmetric(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $transitive(
+        S = {S},
+        ≺ = {≺}
+      )
+    ),
+    %and(
+      $"partial order"(
+        S = {S},
+        ≺ = {≺}
+      ),
+      $connex(
+        S = {S},
+        ≺ = {≺}
+      )
+    )
+  ]
+}

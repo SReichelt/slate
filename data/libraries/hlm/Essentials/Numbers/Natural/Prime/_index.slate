@@ -1,4 +1,4 @@
-%../../../../../../format/library%
+%../../../../../../logics/library%
 
 $Prime: %Section {
   logic = 'hlm',
@@ -13,10 +13,7 @@ $Prime: %Section {
     %item(
       $"Euclids theorem",
       type = 'theorem',
-      title = {
-        de = 'Satz von Euklid',
-        en = 'Euclid\'s theorem'
-      }
+      title = 'Euclid\'s theorem'
     ),
     %item($"Prime and power divisibility criterion")
   ]

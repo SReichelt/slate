@@ -2,6 +2,7 @@ import * as React from 'react';
 import './App.css';
 import SplitPane from 'react-split-pane';
 import { withAlert, InjectedAlertProp } from 'react-alert';
+import StartPage from './components/StartPage';
 import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
@@ -10,7 +11,7 @@ import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
-import * as FmtLibrary from '../shared/format/library';
+import * as FmtLibrary from '../shared/logics/library';
 import * as FmtDisplay from '../shared/display/meta';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
@@ -148,7 +149,7 @@ class App extends React.Component<AppProps, AppState> {
       mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler}/>;
       extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler}/>;
     } else {
-      mainContents = 'Please select an item from the tree.';
+      mainContents = <StartPage/>;
     }
 
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
@@ -234,7 +235,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private treeItemClicked = (item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void => {
-    this.setState({
+    this.navigate({
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
       selectedItemDefinition: definitionPromise,
@@ -243,9 +244,6 @@ class App extends React.Component<AppProps, AppState> {
       editedDefinition: undefined,
       submitting: false
     });
-
-    let uri = libraryDataProvider.pathToURI(path);
-    window.history.pushState(null, 'Slate', uri);
   }
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
@@ -254,10 +252,27 @@ class App extends React.Component<AppProps, AppState> {
       submitting: false
     };
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
-    this.setState(state);
+    this.navigate(state);
+  }
 
-    let uri = libraryDataProvider.pathToURI(path);
-    window.history.pushState(null, 'Slate', uri);
+  private navigate(state: SelectionState): void {
+    this.setState(state);
+    let uri = '/';
+    let appName = 'Slate';
+    let title = appName;
+    if (state.selectedItemPath) {
+      uri = this.libraryDataProvider.pathToURI(state.selectedItemPath);
+      title = `${appName}: ${state.selectedItemPath.name}`;
+    }
+    window.history.pushState(null, title, uri);
+    document.title = title;
+    if (state.selectedItemInfo) {
+      state.selectedItemInfo.then((info: LibraryItemInfo) => {
+        if (info.title) {
+          document.title = `${appName}: ${info.title}`;
+        }
+      });
+    }
   }
 
   private edit = (): void => {

@@ -1,7 +1,8 @@
 %../../../../../../logics/hlm%
 
 /**
- * @references * http://oeis.org/A000027
+ * @references * https://proofwiki.org/wiki/Axiom:Axiomatization_of_1-Based_Natural_Numbers
+ *             * http://oeis.org/A000027
  */
 $"Positive numbers": %SetOperator {
   display = [$SubSup(

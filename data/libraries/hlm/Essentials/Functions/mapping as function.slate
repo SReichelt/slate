@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward.)
+ * @remarks This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward as well.)
  */
 $"mapping as function"(
   S: %Set(auto = %true),

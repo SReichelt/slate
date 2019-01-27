@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './LibraryTree.css';
 import * as Fmt from '../../shared/format/format';
-import * as FmtLibrary from '../../shared/format/library';
+import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
 import Expression from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -126,13 +126,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     let className = 'tree-item hoverable';
     let contents: any = null;
     let icon: any = '\u2001';
-    let display: any = undefined;
-    if (this.props.itemInfo.title instanceof Fmt.CompoundExpression) {
-      let englishTitle = this.props.itemInfo.title.arguments.getOptionalValue('en');
-      if (englishTitle instanceof Fmt.StringExpression) {
-        display = englishTitle.value;
-      }
-    }
+    let display: any = this.props.itemInfo.title;
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       if (this.state.definition) {
         let logic = this.props.libraryDataProvider.logic;

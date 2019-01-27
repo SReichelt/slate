@@ -4,7 +4,7 @@ import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
 import * as FmtWriter from '../format/write';
-import * as FmtLibrary from '../format/library';
+import * as FmtLibrary from '../logics/library';
 import * as Logic from '../logics/logic';
 
 export { LibraryDataAccessor, LibraryItemInfo };
@@ -198,7 +198,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         let contents = definition.contents as FmtLibrary.ObjectContents_Section;
         let items = contents.items as Fmt.ArrayExpression;
         let type: string | undefined = undefined;
-        let title: Fmt.Expression | undefined = undefined;
+        let title: string | undefined = undefined;
         let index = 0;
         for (let item of items.items) {
           if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {

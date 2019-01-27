@@ -1,0 +1,25 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total.
+ */
+$"AC is equivalent to total order": %EquivalenceTheorem {
+  conditions = [
+    $../../Sets/Choice/"axiom of choice",
+    $../../Relations/"total order"(
+      S = {$"Cardinal numbers"},
+      ≺ = {$../../Relations/predicate(
+        S = {$"Cardinal numbers"},
+        T = {$"Cardinal numbers"},
+        parameters = #(
+          𝐱: %Element($"Cardinal numbers"),
+          𝐲: %Element(%previous)
+        ),
+        predicate = $"less or equal"(
+          𝐱 = {𝐱},
+          𝐲 = {𝐲}
+        )
+      )}
+    )
+  ]
+}

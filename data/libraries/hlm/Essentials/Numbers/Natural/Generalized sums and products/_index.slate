@@ -1,4 +1,4 @@
-%../../../../../../format/library%
+%../../../../../../logics/library%
 
 $"Generalized sums and products": %Section {
   logic = 'hlm',

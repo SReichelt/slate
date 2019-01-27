@@ -1,0 +1,22 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Greatest_and_least_elements
+ */
+$"least element"(
+  S: %Set(auto = %true),
+  ≺: %Element($Endorelations(S = {S})),
+  T: %Subset(S),
+  t: %Element(T)
+): %Predicate {
+  display = [$TextualRelation(
+    symbol = ['is a ', ≺, '-least element of'],
+    operands = [t, T]
+  )],
+  definition = [$"lower bound"(
+    S = {S},
+    ≺ = {≺},
+    T = {T},
+    s = {t}
+  )]
+}

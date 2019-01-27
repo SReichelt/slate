@@ -1,0 +1,55 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks The generalized cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
+ *
+ * @references * https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
+ */
+$"Generalized cartesian product"(
+  I: %Set,
+  i: %Binding(
+    I,
+    #(S: %Set(auto = %true))
+  )
+): %Construction {
+  $product(j: %Binding(
+    I,
+    #(s: %Element(S[j]))
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = s,
+        style = '()'
+      ),
+      sub = $Relation(
+        symbol = '∈',
+        operands = [j, I],
+        space = ''
+      )
+    )],
+    equalityDefinition = {
+      leftParameters = #(j: %Binding(
+        I,
+        #(s: %Element(S[j]))
+      )),
+      rightParameters = #(j: %Binding(
+        I,
+        #("s'": %Element(S[j]))
+      )),
+      definition = [%forall(
+        #(j: %Element(I)),
+        %equals(s[j], "s'"[j])
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = [$LargeOperator(
+    symbol = '∏',
+    operand = S,
+    under = $ElementParameter(
+      element = i,
+      set = I
+    )
+  )]
+}

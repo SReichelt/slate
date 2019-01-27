@@ -1,0 +1,14 @@
+%../../../../../logics/library%
+
+$Relations: %Section {
+  logic = 'hlm',
+  items = [
+    %item($closure),
+    %item($"reflexive closure"),
+    %item($"symmetric closure"),
+    %item($"reflexive symmetric closure"),
+    %item($"transitive closure"),
+    %item($"reflexive transitive closure"),
+    %item($"reflexive symmetric transitive closure")
+  ]
+}
