@@ -1011,11 +1011,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let abbr: Fmt.Expression | undefined = undefined;
         if (display.path.name === 'Operator'
             || display.path.name === 'AssociativeOperator'
-            || display.path.name === 'UnaryOperator'
             || display.path.name === 'Relation'
             || display.path.name === 'TextualRelation'
             || display.path.name === 'BooleanOperator'
-            || display.path.name === 'UnaryBooleanOperator'
             || display.path.name === 'FunctionOperator') {
           abbr = display.path.arguments.getValue('symbol');
         } else if (display.path.name === 'Function') {
