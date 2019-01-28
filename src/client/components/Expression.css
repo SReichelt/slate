@@ -448,6 +448,11 @@ p {
   font-style: normal;
 }
 
+.italic {
+  font-family: 'TeX', serif;
+  font-style: italic;
+}
+
 .sans, .ctor {
   font-family: 'TeX-Sans', sans-serif;
   font-style: normal;

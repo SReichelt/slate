@@ -26,6 +26,10 @@ $Numbers: %Section {
     %subsection(
       $Real,
       'Real numbers'
+    ),
+    %subsection(
+      $Complex,
+      'Complex numbers'
     )
   ]
 }

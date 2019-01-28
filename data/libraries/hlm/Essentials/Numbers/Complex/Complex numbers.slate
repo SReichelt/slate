@@ -1,0 +1,52 @@
+%../../../../../logics/hlm%
+
+$"Complex numbers": %Construction {
+  $complex(
+    r: %Element($../Real/"Real numbers"),
+    i: %Element(%previous)
+  ): %Constructor {
+    display = [$Parens(
+      body = $Operator(
+        symbol = '+',
+        operands = [
+          r,
+          $UnaryOperator(
+            symbol = '𝒊',
+            operand = i,
+            space = '',
+            minParenLevel = 2,
+            maxParenLevel = 2
+          )
+        ],
+        space = '',
+        minParenLevel = 1,
+        maxParenLevel = 1
+      ),
+      style = '()'
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        r: %Element($../Real/"Real numbers"),
+        i: %Element(%previous)
+      ),
+      rightParameters = #(
+        "r'": %Element($../Real/"Real numbers"),
+        "i'": %Element(%previous)
+      ),
+      definition = [%and(
+        %equals(r, "r'"),
+        %equals(i, "i'")
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = ['ℂ'],
+  embedding = {
+    parameter = #(r: %Element($../Real/"Real numbers")),
+    target = $"Complex numbers".complex(
+        r = {r},
+        i = {$../Natural/number(value = 0)}
+    )
+  }
+}

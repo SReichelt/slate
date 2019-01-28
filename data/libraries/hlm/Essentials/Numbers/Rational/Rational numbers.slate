@@ -39,6 +39,13 @@ $"Rational numbers": %Construction {
           b = {d}
         )
       )]
+    },
+    rewrite = {
+      value = $quotient(
+        b = {n},
+        a = {d}
+      ),
+      theorem = $"Actual quotient equals formal quotient"
     }
   }
 

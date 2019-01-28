@@ -1,9 +1,9 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks The definitions in this section are somewhat technical. Their purpose is to implement a general notion of “isomorphism” that makes it easy to check whether the equality definition of a structure only identifies isomorphic objects. In that case, no well-definedness proofs are necessary in situations where objects are decomposed, e.g. a magma into a set and an operation.
+ * @remarks The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of “isomorphism” that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
  *
- *          Each of the definitions transforms an object defined on *X* into the equivalent object defined on *Y*, according to the given bijection. The first definition is rather trivial.
+ *          Each of the definitions transforms an object defined on *X* into the equivalent object defined on *Y*, according to the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements.
  */
 $"element transform"(
   X: %Set(auto = %true),

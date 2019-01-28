@@ -7,50 +7,125 @@ $"inner operation transform"(
     X = {X},
     Y = {Y}
   )),
-  ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {X}))
+  ∗: %Element(
+    $../../Essentials/Functions/Operations/"Inner operations"(X = {X}),
+    shortcut = {
+      constructor = $../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {X},
+            T = {X}
+          )},
+          Y = {X}
+        ).function,
+      parameters = #(x: %Binding(
+        $../../Essentials/Sets/"Cartesian product"(
+          S = {X},
+          T = {X}
+        ),
+        #(z: %Element(X))
+      ))
+    }
+  )
 ): %ExplicitOperator {
   display = [$Function(
     function = φ,
     arguments = [∗],
     style = '[]'
   )],
-  definition = [$../../Essentials/Functions/composition(
-    X = {$../../Essentials/Sets/"Cartesian product"(
-      S = {Y},
-      T = {Y}
-    )},
-    Y = {X},
-    Z = {Y},
-    g = {φ},
-    f = {$../../Essentials/Functions/composition(
+  definition = [
+    $../../Essentials/Functions/Functions(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {Y},
+          T = {Y}
+        )},
+        Y = {Y}
+      ).function(x = {
+        parameter = #(y: %Element(
+          $../../Essentials/Sets/"Cartesian product"(
+            S = {Y},
+            T = {Y}
+          ),
+          shortcut = {
+            constructor = $../../Essentials/Sets/"Cartesian product"(
+                S = {Y},
+                T = {Y}
+              ).pair,
+            parameters = #(
+              y_1: %Element(Y),
+              y_2: %Element(Y)
+            ),
+            override = %true
+          }
+        )),
+        arguments = {y = {$../../Essentials/Functions/value(
+          X = {X},
+          Y = {Y},
+          f = {φ},
+          x = {z[$../../Essentials/Sets/"Cartesian product"(
+              S = {Y},
+              T = {Y}
+            ).pair(
+              s = {$../../Essentials/Functions/value(
+                X = {Y},
+                Y = {X},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X},
+                  Y = {Y},
+                  f = {φ}
+                )},
+                x = {y_1}
+              )},
+              t = {$../../Essentials/Functions/value(
+                X = {Y},
+                Y = {X},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X},
+                  Y = {Y},
+                  f = {φ}
+                )},
+                x = {y_2}
+              )}
+          )]}
+        )}}
+    }),
+    $../../Essentials/Functions/composition(
       X = {$../../Essentials/Sets/"Cartesian product"(
         S = {Y},
         T = {Y}
       )},
-      Y = {$../../Essentials/Sets/"Cartesian product"(
-        S = {X},
-        T = {X}
-      )},
-      Z = {X},
-      g = {∗},
-      f = {$../../Essentials/Functions/inverse(
+      Y = {X},
+      Z = {Y},
+      g = {φ},
+      f = {$../../Essentials/Functions/composition(
         X = {$../../Essentials/Sets/"Cartesian product"(
-          S = {X},
-          T = {X}
-        )},
-        Y = {$../../Essentials/Sets/"Cartesian product"(
           S = {Y},
           T = {Y}
         )},
-        f = {$../../Essentials/Functions/"cartesian product"(
-          V = {X},
-          W = {Y},
-          X = {X},
-          Y = {Y},
-          f = {φ},
-          g = {φ}
+        Y = {$../../Essentials/Sets/"Cartesian product"(
+          S = {X},
+          T = {X}
+        )},
+        Z = {X},
+        g = {∗},
+        f = {$../../Essentials/Functions/inverse(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {X},
+            T = {X}
+          )},
+          Y = {$../../Essentials/Sets/"Cartesian product"(
+            S = {Y},
+            T = {Y}
+          )},
+          f = {$../../Essentials/Functions/"cartesian product"(
+            V = {X},
+            W = {Y},
+            X = {X},
+            Y = {Y},
+            f = {φ},
+            g = {φ}
+          )}
         )}
       )}
-    )}
-  )]
+    )
+  ]
 }

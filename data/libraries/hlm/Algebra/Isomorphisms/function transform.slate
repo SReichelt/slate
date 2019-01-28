@@ -7,31 +7,66 @@ $"function transform"(
     X = {X},
     Y = {Y}
   )),
-  f: %Element($../../Essentials/Functions/Functions(
-    X = {X},
-    Y = {X}
-  ))
+  f: %Element(
+    $../../Essentials/Functions/Functions(
+      X = {X},
+      Y = {X}
+    ),
+    shortcut = {
+      constructor = $../../Essentials/Functions/Functions(
+          X = {X},
+          Y = {X}
+        ).function,
+      parameters = #(x: %Binding(
+        X,
+        #(z: %Element(X))
+      ))
+    }
+  )
 ): %ExplicitOperator {
   display = [$Function(
     function = φ,
     arguments = [f],
     style = '[]'
   )],
-  definition = [$../../Essentials/Functions/composition(
-    X = {Y},
-    Y = {X},
-    Z = {Y},
-    g = {φ},
-    f = {$../../Essentials/Functions/composition(
+  definition = [
+    $../../Essentials/Functions/Functions(
+        X = {Y},
+        Y = {Y}
+      ).function(x = {
+        parameter = #(y: %Element(Y)),
+        arguments = {y = {$../../Essentials/Functions/value(
+          X = {X},
+          Y = {Y},
+          f = {φ},
+          x = {z[$../../Essentials/Functions/value(
+            X = {Y},
+            Y = {X},
+            f = {$../../Essentials/Functions/inverse(
+              X = {X},
+              Y = {Y},
+              f = {φ}
+            )},
+            x = {y}
+          )]}
+        )}}
+    }),
+    $../../Essentials/Functions/composition(
       X = {Y},
       Y = {X},
-      Z = {X},
-      g = {f},
-      f = {$../../Essentials/Functions/inverse(
-        X = {X},
-        Y = {Y},
-        f = {φ}
+      Z = {Y},
+      g = {φ},
+      f = {$../../Essentials/Functions/composition(
+        X = {Y},
+        Y = {X},
+        Z = {X},
+        g = {f},
+        f = {$../../Essentials/Functions/inverse(
+          X = {X},
+          Y = {Y},
+          f = {φ}
+        )}
       )}
-    )}
-  )]
+    )
+  ]
 }

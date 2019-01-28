@@ -1,7 +1,9 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition of categories includes the requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). This makes sense because it ensures that two categories are equal if and only if they are equivalent, and because in HLM, all of the usual examples of categories are skeletal anyway.
+ * @remarks This definition of categories includes the additional requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). The reasoning behind this is that I expect the equality definition above, which is derived purely syntactically, to be equivalent to _isomorphism_ of categories, not _equivalence_. That is, without this restriction, two isomorphic categories would be considered equal, but two equivalent categories would not necessarily be. (This needs to be verified.)
+ *
+ *          For skeletal categories, the two concepts coincide. Luckily, in HLM, all of the usual examples of categories happen to be skeletal.
  */
 $Categories: %Construction {
   $category(

@@ -16,6 +16,7 @@ $Rational: %Section {
     %item($absolute),
     %item($product),
     %item($quotient),
+    %item($"Actual quotient equals formal quotient"),
     %item($power),
     %item($"power to integer"),
     %subsection(

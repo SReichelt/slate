@@ -19,56 +19,129 @@ $"morphism transform"(
     X = {X_3},
     Y = {Y_3}
   )),
-  ∙: %Element($../../Essentials/Functions/Functions(
-    X = {$../../Essentials/Sets/"Cartesian product"(
-      S = {X_1},
-      T = {X_2}
-    )},
-    Y = {X_3}
-  ))
+  ∙: %Element(
+    $../../Essentials/Functions/Operations/Operations(
+      X = {X_1},
+      Y = {X_2},
+      Z = {X_3}
+    ),
+    shortcut = {
+      constructor = $../../Essentials/Functions/Functions(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {X_1},
+            T = {X_2}
+          )},
+          Y = {X_3}
+        ).function,
+      parameters = #(x: %Binding(
+        $../../Essentials/Sets/"Cartesian product"(
+          S = {X_1},
+          T = {X_2}
+        ),
+        #(z: %Element(X_3))
+      ))
+    }
+  )
 ): %ExplicitOperator {
   display = [$Function(
     function = $Tuple(items = [φ_1, φ_2, φ_3]),
     arguments = [∙],
     style = '[]'
   )],
-  definition = [$../../Essentials/Functions/composition(
-    X = {$../../Essentials/Sets/"Cartesian product"(
-      S = {Y_1},
-      T = {Y_2}
-    )},
-    Y = {X_3},
-    Z = {Y_3},
-    g = {φ_3},
-    f = {$../../Essentials/Functions/composition(
+  definition = [
+    $../../Essentials/Functions/Functions(
+        X = {$../../Essentials/Sets/"Cartesian product"(
+          S = {Y_1},
+          T = {Y_2}
+        )},
+        Y = {Y_3}
+      ).function(x = {
+        parameter = #(y: %Element(
+          $../../Essentials/Sets/"Cartesian product"(
+            S = {Y_1},
+            T = {Y_2}
+          ),
+          shortcut = {
+            constructor = $../../Essentials/Sets/"Cartesian product"(
+                S = {Y_1},
+                T = {Y_1}
+              ).pair,
+            parameters = #(
+              y_1: %Element(Y_1),
+              y_2: %Element(Y_2)
+            ),
+            override = %true
+          }
+        )),
+        arguments = {y = {$../../Essentials/Functions/value(
+          X = {X_3},
+          Y = {Y_3},
+          f = {φ_3},
+          x = {z[$../../Essentials/Sets/"Cartesian product"(
+              S = {Y_1},
+              T = {Y_2}
+            ).pair(
+              s = {$../../Essentials/Functions/value(
+                X = {Y_1},
+                Y = {X_1},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X_1},
+                  Y = {Y_1},
+                  f = {φ_1}
+                )},
+                x = {y_1}
+              )},
+              t = {$../../Essentials/Functions/value(
+                X = {Y_2},
+                Y = {X_2},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X_2},
+                  Y = {Y_2},
+                  f = {φ_2}
+                )},
+                x = {y_2}
+              )}
+          )]}
+        )}}
+    }),
+    $../../Essentials/Functions/composition(
       X = {$../../Essentials/Sets/"Cartesian product"(
         S = {Y_1},
         T = {Y_2}
       )},
-      Y = {$../../Essentials/Sets/"Cartesian product"(
-        S = {X_1},
-        T = {X_2}
-      )},
-      Z = {X_3},
-      g = {∙},
-      f = {$../../Essentials/Functions/inverse(
+      Y = {X_3},
+      Z = {Y_3},
+      g = {φ_3},
+      f = {$../../Essentials/Functions/composition(
         X = {$../../Essentials/Sets/"Cartesian product"(
-          S = {X_1},
-          T = {X_2}
-        )},
-        Y = {$../../Essentials/Sets/"Cartesian product"(
           S = {Y_1},
           T = {Y_2}
         )},
-        f = {$../../Essentials/Functions/"cartesian product"(
-          V = {X_1},
-          W = {Y_1},
-          X = {X_2},
-          Y = {Y_2},
-          f = {φ_1},
-          g = {φ_2}
+        Y = {$../../Essentials/Sets/"Cartesian product"(
+          S = {X_1},
+          T = {X_2}
+        )},
+        Z = {X_3},
+        g = {∙},
+        f = {$../../Essentials/Functions/inverse(
+          X = {$../../Essentials/Sets/"Cartesian product"(
+            S = {X_1},
+            T = {X_2}
+          )},
+          Y = {$../../Essentials/Sets/"Cartesian product"(
+            S = {Y_1},
+            T = {Y_2}
+          )},
+          f = {$../../Essentials/Functions/"cartesian product"(
+            V = {X_1},
+            W = {Y_1},
+            X = {X_2},
+            Y = {Y_2},
+            f = {φ_1},
+            g = {φ_2}
+          )}
         )}
       )}
-    )}
-  )]
+    )
+  ]
 }

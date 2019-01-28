@@ -1,0 +1,23 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This proposition justifies the notation used for the constructor. Note that the operations on the right are operations on complex numbers, i.e. on the embedding of the real numbers _r_ and _i_ into the complex numbers.
+ */
+$"Actual linear combination equals formal linear combination"(
+  r: %Element($../Real/"Real numbers"),
+  i: %Element(%previous)
+): %StandardTheorem {
+  claim = %equals(
+    $"Complex numbers".complex(
+        r = {r},
+        i = {i}
+    ),
+    $sum(
+      a = {r},
+      b = {$product(
+        a = {i},
+        b = {$"imaginary unit"}
+      )}
+    )
+  )
+}

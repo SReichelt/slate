@@ -47,6 +47,13 @@ $Integers: %Construction {
           n = {m}
         )
       )]
+    },
+    rewrite = {
+      value = $difference(
+        b = {n},
+        a = {m}
+      ),
+      theorem = $"Actual difference equals formal difference"
     }
   }
 

@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers.
+ * @remarks The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers. In HLM, arbitrary sets cannot be used as objects because it is impossible to ask whether two arbitrary sets are equal. However, cardinal numbers work fine as a replacement. The situation with other categories is similar.
  */
 $cardinals: %ExplicitOperator {
   display = ['𝓢𝓮𝓽'],

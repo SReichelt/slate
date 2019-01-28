@@ -12,12 +12,12 @@ $Library: %Library {
       'Algebra'
     ),
     %subsection(
-      $"Category theory",
-      'Category theory'
-    ),
-    %subsection(
       $"Linear algebra",
       'Linear algebra'
+    ),
+    %subsection(
+      $"Category theory",
+      'Category theory'
     )
   ]
 }

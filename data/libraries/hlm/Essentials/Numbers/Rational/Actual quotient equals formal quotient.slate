@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This proposition justifies the notation used for the constructor. Note that the division on the right is division on rational numbers, i.e. on the embedding of the integers _b_ and _a_ into the rational numbers.
+ */
+$"Actual quotient equals formal quotient"(
+  b: %Element($../Integer/Integers),
+  a: %Element($../Integer/Subsets/"Nonzero numbers")
+): %StandardTheorem {
+  claim = %equals(
+    $"Rational numbers".quotient(
+        n = {b},
+        d = {a}
+    ),
+    $quotient(
+      b = {b},
+      a = {a}
+    )
+  )
+}

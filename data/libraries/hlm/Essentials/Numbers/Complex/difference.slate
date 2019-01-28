@@ -1,0 +1,47 @@
+%../../../../../logics/hlm%
+
+$difference(
+  b: %Element(
+    $"Complex numbers",
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_b: %Element($../Real/"Real numbers"),
+        i_b: %Element(%previous)
+      )
+    }
+  ),
+  a: %Element(
+    %previous,
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_a: %Element($../Real/"Real numbers"),
+        i_a: %Element(%previous)
+      )
+    }
+  )
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '−',
+    operands = [b, a],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
+  definition = [
+    $"Complex numbers".complex(
+        r = {$../Real/difference(
+          b = {r_b},
+          a = {r_a}
+        )},
+        i = {$../Real/difference(
+          b = {i_b},
+          a = {i_a}
+        )}
+    ),
+    $sum(
+      a = {b},
+      b = {$inverse(a = {a})}
+    )
+  ]
+}

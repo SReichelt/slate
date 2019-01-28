@@ -1,0 +1,54 @@
+%../../../../../logics/hlm%
+
+$product(
+  a: %Element(
+    $"Complex numbers",
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_a: %Element($../Real/"Real numbers"),
+        i_a: %Element(%previous)
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_b: %Element($../Real/"Real numbers"),
+        i_b: %Element(%previous)
+      )
+    }
+  )
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '⋅',
+    operands = [a, b],
+    space = ' ',
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
+  definition = [$"Complex numbers".complex(
+      r = {$../Real/difference(
+        b = {$../Real/product(
+          a = {r_a},
+          b = {r_b}
+        )},
+        a = {$../Real/product(
+          a = {i_a},
+          b = {i_b}
+        )}
+      )},
+      i = {$../Real/sum(
+        a = {$../Real/product(
+          a = {r_a},
+          b = {i_b}
+        )},
+        b = {$../Real/product(
+          a = {i_a},
+          b = {r_b}
+        )}
+      )}
+  )]
+}

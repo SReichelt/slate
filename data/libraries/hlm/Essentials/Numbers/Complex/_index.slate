@@ -1,0 +1,18 @@
+%../../../../../logics/library%
+
+$Complex: %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Complex numbers"),
+    %item($"imaginary unit"),
+    %item($sum),
+    %item($"Sum is associative"),
+    %item($"Sum is commutative"),
+    %item($inverse),
+    %item($difference),
+    %item($product),
+    %item($"Product is associative"),
+    %item($"Product is commutative"),
+    %item($"Actual linear combination equals formal linear combination")
+  ]
+}

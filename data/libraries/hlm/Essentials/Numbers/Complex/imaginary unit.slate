@@ -1,0 +1,9 @@
+%../../../../../logics/hlm%
+
+$"imaginary unit": %ExplicitOperator {
+  display = ['𝒊'],
+  definition = [$"Complex numbers".complex(
+      r = {$../Natural/number(value = 0)},
+      i = {$../Natural/number(value = 1)}
+  )]
+}

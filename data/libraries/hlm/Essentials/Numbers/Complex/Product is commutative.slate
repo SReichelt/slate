@@ -1,0 +1,21 @@
+%../../../../../logics/hlm%
+
+$"Product is commutative": %StandardTheorem {
+  claim = $../../Functions/Operations/commutative(
+    X = {$"Complex numbers"},
+    Z = {$"Complex numbers"},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$"Complex numbers"},
+      Y = {$"Complex numbers"},
+      Z = {$"Complex numbers"},
+      parameters = #(
+        a: %Element($"Complex numbers"),
+        b: %Element(%previous)
+      ),
+      operator = $product(
+        a = {a},
+        b = {b}
+      )
+    )}
+  )
+}

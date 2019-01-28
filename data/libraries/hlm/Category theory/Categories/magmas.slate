@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks The objects of this category are actually isomorphism classes of magmas.
+ */
 $magmas: %ExplicitOperator {
   display = ['𝓜𝓰𝓶'],
   definition = [$Categories.category(

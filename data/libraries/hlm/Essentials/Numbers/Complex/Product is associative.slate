@@ -1,0 +1,20 @@
+%../../../../../logics/hlm%
+
+$"Product is associative": %StandardTheorem {
+  claim = $../../Functions/Operations/associative(
+    X = {$"Complex numbers"},
+    ∗ = {$../../Functions/Operations/operator(
+      X = {$"Complex numbers"},
+      Y = {$"Complex numbers"},
+      Z = {$"Complex numbers"},
+      parameters = #(
+        a: %Element($"Complex numbers"),
+        b: %Element(%previous)
+      ),
+      operator = $product(
+        a = {a},
+        b = {b}
+      )
+    )}
+  )
+}

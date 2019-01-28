@@ -850,6 +850,20 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           setStyle('bold');
           curText += String.fromCodePoint(cp < 0x1d41a ? cp - 0x1d400 + 0x41 :
                                                          cp - 0x1d41a + 0x61);
+        } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
+          setStyle('italic');
+          switch (cp) {
+            case 0x210e:
+              curText += 'h';
+              break;
+            default:
+              curText += String.fromCodePoint(cp < 0x1d44e ? cp - 0x1d434 + 0x41 :
+                                                             cp - 0x1d44e + 0x61);
+          }
+        } else if (cp >= 0x1d468 && cp < 0x1d49c) {
+          setStyle('bold italic');
+          curText += String.fromCodePoint(cp < 0x1d482 ? cp - 0x1d468 + 0x41 :
+                                                         cp - 0x1d482 + 0x61);
         } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
           setStyle('sans');
           curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :

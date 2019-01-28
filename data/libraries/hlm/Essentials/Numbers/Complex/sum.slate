@@ -1,0 +1,41 @@
+%../../../../../logics/hlm%
+
+$sum(
+  a: %Element(
+    $"Complex numbers",
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_a: %Element($../Real/"Real numbers"),
+        i_a: %Element(%previous)
+      )
+    }
+  ),
+  b: %Element(
+    %previous,
+    shortcut = {
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_b: %Element($../Real/"Real numbers"),
+        i_b: %Element(%previous)
+      )
+    }
+  )
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '+',
+    operands = [a, b],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
+  definition = [$"Complex numbers".complex(
+      r = {$../Real/sum(
+        a = {r_a},
+        b = {r_b}
+      )},
+      i = {$../Real/sum(
+        a = {i_a},
+        b = {i_b}
+      )}
+  )]
+}
