@@ -154,21 +154,6 @@ export class ListExpression extends RenderedExpression {
   }
 }
 
-export interface RenderedExpressionPair {
-  left: RenderedExpression;
-  right: RenderedExpression;
-}
-
-export class AlignedExpression extends RenderedExpression {
-  constructor(public items: RenderedExpressionPair[]) {
-    super();
-  }
-
-  getLineHeight(): CachedPromise<number> {
-    return CachedPromise.resolve(0);
-  }
-}
-
 export class TableExpression extends RenderedExpression {
   constructor(public items: RenderedExpression[][]) {
     super();
@@ -569,18 +554,9 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       expression = new DecoratedExpression(this.getExpressionArg('body'));
       expression.styleClasses = [this.getArg('styleClass')];
       break;
-    case 'Aligned':
-      {
-        let items = this.getExpressionListListArg('items');
-        let rows = items.map((row: RenderedExpression[]) => ({
-          left: new RowExpression(row.splice(0, row.length - 1)),
-          right: row[row.length - 1]
-        }));
-        expression = new AlignedExpression(rows);
-      }
-      break;
     case 'Table':
       expression = new TableExpression(this.getExpressionListListArg('items'));
+      expression.styleClasses = [this.getArg('style')];
       break;
     case 'Parens':
       expression = new ParenExpression(this.getExpressionArg('body'), this.getArg('style'));

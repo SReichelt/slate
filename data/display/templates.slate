@@ -1,8 +1,7 @@
 %display%
 
 $Style(body: %Expr, styleClass: %String): %Template {}
-$Aligned(items: %Expr[,]): %Template {}
-$Table(items: %Expr[,]): %Template {}
+$Table(items: %Expr[,], style: %String): %Template {}
 $Parens(body: %Expr, style: %String): %Template {}
 $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 $OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
@@ -66,10 +65,6 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
     ),
     arguments = arguments
   )
-}
-
-$Argument(param: %Expr, value: %Expr): %Template {
-  display = [param, ': ', value]
 }
 
 $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
@@ -419,11 +414,9 @@ $SetBuilder(element: %Expr, constraint: %Expr): %Template {
 
 $Construction(constructors: %Expr[,]): %Template {
   display = $Parens(
-    body = $Style(
-      body = $Table(
-        items = constructors
-      ),
-      styleClass = 'construction'
+    body = $Table(
+      items = constructors,
+      style = 'construction'
     ),
     style = '{}'
   )
@@ -498,11 +491,9 @@ $PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
 
 $Cases(cases: %Expr[,]): %Template {
   display = $Parens(
-    body = $Style(
-      body = $Table(
-        items = cases
-      ),
-      styleClass = 'cases'
+    body = $Table(
+      items = cases,
+      style = 'cases'
     ),
     style = '{'
   )
@@ -510,11 +501,9 @@ $Cases(cases: %Expr[,]): %Template {
 
 $BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
   display = $Parens(
-    body = $Style(
-      body = $Table(
-        items = [[top], [bottom]]
-      ),
-      styleClass = 'binom'
+    body = $Table(
+      items = [[top], [bottom]],
+      style = 'binom'
     ),
     style = '()'
   )
@@ -527,5 +516,24 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
       symbol = symbol,
       operand = limit
     )
+  )
+}
+
+$LabeledList(items: %Expr[,]): %Template {
+  display = $Table(
+    items = items,
+    style = 'labeled-list'
+  )
+}
+
+$LabeledTuple(items: %Expr[,], style: %String = '()'): %Template {
+  display = $Style(
+    body = $Parens(
+      body = $LabeledList(
+        items = items
+      ),
+      style = style
+    ),
+    styleClass = 'labeled-tuple'
   )
 }

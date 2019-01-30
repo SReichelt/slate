@@ -139,41 +139,37 @@ $Categories: %Construction {
       %equals(s, t)
     ))
   ): %Constructor {
-    display = [$Tuple(
+    display = [$LabeledTuple(
       items = [
-        $Argument(
-          param = 'Obj',
-          value = O
-        ),
-        $Argument(
-          param = $SubSup(
+        ['Obj', O],
+        [
+          $SubSup(
             body = 'Mor',
             sub = $Group(
               items = [a, b],
               separator = ''
             )
           ),
-          value = M
-        ),
-        $Argument(
-          param = $SubSup(
+          M
+        ],
+        [
+          $SubSup(
             body = 'id',
             sub = c
           ),
-          value = i
-        ),
-        $Argument(
-          param = $SubSup(
+          i
+        ],
+        [
+          $SubSup(
             body = '∘',
             sub = $Group(
               items = [d, e, f],
               separator = ''
             )
           ),
-          value = ∘
-        )
+          ∘
+        ]
       ],
-      separator = ', ',
       style = '[]'
     )],
     equalityDefinition = {

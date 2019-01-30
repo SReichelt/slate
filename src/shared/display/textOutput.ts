@@ -42,9 +42,6 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       return renderAsText(item, outputMarkdown, singleLine).then((text) => prefix + ' ' + text);
     });
     return renderList(items, singleLine ? ', ' : outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n');
-  } else if (expression instanceof Display.AlignedExpression) {
-    let items = expression.items.map((item: Display.RenderedExpressionPair) => renderAsText(item.left, outputMarkdown, true).then((left) => renderAsText(item.right, outputMarkdown, true).then((right) => left + right)));
-    return renderList(items, singleLine ? ', ' : outputMarkdown ? '\\\n' : '\n');
   } else if (expression instanceof Display.TableExpression) {
     let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), ' '));
     return renderList(rows, singleLine ? ', ' : outputMarkdown ? '\\\n' : '\n');

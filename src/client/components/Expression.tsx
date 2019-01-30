@@ -265,18 +265,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       }
       return result;
-    } else if (expression instanceof Display.AlignedExpression) {
-      className += ' aligned';
-      result = expression.items.map((item: Display.RenderedExpressionPair, index: number) => (
-        <span className={'aligned-row'} key={index}>
-          <span className={'aligned-left'} key={'left'}>
-            <Expression expression={item.left} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-          <span className={'aligned-right'} key={'right'}>
-            <Expression expression={item.right} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-        </span>
-      ));
     } else if (expression instanceof Display.TableExpression) {
       className += ' table';
       result = expression.items.map((row: Display.RenderedExpression[], rowIndex: number) => (
@@ -309,7 +297,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 parenClassName = 'paren-round-text';
               } else {
                 parenResult = (
-                  <span className={'paren-round'}>
+                  <span className={'paren-large paren-round'}>
                     {parenResult}
                   </span>
                 );
@@ -322,7 +310,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 parenClassName = 'paren-flat-text';
               } else {
                 parenResult = (
-                  <span className={'paren-flat'}>
+                  <span className={'paren-large paren-flat'}>
                     {parenResult}
                   </span>
                 );
@@ -336,7 +324,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 parenClassName = 'paren-square-text';
               } else {
                 parenResult = (
-                  <span className={'paren-square'}>
+                  <span className={'paren-large paren-square'}>
                     <span className={'paren-square-row'}>
                       <span className={'paren-square-left'}/>
                       <span className={'paren-square-body'}>
@@ -356,7 +344,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 parenClassName = 'paren-curly-text';
               } else {
                 parenResult = (
-                  <span className={'paren-curly'}>
+                  <span className={'paren-large paren-curly'}>
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 0 1 10" preserveAspectRatio="none">
@@ -390,7 +378,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                   bodyClassName += ' paren-right-hairline';
                 }
                 parenResult = (
-                  <span className={'paren-curly'}>
+                  <span className={'paren-large paren-curly'}>
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 0 1 10" preserveAspectRatio="none">
@@ -413,7 +401,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 parenClassName = 'paren-angle-text';
               } else {
                 parenResult = (
-                  <span className={'paren-angle'}>
+                  <span className={'paren-large paren-angle'}>
                     <span className={'paren-angle-row'}>
                       <span className={'paren-angle-left'}>
                         <svg viewBox="0 0 1 1" preserveAspectRatio="none">
@@ -571,13 +559,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let under: any = expression.under ? <Expression expression={expression.under} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       result = [
         (
-          <span className={'overunder-over-row'} key="over">
-            <span className={'overunder-over'}>
-              {over}
-            </span>
-          </span>
-        ),
-        (
           <span className={'overunder-body-row'} key="body">
             <span className={'overunder-body'}>
               <Expression expression={bodyWithParens} parent={this} interactionHandler={this.props.interactionHandler}/>
@@ -592,6 +573,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
         )
       ];
+      if (over) {
+        result.unshift(
+          <span className={'overunder-over-row'} key="over">
+            <span className={'overunder-over'}>
+              {over}
+            </span>
+          </span>
+        );
+      } else {
+        className += ' noover';
+      }
     } else if (expression instanceof Display.FractionExpression) {
       className += ' fraction';
       result = [

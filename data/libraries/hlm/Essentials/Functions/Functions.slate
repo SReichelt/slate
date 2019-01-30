@@ -21,20 +21,23 @@ $Functions(
     #(y: %Element(Y))
   )): %Constructor {
     display = [$Parens(
-      body = $Aligned(items = [
-        [
-          $InnerParens(
-            body = X,
-            maxLevel = 0
-          ),
-          ' → ',
-          $InnerParens(
-            body = Y,
-            maxLevel = 0
-          )
+      body = $Table(
+        items = [
+          [
+            $InnerParens(
+              body = X,
+              maxLevel = 0
+            ),
+            ' → ',
+            $InnerParens(
+              body = Y,
+              maxLevel = 0
+            )
+          ],
+          [x, ' ↦ ', y]
         ],
-        [x, ' ↦ ', y]
-      ]),
+        style = 'aligned'
+      ),
       style = '()'
     )],
     definitionDisplay = {
@@ -43,20 +46,23 @@ $Functions(
         function = f,
         body = [
           ' ',
-          $Aligned(items = [
-            [
-              $InnerParens(
-                body = X,
-                maxLevel = 0
-              ),
-              ' → ',
-              $InnerParens(
-                body = Y,
-                maxLevel = 0
-              )
+          $Table(
+            items = [
+              [
+                $InnerParens(
+                  body = X,
+                  maxLevel = 0
+                ),
+                ' → ',
+                $InnerParens(
+                  body = Y,
+                  maxLevel = 0
+                )
+              ],
+              [x, ' ↦ ', y]
             ],
-            [x, ' ↦ ', y]
-          ])
+            style = 'aligned'
+          )
         ]
       )]
     },

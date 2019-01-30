@@ -76,26 +76,6 @@ p {
   color: gray;
 }
 
-.aligned {
-  display: inline-table;
-  vertical-align: middle;
-}
-
-.aligned-row {
-  display: table-row;
-}
-
-.aligned-left {
-  display: table-cell;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.aligned-right {
-  display: table-cell;
-  text-align: left;
-}
-
 .display-math>.aligned-row>.aligned-left, .display-math>.aligned-row>.aligned-right {
   padding-top: 1pt;
   padding-bottom: 1pt;
@@ -164,8 +144,14 @@ p {
   white-space: nowrap;
 }
 
+.overunder.noover {
+  vertical-align: initial;
+  padding-top: 0.6em;
+}
+
 .overunder-body-row {
   display: table-row;
+  vertical-align: initial;
 }
 
 .overunder-over-row, .overunder-under-row {
@@ -179,7 +165,8 @@ p {
   line-height: 100%;
 }
 
-.paren {
+.paren-large {
+  margin: 1pt;
   white-space: nowrap;
 }
 
@@ -192,7 +179,6 @@ p {
   padding-right: 4pt;
   padding-top: 2pt;
   padding-bottom: 2pt;
-  margin: 1pt;
 }
 
 .paren-flat {
@@ -200,17 +186,16 @@ p {
   border-left: solid 1pt;
   border-right: solid 1pt;
   padding: 2pt;
-  margin: 1pt;
 }
 
 .paren-square, .paren-curly, .paren-angle {
   display: inline-table;
   vertical-align: middle;
-  margin: 1pt;
 }
 
 .paren-square-row, .paren-curly-row, .paren-angle-row {
   display: table-row;
+  vertical-align: initial;
 }
 
 .paren-square-left {
@@ -271,45 +256,71 @@ p {
 
 .table {
   display: inline-table;
-  text-align: center;
   vertical-align: middle;
+}
+
+.table.inline {
+  vertical-align: initial;
+}
+
+.table.matrix, .table.binom {
+  text-align: center;
   white-space: nowrap;
 }
 
 .table-row {
   display: table-row;
+  vertical-align: initial;
 }
 
 .table-cell {
   display: table-cell;
-  padding-left: 2pt;
-  padding-right: 2pt;
 }
 
-.cases {
-  text-align: left;
+.table.matrix>.table-row>.table-cell, .table.cases>.table-row>.table-cell {
+  padding-left: 1pt;
+  padding-right: 1pt;
 }
 
-.cases>.table-row>.table-cell:not(:first-child) {
+.table.aligned>.table-row>.table-cell:first-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table.cases>.table-row>.table-cell:not(:first-child) {
   padding-left: 1ex;
 }
 
-.binom {
-  margin: -2pt;
+.table.binom {
+  margin: -2pt -1pt;
 }
 
-.construction {
-  text-align: left;
+.table.construction>.table-row>.table-cell {
+  padding: 2pt;
 }
 
-.construction>.table-row>.table-cell:first-child {
-  padding-right: 1ex;
+.table.construction>.table-row:not(:first-child)>.table-cell {
+  padding-top: 1pt;
 }
 
-.construction>.table-row>.table-cell:not(:first-child) {
+.table.construction>.table-row>.table-cell:first-child {
+  padding-right: 4pt;
+  white-space: nowrap;
+}
+
+.table.construction>.table-row>.table-cell:not(:first-child) {
   border-left: solid 1pt;
-  padding-left: 1ex;
+  padding-left: 4pt;
   white-space: initial;
+}
+
+.table.construction>.table-row>.table-cell:first-child>.labeled-tuple>.paren-large {
+  vertical-align: top;
+}
+
+.table.labeled-list>.table-row>.table-cell:first-child::after {
+  content: ':';
+  padding-right: 2pt;
 }
 
 .fraction {
@@ -482,10 +493,6 @@ p {
   font-family: 'TeX-Large', serif;
   font-size: 110%;
   line-height: 150%;
-}
-
-.baseline {
-  vertical-align: baseline;
 }
 
 .source-code {

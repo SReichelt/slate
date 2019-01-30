@@ -55,6 +55,7 @@ Please follow these steps:
 7. If the app does not start, check the many output/console/terminal windows of Visual Studio Code. On Windows, I had to fix two problems:
    * In the `tsc-watch` package, there were two superfluous commas in a `.js` file. (Probably a matter of different language standards.)
    * In the `open` package, in `open.js`, there is a specialization starting with "`case 'win32':`". This specialization somehow breaks URLs passed to the browser. Commenting it out worked for me, YMMV.
+8. If you would like to debug the application, select the launch configuration called "Launch and attach", which attaches the VSCode debugger to Chrome.
 
 ### Installing the VSCode extension
 

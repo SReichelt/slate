@@ -1,7 +1,9 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between their respective sets. Note that these sets are far from unique (except in the case of the empty set), but the type system prevents the ambiguities that could arise.
+ * @remarks The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between arbitrary representatives _X_ and _Y_.
+ *
+ *          Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal.
  */
 $Homomorphisms(
   𝐱: %Element(

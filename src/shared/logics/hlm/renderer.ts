@@ -1326,10 +1326,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           'right': new Display.EmptyExpression
         });
       }
-      return {left: leftItem, right: rightItem};
+      return [leftItem, rightItem];
     });
-    let result = new Display.AlignedExpression(rows);
-    result.styleClasses = ['baseline'];
+    let result = new Display.TableExpression(rows);
+    result.styleClasses = ['aligned'];
     return result;
   }
 
@@ -1418,7 +1418,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let embedding = definition.contents.embedding;
       if (embedding) {
         let source = embedding.parameter.type.expression as FmtHLM.MetaRefExpression_Element;
-        let rows: Display.RenderedExpressionPair[] = [];
+        let rows: Display.RenderedExpression[][] = [];
         let subset = this.renderSetTerm(source._set);
         let superset = this.renderDefinitionRef([definition]);
         this.setSemanticLink(superset, definition);
@@ -1427,7 +1427,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           'superset': superset
         });
         let supersetWithText = new Display.RowExpression([supersetDefinition, new Display.TextExpression(' via')]);
-        rows.push({left: subset, right: supersetWithText});
+        rows.push([subset, supersetWithText]);
         let subsetElement = this.renderVariableDefinitions([embedding.parameter]);
         let targetTerm = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
         let target = this.renderElementTerm(targetTerm);
@@ -1435,8 +1435,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           'left': new Display.EmptyExpression,
           'right': target
         });
-        rows.push({left: subsetElement, right: supersetElement});
-        paragraphs.push(new Display.AlignedExpression(rows));
+        rows.push([subsetElement, supersetElement]);
+        let table = new Display.TableExpression(rows);
+        table.styleClasses = ['aligned', 'inline'];
+        paragraphs.push(table);
       }
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate
                && definition.contents.display instanceof Fmt.ArrayExpression
