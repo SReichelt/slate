@@ -3,6 +3,8 @@
 /**
  * @remarks This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
  *
+ *          Note also that the definition heavily relies on the embedding of the natural numbers into the cardinal numbers, which is completely transparent in HLM.
+ *
  * @references * https://en.wikipedia.org/wiki/Finite_set
  *             * http://mathworld.wolfram.com/FiniteSet.html
  *             * https://proofwiki.org/wiki/Definition:Finite_Set
