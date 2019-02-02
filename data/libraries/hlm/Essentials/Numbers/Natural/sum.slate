@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type).
+ * @remarks Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the “+” symbols appearing in this definition are part of the notation of the successor constructor.
  *
  * @references * https://en.wikipedia.org/wiki/Natural_number#Addition
  *             * https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers

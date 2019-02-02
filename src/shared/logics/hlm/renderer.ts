@@ -1263,7 +1263,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let isPredicate = contents instanceof FmtHLM.ObjectContents_Predicate;
       this.setDefinitionSemanticLink(definitionRef, definition, contents.display, onSetDisplay, onGetDefault, onGetVariables, isPredicate);
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
-        let hasParameters = false;
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let innerContents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
           let constructorDef = this.renderDefinitionRef([definition, innerDefinition]);
@@ -1278,18 +1277,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.setDefinitionSemanticLink(constructorDef, innerDefinition, innerContents.display, onSetConstructorDisplay, onGetConstructorDefault, onGetConstructorVariables, false);
           let row = [constructorDef];
           if (innerDefinition.parameters.length) {
-            hasParameters = true;
             row.push(this.renderParameterList(innerDefinition.parameters, false, false, false));
           }
           return row;
         });
-        if (hasParameters) {
-          for (let row of rows) {
-            if (row.length < 2) {
-              row.push(new Display.EmptyExpression);
-            }
-          }
-        }
         let construction = this.renderTemplate('Construction', {
           'constructors': rows,
         });

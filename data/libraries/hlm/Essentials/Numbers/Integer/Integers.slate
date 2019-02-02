@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair.
+ * @remarks This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by a [proposition](Actual%20difference%20equals%20formal%20difference).
  *
  *          Since an equality definition for each constructor is always part of a construction, we do not need to build the equivalence classes explicitly, they are implicit in the choice of the equality definition.
  *
@@ -26,7 +26,7 @@ $Integers: %Construction {
         minParenLevel = 1,
         maxParenLevel = 1
       ),
-      style = '[]'
+      style = '()'
     )],
     equalityDefinition = {
       leftParameters = #(

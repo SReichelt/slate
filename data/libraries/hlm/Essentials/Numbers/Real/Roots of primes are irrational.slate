@@ -1,5 +1,9 @@
 %../../../../../logics/hlm%
 
+/**
+ * @references * https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for _n_ = 2)
+ *             * https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for _n_ = 2)
+ */
 $"Roots of primes are irrational"(
   p: %Element($../Natural/Prime/"Prime numbers"),
   n: %Element($../Natural/Subsets/"Segment (greater)"(n = {$../Natural/number(value = 1)}))

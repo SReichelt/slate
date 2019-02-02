@@ -1,9 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type).
- *
- *          Due to appropriate theorems, the two constructors can be rewritten as 0 and _n_ + 1, respectively.
+ * @remarks The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the “successor” constructor, but we could just as well write “S(_n_)”. The notation is justified by an appropriate [proposition](Addition%20of%20one%20yields%20successor).
  *
  *          In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
  *
@@ -17,14 +15,21 @@
  */
 $"Natural numbers": %Construction {
   $zero: %Constructor {
-    display = [$ConstructorName(name = 'O')],
+    display = [$Parens(
+      body = '0',
+      style = '()'
+    )],
     rewrite = {value = $number(value = 0)}
   }
 
   $successor(n: %Element($"Natural numbers")): %Constructor {
-    display = [$Constructor(
-      name = 'S',
-      arguments = [n]
+    display = [$Parens(
+      body = $Operator(
+        symbol = '+',
+        operands = [n, '1'],
+        space = ''
+      ),
+      style = '()'
     )],
     equalityDefinition = {
       leftParameters = #(m: %Element($"Natural numbers")),

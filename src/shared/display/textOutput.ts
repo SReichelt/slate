@@ -43,7 +43,9 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     });
     return renderList(items, singleLine ? ', ' : outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n');
   } else if (expression instanceof Display.TableExpression) {
-    let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), ' '));
+    let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
+    let separator = isConstruction ? ' | ' : ' ';
+    let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), separator));
     return renderList(rows, singleLine ? ', ' : outputMarkdown ? '\\\n' : '\n');
   } else if (expression instanceof Display.ParenExpression) {
     return expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {

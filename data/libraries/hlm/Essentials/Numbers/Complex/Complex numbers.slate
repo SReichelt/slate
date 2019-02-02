@@ -1,5 +1,8 @@
 %../../../../../logics/hlm%
 
+/**
+ * @remarks The constructor notation is later justified by a [proposition](Actual%20linear%20combination%20equals%20formal%20linear%20combination).
+ */
 $"Complex numbers": %Construction {
   $complex(
     r: %Element($../Real/"Real numbers"),
@@ -38,6 +41,16 @@ $"Complex numbers": %Construction {
         %equals(i, "i'")
       )],
       isomorphic = %true
+    },
+    rewrite = {
+      value = $sum(
+        a = {r},
+        b = {$product(
+          a = {i},
+          b = {$"imaginary unit"}
+        )}
+      ),
+      theorem = $"Actual linear combination equals formal linear combination"
     }
   }
 

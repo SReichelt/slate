@@ -1,7 +1,7 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks This result makes further recursive definitions (such as for multiplication) look nicer, as explicit references to the successor constructor are no longer necessary.
+ * @remarks This proposition justifies the notation for the successor constructor.
  */
 $"Addition of one yields successor"(n: %Element($"Natural numbers")): %StandardTheorem {
   claim = %equals(

@@ -267,15 +267,35 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return result;
     } else if (expression instanceof Display.TableExpression) {
       className += ' table';
-      result = expression.items.map((row: Display.RenderedExpression[], rowIndex: number) => (
-        <span className={'table-row'} key={rowIndex}>
-          {row.map((cell: Display.RenderedExpression, colIndex: number) => (
-            <span className={'table-cell'} key={colIndex}>
+      let colCount = 0;
+      for (let row of expression.items) {
+        if (colCount < row.length) {
+          colCount = row.length;
+        }
+      }
+      result = [];
+      let rowIndex = 0;
+      for (let row of expression.items) {
+        let colIndex = 0;
+        let columns: any[] = [];
+        for (let cell of row) {
+          columns.push(
+            <span className={'table-cell'} key={colIndex++}>
               <Expression expression={cell} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
-          ))}
-        </span>
-      ));
+          );
+        }
+        while (colIndex < colCount) {
+          columns.push(
+            <span className={'table-cell'} key={colIndex++}/>
+          );
+        }
+        result.push(
+          <span className={'table-row'} key={rowIndex++}>
+            {columns}
+          </span>
+        );
+      }
     } else if (expression instanceof Display.ParenExpression) {
       className += ' paren';
       let parenExpression = expression;
