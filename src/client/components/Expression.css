@@ -454,6 +454,7 @@ p {
 .dummy {
   color: #606060;
   border: 1px dotted #e0e0a0;
+  margin: -1px;
 }
 
 .bold {
