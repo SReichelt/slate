@@ -68,7 +68,7 @@ p {
 }
 
 .display-math, .indented {
-  margin-left: 2em;
+  margin: 1ex 0 1ex 2em;
 }
 
 .addendum {

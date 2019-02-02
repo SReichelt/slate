@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum).
+ * @remarks This definition constructs a partial order on the disjoint union of two sets _S_ and _T_ from partial orders on _S_ and _T_. Elements of _S_ are always considered smaller than elements of _T_. This is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum).
  */
 $succession(
   S: %Set(auto = %true),

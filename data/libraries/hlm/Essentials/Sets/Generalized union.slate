@@ -15,9 +15,10 @@ $"Generalized union"(
   display = [$LargeOperator(
     symbol = '⋃',
     operand = S,
-    under = $ElementParameter(
-      element = i,
-      set = I
+    under = $Relation(
+      symbol = '∈',
+      operands = [i, I],
+      space = ' '
     )
   )],
   definition = [%subset(

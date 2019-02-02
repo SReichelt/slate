@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product).
+ * @remarks This definition constructs a partial order on the Cartesian product of two sets _S_ and _T_ from partial orders on _S_ and _T_, combining the two partial orders lexicographically. It is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product).
  */
 $"lexicographical order"(
   S: %Set(auto = %true),
