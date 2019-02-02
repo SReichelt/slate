@@ -324,16 +324,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                   <span className={'paren-large paren-round'}>
                     <span className={'paren-round-row'}>
                       <span className={'paren-round-left'}>
-                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 1 0 C -0.25 1 -0.25 9 1 10 C 0 8 0 2 1 0 Z" fill="black"/>
+                        <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
+                          <path d="M 1 -5 C -0.25 -4 -0.25 4 1 5 C 0 3 0 -3 1 -5 Z" fill="black"/>
                         </svg>
                       </span>
                       <span className={'paren-round-body'}>
                         {parenResult}
                       </span>
                       <span className={'paren-round-right'}>
-                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 0 0 C 1.25 1 1.25 9 0 10 C 1 8 1 2 0 0 Z" fill="black"/>
+                        <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
+                          <path d="M 0 -5 C 1.25 -4 1.25 4 0 5 C 1 3 1 -3 0 -5 Z" fill="black"/>
                         </svg>
                       </span>
                     </span>

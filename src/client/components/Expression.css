@@ -183,11 +183,12 @@ p {
   vertical-align: middle;
   text-align: center;
   white-space: nowrap;
+  line-height: 100%;
 }
 
 .overunder.noover {
   vertical-align: initial;
-  padding-top: 0.8em;
+  margin-top: 0.9em;
 }
 
 .overunder-body-row {
@@ -197,18 +198,21 @@ p {
 
 .overunder-over-row, .overunder-under-row {
   display: table-row;
-  height: 0.8em;
   font-size: smaller;
 }
 
 .overunder-body, .overunder-over, .overunder-under {
   display: table-cell;
-  line-height: 100%;
 }
 
 .paren-large {
   margin: 1pt;
   white-space: nowrap;
+}
+
+.paren-large.paren-round {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .paren-flat {
