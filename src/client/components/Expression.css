@@ -28,6 +28,10 @@ span.expr.interactive.link {
   font-weight: normal;
 }
 
+.proof-placeholder {
+  font-style: italic;
+}
+
 p {
   margin-top: 0;
   margin-bottom: 0;

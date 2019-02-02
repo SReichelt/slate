@@ -1602,10 +1602,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       } else {
         let noProof = new Display.TextExpression('No proof.');
-        if (heading === 'Proof') {
-          noProof.styleClasses = ['sub-heading'];
-          paragraphs.push(noProof);
-        } else if (heading) {
+        noProof.styleClasses = ['proof-placeholder'];
+        if (heading && heading !== 'Proof') {
           let label = new Display.TextExpression(`${heading}.`);
           label.styleClasses = ['sub-heading'];
           let row = [label, new Display.TextExpression('  '), noProof];
