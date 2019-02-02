@@ -181,6 +181,12 @@ export abstract class GenericRenderer {
     return itemNumber.join('.');
   }
 
+  protected renderSubHeading(heading: string): Display.RenderedExpression {
+    let subHeading = new Display.TextExpression(`${heading}.`);
+    subHeading.styleClasses = ['sub-heading'];
+    return subHeading;
+  }
+
   protected addDefinitionRemarks(paragraphs: Display.RenderedExpression[]): void {
     let allKinds = ['remarks', 'references'];
     for (let kind of allKinds) {
@@ -202,9 +208,7 @@ export abstract class GenericRenderer {
       }
     }
     if (text || this.editHandler) {
-      let heading = new Display.TextExpression(kind.charAt(0).toUpperCase() + kind.slice(1) + '.');
-      heading.styleClasses = ['sub-heading'];
-      paragraphs.push(heading);
+      paragraphs.push(this.renderSubHeading(kind.charAt(0).toUpperCase() + kind.slice(1)));
       let markdown = new Display.MarkdownExpression(text);
       if (this.editHandler) {
         this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);

@@ -325,6 +325,7 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
+    result.dimension = this.dimension;
     if (this.item) {
       result.item = this.item.substitute(fn, replacedParameters);
       if (result.item !== this.item) {

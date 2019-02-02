@@ -1394,6 +1394,7 @@ export class ObjectContents_Property extends Fmt.ObjectContents {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Property, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
+    result.property = this.property;
     if (this.theorem) {
       result.theorem = this.theorem.substitute(fn, replacedParameters);
       if (result.theorem !== this.theorem) {
@@ -3342,6 +3343,8 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Proof, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
+    result._from = this._from;
+    result._to = this._to;
     if (this.parameters) {
       result.parameters = Object.create(Fmt.ParameterList.prototype);
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
@@ -3403,6 +3406,7 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
+    result.index = this.index;
     return this.getSubstitutionResult(fn, result, changed);
   }
 }

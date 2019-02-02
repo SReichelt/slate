@@ -36,6 +36,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Section, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
+    result.logic = this.logic;
     if (this.items) {
       result.items = this.items.substitute(fn, replacedParameters);
       if (result.items !== this.items) {
@@ -170,6 +171,8 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
+    result.type = this.type;
+    result.title = this.title;
     return this.getSubstitutionResult(fn, result, changed);
   }
 }
@@ -209,6 +212,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
+    result.title = this.title;
     return this.getSubstitutionResult(fn, result, changed);
   }
 }

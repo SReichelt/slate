@@ -223,8 +223,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (expression.style instanceof Array) {
         className += ' custom';
         let rows = expression.items.map((item: Display.RenderedExpression, index: number) => {
+          let itemClassName = 'list-item';
+          if (index) {
+            itemClassName += ' space-above';
+          }
           return (
-            <span className={'list-item'} key={index}>
+            <span className={itemClassName} key={index}>
               <span className={'list-item-header'}>
                 {expression.style[index]}
               </span>
@@ -318,7 +322,21 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               } else {
                 parenResult = (
                   <span className={'paren-large paren-round'}>
-                    {parenResult}
+                    <span className={'paren-round-row'}>
+                      <span className={'paren-round-left'}>
+                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
+                          <path d="M 1 0 C -0.25 1 -0.25 9 1 10 C 0 8 0 2 1 0 Z" fill="black"/>
+                        </svg>
+                      </span>
+                      <span className={'paren-round-body'}>
+                        {parenResult}
+                      </span>
+                      <span className={'paren-round-right'}>
+                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
+                          <path d="M 0 0 C 1.25 1 1.25 9 0 10 C 1 8 1 2 0 0 Z" fill="black"/>
+                        </svg>
+                      </span>
+                    </span>
                   </span>
                 );
                 handled = true;
@@ -368,7 +386,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 0.9 0.1 Q 0.5 0.1 0.5 1 L 0.5 4 Q 0.5 5 0.1 5 Q 0.5 5 0.5 6 L 0.5 9 Q 0.5 9.9 0.9 9.9" y2="0" stroke="black" strokeWidth="0.2" strokeLinecap="square" fill="transparent"/>
+                          <path d="M 1 0 Q 0.4 0 0.4 1.5 L 0.4 3 Q 0.4 5 0 5 Q 0.4 5 0.4 7 L 0.4 8.5 Q 0.4 10 1 10 Q 0.55 10 0.55 8 L 0.55 6.5 Q 0.55 4.8 0 5 Q 0.55 5.2 0.55 3.5 L 0.55 2 Q 0.55 0 1 0 Z" fill="black"/>
                         </svg>
                       </span>
                       <span className={'paren-curly-body'}>
@@ -376,7 +394,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                       </span>
                       <span className={'paren-curly-right'}>
                         <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 0.1 0.1 Q 0.5 0.1 0.5 1 L 0.5 4 Q 0.5 5 0.9 5 Q 0.5 5 0.5 6 L 0.5 9 Q 0.5 9.9 0.1 9.9" y2="0" stroke="black" strokeWidth="0.2" strokeLinecap="square" fill="transparent"/>
+                          <path d="M 0 0 Q 0.6 0 0.6 1.5 L 0.6 3 Q 0.6 5 1 5 Q 0.6 5 0.6 7 L 0.6 8.5 Q 0.6 10 0 10 Q 0.45 10 0.45 8 L 0.45 6.5 Q 0.45 4.8 1 5 Q 0.45 5.2 0.45 3.5 L 0.45 2 Q 0.45 0 0 0 Z" fill="black"/>
                         </svg>
                       </span>
                     </span>
@@ -402,7 +420,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 0.9 0.1 Q 0.5 0.1 0.5 1 L 0.5 4 Q 0.5 5 0.1 5 Q 0.5 5 0.5 6 L 0.5 9 Q 0.5 9.9 0.9 9.9" y2="0" stroke="black" strokeWidth="0.2" strokeLinecap="square" fill="transparent"/>
+                          <path d="M 1 0 Q 0.4 0 0.4 1.5 L 0.4 3 Q 0.4 5 0 5 Q 0.4 5 0.4 7 L 0.4 8.5 Q 0.4 10 1 10 Q 0.55 10 0.55 8 L 0.55 6.5 Q 0.55 4.8 0 5 Q 0.55 5.2 0.55 3.5 L 0.55 2 Q 0.55 0 1 0 Z" fill="black"/>
                         </svg>
                       </span>
                       <span className={bodyClassName}>

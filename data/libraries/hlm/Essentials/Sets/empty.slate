@@ -20,11 +20,17 @@ $empty(S: %Set): %Predicate {
     %not(%exists(#(x: %Element(S))))
   ],
   equivalenceProofs = [
-    {steps = #(_: %UseDef(result = %sub(
-      S,
-      $"Empty set"
-    )))},
     {
+      from = 1,
+      to = 2,
+      steps = #(_: %UseDef(result = %sub(
+        S,
+        $"Empty set"
+      )))
+    },
+    {
+      from = 2,
+      to = 3,
       parameters = #(@: %Constraint(%sub(
         S,
         $"Empty set"
@@ -48,34 +54,38 @@ $empty(S: %Set): %Predicate {
         }))
       }))
     },
-    {steps = #(_: %ProveSetEquals(
-      subsetProof = {steps = #(_: %ProveDef(proof = {
-        goal = %forall(
-          #(a: %Element(S)),
-          %in(
-            a,
-            $"Empty set"
-          )
-        ),
-        steps = #(_: %ProveForAll({
-          parameters = #(a: %Element(S)),
-          goal = %in(
-            a,
-            $"Empty set"
+    {
+      from = 3,
+      to = 1,
+      steps = #(_: %ProveSetEquals(
+        subsetProof = {steps = #(_: %ProveDef(proof = {
+          goal = %forall(
+            #(a: %Element(S)),
+            %in(
+              a,
+              $"Empty set"
+            )
           ),
-          steps = #(_: %State(
-            %exists(#(x: %Element(S))),
-            proof = {steps = #(_: %ProveExists({x = {a}}))}
-          ))
-        }))
-      }))},
-      supersetProof = {steps = #(_: %UseTheorem(
-        $"Empty set is subset of any set"(S = {S}),
-        %sub(
-          $"Empty set",
-          S
-        )
-      ))}
-    ))}
+          steps = #(_: %ProveForAll({
+            parameters = #(a: %Element(S)),
+            goal = %in(
+              a,
+              $"Empty set"
+            ),
+            steps = #(_: %State(
+              %exists(#(x: %Element(S))),
+              proof = {steps = #(_: %ProveExists({x = {a}}))}
+            ))
+          }))
+        }))},
+        supersetProof = {steps = #(_: %UseTheorem(
+          $"Empty set is subset of any set"(S = {S}),
+          %sub(
+            $"Empty set",
+            S
+          )
+        ))}
+      ))
+    }
   ]
 }

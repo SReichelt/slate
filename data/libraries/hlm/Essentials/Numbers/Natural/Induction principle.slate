@@ -13,21 +13,28 @@ $"Induction principle"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       $"Natural numbers"
     )
   ],
-  equivalenceProofs = [{steps = #(_: %ProveSetEquals(supersetProof = {steps = #(_: %ProveDef(proof = {
-    goal = %forall(
-      #(n: %Element($"Natural numbers")),
-      %in(n, M)
-    ),
-    steps = #(_: %ProveForAll({
-      parameters = #(n: %Element($"Natural numbers")),
-      goal = %in(n, M),
-      steps = #(_: %UseTheorem(
-        $"Induction lemma"(
-          M = {M},
-          n = {n}
+  equivalenceProofs = [{
+    from = 1,
+    to = 2,
+    steps = #(_: %ProveSetEquals(
+      subsetProof = {steps = #()},
+      supersetProof = {steps = #(_: %ProveDef(proof = {
+        goal = %forall(
+          #(n: %Element($"Natural numbers")),
+          %in(n, M)
         ),
-        %in(n, M)
-      ))
-    }))
-  }))}))}]
+        steps = #(_: %ProveForAll({
+          parameters = #(n: %Element($"Natural numbers")),
+          goal = %in(n, M),
+          steps = #(_: %UseTheorem(
+            $"Induction lemma"(
+              M = {M},
+              n = {n}
+            ),
+            %in(n, M)
+          ))
+        }))
+      }))}
+    ))
+  }]
 }

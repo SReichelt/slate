@@ -503,15 +503,16 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
-          if (member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String) {
-            continue;
-          }
           let memberName = translateMemberName(member.name);
-          let contentType = getMemberContentType(inFile, member.type);
-          let arrayDimensions = contentType ? member.type.arrayDimensions : 0;
-          outFileStr += `    if (this.${memberName}) {\n`;
-          outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
-          outFileStr += `    }\n`;
+          if (member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String) {
+            outFileStr += `    result.${memberName} = this.${memberName};\n`;
+          } else {
+            let contentType = getMemberContentType(inFile, member.type);
+            let arrayDimensions = contentType ? member.type.arrayDimensions : 0;
+            outFileStr += `    if (this.${memberName}) {\n`;
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
+            outFileStr += `    }\n`;
+          }
         }
       }
       outFileStr += `    return changed;\n`;
@@ -565,18 +566,19 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    let result = new MetaRefExpression_${definition.name};\n`;
         outFileStr += `    let changed = false;\n`;
         for (let parameter of definition.parameters) {
-          if (parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) {
-            continue;
-          }
           let memberName = translateMemberName(parameter.name);
-          let contentType = getMemberContentType(inFile, parameter.type);
-          let arrayDimensions = contentType ? parameter.type.arrayDimensions : 0;
-          if (parameter.list) {
-            arrayDimensions++;
+          if (parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) {
+            outFileStr += `    result.${memberName} = this.${memberName};\n`;
+          } else {
+            let contentType = getMemberContentType(inFile, parameter.type);
+            let arrayDimensions = contentType ? parameter.type.arrayDimensions : 0;
+            if (parameter.list) {
+              arrayDimensions++;
+            }
+            outFileStr += `    if (this.${memberName}) {\n`;
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
+            outFileStr += `    }\n`;
           }
-          outFileStr += `    if (this.${memberName}) {\n`;
-          outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
-          outFileStr += `    }\n`;
         }
         outFileStr += `    return this.getSubstitutionResult(fn, result, changed);\n`;
       } else {

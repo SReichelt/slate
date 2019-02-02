@@ -42,13 +42,13 @@ $"less or equal"(
         },
         {
           constructor = $"Natural numbers".successor,
-          parameters = #(x: %Element($"Natural numbers")),
+          parameters = #(y: %Element($"Natural numbers")),
           value = %and(
             $"less or equal"(
-              m = {x},
+              m = {y},
               n = {n}
             ),
-            %not(%equals(x, n))
+            %not(%equals(y, n))
           ),
           rewrite = %true
         }
@@ -67,10 +67,10 @@ $"less or equal"(
           },
           {
             constructor = $"Natural numbers".successor,
-            parameters = #(y: %Element($"Natural numbers")),
+            parameters = #(z: %Element($"Natural numbers")),
             value = $"less or equal"(
               m = {m},
-              n = {y}
+              n = {z}
             ),
             rewrite = %true
           }

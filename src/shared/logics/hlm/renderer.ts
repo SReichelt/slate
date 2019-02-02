@@ -114,7 +114,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let extractedConstraints: Fmt.Parameter[] = [];
           let reducedParameters = this.extractConstraints(definition.parameters, extractedConstraints);
           let parameters = this.renderParameterList(reducedParameters, false, false, false);
-          let addendum = new Display.RowExpression([new Display.TextExpression('   if '), parameters]);
+          let addendum = new Display.RowExpression([new Display.TextExpression('if '), parameters]);
           addendum.styleClasses = ['addendum'];
           if (extractedConstraints.length) {
             let items = extractedConstraints.map((param: Fmt.Parameter) => this.renderParameter(param, false));
@@ -131,7 +131,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (multiLine) {
             return new Display.ParagraphExpression([claim, addendum]);
           } else {
-            return new Display.RowExpression([claim, addendum]);
+            return new Display.RowExpression([claim, new Display.TextExpression('  '), addendum]);
           }
         } else {
           return claim;
@@ -342,7 +342,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       state.inConstraint = true;
       state.inDefinition = false;
 
-      row.push(this.renderFormula(type.formula));
+      let formula = this.renderFormula(type.formula);
+      if (state.sentence) {
+        row.push(formula);
+      } else {
+        let formulaWithParens = new Display.InnerParenExpression(formula);
+        formulaWithParens.maxLevel = -2;
+        row.push(formulaWithParens);
+      }
     } else {
       if (state.sentence) {
         if (state.started) {
@@ -1234,10 +1241,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       contents.styleClasses.push('display-math');
       paragraphs.push(contents);
     }
-    this.addDefinitionProofs(paragraphs);
     if (includeExtras) {
       this.addExtraDefinitionContents(paragraphs);
     }
+    this.addDefinitionProofs(paragraphs);
   }
 
   renderDefinitionContents(): Display.RenderedExpression | undefined {
@@ -1375,6 +1382,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let definition = this.definition;
     if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
       this.addProofs(definition.contents.proofs, 'Proof', false, paragraphs);
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+      this.addEquivalenceProofs(definition.contents.equivalenceProofs, 'Proof', '⇒', paragraphs);
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
+      if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length > 1) {
+        this.addEquivalenceProofs(definition.contents.equalityProofs, 'Equality', '⊆', paragraphs);
+      }
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+      if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length > 1) {
+        this.addEquivalenceProofs(definition.contents.equalityProofs, 'Equality', '=', paragraphs);
+      }
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+      if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length > 1) {
+        this.addEquivalenceProofs(definition.contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
+      }
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
+      if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length > 1) {
+        this.addEquivalenceProofs(definition.contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
+      }
+      this.addProof(definition.contents.wellDefinednessProof, 'Well-definedness', false, paragraphs);
     }
   }
 
@@ -1416,6 +1442,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               'formula': equivalenceDef
             });
             paragraphs.push(quantification);
+            if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
+              this.addIndentedProof(equalityDefinition.reflexivityProof, 'Reflexivity', paragraphs);
+              this.addIndentedProof(equalityDefinition.symmetryProof, 'Symmetry', paragraphs);
+              this.addIndentedProof(equalityDefinition.transitivityProof, 'Transitivity', paragraphs);
+            }
           }
         }
       }
@@ -1443,6 +1474,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let table = new Display.TableExpression(rows);
         table.styleClasses = ['aligned', 'inline'];
         paragraphs.push(table);
+        this.addIndentedProof(embedding.wellDefinednessProof, 'Well-definedness', paragraphs);
       }
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate
                && definition.contents.display instanceof Fmt.ArrayExpression
@@ -1565,9 +1597,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let row: Display.RenderedExpression[] = [];
           if (heading) {
             let labelText = proofs.length > 1 ? `${heading} ${proofNumber}.` : `${heading}.`;
-            let label = new Display.TextExpression(labelText);
-            label.styleClasses = ['sub-heading'];
-            row.push(label);
+            row.push(this.renderSubHeading(labelText));
           }
           let hasParameters = false;
           if (proof.parameters && proof.parameters.length) {
@@ -1586,32 +1616,46 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               }
             }
             row.push(this.renderFormula(proof.goal));
-            row.push(new Display.TextExpression(':'));
+            let punctuation = ':';
+            if (!proof.steps.length) {
+              punctuation += ' ';
+            }
+            row.push(new Display.TextExpression(punctuation));
           }
-          paragraphs.push(new Display.RowExpression(row));
-          if (indentSteps) {
-            let subParagraphs: Display.RenderedExpression[] = [];
-            this.addProofSteps(proof, subParagraphs);
-            let steps = new Display.ParagraphExpression(subParagraphs);
-            steps.styleClasses = ['indented'];
-            paragraphs.push(steps);
+          if (proof.steps.length) {
+            paragraphs.push(new Display.RowExpression(row));
+            if (indentSteps) {
+              let subParagraphs: Display.RenderedExpression[] = [];
+              this.addProofSteps(proof, subParagraphs);
+              let steps = new Display.ParagraphExpression(subParagraphs);
+              steps.styleClasses = ['indented'];
+              paragraphs.push(steps);
+            } else {
+              this.addProofSteps(proof, paragraphs);
+            }
           } else {
-            this.addProofSteps(proof, paragraphs);
+            let trivial = new Display.TextExpression('Trivial.');
+            trivial.styleClasses = ['proof-placeholder'];
+            row.push(trivial);
+            paragraphs.push(new Display.RowExpression(row));
           }
           proofNumber++;
         }
       } else {
-        let noProof = new Display.TextExpression('No proof.');
-        noProof.styleClasses = ['proof-placeholder'];
-        if (heading && heading !== 'Proof') {
-          let label = new Display.TextExpression(`${heading}.`);
-          label.styleClasses = ['sub-heading'];
-          let row = [label, new Display.TextExpression('  '), noProof];
-          paragraphs.push(new Display.RowExpression(row));
-        } else {
-          paragraphs.push(noProof);
-        }
+        this.addNoProofPlaceholder(heading, paragraphs);
       }
+    }
+  }
+
+  private addNoProofPlaceholder(heading: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+    let noProof = new Display.TextExpression('No proof.');
+    noProof.styleClasses = ['proof-placeholder'];
+    if (heading && heading !== 'Proof') {
+      let label = this.renderSubHeading(heading);
+      let row = [label, new Display.TextExpression('  '), noProof];
+      paragraphs.push(new Display.RowExpression(row));
+    } else {
+      paragraphs.push(noProof);
     }
   }
 
@@ -1631,22 +1675,55 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProof(proof, undefined, true, paragraphs);
   }
 
+  private addIndentedProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+    if (this.includeProofs) {
+      let subParagraphs: Display.RenderedExpression[] = [];
+      this.addProof(proof, heading, false, subParagraphs);
+      let subProof = new Display.ParagraphExpression(subParagraphs);
+      subProof.styleClasses = ['indented'];
+      paragraphs.push(subProof);
+    }
+  }
+
   private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, paragraphs: Display.RenderedExpression[]): void {
-    let subParagraphs: Display.RenderedExpression[] = [];
-    this.addProof(proof, undefined, false, subParagraphs);
-    let subProof = new Display.ParagraphExpression(subParagraphs);
-    subProof.styleClasses = ['indented'];
-    paragraphs.push(subProof);
+    this.addIndentedProof(proof, undefined, paragraphs);
+  }
+
+  private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, paragraphs: Display.RenderedExpression[]): void {
+    if (this.includeProofs) {
+      let items = proofs.map((proof) => {
+        let subParagraphs: Display.RenderedExpression[] = [];
+        this.addProof(proof, undefined, false, subParagraphs);
+        return new Display.ParagraphExpression(subParagraphs);
+      });
+      let list = new Display.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '1.');
+      paragraphs.push(list);
+    }
+  }
+
+  private addEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, symbol: string, paragraphs: Display.RenderedExpression[]): void {
+    if (this.includeProofs) {
+      if (proofs && proofs.length) {
+        if (heading) {
+          paragraphs.push(this.renderSubHeading(heading));
+        }
+        let labels: string[] = [];
+        for (let proof of proofs) {
+          let label = '?';
+          if (proof._from !== undefined && proof._to !== undefined) {
+            label = `${proof._from}${symbol}${proof._to}`;
+          }
+          labels.push(label);
+        }
+        this.addProofList(proofs, labels, paragraphs);
+      } else {
+        this.addNoProofPlaceholder(heading, paragraphs);
+      }
+    }
   }
 
   private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, paragraphs: Display.RenderedExpression[]): void {
-    let items = proofs.map((proof) => {
-      let subParagraphs: Display.RenderedExpression[] = [];
-      this.addProof(proof, undefined, false, subParagraphs);
-      return new Display.ParagraphExpression(subParagraphs);
-    });
-    let list = new Display.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '1.');
-    paragraphs.push(list);
+    this.addProofList(proofs, labels, paragraphs);
   }
 
   private addProofStep(step: Fmt.Parameter, previousResult: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): Fmt.Expression | undefined {
@@ -1785,6 +1862,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           for (let item of definition.contents.definition.items) {
             this.addFormulaParts(item, result);
           }
+          if (definition.contents.wellDefinednessProof) {
+            this.addProofParts(definition.contents.wellDefinednessProof, result);
+          }
           if (definition.contents.equivalenceProofs) {
             this.addProofListParts(definition.contents.equivalenceProofs, result);
           }
@@ -1833,6 +1913,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (expression instanceof Fmt.DefinitionRefExpression) {
       this.addPathParts(expression.path, result);
     }
+    // TODO call addGenericExpressionParts recursively for all sub-expressions
   }
 
   private addPathParts(path: Fmt.Path, result: Map<Object, Logic.RenderFn>): void {
@@ -1877,18 +1958,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addArgumentListParts(args: Fmt.ArgumentList, result: Map<Object, Logic.RenderFn>): void {
     for (let arg of args) {
       if (arg.value instanceof Fmt.CompoundExpression) {
+        let index = 0;
         for (let item of arg.value.arguments) {
-          if (item.name) {
-            if (item.name === 'proof' || item.name.endsWith('Proof')) {
-              let value = item.value as Fmt.CompoundExpression;
-              let proof = new FmtHLM.ObjectContents_Proof;
-              proof.fromCompoundExpression(value);
-              this.addProofParts(proof, result);
-            } else if (item.name === 'arguments') {
-              let value = item.value as Fmt.CompoundExpression;
-              this.addArgumentListParts(value.arguments, result);
-            }
+          if (item.name === 'proof' || (item.name && item.name.endsWith('Proof'))) {
+            let value = item.value as Fmt.CompoundExpression;
+            let proof = new FmtHLM.ObjectContents_Proof;
+            proof.fromCompoundExpression(value);
+            this.addProofParts(proof, result);
+          } else if (item.name === 'arguments') {
+            let value = item.value as Fmt.CompoundExpression;
+            this.addArgumentListParts(value.arguments, result);
+          } else if (!index) {
+            this.addGenericExpressionParts(item.value, result);
           }
+          index++;
         }
       }
     }
