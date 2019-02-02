@@ -220,8 +220,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       resolveDefinitions = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => {
         if (expression instanceof Fmt.DefinitionRefExpression) {
-          let path = this.utils.getOuterDefinitionPath(expression);
-          return this.utils.getDefinition(path)
+          return this.utils.getOuterDefinition(expression)
             .then((definition: Fmt.Definition) => constraintDefinitions.concat(definition));
         } else {
           return constraintDefinitions.concat(undefined);
@@ -1349,8 +1348,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let expression = rightExpressions[0];
       if (expression instanceof Fmt.DefinitionRefExpression) {
         let definitionRef = expression;
-        let path = this.utils.getOuterDefinitionPath(definitionRef);
-        let promise = this.utils.getDefinition(path)
+        let promise = this.utils.getOuterDefinition(definitionRef)
           .then((definition: Fmt.Definition) => {
             let definitions: Fmt.Definition[] = [];
             let argumentLists: Fmt.ArgumentList[] = [];
@@ -1401,6 +1399,46 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addEquivalenceProofs(definition.contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
       }
       this.addProof(definition.contents.wellDefinednessProof, 'Well-definedness', false, paragraphs);
+    }
+    this.addShortcutProofs(paragraphs);
+  }
+
+  private addShortcutProofs(paragraphs: Display.RenderedExpression[]): void {
+    // TODO after the shortcut redesign, we can display actual proofs here
+    let hasNonIsomorphicShortcutPromise = CachedPromise.resolve(false);
+    for (let param of this.definition.parameters) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && type.shortcut._constructor instanceof Fmt.DefinitionRefExpression) {
+        let constructorRef = type.shortcut._constructor;
+        let constructionPromise = this.utils.getOuterDefinition(constructorRef);
+        hasNonIsomorphicShortcutPromise = hasNonIsomorphicShortcutPromise.then((hasNonIsomorphicShortcut: boolean) => {
+          if (hasNonIsomorphicShortcut) {
+            return true;
+          }
+          return constructionPromise.then((construction: Fmt.Definition) => {
+            let constructor = construction.innerDefinitions.getDefinition(constructorRef.path.name);
+            if (constructor.contents instanceof FmtHLM.ObjectContents_Constructor && constructor.contents.equalityDefinition) {
+              if (!(constructor.contents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
+                return true;
+              }
+            }
+            return false;
+          });
+        });
+      }
+    }
+    let immediateResult = hasNonIsomorphicShortcutPromise.getImmediateResult();
+    if (immediateResult !== false) {
+      let proofPromise = hasNonIsomorphicShortcutPromise.then((hasNonIsomorphicShortcut: boolean) => {
+        if (hasNonIsomorphicShortcut) {
+          let subParagraphs: Display.RenderedExpression[] = [];
+          this.addNoProofPlaceholder('Well-definedness', subParagraphs);
+          return new Display.ParagraphExpression(subParagraphs);
+        } else {
+          return new Display.EmptyExpression;
+        }
+      });
+      paragraphs.push(new Display.PromiseExpression(proofPromise));
     }
   }
 
@@ -1596,7 +1634,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         for (let proof of proofs) {
           let row: Display.RenderedExpression[] = [];
           if (heading) {
-            let labelText = proofs.length > 1 ? `${heading} ${proofNumber}.` : `${heading}.`;
+            let labelText = proofs.length > 1 ? `${heading} ${proofNumber}` : heading;
             row.push(this.renderSubHeading(labelText));
           }
           let hasParameters = false;

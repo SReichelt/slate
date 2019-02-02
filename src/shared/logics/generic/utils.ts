@@ -13,12 +13,12 @@ export class GenericUtils {
     }
   }
 
-  getOuterDefinitionPath(expression: Fmt.DefinitionRefExpression): Fmt.Path {
+  getOuterDefinition(expression: Fmt.DefinitionRefExpression): CachedPromise<Fmt.Definition> {
     let path = expression.path;
     while (path.parentPath instanceof Fmt.Path) {
       path = path.parentPath;
     }
-    return path;
+    return this.getDefinition(path);
   }
 
   splitPath(path: Fmt.Path, childPaths: Fmt.Path[]): void {
