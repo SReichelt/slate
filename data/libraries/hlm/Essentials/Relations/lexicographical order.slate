@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product).
+ */
 $"lexicographical order"(
   S: %Set(auto = %true),
   T: %Set(auto = %true),

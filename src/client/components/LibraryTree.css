@@ -2,6 +2,7 @@
   display: table;
   width: 100%;
   white-space: nowrap;
+  user-select: none;
 }
 
 .tree-item {

@@ -1,5 +1,8 @@
 %../../../../logics/hlm%
 
+/**
+ * @remarks This definition is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum).
+ */
 $succession(
   S: %Set(auto = %true),
   T: %Set(auto = %true),

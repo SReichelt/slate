@@ -39,10 +39,10 @@ interface PropertyInfo {
 }
 
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
-  private utils: HLMUtils;
+  utils: HLMUtils;
 
   constructor(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editHandler?: HLMEditHandler) {
-    super(definition, includeProofs, templates, editHandler);
+    super(definition, includeProofs, libraryDataAccessor, templates, editHandler);
     this.utils = new HLMUtils(definition, libraryDataAccessor);
   }
 
@@ -96,7 +96,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  renderDefinitionSummary(): Display.RenderedExpression | undefined {
+  renderDefinitionSummary(multiLine: boolean = false): Display.RenderedExpression | undefined {
     let definition = this.definition;
     if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
       let claim: Display.RenderedExpression | undefined = undefined;
@@ -128,7 +128,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                           'right': claim
                                         });
           }
-          return new Display.RowExpression([claim, addendum]);
+          if (multiLine) {
+            return new Display.ParagraphExpression([claim, addendum]);
+          } else {
+            return new Display.RowExpression([claim, addendum]);
+          }
         } else {
           return claim;
         }
@@ -407,7 +411,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                     }
                   }
                 }
-                if (definitionDisplay.pluralName) {
+                if (definitionDisplay.pluralName && (!state.abbreviate || definitionDisplay.pluralName instanceof Fmt.StringExpression)) {
                   noun.plural = this.applyName(definitionDisplay.pluralName, args, definitionRef, plural);
                 }
               }
@@ -958,6 +962,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else {
       return new Display.ErrorExpression('Unknown expression type');
     }
+  }
+
+  renderExampleExpression(expression: Fmt.DefinitionRefExpression): Display.RenderedExpression {
+    let definitionPromise = this.utils.getDefinition(expression.path);
+    let expressionPromise = definitionPromise.then((definition) => {
+      return this.renderDefinitionRef([definition]);
+    });
+    let result = new Display.PromiseExpression(expressionPromise);
+    return this.setSemanticLink(result, expression);
   }
 
   private renderDefinitionRef(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, replacementParameters?: ReplacementParameters): Display.RenderedExpression {

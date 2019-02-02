@@ -19,12 +19,12 @@ body {
   background-color: #e0c000;
 }
 
-.hoverable:hover, .editor-toolbar a.fa:hover {
+.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
   background-color: #ffd700;
 }
 
-.expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
-  background-color: #ffd700;
+.example:hover {
+  background-color: #fff09b;
 }
 
 .expr.definition.hover, .expr.definition.hover span {

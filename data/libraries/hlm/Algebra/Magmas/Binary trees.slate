@@ -47,7 +47,7 @@ $"Binary trees"(S: %Set(
   }
 
   display = [$Function(
-    function = '𝓑𝓣',
+    function = '𝓑𝓲𝓷𝓣𝓻𝓮𝓮',
     arguments = [S]
   )],
   embedding = {

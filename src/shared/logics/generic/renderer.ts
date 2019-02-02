@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
 import { GenericEditHandler } from './editHandler';
+import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
@@ -9,7 +10,7 @@ export interface RenderedVariable {
 }
 
 export abstract class GenericRenderer {
-  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
+  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;

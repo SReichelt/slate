@@ -9,4 +9,5 @@
   font-family: sans-serif;
   background-color: #e0e0e0;
   cursor: pointer;
+  user-select: none;
 }

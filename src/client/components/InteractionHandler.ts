@@ -79,7 +79,7 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 }
 
 export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerImpl {
-  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {
+  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {
     super();
   }
 
@@ -133,7 +133,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
       while (path.parentPath instanceof Fmt.Path) {
         path = path.parentPath;
       }
-      if (!path.parentPath) {
+      if (!path.parentPath && this.definition) {
         let ownDefinition = this.definition.getImmediateResult();
         if (ownDefinition && path.name === ownDefinition.name) {
           return undefined;

@@ -656,7 +656,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
         }
       } else {
-        return <ReactMarkdownRenderer markdown={expression.text} options={{linkify: true}}/>;
+        let options = {
+          linkify: true,
+          linkTarget: '_blank'
+        };
+        return <ReactMarkdownRenderer markdown={expression.text} options={options}/>;
       }
     } else if (expression instanceof Display.IndirectExpression) {
       try {

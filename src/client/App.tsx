@@ -40,6 +40,7 @@ interface AppState extends SelectionState {
   verticalLayout: boolean;
   error?: string;
   templates?: Fmt.File;
+  rootInteractionHandler?: LibraryItemInteractionHandler;
   extraContentsVisible: boolean;
 }
 
@@ -121,7 +122,10 @@ class App extends React.Component<AppProps, AppState> {
       .then((contents: FileContents) => {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
         contents.close();
-        this.setState({templates: templates});
+        this.setState({
+          templates: templates,
+          rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, this.state.selectedItemDefinition, this.linkClicked)
+        });
         if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
           this.setState({interactionHandler: new LibraryItemInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition, this.linkClicked)});
         }
@@ -149,7 +153,7 @@ class App extends React.Component<AppProps, AppState> {
       mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler}/>;
       extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler}/>;
     } else {
-      mainContents = <StartPage/>;
+      mainContents = <StartPage libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onLinkClicked={this.linkClicked}/>;
     }
 
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;

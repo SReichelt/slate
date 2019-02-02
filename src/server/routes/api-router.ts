@@ -10,10 +10,12 @@ export function apiRouter() {
   const router = Router();
   const rootPath = path.join(__dirname, '..', '..', '..');
   const dataPath = path.join(rootPath, 'data');
+  const docPath = path.join(rootPath, 'docs');
   const fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
 
   router.use(express.static(dataPath));
 
+  router.use('/docs', express.static(docPath));
   router.use('/fonts', express.static(fontPath));
 
   let mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
