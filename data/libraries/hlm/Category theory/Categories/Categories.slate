@@ -139,36 +139,57 @@ $Categories: %Construction {
       %equals(s, t)
     ))
   ): %Constructor {
-    display = [$LabeledTuple(
+    display = [$VerticalTuple(
       items = [
-        ['Obj', O],
-        [
-          $SubSup(
-            body = 'Mor',
-            sub = $Group(
-              items = [a, b],
-              separator = ''
-            )
+        O,
+        $SubSup(
+          body = $Parens(
+            body = M,
+            style = '()'
           ),
-          M
-        ],
-        [
-          $SubSup(
-            body = 'id',
-            sub = c
+          sub = $Relation(
+            symbol = '∈',
+            operands = [
+              $Group(
+                items = [a, b],
+                separator = ','
+              ),
+              O
+            ],
+            space = ''
+          )
+        ),
+        $SubSup(
+          body = $Parens(
+            body = i,
+            style = '()'
           ),
-          i
-        ],
-        [
-          $SubSup(
-            body = '∘',
-            sub = $Group(
-              items = [d, e, f],
-              separator = ''
-            )
+          sub = $Relation(
+            symbol = '∈',
+            operands = [
+              c,
+              O
+            ],
+            space = ''
+          )
+        ),
+        $SubSup(
+          body = $Parens(
+            body = ∘,
+            style = '()'
           ),
-          ∘
-        ]
+          sub = $Relation(
+            symbol = '∈',
+            operands = [
+              $Group(
+                items = [d, e, f],
+                separator = ','
+              ),
+              O
+            ],
+            space = ''
+          )
+        )
       ],
       style = '[]'
     )],

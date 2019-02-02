@@ -29,6 +29,19 @@ $Tuple(items: %Expr[], separator: %Expr = ', ', style: %String = '()'): %Templ
   )
 }
 
+$VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
+  display = $Style(
+    body = $Parens(
+      body = $Table(
+        items = %for(items, 0, [[items]]),
+        style = 'vertical-tuple'
+      ),
+      style = style
+    ),
+    styleClass = 'vertical-tuple'
+  )
+}
+
 $Constraint(left: %Expr, right: %Expr): %Template {
   display = [left, ' : ', right]
 }
@@ -516,24 +529,5 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
       symbol = symbol,
       operand = limit
     )
-  )
-}
-
-$LabeledList(items: %Expr[,]): %Template {
-  display = $Table(
-    items = items,
-    style = 'labeled-list'
-  )
-}
-
-$LabeledTuple(items: %Expr[,], style: %String = '()'): %Template {
-  display = $Style(
-    body = $Parens(
-      body = $LabeledList(
-        items = items
-      ),
-      style = style
-    ),
-    styleClass = 'labeled-tuple'
   )
 }

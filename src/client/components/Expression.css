@@ -318,13 +318,8 @@ p {
   white-space: initial;
 }
 
-.table.construction>.table-row>.table-cell:first-child>.labeled-tuple>.paren-large {
+.table.construction>.table-row>.table-cell:first-child>.vertical-tuple>.paren-large {
   vertical-align: top;
-}
-
-.table.labeled-list>.table-row>.table-cell:first-child::after {
-  content: ':';
-  padding-right: 2pt;
 }
 
 .fraction {
