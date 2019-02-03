@@ -94,55 +94,58 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                 goal = $../../Sets/empty(S = {M}),
                 steps = #(_: %ProveDef(proof = {
                   goal = %not(%exists(#(c: %Element(M)))),
-                  steps = #(_: %ProveNeg({steps = #(_: %UseExists({
-                    parameters = #(c: %Element(M)),
-                    steps = #(
-                      _: %Consider(f),
-                      _: %UseDef(result = $../../Functions/bijective(
-                        X = {$Subsets/"Segment (less)"(n = {l})},
-                        Y = {M},
-                        f = {f}
-                      )),
-                      _: %UseDef(result = $../../Functions/surjective(
-                        X = {$Subsets/"Segment (less)"(n = {l})},
-                        Y = {M},
-                        f = {f}
-                      )),
-                      _: %UseDef(result = %forall(
-                        #(t: %Element(M)),
-                        %exists(
-                          #(s: %Element($Subsets/"Segment (less)"(n = {$number(value = 0)}))),
-                          formula = %equals(
-                            $../../Functions/value(
-                              X = {$Subsets/"Segment (less)"(n = {l})},
-                              Y = {M},
-                              f = {f},
-                              x = {s}
-                            ),
-                            t
-                          )
-                        )
-                      )),
-                      _: %UseForAll({t = {c}}),
-                      _: %UseExists({
-                        parameters = #(s: %Element($Subsets/"Segment (less)"(n = {$number(value = 0)}))),
-                        steps = #(
-                          _: %Consider(s),
-                          _: %UseDef(result = $less(
-                            m = {s},
-                            n = {$number(value = 0)}
-                          )),
-                          _: %UseTheorem(
-                            $"Zero is the smallest number"(n = {s}),
-                            $"less or equal"(
-                              n = {s},
-                              m = {$number(value = 0)}
+                  steps = #(_: %ProveNeg({
+                    parameters = #(_: %Constraint(%exists(#(c: %Element(M))))),
+                    steps = #(_: %UseExists({
+                      parameters = #(c: %Element(M)),
+                      steps = #(
+                        _: %Consider(f),
+                        _: %UseDef(result = $../../Functions/bijective(
+                          X = {$Subsets/"Segment (less)"(n = {l})},
+                          Y = {M},
+                          f = {f}
+                        )),
+                        _: %UseDef(result = $../../Functions/surjective(
+                          X = {$Subsets/"Segment (less)"(n = {l})},
+                          Y = {M},
+                          f = {f}
+                        )),
+                        _: %UseDef(result = %forall(
+                          #(t: %Element(M)),
+                          %exists(
+                            #(s: %Element($Subsets/"Segment (less)"(n = {$number(value = 0)}))),
+                            formula = %equals(
+                              $../../Functions/value(
+                                X = {$Subsets/"Segment (less)"(n = {l})},
+                                Y = {M},
+                                f = {f},
+                                x = {s}
+                              ),
+                              t
                             )
                           )
-                        )
-                      })
-                    )
-                  }))}))
+                        )),
+                        _: %UseForAll({t = {c}}),
+                        _: %UseExists({
+                          parameters = #(s: %Element($Subsets/"Segment (less)"(n = {$number(value = 0)}))),
+                          steps = #(
+                            _: %Consider(s),
+                            _: %UseDef(result = $less(
+                              m = {s},
+                              n = {$number(value = 0)}
+                            )),
+                            _: %UseTheorem(
+                              $"Zero is the smallest number"(n = {s}),
+                              $"less or equal"(
+                                n = {s},
+                                m = {$number(value = 0)}
+                              )
+                            )
+                          )
+                        })
+                      )
+                    }))
+                  }))
                 }))
               },
               {

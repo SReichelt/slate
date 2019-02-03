@@ -1814,7 +1814,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
                  || type instanceof FmtHLM.MetaRefExpression_ProveNeg
                  || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
-        // TODO ProveNeg needs to auto-compute the goal
         this.addSubProof(type.proof, startRow, startRowSpacing, paragraphs);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
@@ -1853,7 +1852,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             source = new Display.PromiseExpression(itemNumberPromise);
             this.setSemanticLink(source, type.theorem);
           }
-          // TODO unset dependsOnPrevious theorem does not depend on previous
+          // TODO unset dependsOnPrevious if theorem does not depend on previous
         } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
           source = this.renderFormula(this.utils.getProofStepResult(type.source));
           this.setSemanticLink(source, type.source);

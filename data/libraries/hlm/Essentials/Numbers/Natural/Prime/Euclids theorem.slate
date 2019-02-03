@@ -7,125 +7,111 @@
  */
 $"Euclids theorem": %StandardTheorem {
   claim = %not($../../../Sets/finite(S = {$"Prime numbers"})),
-  proofs = [{steps = #(_: %ProveNeg({steps = #(
-    _: %UseDef(result = %exists(#(
-      n: %Element($../"Natural numbers"),
-      f: %Element($../../../Functions/Bijections(
-        X = {$../Subsets/"Segment (less)"(n = {n})},
-        Y = {$"Prime numbers"}
-      ))
-    ))),
-    _: %UseExists({
-      parameters = #(
+  proofs = [{steps = #(_: %ProveNeg({
+    parameters = #(_: %Constraint($../../../Sets/finite(S = {$"Prime numbers"}))),
+    steps = #(
+      _: %UseDef(result = %exists(#(
         n: %Element($../"Natural numbers"),
         f: %Element($../../../Functions/Bijections(
           X = {$../Subsets/"Segment (less)"(n = {n})},
           Y = {$"Prime numbers"}
         ))
-      ),
-      steps = #(
-        a: %Def($../"Generalized sums and products"/"inductive product (exclusive)"(
-          n = {n},
-          i = {
-            #(i: %Element($../Subsets/"Segment (less)"(n = {n}))),
-            {a = {$../../../Functions/value(
-              X = {$../Subsets/"Segment (less)"(n = {n})},
-              Y = {$"Prime numbers"},
-              f = {f},
-              x = {i}
-            )}}
-          }
-        )),
-        _: %UseTheorem(
-          $../"Generalized sums and products"/"Inductive product of positive numbers grows"(
+      ))),
+      _: %UseExists({
+        parameters = #(
+          n: %Element($../"Natural numbers"),
+          f: %Element($../../../Functions/Bijections(
+            X = {$../Subsets/"Segment (less)"(n = {n})},
+            Y = {$"Prime numbers"}
+          ))
+        ),
+        steps = #(
+          a: %Def($../"Generalized sums and products"/"inductive product (exclusive)"(
             n = {n},
             i = {
-              #(j: %Element($../Subsets/"Segment (less)"(n = {n}))),
+              #(i: %Element($../Subsets/"Segment (less)"(n = {n}))),
               {a = {$../../../Functions/value(
                 X = {$../Subsets/"Segment (less)"(n = {n})},
                 Y = {$"Prime numbers"},
                 f = {f},
-                x = {j}
+                x = {i}
               )}}
-            },
-            m = {$../number(value = 0)}
-          ),
-          $../"less or equal"(
-            m = {$../number(value = 1)},
-            n = {a}
-          )
-        ),
-        b: %Def($../sum(
-          m = {a},
-          n = {$../number(value = 1)}
-        )),
-        _: %UseTheorem(
-          $../"Successor is always greater"(n = {a}),
-          $../less(
-            n = {b},
-            m = {a}
-          )
-        ),
-        _: %UseTheorem(
-          $../"Less or equal and less combine to less"(
-            a = {$../number(value = 1)},
-            b = {a},
-            c = {b}
-          ),
-          $../less(
-            n = {b},
-            m = {$../number(value = 1)}
-          )
-        ),
-        _: %UseTheorem(
-          $"Every number greater than one has a prime factor"(n = {b}),
-          %exists(
-            #(p: %Element($"Prime numbers")),
-            formula = $../divisible(
-              m = {p},
-              n = {b}
-            )
-          )
-        ),
-        _: %UseExists({
-          parameters = #(p: %Element($"Prime numbers")),
-          steps = #(
-            _: %ResolveDef($../divisible(
-              m = {p},
-              n = {$../sum(
-                m = {a},
-                n = {$../number(value = 1)}
-              )}
-            )),
-            _: %UseTheorem(
-              $../"Generalized sums and products"/"Inductive product is a multiple of each element"(
-                n = {n},
-                i = {
-                  #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
-                  {a = {$../../../Functions/value(
-                    X = {$../Subsets/"Segment (less)"(n = {n})},
-                    Y = {$"Prime numbers"},
-                    f = {f},
-                    x = {k}
-                  )}}
-                },
-                j = {$../../../Functions/value(
-                  X = {$"Prime numbers"},
-                  Y = {$../Subsets/"Segment (less)"(n = {n})},
-                  f = {$../../../Functions/inverse(
-                    X = {$../Subsets/"Segment (less)"(n = {n})},
-                    Y = {$"Prime numbers"},
-                    f = {f}
-                  )},
-                  x = {p}
-                )}
-              ),
-              $../divisible(
-                m = {$../../../Functions/value(
+            }
+          )),
+          _: %UseTheorem(
+            $../"Generalized sums and products"/"Inductive product of positive numbers grows"(
+              n = {n},
+              i = {
+                #(j: %Element($../Subsets/"Segment (less)"(n = {n}))),
+                {a = {$../../../Functions/value(
                   X = {$../Subsets/"Segment (less)"(n = {n})},
                   Y = {$"Prime numbers"},
                   f = {f},
-                  x = {$../../../Functions/value(
+                  x = {j}
+                )}}
+              },
+              m = {$../number(value = 0)}
+            ),
+            $../"less or equal"(
+              m = {$../number(value = 1)},
+              n = {a}
+            )
+          ),
+          b: %Def($../sum(
+            m = {a},
+            n = {$../number(value = 1)}
+          )),
+          _: %UseTheorem(
+            $../"Successor is always greater"(n = {a}),
+            $../less(
+              n = {b},
+              m = {a}
+            )
+          ),
+          _: %UseTheorem(
+            $../"Less or equal and less combine to less"(
+              a = {$../number(value = 1)},
+              b = {a},
+              c = {b}
+            ),
+            $../less(
+              n = {b},
+              m = {$../number(value = 1)}
+            )
+          ),
+          _: %UseTheorem(
+            $"Every number greater than one has a prime factor"(n = {b}),
+            %exists(
+              #(p: %Element($"Prime numbers")),
+              formula = $../divisible(
+                m = {p},
+                n = {b}
+              )
+            )
+          ),
+          _: %UseExists({
+            parameters = #(p: %Element($"Prime numbers")),
+            steps = #(
+              _: %ResolveDef($../divisible(
+                m = {p},
+                n = {$../sum(
+                  m = {a},
+                  n = {$../number(value = 1)}
+                )}
+              )),
+              _: %UseTheorem(
+                $../"Generalized sums and products"/"Inductive product is a multiple of each element"(
+                  n = {n},
+                  i = {
+                    #(k: %Element($../Subsets/"Segment (less)"(n = {n}))),
+                    {a = {$../../../Functions/value(
+                      X = {$../Subsets/"Segment (less)"(n = {n})},
+                      Y = {$"Prime numbers"},
+                      f = {f},
+                      x = {k}
+                    )}}
+                  },
+                  j = {$../../../Functions/value(
                     X = {$"Prime numbers"},
                     Y = {$../Subsets/"Segment (less)"(n = {n})},
                     f = {$../../../Functions/inverse(
@@ -135,20 +121,9 @@ $"Euclids theorem": %StandardTheorem {
                     )},
                     x = {p}
                   )}
-                )},
-                n = {a}
-              )
-            ),
-            _: %Substitute(
-              #(_: %UseTheorem(
-                $../../../Functions/"Application of function after inverse is neutral"(
-                  X = {$../Subsets/"Segment (less)"(n = {n})},
-                  Y = {$"Prime numbers"},
-                  f = {f},
-                  y = {p}
                 ),
-                %equals(
-                  $../../../Functions/value(
+                $../divisible(
+                  m = {$../../../Functions/value(
                     X = {$../Subsets/"Segment (less)"(n = {n})},
                     Y = {$"Prime numbers"},
                     f = {f},
@@ -162,45 +137,73 @@ $"Euclids theorem": %StandardTheorem {
                       )},
                       x = {p}
                     )}
-                  ),
-                  p
+                  )},
+                  n = {a}
                 )
-              )),
-              %left,
-              $../divisible(
-                m = {p},
-                n = {a}
-              )
-            ),
-            _: %UseTheorem(
-              $../"Divisibility criterion"(
-                a = {p},
-                b = {a},
-                c = {$../number(value = 1)}
               ),
-              $../divisible(
-                m = {p},
-                n = {$../number(value = 1)}
-              )
-            ),
-            _: %UseTheorem(
-              $../"Divisors are less or equal"(
-                m = {p},
-                n = {$../number(value = 1)}
+              _: %Substitute(
+                #(_: %UseTheorem(
+                  $../../../Functions/"Application of function after inverse is neutral"(
+                    X = {$../Subsets/"Segment (less)"(n = {n})},
+                    Y = {$"Prime numbers"},
+                    f = {f},
+                    y = {p}
+                  ),
+                  %equals(
+                    $../../../Functions/value(
+                      X = {$../Subsets/"Segment (less)"(n = {n})},
+                      Y = {$"Prime numbers"},
+                      f = {f},
+                      x = {$../../../Functions/value(
+                        X = {$"Prime numbers"},
+                        Y = {$../Subsets/"Segment (less)"(n = {n})},
+                        f = {$../../../Functions/inverse(
+                          X = {$../Subsets/"Segment (less)"(n = {n})},
+                          Y = {$"Prime numbers"},
+                          f = {f}
+                        )},
+                        x = {p}
+                      )}
+                    ),
+                    p
+                  )
+                )),
+                %left,
+                $../divisible(
+                  m = {p},
+                  n = {a}
+                )
               ),
-              $../"less or equal"(
-                m = {p},
-                n = {$../number(value = 1)}
-              )
-            ),
-            _: %Consider(p),
-            _: %UseDef(result = $../less(
-              n = {p},
-              m = {$../number(value = 1)}
-            ))
-          )
-        })
-      )
-    })
-  )}))}]
+              _: %UseTheorem(
+                $../"Divisibility criterion"(
+                  a = {p},
+                  b = {a},
+                  c = {$../number(value = 1)}
+                ),
+                $../divisible(
+                  m = {p},
+                  n = {$../number(value = 1)}
+                )
+              ),
+              _: %UseTheorem(
+                $../"Divisors are less or equal"(
+                  m = {p},
+                  n = {$../number(value = 1)}
+                ),
+                $../"less or equal"(
+                  m = {p},
+                  n = {$../number(value = 1)}
+                )
+              ),
+              _: %Consider(p),
+              _: %UseDef(result = $../less(
+                n = {p},
+                m = {$../number(value = 1)}
+              ))
+            )
+          })
+        )
+      })
+    )
+  }))}]
 }
