@@ -1,5 +1,5 @@
 import * as Fmt from '../../format/format';
-import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
+import { LibraryDataAccessor, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
 export class GenericUtils {
@@ -19,6 +19,14 @@ export class GenericUtils {
       path = path.parentPath;
     }
     return this.getDefinition(path);
+  }
+
+  getItemInfo(expression: Fmt.DefinitionRefExpression): CachedPromise<LibraryItemInfo> {
+    let path = expression.path;
+    while (path.parentPath instanceof Fmt.Path) {
+      path = path.parentPath;
+    }
+    return this.libraryDataAccessor.getItemInfo(path);
   }
 
   splitPath(path: Fmt.Path, childPaths: Fmt.Path[]): void {

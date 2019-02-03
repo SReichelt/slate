@@ -531,3 +531,29 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
     )
   )
 }
+
+$DependentProofStep(result: %Expr, source?: %Expr): %Template {
+  display = [
+    %opt(
+      source,
+      $OverUnder(
+        body = $Style(
+          body = '⇒',
+          styleClass = 'shallow-symbol'
+        ),
+        over = source
+      ),
+      '⇒'
+    ),
+    ' ',
+    result
+  ]
+}
+
+$SourceProofStep(result: %Expr, source: %Expr): %Template {
+  display = [
+    source,
+    ' ⇒ ',
+    result
+  ]
+}

@@ -205,6 +205,12 @@ p {
   display: table-cell;
 }
 
+.overunder-body>.shallow-symbol {
+  position: relative;
+  height: 0.6em;
+  top: -0.4em;
+}
+
 .paren-large {
   margin: 1pt;
   white-space: nowrap;

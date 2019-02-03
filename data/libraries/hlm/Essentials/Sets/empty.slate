@@ -23,7 +23,15 @@ $empty(S: %Set): %Predicate {
     {
       from = 1,
       to = 2,
-      steps = #(_: %UseDef(result = %sub(
+      parameters = #(@: %Constraint(%setEquals(
+        S,
+        $"Empty set"
+      ))),
+      goal = %sub(
+        S,
+        $"Empty set"
+      ),
+      steps = #(_: %Consider(@), _: %UseDef(result = %sub(
         S,
         $"Empty set"
       )))
@@ -35,6 +43,7 @@ $empty(S: %Set): %Predicate {
         S,
         $"Empty set"
       ))),
+      goal = %not(%exists(#(x: %Element(S)))),
       steps = #(_: %ProveNeg({
         parameters = #(_1: %Constraint(%exists(#(x: %Element(S))))),
         steps = #(_: %UseExists({
@@ -57,6 +66,11 @@ $empty(S: %Set): %Predicate {
     {
       from = 3,
       to = 1,
+      parameters = #(@: %Constraint(%not(%exists(#(x: %Element(S)))))),
+      goal = %setEquals(
+        S,
+        $"Empty set"
+      ),
       steps = #(_: %ProveSetEquals(
         subsetProof = {steps = #(_: %ProveDef(proof = {
           goal = %forall(

@@ -192,8 +192,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fileAccessor.openFile!(uri);
   }
 
+  getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo> {
+    let parentProvider = this.getProviderForSection(path.parentPath);
+    return parentProvider.getLocalItemInfo(path.name);
+  }
+
   getLocalItemInfo(name: string): CachedPromise<LibraryItemInfo> {
-    return this.fetchLocalSection()
+    return this.fetchLocalSection(false)
       .then((definition: Fmt.Definition) => {
         let contents = definition.contents as FmtLibrary.ObjectContents_Section;
         let items = contents.items as Fmt.ArrayExpression;
