@@ -113,7 +113,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       items.unshift(new Display.TextExpression('^'));
       items.unshift(new Display.InnerParenExpression(expression.preSup));
     }
-    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true, undefined, optionalParenStyle);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.OverUnderExpression) {
     let items: Display.RenderedExpression[] = [new Display.InnerParenExpression(expression.body)];
     if (expression.under) {
@@ -124,18 +124,14 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       items.push(new Display.TextExpression('^'));
       items.push(new Display.InnerParenExpression(expression.over));
     }
-    return renderAsText(new Display.RowExpression(items), outputMarkdown, true, true, true, undefined, optionalParenStyle);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.FractionExpression) {
     let items: Display.RenderedExpression[] = [
       new Display.InnerParenExpression(expression.numerator),
       new Display.TextExpression('/'),
       new Display.InnerParenExpression(expression.denominator)
     ];
-    let resultExpression: Display.RenderedExpression = new Display.RowExpression(items);
-    if (optionalParenLeft || optionalParenRight) {
-      resultExpression = new Display.ParenExpression(resultExpression, expression.optionalParenStyle);
-    }
-    return renderAsText(resultExpression, outputMarkdown, true, true, true, undefined, optionalParenStyle);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.RadicalExpression) {
     let items: Display.RenderedExpression[] = [
       new Display.TextExpression('√'),
@@ -144,11 +140,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     if (expression.degree) {
       items.unshift(new Display.InnerParenExpression(expression.degree));
     }
-    let resultExpression: Display.RenderedExpression = new Display.RowExpression(items);
-    if (optionalParenLeft || optionalParenRight) {
-      resultExpression = new Display.ParenExpression(resultExpression, expression.optionalParenStyle);
-    }
-    return renderAsText(resultExpression, outputMarkdown, true, true, true);
+    return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.MarkdownExpression) {
     return CachedPromise.resolve(expression.text);
   } else if (expression instanceof Display.IndirectExpression) {
