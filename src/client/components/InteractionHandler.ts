@@ -10,7 +10,7 @@ export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt
 export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHandler {
   private expressionChangeHandlers: OnExpressionChanged[] = [];
   private hoverChangeHandlers: OnHoverChanged[] = [];
-  private updateBlockCounter = 0;
+  private blockCounter = 0;
 
   registerExpressionChangeHandler(handler: OnExpressionChanged): void {
     this.expressionChangeHandlers.push(handler);
@@ -62,19 +62,19 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
     return null;
   }
 
-  enterUpdateBlocker(): void {
-    this.updateBlockCounter++;
+  enterBlocker(): void {
+    this.blockCounter++;
   }
 
-  leaveUpdateBlocker(): void {
-    if (this.updateBlockCounter <= 0) {
+  leaveBlocker(): void {
+    if (this.blockCounter <= 0) {
       throw new Error('Internal error: update block counter underflow');
     }
-    this.updateBlockCounter--;
+    this.blockCounter--;
   }
 
-  isUpdateBlocked(): boolean {
-    return this.updateBlockCounter !== 0;
+  isBlocked(): boolean {
+    return this.blockCounter !== 0;
   }
 }
 

@@ -104,7 +104,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     window.onresize = () => {
-      if (!(this.state.interactionHandler && this.state.interactionHandler.isUpdateBlocked())) {
+      if (!(this.state.interactionHandler && this.state.interactionHandler.isBlocked())) {
         if (window.innerHeight > window.innerWidth * 1.25) {
           if (!this.state.verticalLayout) {
             this.setState({verticalLayout: true});
