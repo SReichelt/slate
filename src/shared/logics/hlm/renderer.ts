@@ -1529,6 +1529,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         paragraphs.push(table);
         this.addIndentedProof(embedding.wellDefinednessProof, 'Well-definedness', paragraphs);
       }
+      this.addSubsetEmbeddings(paragraphs);
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate
                && definition.contents.display instanceof Fmt.ArrayExpression
                && definition.contents.display.items.length) {
@@ -1630,6 +1631,53 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           paragraphs.push(new Display.RowExpression(row));
         }
       }
+    }
+  }
+
+  private addSubsetEmbeddings(paragraphs: Display.RenderedExpression[]): void {
+    let definition = this.definition;
+    let hasSubsetEmbedding = false;
+    for (let param of definition.parameters) {
+      let type = param.type.expression;
+      if ((type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) && type.embedSubsets) {
+        hasSubsetEmbedding = true;
+        break;
+      }
+    }
+    if (hasSubsetEmbedding) {
+      let row: Display.RenderedExpression[] = [];
+      row.push(new Display.TextExpression('For '));
+      let replacementParams = Object.create(Fmt.ParameterList.prototype);
+      let hadParameters = false;
+      for (let param of definition.parameters) {
+        let type = param.type.expression;
+        if ((type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) && type.embedSubsets) {
+          let replacementParam = param.clone();
+          replacementParam.name += '\'';
+          replacementParams.push(replacementParam);
+          if (hadParameters) {
+            row.push(new Display.TextExpression(' and '));
+          } else {
+            hadParameters = true;
+          }
+          row.push(this.renderTemplate('SubsetParameter', {
+                                        'subset': this.renderVariable(replacementParam, undefined, true),
+                                        'superset': this.renderVariable(param)
+                                      }));
+        } else {
+          replacementParams.push(param);
+        }
+      }
+      row.push(new Display.TextExpression(', we canonically treat elements of '));
+      let replacementParameters: ReplacementParameters = {
+        parameters: replacementParams,
+        isDefinition: false
+      };
+      row.push(this.renderDefinitionRef([definition], undefined, false, 0, replacementParameters));
+      row.push(new Display.TextExpression(' as element of '));
+      row.push(this.renderDefinitionRef([definition]));
+      row.push(new Display.TextExpression('.'));
+      paragraphs.push(new Display.RowExpression(row));
     }
   }
 
