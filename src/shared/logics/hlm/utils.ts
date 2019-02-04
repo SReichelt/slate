@@ -235,7 +235,8 @@ export class HLMUtils extends GenericUtils {
         } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
           return variableType.formula;
         } else {
-          return this.getProofStepResult(type.variable.variable, previousResult);
+          // TODO use previous result of proof step
+          return this.getProofStepResult(type.variable.variable);
         }
       } else {
         throw new Error('Variable reference expected');

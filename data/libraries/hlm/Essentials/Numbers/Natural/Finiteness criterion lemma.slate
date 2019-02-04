@@ -59,6 +59,10 @@ $"Finiteness criterion lemma"(
     ),
     proof = {steps = #(_: %ProveCases(caseProofs = [
       {
+        parameters = #(_: %Constraint(%equals(
+          k,
+          $number(value = 0)
+        ))),
         goal = %exists(
           #(a: %Element(M)),
           formula = %forall(
@@ -77,7 +81,16 @@ $"Finiteness criterion lemma"(
         )}}))
       },
       {
-        parameters = #(x: %Element($"Natural numbers")),
+        parameters = #(
+          x: %Element($"Natural numbers"),
+          _: %Constraint(%equals(
+            k,
+            $sum(
+              m = {x},
+              n = {$number(value = 1)}
+            )
+          ))
+        ),
         goal = %exists(
           #(c: %Element(M)),
           formula = %forall(

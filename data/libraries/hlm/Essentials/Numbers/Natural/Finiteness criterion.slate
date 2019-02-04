@@ -46,6 +46,29 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       from = 1,
       to = 2,
       parameters = #(@: %Constraint($../../Sets/finite(S = {M}))),
+      goal = %or(
+        $../../Sets/empty(S = {M}),
+        %exists(
+          #(m: %Element(M)),
+          formula = $../../Relations/"greatest element"(
+            S = {$"Natural numbers"},
+            ≺ = {$../../Relations/predicate(
+              S = {$"Natural numbers"},
+              T = {$"Natural numbers"},
+              parameters = #(
+                m: %Element($"Natural numbers"),
+                n: %Element(%previous)
+              ),
+              predicate = $"less or equal"(
+                m = {m},
+                n = {n}
+              )
+            )},
+            T = {M},
+            t = {m}
+          )
+        )
+      ),
       steps = #(
         _: %UseDef(result = %exists(#(
           l: %Element($"Natural numbers"),
@@ -91,6 +114,10 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
             ),
             proof = {steps = #(_: %ProveCases(caseProofs = [
               {
+                parameters = #(_: %Constraint(%equals(
+                  l,
+                  $number(value = 0)
+                ))),
                 goal = $../../Sets/empty(S = {M}),
                 steps = #(_: %ProveDef(proof = {
                   goal = %not(%exists(#(c: %Element(M)))),
@@ -149,7 +176,16 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
                 }))
               },
               {
-                parameters = #(k: %Element($"Natural numbers")),
+                parameters = #(
+                  k: %Element($"Natural numbers"),
+                  _: %Constraint(%equals(
+                    l,
+                    $sum(
+                      m = {k},
+                      n = {$number(value = 1)}
+                    )
+                  ))
+                ),
                 goal = %exists(
                   #(i: %Element(M)),
                   formula = %forall(
@@ -184,6 +220,8 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
       )
     },
     {
+      from = 2,
+      to = 3,
       parameters = #(@: %Constraint(%or(
         $../../Sets/empty(S = {M}),
         %exists(
@@ -197,88 +235,108 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
           )
         )
       ))),
-      from = 2,
-      to = 3,
+      goal = %exists(
+        #(a: %Element($"Natural numbers")),
+        formula = %sub(
+          M,
+          $Subsets/"Segment (less or equal)"(n = {a})
+        )
+      ),
       steps = #(_: %UseCases(caseProofs = [
-        {steps = #(
-          _1: %UseDef(result = %setEquals(
-            M,
-            $../../Sets/"Empty set"
-          )),
-          _: %ProveExists(
-            {a = {$number(value = 0)}},
-            proof = {
-              goal = %sub(
-                M,
-                $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
-              ),
-              steps = #(
-                _: %UseTheorem(
-                  $../../Sets/"Empty set is subset of any set"(S = {$Subsets/"Segment (less or equal)"(n = {$number(value = 0)})}),
-                  %sub(
-                    $../../Sets/"Empty set",
-                    $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
-                  )
+        {
+          parameters = #(_: %Constraint($../../Sets/empty(S = {M}))),
+          steps = #(
+            _1: %UseDef(result = %setEquals(
+              M,
+              $../../Sets/"Empty set"
+            )),
+            _: %ProveExists(
+              {a = {$number(value = 0)}},
+              proof = {
+                goal = %sub(
+                  M,
+                  $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
                 ),
-                _: %Substitute(
-                  #(_: %Consider(_1)),
-                  %left,
-                  %sub(
-                    M,
-                    $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
+                steps = #(
+                  _: %UseTheorem(
+                    $../../Sets/"Empty set is subset of any set"(S = {$Subsets/"Segment (less or equal)"(n = {$number(value = 0)})}),
+                    %sub(
+                      $../../Sets/"Empty set",
+                      $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
+                    )
+                  ),
+                  _: %Substitute(
+                    #(_: %Consider(_1)),
+                    %left,
+                    %sub(
+                      M,
+                      $Subsets/"Segment (less or equal)"(n = {$number(value = 0)})
+                    )
                   )
                 )
-              )
-            }
+              }
+            )
           )
-        )},
-        {steps = #(_: %UseExists({
-          parameters = #(
-            m: %Element(M),
-            _2: %Constraint(%forall(
+        },
+        {
+          parameters = #(_: %Constraint(%exists(
+            #(m: %Element(M)),
+            formula = %forall(
               #(n: %Element(M)),
               $"less or equal"(
                 m = {n},
                 n = {m}
               )
-            ))
-          ),
-          steps = #(_: %ProveExists(
-            {a = {m}},
-            proof = {
-              goal = %sub(
-                M,
-                $Subsets/"Segment (less or equal)"(n = {m})
-              ),
-              steps = #(_: %ProveDef(proof = {
-                goal = %forall(
-                  #(x: %Element(M)),
-                  %in(
-                    x,
-                    $Subsets/"Segment (less or equal)"(n = {m})
-                  )
+            )
+          ))),
+          steps = #(_: %UseExists({
+            parameters = #(
+              m: %Element(M),
+              _2: %Constraint(%forall(
+                #(n: %Element(M)),
+                $"less or equal"(
+                  m = {n},
+                  n = {m}
+                )
+              ))
+            ),
+            steps = #(_: %ProveExists(
+              {a = {m}},
+              proof = {
+                goal = %sub(
+                  M,
+                  $Subsets/"Segment (less or equal)"(n = {m})
                 ),
-                steps = #(_: %ProveForAll({
-                  parameters = #(x: %Element(M)),
-                  goal = %in(
-                    x,
-                    $Subsets/"Segment (less or equal)"(n = {m})
-                  ),
-                  steps = #(_: %ProveDef(proof = {
-                    goal = $"less or equal"(
-                      m = {x},
-                      n = {m}
-                    ),
-                    steps = #(
-                      _: %Consider(_2),
-                      _: %UseForAll({n = {x}})
+                steps = #(_: %ProveDef(proof = {
+                  goal = %forall(
+                    #(x: %Element(M)),
+                    %in(
+                      x,
+                      $Subsets/"Segment (less or equal)"(n = {m})
                     )
+                  ),
+                  steps = #(_: %ProveForAll({
+                    parameters = #(x: %Element(M)),
+                    goal = %in(
+                      x,
+                      $Subsets/"Segment (less or equal)"(n = {m})
+                    ),
+                    steps = #(_: %ProveDef(proof = {
+                      goal = $"less or equal"(
+                        m = {x},
+                        n = {m}
+                      ),
+                      steps = #(
+                        _: %Consider(_2),
+                        _: %UseForAll({n = {x}})
+                      )
+                    }))
                   }))
                 }))
-              }))
-            }
-          ))
-        }))}
+              }
+            ))
+          }))
+        }
       ]))
     },
     {
@@ -291,6 +349,13 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
           $Subsets/"Segment (less or equal)"(n = {a})
         )
       ))),
+      goal = %exists(
+        #(b: %Element($"Natural numbers")),
+        formula = %sub(
+          M,
+          $Subsets/"Segment (less)"(n = {b})
+        )
+      ),
       steps = #(
         _: %Consider(@),
         _: %UseExists({
@@ -315,6 +380,7 @@ $"Finiteness criterion"(M: %Subset($"Natural numbers")): %EquivalenceTheorem {
           $Subsets/"Segment (less)"(n = {b})
         )
       ))),
+      goal = $../../Sets/finite(S = {M}),
       steps = #(_: %UseExists({
         parameters = #(b: %Element($"Natural numbers")),
         steps = #(
