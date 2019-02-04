@@ -90,6 +90,17 @@ $finite(S: %Set): %Predicate {
     {
       from = 1,
       to = 5,
+      parameters = #(@: %Constraint(%in(
+        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
+        $../Numbers/Natural/"Natural numbers"
+      ))),
+      goal = %exists(#(
+        k: %Element($../Numbers/Natural/"Natural numbers"),
+        f: %Element($../Functions/Bijections(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
+        ))
+      )),
       steps = #(
         _: %Embed(
           $../Numbers/Cardinal/"Cardinal numbers",
@@ -115,6 +126,20 @@ $finite(S: %Set): %Predicate {
     {
       from = 5,
       to = 6,
+      parameters = #(@: %Constraint(%exists(#(
+        k: %Element($../Numbers/Natural/"Natural numbers"),
+        f: %Element($../Functions/Bijections(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
+        ))
+      )))),
+      goal = %exists(#(
+        l: %Element($../Numbers/Natural/"Natural numbers"),
+        g: %Element($../Functions/Bijections(
+          X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})},
+          Y = {S}
+        ))
+      )),
       steps = #(_: %UseExists({
         parameters = #(
           k: %Element($../Numbers/Natural/"Natural numbers"),
@@ -136,6 +161,17 @@ $finite(S: %Set): %Predicate {
     {
       from = 6,
       to = 1,
+      parameters = #(@: %Constraint(%exists(#(
+        l: %Element($../Numbers/Natural/"Natural numbers"),
+        g: %Element($../Functions/Bijections(
+          X = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {l})},
+          Y = {S}
+        ))
+      )))),
+      goal = %in(
+        $../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S}),
+        $../Numbers/Natural/"Natural numbers"
+      ),
       steps = #(_: %UseExists({
         parameters = #(
           l: %Element($../Numbers/Natural/"Natural numbers"),
@@ -185,6 +221,27 @@ $finite(S: %Set): %Predicate {
     {
       from = 5,
       to = 7,
+      parameters = #(@: %Constraint(%exists(#(
+        k: %Element($../Numbers/Natural/"Natural numbers"),
+        f: %Element($../Functions/Bijections(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
+        ))
+      )))),
+      goal = %exists(
+        #(
+          m: %Element($../Numbers/Natural/"Natural numbers"),
+          h: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})}
+          ))
+        ),
+        formula = $../Functions/injective(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})},
+          f = {h}
+        )
+      ),
       steps = #(_: %UseExists({
         parameters = #(
           k: %Element($../Numbers/Natural/"Natural numbers"),
@@ -209,6 +266,34 @@ $finite(S: %Set): %Predicate {
     {
       from = 7,
       to = 8,
+      parameters = #(@: %Constraint(%exists(
+        #(
+          m: %Element($../Numbers/Natural/"Natural numbers"),
+          h: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})}
+          ))
+        ),
+        formula = $../Functions/injective(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {m})},
+          f = {h}
+        )
+      ))),
+      goal = %exists(
+        #(
+          n: %Element($../Numbers/Natural/"Natural numbers"),
+          i: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})}
+          ))
+        ),
+        formula = $../Functions/injective(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})},
+          f = {i}
+        )
+      ),
       steps = #(_: %UseExists({
         parameters = #(
           m: %Element($../Numbers/Natural/"Natural numbers"),
@@ -240,7 +325,28 @@ $finite(S: %Set): %Predicate {
     },
     {
       from = 8,
-      to = 7,
+      to = 3,
+      parameters = #(@: %Constraint(%exists(
+        #(
+          n: %Element($../Numbers/Natural/"Natural numbers"),
+          i: %Element($../Functions/Functions(
+            X = {S},
+            Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})}
+          ))
+        ),
+        formula = $../Functions/injective(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less or equal)"(n = {n})},
+          f = {i}
+        )
+      ))),
+      goal =  %exists(
+        #(y: %Element($../Numbers/Natural/"Natural numbers")),
+        formula = $../Numbers/Cardinal/"less or equal"(
+          𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+          𝐲 = {y}
+        )
+      ),
       steps = #(_: %UseExists({
         parameters = #(
           n: %Element($../Numbers/Natural/"Natural numbers"),
@@ -259,7 +365,7 @@ $finite(S: %Set): %Predicate {
             )
           )),
           _: %ProveExists(
-            {x = {$../Numbers/Natural/"Natural numbers".successor(n = {n})}},
+            {y = {$../Numbers/Natural/"Natural numbers".successor(n = {n})}},
             proof = {
               goal = $../Numbers/Cardinal/"less or equal"(
                 𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
@@ -287,9 +393,30 @@ $finite(S: %Set): %Predicate {
     {
       from = 3,
       to = 5,
+      parameters = #(@: %Constraint(%exists(
+        #(y: %Element($../Numbers/Natural/"Natural numbers")),
+        formula = $../Numbers/Cardinal/"less or equal"(
+          𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+          𝐲 = {y}
+        )
+      ))),
+      goal = %exists(#(
+        k: %Element($../Numbers/Natural/"Natural numbers"),
+        f: %Element($../Functions/Bijections(
+          X = {S},
+          Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {k})}
+        ))
+      )),
       steps = #(_: %UseExists({
-        parameters = #(y: %Element($../Numbers/Natural/"Natural numbers")),
+        parameters = #(
+          y: %Element($../Numbers/Natural/"Natural numbers"),
+          _1: %Constraint($../Numbers/Cardinal/"less or equal"(
+            𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},
+            𝐲 = {y}
+          ))
+        ),
         steps = #(
+          _: %Consider(_1),
           _: %UseDef(result = %exists(
             #(u: %Element($../Functions/Functions(
               X = {S},

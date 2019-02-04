@@ -192,6 +192,16 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
+  substitutePrevious(expression: Fmt.Expression, previous: Fmt.Expression): Fmt.Expression {
+    return expression.substitute((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof FmtHLM.MetaRefExpression_previous) {
+        return previous;
+      } else {
+        return subExpression;
+      }
+    });
+  }
+
   getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression {
     let type = step.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
@@ -222,9 +232,10 @@ export class HLMUtils extends GenericUtils {
           result.element = type.variable;
           result._set = this.substituteIndices(variableType._set, type.variable);
           return result;
+        } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
+          return variableType.formula;
         } else {
-          // TODO allow all proof steps that have a result
-          throw new Error('Unknown result to consider');
+          return this.getProofStepResult(type.variable.variable, previousResult);
         }
       } else {
         throw new Error('Variable reference expected');
@@ -248,21 +259,19 @@ export class HLMUtils extends GenericUtils {
       result.right = type.output;
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
-      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals) {
+      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
         let result = new FmtHLM.MetaRefExpression_setEquals;
-        // TODO substitute %setPrevious
-        result.left = type.term;
-        result.right = type.term;
+        result.left = this.substitutePrevious(type.term, previousResult.left);
+        result.right = this.substitutePrevious(type.term, previousResult.right);
         return result;
       } else {
-        throw new Error('Previous result is not a set equality expression');
+        throw new Error('Previous result is not an equality expression');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
-      if (previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
         let result = new FmtHLM.MetaRefExpression_equals;
-        // TODO substitute %previous
-        result.left = type.term;
-        result.right = type.term;
+        result.left = this.substitutePrevious(type.term, previousResult.left);
+        result.right = this.substitutePrevious(type.term, previousResult.right);
         return result;
       } else {
         throw new Error('Previous result is not an equality expression');

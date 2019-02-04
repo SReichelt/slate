@@ -80,7 +80,7 @@ p {
 }
 
 .list.custom>.space-above>* {
-  padding-top: 0.5ex;
+  padding-top: 1ex;
 }
 
 .list.custom>*>.list-item-header {
@@ -121,8 +121,8 @@ p {
 }
 
 .subsup-full {
-  margin-top: -0.5em;
-  margin-bottom: -0.5em;
+  margin-top: -0.75em;
+  margin-bottom: -0.75em;
 }
 
 .subsup-body-row {
@@ -131,7 +131,7 @@ p {
 
 .subsup-sub-row, .subsup-sup-row {
   display: table-row;
-  height: 0.5em;
+  height: 0.75em;
 }
 
 .subsup-body, .subsup-empty {
@@ -155,27 +155,28 @@ p {
 
 .subsup-left-sub, .subsup-right-sub {
   vertical-align: top;
-  bottom: 0.1em;
+  bottom: 0.2em;
 }
 
 .subsup-left-sup, .subsup-right-sup {
   vertical-align: bottom;
+  top: -0.1em;
 }
 
 .subsup-full-row>.subsup-left-sub, .subsup-full-row>.subsup-right-sub {
-  bottom: 0.5em;
+  bottom: 0.75em;
 }
 
 .subsup-full-row>.subsup-left-sup, .subsup-full-row>.subsup-right-sup {
-  top: 0.5em;
+  top: 0.75em;
 }
 
 .subsup-body:not(:first-child)>.paren>.paren-round {
-  margin-left: -0.1ex;
+  margin-left: -0.05ex;
 }
 
 .subsup-body:not(:last-child)>.paren>.paren-round {
-  margin-right: -0.1ex;
+  margin-right: -0.05ex;
 }
 
 .overunder {
@@ -299,6 +300,10 @@ p {
 
 .height-5 {
   font-size: 140%;
+}
+
+.miniature {
+  font-size: 70%;
 }
 
 .table {

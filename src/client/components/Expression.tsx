@@ -385,16 +385,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                   <span className={'paren-large paren-curly'}>
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
-                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 1 0 Q 0.4 0 0.4 1.5 L 0.4 3 Q 0.4 5 0 5 Q 0.4 5 0.4 7 L 0.4 8.5 Q 0.4 10 1 10 Q 0.55 10 0.55 8 L 0.55 6.5 Q 0.55 4.8 0 5 Q 0.55 5.2 0.55 3.5 L 0.55 2 Q 0.55 0 1 0 Z" fill="black"/>
+                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
+                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="black"/>
                         </svg>
                       </span>
                       <span className={'paren-curly-body'}>
                         {parenResult}
                       </span>
                       <span className={'paren-curly-right'}>
-                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 0 0 Q 0.6 0 0.6 1.5 L 0.6 3 Q 0.6 5 1 5 Q 0.6 5 0.6 7 L 0.6 8.5 Q 0.6 10 0 10 Q 0.45 10 0.45 8 L 0.45 6.5 Q 0.45 4.8 1 5 Q 0.45 5.2 0.45 3.5 L 0.45 2 Q 0.45 0 0 0 Z" fill="black"/>
+                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
+                          <path d="M 0 -5 Q 0.6 -5 0.6 -3.5 L 0.6 -2 Q 0.6 0 1 0 Q 0.6 0 0.6 2 L 0.6 3.5 Q 0.6 5 0 5 Q 0.45 5 0.45 3 L 0.45 1.5 Q 0.45 -0.2 1 0 Q 0.45 0.2 0.45 -1.5 L 0.45 -3 Q 0.45 -5 0 -5 Z" fill="black"/>
                         </svg>
                       </span>
                     </span>
@@ -419,8 +419,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                   <span className={'paren-large paren-curly'}>
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
-                        <svg viewBox="0 0 1 10" preserveAspectRatio="none">
-                          <path d="M 1 0 Q 0.4 0 0.4 1.5 L 0.4 3 Q 0.4 5 0 5 Q 0.4 5 0.4 7 L 0.4 8.5 Q 0.4 10 1 10 Q 0.55 10 0.55 8 L 0.55 6.5 Q 0.55 4.8 0 5 Q 0.55 5.2 0.55 3.5 L 0.55 2 Q 0.55 0 1 0 Z" fill="black"/>
+                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
+                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="black"/>
                         </svg>
                       </span>
                       <span className={bodyClassName}>

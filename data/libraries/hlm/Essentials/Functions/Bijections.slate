@@ -13,7 +13,8 @@ $Bijections(
 ): %SetOperator {
   display = [$FunctionOperator(
     symbol = '↔',
-    operands = [X, Y]
+    operands = [X, Y],
+    minParenLevel = -1
   )],
   definitionDisplay = {
     parameter = #(f: %Expr),

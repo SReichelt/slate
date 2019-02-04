@@ -62,7 +62,12 @@ $"Subsets of finite sets are finite"(
             goal = $../Functions/injective(
               X = {S},
               Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
-              f = {g}
+              f = {$../Functions/restriction(
+                X = {S},
+                Y = {$../Numbers/Natural/Subsets/"Segment (less)"(n = {n})},
+                f = {g},
+                A = {T}
+              )}
             ),
             steps = #(_: %UseTheorem(
               $../Functions/"Restriction preserves injectivity"(

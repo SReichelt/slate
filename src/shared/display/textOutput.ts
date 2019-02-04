@@ -147,7 +147,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     try {
       return renderAsText(expression.resolve(), outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } catch (error) {
-      return CachedPromise.resolve(`Error: ${error.message}`);
+      return CachedPromise.resolve(`[Error: ${error.message}]`);
     }
   } else if (expression instanceof Display.PromiseExpression) {
     return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
@@ -157,7 +157,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return CachedPromise.resolve('?');
   } else {
     let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
-    return CachedPromise.resolve(`Error: ${error}`);
+    return CachedPromise.resolve(`[Error: ${error}]`);
   }
 }
 

@@ -965,6 +965,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderDefinitionRef(definitions, argumentLists, omitArguments, negationCount, replacementParameters);
       });
       return new Display.PromiseExpression(expressionPromise);
+    } else if (expression instanceof FmtHLM.MetaRefExpression_previous) {
+      return new Display.TextExpression('…');
     } else {
       return new Display.ErrorExpression('Unknown expression type');
     }
@@ -1093,6 +1095,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return args[0];
     } else {
       return new Display.ParenExpression(this.renderTemplate('Group', {'items': args}), '()');
+    }
+  }
+
+  private renderArgumentDefinitionList(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList): Display.RenderedExpression {
+    let params: Fmt.Parameter[] = [];
+    let args: Display.RenderedExpression[] = [];
+    // TODO handle bindings better
+    this.fillArguments(parameters, undefined, [argumentList], undefined, true, false, params, args);
+    args = params.map((param: Fmt.Parameter, index: number) => this.renderTemplate('EqualityDefinition', {'left': this.renderVariable(param), 'right': args[index]}));
+    if (args.length === 1) {
+      return args[0];
+    } else {
+      return this.renderTemplate('Group', {'items': args, 'separator': ', '});
     }
   }
 
@@ -1628,10 +1643,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, paragraphs: Display.RenderedExpression[]): void {
-    this.addProofsWithStartRow(proofs, heading, undefined, undefined, paragraphs);
+    this.addProofsInternal(proofs, heading, undefined, undefined, undefined, paragraphs);
   }
 
-  private addProofsWithStartRow(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+  private addProofsInternal(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
     if (this.includeProofs) {
       if (proofs && proofs.length) {
         let proofNumber = 1;
@@ -1681,7 +1696,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               row = undefined;
               spacing = undefined;
             }
-            this.addProofSteps(proof, row, spacing, paragraphs);
+            let goal = proof.goal || externalGoal;
+            this.addProofSteps(proof, goal, undefined, row, spacing, paragraphs);
           } else {
             if (spacing) {
               row.push(new Display.TextExpression(spacing));
@@ -1717,39 +1733,33 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     paragraphs.push(new Display.RowExpression(row));
   }
 
-  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
-    let currentResult: Fmt.Expression | undefined = undefined;
-    for (let step of proof.steps) {
-      currentResult = this.addProofStep(step, currentResult, startRow, startRowSpacing, paragraphs);
-      startRow = undefined;
-    }
-    if (startRow && startRow.length) {
-      paragraphs.push(new Display.RowExpression(startRow));
-    }
-  }
-
   private addProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, paragraphs: Display.RenderedExpression[]): void {
     let proofs = proof ? [proof] : undefined;
     this.addProofs(proofs, heading, paragraphs);
   }
 
-  private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+  private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, externalGoal: Fmt.Expression | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
     let proofs = proof ? [proof] : undefined;
-    this.addProofsWithStartRow(proofs, undefined, startRow, startRowSpacing, paragraphs);
+    this.addProofsInternal(proofs, undefined, externalGoal, startRow, startRowSpacing, paragraphs);
   }
 
   private addIndentedProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+    this.addIndentedProofInternal(proof, heading, undefined, paragraphs);
+  }
+
+  private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
+    this.addIndentedProofInternal(proof, undefined, externalGoal, paragraphs);
+  }
+
+  private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
     if (this.includeProofs) {
       let subParagraphs: Display.RenderedExpression[] = [];
-      this.addProof(proof, heading, subParagraphs);
+      let proofs = proof ? [proof] : undefined;
+      this.addProofsInternal(proofs, heading, externalGoal, undefined, undefined, subParagraphs);
       let subProof = new Display.ParagraphExpression(subParagraphs);
       subProof.styleClasses = ['indented'];
       paragraphs.push(subProof);
     }
-  }
-
-  private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, paragraphs: Display.RenderedExpression[]): void {
-    this.addIndentedProof(proof, undefined, paragraphs);
   }
 
   private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, paragraphs: Display.RenderedExpression[]): void {
@@ -1789,7 +1799,28 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProofList(proofs, labels, paragraphs);
   }
 
-  private addProofStep(step: Fmt.Parameter, previousResult: Fmt.Expression | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): Fmt.Expression | undefined {
+  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression | undefined, replacementParameters: Fmt.ParameterList | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
+    let currentResult: Fmt.Expression | undefined = undefined;
+    let parameters = replacementParameters || proof.parameters;
+    if (parameters && parameters.length) {
+      let lastParamType = parameters[parameters.length - 1].type.expression;
+      if (lastParamType instanceof FmtHLM.MetaRefExpression_Constraint) {
+        currentResult = lastParamType.formula;
+      }
+    }
+    for (let step of proof.steps) {
+      if (proof.parameters && replacementParameters) {
+        step = step.substituteExpression((expression: Fmt.Expression) => this.utils.substituteParameters(expression, proof.parameters!, replacementParameters));
+      }
+      currentResult = this.addProofStep(step, goal, currentResult, startRow, startRowSpacing, paragraphs);
+      startRow = undefined;
+    }
+    if (startRow && startRow.length) {
+      paragraphs.push(new Display.RowExpression(startRow));
+    }
+  }
+
+  private addProofStep(step: Fmt.Parameter, goal: Fmt.Expression | undefined, previousResult: Fmt.Expression | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): Fmt.Expression | undefined {
     try {
       let type = step.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_State) {
@@ -1805,20 +1836,41 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (type.proof) {
           startRow.push(new Display.TextExpression(':'));
           paragraphs.push(new Display.RowExpression(startRow));
-          this.addIndentedSubProof(type.proof, paragraphs);
+          this.addIndentedSubProof(type.proof, type.statement, paragraphs);
         } else {
           startRow.push(new Display.TextExpression('.'));
           paragraphs.push(new Display.RowExpression(startRow));
         }
         return type.statement;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
-                 || type instanceof FmtHLM.MetaRefExpression_ProveNeg
                  || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
-        this.addSubProof(type.proof, startRow, startRowSpacing, paragraphs);
+        this.addSubProof(type.proof, goal, startRow, startRowSpacing, paragraphs);
+        return undefined;
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveNeg) {
+        let externalGoal = new FmtHLM.MetaRefExpression_or;
+        this.addSubProof(type.proof, externalGoal, startRow, startRowSpacing, paragraphs);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
-        // TODO perform parameter replacement on entire sub-proof
-        this.addProofSteps(type.proof, startRow, startRowSpacing, paragraphs);
+        if (type.proof.parameters && (previousResult instanceof FmtHLM.MetaRefExpression_exists || previousResult instanceof FmtHLM.MetaRefExpression_existsUnique)) {
+          let replacementParameters = Object.create(Fmt.ParameterList.prototype);
+          replacementParameters.push(...previousResult.parameters);
+          if (previousResult.formula) {
+            let constraint = new FmtHLM.MetaRefExpression_Constraint;
+            constraint.formula = previousResult.formula;
+            let constraintType = new Fmt.Type;
+            constraintType.expression = constraint;
+            constraintType.arrayDimensions = 0;
+            let constraintParam = new Fmt.Parameter;
+            constraintParam.name = '_';
+            constraintParam.type = constraintType;
+            constraintParam.optional = false;
+            constraintParam.list = false;
+            replacementParameters.push(constraintParam);
+          }
+          this.addProofSteps(type.proof, goal, replacementParameters, startRow, startRowSpacing, paragraphs);
+        } else {
+          paragraphs.push(new Display.ErrorExpression('Previous result is not existentially quantified'));
+        }
         return undefined;
       }
       if (startRow) {
@@ -1842,20 +1894,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let result = this.utils.getProofStepResult(step, previousResult);
         let dependsOnPrevious = !!previousResult;
         let source = undefined;
-        if (type instanceof FmtHLM.MetaRefExpression_UseDef
-            || type instanceof FmtHLM.MetaRefExpression_ResolveDef) {
+        let sourceType = type;
+        if (sourceType instanceof FmtHLM.MetaRefExpression_Substitute) {
+          if (sourceType.source.type.expression instanceof FmtHLM.MetaRefExpression_UseTheorem) {
+            sourceType = sourceType.source.type.expression;
+          } else {
+            source = this.renderFormula(this.utils.getProofStepResult(sourceType.source));
+            if (!source.styleClasses) {
+              source.styleClasses = [];
+            }
+            source.styleClasses.push('miniature');
+            this.setSemanticLink(source, sourceType.source);
+          }
+        }
+        if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
+            || sourceType instanceof FmtHLM.MetaRefExpression_ResolveDef) {
           source = new Display.TextExpression('def');
           // TODO link to definition
-        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-          if (type.theorem instanceof Fmt.DefinitionRefExpression) {
-            let itemNumberPromise = this.utils.getItemInfo(type.theorem).then((itemInfo: LibraryItemInfo) => new Display.TextExpression(this.formatItemNumber(itemInfo.itemNumber)));
+        } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem) {
+          if (sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
+            let itemNumberPromise = this.utils.getItemInfo(sourceType.theorem).then((itemInfo: LibraryItemInfo) => new Display.TextExpression(this.formatItemNumber(itemInfo.itemNumber)));
             source = new Display.PromiseExpression(itemNumberPromise);
-            this.setSemanticLink(source, type.theorem);
+            source.styleClasses = ['miniature'];
+            this.setSemanticLink(source, sourceType.theorem);
           }
           // TODO unset dependsOnPrevious if theorem does not depend on previous
-        } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
-          source = this.renderFormula(this.utils.getProofStepResult(type.source));
-          this.setSemanticLink(source, type.source);
         }
         let resultToDisplay: Display.RenderedExpression;
         if (result instanceof FmtHLM.MetaRefExpression_or && !result.formulae) {
@@ -1873,8 +1936,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                  || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
         this.addSubProofList(type.caseProofs, undefined, paragraphs);
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
-        // TODO add argument list
-        this.addSubProof(type.proof, undefined, undefined, paragraphs);
+        if (goal instanceof FmtHLM.MetaRefExpression_exists || goal instanceof FmtHLM.MetaRefExpression_existsUnique) {
+          let argumentList = this.renderArgumentDefinitionList(goal.parameters, type.arguments);
+          let row = [
+            new Display.TextExpression('Choose '),
+            argumentList,
+            new Display.TextExpression('.')
+          ];
+          if (type.proof) {
+            this.addSubProof(type.proof, undefined, row, ' ', paragraphs);
+          } else {
+            // TODO only omit proof if trivial
+            paragraphs.push(new Display.RowExpression(row));
+          }
+        } else {
+          paragraphs.push(new Display.ErrorExpression('Goal is not existentially quantified'));
+        }
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
         // TODO omit proofs if missing but trivial
         let subProofs = [type.subsetProof, type.supersetProof];
