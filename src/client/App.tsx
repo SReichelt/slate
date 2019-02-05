@@ -50,6 +50,8 @@ class App extends React.Component<AppProps, AppState> {
   private libraryDataProvider: LibraryDataProvider;
   private library: CachedPromise<Fmt.Definition>;
   private treePaneNode: HTMLElement | null = null;
+  private mainContentsPaneNode: HTMLElement | null = null;
+  private extraContentsPaneNode: HTMLElement | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -201,7 +203,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     let contentsPane = (
       <div className={'bottom-toolbar-container'}>
-        <div className={'app-pane'}>
+        <div className={'app-pane'} ref={(htmlNode) => (this.mainContentsPaneNode = htmlNode)}>
           <div className={'app-contents'}>
             {mainContents}
           </div>
@@ -215,13 +217,15 @@ class App extends React.Component<AppProps, AppState> {
       contentsPane = (
         <SplitPane split={'horizontal'} defaultSize={defaultItemHeight}>
           {contentsPane}
-          <div className={'app-pane'}>
+          <div className={'app-pane'} ref={(htmlNode) => (this.extraContentsPaneNode = htmlNode)}>
             <div className={'app-contents'}>
               {extraContents}
             </div>
           </div>
         </SplitPane>
       );
+    } else {
+      this.extraContentsPaneNode = null;
     }
 
     return (
@@ -276,6 +280,12 @@ class App extends React.Component<AppProps, AppState> {
           document.title = `${appName}: ${info.title}`;
         }
       });
+    }
+    if (this.mainContentsPaneNode) {
+      this.mainContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
+    }
+    if (this.extraContentsPaneNode) {
+      this.extraContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
     }
   }
 
