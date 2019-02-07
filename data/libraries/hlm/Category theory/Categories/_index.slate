@@ -4,8 +4,10 @@ $Categories: %Section {
   logic = 'hlm',
   items = [
     %item($Categories),
-    %item($cardinals),
-    %item($ordinals),
-    %item($magmas)
+    %item($Functors),
+    %subsection(
+      $"Concrete categories",
+      'Concrete categories'
+    )
   ]
 }

@@ -1,0 +1,92 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers. In HLM, arbitrary sets cannot be used as objects because it is impossible to ask whether two arbitrary sets are equal. However, cardinal numbers work fine as a replacement. The situation with other categories is similar.
+ */
+$cardinals(U: %Symbol): %ExplicitOperator {
+  display = [$SubSup(
+    body = '𝐒𝐞𝐭',
+    sub = U
+  )],
+  definition = [$../Categories(U = {U}).category(
+      O = {$../../../Essentials/Numbers/Cardinal/"Cardinal numbers"},
+      𝐀 = {
+        #(𝐀: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+        {𝐁 = {
+          #(𝐁: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+          {M = {$../../../Essentials/Numbers/Cardinal/Homomorphisms(
+            𝐱 = {𝐀},
+            𝐲 = {𝐁}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(𝐂: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+        {i = {$../../../Essentials/Numbers/Cardinal/identity(𝐱 = {𝐂})}}
+      },
+      𝐃 = {
+        #(𝐃: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+        {𝐄 = {
+          #(𝐄: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+          {𝐅 = {
+            #(𝐅: %Element($../../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
+            {∘ = {$../../../Essentials/Functions/Operations/operator(
+              X = {$../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                𝐱 = {𝐄},
+                𝐲 = {𝐅}
+              )},
+              Y = {$../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                𝐱 = {𝐃},
+                𝐲 = {𝐄}
+              )},
+              Z = {$../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                𝐱 = {𝐃},
+                𝐲 = {𝐅}
+              )},
+              parameters = #(
+                φ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                  𝐱 = {𝐄},
+                  𝐲 = {𝐅}
+                )),
+                ψ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                  𝐱 = {𝐃},
+                  𝐲 = {𝐄}
+                ))
+              ),
+              operator = $../../../Essentials/Functions/composition(
+                X = {%setStructuralCases(
+                  𝐃,
+                  $../../../Essentials/Numbers/Cardinal/"Cardinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Cardinal/"Cardinal numbers".cardinality,
+                    parameters = #(X: %Set),
+                    value = X
+                  }]
+                )},
+                Y = {%setStructuralCases(
+                  𝐄,
+                  $../../../Essentials/Numbers/Cardinal/"Cardinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Cardinal/"Cardinal numbers".cardinality,
+                    parameters = #(Y: %Set),
+                    value = Y
+                  }]
+                )},
+                Z = {%setStructuralCases(
+                  𝐅,
+                  $../../../Essentials/Numbers/Cardinal/"Cardinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Cardinal/"Cardinal numbers".cardinality,
+                    parameters = #(Z: %Set),
+                    value = Z
+                  }]
+                )},
+                g = {φ},
+                f = {ψ}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

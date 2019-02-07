@@ -497,13 +497,11 @@ p {
 }
 
 .bold {
-  font-family: 'TeX', serif;
   font-weight: bold;
   font-style: normal;
 }
 
-.italic {
-  font-family: 'TeX', serif;
+.italic, .bold.italic {
   font-style: italic;
 }
 

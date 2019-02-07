@@ -1,0 +1,113 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers.
+ */
+$ordinals(U: %Symbol): %ExplicitOperator {
+  display = [$SubSup(
+    body = '𝐖𝐨𝐬𝐞𝐭',
+    sub = U
+  )],
+  definition = [$../Categories(U = {U}).category(
+      O = {$../../../Essentials/Numbers/Ordinal/"Ordinal numbers"},
+      𝐀 = {
+        #(𝐀: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {𝐁 = {
+          #(𝐁: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+          {M = {$../../../Essentials/Numbers/Ordinal/Homomorphisms(
+            𝐱 = {𝐀},
+            𝐲 = {𝐁}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(𝐂: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {i = {$../../../Essentials/Numbers/Ordinal/identity(𝐱 = {𝐂})}}
+      },
+      𝐃 = {
+        #(𝐃: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+        {𝐄 = {
+          #(𝐄: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+          {𝐅 = {
+            #(𝐅: %Element($../../../Essentials/Numbers/Ordinal/"Ordinal numbers")),
+            {∘ = {$../../../Essentials/Functions/Operations/operator(
+              X = {$../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐄},
+                𝐲 = {𝐅}
+              )},
+              Y = {$../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐃},
+                𝐲 = {𝐄}
+              )},
+              Z = {$../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                𝐱 = {𝐃},
+                𝐲 = {𝐅}
+              )},
+              parameters = #(
+                φ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                  𝐱 = {𝐄},
+                  𝐲 = {𝐅}
+                )),
+                ψ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                  𝐱 = {𝐃},
+                  𝐲 = {𝐄}
+                ))
+              ),
+              operator = $../../../Essentials/Functions/composition(
+                X = {%setStructuralCases(
+                  𝐃,
+                  $../../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      X: %Set,
+                      ⪯: %Element($../../../Essentials/Relations/Endorelations(S = {X})),
+                      _1: %Constraint($../../../Essentials/Relations/"well-order"(
+                        S = {X},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = X
+                  }]
+                )},
+                Y = {%setStructuralCases(
+                  𝐄,
+                  $../../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      Y: %Set,
+                      ⪯: %Element($../../../Essentials/Relations/Endorelations(S = {Y})),
+                      _1: %Constraint($../../../Essentials/Relations/"well-order"(
+                        S = {Y},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = Y
+                  }]
+                )},
+                Z = {%setStructuralCases(
+                  𝐅,
+                  $../../../Essentials/Numbers/Ordinal/"Ordinal numbers",
+                  [{
+                    constructor = $../../../Essentials/Numbers/Ordinal/"Ordinal numbers"."order type",
+                    parameters = #(
+                      Z: %Set,
+                      ⪯: %Element($../../../Essentials/Relations/Endorelations(S = {Z})),
+                      _1: %Constraint($../../../Essentials/Relations/"well-order"(
+                        S = {Z},
+                        ≺ = {⪯}
+                      ))
+                    ),
+                    value = Z
+                  }]
+                )},
+                g = {φ},
+                f = {ψ}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

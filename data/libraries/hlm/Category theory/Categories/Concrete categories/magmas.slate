@@ -1,0 +1,101 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks The objects of this category are actually isomorphism classes of magmas.
+ */
+$magmas(U: %Symbol): %ExplicitOperator {
+  display = [$SubSup(
+    body = '𝐌𝐠𝐦',
+    sub = U
+  )],
+  definition = [$../Categories(U = {U}).category(
+      O = {$../../../Algebra/Magmas/Magmas},
+      𝐀 = {
+        #(𝐀: %Element($../../../Algebra/Magmas/Magmas)),
+        {𝐁 = {
+          #(𝐁: %Element($../../../Algebra/Magmas/Magmas)),
+          {M = {$../../../Algebra/Magmas/Homomorphisms(
+            𝐌 = {𝐀},
+            𝐍 = {𝐁}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(𝐂: %Element($../../../Algebra/Magmas/Magmas)),
+        {i = {$../../../Algebra/Magmas/identity(𝐌 = {𝐂})}}
+      },
+      𝐃 = {
+        #(𝐃: %Element($../../../Algebra/Magmas/Magmas)),
+        {𝐄 = {
+          #(𝐄: %Element($../../../Algebra/Magmas/Magmas)),
+          {𝐅 = {
+            #(𝐅: %Element($../../../Algebra/Magmas/Magmas)),
+            {∘ = {$../../../Essentials/Functions/Operations/operator(
+              X = {$../../../Algebra/Magmas/Homomorphisms(
+                𝐌 = {𝐄},
+                𝐍 = {𝐅}
+              )},
+              Y = {$../../../Algebra/Magmas/Homomorphisms(
+                𝐌 = {𝐃},
+                𝐍 = {𝐄}
+              )},
+              Z = {$../../../Algebra/Magmas/Homomorphisms(
+                𝐌 = {𝐃},
+                𝐍 = {𝐅}
+              )},
+              parameters = #(
+                φ: %Element($../../../Algebra/Magmas/Homomorphisms(
+                  𝐌 = {𝐄},
+                  𝐍 = {𝐅}
+                )),
+                ψ: %Element($../../../Algebra/Magmas/Homomorphisms(
+                  𝐌 = {𝐃},
+                  𝐍 = {𝐄}
+                ))
+              ),
+              operator = $../../../Essentials/Functions/composition(
+                X = {%setStructuralCases(
+                  𝐃,
+                  $../../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../../Algebra/Magmas/Magmas.magma,
+                    parameters = #(
+                      M: %Set,
+                      ∗: %Element($../../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+                    ),
+                    value = M
+                  }]
+                )},
+                Y = {%setStructuralCases(
+                  𝐄,
+                  $../../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../../Algebra/Magmas/Magmas.magma,
+                    parameters = #(
+                      M: %Set,
+                      ∗: %Element($../../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+                    ),
+                    value = M
+                  }]
+                )},
+                Z = {%setStructuralCases(
+                  𝐅,
+                  $../../../Algebra/Magmas/Magmas,
+                  [{
+                    constructor = $../../../Algebra/Magmas/Magmas.magma,
+                    parameters = #(
+                      N: %Set,
+                      ⋆: %Element($../../../Essentials/Functions/Operations/"Inner operations"(X = {N}))
+                    ),
+                    value = N
+                  }]
+                )},
+                g = {φ},
+                f = {ψ}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

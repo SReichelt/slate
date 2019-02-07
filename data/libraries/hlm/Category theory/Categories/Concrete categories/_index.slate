@@ -1,0 +1,10 @@
+%../../../../../logics/library%
+
+$"Concrete categories": %Section {
+  logic = 'hlm',
+  items = [
+    %item($cardinals),
+    %item($ordinals),
+    %item($magmas)
+  ]
+}
