@@ -1,0 +1,78 @@
+%../../../../../logics/hlm%
+
+$magmas(
+  U: %Symbol,
+  V: %Symbol
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = '𝐂𝐚𝐭',
+    sub = $Group(items = [U, V])
+  )],
+  definition = [$../Categories(U = {V}).category(
+      O = {$../Categories(U = {U})},
+      𝐀 = {
+        #(𝑨: %Element($../Categories(U = {U}))),
+        {𝐁 = {
+          #(𝑩: %Element($../Categories(U = {U}))),
+          {M = {$../Functors(
+            U = {U},
+            𝑪 = {𝑨},
+            𝑫 = {𝑩}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(𝑪: %Element($../Categories(U = {U}))),
+        {i = {$../"identity functor"(
+          U = {U},
+          𝑪 = {𝑪}
+        )}}
+      },
+      𝐃 = {
+        #(𝑫: %Element($../Categories(U = {U}))),
+        {𝐄 = {
+          #(𝑬: %Element($../Categories(U = {U}))),
+          {𝐅 = {
+            #(𝑭: %Element($../Categories(U = {U}))),
+            {∘ = {$../../../Essentials/Functions/Operations/operator(
+              X = {$../Functors(
+                U = {U},
+                𝑪 = {𝑬},
+                𝑫 = {𝑭}
+              )},
+              Y = {$../Functors(
+                U = {U},
+                𝑪 = {𝑫},
+                𝑫 = {𝑬}
+              )},
+              Z = {$../Functors(
+                U = {U},
+                𝑪 = {𝑫},
+                𝑫 = {𝑭}
+              )},
+              parameters = #(
+                G: %Element($../Functors(
+                  U = {U},
+                  𝑪 = {𝑬},
+                  𝑫 = {𝑭}
+                )),
+                F: %Element($../Functors(
+                  U = {U},
+                  𝑪 = {𝑫},
+                  𝑫 = {𝑬}
+                ))
+              ),
+              operator = $../"functor composition"(
+                U = {U},
+                𝑪 = {𝑫},
+                𝑫 = {𝑬},
+                𝑬 = {𝑭},
+                F = {F},
+                G = {G}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

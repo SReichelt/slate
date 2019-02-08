@@ -5,6 +5,10 @@ $Categories: %Section {
   items = [
     %item($Categories),
     %item($Functors),
+    %item($"functor object value"),
+    %item($"functor morphism value"),
+    %item($"identity functor"),
+    %item($"functor composition"),
     %subsection(
       $"Concrete categories",
       'Concrete categories'

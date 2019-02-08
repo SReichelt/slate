@@ -6,6 +6,8 @@
  *          For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
  *
  *          The symbol _U_ is required to be able to define a category of (smaller) categories, which would normally be prevented by non-circularity rules. A symbol parameter essentially creates multiple distinct copies of a definition, in particular these definitions are considered distinct in the context of non-circularity. So the set of categories “in _U_” can be used to build a category “in _V_” if _V_ is a different symbol. _V_ is then considered “larger.” Informally, _U_ denotes a “universe.”
+ *
+ * @references * https://en.wikipedia.org/wiki/Category_(mathematics)
  */
 $Categories(U: %Symbol): %Construction {
   $category(

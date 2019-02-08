@@ -5,6 +5,7 @@ $"Concrete categories": %Section {
   items = [
     %item($cardinals),
     %item($ordinals),
-    %item($magmas)
+    %item($magmas),
+    %item($categories)
   ]
 }

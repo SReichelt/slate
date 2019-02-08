@@ -351,6 +351,10 @@ p {
   padding-top: 1pt;
 }
 
+.table.construction>.table-row>.table-cell {
+  vertical-align: middle;
+}
+
 .table.construction>.table-row>.table-cell:first-child {
   padding-right: 4pt;
   white-space: nowrap;
@@ -360,10 +364,6 @@ p {
   border-left: solid 1pt;
   padding-left: 4pt;
   white-space: initial;
-}
-
-.table.construction>.table-row>.table-cell:first-child>.vertical-tuple>.paren-large {
-  vertical-align: top;
 }
 
 .fraction {

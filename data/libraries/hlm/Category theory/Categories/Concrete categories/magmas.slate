@@ -44,11 +44,11 @@ $magmas(U: %Symbol): %ExplicitOperator {
                 𝐍 = {𝐅}
               )},
               parameters = #(
-                φ: %Element($../../../Algebra/Magmas/Homomorphisms(
+                ψ: %Element($../../../Algebra/Magmas/Homomorphisms(
                   𝐌 = {𝐄},
                   𝐍 = {𝐅}
                 )),
-                ψ: %Element($../../../Algebra/Magmas/Homomorphisms(
+                φ: %Element($../../../Algebra/Magmas/Homomorphisms(
                   𝐌 = {𝐃},
                   𝐍 = {𝐄}
                 ))
@@ -90,8 +90,8 @@ $magmas(U: %Symbol): %ExplicitOperator {
                     value = N
                   }]
                 )},
-                g = {φ},
-                f = {ψ}
+                f = {φ},
+                g = {ψ}
               )
             )}}
           }}

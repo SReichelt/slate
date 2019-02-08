@@ -44,11 +44,11 @@ $ordinals(U: %Symbol): %ExplicitOperator {
                 𝐲 = {𝐅}
               )},
               parameters = #(
-                φ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                ψ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
                   𝐱 = {𝐄},
                   𝐲 = {𝐅}
                 )),
-                ψ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
+                φ: %Element($../../../Essentials/Numbers/Ordinal/Homomorphisms(
                   𝐱 = {𝐃},
                   𝐲 = {𝐄}
                 ))
@@ -102,8 +102,8 @@ $ordinals(U: %Symbol): %ExplicitOperator {
                     value = Z
                   }]
                 )},
-                g = {φ},
-                f = {ψ}
+                f = {φ},
+                g = {ψ}
               )
             )}}
           }}

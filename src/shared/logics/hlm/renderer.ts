@@ -1465,22 +1465,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (constructorContents instanceof FmtHLM.ObjectContents_Constructor && innerDefinition.parameters.length) {
           let equalityDefinition = constructorContents.equalityDefinition;
           if (equalityDefinition) {
-            // Unfortunately, normal concatenation doesn't seem to work with our derived arrays.
-            let combinedParameters: Fmt.Parameter[] = [];
-            combinedParameters.push(...equalityDefinition.leftParameters);
-            combinedParameters.push(...equalityDefinition.rightParameters);
-            let parameters = this.renderParameterList(combinedParameters, false, true, true);
-            let leftParameters: ReplacementParameters = {
+            let parameters: Display.RenderedExpression;
+            let extractedConstraints: Fmt.Parameter[] = [];
+            let extractedLeftParameters = this.extractConstraints(equalityDefinition.leftParameters, extractedConstraints);
+            let extractedRightParameters = this.extractConstraints(equalityDefinition.rightParameters, extractedConstraints);
+            let combinedParameters = extractedLeftParameters.concat(extractedRightParameters);
+            parameters = this.renderParameterList(combinedParameters, false, true, true);
+            if (extractedConstraints.length) {
+              let row = [parameters, new Display.TextExpression(' with suitable conditions')];
+              parameters = new Display.RowExpression(row);
+            }
+            let leftReplacementParameters: ReplacementParameters = {
               parameters: equalityDefinition.leftParameters,
               isDefinition: false
             };
-            let rightParameters: ReplacementParameters = {
+            let rightReplacementParameters: ReplacementParameters = {
               parameters: equalityDefinition.rightParameters,
               isDefinition: false
             };
-            let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftParameters);
+            let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftReplacementParameters);
             this.setSemanticLink(leftConstructor, innerDefinition);
-            let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightParameters);
+            let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightReplacementParameters);
             this.setSemanticLink(rightConstructor, innerDefinition);
             let equality = this.renderTemplate('EqualityRelation', {
               'left': leftConstructor,

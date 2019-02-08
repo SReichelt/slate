@@ -44,11 +44,11 @@ $cardinals(U: %Symbol): %ExplicitOperator {
                 𝐲 = {𝐅}
               )},
               parameters = #(
-                φ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                ψ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
                   𝐱 = {𝐄},
                   𝐲 = {𝐅}
                 )),
-                ψ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
+                φ: %Element($../../../Essentials/Numbers/Cardinal/Homomorphisms(
                   𝐱 = {𝐃},
                   𝐲 = {𝐄}
                 ))
@@ -81,8 +81,8 @@ $cardinals(U: %Symbol): %ExplicitOperator {
                     value = Z
                   }]
                 )},
-                g = {φ},
-                f = {ψ}
+                f = {φ},
+                g = {ψ}
               )
             )}}
           }}
