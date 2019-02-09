@@ -1,0 +1,15 @@
+%../../../../../logics/hlm%
+
+$free(𝐌: %Element($../Magmas)): %Predicate {
+  display = [$Property(
+    operand = 𝐌,
+    property = 'free'
+  )],
+  definition = [%exists(
+    #(S: %Subset($../Set(𝐌 = {𝐌}))),
+    formula = $"free on set"(
+      𝐌 = {𝐌},
+      S = {S}
+    )
+  )]
+}

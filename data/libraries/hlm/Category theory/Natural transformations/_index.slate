@@ -4,6 +4,9 @@ $"Natural transformations": %Section {
   logic = 'hlm',
   items = [
     %item($"Infranatural transformations"),
+    %item($component),
+    %item($identity),
+    %item($"vertical composition"),
     %item($"Natural transformations")
   ]
 }

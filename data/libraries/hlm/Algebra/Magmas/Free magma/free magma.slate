@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../../../logics/hlm%
 
 $"free magma"(
   S: %Set,
@@ -11,22 +11,22 @@ $"free magma"(
     ),
     arguments = [S]
   )],
-  definition = [$Magmas.magma(
+  definition = [$../Magmas.magma(
       S = {T},
-      ∗ = {$../../Essentials/Functions/Functions(
-          X = {$../../Essentials/Sets/"Cartesian product"(
+      ∗ = {$../../../Essentials/Functions/Functions(
+          X = {$../../../Essentials/Sets/"Cartesian product"(
             S = {T},
             T = {T}
           )},
           Y = {T}
         ).function(x = {
           #(x: %Element(
-            $../../Essentials/Sets/"Cartesian product"(
+            $../../../Essentials/Sets/"Cartesian product"(
               S = {T},
               T = {T}
             ),
             shortcut = {
-              constructor = $../../Essentials/Sets/"Cartesian product"(
+              constructor = $../../../Essentials/Sets/"Cartesian product"(
                   S = {T},
                   T = {T}
                 ).pair,

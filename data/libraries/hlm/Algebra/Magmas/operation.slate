@@ -1,0 +1,30 @@
+%../../../../logics/hlm%
+
+$operation(
+  𝐌: %Element(
+    $Magmas,
+    auto = %true,
+    shortcut = {
+      constructor = $Magmas.magma,
+      parameters = #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+      )
+    }
+  ),
+  a: %Element(M),
+  b: %Element(%previous)
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '•',
+    operands = [a, b]
+  )],
+  definition = [$../../Essentials/Functions/Operations/value(
+    X = {M},
+    Y = {M},
+    Z = {M},
+    ∗ = {∗},
+    x = {a},
+    y = {b}
+  )]
+}

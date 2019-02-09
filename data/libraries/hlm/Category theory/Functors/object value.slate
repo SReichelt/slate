@@ -1,0 +1,140 @@
+%../../../../logics/hlm%
+
+$"object value"(
+  U: %Symbol(auto = %true),
+  𝓒: %Element(
+    $../Categories(U = {U}),
+    auto = %true
+  ),
+  𝓓: %Element(
+    %previous,
+    auto = %true
+  ),
+  F: %Element(
+    $Functors(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓓}
+    ),
+    shortcut = {
+      constructor = $Functors(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓}
+        ).functor,
+      parameters = #(
+        𝐗: %Binding(
+          $../Objects(
+            U = {U},
+            𝓒 = {𝓒}
+          ),
+          #(𝐃: %Element($../Objects(
+            U = {U},
+            𝓒 = {𝓓}
+          )))
+        ),
+        𝐘: %Binding(
+          $../Objects(
+            U = {U},
+            𝓒 = {𝓒}
+          ),
+          #(𝐙: %Binding(
+            %previous,
+            #(f: %Binding(
+              $../Morphisms(
+                U = {U},
+                𝓒 = {𝓒},
+                𝐗 = {𝐘},
+                𝐘 = {𝐙}
+              ),
+              #(d: %Element($../Morphisms(
+                U = {U},
+                𝓒 = {𝓓},
+                𝐗 = {𝐃[𝐘]},
+                𝐘 = {𝐃[𝐙]}
+              )))
+            ))
+          ))
+        ),
+        _1: %Constraint(%forall(
+          #(𝐗: %Element($../Objects(
+            U = {U},
+            𝓒 = {𝓒}
+          ))),
+          %equals(
+            d[
+              𝐗,
+              𝐗,
+              $../identity(
+                U = {U},
+                𝓒 = {𝓒},
+                𝐗 = {𝐗}
+              )
+            ],
+            $../identity(
+              U = {U},
+              𝓒 = {𝓓},
+              𝐗 = {𝐃[𝐗]}
+            )
+          )
+        )),
+        _2: %Constraint(%forall(
+          #(
+            𝐗: %Element($../Objects(
+              U = {U},
+              𝓒 = {𝓒}
+            )),
+            𝐘: %Element(%previous),
+            𝐙: %Element(%previous),
+            f: %Element($../Morphisms(
+              U = {U},
+              𝓒 = {𝓒},
+              𝐗 = {𝐗},
+              𝐘 = {𝐘}
+            )),
+            g: %Element($../Morphisms(
+              U = {U},
+              𝓒 = {𝓒},
+              𝐗 = {𝐘},
+              𝐘 = {𝐙}
+            ))
+          ),
+          %equals(
+            d[
+              𝐗,
+              𝐙,
+              $../composition(
+                U = {U},
+                𝓒 = {𝓒},
+                𝐗 = {𝐗},
+                𝐘 = {𝐘},
+                𝐙 = {𝐙},
+                g = {g},
+                f = {f}
+              )
+            ],
+            $../composition(
+              U = {U},
+              𝓒 = {𝓓},
+              𝐗 = {𝐃[𝐗]},
+              𝐘 = {𝐃[𝐘]},
+              𝐙 = {𝐃[𝐙]},
+              g = {d[𝐘,𝐙,g]},
+              f = {d[𝐗,𝐘,f]}
+            )
+          )
+        ))
+      )
+    }
+  ),
+  𝐗: %Element($../Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  ))
+): %ExplicitOperator {
+  display = [$Function(
+    function = F,
+    arguments = [𝐗]
+  )],
+  definition = [𝐃[𝐗]]
+}

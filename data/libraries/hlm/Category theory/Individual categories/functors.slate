@@ -1,0 +1,131 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Functor_category
+ *             * https://ncatlab.org/nlab/show/functor+category
+ */
+$functors(
+  U: %Symbol(auto = %true),
+  𝓒: %Element($../Categories(U = {U})),
+  𝓓: %Element(%previous),
+  V: %Symbol
+): %ExplicitOperator {
+  display = [$Function(
+    function = $SubSup(
+      body = '𝐅𝐮𝐧',
+      sub = V
+    ),
+    arguments = [𝓒, 𝓓]
+  )],
+  definition = [$../Categories(U = {V}).category(
+      O = {$../Functors/Functors(
+        U = {U},
+        𝓒 = {𝓒},
+        𝓓 = {𝓓}
+      )},
+      𝐀 = {
+        #(A: %Element($../Functors/Functors(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓}
+        ))),
+        {𝐁 = {
+          #(B: %Element($../Functors/Functors(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓}
+          ))),
+          {M = {$../"Natural transformations"/"Natural transformations"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {A},
+            G = {B}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(C: %Element($../Functors/Functors(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓}
+        ))),
+        {i = {$../"Natural transformations"/identity(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {C}
+        )}}
+      },
+      𝐃 = {
+        #(D: %Element($../Functors/Functors(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓}
+        ))),
+        {𝐄 = {
+          #(E: %Element($../Functors/Functors(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓}
+          ))),
+          {𝐅 = {
+            #(F: %Element($../Functors/Functors(
+              U = {U},
+              𝓒 = {𝓒},
+              𝓓 = {𝓓}
+            ))),
+            {∘ = {$../../Essentials/Functions/Operations/operator(
+              X = {$../"Natural transformations"/"Natural transformations"(
+                U = {U},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
+                F = {E},
+                G = {F}
+              )},
+              Y = {$../"Natural transformations"/"Natural transformations"(
+                U = {U},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
+                F = {D},
+                G = {E}
+              )},
+              Z = {$../"Natural transformations"/"Natural transformations"(
+                U = {U},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
+                F = {D},
+                G = {F}
+              )},
+              parameters = #(
+                ε: %Element($../"Natural transformations"/"Natural transformations"(
+                  U = {U},
+                  𝓒 = {𝓒},
+                  𝓓 = {𝓓},
+                  F = {E},
+                  G = {F}
+                )),
+                η: %Element($../"Natural transformations"/"Natural transformations"(
+                  U = {U},
+                  𝓒 = {𝓒},
+                  𝓓 = {𝓓},
+                  F = {D},
+                  G = {E}
+                ))
+              ),
+              operator = $../"Natural transformations"/"vertical composition"(
+                U = {U},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
+                F = {D},
+                G = {E},
+                H = {F},
+                η = {η},
+                ε = {ε}
+              )
+            )}}
+          }}
+        }}
+      }
+  )]
+}

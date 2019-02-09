@@ -1,4 +1,4 @@
-%../../../../logics/hlm%
+%../../../logics/hlm%
 
 /**
  * @remarks This definition of categories includes the additional requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). The reasoning behind this is that I expect the equality definition above, which is derived purely syntactically, to be equivalent to _isomorphism_ of categories, not _equivalence_. That is, without this restriction, two isomorphic categories would be considered equal, but two equivalent categories would not necessarily be. (This needs to be verified.)
@@ -8,6 +8,7 @@
  *          The symbol _U_ is required to be able to define a category of (smaller) categories, which would normally be prevented by non-circularity rules. A symbol parameter essentially creates multiple distinct copies of a definition, in particular these definitions are considered distinct in the context of non-circularity. So the set of categories “in _U_” can be used to build a category “in _V_” if _V_ is a different symbol. _V_ is then considered “larger.” Informally, _U_ denotes a “universe.”
  *
  * @references * https://en.wikipedia.org/wiki/Category_(mathematics)
+ *             * https://ncatlab.org/nlab/show/category
  */
 $Categories(U: %Symbol): %Construction {
   $category(
@@ -29,7 +30,7 @@ $Categories(U: %Symbol): %Construction {
         %previous,
         #(𝐅: %Binding(
           %previous,
-          #(∘: %Element($../../Essentials/Functions/Operations/Operations(
+          #(∘: %Element($../Essentials/Functions/Operations/Operations(
             X = {M[𝐄,𝐅]},
             Y = {M[𝐃,𝐄]},
             Z = {M[𝐃,𝐅]}
@@ -48,12 +49,12 @@ $Categories(U: %Symbol): %Construction {
         h: %Element(M[𝐘,𝐙])
       ),
       %equals(
-        $../../Essentials/Functions/Operations/value(
+        $../Essentials/Functions/Operations/value(
           X = {M[𝐗,𝐙]},
           Y = {M[𝐖,𝐗]},
           Z = {M[𝐖,𝐙]},
           ∗ = {∘[𝐖,𝐗,𝐙]},
-          x = {$../../Essentials/Functions/Operations/value(
+          x = {$../Essentials/Functions/Operations/value(
             X = {M[𝐘,𝐙]},
             Y = {M[𝐗,𝐘]},
             Z = {M[𝐗,𝐙]},
@@ -63,13 +64,13 @@ $Categories(U: %Symbol): %Construction {
           )},
           y = {f}
         ),
-        $../../Essentials/Functions/Operations/value(
+        $../Essentials/Functions/Operations/value(
           X = {M[𝐘,𝐙]},
           Y = {M[𝐖,𝐘]},
           Z = {M[𝐖,𝐙]},
           ∗ = {∘[𝐖,𝐘,𝐙]},
           x = {h},
-          y = {$../../Essentials/Functions/Operations/value(
+          y = {$../Essentials/Functions/Operations/value(
             X = {M[𝐗,𝐘]},
             Y = {M[𝐖,𝐗]},
             Z = {M[𝐖,𝐘]},
@@ -88,7 +89,7 @@ $Categories(U: %Symbol): %Construction {
       ),
       %and(
         %equals(
-          $../../Essentials/Functions/Operations/value(
+          $../Essentials/Functions/Operations/value(
             X = {M[𝐘,𝐘]},
             Y = {M[𝐗,𝐘]},
             Z = {M[𝐗,𝐘]},
@@ -99,7 +100,7 @@ $Categories(U: %Symbol): %Construction {
           f
         ),
         %equals(
-          $../../Essentials/Functions/Operations/value(
+          $../Essentials/Functions/Operations/value(
             X = {M[𝐗,𝐘]},
             Y = {M[𝐗,𝐗]},
             Z = {M[𝐗,𝐘]},
@@ -118,7 +119,7 @@ $Categories(U: %Symbol): %Construction {
         f: %Element(M[𝐗,𝐘]),
         g: %Element(M[𝐘,𝐗]),
         _4: %Constraint(%equals(
-          $../../Essentials/Functions/Operations/value(
+          $../Essentials/Functions/Operations/value(
             X = {M[𝐗,𝐘]},
             Y = {M[𝐘,𝐗]},
             Z = {M[𝐘,𝐘]},
@@ -129,7 +130,7 @@ $Categories(U: %Symbol): %Construction {
           i[𝐘]
         )),
         _5: %Constraint(%equals(
-          $../../Essentials/Functions/Operations/value(
+          $../Essentials/Functions/Operations/value(
             X = {M[𝐘,𝐗]},
             Y = {M[𝐗,𝐘]},
             Z = {M[𝐗,𝐗]},
@@ -217,7 +218,7 @@ $Categories(U: %Symbol): %Construction {
             %previous,
             #(𝐅: %Binding(
               %previous,
-              #(∘: %Element($../../Essentials/Functions/Operations/Operations(
+              #(∘: %Element($../Essentials/Functions/Operations/Operations(
                 X = {M[𝐄,𝐅]},
                 Y = {M[𝐃,𝐄]},
                 Z = {M[𝐃,𝐅]}
@@ -236,12 +237,12 @@ $Categories(U: %Symbol): %Construction {
             h: %Element(M[𝐘,𝐙])
           ),
           %equals(
-            $../../Essentials/Functions/Operations/value(
+            $../Essentials/Functions/Operations/value(
               X = {M[𝐗,𝐙]},
               Y = {M[𝐖,𝐗]},
               Z = {M[𝐖,𝐙]},
               ∗ = {∘[𝐖,𝐗,𝐙]},
-              x = {$../../Essentials/Functions/Operations/value(
+              x = {$../Essentials/Functions/Operations/value(
                 X = {M[𝐘,𝐙]},
                 Y = {M[𝐗,𝐘]},
                 Z = {M[𝐗,𝐙]},
@@ -251,13 +252,13 @@ $Categories(U: %Symbol): %Construction {
               )},
               y = {f}
             ),
-            $../../Essentials/Functions/Operations/value(
+            $../Essentials/Functions/Operations/value(
               X = {M[𝐘,𝐙]},
               Y = {M[𝐖,𝐘]},
               Z = {M[𝐖,𝐙]},
               ∗ = {∘[𝐖,𝐘,𝐙]},
               x = {h},
-              y = {$../../Essentials/Functions/Operations/value(
+              y = {$../Essentials/Functions/Operations/value(
                 X = {M[𝐗,𝐘]},
                 Y = {M[𝐖,𝐗]},
                 Z = {M[𝐖,𝐘]},
@@ -276,7 +277,7 @@ $Categories(U: %Symbol): %Construction {
           ),
           %and(
             %equals(
-              $../../Essentials/Functions/Operations/value(
+              $../Essentials/Functions/Operations/value(
                 X = {M[𝐘,𝐘]},
                 Y = {M[𝐗,𝐘]},
                 Z = {M[𝐗,𝐘]},
@@ -287,7 +288,7 @@ $Categories(U: %Symbol): %Construction {
               f
             ),
             %equals(
-              $../../Essentials/Functions/Operations/value(
+              $../Essentials/Functions/Operations/value(
                 X = {M[𝐗,𝐘]},
                 Y = {M[𝐗,𝐗]},
                 Z = {M[𝐗,𝐘]},
@@ -306,7 +307,7 @@ $Categories(U: %Symbol): %Construction {
             f: %Element(M[𝐗,𝐘]),
             g: %Element(M[𝐘,𝐗]),
             _4: %Constraint(%equals(
-              $../../Essentials/Functions/Operations/value(
+              $../Essentials/Functions/Operations/value(
                 X = {M[𝐗,𝐘]},
                 Y = {M[𝐘,𝐗]},
                 Z = {M[𝐘,𝐘]},
@@ -317,7 +318,7 @@ $Categories(U: %Symbol): %Construction {
               i[𝐘]
             )),
             _5: %Constraint(%equals(
-              $../../Essentials/Functions/Operations/value(
+              $../Essentials/Functions/Operations/value(
                 X = {M[𝐘,𝐗]},
                 Y = {M[𝐗,𝐘]},
                 Z = {M[𝐗,𝐗]},
@@ -333,132 +334,132 @@ $Categories(U: %Symbol): %Construction {
       ),
       rightParameters = #(
         P: %Set,
-        "𝐀": %Binding(
+        𝐀: %Binding(
           P,
-          #("𝐁": %Binding(
+          #(𝐁: %Binding(
             %previous,
             #(N: %Set)
           ))
         ),
-        "𝐂": %Binding(
+        𝐂: %Binding(
           P,
-          #(j: %Element(N["𝐂","𝐂"]))
+          #(j: %Element(N[𝐂,𝐂]))
         ),
-        "𝐃": %Binding(
+        𝐃: %Binding(
           P,
-          #("𝐄": %Binding(
+          #(𝐄: %Binding(
             %previous,
-            #("𝐅": %Binding(
+            #(𝐅: %Binding(
               %previous,
-              #(∙: %Element($../../Essentials/Functions/Operations/Operations(
-                X = {N["𝐄","𝐅"]},
-                Y = {N["𝐃","𝐄"]},
-                Z = {N["𝐃","𝐅"]}
+              #(∙: %Element($../Essentials/Functions/Operations/Operations(
+                X = {N[𝐄,𝐅]},
+                Y = {N[𝐃,𝐄]},
+                Z = {N[𝐃,𝐅]}
               )))
             ))
           ))
         ),
-        "_1": %Constraint(%forall(
+        _1: %Constraint(%forall(
           #(
-            "𝐖": %Element(P),
-            "𝐗": %Element(%previous),
-            "𝐘": %Element(%previous),
-            "𝐙": %Element(%previous),
-            f: %Element(N["𝐖","𝐗"]),
-            g: %Element(N["𝐗","𝐘"]),
-            h: %Element(N["𝐘","𝐙"])
+            𝐖: %Element(P),
+            𝐗: %Element(%previous),
+            𝐘: %Element(%previous),
+            𝐙: %Element(%previous),
+            f: %Element(N[𝐖,𝐗]),
+            g: %Element(N[𝐗,𝐘]),
+            h: %Element(N[𝐘,𝐙])
           ),
           %equals(
-            $../../Essentials/Functions/Operations/value(
-              X = {N["𝐗","𝐙"]},
-              Y = {N["𝐖","𝐗"]},
-              Z = {N["𝐖","𝐙"]},
-              ∗ = {∙["𝐖","𝐗","𝐙"]},
-              x = {$../../Essentials/Functions/Operations/value(
-                X = {N["𝐘","𝐙"]},
-                Y = {N["𝐗","𝐘"]},
-                Z = {N["𝐗","𝐙"]},
-                ∗ = {∙["𝐗","𝐘","𝐙"]},
+            $../Essentials/Functions/Operations/value(
+              X = {N[𝐗,𝐙]},
+              Y = {N[𝐖,𝐗]},
+              Z = {N[𝐖,𝐙]},
+              ∗ = {∙[𝐖,𝐗,𝐙]},
+              x = {$../Essentials/Functions/Operations/value(
+                X = {N[𝐘,𝐙]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐙]},
+                ∗ = {∙[𝐗,𝐘,𝐙]},
                 x = {h},
                 y = {g}
               )},
               y = {f}
             ),
-            $../../Essentials/Functions/Operations/value(
-              X = {N["𝐘","𝐙"]},
-              Y = {N["𝐖","𝐘"]},
-              Z = {N["𝐖","𝐙"]},
-              ∗ = {∙["𝐖","𝐘","𝐙"]},
+            $../Essentials/Functions/Operations/value(
+              X = {N[𝐘,𝐙]},
+              Y = {N[𝐖,𝐘]},
+              Z = {N[𝐖,𝐙]},
+              ∗ = {∙[𝐖,𝐘,𝐙]},
               x = {h},
-              y = {$../../Essentials/Functions/Operations/value(
-                X = {N["𝐗","𝐘"]},
-                Y = {N["𝐖","𝐗"]},
-                Z = {N["𝐖","𝐘"]},
-                ∗ = {∙["𝐖","𝐗","𝐘"]},
+              y = {$../Essentials/Functions/Operations/value(
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐖,𝐗]},
+                Z = {N[𝐖,𝐘]},
+                ∗ = {∙[𝐖,𝐗,𝐘]},
                 x = {g},
                 y = {f}
               )}
             )
           )
         )),
-        "_2": %Constraint(%forall(
+        _2: %Constraint(%forall(
           #(
-            "𝐗": %Element(P),
-            "𝐘": %Element(%previous),
-            f: %Element(N["𝐗","𝐘"])
+            𝐗: %Element(P),
+            𝐘: %Element(%previous),
+            f: %Element(N[𝐗,𝐘])
           ),
           %and(
             %equals(
-              $../../Essentials/Functions/Operations/value(
-                X = {N["𝐘","𝐘"]},
-                Y = {N["𝐗","𝐘"]},
-                Z = {N["𝐗","𝐘"]},
-                ∗ = {∙["𝐗","𝐘","𝐘"]},
-                x = {j["𝐘"]},
+              $../Essentials/Functions/Operations/value(
+                X = {N[𝐘,𝐘]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐘]},
+                ∗ = {∙[𝐗,𝐘,𝐘]},
+                x = {j[𝐘]},
                 y = {f}
               ),
               f
             ),
             %equals(
-              $../../Essentials/Functions/Operations/value(
-                X = {N["𝐗","𝐘"]},
-                Y = {N["𝐗","𝐗"]},
-                Z = {N["𝐗","𝐘"]},
-                ∗ = {∙["𝐗","𝐗","𝐘"]},
+              $../Essentials/Functions/Operations/value(
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐗,𝐗]},
+                Z = {N[𝐗,𝐘]},
+                ∗ = {∙[𝐗,𝐗,𝐘]},
                 x = {f},
-                y = {j["𝐗"]}
+                y = {j[𝐗]}
               ),
               f
             )
           )
         )),
-        "_3": %Constraint(%forall(
+        _3: %Constraint(%forall(
           #(
-            "𝐗": %Element(P),
-            "𝐘": %Element(%previous),
-            f: %Element(N["𝐗","𝐘"]),
-            g: %Element(N["𝐘","𝐗"]),
-            "_4": %Constraint(%equals(
-              $../../Essentials/Functions/Operations/value(
-                X = {N["𝐗","𝐘"]},
-                Y = {N["𝐘","𝐗"]},
-                Z = {N["𝐘","𝐘"]},
-                ∗ = {∙["𝐘","𝐗","𝐘"]},
+            𝐗: %Element(P),
+            𝐘: %Element(%previous),
+            f: %Element(N[𝐗,𝐘]),
+            g: %Element(N[𝐘,𝐗]),
+            _4: %Constraint(%equals(
+              $../Essentials/Functions/Operations/value(
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐘,𝐗]},
+                Z = {N[𝐘,𝐘]},
+                ∗ = {∙[𝐘,𝐗,𝐘]},
                 x = {f},
                 y = {g}
               ),
-              j["𝐘"]
+              j[𝐘]
             )),
-            "_5": %Constraint(%equals(
-              $../../Essentials/Functions/Operations/value(
-                X = {N["𝐘","𝐗"]},
-                Y = {N["𝐗","𝐘"]},
-                Z = {N["𝐗","𝐗"]},
-                ∗ = {∙["𝐗","𝐘","𝐗"]},
+            _5: %Constraint(%equals(
+              $../Essentials/Functions/Operations/value(
+                X = {N[𝐘,𝐗]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐗]},
+                ∗ = {∙[𝐗,𝐘,𝐗]},
                 x = {g},
                 y = {f}
               ),
-              j["𝐗"]
+              j[𝐗]
             ))
           ),
           %equals(f, g)
@@ -466,7 +467,7 @@ $Categories(U: %Symbol): %Construction {
       ),
       definition = [%exists(
         #(
-          φ: %Element($../../Essentials/Functions/Bijections(
+          φ: %Element($../Essentials/Functions/Bijections(
             X = {O},
             Y = {P}
           )),
@@ -474,16 +475,16 @@ $Categories(U: %Symbol): %Construction {
             O,
             #(𝐁: %Binding(
               %previous,
-              #(ψ: %Element($../../Essentials/Functions/Bijections(
+              #(ψ: %Element($../Essentials/Functions/Bijections(
                 X = {M[𝐀,𝐁]},
                 Y = {N[
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
                     x = {𝐀}
                   ),
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
@@ -498,16 +499,16 @@ $Categories(U: %Symbol): %Construction {
           %forall(
             #(𝐂: %Element(O)),
             %equals(
-              $../../Algebra/Isomorphisms/"element transform"(
+              $../Algebra/Isomorphisms/"element transform"(
                 X = {M[𝐂,𝐂]},
                 Y = {N[
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
                     x = {𝐂}
                   ),
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
@@ -517,7 +518,7 @@ $Categories(U: %Symbol): %Construction {
                 φ = {ψ[𝐂,𝐂]},
                 x = {i[𝐂]}
               ),
-              j[$../../Algebra/Isomorphisms/"element transform"(
+              j[$../Algebra/Isomorphisms/"element transform"(
                 X = {O},
                 Y = {P},
                 φ = {φ},
@@ -532,18 +533,18 @@ $Categories(U: %Symbol): %Construction {
               𝐅: %Element(%previous)
             ),
             %equals(
-              $../../Algebra/Isomorphisms/"morphism transform"(
+              $../Algebra/Isomorphisms/"morphism transform"(
                 X_1 = {M[𝐃,𝐄]},
                 X_2 = {M[𝐄,𝐅]},
                 X_3 = {M[𝐃,𝐅]},
                 Y_1 = {N[
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
                     x = {𝐃}
                   ),
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
@@ -551,13 +552,13 @@ $Categories(U: %Symbol): %Construction {
                   )
                 ]},
                 Y_2 = {N[
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
                     x = {𝐄}
                   ),
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
@@ -565,13 +566,13 @@ $Categories(U: %Symbol): %Construction {
                   )
                 ]},
                 Y_3 = {N[
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
                     x = {𝐃}
                   ),
-                  $../../Algebra/Isomorphisms/"element transform"(
+                  $../Algebra/Isomorphisms/"element transform"(
                     X = {O},
                     Y = {P},
                     φ = {φ},
@@ -584,19 +585,19 @@ $Categories(U: %Symbol): %Construction {
                 ∙ = {∘[𝐃,𝐄,𝐅]}
               ),
               ∙[
-                $../../Algebra/Isomorphisms/"element transform"(
+                $../Algebra/Isomorphisms/"element transform"(
                   X = {O},
                   Y = {P},
                   φ = {φ},
                   x = {𝐃}
                 ),
-                $../../Algebra/Isomorphisms/"element transform"(
+                $../Algebra/Isomorphisms/"element transform"(
                   X = {O},
                   Y = {P},
                   φ = {φ},
                   x = {𝐄}
                 ),
-                $../../Algebra/Isomorphisms/"element transform"(
+                $../Algebra/Isomorphisms/"element transform"(
                   X = {O},
                   Y = {P},
                   φ = {φ},

@@ -1,0 +1,41 @@
+%../../../../../logics/hlm%
+
+$"free on set"(
+  𝐌: %Element($../Magmas),
+  S: %Subset($../Set(𝐌 = {𝐌}))
+): %Predicate {
+  display = [$Property(
+    operand = 𝐌,
+    property = ['free on ', S]
+  )],
+  definition = [
+    %equals(
+      𝐌,
+      $"free magma"(S = {S})
+    ),
+    %forall(
+      #(
+        𝐍: %Element($../Magmas),
+        f: %Element($../../../Essentials/Functions/Functions(
+          X = {S},
+          Y = {$../Set(𝐌 = {𝐍})}
+        ))
+      ),
+      %existsUnique(
+        #(φ: %Element($../Homomorphisms(
+          𝐌 = {𝐌},
+          𝐍 = {𝐍}
+        ))),
+        formula = %equals(
+          $../../../Essentials/Functions/restriction(
+            X = {$../Set(𝐌 = {𝐌})},
+            Y = {$../Set(𝐌 = {𝐍})},
+            A = {S},
+            f = {φ}
+          ),
+          f
+        )
+      )
+    )
+  ]
+}

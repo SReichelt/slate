@@ -8,7 +8,7 @@ $ordinals(U: %Symbol): %ExplicitOperator {
     body = '𝐖𝐨𝐬𝐞𝐭',
     sub = U
   )],
-  definition = [$../Categories/Categories(U = {U}).category(
+  definition = [$../Categories(U = {U}).category(
       O = {$../../Essentials/Numbers/Ordinal/"Ordinal numbers"},
       𝐀 = {
         #(𝐀: %Element($../../Essentials/Numbers/Ordinal/"Ordinal numbers")),

@@ -7,6 +7,7 @@ $"Individual categories": %Section {
     %item($cardinals),
     %item($ordinals),
     %item($magmas),
-    %item($categories)
+    %item($categories),
+    %item($functors)
   ]
 }

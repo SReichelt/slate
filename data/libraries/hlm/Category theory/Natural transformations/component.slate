@@ -1,0 +1,77 @@
+%../../../../logics/hlm%
+
+$component(
+  U: %Symbol(auto = %true),
+  𝓒: %Element(
+    $../Categories(U = {U}),
+    auto = %true
+  ),
+  𝓓: %Element(
+    %previous,
+    auto = %true
+  ),
+  F: %Element(
+    $../Functors/Functors(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓓}
+    ),
+    auto = %true
+  ),
+  G: %Element(
+    %previous,
+    auto = %true
+  ),
+  η: %Element(
+    $"Infranatural transformations"(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓓},
+      F = {F},
+      G = {G}
+    ),
+    shortcut = {
+      constructor = $"Infranatural transformations"(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {F},
+          G = {G}
+        ).transformation,
+      parameters = #(𝐗: %Binding(
+        $../Objects(
+          U = {U},
+          𝓒 = {𝓒}
+        ),
+        #(n: %Element($../Morphisms(
+          U = {U},
+          𝓒 = {𝓓},
+          𝐗 = {$../Functors/"object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {F},
+            𝐗 = {𝐗}
+          )},
+          𝐘 = {$../Functors/"object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {G},
+            𝐗 = {𝐗}
+          )}
+        )))
+      ))
+    }
+  ),
+  𝐗: %Element($../Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  ))
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = η,
+    sub = 𝐗
+  )],
+  definition = [n[𝐗]]
+}

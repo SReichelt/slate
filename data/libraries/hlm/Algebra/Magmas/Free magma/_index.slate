@@ -1,0 +1,11 @@
+%../../../../../logics/library%
+
+$"Free magma": %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Binary trees"),
+    %item($"free magma"),
+    %item($"free on set"),
+    %item($free)
+  ]
+}

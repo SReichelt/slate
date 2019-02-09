@@ -1,0 +1,108 @@
+%../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Natural_transformation#Operations_with_natural_transformations
+ */
+$"vertical composition"(
+  U: %Symbol(auto = %true),
+  𝓒: %Element(
+    $../Categories(U = {U}),
+    auto = %true
+  ),
+  𝓓: %Element(
+    %previous,
+    auto = %true
+  ),
+  F: %Element(
+    $../Functors/Functors(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓓}
+    ),
+    auto = %true
+  ),
+  G: %Element(
+    %previous,
+    auto = %true
+  ),
+  H: %Element(
+    %previous,
+    auto = %true
+  ),
+  η: %Element($"Infranatural transformations"(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓},
+    F = {F},
+    G = {G}
+  )),
+  ε: %Element($"Infranatural transformations"(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓},
+    F = {G},
+    G = {H}
+  ))
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '∘',
+    operands = [ε, η],
+    minParenLevel = 2,
+    maxParenLevel = 2
+  )],
+  definition = [$"Infranatural transformations"(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓓},
+      F = {F},
+      G = {H}
+    ).transformation(𝐗 = {
+      parameter = #(𝐗: %Element($../Objects(
+        U = {U},
+        𝓒 = {𝓒}
+      ))),
+      arguments = {n = {$../composition(
+        U = {U},
+        𝓒 = {𝓓},
+        𝐗 = {$../Functors/"object value"(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {F},
+          𝐗 = {𝐗}
+        )},
+        𝐘 = {$../Functors/"object value"(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {G},
+          𝐗 = {𝐗}
+        )},
+        𝐙 = {$../Functors/"object value"(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {H},
+          𝐗 = {𝐗}
+        )},
+        f = {$component(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {F},
+          G = {G},
+          η = {η},
+          𝐗 = {𝐗}
+        )},
+        g = {$component(
+          U = {U},
+          𝓒 = {𝓒},
+          𝓓 = {𝓓},
+          F = {G},
+          G = {H},
+          η = {ε},
+          𝐗 = {𝐗}
+        )}
+      )}}
+  })]
+}

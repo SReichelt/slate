@@ -1,0 +1,48 @@
+%../../../../logics/hlm%
+
+$identity(
+  U: %Symbol(auto = %true),
+  𝓒: %Element(
+    $../Categories(U = {U}),
+    auto = %true
+  )
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = 'id',
+    sub = 𝓒
+  )],
+  definition = [$Functors(
+      U = {U},
+      𝓒 = {𝓒},
+      𝓓 = {𝓒}
+    ).functor(
+      𝐗 = {
+        #(𝐗: %Element($../Objects(
+          U = {U},
+          𝓒 = {𝓒}
+        ))),
+        {𝐃 = {𝐗}}
+      },
+      𝐘 = {
+        #(𝐘: %Element($../Objects(
+          U = {U},
+          𝓒 = {𝓒}
+        ))),
+        {𝐙 = {
+          #(𝐙: %Element($../Objects(
+            U = {U},
+            𝓒 = {𝓒}
+          ))),
+          {f = {
+            #(f: %Element($../Morphisms(
+              U = {U},
+              𝓒 = {𝓒},
+              𝐗 = {𝐘},
+              𝐘 = {𝐙}
+            ))),
+            {d = {f}}
+          }}
+        }}
+      }
+  )]
+}

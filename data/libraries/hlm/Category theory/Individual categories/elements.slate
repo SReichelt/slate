@@ -4,6 +4,7 @@
  * @remarks This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of a morphism implies that _d_=_e_=_f_.
  *
  * @references * https://en.wikipedia.org/wiki/Discrete_category
+ *             * https://ncatlab.org/nlab/show/discrete+category#CategoricalMeaning
  */
 $elements(
   U: %Symbol,
@@ -16,7 +17,7 @@ $elements(
     ),
     arguments = [S]
   )],
-  definition = [$../Categories/Categories(U = {U}).category(
+  definition = [$../Categories(U = {U}).category(
       O = {S},
       𝐀 = {
         #(a: %Element(S)),

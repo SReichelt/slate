@@ -3,10 +3,11 @@
 $"Category theory": %Section {
   logic = 'hlm',
   items = [
-    %subsection(
-      $Categories,
-      'Categories'
-    ),
+    %item($Categories),
+    %item($Objects),
+    %item($Morphisms),
+    %item($identity),
+    %item($composition),
     %subsection(
       $Functors,
       'Functors'

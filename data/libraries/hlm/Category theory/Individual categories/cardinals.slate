@@ -2,13 +2,16 @@
 
 /**
  * @remarks The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers. In HLM, arbitrary sets cannot be used as objects because it is impossible to ask whether two arbitrary sets are equal. However, cardinal numbers work fine as a replacement. The situation with other categories is similar.
+ *
+ * @references * https://en.wikipedia.org/wiki/Category_of_sets
+ *             * https://ncatlab.org/nlab/show/Set
  */
 $cardinals(U: %Symbol): %ExplicitOperator {
   display = [$SubSup(
     body = '𝐒𝐞𝐭',
     sub = U
   )],
-  definition = [$../Categories/Categories(U = {U}).category(
+  definition = [$../Categories(U = {U}).category(
       O = {$../../Essentials/Numbers/Cardinal/"Cardinal numbers"},
       𝐀 = {
         #(𝐀: %Element($../../Essentials/Numbers/Cardinal/"Cardinal numbers")),
