@@ -150,132 +150,132 @@ $"Infranatural transformations"(
       constructor = $Categories(U = {U}).category,
       parameters = #(
         P: %Set,
-        "𝐀'": %Binding(
+        𝐀: %Binding(
           P,
-          #("𝐁'": %Binding(
+          #(𝐁: %Binding(
             %previous,
             #(N: %Set)
           ))
         ),
-        "𝐂'": %Binding(
+        𝐂: %Binding(
           P,
-          #(j: %Element(N["𝐂'","𝐂'"]))
+          #(j: %Element(N[𝐂,𝐂]))
         ),
-        "𝐃'": %Binding(
+        𝐃: %Binding(
           P,
-          #("𝐄'": %Binding(
+          #(𝐄: %Binding(
             %previous,
-            #("𝐅'": %Binding(
+            #(𝐅: %Binding(
               %previous,
               #(∙: %Element($../../Essentials/Functions/Operations/Operations(
-                X = {N["𝐄'","𝐅'"]},
-                Y = {N["𝐃'","𝐄'"]},
-                Z = {N["𝐃'","𝐅'"]}
+                X = {N[𝐄,𝐅]},
+                Y = {N[𝐃,𝐄]},
+                Z = {N[𝐃,𝐅]}
               )))
             ))
           ))
         ),
-        "_1'": %Constraint(%forall(
+        _1: %Constraint(%forall(
           #(
-            "𝐖'": %Element(P),
-            "𝐗'": %Element(%previous),
-            "𝐘'": %Element(%previous),
-            "𝐙'": %Element(%previous),
-            f: %Element(N["𝐖'","𝐗'"]),
-            g: %Element(N["𝐗'","𝐘'"]),
-            h: %Element(N["𝐘'","𝐙'"])
+            𝐖: %Element(P),
+            𝐗: %Element(%previous),
+            𝐘: %Element(%previous),
+            𝐙: %Element(%previous),
+            f: %Element(N[𝐖,𝐗]),
+            g: %Element(N[𝐗,𝐘]),
+            h: %Element(N[𝐘,𝐙])
           ),
           %equals(
             $../../Essentials/Functions/Operations/value(
-              X = {N["𝐗'","𝐙'"]},
-              Y = {N["𝐖'","𝐗'"]},
-              Z = {N["𝐖'","𝐙'"]},
-              ∗ = {∙["𝐖'","𝐗'","𝐙'"]},
+              X = {N[𝐗,𝐙]},
+              Y = {N[𝐖,𝐗]},
+              Z = {N[𝐖,𝐙]},
+              ∗ = {∙[𝐖,𝐗,𝐙]},
               x = {$../../Essentials/Functions/Operations/value(
-                X = {N["𝐘'","𝐙'"]},
-                Y = {N["𝐗'","𝐘'"]},
-                Z = {N["𝐗'","𝐙'"]},
-                ∗ = {∙["𝐗'","𝐘'","𝐙'"]},
+                X = {N[𝐘,𝐙]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐙]},
+                ∗ = {∙[𝐗,𝐘,𝐙]},
                 x = {h},
                 y = {g}
               )},
               y = {f}
             ),
             $../../Essentials/Functions/Operations/value(
-              X = {N["𝐘'","𝐙'"]},
-              Y = {N["𝐖'","𝐘'"]},
-              Z = {N["𝐖'","𝐙'"]},
-              ∗ = {∙["𝐖'","𝐘'","𝐙'"]},
+              X = {N[𝐘,𝐙]},
+              Y = {N[𝐖,𝐘]},
+              Z = {N[𝐖,𝐙]},
+              ∗ = {∙[𝐖,𝐘,𝐙]},
               x = {h},
               y = {$../../Essentials/Functions/Operations/value(
-                X = {N["𝐗'","𝐘'"]},
-                Y = {N["𝐖'","𝐗'"]},
-                Z = {N["𝐖'","𝐘'"]},
-                ∗ = {∙["𝐖'","𝐗'","𝐘'"]},
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐖,𝐗]},
+                Z = {N[𝐖,𝐘]},
+                ∗ = {∙[𝐖,𝐗,𝐘]},
                 x = {g},
                 y = {f}
               )}
             )
           )
         )),
-        "_2'": %Constraint(%forall(
+        _2: %Constraint(%forall(
           #(
-            "𝐗'": %Element(P),
-            "𝐘'": %Element(%previous),
-            f: %Element(N["𝐗'","𝐘'"])
+            𝐗: %Element(P),
+            𝐘: %Element(%previous),
+            f: %Element(N[𝐗,𝐘])
           ),
           %and(
             %equals(
               $../../Essentials/Functions/Operations/value(
-                X = {N["𝐘'","𝐘'"]},
-                Y = {N["𝐗'","𝐘'"]},
-                Z = {N["𝐗'","𝐘'"]},
-                ∗ = {∙["𝐗'","𝐘'","𝐘'"]},
-                x = {j["𝐘'"]},
+                X = {N[𝐘,𝐘]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐘]},
+                ∗ = {∙[𝐗,𝐘,𝐘]},
+                x = {j[𝐘]},
                 y = {f}
               ),
               f
             ),
             %equals(
               $../../Essentials/Functions/Operations/value(
-                X = {N["𝐗'","𝐘'"]},
-                Y = {N["𝐗'","𝐗'"]},
-                Z = {N["𝐗'","𝐘'"]},
-                ∗ = {∙["𝐗'","𝐗'","𝐘'"]},
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐗,𝐗]},
+                Z = {N[𝐗,𝐘]},
+                ∗ = {∙[𝐗,𝐗,𝐘]},
                 x = {f},
-                y = {j["𝐗'"]}
+                y = {j[𝐗]}
               ),
               f
             )
           )
         )),
-        "_3'": %Constraint(%forall(
+        _3: %Constraint(%forall(
           #(
-            "𝐗'": %Element(P),
-            "𝐘'": %Element(%previous),
-            f: %Element(N["𝐗'","𝐘'"]),
-            g: %Element(N["𝐘'","𝐗'"]),
-            "_4'": %Constraint(%equals(
+            𝐗: %Element(P),
+            𝐘: %Element(%previous),
+            f: %Element(N[𝐗,𝐘]),
+            g: %Element(N[𝐘,𝐗]),
+            _4: %Constraint(%equals(
               $../../Essentials/Functions/Operations/value(
-                X = {N["𝐗'","𝐘'"]},
-                Y = {N["𝐘'","𝐗'"]},
-                Z = {N["𝐘'","𝐘'"]},
-                ∗ = {∙["𝐘'","𝐗'","𝐘'"]},
+                X = {N[𝐗,𝐘]},
+                Y = {N[𝐘,𝐗]},
+                Z = {N[𝐘,𝐘]},
+                ∗ = {∙[𝐘,𝐗,𝐘]},
                 x = {f},
                 y = {g}
               ),
-              j["𝐘'"]
+              j[𝐘]
             )),
-            "_5'": %Constraint(%equals(
+            _5: %Constraint(%equals(
               $../../Essentials/Functions/Operations/value(
-                X = {N["𝐘'","𝐗'"]},
-                Y = {N["𝐗'","𝐘'"]},
-                Z = {N["𝐗'","𝐗'"]},
-                ∗ = {∙["𝐗'","𝐘'","𝐗'"]},
+                X = {N[𝐘,𝐗]},
+                Y = {N[𝐗,𝐘]},
+                Z = {N[𝐗,𝐗]},
+                ∗ = {∙[𝐗,𝐘,𝐗]},
                 x = {g},
                 y = {f}
               ),
-              j["𝐗'"]
+              j[𝐗]
             ))
           ),
           %equals(f, g)
