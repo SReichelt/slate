@@ -2,18 +2,5 @@
 
 $Categories: %Section {
   logic = 'hlm',
-  items = [
-    %item($Categories),
-    %item($Functors),
-    %item($"functor object value"),
-    %item($"functor morphism value"),
-    %item($"identity functor"),
-    %item($"functor composition"),
-    %item($"Infranatural transformations"),
-    %item($"Natural transformations"),
-    %subsection(
-      $"Individual categories",
-      'Individual categories'
-    )
-  ]
+  items = [%item($Categories)]
 }

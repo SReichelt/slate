@@ -6,9 +6,9 @@
 $Functors(
   U: %Symbol(auto = %true),
   𝓒: %Element(
-    $Categories(U = {U}),
+    $../Categories/Categories(U = {U}),
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         O: %Set,
         𝐀: %Binding(
@@ -147,7 +147,7 @@ $Functors(
   𝓓: %Element(
     %previous,
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         P: %Set,
         𝐀: %Binding(

@@ -1,12 +1,14 @@
 %../../../../logics/hlm%
 
-$"functor object value"(
+/**
+ * @references * https://en.wikipedia.org/wiki/Natural_transformation
+ */
+$"Infranatural transformations"(
   U: %Symbol(auto = %true),
   𝓒: %Element(
-    $Categories(U = {U}),
-    auto = %true,
+    $../Categories/Categories(U = {U}),
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         O: %Set,
         𝐀: %Binding(
@@ -144,9 +146,8 @@ $"functor object value"(
   ),
   𝓓: %Element(
     %previous,
-    auto = %true,
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         P: %Set,
         𝐀: %Binding(
@@ -282,76 +283,104 @@ $"functor object value"(
       )
     }
   ),
-  F: %Element(
-    $Functors(
-      U = {U},
-      𝓒 = {𝓒},
-      𝓓 = {𝓓}
-    ),
-    shortcut = {
-      constructor = $Functors(
-          U = {U},
-          𝓒 = {𝓒},
-          𝓓 = {𝓓}
-        ).functor,
-      parameters = #(
-        𝐀: %Binding(
-          O,
-          #(𝐏: %Element(P))
-        ),
-        𝐁: %Binding(
-          O,
-          #(𝐂: %Binding(
-            O,
-            #(f: %Binding(
-              M[𝐁,𝐂],
-              #(n: %Element(N[𝐏[𝐁],𝐏[𝐂]]))
-            ))
-          ))
-        ),
-        _1: %Constraint(%forall(
-          #(𝐀: %Element(O)),
-          %equals(n[𝐀,𝐀,i[𝐀]], j[𝐏[𝐀]])
-        )),
-        _2: %Constraint(%forall(
-          #(
-            𝐀: %Element(O),
-            𝐁: %Element(%previous),
-            𝐂: %Element(%previous),
-            f: %Element(M[𝐀,𝐁]),
-            g: %Element(M[𝐁,𝐂])
-          ),
-          %equals(
-            n[
-              𝐀,
-              𝐂,
-              $../../Essentials/Functions/Operations/value(
-                X = {M[𝐁,𝐂]},
-                Y = {M[𝐀,𝐁]},
-                Z = {M[𝐀,𝐂]},
-                ∗ = {∘[𝐀,𝐁,𝐂]},
-                x = {g},
-                y = {f}
-              )
-            ],
-            $../../Essentials/Functions/Operations/value(
-              X = {N[𝐏[𝐁],𝐏[𝐂]]},
-              Y = {N[𝐏[𝐀],𝐏[𝐁]]},
-              Z = {N[𝐏[𝐀],𝐏[𝐂]]},
-              ∗ = {∙[𝐏[𝐀],𝐏[𝐁],𝐏[𝐂]]},
-              x = {n[𝐁,𝐂,g]},
-              y = {n[𝐀,𝐁,f]}
-            )
-          )
-        ))
+  F: %Element($../Functors/Functors(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓}
+  )),
+  G: %Element(%previous)
+): %Construction {
+  $transformation(𝐗: %Binding(
+    O,
+    #(η: %Element(N[
+      $../Functors/"functor object value"(
+        U = {U},
+        𝓒 = {𝓒},
+        𝓓 = {𝓓},
+        F = {F},
+        𝐗 = {𝐗}
+      ),
+      $../Functors/"functor object value"(
+        U = {U},
+        𝓒 = {𝓒},
+        𝓓 = {𝓓},
+        F = {G},
+        𝐗 = {𝐗}
       )
+    ]))
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = η,
+        style = '()'
+      ),
+      sub = $Relation(
+        symbol = '∈',
+        operands = [𝐗, 𝓒],
+        space = ''
+      )
+    )],
+    equalityDefinition = {
+      leftParameters = #(𝐗: %Binding(
+        O,
+        #(η: %Element(N[
+          $../Functors/"functor object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {F},
+            𝐗 = {𝐗}
+          ),
+          $../Functors/"functor object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {G},
+            𝐗 = {𝐗}
+          )
+        ]))
+      )),
+      rightParameters = #(𝐗: %Binding(
+        O,
+        #(ε: %Element(N[
+          $../Functors/"functor object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {F},
+            𝐗 = {𝐗}
+          ),
+          $../Functors/"functor object value"(
+            U = {U},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
+            F = {G},
+            𝐗 = {𝐗}
+          )
+        ]))
+      )),
+      definition = [%forall(
+        #(𝐗: %Element(O)),
+        %equals(η[𝐗], ε[𝐗])
+      )],
+      isomorphic = %true
     }
-  ),
-  𝐗: %Element(O)
-): %ExplicitOperator {
-  display = [$Function(
-    function = F,
-    arguments = [𝐗]
+  }
+
+  display = [$FunctionOperator(
+    symbol = '⇀',
+    operands = [F, G],
+    minParenLevel = -1
   )],
-  definition = [𝐏[𝐗]]
+  definitionDisplay = {
+    parameter = #(η: %Expr),
+    display = [$FunctionDefinition(
+      function = η,
+      symbol = '⇀',
+      operands = [F, G]
+    )],
+    singularName = 'infranatural transformation',
+    pluralName = 'infranatural transformations',
+    nameOptional = %true
+  }
 }

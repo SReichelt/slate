@@ -3,7 +3,7 @@
 $"identity functor"(
   U: %Symbol(auto = %true),
   𝓒: %Element(
-    $Categories(U = {U}),
+    $../Categories/Categories(U = {U}),
     auto = %true
   )
 ): %ExplicitOperator {
@@ -19,9 +19,9 @@ $"identity functor"(
       𝐗 = {
         #(𝐗: %Element(%setStructuralCases(
           𝓒,
-          $Categories(U = {U}),
+          $../Categories/Categories(U = {U}),
           [{
-            constructor = $Categories(U = {U}).category,
+            constructor = $../Categories/Categories(U = {U}).category,
             parameters = #(
               O: %Set,
               𝐀: %Binding(
@@ -163,9 +163,9 @@ $"identity functor"(
       𝐘 = {
         #(𝐘: %Element(%setStructuralCases(
           𝓒,
-          $Categories(U = {U}),
+          $../Categories/Categories(U = {U}),
           [{
-            constructor = $Categories(U = {U}).category,
+            constructor = $../Categories/Categories(U = {U}).category,
             parameters = #(
               O: %Set,
               𝐀: %Binding(
@@ -305,9 +305,9 @@ $"identity functor"(
         {𝐙 = {
           #(𝐙: %Element(%setStructuralCases(
             𝓒,
-            $Categories(U = {U}),
+            $../Categories/Categories(U = {U}),
             [{
-              constructor = $Categories(U = {U}).category,
+              constructor = $../Categories/Categories(U = {U}).category,
               parameters = #(
                 O: %Set,
                 𝐀: %Binding(
@@ -447,9 +447,9 @@ $"identity functor"(
           {f = {
             #(f: %Element(%setStructuralCases(
               𝓒,
-              $Categories(U = {U}),
+              $../Categories/Categories(U = {U}),
               [{
-                constructor = $Categories(U = {U}).category,
+                constructor = $../Categories/Categories(U = {U}).category,
                 parameters = #(
                   O: %Set,
                   𝐀: %Binding(

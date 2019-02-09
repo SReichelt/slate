@@ -3,10 +3,10 @@
 $"functor morphism value"(
   U: %Symbol(auto = %true),
   𝓒: %Element(
-    $Categories(U = {U}),
+    $../Categories/Categories(U = {U}),
     auto = %true,
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         O: %Set,
         𝐀: %Binding(
@@ -146,7 +146,7 @@ $"functor morphism value"(
     %previous,
     auto = %true,
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         P: %Set,
         𝐀: %Binding(

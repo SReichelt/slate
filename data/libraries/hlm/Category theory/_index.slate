@@ -2,8 +2,22 @@
 
 $"Category theory": %Section {
   logic = 'hlm',
-  items = [%subsection(
-    $Categories,
-    'Categories'
-  )]
+  items = [
+    %subsection(
+      $Categories,
+      'Categories'
+    ),
+    %subsection(
+      $Functors,
+      'Functors'
+    ),
+    %subsection(
+      $"Natural transformations",
+      'Natural transformations'
+    ),
+    %subsection(
+      $"Individual categories",
+      'Individual categories'
+    )
+  ]
 }

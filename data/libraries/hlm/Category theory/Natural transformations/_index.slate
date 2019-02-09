@@ -1,0 +1,9 @@
+%../../../../logics/library%
+
+$"Natural transformations": %Section {
+  logic = 'hlm',
+  items = [
+    %item($"Infranatural transformations"),
+    %item($"Natural transformations")
+  ]
+}

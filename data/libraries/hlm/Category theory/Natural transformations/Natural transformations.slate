@@ -6,9 +6,9 @@
 $"Natural transformations"(
   U: %Symbol(auto = %true),
   𝓒: %Element(
-    $Categories(U = {U}),
+    $../Categories/Categories(U = {U}),
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         O: %Set,
         𝐀: %Binding(
@@ -147,7 +147,7 @@ $"Natural transformations"(
   𝓓: %Element(
     %previous,
     shortcut = {
-      constructor = $Categories(U = {U}).category,
+      constructor = $../Categories/Categories(U = {U}).category,
       parameters = #(
         P: %Set,
         𝐀: %Binding(
@@ -283,7 +283,7 @@ $"Natural transformations"(
       )
     }
   ),
-  F: %Element($Functors(
+  F: %Element($../Functors/Functors(
     U = {U},
     𝓒 = {𝓒},
     𝓓 = {𝓓}
@@ -326,14 +326,14 @@ $"Natural transformations"(
         parameters = #(𝐗: %Binding(
           O,
           #(η: %Element(N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -354,14 +354,14 @@ $"Natural transformations"(
       %equals(
         $../../Essentials/Functions/Operations/value(
           X = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐘}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -370,14 +370,14 @@ $"Natural transformations"(
             )
           ]},
           Y = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -386,14 +386,14 @@ $"Natural transformations"(
             )
           ]},
           Z = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -402,21 +402,21 @@ $"Natural transformations"(
             )
           ]},
           ∗ = {∙[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐘}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -425,7 +425,7 @@ $"Natural transformations"(
             )
           ]},
           x = {η[𝐘]},
-          y = {$"functor morphism value"(
+          y = {$../Functors/"functor morphism value"(
             U = {U},
             𝓒 = {𝓒},
             𝓓 = {𝓓},
@@ -437,14 +437,14 @@ $"Natural transformations"(
         ),
         $../../Essentials/Functions/Operations/value(
           X = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {G},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -453,14 +453,14 @@ $"Natural transformations"(
             )
           ]},
           Y = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -469,14 +469,14 @@ $"Natural transformations"(
             )
           ]},
           Z = {N[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -485,21 +485,21 @@ $"Natural transformations"(
             )
           ]},
           ∗ = {∙[
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {F},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
               F = {G},
               𝐗 = {𝐗}
             ),
-            $"functor object value"(
+            $../Functors/"functor object value"(
               U = {U},
               𝓒 = {𝓒},
               𝓓 = {𝓓},
@@ -507,7 +507,7 @@ $"Natural transformations"(
               𝐗 = {𝐘}
             )
           ]},
-          x = {$"functor morphism value"(
+          x = {$../Functors/"functor morphism value"(
             U = {U},
             𝓒 = {𝓒},
             𝓓 = {𝓓},

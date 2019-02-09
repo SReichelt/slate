@@ -1,4 +1,4 @@
-%../../../../../logics/library%
+%../../../../logics/library%
 
 $"Individual categories": %Section {
   logic = 'hlm',

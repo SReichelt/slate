@@ -1,4 +1,4 @@
-%../../../../../logics/hlm%
+%../../../../logics/hlm%
 
 /**
  * @remarks This defines the category of small categories, or, more generally, a category in _V_ of all categories in _U_.
@@ -11,13 +11,13 @@ $categories(
     body = '𝐂𝐚𝐭',
     sub = $Group(items = [U, V])
   )],
-  definition = [$../Categories(U = {V}).category(
-      O = {$../Categories(U = {U})},
+  definition = [$../Categories/Categories(U = {V}).category(
+      O = {$../Categories/Categories(U = {U})},
       𝐀 = {
-        #(𝓐: %Element($../Categories(U = {U}))),
+        #(𝓐: %Element($../Categories/Categories(U = {U}))),
         {𝐁 = {
-          #(𝓑: %Element($../Categories(U = {U}))),
-          {M = {$../Functors(
+          #(𝓑: %Element($../Categories/Categories(U = {U}))),
+          {M = {$../Functors/Functors(
             U = {U},
             𝓒 = {𝓐},
             𝓓 = {𝓑}
@@ -25,47 +25,47 @@ $categories(
         }}
       },
       𝐂 = {
-        #(𝓒: %Element($../Categories(U = {U}))),
-        {i = {$../"identity functor"(
+        #(𝓒: %Element($../Categories/Categories(U = {U}))),
+        {i = {$../Functors/"identity functor"(
           U = {U},
           𝓒 = {𝓒}
         )}}
       },
       𝐃 = {
-        #(𝓓: %Element($../Categories(U = {U}))),
+        #(𝓓: %Element($../Categories/Categories(U = {U}))),
         {𝐄 = {
-          #(𝓔: %Element($../Categories(U = {U}))),
+          #(𝓔: %Element($../Categories/Categories(U = {U}))),
           {𝐅 = {
-            #(𝓕: %Element($../Categories(U = {U}))),
-            {∘ = {$../../../Essentials/Functions/Operations/operator(
-              X = {$../Functors(
+            #(𝓕: %Element($../Categories/Categories(U = {U}))),
+            {∘ = {$../../Essentials/Functions/Operations/operator(
+              X = {$../Functors/Functors(
                 U = {U},
                 𝓒 = {𝓔},
                 𝓓 = {𝓕}
               )},
-              Y = {$../Functors(
+              Y = {$../Functors/Functors(
                 U = {U},
                 𝓒 = {𝓓},
                 𝓓 = {𝓔}
               )},
-              Z = {$../Functors(
+              Z = {$../Functors/Functors(
                 U = {U},
                 𝓒 = {𝓓},
                 𝓓 = {𝓕}
               )},
               parameters = #(
-                G: %Element($../Functors(
+                G: %Element($../Functors/Functors(
                   U = {U},
                   𝓒 = {𝓔},
                   𝓓 = {𝓕}
                 )),
-                F: %Element($../Functors(
+                F: %Element($../Functors/Functors(
                   U = {U},
                   𝓒 = {𝓓},
                   𝓓 = {𝓔}
                 ))
               ),
-              operator = $../"functor composition"(
+              operator = $../Functors/"functor composition"(
                 U = {U},
                 𝓒 = {𝓓},
                 𝓓 = {𝓔},
