@@ -2,23 +2,23 @@
 
 $"identity functor"(
   U: %Symbol(auto = %true),
-  𝑪: %Element(
+  𝓒: %Element(
     $Categories(U = {U}),
     auto = %true
   )
 ): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
-    sub = 𝑪
+    sub = 𝓒
   )],
   definition = [$Functors(
       U = {U},
-      𝑪 = {𝑪},
-      𝑫 = {𝑪}
+      𝓒 = {𝓒},
+      𝓓 = {𝓒}
     ).functor(
       𝐗 = {
         #(𝐗: %Element(%setStructuralCases(
-          𝑪,
+          𝓒,
           $Categories(U = {U}),
           [{
             constructor = $Categories(U = {U}).category,
@@ -162,7 +162,7 @@ $"identity functor"(
       },
       𝐘 = {
         #(𝐘: %Element(%setStructuralCases(
-          𝑪,
+          𝓒,
           $Categories(U = {U}),
           [{
             constructor = $Categories(U = {U}).category,
@@ -304,7 +304,7 @@ $"identity functor"(
         ))),
         {𝐙 = {
           #(𝐙: %Element(%setStructuralCases(
-            𝑪,
+            𝓒,
             $Categories(U = {U}),
             [{
               constructor = $Categories(U = {U}).category,
@@ -446,7 +446,7 @@ $"identity functor"(
           ))),
           {f = {
             #(f: %Element(%setStructuralCases(
-              𝑪,
+              𝓒,
               $Categories(U = {U}),
               [{
                 constructor = $Categories(U = {U}).category,

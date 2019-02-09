@@ -2,7 +2,7 @@
 
 $"functor object value"(
   U: %Symbol(auto = %true),
-  𝑪: %Element(
+  𝓒: %Element(
     $Categories(U = {U}),
     auto = %true,
     shortcut = {
@@ -142,7 +142,7 @@ $"functor object value"(
       )
     }
   ),
-  𝑫: %Element(
+  𝓓: %Element(
     %previous,
     auto = %true,
     shortcut = {
@@ -285,14 +285,14 @@ $"functor object value"(
   F: %Element(
     $Functors(
       U = {U},
-      𝑪 = {𝑪},
-      𝑫 = {𝑫}
+      𝓒 = {𝓒},
+      𝓓 = {𝓓}
     ),
     shortcut = {
       constructor = $Functors(
           U = {U},
-          𝑪 = {𝑪},
-          𝑫 = {𝑫}
+          𝓒 = {𝓒},
+          𝓓 = {𝓓}
         ).functor,
       parameters = #(
         𝐀: %Binding(

@@ -10,8 +10,8 @@ $Categories: %Section {
     %item($"identity functor"),
     %item($"functor composition"),
     %subsection(
-      $"Concrete categories",
-      'Concrete categories'
+      $"Individual categories",
+      'Individual categories'
     )
   ]
 }

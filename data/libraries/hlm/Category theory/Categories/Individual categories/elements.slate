@@ -1,0 +1,79 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of a morphism implies that _d_=_e_=_f_.
+ *
+ * @references * https://en.wikipedia.org/wiki/Discrete_category
+ */
+$elements(
+  U: %Symbol,
+  S: %Set
+): %ExplicitOperator {
+  display = [$Function(
+    function = $SubSup(
+      body = '𝐄𝐥𝐞𝐦',
+      sub = U
+    ),
+    arguments = [S]
+  )],
+  definition = [$../Categories(U = {U}).category(
+      O = {S},
+      𝐀 = {
+        #(a: %Element(S)),
+        {𝐁 = {
+          #(b: %Element(S)),
+          {M = {$../../../Essentials/Sets/Intersection(
+            U = {S},
+            S = {%enumeration(a)},
+            T = {%enumeration(b)}
+          )}}
+        }}
+      },
+      𝐂 = {
+        #(c: %Element(S)),
+        {i = {c}}
+      },
+      𝐃 = {
+        #(d: %Element(S)),
+        {𝐄 = {
+          #(e: %Element(S)),
+          {𝐅 = {
+            #(f: %Element(S)),
+            {∘ = {$../../../Essentials/Functions/Functions(
+                X = {$../../../Essentials/Sets/"Cartesian product"(
+                  S = {$../../../Essentials/Sets/Intersection(
+                    U = {S},
+                    S = {%enumeration(e)},
+                    T = {%enumeration(f)}
+                  )},
+                  T = {$../../../Essentials/Sets/Intersection(
+                    U = {S},
+                    S = {%enumeration(d)},
+                    T = {%enumeration(e)}
+                  )}
+                )},
+                Y = {$../../../Essentials/Sets/Intersection(
+                  U = {S},
+                  S = {%enumeration(d)},
+                  T = {%enumeration(f)}
+                )}
+              ).function(x = {
+                parameter = #(x: %Element($../../../Essentials/Sets/"Cartesian product"(
+                  S = {$../../../Essentials/Sets/Intersection(
+                    U = {S},
+                    S = {%enumeration(e)},
+                    T = {%enumeration(f)}
+                  )},
+                  T = {$../../../Essentials/Sets/Intersection(
+                    U = {S},
+                    S = {%enumeration(d)},
+                    T = {%enumeration(e)}
+                  )}
+                ))),
+                arguments = {y = {e}}
+            })}}
+          }}
+        }}
+      }
+  )]
+}

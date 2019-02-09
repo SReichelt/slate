@@ -40,7 +40,7 @@ $Magmas: %Construction {
     }
   }
 
-  display = ['𝓜𝓰𝓶'],
+  display = ['𝓜𝓪𝓰'],
   definitionDisplay = {
     parameter = #(𝐌: %Expr),
     singularName = 'magma',

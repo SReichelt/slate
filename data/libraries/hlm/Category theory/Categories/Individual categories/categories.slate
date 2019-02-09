@@ -1,6 +1,9 @@
 %../../../../../logics/hlm%
 
-$magmas(
+/**
+ * @remarks This defines the category of small categories, or, more generally, a category in _V_ of all categories in _U_.
+ */
+$categories(
   U: %Symbol,
   V: %Symbol
 ): %ExplicitOperator {
@@ -11,62 +14,62 @@ $magmas(
   definition = [$../Categories(U = {V}).category(
       O = {$../Categories(U = {U})},
       𝐀 = {
-        #(𝑨: %Element($../Categories(U = {U}))),
+        #(𝓐: %Element($../Categories(U = {U}))),
         {𝐁 = {
-          #(𝑩: %Element($../Categories(U = {U}))),
+          #(𝓑: %Element($../Categories(U = {U}))),
           {M = {$../Functors(
             U = {U},
-            𝑪 = {𝑨},
-            𝑫 = {𝑩}
+            𝓒 = {𝓐},
+            𝓓 = {𝓑}
           )}}
         }}
       },
       𝐂 = {
-        #(𝑪: %Element($../Categories(U = {U}))),
+        #(𝓒: %Element($../Categories(U = {U}))),
         {i = {$../"identity functor"(
           U = {U},
-          𝑪 = {𝑪}
+          𝓒 = {𝓒}
         )}}
       },
       𝐃 = {
-        #(𝑫: %Element($../Categories(U = {U}))),
+        #(𝓓: %Element($../Categories(U = {U}))),
         {𝐄 = {
-          #(𝑬: %Element($../Categories(U = {U}))),
+          #(𝓔: %Element($../Categories(U = {U}))),
           {𝐅 = {
-            #(𝑭: %Element($../Categories(U = {U}))),
+            #(𝓕: %Element($../Categories(U = {U}))),
             {∘ = {$../../../Essentials/Functions/Operations/operator(
               X = {$../Functors(
                 U = {U},
-                𝑪 = {𝑬},
-                𝑫 = {𝑭}
+                𝓒 = {𝓔},
+                𝓓 = {𝓕}
               )},
               Y = {$../Functors(
                 U = {U},
-                𝑪 = {𝑫},
-                𝑫 = {𝑬}
+                𝓒 = {𝓓},
+                𝓓 = {𝓔}
               )},
               Z = {$../Functors(
                 U = {U},
-                𝑪 = {𝑫},
-                𝑫 = {𝑭}
+                𝓒 = {𝓓},
+                𝓓 = {𝓕}
               )},
               parameters = #(
                 G: %Element($../Functors(
                   U = {U},
-                  𝑪 = {𝑬},
-                  𝑫 = {𝑭}
+                  𝓒 = {𝓔},
+                  𝓓 = {𝓕}
                 )),
                 F: %Element($../Functors(
                   U = {U},
-                  𝑪 = {𝑫},
-                  𝑫 = {𝑬}
+                  𝓒 = {𝓓},
+                  𝓓 = {𝓔}
                 ))
               ),
               operator = $../"functor composition"(
                 U = {U},
-                𝑪 = {𝑫},
-                𝑫 = {𝑬},
-                𝑬 = {𝑭},
+                𝓒 = {𝓓},
+                𝓓 = {𝓔},
+                𝓔 = {𝓕},
                 F = {F},
                 G = {G}
               )

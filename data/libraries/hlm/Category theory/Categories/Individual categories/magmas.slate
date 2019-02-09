@@ -5,7 +5,7 @@
  */
 $magmas(U: %Symbol): %ExplicitOperator {
   display = [$SubSup(
-    body = '𝐌𝐠𝐦',
+    body = '𝐌𝐚𝐠',
     sub = U
   )],
   definition = [$../Categories(U = {U}).category(

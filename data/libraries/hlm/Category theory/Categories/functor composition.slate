@@ -2,27 +2,27 @@
 
 $"functor composition"(
   U: %Symbol(auto = %true),
-  𝑪: %Element(
+  𝓒: %Element(
     $Categories(U = {U}),
     auto = %true
   ),
-  𝑫: %Element(
+  𝓓: %Element(
     %previous,
     auto = %true
   ),
-  𝑬: %Element(
+  𝓔: %Element(
     %previous,
     auto = %true
   ),
   F: %Element($Functors(
     U = {U},
-    𝑪 = {𝑪},
-    𝑫 = {𝑫}
+    𝓒 = {𝓒},
+    𝓓 = {𝓓}
   )),
   G: %Element($Functors(
     U = {U},
-    𝑪 = {𝑫},
-    𝑫 = {𝑬}
+    𝓒 = {𝓓},
+    𝓓 = {𝓔}
   ))
 ): %ExplicitOperator {
   display = [$Operator(
@@ -33,12 +33,12 @@ $"functor composition"(
   )],
   definition = [$Functors(
       U = {U},
-      𝑪 = {𝑪},
-      𝑫 = {𝑬}
+      𝓒 = {𝓒},
+      𝓓 = {𝓔}
     ).functor(
       𝐗 = {
         #(𝐗: %Element(%setStructuralCases(
-          𝑪,
+          𝓒,
           $Categories(U = {U}),
           [{
             constructor = $Categories(U = {U}).category,
@@ -180,13 +180,13 @@ $"functor composition"(
         ))),
         {𝐏 = {$"functor object value"(
           U = {U},
-          𝑪 = {𝑫},
-          𝑫 = {𝑬},
+          𝓒 = {𝓓},
+          𝓓 = {𝓔},
           F = {G},
           𝐗 = {$"functor object value"(
             U = {U},
-            𝑪 = {𝑪},
-            𝑫 = {𝑫},
+            𝓒 = {𝓒},
+            𝓓 = {𝓓},
             F = {F},
             𝐗 = {𝐗}
           )}
@@ -194,7 +194,7 @@ $"functor composition"(
       },
       𝐘 = {
         #(𝐘: %Element(%setStructuralCases(
-          𝑪,
+          𝓒,
           $Categories(U = {U}),
           [{
             constructor = $Categories(U = {U}).category,
@@ -336,7 +336,7 @@ $"functor composition"(
         ))),
         {𝐙 = {
           #(𝐙: %Element(%setStructuralCases(
-            𝑪,
+            𝓒,
             $Categories(U = {U}),
             [{
               constructor = $Categories(U = {U}).category,
@@ -478,7 +478,7 @@ $"functor composition"(
           ))),
           {f = {
             #(f: %Element(%setStructuralCases(
-              𝑪,
+              𝓒,
               $Categories(U = {U}),
               [{
                 constructor = $Categories(U = {U}).category,
@@ -620,27 +620,27 @@ $"functor composition"(
             ))),
             {n = {$"functor morphism value"(
               U = {U},
-              𝑪 = {𝑫},
-              𝑫 = {𝑬},
+              𝓒 = {𝓓},
+              𝓓 = {𝓔},
               F = {G},
               𝐘 = {$"functor object value"(
                 U = {U},
-                𝑪 = {𝑪},
-                𝑫 = {𝑫},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
                 F = {F},
                 𝐗 = {𝐘}
               )},
               𝐙 = {$"functor object value"(
                 U = {U},
-                𝑪 = {𝑪},
-                𝑫 = {𝑫},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
                 F = {F},
                 𝐗 = {𝐙}
               )},
               f = {$"functor morphism value"(
                 U = {U},
-                𝑪 = {𝑪},
-                𝑫 = {𝑫},
+                𝓒 = {𝓒},
+                𝓓 = {𝓓},
                 F = {F},
                 𝐘 = {𝐘},
                 𝐙 = {𝐙},

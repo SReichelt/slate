@@ -616,7 +616,7 @@ $Categories(U: %Symbol): %Construction {
     sub = U
   )],
   definitionDisplay = {
-    parameter = #(𝑪: %Expr),
+    parameter = #(𝓒: %Expr),
     singularName = ['category', ' in ', U],
     pluralName = ['categories', ' in ', U]
   }

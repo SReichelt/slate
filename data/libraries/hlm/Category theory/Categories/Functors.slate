@@ -5,7 +5,7 @@
  */
 $Functors(
   U: %Symbol(auto = %true),
-  𝑪: %Element(
+  𝓒: %Element(
     $Categories(U = {U}),
     shortcut = {
       constructor = $Categories(U = {U}).category,
@@ -144,7 +144,7 @@ $Functors(
       )
     }
   ),
-  𝑫: %Element(
+  𝓓: %Element(
     %previous,
     shortcut = {
       constructor = $Categories(U = {U}).category,
@@ -340,12 +340,12 @@ $Functors(
         items = [
           [
             $InnerParens(
-              body = 𝑪,
+              body = 𝓒,
               maxLevel = 0
             ),
             ' → ',
             $InnerParens(
-              body = 𝑫,
+              body = 𝓓,
               maxLevel = 0
             )
           ],
@@ -377,12 +377,12 @@ $Functors(
             items = [
               [
                 $InnerParens(
-                  body = 𝑪,
+                  body = 𝓒,
                   maxLevel = 0
                 ),
                 ' → ',
                 $InnerParens(
-                  body = 𝑫,
+                  body = 𝓓,
                   maxLevel = 0
                 )
               ],
@@ -528,7 +528,7 @@ $Functors(
 
   display = [$FunctionOperator(
     symbol = '→',
-    operands = [𝑪, 𝑫],
+    operands = [𝓒, 𝓓],
     minParenLevel = -1
   )],
   definitionDisplay = {
@@ -536,7 +536,7 @@ $Functors(
     display = [$FunctionDefinition(
       function = F,
       symbol = '→',
-      operands = [𝑪, 𝑫]
+      operands = [𝓒, 𝓓]
     )],
     singularName = 'functor',
     pluralName = 'functors',
