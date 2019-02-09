@@ -342,7 +342,7 @@ $"Infranatural transformations"(
       )),
       rightParameters = #(𝐗: %Binding(
         O,
-        #(ι: %Element(N[
+        #(ε: %Element(N[
           $"functor object value"(
             U = {U},
             𝓒 = {𝓒},
@@ -361,7 +361,7 @@ $"Infranatural transformations"(
       )),
       definition = [%forall(
         #(𝐗: %Element(O)),
-        %equals(η[𝐗], ι[𝐗])
+        %equals(η[𝐗], ε[𝐗])
       )],
       isomorphic = %true
     }
