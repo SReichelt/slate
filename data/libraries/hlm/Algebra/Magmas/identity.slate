@@ -1,7 +1,8 @@
 %../../../../logics/hlm%
 
-$Set(𝐌: %Element(
+$identity(𝐌: %Element(
   $Magmas,
+  auto = %true,
   shortcut = {
     constructor = $Magmas.magma,
     parameters = #(
@@ -9,7 +10,10 @@ $Set(𝐌: %Element(
       ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
     )
   }
-)): %SetOperator {
-  display = [𝐌],
-  definition = [M]
+)): %ExplicitOperator {
+  display = [$SubSup(
+    body = 'id',
+    sub = 𝐌
+  )],
+  definition = [$../../Essentials/Functions/identity(X = {M})]
 }

@@ -24,7 +24,7 @@ $magmas(U: %Symbol): %ExplicitOperator {
       },
       𝐂 = {
         #(𝐂: %Element($../../Algebra/Magmas/Magmas)),
-        {i = {$../../Essentials/Functions/identity(X = {$../../Algebra/Magmas/Set(𝐌 = {𝐂})})}}
+        {i = {$../../Algebra/Magmas/identity(𝐌 = {𝐂})}}
       },
       𝐃 = {
         #(𝐃: %Element($../../Algebra/Magmas/Magmas)),

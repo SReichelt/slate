@@ -240,7 +240,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     while (remainingParameters.length) {
       let param = remainingParameters[0];
       if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
-        row.push(this.renderParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices));
+        this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
         currentGroup.length = 0;
         currentGroupDefinition = undefined;
       } else {
@@ -253,7 +253,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     if (currentGroup.length) {
-      row.push(this.renderParameterGroup(currentGroup, currentGroupDefinition, undefined, undefined, state, indices));
+      this.addParameterGroup(currentGroup, currentGroupDefinition, undefined, undefined, state, indices, row);
     }
     if (state.started && state.fullSentence && !indices) {
       row.push(new Display.TextExpression('.'));
@@ -273,282 +273,297 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || (paramType instanceof FmtHLM.MetaRefExpression_Symbol && firstParamType instanceof FmtHLM.MetaRefExpression_Symbol);
   }
 
-  private renderParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
+  private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[]): void {
     let type = parameters[0].type.expression;
-    let row: Display.RenderedExpression[] = [];
 
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+      this.addBindingParameterGroup(parameters, type, definition, state, indices, row);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
+      this.addConstraint(type, state, row);
+    } else {
+      this.addRegularParameterGroup(parameters, type, definition, remainingParameters, remainingDefinitions, state, indices, row);
+    }
+  }
+
+  private addBindingParameterGroup(parameters: Fmt.Parameter[], type: FmtHLM.MetaRefExpression_Binding, definition: Fmt.Definition | undefined, state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[]): void {
+    state.inLetExpr = false;
+    state.inConstraint = false;
+    state.inDefinition = false;
+
+    for (let param of parameters) {
+      let forEachRow: Display.RenderedExpression[] = [new Display.TextExpression(state.abbreviate ? ' f.e. ' : ' for each ')];
+      let forEachState = {
+        ...state,
+        started: false
+      };
+
+      let variables: Fmt.Parameter[] = [param];
+      let currentVariableGroup: Fmt.Parameter[] = [param];
+      let currentVariableGroupType = type;
+      let innerParameters = type.parameters;
+      while (innerParameters.length === 1) {
+        let innerParameter = innerParameters[0];
+        let innerBindingType: Fmt.Expression = innerParameter.type.expression;
+        if (innerBindingType instanceof FmtHLM.MetaRefExpression_Binding) {
+          if (!(innerBindingType._set instanceof FmtHLM.MetaRefExpression_previous)) {
+            this.addRegularParameterGroup(currentVariableGroup, currentVariableGroupType, definition, undefined, undefined, forEachState, indices, forEachRow);
+            currentVariableGroup.length = 0;
+            currentVariableGroupType = innerBindingType;
+            forEachRow.push(new Display.TextExpression(' and '));
+            forEachState.started = false;
+          }
+          variables.push(innerParameter);
+          currentVariableGroup.push(innerParameter);
+          innerParameters = innerBindingType.parameters;
+        } else {
+          break;
+        }
+      }
+      this.addRegularParameterGroup(currentVariableGroup, currentVariableGroupType, definition, undefined, undefined, forEachState, indices, forEachRow);
+
+      let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
+      for (let variable of variables) {
+        newIndices.push(this.renderVariable(variable));
+      }
+      row.push(this.renderParameters(innerParameters, state, newIndices));
+
+      row.push(...forEachRow);
+
       state.inLetExpr = false;
       state.inConstraint = false;
       state.inDefinition = false;
+    }
 
-      for (let param of parameters) {
-        row.push(new Display.TextExpression(state.abbreviate ? ' f.e. ' : ' for each '));
-        let variables: Fmt.Parameter[] = [param];
-        let currentVariableGroup: Fmt.Parameter[] = [param];
-        let currentVariableGroupType = type;
-        let innerParameters = type.parameters;
-        while (innerParameters.length === 1) {
-          let innerParameter = innerParameters[0];
-          let innerBindingType: Fmt.Expression = innerParameter.type.expression;
-          if (innerBindingType instanceof FmtHLM.MetaRefExpression_Binding) {
-            if (!(innerBindingType._set instanceof FmtHLM.MetaRefExpression_previous)) {
-              row.push(this.renderTemplate('ElementParameter', {
-                                             'element': this.renderVariableDefinitions(currentVariableGroup),
-                                             'set': this.renderSetTerm(currentVariableGroupType._set)
-                                           }));
-              currentVariableGroup.length = 0;
-              currentVariableGroupType = innerBindingType;
-              row.push(new Display.TextExpression(' and '));
-            }
-            variables.push(innerParameter);
-            currentVariableGroup.push(innerParameter);
-            innerParameters = innerBindingType.parameters;
-          } else {
-            break;
-          }
-        }
-        row.push(this.renderTemplate('ElementParameter', {
-                                       'element': this.renderVariableDefinitions(currentVariableGroup),
-                                       'set': this.renderSetTerm(currentVariableGroupType._set)
-                                     }));
+    state.started = true;
+  }
 
-        let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
-        for (let variable of variables) {
-          newIndices.push(this.renderVariable(variable));
-        }
-        row.unshift(this.renderParameters(innerParameters, state, newIndices));
-
-        state.inLetExpr = false;
-        state.inConstraint = false;
-        state.inDefinition = false;
-      }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      if (state.started && state.inLetExpr && !state.inDefinition) {
-        if (state.inConstraint) {
-          row.push(new Display.TextExpression(' and '));
-        } else {
-          row.push(new Display.TextExpression(state.abbreviate ? ' s.t. ' : ' such that '));
-        }
+  private addConstraint(type: FmtHLM.MetaRefExpression_Constraint, state: ParameterListState, row: Display.RenderedExpression[]): void {
+    if (state.started && state.inLetExpr && !state.inDefinition) {
+      if (state.inConstraint) {
+        row.push(new Display.TextExpression(' and '));
       } else {
-        if (state.started) {
-          row.push(new Display.TextExpression(', '));
-        }
-        if (state.sentence) {
-          row.push(new Display.TextExpression(state.fullSentence && !state.started ? 'Assume ' : 'assume '));
-        }
-      }
-      state.inConstraint = true;
-      state.inDefinition = false;
-
-      let formula = this.renderFormula(type.formula);
-      if (state.sentence) {
-        row.push(formula);
-      } else {
-        let formulaWithParens = new Display.InnerParenExpression(formula);
-        formulaWithParens.maxLevel = -2;
-        row.push(formulaWithParens);
+        row.push(new Display.TextExpression(state.abbreviate ? ' s.t. ' : ' such that '));
       }
     } else {
+      if (state.started) {
+        row.push(new Display.TextExpression(', '));
+      }
       if (state.sentence) {
-        if (state.started) {
-          row.push(new Display.TextExpression(', '));
-          if (!state.inLetExpr) {
-            row.push(new Display.TextExpression('let '));
-          }
-        } else {
-          row.push(new Display.TextExpression(state.fullSentence ? 'Let ' : 'let '));
+        row.push(new Display.TextExpression(state.fullSentence && !state.started ? 'Assume ' : 'assume '));
+      }
+    }
+    state.inConstraint = true;
+    state.inDefinition = false;
+
+    let formula = this.renderFormula(type.formula);
+    if (state.sentence) {
+      row.push(formula);
+    } else {
+      let formulaWithParens = new Display.InnerParenExpression(formula);
+      formulaWithParens.maxLevel = -2;
+      row.push(formulaWithParens);
+    }
+
+    state.started = true;
+  }
+
+  private addRegularParameterGroup(parameters: Fmt.Parameter[], type: Fmt.Expression, definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[]): void {
+    if (state.sentence) {
+      if (state.started) {
+        row.push(new Display.TextExpression(', '));
+        if (!state.inLetExpr) {
+          row.push(new Display.TextExpression('let '));
         }
       } else {
-        if (state.started) {
-          row.push(new Display.TextExpression(', '));
-        }
+        row.push(new Display.TextExpression(state.fullSentence ? 'Let ' : 'let '));
       }
-      state.inLetExpr = true;
-      state.inConstraint = false;
-      state.inDefinition = false;
+    } else {
+      if (state.started) {
+        row.push(new Display.TextExpression(', '));
+      }
+    }
+    state.inLetExpr = true;
+    state.inConstraint = false;
+    state.inDefinition = false;
 
-      let variableDefinitions = this.renderVariableDefinitions(parameters, indices);
-      let variableDisplay: Display.RenderedExpression | undefined;
-      let noun: PropertyInfo = {
-        isFeature: false,
-        extracted: false
-      };
-      let singular: Display.RenderedExpression[] = [];
-      let plural: Display.RenderedExpression[] = [];
-      let combineWithNext = false;
-      if (definition && state.enableSpecializations) {
-        let definitionRef = this.getDisplayDefinitionRef(type);
-        if (definitionRef instanceof Fmt.DefinitionRefExpression) {
-          noun.definitionRef = definitionRef;
-          let definitions: Fmt.Definition[] = [];
-          let argumentLists: Fmt.ArgumentList[] = [];
-          this.utils.analyzeDefinitionRef(definitionRef, definition, definitions, argumentLists);
-          let innerDefinition = definitions[definitions.length - 1];
-          if (innerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
-            let definitionDisplay = innerDefinition.contents.definitionDisplay;
-            if (definitionDisplay) {
-              let args = this.getRenderedTemplateArguments(definitions, argumentLists);
-              args[definitionDisplay.parameter.name] = variableDefinitions;
-              if (definitionDisplay.display
-                  && definitionDisplay.display instanceof Fmt.ArrayExpression
-                  && definitionDisplay.display.items.length) {
-                let display = this.findBestMatch(definitionDisplay.display.items, argumentLists)!;
-                variableDisplay = this.renderDisplayExpression(display, args);
-                this.setSemanticLink(variableDisplay, definitionRef);
-              }
-              if (!(state.abbreviate && definitionDisplay.nameOptional instanceof FmtDisplay.MetaRefExpression_true)) {
-                if (definitionDisplay.singularName && (!state.abbreviate || definitionDisplay.singularName instanceof Fmt.StringExpression)) {
-                  noun.singular = this.applyName(definitionDisplay.singularName, args, definitionRef, singular);
-                  if (definitionDisplay.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
-                    let nextDefinitionRef = this.getDisplayDefinitionRef(remainingParameters[0].type.expression);
-                    let nextDefinition = remainingDefinitions[0];
-                    if (nextDefinitionRef instanceof Fmt.DefinitionRefExpression && nextDefinition) {
-                      let nextDefinitions: Fmt.Definition[] = [];
-                      let nextArgumentLists: Fmt.ArgumentList[] = [];
-                      this.utils.analyzeDefinitionRef(nextDefinitionRef, nextDefinition, nextDefinitions, nextArgumentLists);
-                      let nextInnerDefinition = nextDefinitions[nextDefinitions.length - 1];
-                      if (nextInnerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
-                        let nextDefinitionDisplay = nextInnerDefinition.contents.definitionDisplay;
-                        if (nextDefinitionDisplay && nextDefinitionDisplay.singularName instanceof Fmt.StringExpression && definitionDisplay.singularName.value === nextDefinitionDisplay.singularName.value) {
-                          combineWithNext = true;
-                        }
+    let variableDefinitions = this.renderVariableDefinitions(parameters, indices);
+    let variableDisplay: Display.RenderedExpression | undefined;
+    let noun: PropertyInfo = {
+      isFeature: false,
+      extracted: false
+    };
+    let singular: Display.RenderedExpression[] = [];
+    let plural: Display.RenderedExpression[] = [];
+    let combineWithNext = false;
+    if (definition && state.enableSpecializations) {
+      let definitionRef = this.getDisplayDefinitionRef(type);
+      if (definitionRef instanceof Fmt.DefinitionRefExpression) {
+        noun.definitionRef = definitionRef;
+        let definitions: Fmt.Definition[] = [];
+        let argumentLists: Fmt.ArgumentList[] = [];
+        this.utils.analyzeDefinitionRef(definitionRef, definition, definitions, argumentLists);
+        let innerDefinition = definitions[definitions.length - 1];
+        if (innerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
+          let definitionDisplay = innerDefinition.contents.definitionDisplay;
+          if (definitionDisplay) {
+            let args = this.getRenderedTemplateArguments(definitions, argumentLists);
+            args[definitionDisplay.parameter.name] = variableDefinitions;
+            if (definitionDisplay.display
+                && definitionDisplay.display instanceof Fmt.ArrayExpression
+                && definitionDisplay.display.items.length) {
+              let display = this.findBestMatch(definitionDisplay.display.items, argumentLists)!;
+              variableDisplay = this.renderDisplayExpression(display, args);
+              this.setSemanticLink(variableDisplay, definitionRef);
+            }
+            if (!(state.abbreviate && definitionDisplay.nameOptional instanceof FmtDisplay.MetaRefExpression_true)) {
+              if (definitionDisplay.singularName && (!state.abbreviate || definitionDisplay.singularName instanceof Fmt.StringExpression)) {
+                noun.singular = this.applyName(definitionDisplay.singularName, args, definitionRef, singular);
+                if (definitionDisplay.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
+                  let nextDefinitionRef = this.getDisplayDefinitionRef(remainingParameters[0].type.expression);
+                  let nextDefinition = remainingDefinitions[0];
+                  if (nextDefinitionRef instanceof Fmt.DefinitionRefExpression && nextDefinition) {
+                    let nextDefinitions: Fmt.Definition[] = [];
+                    let nextArgumentLists: Fmt.ArgumentList[] = [];
+                    this.utils.analyzeDefinitionRef(nextDefinitionRef, nextDefinition, nextDefinitions, nextArgumentLists);
+                    let nextInnerDefinition = nextDefinitions[nextDefinitions.length - 1];
+                    if (nextInnerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
+                      let nextDefinitionDisplay = nextInnerDefinition.contents.definitionDisplay;
+                      if (nextDefinitionDisplay && nextDefinitionDisplay.singularName instanceof Fmt.StringExpression && definitionDisplay.singularName.value === nextDefinitionDisplay.singularName.value) {
+                        combineWithNext = true;
                       }
                     }
                   }
                 }
-                if (definitionDisplay.pluralName && (!state.abbreviate || definitionDisplay.pluralName instanceof Fmt.StringExpression)) {
-                  noun.plural = this.applyName(definitionDisplay.pluralName, args, definitionRef, plural);
-                }
+              }
+              if (definitionDisplay.pluralName && (!state.abbreviate || definitionDisplay.pluralName instanceof Fmt.StringExpression)) {
+                noun.plural = this.applyName(definitionDisplay.pluralName, args, definitionRef, plural);
               }
             }
           }
         }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        noun.singular = 'set';
-        noun.plural = 'sets';
-      } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
-        noun.singular = 'symbol';
-        noun.plural = 'symbols';
       }
-      let properties = this.extractProperties(parameters, noun, remainingParameters, remainingDefinitions);
-      this.replaceName(noun.singular, noun.definitionRef, noun.extracted, singular);
-      this.replaceName(noun.plural, noun.definitionRef, noun.extracted, plural);
-      if (singular.length && plural.length) {
-        if (properties && properties.length) {
-          noun.article = undefined;
-          for (let property of properties) {
-            let space = new Display.TextExpression(' ');
-            if (property.property) {
-              let renderedProperty = new Display.TextExpression(property.property);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
+      noun.singular = 'set';
+      noun.plural = 'sets';
+    } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
+      noun.singular = 'symbol';
+      noun.plural = 'symbols';
+    }
+    let properties = this.extractProperties(parameters, noun, remainingParameters, remainingDefinitions);
+    this.replaceName(noun.singular, noun.definitionRef, noun.extracted, singular);
+    this.replaceName(noun.plural, noun.definitionRef, noun.extracted, plural);
+    if (singular.length && plural.length) {
+      if (properties && properties.length) {
+        noun.article = undefined;
+        for (let property of properties) {
+          let space = new Display.TextExpression(' ');
+          if (property.property) {
+            let renderedProperty = new Display.TextExpression(property.property);
+            if (property.definitionRef) {
+              this.setSemanticLink(renderedProperty, property.definitionRef);
+            }
+            singular.unshift(space);
+            singular.unshift(renderedProperty);
+            plural.unshift(space);
+            plural.unshift(renderedProperty);
+          } else if (property.singular) {
+            let preposition = new Display.TextExpression(' with ');
+            singular.push(preposition);
+            plural.push(preposition);
+            if (property.article) {
+              singular.push(new Display.TextExpression(property.article));
+              singular.push(space);
+            }
+            let renderedProperty = new Display.TextExpression(property.singular);
+            if (property.definitionRef) {
+              this.setSemanticLink(renderedProperty, property.definitionRef);
+            }
+            singular.push(renderedProperty);
+            if (property.plural) {
+              renderedProperty = new Display.TextExpression(property.plural);
               if (property.definitionRef) {
                 this.setSemanticLink(renderedProperty, property.definitionRef);
               }
-              singular.unshift(space);
-              singular.unshift(renderedProperty);
-              plural.unshift(space);
-              plural.unshift(renderedProperty);
-            } else if (property.singular) {
-              let preposition = new Display.TextExpression(' with ');
-              singular.push(preposition);
-              plural.push(preposition);
-              if (property.article) {
-                singular.push(new Display.TextExpression(property.article));
-                singular.push(space);
-              }
-              let renderedProperty = new Display.TextExpression(property.singular);
-              if (property.definitionRef) {
-                this.setSemanticLink(renderedProperty, property.definitionRef);
-              }
-              singular.push(renderedProperty);
-              if (property.plural) {
-                renderedProperty = new Display.TextExpression(property.plural);
-                if (property.definitionRef) {
-                  this.setSemanticLink(renderedProperty, property.definitionRef);
-                }
-              }
-              plural.push(renderedProperty);
             }
+            plural.push(renderedProperty);
           }
         }
-        if (!variableDisplay) {
-          variableDisplay = variableDefinitions;
-        }
-        if (state.abbreviate) {
-          let which = parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural;
-          row.push(...which);
-          row.push(new Display.TextExpression(' '));
-          row.push(variableDisplay);
-        } else {
-          row.push(variableDisplay);
-          if (combineWithNext) {
-            state.inDefinitionDisplayGroup = true;
-          } else {
-            if (parameters.length === 1 && !state.inDefinitionDisplayGroup) {
-              let singularStart = singular[0];
-              for (;;) {
-                if (singularStart instanceof Display.RowExpression && singularStart.items.length) {
-                  singularStart = singularStart.items[0];
-                } else if (singularStart instanceof Display.IndirectExpression) {
-                  singularStart = singularStart.resolve();
-                } else {
-                  break;
-                }
-              }
-              if (!noun.article) {
-                noun.article = this.getSingularArticle(singularStart instanceof Display.TextExpression ? singularStart.text : undefined);
-              }
-              if (state.sentence) {
-                row.push(new Display.TextExpression(` be ${noun.article} `));
-                row.push(...singular);
-              } else {
-                row.push(new Display.TextExpression(` is ${noun.article} `));
-                row.push(...singular);
-              }
-            } else {
-              if (state.sentence) {
-                row.push(new Display.TextExpression(' be '));
-                row.push(...plural);
-              } else {
-                row.push(new Display.TextExpression(' are '));
-                row.push(...plural);
-              }
-            }
-            state.inDefinitionDisplayGroup = false;
-          }
-        }
-      } else if (variableDisplay) {
+      }
+      if (!variableDisplay) {
+        variableDisplay = variableDefinitions;
+      }
+      if (state.abbreviate) {
+        let which = parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural;
+        row.push(...which);
+        row.push(new Display.TextExpression(' '));
         row.push(variableDisplay);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        row.push(this.renderTemplate('SubsetParameter', {
-                                       'subset': variableDefinitions,
-                                       'superset': this.renderSetTerm(type.superset)
-                                     }));
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        row.push(this.renderTemplate('ElementParameter', {
-                                       'element': variableDefinitions,
-                                       'set': this.renderSetTerm(type._set)
-                                     }));
-      } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
-        row.push(this.renderTemplate('VariableDefinition', {
-                                       'left': variableDefinitions,
-                                       'right': this.renderSetTerm(type._set)
-                                     }));
-        state.inDefinition = true;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-        row.push(this.renderTemplate('VariableDefinition', {
-                                       'left': variableDefinitions,
-                                       'right': this.renderElementTerm(type.element)
-                                     }));
-        state.inDefinition = true;
       } else {
-        row.push(new Display.ErrorExpression('Unknown parameter type'));
+        row.push(variableDisplay);
+        if (combineWithNext) {
+          state.inDefinitionDisplayGroup = true;
+        } else {
+          if (parameters.length === 1 && !state.inDefinitionDisplayGroup) {
+            let singularStart = singular[0];
+            for (;;) {
+              if (singularStart instanceof Display.RowExpression && singularStart.items.length) {
+                singularStart = singularStart.items[0];
+              } else if (singularStart instanceof Display.IndirectExpression) {
+                singularStart = singularStart.resolve();
+              } else {
+                break;
+              }
+            }
+            if (!noun.article) {
+              noun.article = this.getSingularArticle(singularStart instanceof Display.TextExpression ? singularStart.text : undefined);
+            }
+            if (state.sentence) {
+              row.push(new Display.TextExpression(` be ${noun.article} `));
+              row.push(...singular);
+            } else {
+              row.push(new Display.TextExpression(` is ${noun.article} `));
+              row.push(...singular);
+            }
+          } else {
+            if (state.sentence) {
+              row.push(new Display.TextExpression(' be '));
+              row.push(...plural);
+            } else {
+              row.push(new Display.TextExpression(' are '));
+              row.push(...plural);
+            }
+          }
+          state.inDefinitionDisplayGroup = false;
+        }
       }
+    } else if (variableDisplay) {
+      row.push(variableDisplay);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      row.push(this.renderTemplate('SubsetParameter', {
+                                      'subset': variableDefinitions,
+                                      'superset': this.renderSetTerm(type.superset)
+                                    }));
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
+      row.push(this.renderTemplate('ElementParameter', {
+                                      'element': variableDefinitions,
+                                      'set': this.renderSetTerm(type._set)
+                                    }));
+    } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+      row.push(this.renderTemplate('VariableDefinition', {
+                                      'left': variableDefinitions,
+                                      'right': this.renderSetTerm(type._set)
+                                    }));
+      state.inDefinition = true;
+    } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
+      row.push(this.renderTemplate('VariableDefinition', {
+                                      'left': variableDefinitions,
+                                      'right': this.renderElementTerm(type.element)
+                                    }));
+      state.inDefinition = true;
+    } else {
+      row.push(new Display.ErrorExpression('Unknown parameter type'));
     }
 
     state.started = true;
-
-    return new Display.RowExpression(row);
   }
 
   private applyName(name: Fmt.Expression, args: Display.RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Display.RenderedExpression[]): string | undefined {

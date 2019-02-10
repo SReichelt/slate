@@ -4,12 +4,13 @@ $Magmas: %Section {
   logic = 'hlm',
   items = [
     %item($Magmas),
-    %item($Set),
+    %item($Elements),
     %item($operation),
     %item($associative),
     %item($commutative),
     %item($Homomorphisms),
     %item($Isomorphisms),
+    %item($identity),
     %item($"Equality criterion"),
     %item($"Inverse of isomorphism is also isomorphism"),
     %subsection(

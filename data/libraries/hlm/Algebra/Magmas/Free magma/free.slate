@@ -6,7 +6,7 @@ $free(𝐌: %Element($../Magmas)): %Predicate {
     property = 'free'
   )],
   definition = [%exists(
-    #(S: %Subset($../Set(𝐌 = {𝐌}))),
+    #(S: %Subset($../Elements(𝐌 = {𝐌}))),
     formula = $"free on set"(
       𝐌 = {𝐌},
       S = {S}

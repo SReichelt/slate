@@ -1,0 +1,28 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition retrieves a representative set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation.
+ */
+$Elements(𝐌: %Element(
+  $Magmas,
+  shortcut = {
+    constructor = $Magmas.magma,
+    parameters = #(
+      M: %Set,
+      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+    )
+  }
+)): %SetOperator {
+  display = [$SubSup(
+    body = 'El',
+    sub = 𝐌
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    display = [$ElementParameter(
+      element = a,
+      set = 𝐌
+    )]
+  },
+  definition = [M]
+}

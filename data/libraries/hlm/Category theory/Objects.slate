@@ -1,7 +1,7 @@
 %../../../logics/hlm%
 
 /**
- * @remarks This definition retrieves a representative set of objects from a category, and enables typical abuse of notation.
+ * @remarks This definition retrieves a representative set of objects from a category (which is actually an equivalence class of categories), and enables typical abuse of notation.
  */
 $Objects(
   U: %Symbol(auto = %true),
@@ -145,6 +145,16 @@ $Objects(
     }
   )
 ): %SetOperator {
-  display = [𝓒],
+  display = [$SubSup(
+    body = 'Ob',
+    sub = 𝓒
+  )],
+  definitionDisplay = {
+    parameter = #(𝐗: %Expr),
+    display = [$ElementParameter(
+      element = 𝐗,
+      set = 𝓒
+    )]
+  },
   definition = [O]
 }
