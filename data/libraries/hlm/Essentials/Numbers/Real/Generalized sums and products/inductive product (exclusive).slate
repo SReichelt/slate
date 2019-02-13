@@ -12,8 +12,7 @@ $"inductive product (exclusive)"(
     operand = a,
     under = $Relation(
       symbol = '<',
-      operands = [i, n],
-      space = ' '
+      operands = [i, n]
     ),
     minParenLevel = 2,
     maxParenLevel = 2

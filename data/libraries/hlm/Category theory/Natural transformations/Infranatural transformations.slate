@@ -49,10 +49,9 @@ $"Infranatural transformations"(
         body = n,
         style = '()'
       ),
-      sub = $Relation(
-        symbol = '∈',
-        operands = [𝐗, 𝓒],
-        space = ''
+      sub = $ElementRelation(
+        element = 𝐗,
+        set = 𝓒
       )
     )],
     equalityDefinition = {

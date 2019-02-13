@@ -115,7 +115,7 @@ $PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minPare
   )
 }
 
-$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
+$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
   display = $Operator(
     symbol = symbol,
     operands = operands,

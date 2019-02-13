@@ -5,7 +5,6 @@ $Sequences: %Section {
   items = [
     %item($converges),
     %item($convergent),
-    %item($"sequence limit"),
     %item($limit),
     %item($cauchy),
     %item($"sequence sum"),

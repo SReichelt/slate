@@ -21,10 +21,9 @@ $"Generalized cartesian product"(
         body = s,
         style = '()'
       ),
-      sub = $Relation(
-        symbol = '∈',
-        operands = [j, I],
-        space = ''
+      sub = $ElementRelation(
+        element = j,
+        set = I
       )
     )],
     equalityDefinition = {
@@ -47,10 +46,9 @@ $"Generalized cartesian product"(
   display = [$LargeOperator(
     symbol = '∏',
     operand = S,
-    under = $Relation(
-      symbol = '∈',
-      operands = [i, I],
-      space = ' '
+    under = $ElementRelation(
+      element = i,
+      set = I
     )
   )]
 }

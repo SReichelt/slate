@@ -24,8 +24,7 @@ $"Finite sequences"(S: %Set(auto = %true)): %Construction {
       ),
       sub = $Relation(
         symbol = '<',
-        operands = [k, n],
-        space = ''
+        operands = [k, n]
       )
     )],
     equalityDefinition = {

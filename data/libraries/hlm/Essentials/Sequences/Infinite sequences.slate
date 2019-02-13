@@ -22,10 +22,9 @@ $"Infinite sequences"(S: %Set(auto = %true)): %Construction {
         body = a,
         style = '()'
       ),
-      sub = $Relation(
-        symbol = '∈',
-        operands = [n, 'ℕ'],
-        space = ''
+      sub = $ElementRelation(
+        element = n,
+        set = 'ℕ'
       )
     )],
     equalityDefinition = {

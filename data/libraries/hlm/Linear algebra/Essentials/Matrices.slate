@@ -23,13 +23,11 @@ $Matrices(
       sub = $Group(items = [
         $Relation(
           symbol = '<',
-          operands = [i, m],
-          space = ''
+          operands = [i, m]
         ),
         $Relation(
           symbol = '<',
-          operands = [j, n],
-          space = ''
+          operands = [j, n]
         )
       ])
     )]
@@ -39,8 +37,7 @@ $Matrices(
     body = S,
     sup = $Operator(
       symbol = '×',
-      operands = [m, n],
-      space = ''
+      operands = [m, n]
     )
   )]
 }

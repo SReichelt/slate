@@ -10,15 +10,18 @@ $limit(
       {a = {a[m]}}
   })),
   _1: %Constraint($convergent(𝐚 = {𝐚}))
-): %ExplicitOperator {
+): %ImplicitOperator {
   display = [$OverUnderOperator(
     symbol = 'lim',
     operand = a,
     under = $Relation(
       symbol = '→',
-      operands = [n, '∞'],
-      space = ''
+      operands = [n, '∞']
     )
   )],
-  definition = [$"sequence limit"(𝐚 = {𝐚})]
+  parameter = #(l: %Element($../"Rational numbers")),
+  definition = [$converges(
+    𝐚 = {𝐚},
+    l = {l}
+  )]
 }

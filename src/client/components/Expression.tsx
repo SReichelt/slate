@@ -7,6 +7,7 @@ import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
 import ExpressionDialog from './ExpressionDialog';
 import { getDefinitionIcon } from '../utils/icons';
+import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import Modal from 'react-responsive-modal';
 import 'simplemde/dist/simplemde.min.css';
@@ -38,6 +39,7 @@ let previewContents: any = null;
 interface ExpressionProps {
   expression: Display.RenderedExpression;
   addInnerParens?: boolean;
+  shrinkMathSpaces?: number;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
   tooltipPosition?: string;
@@ -54,9 +56,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private semanticLinks?: Display.SemanticLink[];
   private windowClickListener?: () => void;
-  private interactionBlocked: boolean;
+  private interactionBlocked = false;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
+  private shrinkMathSpaces = 0;
   private tooltipPosition: string;
 
   constructor(props: ExpressionProps) {
@@ -99,6 +102,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private updateOptionalProps(props: ExpressionProps): void {
+    this.shrinkMathSpaces = props.shrinkMathSpaces ? props.shrinkMathSpaces : props.parent ? props.parent.shrinkMathSpaces : 0;
     this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
   }
 
@@ -492,56 +496,43 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.InnerParenExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
-      // TODO shrink spaces in all sub/sup/over/under parts (and remove specializations in display specifications)
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
         let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
+        let sub: any = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sup: any = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSub: any = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSup: any = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
-          if (subSupExpression.sub) {
-            subSupResult.push(<sub key="sub"><Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);
+          if (sub) {
+            subSupResult.push(<sub key="sub">{sub}</sub>);
           }
-          if (subSupExpression.sup) {
-            subSupResult.push(<sup key="sup"><Expression expression={subSupExpression.sup} parent={this} interactionHandler={this.props.interactionHandler}/></sup>);
+          if (sup) {
+            subSupResult.push(<sup key="sup">{sup}</sup>);
           }
-          if (subSupExpression.preSub) {
-            subSupResult.unshift(<sub key="preSub"><Expression expression={subSupExpression.preSub} parent={this} interactionHandler={this.props.interactionHandler}/></sub>);
+          if (preSub) {
+            subSupResult.unshift(<sub key="preSub">{preSub}</sub>);
           }
-          if (subSupExpression.preSup) {
-            subSupResult.unshift(<sup key="preSup"><Expression expression={subSupExpression.preSup} parent={this} interactionHandler={this.props.interactionHandler}/></sup>);
+          if (preSup) {
+            subSupResult.unshift(<sup key="preSup">{preSup}</sup>);
           }
         } else {
           let empty = <span className={'subsup-empty'} key="empty"/>;
           let rightSub = null;
           let rightSup = null;
-          if (subSupExpression.sub) {
-            rightSub = (
-              <span className={'subsup-right-sub'} key="sub">
-                <Expression expression={subSupExpression.sub} parent={this} interactionHandler={this.props.interactionHandler}/>
-              </span>
-            );
+          if (sub) {
+            rightSub = <span className={'subsup-right-sub'} key="sub">{sub}</span>;
           }
-          if (subSupExpression.sup) {
-            rightSup = (
-              <span className={'subsup-right-sup'} key="sup">
-                <Expression expression={subSupExpression.sup} parent={this} interactionHandler={this.props.interactionHandler}/>
-              </span>
-            );
+          if (sup) {
+            rightSup = <span className={'subsup-right-sup'} key="sup">{sup}</span>;
           }
           let leftSub = null;
           let leftSup = null;
-          if (subSupExpression.preSub) {
-            leftSub = (
-              <span className={'subsup-left-sub'} key="sub">
-                <Expression expression={subSupExpression.preSub} parent={this} interactionHandler={this.props.interactionHandler}/>
-              </span>
-            );
+          if (preSub) {
+            leftSub = <span className={'subsup-left-sub'} key="sub">{preSub}</span>;
           }
-          if (subSupExpression.preSup) {
-            leftSup = (
-              <span className={'subsup-left-sup'} key="sup">
-                <Expression expression={subSupExpression.preSup} parent={this} interactionHandler={this.props.interactionHandler}/>
-              </span>
-            );
+          if (preSup) {
+            leftSup = <span className={'subsup-left-sup'} key="sup">{preSup}</span>;
           }
           if (lineHeight) {
             subSupResult = [subSupResult];
@@ -599,8 +590,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
       let bodyWithParens = new Display.InnerParenExpression(expression.body);
-      let over: any = expression.over ? <Expression expression={expression.over} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      let under: any = expression.under ? <Expression expression={expression.under} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let over: any = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let under: any = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       result = [
         (
           <span className={'overunder-body-row'} key="body">
@@ -654,7 +645,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'radical-degree-table'}>
               <span className={'radical-degree-top-row'}>
                 <span className={'radical-degree'}>
-                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} parent={this} interactionHandler={this.props.interactionHandler}/>
+                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/>
                 </span>
               </span>
               <span className={'radical-degree-bottom-row'}>
@@ -866,149 +857,156 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     let iterator = text[Symbol.iterator]();
     for (let next = iterator.next(); !next.done; next = iterator.next()) {
       let c = next.value;
-      if (c === '\r') {
-        // ignore
-      } else if (c === '\n') {
-        flush();
-        result.push(<br key={childIndex++}/>);
-      } else if (c === ' ') {
-        if (curText) {
-          if (curText.endsWith(' ')) {
-            curText = curText.substring(0, curText.length - 1);
-            flush();
-            result.push(<span key={childIndex++}>&nbsp;</span>);
+      switch (c) {
+        case '\r':
+          break;
+        case '\n':
+          flush();
+          result.push(<br key={childIndex++}/>);
+          break;
+        case ' ':
+          if (curText) {
+            if (curText.endsWith(' ')) {
+              curText = curText.substring(0, curText.length - 1);
+              flush();
+              result.push(<span key={childIndex++}>&nbsp;</span>);
+            }
+            curText += c;
+          } else {
+            result.push(<span key={childIndex++}>{'\u2008'}</span>);
           }
-          curText += c;
-        } else {
-          result.push(<span key={childIndex++}>{'\u2008'}</span>);
-        }
-      } else if (c === '\'') {
-        flush();
-        result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
-      } else {
-        let cp = c.codePointAt(0)!;
-        if (cp >= 0x1d400 && cp < 0x1d434) {
-          setStyle('bold');
-          curText += String.fromCodePoint(cp < 0x1d41a ? cp - 0x1d400 + 0x41 :
-                                                         cp - 0x1d41a + 0x61);
-        } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
-          setStyle('italic');
-          switch (cp) {
-            case 0x210e:
-              curText += 'h';
-              break;
-            default:
-              curText += String.fromCodePoint(cp < 0x1d44e ? cp - 0x1d434 + 0x41 :
-                                                             cp - 0x1d44e + 0x61);
+          break;
+        case '\'':
+          flush();
+          result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
+          break;
+        default:
+          let cp = c.codePointAt(0)!;
+          if (cp >= 0x1d400 && cp < 0x1d434) {
+            setStyle('bold');
+            curText += String.fromCodePoint(cp < 0x1d41a ? cp - 0x1d400 + 0x41 :
+                                                          cp - 0x1d41a + 0x61);
+          } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
+            setStyle('italic');
+            switch (cp) {
+              case 0x210e:
+                curText += 'h';
+                break;
+              default:
+                curText += String.fromCodePoint(cp < 0x1d44e ? cp - 0x1d434 + 0x41 :
+                                                              cp - 0x1d44e + 0x61);
+            }
+          } else if (cp >= 0x1d468 && cp < 0x1d49c) {
+            setStyle('bold italic');
+            curText += String.fromCodePoint(cp < 0x1d482 ? cp - 0x1d468 + 0x41 :
+                                                          cp - 0x1d482 + 0x61);
+          } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
+            setStyle('sans');
+            curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
+                                                          cp - 0x1d5ba + 0x61);
+          } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
+            setStyle('calligraphic');
+            switch (cp) {
+              case 0x212c:
+                curText += 'B';
+                break;
+              case 0x2130:
+                curText += 'E';
+                break;
+              case 0x2131:
+                curText += 'F';
+                break;
+              case 0x210b:
+                curText += 'H';
+                break;
+              case 0x2110:
+                curText += 'I';
+                break;
+              case 0x2112:
+                curText += 'L';
+                break;
+              case 0x2133:
+                curText += 'M';
+                break;
+              case 0x211b:
+                curText += 'R';
+                break;
+              case 0x212f:
+                curText += 'e';
+                break;
+              case 0x210a:
+                curText += 'g';
+                break;
+              case 0x2134:
+                curText += 'o';
+                break;
+              default:
+                curText += String.fromCodePoint(cp < 0x1d4b6 ? cp - 0x1d49c + 0x41 :
+                                                cp < 0x1d4d0 ? cp - 0x1d4b6 + 0x61 :
+                                                cp < 0x1d4ea ? cp - 0x1d4d0 + 0x41 :
+                                                              cp - 0x1d4ea + 0x61);
+            }
+          } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
+            setStyle('fraktur');
+            switch (cp) {
+              case 0x212d:
+                curText += 'C';
+                break;
+              case 0x210c:
+                curText += 'H';
+                break;
+              case 0x2111:
+                curText += 'I';
+                break;
+              case 0x211c:
+                curText += 'R';
+                break;
+              case 0x2128:
+                curText += 'Z';
+                break;
+              default:
+                curText += String.fromCodePoint(cp < 0x1d51e ? cp - 0x1d504 + 0x41 :
+                                                cp < 0x1d56c ? cp - 0x1d51e + 0x61 :
+                                                cp < 0x1d586 ? cp - 0x1d56c + 0x41 :
+                                                              cp - 0x1d586 + 0x61);
+            }
+          } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
+            setStyle('double-struck');
+            switch (cp) {
+              case 0x2102:
+                curText += 'C';
+                break;
+              case 0x210d:
+                curText += 'H';
+                break;
+              case 0x2115:
+                curText += 'N';
+                break;
+              case 0x2119:
+                curText += 'P';
+                break;
+              case 0x211a:
+                curText += 'Q';
+                break;
+              case 0x211d:
+                curText += 'R';
+                break;
+              case 0x2124:
+                curText += 'Z';
+                break;
+              default:
+                curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
+                                                              cp - 0x1d552 + 0x61);
+            }
+          } else {
+            if (curStyle) {
+              flush();
+            }
+            for (let i = 0; i < this.shrinkMathSpaces; i++) {
+              c = shrinkMathSpace(c);
+            }
+            curText += c;
           }
-        } else if (cp >= 0x1d468 && cp < 0x1d49c) {
-          setStyle('bold italic');
-          curText += String.fromCodePoint(cp < 0x1d482 ? cp - 0x1d468 + 0x41 :
-                                                         cp - 0x1d482 + 0x61);
-        } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
-          setStyle('sans');
-          curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
-                                                         cp - 0x1d5ba + 0x61);
-        } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
-          setStyle('calligraphic');
-          switch (cp) {
-            case 0x212c:
-              curText += 'B';
-              break;
-            case 0x2130:
-              curText += 'E';
-              break;
-            case 0x2131:
-              curText += 'F';
-              break;
-            case 0x210b:
-              curText += 'H';
-              break;
-            case 0x2110:
-              curText += 'I';
-              break;
-            case 0x2112:
-              curText += 'L';
-              break;
-            case 0x2133:
-              curText += 'M';
-              break;
-            case 0x211b:
-              curText += 'R';
-              break;
-            case 0x212f:
-              curText += 'e';
-              break;
-            case 0x210a:
-              curText += 'g';
-              break;
-            case 0x2134:
-              curText += 'o';
-              break;
-            default:
-              curText += String.fromCodePoint(cp < 0x1d4b6 ? cp - 0x1d49c + 0x41 :
-                                              cp < 0x1d4d0 ? cp - 0x1d4b6 + 0x61 :
-                                              cp < 0x1d4ea ? cp - 0x1d4d0 + 0x41 :
-                                                             cp - 0x1d4ea + 0x61);
-          }
-        } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
-          setStyle('fraktur');
-          switch (cp) {
-            case 0x212d:
-              curText += 'C';
-              break;
-            case 0x210c:
-              curText += 'H';
-              break;
-            case 0x2111:
-              curText += 'I';
-              break;
-            case 0x211c:
-              curText += 'R';
-              break;
-            case 0x2128:
-              curText += 'Z';
-              break;
-            default:
-              curText += String.fromCodePoint(cp < 0x1d51e ? cp - 0x1d504 + 0x41 :
-                                              cp < 0x1d56c ? cp - 0x1d51e + 0x61 :
-                                              cp < 0x1d586 ? cp - 0x1d56c + 0x41 :
-                                                             cp - 0x1d586 + 0x61);
-          }
-        } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
-          setStyle('double-struck');
-          switch (cp) {
-            case 0x2102:
-              curText += 'C';
-              break;
-            case 0x210d:
-              curText += 'H';
-              break;
-            case 0x2115:
-              curText += 'N';
-              break;
-            case 0x2119:
-              curText += 'P';
-              break;
-            case 0x211a:
-              curText += 'Q';
-              break;
-            case 0x211d:
-              curText += 'R';
-              break;
-            case 0x2124:
-              curText += 'Z';
-              break;
-            default:
-              curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
-                                                             cp - 0x1d552 + 0x61);
-          }
-        } else {
-          if (curStyle) {
-            flush();
-          }
-          curText += c;
-        }
       }
     }
     flush();

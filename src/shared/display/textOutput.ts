@@ -1,7 +1,10 @@
 import * as Display from './display';
 import CachedPromise from '../data/cachedPromise';
+import { shrinkMathSpaces } from '../format/common';
 
 const escapeForMarkdown = require('markdown-escape');
+
+class ScriptExpression extends Display.InnerParenExpression {}
 
 export function renderAsText(expression: Display.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   if (!optionalParenStyle) {
@@ -94,35 +97,39 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       return renderAsText(expression.body, outputMarkdown, true);
     }
   } else if (expression instanceof Display.InnerParenExpression) {
-    return renderAsText(expression.body, outputMarkdown, true, expression.left, expression.right, expression.maxLevel);
+    let result = renderAsText(expression.body, outputMarkdown, true, expression.left, expression.right, expression.maxLevel);
+    if (expression instanceof ScriptExpression) {
+      result = result.then((text: string) => shrinkMathSpaces(text));
+    }
+    return result;
   } else if (expression instanceof Display.SubSupExpression) {
     let items: Display.RenderedExpression[] = [new Display.InnerParenExpression(expression.body)];
     if (expression.sub) {
       items.push(new Display.TextExpression('_'));
-      items.push(new Display.InnerParenExpression(expression.sub));
+      items.push(new ScriptExpression(expression.sub));
     }
     if (expression.sup) {
       items.push(new Display.TextExpression('^'));
-      items.push(new Display.InnerParenExpression(expression.sup));
+      items.push(new ScriptExpression(expression.sup));
     }
     if (expression.preSub) {
       items.unshift(new Display.TextExpression('_'));
-      items.unshift(new Display.InnerParenExpression(expression.preSub));
+      items.unshift(new ScriptExpression(expression.preSub));
     }
     if (expression.preSup) {
       items.unshift(new Display.TextExpression('^'));
-      items.unshift(new Display.InnerParenExpression(expression.preSup));
+      items.unshift(new ScriptExpression(expression.preSup));
     }
     return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.OverUnderExpression) {
     let items: Display.RenderedExpression[] = [new Display.InnerParenExpression(expression.body)];
     if (expression.under) {
       items.push(new Display.TextExpression('_'));
-      items.push(new Display.InnerParenExpression(expression.under));
+      items.push(new ScriptExpression(expression.under));
     }
     if (expression.over) {
       items.push(new Display.TextExpression('^'));
-      items.push(new Display.InnerParenExpression(expression.over));
+      items.push(new ScriptExpression(expression.over));
     }
     return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.FractionExpression) {
@@ -138,7 +145,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       new Display.InnerParenExpression(expression.radicand)
     ];
     if (expression.degree) {
-      items.unshift(new Display.InnerParenExpression(expression.degree));
+      items.unshift(new ScriptExpression(expression.degree));
     }
     return renderAsText(new Display.RowExpression(items), outputMarkdown, true);
   } else if (expression instanceof Display.MarkdownExpression) {
