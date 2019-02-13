@@ -31,10 +31,13 @@ $empty(S: %Set): %Predicate {
         S,
         $"Empty set"
       ),
-      steps = #(_: %Consider(@), _: %UseDef(result = %sub(
-        S,
-        $"Empty set"
-      )))
+      steps = #(
+        _: %Consider(@),
+        _: %UseDef(result = %sub(
+          S,
+          $"Empty set"
+        ))
+      )
     },
     {
       from = 2,

@@ -340,7 +340,7 @@ $finite(S: %Set): %Predicate {
           f = {i}
         )
       ))),
-      goal =  %exists(
+      goal = %exists(
         #(y: %Element($../Numbers/Natural/"Natural numbers")),
         formula = $../Numbers/Cardinal/"less or equal"(
           𝐱 = {$../Numbers/Cardinal/"Cardinal numbers".cardinality(S = {S})},

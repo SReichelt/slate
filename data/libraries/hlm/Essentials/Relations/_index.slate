@@ -39,7 +39,7 @@ $Relations: %Section {
       title = 'Equivalence classes'
     ),
     %item(
-      $"succession",
+      $succession,
       title = 'Succession'
     ),
     %item(
