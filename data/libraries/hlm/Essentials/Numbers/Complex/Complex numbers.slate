@@ -10,7 +10,7 @@ $"Complex numbers": %Construction {
   ): %Constructor {
     display = [$Parens(
       body = $Operator(
-        symbol = '+',
+        symbol = $ConstructorName(name = '+'),
         operands = [
           r,
           $UnaryOperator(
