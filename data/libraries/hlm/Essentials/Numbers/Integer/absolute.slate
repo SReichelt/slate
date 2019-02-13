@@ -1,7 +1,10 @@
 %../../../../../logics/hlm%
 
 /**
- * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
+ * @references * https://en.wikipedia.org/wiki/Absolute_value
+ *             * http://mathworld.wolfram.com/AbsoluteValue.html
+ *             * https://proofwiki.org/wiki/Definition:Absolute_Value
+ *             * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
  */
 $absolute(a: %Element($Integers)): %ExplicitOperator {
   display = [$Parens(

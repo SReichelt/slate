@@ -1,0 +1,29 @@
+%../../../../../logics/hlm%
+
+/**
+ * @references * https://en.wikipedia.org/wiki/Binomial_coefficient
+ *             * http://mathworld.wolfram.com/BinomialCoefficient.html
+ *             * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
+ *             * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
+ */
+$"Binomial coefficient equality"(
+  n: %Element($"Natural numbers"),
+  k: %Element($Subsets/"Segment (less or equal)"(n = {n}))
+): %StandardTheorem {
+  claim = %equals(
+    $"binomial coefficient"(
+      n = {n},
+      k = {k}
+    ),
+    $quotient(
+      n = {$factorial(n = {n})},
+      m = {$product(
+        m = {$factorial(n = {k})},
+        n = {$factorial(n = {$difference(
+          n = {n},
+          m = {k}
+        )})}
+      )}
+    )
+  )
+}

@@ -492,6 +492,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.InnerParenExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
+      // TODO shrink spaces in all sub/sup/over/under parts (and remove specializations in display specifications)
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
         let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
@@ -762,15 +763,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let cells: any;
       if (expression instanceof Display.PlaceholderExpression) {
-        cells = <span className={className + ' menu-placeholder-cell'}>{result}</span>;
+        cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else {
         cells = [
-          <span className={className + ' menu-cell'} key={'content'}>{result}</span>,
+          <span className={'menu-cell'} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
       }
       result = (
-        <span className={'menu-container'}>
+        <span className={className + ' menu-container'}>
           <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}

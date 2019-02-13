@@ -19,10 +19,6 @@ span.expr.interactive.link {
   font-weight: bold;
 }
 
-.proof-placeholder {
-  font-style: italic;
-}
-
 .sub-heading {
   display: inline-block;
   margin-top: 1em;
@@ -31,6 +27,7 @@ span.expr.interactive.link {
 .proof-placeholder {
   display: inline-block;
   margin-top: 1ex;
+  font-style: italic;
 }
 
 .indented .sub-heading, .indented .proof-placeholder {
@@ -329,6 +326,10 @@ p {
   display: table-cell;
 }
 
+.table-cell:empty {
+  height: 1ex;
+}
+
 .table.matrix>.table-row>.table-cell, .table.cases>.table-row>.table-cell {
   padding-left: 1pt;
   padding-right: 1pt;
@@ -339,8 +340,12 @@ p {
   white-space: nowrap;
 }
 
-.table.cases>.table-row>.table-cell:not(:first-child) {
+.case-parameters {
   padding-left: 1ex;
+}
+
+.table.aligned>.table-row>.table-cell>.case-parameters {
+  padding-left: 1em;
 }
 
 .table.construction>.table-row>.table-cell {
@@ -612,6 +617,7 @@ p {
   padding: 1px 3px;
   cursor: default;
   background-color: #f8f8f8;
+  overflow: hidden;
 }
 
 .menu-placeholder-cell, .menu-dropdown-cell {

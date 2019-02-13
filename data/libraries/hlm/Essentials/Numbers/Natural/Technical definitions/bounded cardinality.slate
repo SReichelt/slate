@@ -28,10 +28,6 @@ $"bounded cardinality"(
         parameters = #(x: %Element($../"Natural numbers")),
         value = %cases([
           {
-            formula = $../../../Sets/empty(S = {M}),
-            value = $../number(value = 0)
-          },
-          {
             formula = %not($../../../Sets/empty(S = {M})),
             value = $../sum(
               m = {$"bounded cardinality"(
@@ -44,6 +40,10 @@ $"bounded cardinality"(
               )},
               n = {$../number(value = 1)}
             )
+          },
+          {
+            formula = $../../../Sets/empty(S = {M}),
+            value = $../number(value = 0)
           }
         ]),
         rewrite = %true

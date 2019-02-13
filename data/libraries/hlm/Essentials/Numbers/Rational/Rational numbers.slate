@@ -14,7 +14,7 @@ $"Rational numbers": %Construction {
   ): %Constructor {
     display = [$Parens(
       body = $Operator(
-        symbol = '/',
+        symbol = $ConstructorName(name = '/'),
         operands = [n, d],
         space = '',
         minParenLevel = 2,

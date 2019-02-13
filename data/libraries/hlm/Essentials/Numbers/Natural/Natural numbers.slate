@@ -16,7 +16,7 @@
 $"Natural numbers": %Construction {
   $zero: %Constructor {
     display = [$Parens(
-      body = '0',
+      body = $ConstructorName(name = '0'),
       style = '()'
     )],
     rewrite = {value = $number(value = 0)}
@@ -25,8 +25,11 @@ $"Natural numbers": %Construction {
   $successor(n: %Element($"Natural numbers")): %Constructor {
     display = [$Parens(
       body = $Operator(
-        symbol = '+',
-        operands = [n, '1'],
+        symbol = $ConstructorName(name = '+'),
+        operands = [
+          n,
+          $ConstructorName(name = '1')
+        ],
         space = ''
       ),
       style = '()'

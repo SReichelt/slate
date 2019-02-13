@@ -141,7 +141,7 @@ function StartPage(props: StartPageProps): any {
       <p>
         <img src="http://hlm.sourceforge.net/screenshots/input-formula.png" width="403pt" height="210pt" alt="Screenshot of formula input in desktop version"/>
       </p>
-      <h2>Mathematical Properties</h2>
+      <h2>Foundations</h2>
       <p>
         In contrast to the desktop version, Slate is not tied to any particular logic.
         We continue using the name "HLM" for the specialized logic that is implemented in Slate, but other logics can be implemented side-by-side.

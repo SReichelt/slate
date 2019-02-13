@@ -74,6 +74,7 @@ $Natural: %Section {
     %item($minimum),
     %item($factorial),
     %item($"binomial coefficient"),
+    %item($"Binomial coefficient equality"),
     %subsection(
       $"Generalized sums and products",
       'Generalized sums and products'

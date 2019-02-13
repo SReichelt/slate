@@ -20,7 +20,7 @@ $Integers: %Construction {
   ): %Constructor {
     display = [$Parens(
       body = $Operator(
-        symbol = '-',
+        symbol = $ConstructorName(name = '-'),
         operands = [n, m],
         space = '',
         minParenLevel = 1,

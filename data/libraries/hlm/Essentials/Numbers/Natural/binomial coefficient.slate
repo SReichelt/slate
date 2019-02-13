@@ -1,12 +1,9 @@
 %../../../../../logics/hlm%
 
 /**
- * @remarks The first definition is an application of [Pascal's rule](https://en.wikipedia.org/wiki/Pascal%27s_rule). It is more explicit because it does not rely on division of natural numbers.
+ * @remarks We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition.
  *
- * @references * https://en.wikipedia.org/wiki/Binomial_coefficient
- *             * http://mathworld.wolfram.com/BinomialCoefficient.html
- *             * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
- *             * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
+ * @references * https://en.wikipedia.org/wiki/Pascal%27s_rule
  */
 $"binomial coefficient"(
   n: %Element($"Natural numbers"),
@@ -16,73 +13,49 @@ $"binomial coefficient"(
     top = n,
     bottom = k
   )],
-  definition = [
-    %structuralCases(
-      k,
-      $"Natural numbers",
-      [
-        {
-          constructor = $"Natural numbers".zero,
-          value = $number(value = 1),
-          rewrite = %true
-        },
-        {
-          constructor = $"Natural numbers".successor,
-          parameters = #(x: %Element($"Natural numbers")),
-          value = %structuralCases(
-            n,
-            $"Natural numbers",
-            [
-              {
-                constructor = $"Natural numbers".zero,
-                value = $number(value = 0),
-                rewrite = %true
-              },
-              {
-                constructor = $"Natural numbers".successor,
-                parameters = #(m: %Element($"Natural numbers")),
-                value = $sum(
-                  m = {$"binomial coefficient"(
-                    n = {m},
-                    k = {x}
-                  )},
-                  n = {$"binomial coefficient"(
-                    n = {m},
-                    k = {k}
-                  )}
-                ),
-                rewrite = %true
-              }
-            ]
-          ),
-          rewrite = %true
-        }
-      ]
-    ),
-    %cases([
+  definition = [%structuralCases(
+    k,
+    $"Natural numbers",
+    [
       {
-        formula = $"less or equal"(
-          n = {n},
-          m = {k}
-        ),
-        value = $quotient(
-          n = {$factorial(n = {n})},
-          m = {$product(
-            m = {$factorial(n = {k})},
-            n = {$factorial(n = {$difference(
-              n = {n},
-              m = {k}
-            )})}
-          )}
-        )
+        constructor = $"Natural numbers".zero,
+        value = $number(value = 1),
+        rewrite = %true
       },
       {
-        formula = $less(
-          m = {n},
-          n = {k}
+        constructor = $"Natural numbers".successor,
+        parameters = #(x: %Element($"Natural numbers")),
+        value = %structuralCases(
+          n,
+          $"Natural numbers",
+          [
+            {
+              constructor = $"Natural numbers".zero,
+              value = $number(value = 0),
+              rewrite = %true
+            },
+            {
+              constructor = $"Natural numbers".successor,
+              parameters = #(m: %Element($"Natural numbers")),
+              value = $sum(
+                m = {$"binomial coefficient"(
+                  n = {m},
+                  k = {x}
+                )},
+                n = {$"binomial coefficient"(
+                  n = {m},
+                  k = {$sum(
+                    m = {x},
+                    n = {$number(value = 1)}
+                  )}
+                )}
+              ),
+              rewrite = %true
+            }
+          ]
         ),
-        value = $number(value = 0)
+        rewrite = %true
       }
-    ])
-  ]
+    ]
+  )]
 }

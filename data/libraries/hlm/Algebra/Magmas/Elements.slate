@@ -13,9 +13,9 @@ $Elements(𝐌: %Element(
     )
   }
 )): %SetOperator {
-  display = [$SubSup(
-    body = 'El',
-    sub = 𝐌
+  display = [$Function(
+    function = 'El',
+    arguments = [𝐌]
   )],
   definitionDisplay = {
     parameter = #(a: %Expr),
