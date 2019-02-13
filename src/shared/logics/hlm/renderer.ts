@@ -325,10 +325,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
     for (let param of parameters) {
       let forEachRow: Display.RenderedExpression[] = [new Display.TextExpression(state.abbreviate ? ' f.e. ' : ' for each ')];
-      let forEachState = {
-        ...state,
+      let forEachState: ParameterListState = {
+        fullSentence: false,
+        sentence: false,
+        abbreviate: true,
         forcePlural: false,
+        enableSpecializations: state.enableSpecializations,
         started: false,
+        inLetExpr: false,
+        inConstraint: false,
+        inDefinition: false,
         inDefinitionDisplayGroup: false
       };
 
