@@ -3,10 +3,19 @@ import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtWriter from '../shared/format/write';
 import { getMetaModelWithFallback } from '../fs/format/dynamic';
+import * as Logics from '../shared/logics/logics';
 
 function tidy(fileName: string): void {
   let fileStr: string = fs.readFileSync(fileName, 'utf8');
-  let file: Fmt.File = FmtReader.readString(fileStr, fileName, (path: Fmt.Path) => getMetaModelWithFallback(fileName, path));
+  let getMetaModel = (path: Fmt.Path) => {
+    for (let logic of Logics.logics) {
+      if (path.name === logic.name) {
+        return logic.getMetaModel(path);
+      }
+    }
+    return getMetaModelWithFallback(fileName, path);
+  };
+  let file: Fmt.File = FmtReader.readString(fileStr, fileName, getMetaModel);
   fileStr = FmtWriter.writeString(file);
   fs.writeFileSync(fileName, fileStr, 'utf8');
 }
