@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of a morphism implies that _d_=_e_=_f_.
+ * @remarks This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of morphism composition implies that _d_=_e_=_f_.
  *
  * @references * https://en.wikipedia.org/wiki/Discrete_category
  *             * https://ncatlab.org/nlab/show/discrete+category#CategoricalMeaning
