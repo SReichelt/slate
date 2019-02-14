@@ -1,22 +1,9 @@
 %../../../../../logics/hlm%
 
-$identity(𝐱: %Element(
-  $"Ordinal numbers",
-  shortcut = {
-    constructor = $"Ordinal numbers"."order type",
-    parameters = #(
-      X: %Set,
-      ⪯: %Element($../../Relations/Endorelations(S = {X})),
-      _1: %Constraint($../../Relations/"well-order"(
-        S = {X},
-        ≺ = {⪯}
-      ))
-    )
-  }
-)): %ExplicitOperator {
+$identity(𝐱: %Element($"Ordinal numbers")): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
     sub = 𝐱
   )],
-  definition = [$../../Functions/identity(X = {X})]
+  definition = [$../../Functions/identity(X = {$Elements(𝐱 = {𝐱})})]
 }

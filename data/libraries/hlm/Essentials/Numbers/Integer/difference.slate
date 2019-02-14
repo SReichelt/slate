@@ -4,26 +4,8 @@
  * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.sub (but uses a different encoding)
  */
 $difference(
-  b: %Element(
-    $Integers,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_b: %Element($../Natural/"Natural numbers"),
-        m_b: %Element(%previous)
-      )
-    }
-  ),
-  a: %Element(
-    %previous,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_a: %Element($../Natural/"Natural numbers"),
-        m_a: %Element(%previous)
-      )
-    }
-  )
+  b: %Element($Integers),
+  a: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '−',
@@ -32,15 +14,37 @@ $difference(
     maxParenLevel = 1
   )],
   definition = [
-    $Integers.difference(
-        n = {$../Natural/sum(
-          m = {n_b},
-          n = {m_a}
-        )},
-        m = {$../Natural/sum(
-          m = {m_b},
-          n = {n_a}
-        )}
+    %structuralCases(
+      a,
+      $Integers,
+      [{
+        constructor = $Integers.difference,
+        parameters = #(
+          n_a: %Element($../Natural/"Natural numbers"),
+          m_a: %Element(%previous)
+        ),
+        value = %structuralCases(
+          b,
+          $Integers,
+          [{
+            constructor = $Integers.difference,
+            parameters = #(
+              n_b: %Element($../Natural/"Natural numbers"),
+              m_b: %Element(%previous)
+            ),
+            value = $Integers.difference(
+                n = {$../Natural/sum(
+                  m = {n_b},
+                  n = {m_a}
+                )},
+                m = {$../Natural/sum(
+                  m = {m_b},
+                  n = {n_a}
+                )}
+            )
+          }]
+        )
+      }]
     ),
     $sum(
       a = {b},

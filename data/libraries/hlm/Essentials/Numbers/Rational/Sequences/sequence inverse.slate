@@ -1,23 +1,25 @@
 %../../../../../../logics/hlm%
 
-$"sequence inverse"(𝐚: %Element(
-  $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
-  shortcut = {
-    constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
-    parameters = #(n: %Binding(
-      $../../Natural/"Natural numbers",
-      #(a: %Element($../"Rational numbers"))
-    ))
-  }
-)): %ExplicitOperator {
+$"sequence inverse"(𝐚: %Element($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}))): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = 𝐚,
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
-      #(n: %Element($../../Natural/"Natural numbers")),
-      {a = {$../inverse(a = {a[n]})}}
-  })]
+  definition = [%structuralCases(
+    𝐚,
+    $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
+    [{
+      constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
+      parameters = #(n: %Binding(
+        $../../Natural/"Natural numbers",
+        #(a: %Element($../"Rational numbers"))
+      )),
+      value = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence(n = {
+          #(n: %Element($../../Natural/"Natural numbers")),
+          {a = {$../inverse(a = {a[n]})}}
+      })
+    }]
+  )]
 }

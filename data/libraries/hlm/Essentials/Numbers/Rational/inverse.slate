@@ -3,24 +3,26 @@
 /**
  * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qopp
  */
-$inverse(a: %Element(
-  $"Rational numbers",
-  shortcut = {
-    constructor = $"Rational numbers".quotient,
-    parameters = #(
-      n_a: %Element($../Integer/Integers),
-      d_a: %Element($../Natural/Subsets/"Positive numbers")
-    )
-  }
-)): %ExplicitOperator {
+$inverse(a: %Element($"Rational numbers")): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$"Rational numbers".quotient(
-      n = {$../Integer/inverse(a = {n_a})},
-      d = {d_a}
+  definition = [%structuralCases(
+    a,
+    $"Rational numbers",
+    [{
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
+        n_a: %Element($../Integer/Integers),
+        d_a: %Element($../Natural/Subsets/"Positive numbers")
+      ),
+      value = $"Rational numbers".quotient(
+          n = {$../Integer/inverse(a = {n_a})},
+          d = {d_a}
+      )
+    }]
   )]
 }

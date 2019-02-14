@@ -6,20 +6,8 @@
  *             * https://proofwiki.org/wiki/Definition:Sum_of_Cardinals
  */
 $sum(
-  𝐱: %Element(
-    $"Cardinal numbers",
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(X: %Set)
-    }
-  ),
-  𝐲: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(Y: %Set)
-    }
-  )
+  𝐱: %Element($"Cardinal numbers"),
+  𝐲: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '+',
@@ -27,8 +15,24 @@ $sum(
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$"Cardinal numbers".cardinality(S = {$../../Sets/"Disjoint union"(
-      S = {X},
-      T = {Y}
-  )})]
+  definition = [%structuralCases(
+    𝐲,
+    $"Cardinal numbers",
+    [{
+      constructor = $"Cardinal numbers".cardinality,
+      parameters = #(Y: %Set),
+      value = %structuralCases(
+        𝐱,
+        $"Cardinal numbers",
+        [{
+          constructor = $"Cardinal numbers".cardinality,
+          parameters = #(X: %Set),
+          value = $"Cardinal numbers".cardinality(S = {$../../Sets/"Disjoint union"(
+              S = {X},
+              T = {Y}
+          )})
+        }]
+      )
+    }]
+  )]
 }

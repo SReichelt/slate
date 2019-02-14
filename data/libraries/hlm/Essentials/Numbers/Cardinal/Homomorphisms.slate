@@ -6,20 +6,8 @@
  *          Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal.
  */
 $Homomorphisms(
-  𝐱: %Element(
-    $"Cardinal numbers",
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(X: %Set)
-    }
-  ),
-  𝐲: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(Y: %Set)
-    }
-  )
+  𝐱: %Element($"Cardinal numbers"),
+  𝐲: %Element(%previous)
 ): %SetOperator {
   display = [$Function(
     function = 'Hom',
@@ -37,7 +25,7 @@ $Homomorphisms(
     nameOptional = %true
   },
   definition = [$../../Functions/Functions(
-    X = {X},
-    Y = {Y}
+    X = {$Elements(𝐱 = {𝐱})},
+    Y = {$Elements(𝐱 = {𝐲})}
   )]
 }

@@ -5,9 +5,23 @@
  */
 $Objects(
   U: %Symbol(auto = %true),
-  𝓒: %Element(
+  𝓒: %Element($Categories(U = {U}))
+): %SetOperator {
+  display = [$Function(
+    function = 'Ob',
+    arguments = [𝓒]
+  )],
+  definitionDisplay = {
+    parameter = #(𝐗: %Expr),
+    display = [$ElementParameter(
+      element = 𝐗,
+      set = 𝓒
+    )]
+  },
+  definition = [%setStructuralCases(
+    𝓒,
     $Categories(U = {U}),
-    shortcut = {
+    [{
       constructor = $Categories(U = {U}).category,
       parameters = #(
         O: %Set,
@@ -141,20 +155,8 @@ $Objects(
           ),
           %equals(f, g)
         ))
-      )
-    }
-  )
-): %SetOperator {
-  display = [$Function(
-    function = 'Ob',
-    arguments = [𝓒]
-  )],
-  definitionDisplay = {
-    parameter = #(𝐗: %Expr),
-    display = [$ElementParameter(
-      element = 𝐗,
-      set = 𝓒
-    )]
-  },
-  definition = [O]
+      ),
+      value = O
+    }]
+  )]
 }

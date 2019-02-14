@@ -1,23 +1,25 @@
 %../../../../../logics/hlm%
 
-$inverse(a: %Element(
-  $"Complex numbers",
-  shortcut = {
-    constructor = $"Complex numbers".complex,
-    parameters = #(
-      r_a: %Element($../Real/"Real numbers"),
-      i_a: %Element(%previous)
-    )
-  }
-)): %ExplicitOperator {
+$inverse(a: %Element($"Complex numbers")): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$"Complex numbers".complex(
-      r = {$../Real/inverse(a = {r_a})},
-      i = {$../Real/inverse(a = {i_a})}
+  definition = [%structuralCases(
+    a,
+    $"Complex numbers",
+    [{
+      constructor = $"Complex numbers".complex,
+      parameters = #(
+        r_a: %Element($../Real/"Real numbers"),
+        i_a: %Element(%previous)
+      ),
+      value = $"Complex numbers".complex(
+          r = {$../Real/inverse(a = {r_a})},
+          i = {$../Real/inverse(a = {i_a})}
+      )
+    }]
   )]
 }

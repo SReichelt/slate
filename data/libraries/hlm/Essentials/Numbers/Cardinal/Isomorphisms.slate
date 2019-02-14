@@ -1,20 +1,8 @@
 %../../../../../logics/hlm%
 
 $Isomorphisms(
-  𝐱: %Element(
-    $"Cardinal numbers",
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(X: %Set)
-    }
-  ),
-  𝐲: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Cardinal numbers".cardinality,
-      parameters = #(Y: %Set)
-    }
-  )
+  𝐱: %Element($"Cardinal numbers"),
+  𝐲: %Element(%previous)
 ): %SetOperator {
   display = [$Function(
     function = 'Iso',
@@ -38,14 +26,14 @@ $Isomorphisms(
         𝐲 = {𝐲}
       ))),
       $../../Functions/bijective(
-        X = {X},
-        Y = {Y},
+        X = {$Elements(𝐱 = {𝐱})},
+        Y = {$Elements(𝐱 = {𝐲})},
         f = {φ}
       )
     ),
     $../../Functions/Bijections(
-      X = {X},
-      Y = {Y}
+      X = {$Elements(𝐱 = {𝐱})},
+      Y = {$Elements(𝐱 = {𝐲})}
     )
   ]
 }

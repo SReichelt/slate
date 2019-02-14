@@ -7,22 +7,10 @@
 $converse(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
-  ≺: %Element(
-    $Relations(
-      S = {S},
-      T = {T}
-    ),
-    shortcut = {
-      constructor = $Relations(
-          S = {S},
-          T = {T}
-        ).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      )))
-    }
-  )
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  ))
 ): %ExplicitOperator {
   display = [$SubSup(
     body = ≺,
@@ -31,30 +19,47 @@ $converse(
       styleClass = 'sans'
     )
   )],
-  definition = [$Relations(
-      S = {T},
-      T = {S}
-    ).relation(R = {%extendedSubset(
-      #(x: %Element(
-        R,
-        shortcut = {
-          constructor = $../Sets/"Cartesian product"(
-              S = {S},
-              T = {T}
-            ).pair,
-          parameters = #(
-            s: %Element(S),
-            t: %Element(T)
-          ),
-          override = %true
-        }
-      )),
-      $../Sets/"Cartesian product"(
+  definition = [%structuralCases(
+    ≺,
+    $Relations(
+      S = {S},
+      T = {T}
+    ),
+    [{
+      constructor = $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {T}
+      ))),
+      value = $Relations(
           S = {T},
           T = {S}
-        ).pair(
-          s = {t},
-          t = {s}
-      )
-  )})]
+        ).relation(R = {%extendedSubset(
+          #(x: %Element(
+            R,
+            shortcut = {
+              constructor = $../Sets/"Cartesian product"(
+                  S = {S},
+                  T = {T}
+                ).pair,
+              parameters = #(
+                s: %Element(S),
+                t: %Element(T)
+              ),
+              override = %true
+            }
+          )),
+          $../Sets/"Cartesian product"(
+              S = {T},
+              T = {S}
+            ).pair(
+              s = {t},
+              t = {s}
+          )
+      )})
+    }]
+  )]
 }

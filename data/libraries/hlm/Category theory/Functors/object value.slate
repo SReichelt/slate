@@ -10,13 +10,28 @@ $"object value"(
     %previous,
     auto = %true
   ),
-  F: %Element(
+  F: %Element($Functors(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓}
+  )),
+  𝐗: %Element($../Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  ))
+): %ExplicitOperator {
+  display = [$Function(
+    function = F,
+    arguments = [𝐗]
+  )],
+  definition = [%structuralCases(
+    F,
     $Functors(
       U = {U},
       𝓒 = {𝓒},
       𝓓 = {𝓓}
     ),
-    shortcut = {
+    [{
       constructor = $Functors(
           U = {U},
           𝓒 = {𝓒},
@@ -124,17 +139,8 @@ $"object value"(
             )
           )
         ))
-      )
-    }
-  ),
-  𝐗: %Element($../Objects(
-    U = {U},
-    𝓒 = {𝓒}
-  ))
-): %ExplicitOperator {
-  display = [$Function(
-    function = F,
-    arguments = [𝐗]
-  )],
-  definition = [𝐃[𝐗]]
+      ),
+      value = 𝐃[𝐗]
+    }]
+  )]
 }

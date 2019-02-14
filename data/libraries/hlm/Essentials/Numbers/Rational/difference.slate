@@ -1,26 +1,8 @@
 %../../../../../logics/hlm%
 
 $difference(
-  b: %Element(
-    $"Rational numbers",
-    shortcut = {
-      constructor = $"Rational numbers".quotient,
-      parameters = #(
-        n_b: %Element($../Integer/Integers),
-        d_b: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  ),
-  a: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Rational numbers".quotient,
-      parameters = #(
-        n_a: %Element($../Integer/Integers),
-        d_a: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  )
+  b: %Element($"Rational numbers"),
+  a: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '−',
@@ -29,21 +11,43 @@ $difference(
     maxParenLevel = 1
   )],
   definition = [
-    $"Rational numbers".quotient(
-        n = {$../Integer/difference(
-          b = {$../Integer/product(
-            a = {n_b},
-            b = {d_a}
-          )},
-          a = {$../Integer/product(
-            a = {n_a},
-            b = {d_b}
-          )}
-        )},
-        d = {$../Natural/product(
-          m = {d_b},
-          n = {d_a}
-        )}
+    %structuralCases(
+      a,
+      $"Rational numbers",
+      [{
+        constructor = $"Rational numbers".quotient,
+        parameters = #(
+          n_a: %Element($../Integer/Integers),
+          d_a: %Element($../Natural/Subsets/"Positive numbers")
+        ),
+        value = %structuralCases(
+          b,
+          $"Rational numbers",
+          [{
+            constructor = $"Rational numbers".quotient,
+            parameters = #(
+              n_b: %Element($../Integer/Integers),
+              d_b: %Element($../Natural/Subsets/"Positive numbers")
+            ),
+            value = $"Rational numbers".quotient(
+                n = {$../Integer/difference(
+                  b = {$../Integer/product(
+                    a = {n_b},
+                    b = {d_a}
+                  )},
+                  a = {$../Integer/product(
+                    a = {n_a},
+                    b = {d_b}
+                  )}
+                )},
+                d = {$../Natural/product(
+                  m = {d_b},
+                  n = {d_a}
+                )}
+            )
+          }]
+        )
+      }]
     ),
     $sum(
       a = {b},

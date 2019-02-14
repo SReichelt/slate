@@ -3,22 +3,10 @@
 $related(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
-  ≺: %Element(
-    $Relations(
-      S = {S},
-      T = {T}
-    ),
-    shortcut = {
-      $Relations(
-          S = {S},
-          T = {T}
-        ).relation,
-      #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      )))
-    }
-  ),
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  )),
   s: %Element(S),
   t: %Element(T)
 ): %Predicate {
@@ -26,14 +14,31 @@ $related(
     symbol = ≺,
     operands = [s, t]
   )],
-  definition = [%in(
-    $../Sets/"Cartesian product"(
+  definition = [%structural(
+    ≺,
+    $Relations(
+      S = {S},
+      T = {T}
+    ),
+    [{
+      constructor = $Relations(
+          S = {S},
+          T = {T}
+        ).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}
-      ).pair(
-        s = {s},
-        t = {t}
-    ),
-    R
+      ))),
+      value = %in(
+        $../Sets/"Cartesian product"(
+            S = {S},
+            T = {T}
+          ).pair(
+            s = {s},
+            t = {t}
+        ),
+        R
+      )
+    }]
   )]
 }

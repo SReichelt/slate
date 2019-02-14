@@ -1,23 +1,19 @@
 %../../../../../logics/hlm%
 
 $sum(
-  𝐱: %Element(
+  𝐱: %Element($"Ordinal numbers"),
+  𝐲: %Element(%previous)
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '+',
+    operands = [𝐱, 𝐲],
+    minParenLevel = 1,
+    maxParenLevel = 1
+  )],
+  definition = [%structuralCases(
+    𝐲,
     $"Ordinal numbers",
-    shortcut = {
-      constructor = $"Ordinal numbers"."order type",
-      parameters = #(
-        X: %Set,
-        ⪯: %Element($../../Relations/Endorelations(S = {X})),
-        _1: %Constraint($../../Relations/"well-order"(
-          S = {X},
-          ≺ = {⪯}
-        ))
-      )
-    }
-  ),
-  𝐲: %Element(
-    %previous,
-    shortcut = {
+    [{
       constructor = $"Ordinal numbers"."order type",
       parameters = #(
         Y: %Set,
@@ -26,26 +22,34 @@ $sum(
           S = {Y},
           ≺ = {⊑}
         ))
+      ),
+      value = %structuralCases(
+        𝐱,
+        $"Ordinal numbers",
+        [{
+          constructor = $"Ordinal numbers"."order type",
+          parameters = #(
+            X: %Set,
+            ⪯: %Element($../../Relations/Endorelations(S = {X})),
+            _1: %Constraint($../../Relations/"well-order"(
+              S = {X},
+              ≺ = {⪯}
+            ))
+          ),
+          value = $"Ordinal numbers"."order type"(
+              S = {$../../Sets/"Disjoint union"(
+                S = {X},
+                T = {Y}
+              )},
+              ⪯ = {$../../Relations/succession(
+                S = {X},
+                T = {Y},
+                ⪯ = {⪯},
+                ⊑ = {⊑}
+              )}
+          )
+        }]
       )
-    }
-  )
-): %ExplicitOperator {
-  display = [$Operator(
-    symbol = '+',
-    operands = [𝐱, 𝐲],
-    minParenLevel = 1,
-    maxParenLevel = 1
-  )],
-  definition = [$"Ordinal numbers"."order type"(
-      S = {$../../Sets/"Disjoint union"(
-        S = {X},
-        T = {Y}
-      )},
-      ⪯ = {$../../Relations/succession(
-        S = {X},
-        T = {Y},
-        ⪯ = {⪯},
-        ⊑ = {⊑}
-      )}
+    }]
   )]
 }

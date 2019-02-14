@@ -1,36 +1,38 @@
 %../../../../../../logics/hlm%
 
 $converges(
-  𝐚: %Element(
-    $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
-    shortcut = {
-      constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
-      parameters = #(n: %Binding(
-        $../../Natural/"Natural numbers",
-        #(a: %Element($../"Rational numbers"))
-      ))
-    }
-  ),
+  𝐚: %Element($../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"})),
   l: %Element($../"Rational numbers")
 ): %Predicate {
   display = [$TextualRelation(
     symbol = %neg('converges to', 'does not converge to'),
     operands = [𝐚, l]
   )],
-  definition = [%forall(
-    #(ε: %Element($../Subsets/"Positive numbers")),
-    %exists(
-      #(n: %Element($../../Natural/"Natural numbers")),
-      formula = %forall(
-        #(m: %Element($../../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
-        $../less(
-          a = {$../absolute(a = {$../difference(
-            b = {a[m]},
-            a = {l}
-          )})},
-          b = {ε}
+  definition = [%structural(
+    𝐚,
+    $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}),
+    [{
+      constructor = $../../../Sequences/"Infinite sequences"(S = {$../"Rational numbers"}).sequence,
+      parameters = #(n: %Binding(
+        $../../Natural/"Natural numbers",
+        #(a: %Element($../"Rational numbers"))
+      )),
+      value = %forall(
+        #(ε: %Element($../Subsets/"Positive numbers")),
+        %exists(
+          #(n: %Element($../../Natural/"Natural numbers")),
+          formula = %forall(
+            #(m: %Element($../../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
+            $../less(
+              a = {$../absolute(a = {$../difference(
+                b = {a[m]},
+                a = {l}
+              )})},
+              b = {ε}
+            )
+          )
         )
       )
-    )
+    }]
   )]
 }

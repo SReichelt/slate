@@ -2,18 +2,11 @@
 
 $identity(𝐌: %Element(
   $Magmas,
-  auto = %true,
-  shortcut = {
-    constructor = $Magmas.magma,
-    parameters = #(
-      M: %Set,
-      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
-    )
-  }
+  auto = %true
 )): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
     sub = 𝐌
   )],
-  definition = [$../../Essentials/Functions/identity(X = {M})]
+  definition = [$../../Essentials/Functions/identity(X = {$Elements(𝐌 = {𝐌})})]
 }

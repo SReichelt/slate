@@ -1,26 +1,8 @@
 %../../../../../logics/hlm%
 
 $"less or equal"(
-  a: %Element(
-    $"Rational numbers",
-    shortcut = {
-      $"Rational numbers".quotient,
-      #(
-        n_a: %Element($../Integer/Integers),
-        d_a: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  ),
-  b: %Element(
-    %previous,
-    shortcut = {
-      $"Rational numbers".quotient,
-      #(
-        n_b: %Element($../Integer/Integers),
-        d_b: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  )
+  a: %Element($"Rational numbers"),
+  b: %Element(%previous)
 ): %Predicate {
   display = [
     $Relation(
@@ -32,14 +14,36 @@ $"less or equal"(
       operands = [b, a]
     )
   ],
-  definition = [$../Integer/"less or equal"(
-    a = {$../Integer/product(
-      a = {n_a},
-      b = {d_b}
-    )},
-    b = {$../Integer/product(
-      a = {n_b},
-      b = {d_a}
-    )}
+  definition = [%structural(
+    b,
+    $"Rational numbers",
+    [{
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
+        n_b: %Element($../Integer/Integers),
+        d_b: %Element($../Natural/Subsets/"Positive numbers")
+      ),
+      value = %structural(
+        a,
+        $"Rational numbers",
+        [{
+          constructor = $"Rational numbers".quotient,
+          parameters = #(
+            n_a: %Element($../Integer/Integers),
+            d_a: %Element($../Natural/Subsets/"Positive numbers")
+          ),
+          value = $../Integer/"less or equal"(
+            a = {$../Integer/product(
+              a = {n_a},
+              b = {d_b}
+            )},
+            b = {$../Integer/product(
+              a = {n_b},
+              b = {d_a}
+            )}
+          )
+        }]
+      )
+    }]
   )]
 }

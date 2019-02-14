@@ -4,26 +4,8 @@
  * @references * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qplus
  */
 $sum(
-  a: %Element(
-    $"Rational numbers",
-    shortcut = {
-      constructor = $"Rational numbers".quotient,
-      parameters = #(
-        n_a: %Element($../Integer/Integers),
-        d_a: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  ),
-  b: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Rational numbers".quotient,
-      parameters = #(
-        n_b: %Element($../Integer/Integers),
-        d_b: %Element($../Natural/Subsets/"Positive numbers")
-      )
-    }
-  )
+  a: %Element($"Rational numbers"),
+  b: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '+',
@@ -31,20 +13,42 @@ $sum(
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$"Rational numbers".quotient(
-      n = {$../Integer/sum(
-        a = {$../Integer/product(
-          a = {n_a},
-          b = {d_b}
-        )},
-        b = {$../Integer/product(
-          a = {n_b},
-          b = {d_a}
-        )}
-      )},
-      d = {$../Natural/product(
-        m = {d_a},
-        n = {d_b}
-      )}
+  definition = [%structuralCases(
+    b,
+    $"Rational numbers",
+    [{
+      constructor = $"Rational numbers".quotient,
+      parameters = #(
+        n_b: %Element($../Integer/Integers),
+        d_b: %Element($../Natural/Subsets/"Positive numbers")
+      ),
+      value = %structuralCases(
+        a,
+        $"Rational numbers",
+        [{
+          constructor = $"Rational numbers".quotient,
+          parameters = #(
+            n_a: %Element($../Integer/Integers),
+            d_a: %Element($../Natural/Subsets/"Positive numbers")
+          ),
+          value = $"Rational numbers".quotient(
+              n = {$../Integer/sum(
+                a = {$../Integer/product(
+                  a = {n_a},
+                  b = {d_b}
+                )},
+                b = {$../Integer/product(
+                  a = {n_b},
+                  b = {d_a}
+                )}
+              )},
+              d = {$../Natural/product(
+                m = {d_a},
+                n = {d_b}
+              )}
+          )
+        }]
+      )
+    }]
   )]
 }

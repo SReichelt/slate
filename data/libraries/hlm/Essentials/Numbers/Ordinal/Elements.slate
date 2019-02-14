@@ -1,0 +1,34 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This definition retrieves a representative set from an ordinal number, and enables typical abuse of notation.
+ */
+$Elements(𝐱: %Element($"Ordinal numbers")): %SetOperator {
+  display = [$Function(
+    function = 'El',
+    arguments = [𝐱]
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    display = [$ElementParameter(
+      element = a,
+      set = 𝐱
+    )]
+  },
+  definition = [%setStructuralCases(
+    𝐱,
+    $"Ordinal numbers",
+    [{
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        S: %Set,
+        ⪯: %Element($../../Relations/Endorelations(S = {S})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {S},
+          ≺ = {⪯}
+        ))
+      ),
+      value = S
+    }]
+  )]
+}

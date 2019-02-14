@@ -1,22 +1,24 @@
 %../../../../logics/hlm%
 
-$commutative(𝐌: %Element(
-  $Magmas,
-  shortcut = {
-    constructor = $Magmas.magma,
-    parameters = #(
-      M: %Set,
-      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
-    )
-  }
-)): %Predicate {
+$commutative(𝐌: %Element($Magmas)): %Predicate {
   display = [$Property(
     operand = 𝐌,
     property = 'commutative'
   )],
-  definition = [$../../Essentials/Functions/Operations/commutative(
-    X = {M},
-    Z = {M},
-    ∗ = {∗}
+  definition = [%structural(
+    𝐌,
+    $Magmas,
+    [{
+      constructor = $Magmas.magma,
+      parameters = #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+      ),
+      value = $../../Essentials/Functions/Operations/commutative(
+        X = {M},
+        Z = {M},
+        ∗ = {∗}
+      )
+    }]
   )]
 }

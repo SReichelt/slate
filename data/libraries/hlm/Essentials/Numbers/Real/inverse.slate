@@ -1,20 +1,22 @@
 %../../../../../logics/hlm%
 
-$inverse(a: %Element(
-  $"Real numbers",
-  shortcut = {
-    $"Real numbers".class,
-    #(
-      r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-      _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
-    )
-  }
-)): %ExplicitOperator {
+$inverse(a: %Element($"Real numbers")): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$"Real numbers".class(r = {$../Rational/Sequences/"sequence inverse"(𝐚 = {r_a})})]
+  definition = [%structuralCases(
+    a,
+    $"Real numbers",
+    [{
+      constructor = $"Real numbers".class,
+      parameters = #(
+        r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
+        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
+      ),
+      value = $"Real numbers".class(r = {$../Rational/Sequences/"sequence inverse"(𝐚 = {r_a})})
+    }]
+  )]
 }

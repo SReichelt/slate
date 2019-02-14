@@ -1,26 +1,8 @@
 %../../../../../logics/hlm%
 
 $difference(
-  b: %Element(
-    $"Complex numbers",
-    shortcut = {
-      constructor = $"Complex numbers".complex,
-      parameters = #(
-        r_b: %Element($../Real/"Real numbers"),
-        i_b: %Element(%previous)
-      )
-    }
-  ),
-  a: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Complex numbers".complex,
-      parameters = #(
-        r_a: %Element($../Real/"Real numbers"),
-        i_a: %Element(%previous)
-      )
-    }
-  )
+  b: %Element($"Complex numbers"),
+  a: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '−',
@@ -29,15 +11,37 @@ $difference(
     maxParenLevel = 1
   )],
   definition = [
-    $"Complex numbers".complex(
-        r = {$../Real/difference(
-          b = {r_b},
-          a = {r_a}
-        )},
-        i = {$../Real/difference(
-          b = {i_b},
-          a = {i_a}
-        )}
+    %structuralCases(
+      a,
+      $"Complex numbers",
+      [{
+        constructor = $"Complex numbers".complex,
+        parameters = #(
+          r_a: %Element($../Real/"Real numbers"),
+          i_a: %Element(%previous)
+        ),
+        value = %structuralCases(
+          b,
+          $"Complex numbers",
+          [{
+            constructor = $"Complex numbers".complex,
+            parameters = #(
+              r_b: %Element($../Real/"Real numbers"),
+              i_b: %Element(%previous)
+            ),
+            value = $"Complex numbers".complex(
+                r = {$../Real/difference(
+                  b = {r_b},
+                  a = {r_a}
+                )},
+                i = {$../Real/difference(
+                  b = {i_b},
+                  a = {i_a}
+                )}
+            )
+          }]
+        )
+      }]
     ),
     $sum(
       a = {b},

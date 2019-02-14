@@ -5,19 +5,7 @@
  */
 $restriction(
   S: %Set(auto = %true),
-  ≺: %Element(
-    $Endorelations(S = {S}),
-    shortcut = {
-      constructor = $Relations(
-          S = {S},
-          T = {S}
-        ).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {S}
-      )))
-    }
-  ),
+  ≺: %Element($Endorelations(S = {S})),
   T: %Subset(S)
 ): %ExplicitOperator {
   display = [$UnaryOperator(
@@ -27,30 +15,31 @@ $restriction(
     ),
     operand = ≺
   )],
-  definition = [
+  definition = [%structuralCases(
+    ≺,
     $Relations(
-        S = {T},
-        T = {T}
-      ).relation(R = {%subset(
-        #(t: %Element($../Sets/"Cartesian product"(
-          S = {T},
-          T = {T}
-        ))),
-        %in(t, R)
-    )}),
-    $Relations(
-        S = {T},
-        T = {T}
-      ).relation(R = {$../Sets/Intersection(
-        U = {$../Sets/"Cartesian product"(
+      S = {S},
+      T = {S}
+    ),
+    [{
+      constructor = $Relations(
           S = {S},
           T = {S}
-        )},
-        S = {R},
-        T = {$../Sets/"Cartesian product"(
+        ).relation,
+      parameters = #(R: %Subset($../Sets/"Cartesian product"(
+        S = {S},
+        T = {S}
+      ))),
+      value = $Relations(
           S = {T},
           T = {T}
-        )}
-    )})
-  ]
+        ).relation(R = {%subset(
+          #(t: %Element($../Sets/"Cartesian product"(
+            S = {T},
+            T = {T}
+          ))),
+          %in(t, R)
+      )})
+    }]
+  )]
 }

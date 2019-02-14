@@ -1,26 +1,8 @@
 %../../../../../logics/hlm%
 
 $difference(
-  b: %Element(
-    $"Real numbers",
-    shortcut = {
-      $"Real numbers".class,
-      #(
-        r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
-      )
-    }
-  ),
-  a: %Element(
-    %previous,
-    shortcut = {
-      $"Real numbers".class,
-      #(
-        r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
-        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
-      )
-    }
-  )
+  b: %Element($"Real numbers"),
+  a: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '−',
@@ -29,10 +11,32 @@ $difference(
     maxParenLevel = 1
   )],
   definition = [
-    $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
-        𝐛 = {r_b},
-        𝐚 = {r_a}
-    )}),
+    %structuralCases(
+      a,
+      $"Real numbers",
+      [{
+        constructor = $"Real numbers".class,
+        parameters = #(
+          r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
+          _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
+        ),
+        value = %structuralCases(
+          b,
+          $"Real numbers",
+          [{
+            constructor = $"Real numbers".class,
+            parameters = #(
+              r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
+              _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
+            ),
+            value = $"Real numbers".class(r = {$../Rational/Sequences/"sequence difference"(
+                𝐛 = {r_b},
+                𝐚 = {r_a}
+            )})
+          }]
+        )
+      }]
+    ),
     $sum(
       a = {b},
       b = {$inverse(a = {a})}

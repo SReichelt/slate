@@ -1,0 +1,27 @@
+%../../../../../logics/hlm%
+
+/**
+ * @remarks This definition retrieves a representative set from a cardinal number, and enables typical abuse of notation.
+ */
+$Elements(𝐱: %Element($"Cardinal numbers")): %SetOperator {
+  display = [$Function(
+    function = 'El',
+    arguments = [𝐱]
+  )],
+  definitionDisplay = {
+    parameter = #(a: %Expr),
+    display = [$ElementParameter(
+      element = a,
+      set = 𝐱
+    )]
+  },
+  definition = [%setStructuralCases(
+    𝐱,
+    $"Cardinal numbers",
+    [{
+      constructor = $"Cardinal numbers".cardinality,
+      parameters = #(S: %Set),
+      value = S
+    }]
+  )]
+}

@@ -4,8 +4,24 @@ $identity(
   U: %Symbol(auto = %true),
   𝓒: %Element(
     $Categories(U = {U}),
-    auto = %true,
-    shortcut = {
+    auto = %true
+  ),
+  𝐗: %Element(
+    $Objects(
+      U = {U},
+      𝓒 = {𝓒}
+    ),
+    auto = %true
+  )
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = 'id',
+    sub = 𝐗
+  )],
+  definition = [%structuralCases(
+    𝓒,
+    $Categories(U = {U}),
+    [{
       constructor = $Categories(U = {U}).category,
       parameters = #(
         O: %Set,
@@ -139,17 +155,8 @@ $identity(
           ),
           %equals(f, g)
         ))
-      )
-    }
-  ),
-  𝐗: %Element(
-    O,
-    auto = %true
-  )
-): %ExplicitOperator {
-  display = [$SubSup(
-    body = 'id',
-    sub = 𝐗
-  )],
-  definition = [i[𝐗]]
+      ),
+      value = i[𝐗]
+    }]
+  )]
 }

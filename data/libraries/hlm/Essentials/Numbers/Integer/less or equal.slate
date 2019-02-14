@@ -6,28 +6,8 @@
  * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.leb (but uses a different encoding)
  */
 $"less or equal"(
-  a: %Element(
-    $Integers,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_a: %Element($../Natural/"Natural numbers"),
-        m_a: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  ),
-  b: %Element(
-    %previous,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_b: %Element($../Natural/"Natural numbers"),
-        m_b: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  )
+  a: %Element($Integers),
+  b: %Element(%previous)
 ): %Predicate {
   display = [
     $Relation(
@@ -40,15 +20,39 @@ $"less or equal"(
     )
   ],
   definition = [
-    $../Natural/"less or equal"(
-      m = {$../Natural/sum(
-        m = {n_a},
-        n = {m_b}
-      )},
-      n = {$../Natural/sum(
-        m = {n_b},
-        n = {m_a}
-      )}
+    %structural(
+      b,
+      $Integers,
+      [{
+        constructor = $Integers.difference,
+        parameters = #(
+          n_b: %Element($../Natural/"Natural numbers"),
+          m_b: %Element(%previous)
+        ),
+        value = %structural(
+          a,
+          $Integers,
+          [{
+            constructor = $Integers.difference,
+            parameters = #(
+              n_a: %Element($../Natural/"Natural numbers"),
+              m_a: %Element(%previous)
+            ),
+            value = $../Natural/"less or equal"(
+              m = {$../Natural/sum(
+                m = {n_a},
+                n = {m_b}
+              )},
+              n = {$../Natural/sum(
+                m = {n_b},
+                n = {m_a}
+              )}
+            ),
+            rewrite = %true
+          }]
+        ),
+        rewrite = %true
+      }]
     ),
     %exists(
       #(x: %Element($../Natural/"Natural numbers")),

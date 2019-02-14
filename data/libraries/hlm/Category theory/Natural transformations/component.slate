@@ -22,7 +22,24 @@ $component(
     %previous,
     auto = %true
   ),
-  η: %Element(
+  η: %Element($"Infranatural transformations"(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓},
+    F = {F},
+    G = {G}
+  )),
+  𝐗: %Element($../Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  ))
+): %ExplicitOperator {
+  display = [$SubSup(
+    body = η,
+    sub = 𝐗
+  )],
+  definition = [%structuralCases(
+    η,
     $"Infranatural transformations"(
       U = {U},
       𝓒 = {𝓒},
@@ -30,7 +47,7 @@ $component(
       F = {F},
       G = {G}
     ),
-    shortcut = {
+    [{
       constructor = $"Infranatural transformations"(
           U = {U},
           𝓒 = {𝓒},
@@ -61,17 +78,8 @@ $component(
             𝐗 = {𝐗}
           )}
         )))
-      ))
-    }
-  ),
-  𝐗: %Element($../Objects(
-    U = {U},
-    𝓒 = {𝓒}
-  ))
-): %ExplicitOperator {
-  display = [$SubSup(
-    body = η,
-    sub = 𝐗
-  )],
-  definition = [n[𝐗]]
+      )),
+      value = n[𝐗]
+    }]
+  )]
 }

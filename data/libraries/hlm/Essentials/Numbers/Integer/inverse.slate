@@ -3,24 +3,26 @@
 /**
  * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.opp (but uses a different encoding)
  */
-$inverse(a: %Element(
-  $Integers,
-  shortcut = {
-    constructor = $Integers.difference,
-    parameters = #(
-      n_a: %Element($../Natural/"Natural numbers"),
-      m_a: %Element(%previous)
-    )
-  }
-)): %ExplicitOperator {
+$inverse(a: %Element($Integers)): %ExplicitOperator {
   display = [$PrefixUnaryOperator(
     symbol = '−',
     operand = a,
     minParenLevel = 1,
     maxParenLevel = 1
   )],
-  definition = [$Integers.difference(
-      n = {m_a},
-      m = {n_a}
+  definition = [%structuralCases(
+    a,
+    $Integers,
+    [{
+      constructor = $Integers.difference,
+      parameters = #(
+        n_a: %Element($../Natural/"Natural numbers"),
+        m_a: %Element(%previous)
+      ),
+      value = $Integers.difference(
+          n = {m_a},
+          m = {n_a}
+      )
+    }]
   )]
 }

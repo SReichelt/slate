@@ -1,26 +1,8 @@
 %../../../../logics/hlm%
 
 $Isomorphisms(
-  𝐌: %Element(
-    $Magmas,
-    shortcut = {
-      constructor = $Magmas.magma,
-      parameters = #(
-        M: %Set,
-        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
-      )
-    }
-  ),
-  𝐍: %Element(
-    %previous,
-    shortcut = {
-      constructor = $Magmas.magma,
-      parameters = #(
-        N: %Set,
-        ⋆: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {N}))
-      )
-    }
-  )
+  𝐌: %Element($Magmas),
+  𝐍: %Element(%previous)
 ): %SetOperator {
   display = [$Function(
     function = 'Iso',
@@ -43,49 +25,43 @@ $Isomorphisms(
         𝐍 = {𝐍}
       ))),
       $../../Essentials/Functions/bijective(
-        X = {M},
-        Y = {N},
+        X = {$Elements(𝐌 = {𝐌})},
+        Y = {$Elements(𝐌 = {𝐍})},
         f = {φ}
       )
     ),
     %subset(
       #(f: %Element($../../Essentials/Functions/Bijections(
-        X = {M},
-        Y = {N}
+        X = {$Elements(𝐌 = {𝐌})},
+        Y = {$Elements(𝐌 = {𝐍})}
       ))),
       %forall(
         #(
-          a: %Element(M),
+          a: %Element($Elements(𝐌 = {𝐌})),
           b: %Element(%previous)
         ),
         %equals(
           $../../Essentials/Functions/value(
-            X = {M},
-            Y = {N},
+            X = {$Elements(𝐌 = {𝐌})},
+            Y = {$Elements(𝐌 = {𝐍})},
             f = {f},
-            x = {$../../Essentials/Functions/Operations/value(
-              X = {M},
-              Y = {M},
-              Z = {M},
-              ∗ = {∗},
-              x = {a},
-              y = {b}
+            x = {$operation(
+              𝐌 = {𝐌},
+              a = {a},
+              b = {b}
             )}
           ),
-          $../../Essentials/Functions/Operations/value(
-            X = {N},
-            Y = {N},
-            Z = {N},
-            ∗ = {⋆},
-            x = {$../../Essentials/Functions/value(
-              X = {M},
-              Y = {N},
+          $operation(
+            𝐌 = {𝐍},
+            a = {$../../Essentials/Functions/value(
+              X = {$Elements(𝐌 = {𝐌})},
+              Y = {$Elements(𝐌 = {𝐍})},
               f = {f},
               x = {a}
             )},
-            y = {$../../Essentials/Functions/value(
-              X = {M},
-              Y = {N},
+            b = {$../../Essentials/Functions/value(
+              X = {$Elements(𝐌 = {𝐌})},
+              Y = {$Elements(𝐌 = {𝐍})},
               f = {f},
               x = {b}
             )}

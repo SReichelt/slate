@@ -1,34 +1,8 @@
 %../../../../../logics/hlm%
 
 $Homomorphisms(
-  𝐱: %Element(
-    $"Ordinal numbers",
-    shortcut = {
-      constructor = $"Ordinal numbers"."order type",
-      parameters = #(
-        X: %Set,
-        ⪯: %Element($../../Relations/Endorelations(S = {X})),
-        _1: %Constraint($../../Relations/"well-order"(
-          S = {X},
-          ≺ = {⪯}
-        ))
-      )
-    }
-  ),
-  𝐲: %Element(
-    %previous,
-    shortcut = {
-      constructor = $"Ordinal numbers"."order type",
-      parameters = #(
-        Y: %Set,
-        ⊑: %Element($../../Relations/Endorelations(S = {Y})),
-        _1: %Constraint($../../Relations/"well-order"(
-          S = {Y},
-          ≺ = {⊑}
-        ))
-      )
-    }
-  )
+  𝐱: %Element($"Ordinal numbers"),
+  𝐲: %Element(%previous)
 ): %SetOperator {
   display = [$Function(
     function = 'Hom',
@@ -46,37 +20,33 @@ $Homomorphisms(
   },
   definition = [%subset(
     #(f: %Element($../../Functions/Functions(
-      X = {X},
-      Y = {Y}
+      X = {$Elements(𝐱 = {𝐱})},
+      Y = {$Elements(𝐱 = {𝐲})}
     ))),
     %forall(
       #(
-        a: %Element(X),
+        a: %Element($Elements(𝐱 = {𝐱})),
         b: %Element(%previous),
-        _1: %Constraint($../../Relations/related(
-          S = {X},
-          T = {X},
-          s = {a},
-          t = {b},
-          ≺ = {⪯}
+        _1: %Constraint($before(
+          𝐱 = {𝐱},
+          a = {a},
+          b = {b}
         ))
       ),
-      $../../Relations/related(
-        S = {Y},
-        T = {Y},
-        s = {$../../Functions/value(
-          X = {X},
-          Y = {Y},
+      $before(
+        𝐱 = {𝐲},
+        a = {$../../Functions/value(
+          X = {$Elements(𝐱 = {𝐱})},
+          Y = {$Elements(𝐱 = {𝐲})},
           f = {f},
           x = {a}
         )},
-        t = {$../../Functions/value(
-          X = {X},
-          Y = {Y},
+        b = {$../../Functions/value(
+          X = {$Elements(𝐱 = {𝐱})},
+          Y = {$Elements(𝐱 = {𝐲})},
           f = {f},
           x = {b}
-        )},
-        ≺ = {⊑}
+        )}
       )
     )
   )]

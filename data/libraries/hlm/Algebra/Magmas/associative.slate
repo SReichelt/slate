@@ -1,21 +1,23 @@
 %../../../../logics/hlm%
 
-$associative(𝐌: %Element(
-  $Magmas,
-  shortcut = {
-    constructor = $Magmas.magma,
-    parameters = #(
-      M: %Set,
-      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
-    )
-  }
-)): %Predicate {
+$associative(𝐌: %Element($Magmas)): %Predicate {
   display = [$Property(
     operand = 𝐌,
     property = 'associative'
   )],
-  definition = [$../../Essentials/Functions/Operations/associative(
-    X = {M},
-    ∗ = {∗}
+  definition = [%structural(
+    𝐌,
+    $Magmas,
+    [{
+      constructor = $Magmas.magma,
+      parameters = #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+      ),
+      value = $../../Essentials/Functions/Operations/associative(
+        X = {M},
+        ∗ = {∗}
+      )
+    }]
   )]
 }

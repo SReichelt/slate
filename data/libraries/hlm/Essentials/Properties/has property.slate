@@ -2,18 +2,20 @@
 
 $"has property"(
   S: %Set(auto = %true),
-  p: %Element(
-    $Properties(S = {S}),
-    shortcut = {
-      constructor = $Properties(S = {S}).property,
-      parameters = #(P: %Subset(S))
-    }
-  ),
+  p: %Element($Properties(S = {S})),
   s: %Element(S)
 ): %Predicate {
   display = [$TextualRelation(
     symbol = %neg('is', 'is not'),
     operands = [s, p]
   )],
-  definition = [%in(s, P)]
+  definition = [%structural(
+    p,
+    $Properties(S = {S}),
+    [{
+      constructor = $Properties(S = {S}).property,
+      parameters = #(P: %Subset(S)),
+      value = %in(s, P)
+    }]
+  )]
 }

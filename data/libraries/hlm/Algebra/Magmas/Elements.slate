@@ -3,16 +3,7 @@
 /**
  * @remarks This definition retrieves a representative set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation.
  */
-$Elements(𝐌: %Element(
-  $Magmas,
-  shortcut = {
-    constructor = $Magmas.magma,
-    parameters = #(
-      M: %Set,
-      ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
-    )
-  }
-)): %SetOperator {
+$Elements(𝐌: %Element($Magmas)): %SetOperator {
   display = [$Function(
     function = 'El',
     arguments = [𝐌]
@@ -24,5 +15,16 @@ $Elements(𝐌: %Element(
       set = 𝐌
     )]
   },
-  definition = [M]
+  definition = [%setStructuralCases(
+    𝐌,
+    $Magmas,
+    [{
+      constructor = $Magmas.magma,
+      parameters = #(
+        M: %Set,
+        ∗: %Element($../../Essentials/Functions/Operations/"Inner operations"(X = {M}))
+      ),
+      value = M
+    }]
+  )]
 }

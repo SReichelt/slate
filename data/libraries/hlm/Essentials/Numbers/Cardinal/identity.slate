@@ -2,14 +2,11 @@
 
 $identity(𝐱: %Element(
   $"Cardinal numbers",
-  shortcut = {
-    constructor = $"Cardinal numbers".cardinality,
-    parameters = #(X: %Set)
-  }
+  auto = %true
 )): %ExplicitOperator {
   display = [$SubSup(
     body = 'id',
     sub = 𝐱
   )],
-  definition = [$../../Functions/identity(X = {X})]
+  definition = [$../../Functions/identity(X = {$Elements(𝐱 = {𝐱})})]
 }

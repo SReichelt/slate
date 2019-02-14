@@ -7,9 +7,20 @@ $"relation transform"(
     X = {X},
     Y = {Y}
   )),
-  ≺: %Element(
-    $../../Essentials/Relations/Endorelations(S = {X}),
-    shortcut = {
+  ≺: %Element($../../Essentials/Relations/Endorelations(S = {X}))
+): %ExplicitOperator {
+  display = [$Function(
+    function = φ,
+    arguments = [≺],
+    style = '[]'
+  )],
+  definition = [%structuralCases(
+    ≺,
+    $../../Essentials/Relations/Relations(
+      S = {X},
+      T = {X}
+    ),
+    [{
       constructor = $../../Essentials/Relations/Relations(
           S = {X},
           T = {X}
@@ -17,49 +28,43 @@ $"relation transform"(
       parameters = #(R: %Subset($../../Essentials/Sets/"Cartesian product"(
         S = {X},
         T = {X}
-      )))
-    }
-  )
-): %ExplicitOperator {
-  display = [$Function(
-    function = φ,
-    arguments = [≺],
-    style = '[]'
-  )],
-  definition = [$../../Essentials/Relations/Relations(
-      S = {Y},
-      T = {Y}
-    ).relation(R = {%extendedSubset(
-      #(r: %Element(
-        R,
-        shortcut = {
-          constructor = $../../Essentials/Sets/"Cartesian product"(
+      ))),
+      value = $../../Essentials/Relations/Relations(
+          S = {Y},
+          T = {Y}
+        ).relation(R = {%extendedSubset(
+          #(r: %Element(
+            R,
+            shortcut = {
+              constructor = $../../Essentials/Sets/"Cartesian product"(
+                  S = {X},
+                  T = {X}
+                ).pair,
+              parameters = #(
+                s: %Element(X),
+                t: %Element(X)
+              ),
+              override = %true
+            }
+          )),
+          $../../Essentials/Sets/"Cartesian product"(
               S = {X},
               T = {X}
-            ).pair,
-          parameters = #(
-            s: %Element(X),
-            t: %Element(X)
-          ),
-          override = %true
-        }
-      )),
-      $../../Essentials/Sets/"Cartesian product"(
-          S = {X},
-          T = {X}
-        ).pair(
-          s = {$../../Essentials/Functions/value(
-            X = {X},
-            Y = {Y},
-            f = {φ},
-            x = {s}
-          )},
-          t = {$../../Essentials/Functions/value(
-            X = {X},
-            Y = {Y},
-            f = {φ},
-            x = {t}
-          )}
-      )
-  )})]
+            ).pair(
+              s = {$../../Essentials/Functions/value(
+                X = {X},
+                Y = {Y},
+                f = {φ},
+                x = {s}
+              )},
+              t = {$../../Essentials/Functions/value(
+                X = {X},
+                Y = {Y},
+                f = {φ},
+                x = {t}
+              )}
+          )
+      )})
+    }]
+  )]
 }

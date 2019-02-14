@@ -8,8 +8,34 @@ $Morphisms(
   U: %Symbol(auto = %true),
   𝓒: %Element(
     $Categories(U = {U}),
-    auto = %true,
-    shortcut = {
+    auto = %true
+  ),
+  𝐗: %Element($Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  )),
+  𝐘: %Element(%previous)
+): %SetOperator {
+  display = [$FunctionOperator(
+    symbol = '→',
+    operands = [𝐗, 𝐘],
+    minParenLevel = -1
+  )],
+  definitionDisplay = {
+    parameter = #(F: %Expr),
+    display = [$FunctionDefinition(
+      function = F,
+      symbol = '→',
+      operands = [𝐗, 𝐘]
+    )],
+    singularName = 'morphism',
+    pluralName = 'morphisms',
+    nameOptional = %true
+  },
+  definition = [%setStructuralCases(
+    𝓒,
+    $Categories(U = {U}),
+    [{
       constructor = $Categories(U = {U}).category,
       parameters = #(
         O: %Set,
@@ -143,27 +169,8 @@ $Morphisms(
           ),
           %equals(f, g)
         ))
-      )
-    }
-  ),
-  𝐗: %Element(O),
-  𝐘: %Element(%previous)
-): %SetOperator {
-  display = [$FunctionOperator(
-    symbol = '→',
-    operands = [𝐗, 𝐘],
-    minParenLevel = -1
-  )],
-  definitionDisplay = {
-    parameter = #(F: %Expr),
-    display = [$FunctionDefinition(
-      function = F,
-      symbol = '→',
-      operands = [𝐗, 𝐘]
-    )],
-    singularName = 'morphism',
-    pluralName = 'morphisms',
-    nameOptional = %true
-  },
-  definition = [M[𝐗,𝐘]]
+      ),
+      value = M[𝐗,𝐘]
+    }]
+  )]
 }

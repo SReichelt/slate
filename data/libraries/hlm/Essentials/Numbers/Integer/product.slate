@@ -6,28 +6,8 @@
  * @references * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul (but uses a different encoding)
  */
 $product(
-  a: %Element(
-    $Integers,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_a: %Element($../Natural/"Natural numbers"),
-        m_a: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  ),
-  b: %Element(
-    %previous,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_b: %Element($../Natural/"Natural numbers"),
-        m_b: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  )
+  a: %Element($Integers),
+  b: %Element(%previous)
 ): %ExplicitOperator {
   display = [$Operator(
     symbol = '⋅',
@@ -36,26 +16,50 @@ $product(
     minParenLevel = 2,
     maxParenLevel = 2
   )],
-  definition = [$Integers.difference(
-      n = {$../Natural/sum(
-        m = {$../Natural/product(
-          m = {n_a},
-          n = {n_b}
-        )},
-        n = {$../Natural/product(
-          m = {m_a},
-          n = {m_b}
-        )}
-      )},
-      m = {$../Natural/sum(
-        m = {$../Natural/product(
-          m = {n_a},
-          n = {m_b}
-        )},
-        n = {$../Natural/product(
-          m = {m_a},
-          n = {n_b}
-        )}
-      )}
+  definition = [%structuralCases(
+    b,
+    $Integers,
+    [{
+      constructor = $Integers.difference,
+      parameters = #(
+        n_b: %Element($../Natural/"Natural numbers"),
+        m_b: %Element(%previous)
+      ),
+      value = %structuralCases(
+        a,
+        $Integers,
+        [{
+          constructor = $Integers.difference,
+          parameters = #(
+            n_a: %Element($../Natural/"Natural numbers"),
+            m_a: %Element(%previous)
+          ),
+          value = $Integers.difference(
+              n = {$../Natural/sum(
+                m = {$../Natural/product(
+                  m = {n_a},
+                  n = {n_b}
+                )},
+                n = {$../Natural/product(
+                  m = {m_a},
+                  n = {m_b}
+                )}
+              )},
+              m = {$../Natural/sum(
+                m = {$../Natural/product(
+                  m = {n_a},
+                  n = {m_b}
+                )},
+                n = {$../Natural/product(
+                  m = {m_a},
+                  n = {n_b}
+                )}
+              )}
+          ),
+          rewrite = %true
+        }]
+      ),
+      rewrite = %true
+    }]
   )]
 }

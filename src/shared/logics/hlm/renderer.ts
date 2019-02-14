@@ -39,6 +39,7 @@ interface PropertyInfo {
 }
 
 interface ExtractedStructuralCase {
+  structuralCases?: FmtHLM.ObjectContents_StructuralCase[];
   parameters?: Fmt.Parameter[];
   definitionArguments?: CachedPromise<Fmt.ArgumentList>;
   definitions: Fmt.Expression[];
@@ -88,7 +89,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else {
         if (contents instanceof FmtHLM.ObjectContents_SetOperator || contents instanceof FmtHLM.ObjectContents_ExplicitOperator || contents instanceof FmtHLM.ObjectContents_ImplicitOperator || contents instanceof FmtHLM.ObjectContents_Predicate) {
           cases = this.extractStructuralCases(contents.definition);
-          hasCases = cases.length > 1;
+          hasCases = cases.length > 0 && cases[0].definitionArguments !== undefined;
         }
         let colon = hasCases ? '' : ':';
         if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
@@ -1364,7 +1365,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (includeExtras) {
       this.addExtraDefinitionContents(paragraphs);
     }
-    this.addDefinitionProofs(paragraphs);
+    this.addDefinitionProofs(cases, paragraphs);
   }
 
   private renderDefinitionContents(definitionRef: Display.RenderedExpression, cases: ExtractedStructuralCase[] | undefined): Display.RenderedExpression | undefined {
@@ -1443,12 +1444,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               && currentCaseDefinition.term instanceof Fmt.VariableRefExpression) {
             let currentParameter = currentCaseDefinition.term.variable;
             let currentParameterIndex = definition.parameters.indexOf(currentParameter);
-            if (currentParameterIndex >= 0) {
+            let currentParameterType = currentParameter.type.expression;
+            if (currentParameterIndex >= 0 && currentParameterType instanceof FmtHLM.MetaRefExpression_Element && !currentParameterType.auto) {
               let construction = currentCaseDefinition.construction;
+              let previousStructuralCases = currentCase.structuralCases || [];
               let previousParameters = currentCase.parameters || [];
               let currentArgumentsPromise = currentCase.definitionArguments || CachedPromise.resolve(this.utils.getParameterArguments(definition.parameters));
               let otherDefinitions = currentCase.definitions.slice(1);
               for (let structuralCase of currentCaseDefinition.cases) {
+                let caseStructuralCases = [structuralCase, ...previousStructuralCases];
                 let caseParameters = previousParameters.slice();
                 if (structuralCase.parameters) {
                   caseParameters.unshift(...structuralCase.parameters);
@@ -1467,6 +1471,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 });
                 let caseDefinitions = [structuralCase.value, ...otherDefinitions];
                 let extractedCase: ExtractedStructuralCase = {
+                  structuralCases: caseStructuralCases,
                   parameters: caseParameters,
                   definitionArguments: caseArgumentsPromise,
                   definitions: caseDefinitions
@@ -1508,7 +1513,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (rows.length) {
             rows.push([]);
           }
-          first = false;
         } else {
           leftItem = this.renderTemplate(type + 'Relation', {
                                            'left': new Display.EmptyExpression,
@@ -1517,10 +1521,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         let rightItem = renderRightSide(definition);
         let row = [leftItem, rightItem];
-        if (currentCase.parameters) {
+        if (first && currentCase.parameters) {
           this.addCaseParameters(currentCase.parameters, row);
         }
         rows.push(row);
+        first = false;
       }
     }
     let result = new Display.TableExpression(rows);
@@ -1561,7 +1566,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderMultiDefinitions(type, cases, renderLeftSide, renderRightSide);
   }
 
-  private addDefinitionProofs(paragraphs: Display.RenderedExpression[]): void {
+  private addDefinitionProofs(cases: ExtractedStructuralCase[] | undefined, paragraphs: Display.RenderedExpression[]): void {
     let definition = this.definition;
     let contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
@@ -1586,39 +1591,43 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.addProof(contents.wellDefinednessProof, 'Well-definedness', undefined, paragraphs);
     }
-    this.addShortcutProofs(paragraphs);
+    if (cases) {
+      this.addStructuralCaseProofs(cases, paragraphs);
+    }
   }
 
-  private addShortcutProofs(paragraphs: Display.RenderedExpression[]): void {
-    // TODO after the shortcut redesign, we can display actual proofs here
-    let hasNonIsomorphicShortcutPromise = CachedPromise.resolve(false);
-    for (let param of this.definition.parameters) {
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && type.shortcut._constructor instanceof Fmt.DefinitionRefExpression) {
-        let constructorRef = type.shortcut._constructor;
-        let constructionPromise = this.utils.getOuterDefinition(constructorRef);
-        hasNonIsomorphicShortcutPromise = hasNonIsomorphicShortcutPromise.then((hasNonIsomorphicShortcut: boolean) => {
-          if (hasNonIsomorphicShortcut) {
-            return true;
+  private addStructuralCaseProofs(cases: ExtractedStructuralCase[], paragraphs: Display.RenderedExpression[]): void {
+    let nonIsomorphicCasesPromise: CachedPromise<FmtHLM.ObjectContents_StructuralCase[]> = CachedPromise.resolve([]);
+    for (let currentCase of cases) {
+      if (currentCase.structuralCases) {
+        for (let structuralCase of currentCase.structuralCases) {
+          let currentStructuralCase = structuralCase;
+          let constructorRef = currentStructuralCase._constructor;
+          if (constructorRef instanceof Fmt.DefinitionRefExpression) {
+            let currentConstructorRef = constructorRef;
+            let constructionPromise = this.utils.getOuterDefinition(constructorRef);
+            nonIsomorphicCasesPromise = nonIsomorphicCasesPromise.then((previousCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+              return constructionPromise.then((construction: Fmt.Definition) => {
+                let constructor = construction.innerDefinitions.getDefinition(currentConstructorRef.path.name);
+                if (constructor.contents instanceof FmtHLM.ObjectContents_Constructor && constructor.contents.equalityDefinition) {
+                  if (!(constructor.contents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
+                    return [...previousCases, currentStructuralCase];
+                  }
+                }
+                return previousCases;
+              });
+            });
           }
-          return constructionPromise.then((construction: Fmt.Definition) => {
-            let constructor = construction.innerDefinitions.getDefinition(constructorRef.path.name);
-            if (constructor.contents instanceof FmtHLM.ObjectContents_Constructor && constructor.contents.equalityDefinition) {
-              if (!(constructor.contents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
-                return true;
-              }
-            }
-            return false;
-          });
-        });
+        }
       }
     }
-    let immediateResult = hasNonIsomorphicShortcutPromise.getImmediateResult();
-    if (immediateResult !== false) {
-      let proofPromise = hasNonIsomorphicShortcutPromise.then((hasNonIsomorphicShortcut: boolean) => {
-        if (hasNonIsomorphicShortcut) {
+    let immediateResult = nonIsomorphicCasesPromise.getImmediateResult();
+    if (!immediateResult || immediateResult.length) {
+      let proofPromise = nonIsomorphicCasesPromise.then((nonIsomorphicCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+        if (nonIsomorphicCases.length) {
           let subParagraphs: Display.RenderedExpression[] = [];
-          this.addNoProofPlaceholder('Well-definedness', undefined, undefined, subParagraphs);
+          let proofs = nonIsomorphicCases.map((nonIsomorphicCase) => nonIsomorphicCase.wellDefinednessProof);
+          this.addProofList(proofs, 'Well-definedness', undefined, undefined, subParagraphs);
           return new Display.ParagraphExpression(subParagraphs);
         } else {
           // TODO this results in an empty paragraph; needs to be fixed somehow
@@ -1994,24 +2003,28 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
+  private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
     if (this.includeProofs) {
-      let items = proofs.map((proof) => {
-        let subParagraphs: Display.RenderedExpression[] = [];
-        this.addProof(proof, undefined, externalGoal, subParagraphs);
-        return new Display.ParagraphExpression(subParagraphs);
-      });
-      let list = new Display.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '1.');
-      paragraphs.push(list);
+      if (proofs.every((proof) => proof === undefined)) {
+        this.addProof(undefined, heading, externalGoal, paragraphs);
+      } else {
+        if (heading) {
+          paragraphs.push(this.renderSubHeading(heading));
+        }
+        let items = proofs.map((proof) => {
+          let subParagraphs: Display.RenderedExpression[] = [];
+          this.addProof(proof, undefined, externalGoal, subParagraphs);
+          return new Display.ParagraphExpression(subParagraphs);
+        });
+        let list = new Display.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '1.');
+        paragraphs.push(list);
+      }
     }
   }
 
   private addEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, symbol: string, paragraphs: Display.RenderedExpression[]): void {
     if (this.includeProofs) {
       if (proofs && proofs.length) {
-        if (heading) {
-          paragraphs.push(this.renderSubHeading(heading));
-        }
         let labels: string[] = [];
         for (let proof of proofs) {
           let label = '?';
@@ -2020,7 +2033,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
           labels.push(label);
         }
-        this.addProofList(proofs, labels, undefined, paragraphs);
+        this.addProofList(proofs, heading, labels, undefined, paragraphs);
       } else {
         this.addNoProofPlaceholder(heading, undefined, undefined, paragraphs);
       }
@@ -2028,7 +2041,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
-    this.addProofList(proofs, labels, externalGoal, paragraphs);
+    this.addProofList(proofs, undefined, labels, externalGoal, paragraphs);
   }
 
   private addProofSteps(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression | undefined, replacementParameters: Fmt.ParameterList | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {

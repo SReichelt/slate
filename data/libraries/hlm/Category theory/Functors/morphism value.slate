@@ -10,13 +10,35 @@ $"morphism value"(
     %previous,
     auto = %true
   ),
-  F: %Element(
+  F: %Element($Functors(
+    U = {U},
+    𝓒 = {𝓒},
+    𝓓 = {𝓓}
+  )),
+  𝐘: %Element($../Objects(
+    U = {U},
+    𝓒 = {𝓒}
+  )),
+  𝐙: %Element(%previous),
+  f: %Element($../Morphisms(
+    U = {U},
+    𝓒 = {𝓒},
+    𝐗 = {𝐘},
+    𝐘 = {𝐙}
+  ))
+): %ExplicitOperator {
+  display = [$Function(
+    function = F,
+    arguments = [f]
+  )],
+  definition = [%structuralCases(
+    F,
     $Functors(
       U = {U},
       𝓒 = {𝓒},
       𝓓 = {𝓓}
     ),
-    shortcut = {
+    [{
       constructor = $Functors(
           U = {U},
           𝓒 = {𝓒},
@@ -124,24 +146,8 @@ $"morphism value"(
             )
           )
         ))
-      )
-    }
-  ),
-  𝐘: %Element($../Objects(
-    U = {U},
-    𝓒 = {𝓒}
-  )),
-  𝐙: %Element(%previous),
-  f: %Element($../Morphisms(
-    U = {U},
-    𝓒 = {𝓒},
-    𝐗 = {𝐘},
-    𝐘 = {𝐙}
-  ))
-): %ExplicitOperator {
-  display = [$Function(
-    function = F,
-    arguments = [f]
-  )],
-  definition = [d[𝐘,𝐙,f]]
+      ),
+      value = d[𝐘,𝐙,f]
+    }]
+  )]
 }

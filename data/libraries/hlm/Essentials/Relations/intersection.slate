@@ -6,25 +6,24 @@
 $intersection(
   S: %Set(auto = %true),
   T: %Set(auto = %true),
-  ≺: %Element(
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  )),
+  ⊂: %Element(%previous)
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '∩',
+    operands = [≺, ⊂],
+    space = ' '
+  )],
+  definition = [%structuralCases(
+    ⊂,
     $Relations(
       S = {S},
       T = {T}
     ),
-    shortcut = {
-      constructor = $Relations(
-          S = {S},
-          T = {T}
-        ).relation,
-      parameters = #(Q: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      )))
-    }
-  ),
-  ⊂: %Element(
-    %previous,
-    shortcut = {
+    [{
       constructor = $Relations(
           S = {S},
           T = {T}
@@ -32,24 +31,35 @@ $intersection(
       parameters = #(R: %Subset($../Sets/"Cartesian product"(
         S = {S},
         T = {T}
-      )))
-    }
-  )
-): %ExplicitOperator {
-  display = [$Operator(
-    symbol = '∩',
-    operands = [≺, ⊂],
-    space = ' '
-  )],
-  definition = [$Relations(
-      S = {S},
-      T = {T}
-    ).relation(R = {$../Sets/Intersection(
-      U = {$../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      )},
-      S = {Q},
-      T = {R}
-  )})]
+      ))),
+      value = %structuralCases(
+        ≺,
+        $Relations(
+          S = {S},
+          T = {T}
+        ),
+        [{
+          constructor = $Relations(
+              S = {S},
+              T = {T}
+            ).relation,
+          parameters = #(Q: %Subset($../Sets/"Cartesian product"(
+            S = {S},
+            T = {T}
+          ))),
+          value = $Relations(
+              S = {S},
+              T = {T}
+            ).relation(R = {$../Sets/Intersection(
+              U = {$../Sets/"Cartesian product"(
+                S = {S},
+                T = {T}
+              )},
+              S = {Q},
+              T = {R}
+          )})
+        }]
+      )
+    }]
+  )]
 }

@@ -8,9 +8,10 @@ $Cardinal: %Section {
       type = 'lemma'
     ),
     %item($"Cardinal numbers"),
+    %item($Elements),
     %item($Homomorphisms),
-    %item($identity),
     %item($Isomorphisms),
+    %item($identity),
     %item($"less or equal"),
     %item($less),
     %item($"Less or equal is a partial order"),

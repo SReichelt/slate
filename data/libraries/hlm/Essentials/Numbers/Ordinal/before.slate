@@ -1,0 +1,37 @@
+%../../../../../logics/hlm%
+
+$before(
+  𝐱: %Element(
+    $"Ordinal numbers",
+    auto = %true
+  ),
+  a: %Element($Elements(𝐱 = {𝐱})),
+  b: %Element(%previous)
+): %Predicate {
+  display = [$Relation(
+    symbol = '≤',
+    operands = [a, b]
+  )],
+  definition = [%structural(
+    𝐱,
+    $"Ordinal numbers",
+    [{
+      constructor = $"Ordinal numbers"."order type",
+      parameters = #(
+        X: %Set,
+        ⪯: %Element($../../Relations/Endorelations(S = {X})),
+        _1: %Constraint($../../Relations/"well-order"(
+          S = {X},
+          ≺ = {⪯}
+        ))
+      ),
+      value = $../../Relations/related(
+        S = {X},
+        T = {X},
+        s = {a},
+        t = {b},
+        ≺ = {⪯}
+      )
+    }]
+  )]
+}

@@ -1,46 +1,8 @@
 %../../../../../logics/hlm%
 
 $"less or equal"(
-  a: %Element(
-    $"Real numbers",
-    shortcut = {
-      $"Real numbers".class,
-      #(
-        r_a: %Element(
-          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-          shortcut = {
-            $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-            #(n: %Binding(
-              $../Natural/"Natural numbers",
-              #(x: %Element($../Rational/"Rational numbers"))
-            )),
-            override = %true
-          }
-        ),
-        _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
-      )
-    }
-  ),
-  b: %Element(
-    %previous,
-    shortcut = {
-      $"Real numbers".class,
-      #(
-        r_b: %Element(
-          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-          shortcut = {
-            $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-            #(n: %Binding(
-              $../Natural/"Natural numbers",
-              #(y: %Element($../Rational/"Rational numbers"))
-            )),
-            override = %true
-          }
-        ),
-        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
-      )
-    }
-  )
+  a: %Element($"Real numbers"),
+  b: %Element(%previous)
 ): %Predicate {
   display = [
     $Relation(
@@ -52,20 +14,62 @@ $"less or equal"(
       operands = [b, a]
     )
   ],
-  definition = [%forall(
-    #(ε: %Element($../Rational/Subsets/"Positive numbers")),
-    %exists(
-      #(n: %Element($../Natural/"Natural numbers")),
-      formula = %forall(
-        #(m: %Element($../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
-        $../Rational/"less or equal"(
-          a = {x[m]},
-          b = {$../Rational/sum(
-            a = {y[m]},
-            b = {ε}
-          )}
-        )
+  definition = [%structural(
+    b,
+    $"Real numbers",
+    [{
+      constructor = $"Real numbers".class,
+      parameters = #(
+        r_b: %Element(
+          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
+          shortcut = {
+            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
+            parameters = #(n: %Binding(
+              $../Natural/"Natural numbers",
+              #(y: %Element($../Rational/"Rational numbers"))
+            )),
+            override = %true
+          }
+        ),
+        _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
+      ),
+      value = %structural(
+        a,
+        $"Real numbers",
+        [{
+          constructor = $"Real numbers".class,
+          parameters = #(
+            r_a: %Element(
+              $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
+              shortcut = {
+                constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
+                parameters = #(n: %Binding(
+                  $../Natural/"Natural numbers",
+                  #(x: %Element($../Rational/"Rational numbers"))
+                )),
+                override = %true
+              }
+            ),
+            _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
+          ),
+          value = %forall(
+            #(ε: %Element($../Rational/Subsets/"Positive numbers")),
+            %exists(
+              #(n: %Element($../Natural/"Natural numbers")),
+              formula = %forall(
+                #(m: %Element($../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
+                $../Rational/"less or equal"(
+                  a = {x[m]},
+                  b = {$../Rational/sum(
+                    a = {y[m]},
+                    b = {ε}
+                  )}
+                )
+              )
+            )
+          )
+        }]
       )
-    )
+    }]
   )]
 }

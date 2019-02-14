@@ -26,7 +26,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getParameterArgument(param: Fmt.Parameter, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.Argument | undefined {
+  getParameterArgument(param: Fmt.Parameter, targetParam?: Fmt.Parameter, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.Argument | undefined {
     let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol || type instanceof FmtHLM.MetaRefExpression_Binding) {
       let arg = new Fmt.Argument;
@@ -35,7 +35,7 @@ export class HLMUtils extends GenericUtils {
       if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = new FmtHLM.ObjectContents_BindingArg;
         let bindingArgParam = new Fmt.Parameter;
-        bindingArgParam.name = param.name;
+        bindingArgParam.name = targetParam ? targetParam.name : param.name;
         let bindingArgParamType = new Fmt.Type;
         let bindingArgParamTypeExpr = new FmtHLM.MetaRefExpression_Element;
         bindingArgParamTypeExpr._set = this.substitutePath(type._set, targetPath);
@@ -45,10 +45,11 @@ export class HLMUtils extends GenericUtils {
         bindingArgParam.optional = false;
         bindingArgParam.list = false;
         bindingArg.parameter = bindingArgParam;
+        let targetInnerParameters = targetParam ? (targetParam.type.expression as FmtHLM.MetaRefExpression_Binding).parameters : undefined;
         let indexExpr = new Fmt.VariableRefExpression;
         indexExpr.variable = bindingArgParam;
         let newIndices = indices ? indices.concat([indexExpr]) : [indexExpr];
-        bindingArg.arguments = this.getParameterArguments(type.parameters, targetPath, newIndices);
+        bindingArg.arguments = this.getParameterArguments(type.parameters, targetInnerParameters, targetPath, newIndices);
         bindingArg.toCompoundExpression(argValue);
       } else {
         let varExpr = new Fmt.VariableRefExpression;
@@ -78,10 +79,12 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(parameters: Fmt.ParameterList, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.ArgumentList {
+  getParameterArguments(parameters: Fmt.ParameterList, targetParameters?: Fmt.ParameterList, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.ArgumentList {
     let result = Object.create(Fmt.ArgumentList.prototype);
-    for (let param of parameters) {
-      let arg = this.getParameterArgument(param, targetPath, indices);
+    for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
+      let param = parameters[paramIndex];
+      let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
+      let arg = this.getParameterArgument(param, targetParam, targetPath, indices);
       if (arg) {
         result.push(arg);
       }
@@ -106,7 +109,7 @@ export class HLMUtils extends GenericUtils {
         let resultPath = new Fmt.Path;
         resultPath.parentPath = constructionPath;
         resultPath.name = constructorPath.name;
-        resultPath.arguments = this.getParameterArguments(constructorDefinition.parameters, constructionPath.parentPath);
+        resultPath.arguments = this.getParameterArguments(constructorDefinition.parameters, structuralCase.parameters, constructionPath.parentPath);
         let resultRef = new Fmt.DefinitionRefExpression;
         resultRef.path = resultPath;
         result = resultRef;
@@ -126,7 +129,7 @@ export class HLMUtils extends GenericUtils {
     let fullConstructionPath = new Fmt.Path;
     fullConstructionPath.parentPath = constructionPath.parentPath;
     fullConstructionPath.name = constructionPath.name;
-    fullConstructionPath.arguments = this.getParameterArguments(construction.parameters, constructionPath.parentPath);
+    fullConstructionPath.arguments = this.getParameterArguments(construction.parameters, undefined, constructionPath.parentPath);
     let resultPath = new Fmt.Path;
     resultPath.parentPath = fullConstructionPath;
     resultPath.name = constructorPath.name;

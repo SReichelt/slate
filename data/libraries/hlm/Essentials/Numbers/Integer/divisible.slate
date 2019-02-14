@@ -1,28 +1,8 @@
 %../../../../../logics/hlm%
 
 $divisible(
-  a: %Element(
-    $Subsets/"Nonzero numbers",
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_a: %Element($../Natural/"Natural numbers"),
-        m_a: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  ),
-  b: %Element(
-    $Integers,
-    shortcut = {
-      constructor = $Integers.difference,
-      parameters = #(
-        n_b: %Element($../Natural/"Natural numbers"),
-        m_b: %Element(%previous)
-      ),
-      rewrite = %true
-    }
-  )
+  a: %Element($Subsets/"Nonzero numbers"),
+  b: %Element($Integers)
 ): %Predicate {
   display = [$Relation(
     symbol = %neg('∣', '∤'),
@@ -30,15 +10,39 @@ $divisible(
     parenLevel = 1
   )],
   definition = [
-    %exists(
-      #(x: %Element($Integers)),
-      formula = %equals(
-        $product(
-          a = {a},
-          b = {x}
+    %structural(
+      b,
+      $Integers,
+      [{
+        constructor = $Integers.difference,
+        parameters = #(
+          n_b: %Element($../Natural/"Natural numbers"),
+          m_b: %Element(%previous)
         ),
-        b
-      )
+        value = %structural(
+          a,
+          $Integers,
+          [{
+            constructor = $Integers.difference,
+            parameters = #(
+              n_a: %Element($../Natural/"Natural numbers"),
+              m_a: %Element(%previous)
+            ),
+            value = %exists(
+              #(x: %Element($Integers)),
+              formula = %equals(
+                $product(
+                  a = {a},
+                  b = {x}
+                ),
+                b
+              )
+            ),
+            rewrite = %true
+          }]
+        ),
+        rewrite = %true
+      }]
     ),
     $../Natural/divisible(
       m = {$absolute(a = {a})},
