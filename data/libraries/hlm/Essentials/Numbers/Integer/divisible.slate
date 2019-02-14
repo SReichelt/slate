@@ -10,39 +10,15 @@ $divisible(
     parenLevel = 1
   )],
   definition = [
-    %structural(
-      b,
-      $Integers,
-      [{
-        constructor = $Integers.difference,
-        parameters = #(
-          n_b: %Element($../Natural/"Natural numbers"),
-          m_b: %Element(%previous)
+    %exists(
+      #(x: %Element($Integers)),
+      formula = %equals(
+        $product(
+          a = {a},
+          b = {x}
         ),
-        value = %structural(
-          a,
-          $Integers,
-          [{
-            constructor = $Integers.difference,
-            parameters = #(
-              n_a: %Element($../Natural/"Natural numbers"),
-              m_a: %Element(%previous)
-            ),
-            value = %exists(
-              #(x: %Element($Integers)),
-              formula = %equals(
-                $product(
-                  a = {a},
-                  b = {x}
-                ),
-                b
-              )
-            ),
-            rewrite = %true
-          }]
-        ),
-        rewrite = %true
-      }]
+        b
+      )
     ),
     $../Natural/divisible(
       m = {$absolute(a = {a})},
