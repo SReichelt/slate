@@ -89,16 +89,16 @@ p {
   display: inline-block;
 }
 
+div.display-math {
+  display: block;
+}
+
 .paragraph+.paragraph .display-math {
   margin-top: 1ex;
 }
 
 .display-math, .indented {
   margin-left: 2em;
-}
-
-.preview .display-math {
-  margin-left: 0;
 }
 
 .addendum {
@@ -340,11 +340,11 @@ p {
   white-space: nowrap;
 }
 
-.case-parameters {
+.table.cases>.table-row>.table-cell:not(:first-child) {
   padding-left: 1ex;
 }
 
-.table.aligned>.table-row>.table-cell>.case-parameters {
+.table.definitions>.table-row>.table-cell:nth-child(3) {
   padding-left: 1em;
 }
 

@@ -39,7 +39,7 @@ interface PropertyInfo {
 }
 
 interface ExtractedStructuralCase {
-  structuralCases?: FmtHLM.ObjectContents_StructuralCase[];
+  parameters?: Fmt.Parameter[];
   definitionArguments?: CachedPromise<Fmt.ArgumentList>;
   definitions: Fmt.Expression[];
 }
@@ -1027,7 +1027,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                           'right': constructorDisplay
                                         });
       let row = this.buildCaseRow(value, formula);
-      this.addCaseParameters([structuralCase], row);
+      if (structuralCase.parameters) {
+        this.addCaseParameters(structuralCase.parameters, row);
+      }
       return row;
     });
     return this.renderTemplate('Cases', {
@@ -1035,16 +1037,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     });
   }
 
-  private addCaseParameters(structuralCases: FmtHLM.ObjectContents_StructuralCase[], row: Display.RenderedExpression[]): void {
-    let combinedParameters: Fmt.Parameter[] = [];
-    for (let structuralCase of structuralCases) {
-      if (structuralCase.parameters) {
-        combinedParameters.push(...structuralCase.parameters);
+  private addCaseParameters(parameters: Fmt.Parameter[], row: Display.RenderedExpression[]): void {
+    if (parameters.length) {
+      let extractedConstraints: Fmt.Parameter[] = [];
+      let extractedParameters = this.extractConstraints(parameters, extractedConstraints);
+      if (!extractedParameters.length) {
+        extractedConstraints = [];
+        extractedParameters = parameters;
       }
-    }
-    if (combinedParameters.length) {
-      let parameters = this.renderParameterList(combinedParameters, false, false, false);
-      let caseParameters = new Display.ParenExpression(parameters, '()');
+      let parameterList = this.renderParameterList(extractedParameters, false, false, false);
+      if (extractedConstraints.length) {
+        let caseRow = [parameterList, new Display.TextExpression(' with suitable conditions')];
+        parameterList = new Display.RowExpression(caseRow);
+      }
+      let caseParameters = new Display.ParenExpression(parameterList, '()');
       caseParameters.styleClasses = ['case-parameters'];
       row.push(caseParameters);
     }
@@ -1439,11 +1445,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let currentParameterIndex = definition.parameters.indexOf(currentParameter);
             if (currentParameterIndex >= 0) {
               let construction = currentCaseDefinition.construction;
-              let previousCases = currentCase.structuralCases || [];
+              let previousParameters = currentCase.parameters || [];
               let currentArgumentsPromise = currentCase.definitionArguments || CachedPromise.resolve(this.utils.getParameterArguments(definition.parameters));
               let otherDefinitions = currentCase.definitions.slice(1);
               for (let structuralCase of currentCaseDefinition.cases) {
-                let caseStructuralCases = [structuralCase, ...previousCases];
+                let caseParameters = previousParameters.slice();
+                if (structuralCase.parameters) {
+                  caseParameters.unshift(...structuralCase.parameters);
+                }
                 let caseArgumentsPromise = currentArgumentsPromise.then((currentArguments: Fmt.ArgumentList) => {
                   let caseArguments: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
                   currentArguments.clone(caseArguments);
@@ -1458,7 +1467,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 });
                 let caseDefinitions = [structuralCase.value, ...otherDefinitions];
                 let extractedCase: ExtractedStructuralCase = {
-                  structuralCases: caseStructuralCases,
+                  parameters: caseParameters,
                   definitionArguments: caseArgumentsPromise,
                   definitions: caseDefinitions
                 };
@@ -1508,14 +1517,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         let rightItem = renderRightSide(definition);
         let row = [leftItem, rightItem];
-        if (currentCase.structuralCases) {
-          this.addCaseParameters(currentCase.structuralCases, row);
+        if (currentCase.parameters) {
+          this.addCaseParameters(currentCase.parameters, row);
         }
         rows.push(row);
       }
     }
     let result = new Display.TableExpression(rows);
-    result.styleClasses = ['aligned'];
+    result.styleClasses = ['aligned', 'definitions'];
     return result;
   }
 
@@ -1622,58 +1631,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addExtraDefinitionContents(paragraphs: Display.RenderedExpression[]): void {
     let definition = this.definition;
+
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
-      for (let innerDefinition of definition.innerDefinitions) {
-        let constructorContents = innerDefinition.contents;
-        if (constructorContents instanceof FmtHLM.ObjectContents_Constructor && innerDefinition.parameters.length) {
-          let equalityDefinition = constructorContents.equalityDefinition;
-          if (equalityDefinition) {
-            let parameters: Display.RenderedExpression;
-            let extractedConstraints: Fmt.Parameter[] = [];
-            let extractedLeftParameters = this.extractConstraints(equalityDefinition.leftParameters, extractedConstraints);
-            let extractedRightParameters = this.extractConstraints(equalityDefinition.rightParameters, extractedConstraints);
-            let combinedParameters = extractedLeftParameters.concat(extractedRightParameters);
-            parameters = this.renderParameterList(combinedParameters, false, true, true);
-            if (extractedConstraints.length) {
-              let row = [parameters, new Display.TextExpression(' with suitable conditions')];
-              parameters = new Display.RowExpression(row);
-            }
-            let leftReplacementParameters: ReplacementParameters = {
-              parameters: equalityDefinition.leftParameters,
-              isDefinition: false
-            };
-            let rightReplacementParameters: ReplacementParameters = {
-              parameters: equalityDefinition.rightParameters,
-              isDefinition: false
-            };
-            let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftReplacementParameters);
-            this.setSemanticLink(leftConstructor, innerDefinition);
-            let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightReplacementParameters);
-            this.setSemanticLink(rightConstructor, innerDefinition);
-            let equality = this.renderTemplate('EqualityRelation', {
-              'left': leftConstructor,
-              'right': rightConstructor
-            });
-            this.setSemanticLink(equality, equalityDefinition);
-            let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula);
-            let definitions = equalityDefinition.definition as Fmt.ArrayExpression;
-            let singleCase: ExtractedStructuralCase = {
-              definitions: definitions.items
-            };
-            let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide);
-            let quantification = this.renderTemplate('UniversalQuantification', {
-              'parameters': parameters,
-              'formula': equivalenceDef
-            });
-            paragraphs.push(quantification);
-            if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
-              this.addIndentedProof(equalityDefinition.reflexivityProof, 'Reflexivity', paragraphs);
-              this.addIndentedProof(equalityDefinition.symmetryProof, 'Symmetry', paragraphs);
-              this.addIndentedProof(equalityDefinition.transitivityProof, 'Transitivity', paragraphs);
-            }
-          }
-        }
+      let equalityDefinitionParagraphs: Display.RenderedExpression[] = [];
+      this.addEqualityDefinitions(equalityDefinitionParagraphs);
+      if (equalityDefinitionParagraphs.length) {
+        let equalityDefinitions = new Display.ParagraphExpression(equalityDefinitionParagraphs);
+        equalityDefinitions.styleClasses = ['display-math'];
+        paragraphs.push(equalityDefinitions);
       }
+
       let embedding = definition.contents.embedding;
       if (embedding) {
         let source = embedding.parameter.type.expression as FmtHLM.MetaRefExpression_Element;
@@ -1800,6 +1767,51 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           row.push(this.renderParameters([parameter], initialState));
           row.push(new Display.TextExpression('.”'));
           paragraphs.push(new Display.RowExpression(row));
+        }
+      }
+    }
+  }
+
+  private addEqualityDefinitions(paragraphs: Display.RenderedExpression[]): void {
+    let definition = this.definition;
+    for (let innerDefinition of definition.innerDefinitions) {
+      let constructorContents = innerDefinition.contents;
+      if (constructorContents instanceof FmtHLM.ObjectContents_Constructor) {
+        let equalityDefinition = constructorContents.equalityDefinition;
+        if (equalityDefinition) {
+          let leftReplacementParameters: ReplacementParameters = {
+            parameters: equalityDefinition.leftParameters,
+            isDefinition: false
+          };
+          let rightReplacementParameters: ReplacementParameters = {
+            parameters: equalityDefinition.rightParameters,
+            isDefinition: false
+          };
+          let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, leftReplacementParameters);
+          this.setSemanticLink(leftConstructor, innerDefinition);
+          let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, false, 0, rightReplacementParameters);
+          this.setSemanticLink(rightConstructor, innerDefinition);
+          let equality = this.renderTemplate('EqualityRelation', {
+            'left': leftConstructor,
+            'right': rightConstructor
+          });
+          this.setSemanticLink(equality, equalityDefinition);
+          let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula);
+          let definitions = equalityDefinition.definition as Fmt.ArrayExpression;
+          let parameters: Fmt.Parameter[] = [];
+          parameters.push(...equalityDefinition.leftParameters);
+          parameters.push(...equalityDefinition.rightParameters);
+          let singleCase: ExtractedStructuralCase = {
+            parameters: parameters,
+            definitions: definitions.items
+          };
+          let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide);
+          paragraphs.push(equivalenceDef);
+          if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
+            this.addIndentedProof(equalityDefinition.reflexivityProof, 'Reflexivity', paragraphs);
+            this.addIndentedProof(equalityDefinition.symmetryProof, 'Symmetry', paragraphs);
+            this.addIndentedProof(equalityDefinition.transitivityProof, 'Transitivity', paragraphs);
+          }
         }
       }
     }
