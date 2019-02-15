@@ -55,7 +55,7 @@ $component(
           F = {F},
           G = {G}
         ).transformation,
-      parameters = #(𝐗: %Binding(
+      parameters = #(𝐘: %Binding(
         $../Objects(
           U = {U},
           𝓒 = {𝓒}
@@ -68,14 +68,14 @@ $component(
             𝓒 = {𝓒},
             𝓓 = {𝓓},
             F = {F},
-            𝐗 = {𝐗}
+            𝐗 = {𝐘}
           )},
           𝐘 = {$../Functors/"object value"(
             U = {U},
             𝓒 = {𝓒},
             𝓓 = {𝓓},
             F = {G},
-            𝐗 = {𝐗}
+            𝐗 = {𝐘}
           )}
         )))
       )),
