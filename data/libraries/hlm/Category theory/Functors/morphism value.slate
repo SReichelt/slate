@@ -45,7 +45,7 @@ $"morphism value"(
           𝓓 = {𝓓}
         ).functor,
       parameters = #(
-        𝐗: %Binding(
+        𝐀: %Binding(
           $../Objects(
             U = {U},
             𝓒 = {𝓒}
@@ -55,82 +55,82 @@ $"morphism value"(
             𝓒 = {𝓓}
           )))
         ),
-        𝐘: %Binding(
+        𝐁: %Binding(
           $../Objects(
             U = {U},
             𝓒 = {𝓒}
           ),
-          #(𝐙: %Binding(
+          #(𝐂: %Binding(
             %previous,
             #(f: %Binding(
               $../Morphisms(
                 U = {U},
                 𝓒 = {𝓒},
-                𝐗 = {𝐘},
-                𝐘 = {𝐙}
+                𝐗 = {𝐁},
+                𝐘 = {𝐂}
               ),
               #(d: %Element($../Morphisms(
                 U = {U},
                 𝓒 = {𝓓},
-                𝐗 = {𝐃[𝐘]},
-                𝐘 = {𝐃[𝐙]}
+                𝐗 = {𝐃[𝐁]},
+                𝐘 = {𝐃[𝐂]}
               )))
             ))
           ))
         ),
         _1: %Constraint(%forall(
-          #(𝐗: %Element($../Objects(
+          #(𝐀: %Element($../Objects(
             U = {U},
             𝓒 = {𝓒}
           ))),
           %equals(
             d[
-              𝐗,
-              𝐗,
+              𝐀,
+              𝐀,
               $../identity(
                 U = {U},
                 𝓒 = {𝓒},
-                𝐗 = {𝐗}
+                𝐗 = {𝐀}
               )
             ],
             $../identity(
               U = {U},
               𝓒 = {𝓓},
-              𝐗 = {𝐃[𝐗]}
+              𝐗 = {𝐃[𝐀]}
             )
           )
         )),
         _2: %Constraint(%forall(
           #(
-            𝐗: %Element($../Objects(
+            𝐀: %Element($../Objects(
               U = {U},
               𝓒 = {𝓒}
             )),
-            𝐘: %Element(%previous),
-            𝐙: %Element(%previous),
+            𝐁: %Element(%previous),
+            𝐂: %Element(%previous),
             f: %Element($../Morphisms(
               U = {U},
               𝓒 = {𝓒},
-              𝐗 = {𝐗},
-              𝐘 = {𝐘}
+              𝐗 = {𝐀},
+              𝐘 = {𝐁}
             )),
             g: %Element($../Morphisms(
               U = {U},
               𝓒 = {𝓒},
-              𝐗 = {𝐘},
-              𝐘 = {𝐙}
+              𝐗 = {𝐁},
+              𝐘 = {𝐂}
             ))
           ),
           %equals(
             d[
-              𝐗,
-              𝐙,
+              𝐀,
+              𝐂,
               $../composition(
                 U = {U},
                 𝓒 = {𝓒},
-                𝐗 = {𝐗},
-                𝐘 = {𝐘},
-                𝐙 = {𝐙},
+                𝐗 = {𝐀},
+                𝐘 = {𝐁},
+                𝐙 = {𝐂},
                 g = {g},
                 f = {f}
               )
@@ -138,11 +138,11 @@ $"morphism value"(
             $../composition(
               U = {U},
               𝓒 = {𝓓},
-              𝐗 = {𝐃[𝐗]},
-              𝐘 = {𝐃[𝐘]},
-              𝐙 = {𝐃[𝐙]},
-              g = {d[𝐘,𝐙,g]},
-              f = {d[𝐗,𝐘,f]}
+              𝐗 = {𝐃[𝐀]},
+              𝐘 = {𝐃[𝐁]},
+              𝐙 = {𝐃[𝐂]},
+              g = {d[𝐁,𝐂,g]},
+              f = {d[𝐀,𝐁,f]}
             )
           )
         ))
