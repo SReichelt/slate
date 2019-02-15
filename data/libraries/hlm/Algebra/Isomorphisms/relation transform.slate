@@ -49,7 +49,7 @@ $"relation transform"(
                 s: %Element(X),
                 t: %Element(X)
               ),
-              $../../Essentials/Sets/"Cartesian product"(
+              value = $../../Essentials/Sets/"Cartesian product"(
                   S = {X},
                   T = {X}
                 ).pair(

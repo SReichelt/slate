@@ -152,7 +152,7 @@ $"Roots of primes are irrational"(
               b = {b}
             )
           ),
-          _3: %UseDef(result = %exists(
+          _: %UseDef(result = %exists(
             #(y: %Element($../Integer/Integers)),
             formula = %equals(
               $../Integer/product(
@@ -163,7 +163,16 @@ $"Roots of primes are irrational"(
             )
           )),
           _: %UseExists({
-            parameters = #(y: %Element($../Integer/Integers)),
+            parameters = #(
+              y: %Element($../Integer/Integers),
+              _3: %Constraint(%equals(
+                $../Integer/product(
+                  a = {p},
+                  b = {y}
+                ),
+                b
+              ))
+            ),
             steps = #(
               _: %Consider(n),
               _: %UseDef(result = $../Natural/less(

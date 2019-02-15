@@ -54,7 +54,7 @@ $converse(
                 s: %Element(S),
                 t: %Element(T)
               ),
-              $../Sets/"Cartesian product"(
+              value = $../Sets/"Cartesian product"(
                   S = {T},
                   T = {S}
                 ).pair(
