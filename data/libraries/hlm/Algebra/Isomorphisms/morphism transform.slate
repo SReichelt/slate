@@ -62,12 +62,17 @@ $"morphism transform"(
             )},
             Y = {Y_3}
           ).function(x = {
-            parameter = #(y: %Element(
+            parameter = #(_y: %Element($../../Essentials/Sets/"Cartesian product"(
+              S = {Y_1},
+              T = {Y_2}
+            ))),
+            arguments = {y = {%structuralCases(
+              _y,
               $../../Essentials/Sets/"Cartesian product"(
                 S = {Y_1},
-                T = {Y_2}
+                T = {Y_1}
               ),
-              shortcut = {
+              [{
                 constructor = $../../Essentials/Sets/"Cartesian product"(
                     S = {Y_1},
                     T = {Y_1}
@@ -76,38 +81,37 @@ $"morphism transform"(
                   y_1: %Element(Y_1),
                   y_2: %Element(Y_2)
                 ),
-                override = %true
-              }
-            )),
-            arguments = {y = {$../../Essentials/Functions/value(
-              X = {X_3},
-              Y = {Y_3},
-              f = {φ_3},
-              x = {z[$../../Essentials/Sets/"Cartesian product"(
-                  S = {Y_1},
-                  T = {Y_2}
-                ).pair(
-                  s = {$../../Essentials/Functions/value(
-                    X = {Y_1},
-                    Y = {X_1},
-                    f = {$../../Essentials/Functions/inverse(
-                      X = {X_1},
-                      Y = {Y_1},
-                      f = {φ_1}
-                    )},
-                    x = {y_1}
-                  )},
-                  t = {$../../Essentials/Functions/value(
-                    X = {Y_2},
-                    Y = {X_2},
-                    f = {$../../Essentials/Functions/inverse(
-                      X = {X_2},
-                      Y = {Y_2},
-                      f = {φ_2}
-                    )},
-                    x = {y_2}
-                  )}
-              )]}
+                value = $../../Essentials/Functions/value(
+                  X = {X_3},
+                  Y = {Y_3},
+                  f = {φ_3},
+                  x = {z[$../../Essentials/Sets/"Cartesian product"(
+                      S = {Y_1},
+                      T = {Y_2}
+                    ).pair(
+                      s = {$../../Essentials/Functions/value(
+                        X = {Y_1},
+                        Y = {X_1},
+                        f = {$../../Essentials/Functions/inverse(
+                          X = {X_1},
+                          Y = {Y_1},
+                          f = {φ_1}
+                        )},
+                        x = {y_1}
+                      )},
+                      t = {$../../Essentials/Functions/value(
+                        X = {Y_2},
+                        Y = {X_2},
+                        f = {$../../Essentials/Functions/inverse(
+                          X = {X_2},
+                          Y = {Y_2},
+                          f = {φ_2}
+                        )},
+                        x = {y_2}
+                      )}
+                  )]}
+                )
+              }]
             )}}
         })
       }]

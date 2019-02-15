@@ -31,12 +31,17 @@ $"cartesian product"(
         T = {Y}
       )}
     ).function(x = {
-      #(z: %Element(
+      #(_z: %Element($../Sets/"Cartesian product"(
+        S = {V},
+        T = {X}
+      ))),
+      {y = {%structuralCases(
+        _z,
         $../Sets/"Cartesian product"(
           S = {V},
           T = {X}
         ),
-        shortcut = {
+        [{
           constructor = $../Sets/"Cartesian product"(
               S = {V},
               T = {X}
@@ -45,25 +50,24 @@ $"cartesian product"(
             v: %Element(V),
             x: %Element(X)
           ),
-          override = %true
-        }
-      )),
-      {y = {$../Sets/"Cartesian product"(
-          S = {W},
-          T = {Y}
-        ).pair(
-          s = {$value(
-            X = {V},
-            Y = {W},
-            f = {f},
-            x = {v}
-          )},
-          t = {$value(
-            X = {X},
-            Y = {Y},
-            f = {g},
-            x = {x}
-          )}
+          value = $../Sets/"Cartesian product"(
+              S = {W},
+              T = {Y}
+            ).pair(
+              s = {$value(
+                X = {V},
+                Y = {W},
+                f = {f},
+                x = {v}
+              )},
+              t = {$value(
+                X = {X},
+                Y = {Y},
+                f = {g},
+                x = {x}
+              )}
+          )
+        }]
       )}}
   })]
 }

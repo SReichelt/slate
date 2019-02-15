@@ -13,15 +13,16 @@ $"Generalized union using power set"(
   )],
   definition = [$"Generalized union"(
     i = {
-      #(i: %Element(
-        S,
-        shortcut = {
+      #(_i: %Element(S)),
+      {S = {%setStructuralCases(
+        _i,
+        $"Power set"(S = {U}),
+        [{
           constructor = $"Power set"(S = {U}).subset,
           parameters = #(T: %Subset(U)),
-          override = %true
-        }
-      )),
-      {S = {T}}
+          value = T
+        }]
+      )}}
     },
     U = {U},
     I = {S}

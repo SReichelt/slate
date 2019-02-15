@@ -20,12 +20,17 @@ $"free magma"(
           )},
           Y = {T}
         ).function(x = {
-          #(x: %Element(
+          #(_x: %Element($../../../Essentials/Sets/"Cartesian product"(
+            S = {T},
+            T = {T}
+          ))),
+          {y = {%structuralCases(
+            _x,
             $../../../Essentials/Sets/"Cartesian product"(
               S = {T},
               T = {T}
             ),
-            shortcut = {
+            [{
               constructor = $../../../Essentials/Sets/"Cartesian product"(
                   S = {T},
                   T = {T}
@@ -34,12 +39,11 @@ $"free magma"(
                 a: %Element(T),
                 b: %Element(T)
               ),
-              override = %true
-            }
-          )),
-          {y = {$"Binary trees"(S = {S}).join(
-              a = {a},
-              b = {b}
+              value = $"Binary trees"(S = {S}).join(
+                  a = {a},
+                  b = {b}
+              )
+            }]
           )}}
       })}
   )]

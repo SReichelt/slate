@@ -79,7 +79,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(parameters: Fmt.ParameterList, targetParameters?: Fmt.ParameterList, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.ArgumentList {
+  getParameterArguments(parameters: Fmt.Parameter[], targetParameters?: Fmt.Parameter[], targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.ArgumentList {
     let result = Object.create(Fmt.ArgumentList.prototype);
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];

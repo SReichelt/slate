@@ -11,56 +11,20 @@ $"Real numbers": %Construction {
     )],
     equalityDefinition = {
       leftParameters = #(
-        r: %Element(
-          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-          shortcut = {
-            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-            parameters = #(n: %Binding(
-              $../Natural/"Natural numbers",
-              #(a: %Element($../Rational/"Rational numbers"))
-            ))
-          }
-        ),
+        r: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
         _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r}))
       ),
       rightParameters = #(
-        "r'": %Element(
-          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-          shortcut = {
-            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-            parameters = #(n: %Binding(
-              $../Natural/"Natural numbers",
-              #("a'": %Element($../Rational/"Rational numbers"))
-            ))
-          }
-        ),
+        "r'": %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
         _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {"r'"}))
       ),
-      definition = [
-        $../Rational/Sequences/converges(
-          𝐚 = {$../Rational/Sequences/"sequence difference"(
-            𝐛 = {r},
-            𝐚 = {"r'"}
-          )},
-          l = {$../Natural/number(value = 0)}
-        ),
-        %forall(
-          #(ε: %Element($../Rational/Subsets/"Positive numbers")),
-          %exists(
-            #(n: %Element($../Natural/"Natural numbers")),
-            formula = %forall(
-              #(m: %Element($../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
-              $../Rational/less(
-                a = {$../Rational/absolute(a = {$../Rational/difference(
-                  b = {a[m]},
-                  a = {"a'"[m]}
-                )})},
-                b = {ε}
-              )
-            )
-          )
-        )
-      ]
+      definition = [$../Rational/Sequences/converges(
+        𝐚 = {$../Rational/Sequences/"sequence difference"(
+          𝐛 = {r},
+          𝐚 = {"r'"}
+        )},
+        l = {$../Natural/number(value = 0)}
+      )]
     }
   }
 
