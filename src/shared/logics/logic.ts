@@ -25,9 +25,10 @@ export interface LogicDisplay {
 }
 
 export type RenderFn = () => Display.RenderedExpression;
+export type ObjectRenderFns = Map<Object, RenderFn>;
 
 export interface LogicRenderer {
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
   renderDefinitionSummary(): Display.RenderedExpression | undefined;
-  getDefinitionParts(): Map<Object, RenderFn>;
+  getDefinitionParts(): ObjectRenderFns;
 }

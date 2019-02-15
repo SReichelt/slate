@@ -38,9 +38,14 @@ $converse(
           S = {T},
           T = {S}
         ).relation(R = {%extendedSubset(
-          #(x: %Element(
-            R,
-            shortcut = {
+          #(_x: %Element(R)),
+          %structuralCases(
+            _x,
+            $../Sets/"Cartesian product"(
+              S = {S},
+              T = {T}
+            ),
+            [{
               constructor = $../Sets/"Cartesian product"(
                   S = {S},
                   T = {T}
@@ -49,15 +54,14 @@ $converse(
                 s: %Element(S),
                 t: %Element(T)
               ),
-              override = %true
-            }
-          )),
-          $../Sets/"Cartesian product"(
-              S = {T},
-              T = {S}
-            ).pair(
-              s = {t},
-              t = {s}
+              $../Sets/"Cartesian product"(
+                  S = {T},
+                  T = {S}
+                ).pair(
+                  s = {t},
+                  t = {s}
+              )
+            }]
           )
       )})
     }]

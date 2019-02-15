@@ -41,12 +41,17 @@ $closure(
             T = {S}
           )},
           S = {%subset(
-            #(x: %Element(
+            #(_x: %Element($../../Sets/"Power set"(S = {$../../Sets/"Cartesian product"(
+              S = {S},
+              T = {S}
+            )}))),
+            %structural(
+              _x,
               $../../Sets/"Power set"(S = {$../../Sets/"Cartesian product"(
                 S = {S},
                 T = {S}
               )}),
-              shortcut = {
+              [{
                 constructor = $../../Sets/"Power set"(S = {$../../Sets/"Cartesian product"(
                     S = {S},
                     T = {S}
@@ -55,19 +60,18 @@ $closure(
                   S = {S},
                   T = {S}
                 ))),
-                override = %true
-              }
-            )),
-            %and(
-              %sub(R, X),
-              $../../Properties/"has property"(
-                S = {$../Endorelations(S = {S})},
-                p = {p},
-                s = {$../Relations(
-                    S = {S},
-                    T = {S}
-                  ).relation(R = {X})}
-              )
+                value = %and(
+                  %sub(R, X),
+                  $../../Properties/"has property"(
+                    S = {$../Endorelations(S = {S})},
+                    p = {p},
+                    s = {$../Relations(
+                        S = {S},
+                        T = {S}
+                      ).relation(R = {X})}
+                  )
+                )
+              }]
             )
           )}
       )})
