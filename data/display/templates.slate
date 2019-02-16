@@ -288,15 +288,6 @@ $VariableDefinition(left: %Expr, right: %Expr): %Template {
   )
 }
 
-$Shortcut(element: %Expr, shortcut: %Expr): %Template {
-  display = $Relation(
-    symbol = '=:',
-    operands = [element, shortcut],
-    space = ' ',
-    parenLevel = 0
-  )
-}
-
 $MultiEqualityRelation(operands: %Expr[]): %Template {
   display = $Relation(
     symbol = %neg('=', '≠'),

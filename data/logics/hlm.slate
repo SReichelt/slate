@@ -170,9 +170,8 @@ $Set(auto: $Bool = $false, embedSubsets: $Bool = $false): %ParameterType($SetTer
 $Subset(superset: $SetTerm, auto: $Bool = $false, embedSubsets: $Bool = $false): %ParameterType($SetTerm) {
   argumentType = $SubsetArg
 }
-$Element(set: $SetTerm, auto: $Bool = $false, shortcut?: $Shortcut): %ParameterType($ElementTerm) {
-  argumentType = $ElementArg,
-  exports = [shortcut]
+$Element(set: $SetTerm, auto: $Bool = $false): %ParameterType($ElementTerm) {
+  argumentType = $ElementArg
 }
 $Symbol(auto: $Bool = $false): %ParameterType($SymbolTerm) {
   argumentType = $SymbolArg
@@ -190,16 +189,6 @@ $SetDef(set: $SetTerm): %ParameterType($SetTerm) {
 }
 $Def(element: $ElementTerm): %ParameterType($ElementTerm) {
   optional = %true
-}
-
-$Shortcut: %ExpressionType {
-  members = #(
-    constructor: $Constructor,
-    parameters: %ParameterList = #(),
-    rewrite: $Bool = $false,
-    override: $Bool = $false
-  ),
-  exports = [parameters]
 }
 
 $SetArg: %ExpressionType {

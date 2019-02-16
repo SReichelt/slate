@@ -841,34 +841,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return variableOverride;
       }
     }
-    let result = super.renderVariable(param, indices, isDefinition, isDummy);
-    if (!isDummy) {
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Element && type.shortcut && (isDefinition || type.shortcut._override instanceof FmtHLM.MetaRefExpression_true)) {
-        result = this.renderShortcut(type.shortcut, result, indices, isDefinition);
-      }
-    }
-    return result;
-  }
-
-  renderShortcut(shortcut: FmtHLM.ObjectContents_Shortcut, element: Display.RenderedExpression, indices?: Display.RenderedExpression[], isDefinition: boolean = false): Display.RenderedExpression {
-    let parameterOverrides: ParameterOverrides = {
-      replacementParameters: {
-        parameters: shortcut.parameters,
-        indices: indices,
-        isDefinition: isDefinition
-      }
-    };
-    let shortcutDisplay = this.renderGenericExpression(shortcut._constructor, false, 0, parameterOverrides);
-    this.setSemanticLink(shortcutDisplay, shortcut._constructor);
-    if (shortcut._override instanceof FmtHLM.MetaRefExpression_true) {
-      return shortcutDisplay;
-    } else {
-      return this.renderTemplate('Shortcut', {
-                                   'element': element,
-                                   'shortcut': shortcutDisplay
-                                 });
-    }
+    return super.renderVariable(param, indices, isDefinition, isDummy);
   }
 
   renderDefinedSymbol(definitions: Fmt.Definition[]): Display.RenderedExpression {

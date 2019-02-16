@@ -1690,7 +1690,6 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
 export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
   _set: Fmt.Expression;
   auto?: Fmt.Expression;
-  shortcut?: ObjectContents_Shortcut;
 
   getName(): string {
     return 'Element';
@@ -1699,16 +1698,6 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this._set = argumentList.getValue('set', 0);
     this.auto = argumentList.getOptionalValue('auto', 1);
-    let shortcutRaw = argumentList.getOptionalValue('shortcut', 2);
-    if (shortcutRaw !== undefined) {
-      if (shortcutRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Shortcut;
-        newItem.fromCompoundExpression(shortcutRaw);
-        this.shortcut = newItem;
-      } else {
-        throw new Error('shortcut: Compound expression expected');
-      }
-    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -1716,11 +1705,6 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
     argumentList.add(this._set);
     if (this.auto !== undefined) {
       argumentList.add(this.auto, 'auto');
-    }
-    if (this.shortcut !== undefined) {
-      let shortcutExpr = new Fmt.CompoundExpression;
-      this.shortcut.toCompoundExpression(shortcutExpr);
-      argumentList.add(shortcutExpr, 'shortcut');
     }
   }
 
@@ -1736,12 +1720,6 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
     if (this.auto) {
       result.auto = this.auto.substitute(fn, replacedParameters);
       if (result.auto !== this.auto) {
-        changed = true;
-      }
-    }
-    if (this.shortcut) {
-      result.shortcut = new ObjectContents_Shortcut;
-      if (this.shortcut.substituteExpression(fn, result.shortcut!, replacedParameters)) {
         changed = true;
       }
     }
@@ -1909,78 +1887,6 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
-  }
-}
-
-export class ObjectContents_Shortcut extends Fmt.ObjectContents {
-  _constructor: Fmt.Expression;
-  parameters?: Fmt.ParameterList;
-  rewrite?: Fmt.Expression;
-  _override?: Fmt.Expression;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this._constructor = argumentList.getValue('constructor', 0);
-    let parametersRaw = argumentList.getOptionalValue('parameters', 1);
-    if (parametersRaw !== undefined) {
-      if (parametersRaw instanceof Fmt.ParameterExpression) {
-        this.parameters = parametersRaw.parameters;
-      } else {
-        throw new Error('parameters: Parameter expression expected');
-      }
-    }
-    this.rewrite = argumentList.getOptionalValue('rewrite', 2);
-    this._override = argumentList.getOptionalValue('override', 3);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    argumentList.add(this._constructor, 'constructor');
-    if (this.parameters !== undefined) {
-      let parametersExpr = new Fmt.ParameterExpression;
-      parametersExpr.parameters.push(...this.parameters);
-      argumentList.add(parametersExpr, 'parameters');
-    }
-    if (this.rewrite !== undefined) {
-      argumentList.add(this.rewrite, 'rewrite');
-    }
-    if (this._override !== undefined) {
-      argumentList.add(this._override, 'override');
-    }
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Shortcut {
-    let result = new ObjectContents_Shortcut;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Shortcut, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    if (this._constructor) {
-      result._constructor = this._constructor.substitute(fn, replacedParameters);
-      if (result._constructor !== this._constructor) {
-        changed = true;
-      }
-    }
-    if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    if (this.rewrite) {
-      result.rewrite = this.rewrite.substitute(fn, replacedParameters);
-      if (result.rewrite !== this.rewrite) {
-        changed = true;
-      }
-    }
-    if (this._override) {
-      result._override = this._override.substitute(fn, replacedParameters);
-      if (result._override !== this._override) {
-        changed = true;
-      }
-    }
-    return changed;
   }
 }
 
@@ -4679,11 +4585,6 @@ export class MetaModel extends Fmt.MetaModel {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
             }
           }
-          if (currentContext.objectContentsClass === ObjectContents_Shortcut) {
-            if (argument.name === 'constructor' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Constructor, context);
-            }
-          }
           if (currentContext.objectContentsClass === ObjectContents_SubsetArg) {
             if (argument.name === 'subsetProof' || (argument.name === undefined && argumentIndex === 1)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
@@ -4747,11 +4648,6 @@ export class MetaModel extends Fmt.MetaModel {
       }
     }
     if (parent instanceof Fmt.MetaRefExpression) {
-      if (parent instanceof MetaRefExpression_Element) {
-        if (argument.name === 'shortcut' || (argument.name === undefined && argumentIndex === 2)) {
-          context = new ArgumentTypeContext(ObjectContents_Shortcut, context);
-        }
-      }
       if (parent instanceof MetaRefExpression_Binding) {
         if (argument.name === 'parameters' || (argument.name === undefined && argumentIndex === 1)) {
           for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
@@ -4898,13 +4794,6 @@ export class MetaModel extends Fmt.MetaModel {
 
   protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
     let context = parentContext;
-    if (expression instanceof MetaRefExpression_Element) {
-      if (expression.shortcut !== undefined) {
-        if (expression.shortcut.parameters !== undefined) {
-          context = this.getParameterListContext(expression.shortcut.parameters, context);
-        }
-      }
-    }
     if (expression instanceof MetaRefExpression_Binding) {
       context = this.getParameterListContext(expression.parameters, context);
     }
