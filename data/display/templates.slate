@@ -557,7 +557,7 @@ $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
         body = variable,
         maxLevel = 3
       ),
-      '.',
+      '. ',
       $InnerParens(
         body = term,
         maxLevel = 1
