@@ -5,7 +5,7 @@
  */
 $"Actual quotient equals formal quotient"(
   n: %Element($../Integer/Integers),
-  d: %Element($../Integer/Subsets/"Nonzero numbers")
+  d: %Element($../Natural/Subsets/"Positive numbers")
 ): %StandardTheorem {
   claim = %equals(
     $"Rational numbers".quotient(
