@@ -18,6 +18,10 @@ $Library: %Library {
     %subsection(
       $"Category theory",
       'Category theory'
+    ),
+    %subsection(
+      $"Formal systems",
+      'Formal systems'
     )
   ]
 }

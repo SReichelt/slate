@@ -1,0 +1,217 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition checks whether a rewrite rule matches a pair of terms. It considers both the pair itself as well as all subterms. Structural induction on both sides makes the definition a bit complicated.
+ */
+$rewritable(
+  V: %Subset(
+    $../Variables,
+    auto = %true
+  ),
+  _1: %Constraint($../../Essentials/Sets/finite(S = {V})),
+  ℜ: %Subset($../"Rewriting rules"(T = {$Terms(V = {V})})),
+  L: %Element($Terms(V = {V})),
+  R: %Element(%previous)
+): %Predicate {
+  display = [$Relation(
+    symbol = $SubSup(
+      body = '→',
+      sub = ℜ
+    ),
+    operands = [L, R]
+  )],
+  definition = [%or(
+    %in(
+      $../"Rewriting rules"(T = {$Terms(V = {V})}).rule(
+          l = {L},
+          r = {R}
+      ),
+      ℜ
+    ),
+    %structural(
+      R,
+      $Terms(V = {V}),
+      [
+        {
+          constructor = $Terms(V = {V}).variable,
+          parameters = #(z: %Element(V)),
+          value = %or
+        },
+        {
+          constructor = $Terms(V = {V}).abstraction,
+          parameters = #(
+            z: %Binding(
+              $../"Fresh variables"(V = {V}),
+              #(N: %Element($Terms(V = {$../../Essentials/Sets/Union(
+                U = {$../Variables},
+                S = {V},
+                T = {%enumeration(z)}
+              )})))
+            ),
+            _2: %Constraint(%forall(
+              #(
+                a: %Element($../"Fresh variables"(V = {V})),
+                b: %Element(%previous)
+              ),
+              %equals(
+                $substitution(
+                  V = {$Terms(V = {$../../Essentials/Sets/Union(
+                    U = {$../Variables},
+                    S = {V},
+                    T = {%enumeration(z)}
+                  )})},
+                  T = {N[a]},
+                  x = {a},
+                  R = {b}
+                ),
+                N[b]
+              )
+            ))
+          ),
+          value = %structural(
+            L,
+            $Terms(V = {V}),
+            [
+              {
+                constructor = $Terms(V = {V}).variable,
+                parameters = #(y: %Element(V)),
+                value = %or
+              },
+              {
+                constructor = $Terms(V = {V}).abstraction,
+                parameters = #(
+                  y: %Binding(
+                    $../"Fresh variables"(V = {V}),
+                    #(M: %Element($Terms(V = {$../../Essentials/Sets/Union(
+                      U = {$../Variables},
+                      S = {V},
+                      T = {%enumeration(y)}
+                    )})))
+                  ),
+                  _2: %Constraint(%forall(
+                    #(
+                      a: %Element($../"Fresh variables"(V = {V})),
+                      b: %Element(%previous)
+                    ),
+                    %equals(
+                      $substitution(
+                        V = {$Terms(V = {$../../Essentials/Sets/Union(
+                          U = {$../Variables},
+                          S = {V},
+                          T = {%enumeration(y)}
+                        )})},
+                        T = {M[a]},
+                        x = {a},
+                        R = {b}
+                      ),
+                      M[b]
+                    )
+                  ))
+                ),
+                value = %forall(
+                  #(v: %Element($../"Fresh variables"(V = {V}))),
+                  $rewritable(
+                    V = {$../../Essentials/Sets/Union(
+                      U = {$../Variables},
+                      S = {V},
+                      T = {%enumeration(v)}
+                    )},
+                    ℜ = {ℜ},
+                    L = {M[v]},
+                    R = {N[v]}
+                  )
+                )
+              },
+              {
+                constructor = $Terms(V = {V}).application,
+                parameters = #(
+                  M: %Element($Terms(V = {V})),
+                  N: %Element(%previous)
+                ),
+                value = %or
+              }
+            ]
+          )
+        },
+        {
+          constructor = $Terms(V = {V}).application,
+          parameters = #(
+            O: %Element($Terms(V = {V})),
+            P: %Element(%previous)
+          ),
+          value = %structural(
+            L,
+            $Terms(V = {V}),
+            [
+              {
+                constructor = $Terms(V = {V}).variable,
+                parameters = #(y: %Element(V)),
+                value = %or
+              },
+              {
+                constructor = $Terms(V = {V}).abstraction,
+                parameters = #(
+                  y: %Binding(
+                    $../"Fresh variables"(V = {V}),
+                    #(M: %Element($Terms(V = {$../../Essentials/Sets/Union(
+                      U = {$../Variables},
+                      S = {V},
+                      T = {%enumeration(y)}
+                    )})))
+                  ),
+                  _2: %Constraint(%forall(
+                    #(
+                      a: %Element($../"Fresh variables"(V = {V})),
+                      b: %Element(%previous)
+                    ),
+                    %equals(
+                      $substitution(
+                        V = {$Terms(V = {$../../Essentials/Sets/Union(
+                          U = {$../Variables},
+                          S = {V},
+                          T = {%enumeration(y)}
+                        )})},
+                        T = {M[a]},
+                        x = {a},
+                        R = {b}
+                      ),
+                      M[b]
+                    )
+                  ))
+                ),
+                value = %or
+              },
+              {
+                constructor = $Terms(V = {V}).application,
+                parameters = #(
+                  M: %Element($Terms(V = {V})),
+                  N: %Element(%previous)
+                ),
+                value = %or(
+                  %and(
+                    $rewritable(
+                      V = {V},
+                      ℜ = {ℜ},
+                      L = {M},
+                      R = {O}
+                    ),
+                    %equals(N, P)
+                  ),
+                  %and(
+                    %equals(M, O),
+                    $rewritable(
+                      V = {V},
+                      ℜ = {ℜ},
+                      L = {N},
+                      R = {P}
+                    )
+                  )
+                )
+              }
+            ]
+          )
+        }
+      ]
+    )
+  )]
+}

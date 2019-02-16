@@ -1,0 +1,12 @@
+%../../../../../logics/hlm%
+
+$omega: %ExplicitOperator {
+  display = ['𝞈'],
+  definition = [$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+      #(x: %Element($../../Variables)),
+      {M = {$../Terms(V = {%enumeration(x)}).application(
+          M = {x},
+          N = {x}
+      )}}
+  })]
+}

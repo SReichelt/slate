@@ -1,0 +1,25 @@
+%../../../logics/hlm%
+
+/**
+ * @remarks This definition formalizes an infinite supply of variables. Each variable is identified by a natural number, but that number is not used anywhere. In fact, any infinite set would do.
+ *
+ *          Variables, therefore, do not carry a name. Instead, we use bound variables in HLM to model variables in the target language, and these bound variables have a name in HLM.
+ *
+ *          As a consequence, α-equivalent terms are never distinguishable.
+ */
+$Variables: %Construction {
+  $variable(n: %Element($../Essentials/Numbers/Natural/"Natural numbers")): %Constructor {
+    display = [$Parens(
+      body = n,
+      style = '()'
+    )],
+    equalityDefinition = {
+      leftParameters = #(m: %Element($../Essentials/Numbers/Natural/"Natural numbers")),
+      rightParameters = #(n: %Element($../Essentials/Numbers/Natural/"Natural numbers")),
+      definition = [%equals(m, n)],
+      isomorphic = %true
+    }
+  }
+
+  display = ['𝓥𝓪𝓻']
+}

@@ -1,0 +1,12 @@
+%../../../../../logics/library%
+
+$Combinators: %Section {
+  logic = 'hlm',
+  items = [
+    %item($identity),
+    %item($constant),
+    %item($substitution),
+    %item($omega),
+    %item($"fixed-point")
+  ]
+}

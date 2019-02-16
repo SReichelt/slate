@@ -884,8 +884,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           let cp = c.codePointAt(0)!;
           if (cp >= 0x1d400 && cp < 0x1d434) {
             setStyle('bold');
-            curText += String.fromCodePoint(cp < 0x1d41a ? cp - 0x1d400 + 0x41 :
-                                                          cp - 0x1d41a + 0x61);
+            curText += this.convertLatinMathToRegular(cp - 0x1d400);
+          } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
+            setStyle('bold');
+            curText += this.convertGreekMathToRegular(cp - 0x1d6a8);
+          } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
+            setStyle('bold');
+            curText += this.convertDigitMathToRegular(cp - 0x1d7ce);
           } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
             setStyle('italic');
             switch (cp) {
@@ -893,17 +898,41 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 curText += 'h';
                 break;
               default:
-                curText += String.fromCodePoint(cp < 0x1d44e ? cp - 0x1d434 + 0x41 :
-                                                              cp - 0x1d44e + 0x61);
+                curText += this.convertLatinMathToRegular(cp - 0x1d434);
             }
+          } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
+            setStyle('italic');
+            curText += this.convertGreekMathToRegular(cp - 0x1d6e2);
           } else if (cp >= 0x1d468 && cp < 0x1d49c) {
             setStyle('bold italic');
-            curText += String.fromCodePoint(cp < 0x1d482 ? cp - 0x1d468 + 0x41 :
-                                                          cp - 0x1d482 + 0x61);
+            curText += this.convertLatinMathToRegular(cp - 0x1d468);
+          } else if (cp >= 0x1d71c && cp < 0x1d756) {
+            setStyle('bold italic');
+            curText += this.convertGreekMathToRegular(cp - 0x1d71c);
           } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
             setStyle('sans');
-            curText += String.fromCodePoint(cp < 0x1d5ba ? cp - 0x1d5a0 + 0x41 :
-                                                          cp - 0x1d5ba + 0x61);
+            curText += this.convertLatinMathToRegular(cp - 0x1d5a0);
+          } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
+            setStyle('sans');
+            curText += this.convertDigitMathToRegular(cp - 0x1d7e2);
+          } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
+            setStyle('sans bold');
+            curText += this.convertLatinMathToRegular(cp - 0x1d5d4);
+          } else if (cp >= 0x1d756 && cp < 0x1d790) {
+            setStyle('sans bold');
+            curText += this.convertGreekMathToRegular(cp - 0x1d756);
+          } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
+            setStyle('sans bold');
+            curText += this.convertDigitMathToRegular(cp - 0x1d7ec);
+          } else if (cp >= 0x1d608 && cp < 0x1d63c) {
+            setStyle('sans italic');
+            curText += this.convertLatinMathToRegular(cp - 0x1d608);
+          } else if (cp >= 0x1d63c && cp < 0x1d670) {
+            setStyle('sans bold italic');
+            curText += this.convertLatinMathToRegular(cp - 0x1d63c);
+          } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
+            setStyle('sans bold italic');
+            curText += this.convertGreekMathToRegular(cp - 0x1d790);
           } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
             setStyle('calligraphic');
             switch (cp) {
@@ -941,10 +970,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 curText += 'o';
                 break;
               default:
-                curText += String.fromCodePoint(cp < 0x1d4b6 ? cp - 0x1d49c + 0x41 :
-                                                cp < 0x1d4d0 ? cp - 0x1d4b6 + 0x61 :
-                                                cp < 0x1d4ea ? cp - 0x1d4d0 + 0x41 :
-                                                              cp - 0x1d4ea + 0x61);
+                curText += this.convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
             }
           } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
             setStyle('fraktur');
@@ -965,10 +991,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 curText += 'Z';
                 break;
               default:
-                curText += String.fromCodePoint(cp < 0x1d51e ? cp - 0x1d504 + 0x41 :
-                                                cp < 0x1d56c ? cp - 0x1d51e + 0x61 :
-                                                cp < 0x1d586 ? cp - 0x1d56c + 0x41 :
-                                                              cp - 0x1d586 + 0x61);
+                curText += this.convertLatinMathToRegular(cp < 0x1d56c ? cp - 0x1d504 : cp - 0x1d56c);
             }
           } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
             setStyle('double-struck');
@@ -995,9 +1018,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                 curText += 'Z';
                 break;
               default:
-                curText += String.fromCodePoint(cp < 0x1d552 ? cp - 0x1d538 + 0x41 :
-                                                              cp - 0x1d552 + 0x61);
+                curText += this.convertLatinMathToRegular(cp - 0x1d538);
             }
+          } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
+            setStyle('double-struck');
+            curText += this.convertDigitMathToRegular(cp - 0x1d7d8);
+          } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
+            setStyle('monospace');
+            curText += this.convertLatinMathToRegular(cp - 0x1d670);
+          } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
+            setStyle('monospace');
+            curText += this.convertDigitMathToRegular(cp - 0x1d7f6);
           } else {
             if (curStyle) {
               flush();
@@ -1015,6 +1046,31 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else {
       return result;
     }
+  }
+
+  private convertLatinMathToRegular(cpOffset: number): string {
+    return String.fromCodePoint(cpOffset < 0x1a ? cpOffset + 0x41 :
+                                                  cpOffset - 0x1a + 0x61);
+  }
+
+  private convertGreekMathToRegular(cpOffset: number): string {
+    return String.fromCodePoint(cpOffset === 0x11  ? 0x3f4 :
+                                cpOffset < 0x19    ? cpOffset + 0x391 :
+                                cpOffset === 0x19  ? 0x2207 :
+                                cpOffset < 0x33    ? cpOffset - 0x1a + 0x3b1 :
+                                cpOffset === 0x33  ? 0x2202 :
+                                cpOffset === 0x34  ? 0x3f5 :
+                                cpOffset === 0x35  ? 0x3f0 :
+                                cpOffset === 0x36  ? 0x3d5 :
+                                cpOffset === 0x37  ? 0x3f1 :
+                                cpOffset === 0x38  ? 0x3d6 :
+                                cpOffset === 0x122 ? 0x3dc :
+                                cpOffset === 0x123 ? 0x3dd :
+                                0);
+  }
+
+  private convertDigitMathToRegular(cpOffset: number): string {
+    return String.fromCodePoint(cpOffset + 0x30);
   }
 
   private addToHoveredChildren(expression: Expression = this): void {

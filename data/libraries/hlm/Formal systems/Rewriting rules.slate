@@ -1,0 +1,39 @@
+%../../../logics/hlm%
+
+/**
+ * @remarks This definition just provides some useful notation for rewriting rules for terms in _T_. It is actually equivalent to the cartesian product of _T_ with itself.
+ */
+$"Rewriting rules"(T: %Set(
+  auto = %true,
+  embedSubsets = %true
+)): %Construction {
+  $rule(
+    l: %Element(T),
+    r: %Element(%previous)
+  ): %Constructor {
+    display = [$FunctionOperator(
+      operands = [l, r],
+      minParenLevel = -1
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        l: %Element(T),
+        r: %Element(%previous)
+      ),
+      rightParameters = #(
+        "l'": %Element(T),
+        "r'": %Element(%previous)
+      ),
+      definition = [%and(
+        %equals(l, "l'"),
+        %equals(r, "r'")
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = [$Function(
+    function = '𝓡𝓮𝔀𝓻',
+    arguments = [T]
+  )]
+}

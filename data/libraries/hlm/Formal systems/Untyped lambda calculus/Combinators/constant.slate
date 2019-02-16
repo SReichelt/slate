@@ -1,0 +1,12 @@
+%../../../../../logics/hlm%
+
+$constant: %ExplicitOperator {
+  display = ['𝗞'],
+  definition = [$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+      #(x: %Element($../../Variables)),
+      {M = {$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+          #(y: %Element($../../"Fresh variables"(V = {%enumeration(x)}))),
+          {M = {x}}
+      })}}
+  })]
+}

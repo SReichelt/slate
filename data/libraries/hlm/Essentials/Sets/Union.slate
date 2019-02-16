@@ -15,7 +15,7 @@ $Union(
   display = [$Operator(
     symbol = '∪',
     operands = [S, T],
-    space = ' '
+    space = ' '
   )],
   definition = [%subset(
     #(x: %Element(U)),

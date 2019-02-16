@@ -1,0 +1,24 @@
+%../../../../../logics/hlm%
+
+$substitution: %ExplicitOperator {
+  display = ['𝗦'],
+  definition = [$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+      #(x: %Element($../../Variables)),
+      {M = {$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+          #(y: %Element($../../"Fresh variables"(V = {%enumeration(x)}))),
+          {M = {$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+              #(z: %Element($../../"Fresh variables"(V = {%enumeration(x, y)}))),
+              {M = {$../Terms(V = {%enumeration(x, y, z)}).application(
+                  M = {$../Terms(V = {%enumeration(x, y, z)}).application(
+                      M = {x},
+                      N = {z}
+                  )},
+                  N = {$../Terms(V = {%enumeration(x, y, z)}).application(
+                      M = {y},
+                      N = {z}
+                  )}
+              )}}
+          })}}
+      })}}
+  })]
+}

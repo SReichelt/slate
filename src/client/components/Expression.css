@@ -502,12 +502,12 @@ div.display-math {
 }
 
 .bold {
-  font-weight: bold;
+  font-weight: bold!important;
   font-style: normal;
 }
 
-.italic, .bold.italic {
-  font-style: italic;
+.italic {
+  font-style: italic!important;
 }
 
 .sans, .ctor {

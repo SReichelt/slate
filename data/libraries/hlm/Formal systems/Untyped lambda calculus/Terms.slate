@@ -1,0 +1,168 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This formalization of the untyped lambda calculus is fairly standard except for one thing: The right side of a lambda abstraction depends on the value of the bound variable used to define it (which is kind of the point of bound variables). To prevent wild pseudo-terms that actually differ in nontrivial ways depending on the variable, there needs to be an additional substitutability constraint. Although substitution is defined later, we can use it in this case because we are applying it to subterms only (i.e. we are employing mutual induction).
+ *
+ * @references * https://en.wikipedia.org/wiki/Lambda_calculus
+ */
+$Terms(
+  V: %Subset(
+    $../Variables,
+    auto = %true,
+    embedSubsets = %true
+  ),
+  _1: %Constraint($../../Essentials/Sets/finite(S = {V}))
+): %Construction {
+  $variable(x: %Element(V)): %Constructor {
+    display = [$Parens(
+      body = x,
+      style = '()'
+    )],
+    equalityDefinition = {
+      leftParameters = #(x: %Element(V)),
+      rightParameters = #(y: %Element(V)),
+      definition = [%equals(x, y)],
+      isomorphic = %true
+    }
+  }
+
+  $abstraction(
+    x: %Binding(
+      $../"Fresh variables"(V = {V}),
+      #(M: %Element($Terms(V = {$../../Essentials/Sets/Union(
+        U = {$../Variables},
+        S = {V},
+        T = {%enumeration(x)}
+      )})))
+    ),
+    _2: %Constraint(%forall(
+      #(
+        x: %Element($../"Fresh variables"(V = {V})),
+        y: %Element(%previous)
+      ),
+      %equals(
+        $substitution(
+          V = {$Terms(V = {$../../Essentials/Sets/Union(
+            U = {$../Variables},
+            S = {V},
+            T = {%enumeration(x)}
+          )})},
+          T = {M[x]},
+          x = {x},
+          R = {y}
+        ),
+        M[y]
+      )
+    ))
+  ): %Constructor {
+    display = [$LambdaAbstraction(
+      variable = x,
+      term = M
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        x: %Binding(
+          $../"Fresh variables"(V = {V}),
+          #(M: %Element($Terms(V = {$../../Essentials/Sets/Union(
+            U = {$../Variables},
+            S = {V},
+            T = {%enumeration(x)}
+          )})))
+        ),
+        _2: %Constraint(%forall(
+          #(
+            x: %Element($../"Fresh variables"(V = {V})),
+            y: %Element(%previous)
+          ),
+          %equals(
+            $substitution(
+              V = {$Terms(V = {$../../Essentials/Sets/Union(
+                U = {$../Variables},
+                S = {V},
+                T = {%enumeration(x)}
+              )})},
+              T = {M[x]},
+              x = {x},
+              R = {y}
+            ),
+            M[y]
+          )
+        ))
+      ),
+      rightParameters = #(
+        x: %Binding(
+          $../"Fresh variables"(V = {V}),
+          #("M'": %Element($Terms(V = {$../../Essentials/Sets/Union(
+            U = {$../Variables},
+            S = {V},
+            T = {%enumeration(x)}
+          )})))
+        ),
+        "_2'": %Constraint(%forall(
+          #(
+            x: %Element($../"Fresh variables"(V = {V})),
+            y: %Element(%previous)
+          ),
+          %equals(
+            $substitution(
+              V = {$Terms(V = {$../../Essentials/Sets/Union(
+                U = {$../Variables},
+                S = {V},
+                T = {%enumeration(x)}
+              )})},
+              T = {"M'"[x]},
+              x = {x},
+              R = {y}
+            ),
+            "M'"[y]
+          )
+        ))
+      ),
+      definition = [
+        %forall(
+          #(x: %Element($../"Fresh variables"(V = {V}))),
+          %equals(M[x], "M'"[x])
+        ),
+        %exists(
+          #(x: %Element($../"Fresh variables"(V = {V}))),
+          formula = %equals(M[x], "M'"[x])
+        )
+      ],
+      isomorphic = %true
+    }
+  }
+
+  $application(
+    M: %Element($Terms(V = {V})),
+    N: %Element(%previous)
+  ): %Constructor {
+    display = [$LambdaApplication(
+      function = M,
+      argument = N
+    )],
+    equalityDefinition = {
+      leftParameters = #(
+        M: %Element($Terms(V = {V})),
+        N: %Element(%previous)
+      ),
+      rightParameters = #(
+        "M'": %Element($Terms(V = {V})),
+        "N'": %Element(%previous)
+      ),
+      definition = [%and(
+        %equals(M, "M'"),
+        %equals(N, "N'")
+      )],
+      isomorphic = %true
+    }
+  }
+
+  display = [$SubSup(
+    body = '𝓣',
+    sub = V
+  )],
+  embedding = {
+    parameter = #(x: %Element(V)),
+    target = $Terms(V = {V}).variable(x = {x})
+  }
+}

@@ -1,0 +1,30 @@
+%../../../../../logics/hlm%
+
+$"fixed-point": %ExplicitOperator {
+  display = ['𝗬'],
+  definition = [$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+      #(f: %Element($../../Variables)),
+      {M = {$../Terms(V = {%enumeration(f)}).application(
+          M = {$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+              #(x: %Element($../../"Fresh variables"(V = {%enumeration(f)}))),
+              {M = {$../Terms(V = {%enumeration(f, x)}).application(
+                  M = {f},
+                  N = {$../Terms(V = {%enumeration(f, x)}).application(
+                      M = {x},
+                      N = {x}
+                  )}
+              )}}
+          })},
+          N = {$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+              #(x: %Element($../../"Fresh variables"(V = {%enumeration(f)}))),
+              {M = {$../Terms(V = {%enumeration(f, x)}).application(
+                  M = {f},
+                  N = {$../Terms(V = {%enumeration(f, x)}).application(
+                      M = {x},
+                      N = {x}
+                  )}
+              )}}
+          })}
+      )}}
+  })]
+}

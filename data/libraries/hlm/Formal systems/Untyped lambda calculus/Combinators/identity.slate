@@ -1,0 +1,9 @@
+%../../../../../logics/hlm%
+
+$identity: %ExplicitOperator {
+  display = ['𝗜'],
+  definition = [$../Terms(V = {$../../../Essentials/Sets/"Empty set"}).abstraction(x = {
+      #(x: %Element($../../Variables)),
+      {M = {x}}
+  })]
+}

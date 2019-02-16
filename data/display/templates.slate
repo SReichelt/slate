@@ -548,3 +548,50 @@ $SourceProofStep(result: %Expr, source: %Expr): %Template {
     result
   ]
 }
+
+$LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
+  display = $OuterParens(
+    body = [
+      'λ',
+      $InnerParens(
+        body = variable,
+        maxLevel = 3
+      ),
+      '.',
+      $InnerParens(
+        body = term,
+        maxLevel = 1
+      )
+    ],
+    minLevel = 2
+  )
+}
+
+$LambdaApplication(function: %Expr, argument: %Expr): %Template {
+  display = $OuterParens(
+    body = [
+      $InnerParens(
+        body = function,
+        maxLevel = 2
+      ),
+      ' ',
+      $InnerParens(
+        body = argument,
+        maxLevel = 2
+      )
+    ],
+    minLevel = 2
+  )
+}
+
+$LambdaSubstitution(term: %Expr, variable: %Expr, replacement: %Expr): %Template {
+  display = $Function(
+    function = term,
+    arguments = [$EqualityDefinition(
+      left = variable,
+      right = replacement
+    )],
+    style = '[]',
+    maxParenLevel = 4
+  )
+}

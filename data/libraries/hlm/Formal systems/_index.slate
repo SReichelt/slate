@@ -1,0 +1,14 @@
+%../../../logics/library%
+
+$"Formal systems": %Section {
+  logic = 'hlm',
+  items = [
+    %item($Variables),
+    %item($"Fresh variables"),
+    %item($"Rewriting rules"),
+    %subsection(
+      $"Untyped lambda calculus",
+      'Untyped lambda calculus'
+    )
+  ]
+}

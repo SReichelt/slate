@@ -1,0 +1,16 @@
+%../../../../logics/library%
+
+$"Untyped lambda calculus": %Section {
+  logic = 'hlm',
+  items = [
+    %item($Terms),
+    %item($substitution),
+    %item($rewritable),
+    %item($"beta reduction"),
+    %item($"eta conversion"),
+    %subsection(
+      $Combinators,
+      'Combinators'
+    )
+  ]
+}

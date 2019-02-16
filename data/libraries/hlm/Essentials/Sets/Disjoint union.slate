@@ -50,6 +50,6 @@ $"Disjoint union"(
   display = [$Operator(
     symbol = '⊎',
     operands = [S, T],
-    space = ' '
+    space = ' '
   )]
 }

@@ -1,0 +1,19 @@
+%../../../logics/hlm%
+
+/**
+ * @remarks This is just the subset of variables that do not appear in _V_. It should be used whenever a new bound variable is needed.
+ */
+$"Fresh variables"(
+  V: %Subset($Variables),
+  _1: %Constraint($../Essentials/Sets/finite(S = {V}))
+): %SetOperator {
+  display = [$Function(
+    function = 'Fresh',
+    arguments = [V]
+  )],
+  definition = [$../Essentials/Sets/"Relative complement"(
+    U = {$Variables},
+    S = {$Variables},
+    T = {V}
+  )]
+}

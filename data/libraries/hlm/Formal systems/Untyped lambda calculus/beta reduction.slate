@@ -1,0 +1,44 @@
+%../../../../logics/hlm%
+
+$"beta reduction"(
+  V: %Subset($../Variables),
+  _1: %Constraint($../../Essentials/Sets/finite(S = {V}))
+): %SetOperator {
+  display = [$SubSup(
+    body = 'β',
+    sub = V
+  )],
+  definition = [%extendedSubset(
+    #(
+      x: %Binding(
+        $../"Fresh variables"(V = {V}),
+        #(M: %Element($Terms(V = {$../../Essentials/Sets/Union(
+          U = {$../Variables},
+          S = {V},
+          T = {%enumeration(x)}
+        )})))
+      ),
+      N: %Element($Terms(V = {V})),
+      y: %Element($../"Fresh variables"(V = {V}))
+    ),
+    $../"Rewriting rules"(T = {$Terms(V = {V})}).rule(
+        l = {$Terms(V = {V}).application(
+            M = {$Terms(V = {V}).abstraction(x = {
+                #(z: %Element($../"Fresh variables"(V = {V}))),
+                {M = {M[z]}}
+            })},
+            N = {N}
+        )},
+        r = {$substitution(
+          V = {$../../Essentials/Sets/Union(
+            U = {$../Variables},
+            S = {V},
+            T = {%enumeration(y)}
+          )},
+          T = {M[y]},
+          x = {y},
+          R = {N}
+        )}
+    )
+  )]
+}
