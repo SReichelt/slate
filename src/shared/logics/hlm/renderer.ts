@@ -1316,6 +1316,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (resultParams) {
       resultParams.push(param);
     }
+    let paramToDisplay = replacementParam || param;
+    let variableOverrides = parameterOverrides ? parameterOverrides.variableOverrides : undefined;
+    if (variableOverrides) {
+      let variableOverride = variableOverrides.get(paramToDisplay);
+      if (variableOverride) {
+        resultArgs.push(variableOverride);
+        return;
+      }
+    }
     if (argumentLists) {
       if (type instanceof FmtHLM.MetaRefExpression_Set) {
         let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_SetArg);
@@ -1366,8 +1375,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else {
       let isDefinition = parameterOverrides && parameterOverrides.replacementParameters ? parameterOverrides.replacementParameters.isDefinition : false;
-      let variableOverrides = parameterOverrides ? parameterOverrides.variableOverrides : undefined;
-      resultArgs.push(this.renderVariable(replacementParam || param, indices, isDefinition, markAsDummy, variableOverrides));
+      resultArgs.push(this.renderVariable(paramToDisplay, indices, isDefinition, markAsDummy, variableOverrides));
     }
   }
 

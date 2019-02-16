@@ -39,7 +39,7 @@ let previewContents: any = null;
 interface ExpressionProps {
   expression: Display.RenderedExpression;
   addInnerParens?: boolean;
-  shrinkMathSpaces?: number;
+  shrinkMathSpaces?: boolean;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
   tooltipPosition?: string;
@@ -59,7 +59,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private interactionBlocked = false;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
-  private shrinkMathSpaces = 0;
+  private shrinkMathSpaces = true;
   private tooltipPosition: string;
 
   constructor(props: ExpressionProps) {
@@ -102,7 +102,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private updateOptionalProps(props: ExpressionProps): void {
-    this.shrinkMathSpaces = props.shrinkMathSpaces ? props.shrinkMathSpaces : props.parent ? props.parent.shrinkMathSpaces : 0;
+    this.shrinkMathSpaces = props.shrinkMathSpaces ? props.shrinkMathSpaces : props.parent ? props.parent.shrinkMathSpaces : false;
     this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
   }
 
@@ -499,10 +499,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
         let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
-        let sub: any = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let sup: any = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSub: any = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSup: any = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={2} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sub: any = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sup: any = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSub: any = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSup: any = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (sub) {
             subSupResult.push(<sub key="sub">{sub}</sub>);
@@ -590,8 +590,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
       let bodyWithParens = new Display.InnerParenExpression(expression.body);
-      let over: any = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      let under: any = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let over: any = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let under: any = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       result = [
         (
           <span className={'overunder-body-row'} key="body">
@@ -645,7 +645,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'radical-degree-table'}>
               <span className={'radical-degree-top-row'}>
                 <span className={'radical-degree'}>
-                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} shrinkMathSpaces={1} parent={this} interactionHandler={this.props.interactionHandler}/>
+                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/>
                 </span>
               </span>
               <span className={'radical-degree-bottom-row'}>
@@ -1002,7 +1002,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             if (curStyle) {
               flush();
             }
-            for (let i = 0; i < this.shrinkMathSpaces; i++) {
+            if (this.shrinkMathSpaces) {
               c = shrinkMathSpace(c);
             }
             curText += c;
