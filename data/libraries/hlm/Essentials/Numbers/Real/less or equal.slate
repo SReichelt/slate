@@ -20,17 +20,7 @@ $"less or equal"(
     [{
       constructor = $"Real numbers".class,
       parameters = #(
-        r_b: %Element(
-          $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-          shortcut = {
-            constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-            parameters = #(n: %Binding(
-              $../Natural/"Natural numbers",
-              #(y: %Element($../Rational/"Rational numbers"))
-            )),
-            override = %true
-          }
-        ),
+        r_b: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
         _2: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_b}))
       ),
       value = %structural(
@@ -39,34 +29,46 @@ $"less or equal"(
         [{
           constructor = $"Real numbers".class,
           parameters = #(
-            r_a: %Element(
-              $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
-              shortcut = {
-                constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
-                parameters = #(n: %Binding(
-                  $../Natural/"Natural numbers",
-                  #(x: %Element($../Rational/"Rational numbers"))
-                )),
-                override = %true
-              }
-            ),
+            r_a: %Element($../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"})),
             _1: %Constraint($../Rational/Sequences/cauchy(𝐚 = {r_a}))
           ),
-          value = %forall(
-            #(ε: %Element($../Rational/Subsets/"Positive numbers")),
-            %exists(
-              #(n: %Element($../Natural/"Natural numbers")),
-              formula = %forall(
-                #(m: %Element($../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
-                $../Rational/"less or equal"(
-                  a = {x[m]},
-                  b = {$../Rational/sum(
-                    a = {y[m]},
-                    b = {ε}
-                  )}
-                )
+          value = %structural(
+            r_b,
+            $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
+            [{
+              constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
+              parameters = #(n: %Binding(
+                $../Natural/"Natural numbers",
+                #(y: %Element($../Rational/"Rational numbers"))
+              )),
+              value = %structural(
+                r_a,
+                $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}),
+                [{
+                  constructor = $../../Sequences/"Infinite sequences"(S = {$../Rational/"Rational numbers"}).sequence,
+                  parameters = #(n: %Binding(
+                    $../Natural/"Natural numbers",
+                    #(x: %Element($../Rational/"Rational numbers"))
+                  )),
+                  value = %forall(
+                    #(ε: %Element($../Rational/Subsets/"Positive numbers")),
+                    %exists(
+                      #(n: %Element($../Natural/"Natural numbers")),
+                      formula = %forall(
+                        #(m: %Element($../Natural/Subsets/"Segment (greater or equal)"(n = {n}))),
+                        $../Rational/"less or equal"(
+                          a = {x[m]},
+                          b = {$../Rational/sum(
+                            a = {y[m]},
+                            b = {ε}
+                          )}
+                        )
+                      )
+                    )
+                  )
+                }]
               )
-            )
+            }]
           )
         }]
       )

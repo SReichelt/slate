@@ -31,7 +31,18 @@ $"lexicographical order"(
         T = {T}
       )}
     ).relation(R = {%subset(
-      #(x: %Element(
+      #(_x: %Element($../Sets/"Cartesian product"(
+        S = {$../Sets/"Cartesian product"(
+          S = {S},
+          T = {T}
+        )},
+        T = {$../Sets/"Cartesian product"(
+          S = {S},
+          T = {T}
+        )}
+      ))),
+      %structural(
+        _x,
         $../Sets/"Cartesian product"(
           S = {$../Sets/"Cartesian product"(
             S = {S},
@@ -42,7 +53,7 @@ $"lexicographical order"(
             T = {T}
           )}
         ),
-        shortcut = {
+        [{
           constructor = $../Sets/"Cartesian product"(
               S = {$../Sets/"Cartesian product"(
                 S = {S},
@@ -54,62 +65,69 @@ $"lexicographical order"(
               )}
             ).pair,
           parameters = #(
-            y: %Element(
-              $../Sets/"Cartesian product"(
-                S = {S},
-                T = {T}
-              ),
-              shortcut = {
-                constructor = $../Sets/"Cartesian product"(
-                    S = {S},
-                    T = {T}
-                  ).pair,
-                parameters = #(
-                  s: %Element(S),
-                  t: %Element(T)
-                ),
-                override = %true
-              }
-            ),
-            z: %Element(
-              $../Sets/"Cartesian product"(
-                S = {S},
-                T = {T}
-              ),
-              shortcut = {
-                constructor = $../Sets/"Cartesian product"(
-                    S = {S},
-                    T = {T}
-                  ).pair,
-                parameters = #(
-                  "s'": %Element(S),
-                  "t'": %Element(T)
-                ),
-                override = %true
-              }
-            )
+            _y: %Element($../Sets/"Cartesian product"(
+              S = {S},
+              T = {T}
+            )),
+            _z: %Element($../Sets/"Cartesian product"(
+              S = {S},
+              T = {T}
+            ))
           ),
-          override = %true
-        }
-      )),
-      %and(
-        $related(
-          S = {S},
-          T = {S},
-          ≺ = {⪯},
-          s = {s},
-          t = {"s'"}
-        ),
-        %or(
-          %not(%equals(s, "s'")),
-          $related(
-            S = {T},
-            T = {T},
-            ≺ = {⊑},
-            s = {t},
-            t = {"t'"}
+          value = %structural(
+            _z,
+            $../Sets/"Cartesian product"(
+              S = {S},
+              T = {T}
+            ),
+            [{
+              constructor = $../Sets/"Cartesian product"(
+                  S = {S},
+                  T = {T}
+                ).pair,
+              parameters = #(
+                "s'": %Element(S),
+                "t'": %Element(T)
+              ),
+              value = %structural(
+                _y,
+                $../Sets/"Cartesian product"(
+                  S = {S},
+                  T = {T}
+                ),
+                [{
+                  constructor = $../Sets/"Cartesian product"(
+                      S = {S},
+                      T = {T}
+                    ).pair,
+                  parameters = #(
+                    s: %Element(S),
+                    t: %Element(T)
+                  ),
+                  value = %and(
+                    $related(
+                      S = {S},
+                      T = {S},
+                      ≺ = {⪯},
+                      s = {s},
+                      t = {"s'"}
+                    ),
+                    %or(
+                      %not(%equals(s, "s'")),
+                      $related(
+                        S = {T},
+                        T = {T},
+                        ≺ = {⊑},
+                        s = {t},
+                        t = {"t'"}
+                      )
+                    )
+                  )
+                }]
+              )
+            }]
           )
-        )
+        }]
       )
   )})]
 }
