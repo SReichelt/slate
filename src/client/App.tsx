@@ -69,6 +69,7 @@ class App extends React.Component<AppProps, AppState> {
     };
     this.updateSelectionState(state);
     this.state = state;
+    this.updateTitle(state);
   }
 
   private updateSelectionState(state: SelectionState): boolean {
@@ -268,13 +269,25 @@ class App extends React.Component<AppProps, AppState> {
   private navigate(state: SelectionState): void {
     this.setState(state);
     let uri = '/';
+    if (state.selectedItemPath) {
+      uri = this.libraryDataProvider.pathToURI(state.selectedItemPath);
+    }
+    let title = this.updateTitle(state);
+    window.history.pushState(null, title, uri);
+    if (this.mainContentsPaneNode) {
+      this.mainContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
+    }
+    if (this.extraContentsPaneNode) {
+      this.extraContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
+    }
+  }
+
+  private updateTitle(state: SelectionState): string {
     let appName = 'Slate';
     let title = appName;
     if (state.selectedItemPath) {
-      uri = this.libraryDataProvider.pathToURI(state.selectedItemPath);
       title = `${appName}: ${state.selectedItemPath.name}`;
     }
-    window.history.pushState(null, title, uri);
     document.title = title;
     if (state.selectedItemInfo) {
       state.selectedItemInfo.then((info: LibraryItemInfo) => {
@@ -283,12 +296,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       });
     }
-    if (this.mainContentsPaneNode) {
-      this.mainContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
-    }
-    if (this.extraContentsPaneNode) {
-      this.extraContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
-    }
+    return title;
   }
 
   private edit = (): void => {
