@@ -1186,7 +1186,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let curParams: Fmt.Parameter[] = [];
       let curArgs: Display.RenderedExpression[] = [];
       let curParameterOverrides = index === definitions.length - 1 ? parameterOverrides : undefined;
-      let curArgumentLists = argumentLists && !curParameterOverrides ? argumentLists.slice(0, index + 1) : undefined;
+      let curReplacementParameters = curParameterOverrides ? curParameterOverrides.replacementParameters : undefined;
+      let curArgumentLists = argumentLists && !curReplacementParameters ? argumentLists.slice(0, index + 1) : undefined;
       this.fillArguments(curDefinition.parameters, curParameterOverrides, curArgumentLists, undefined, false, markAsDummy, curParams, curArgs);
       for (let paramIndex = 0; paramIndex < curParams.length; paramIndex++) {
         let curParam = curParams[paramIndex];
