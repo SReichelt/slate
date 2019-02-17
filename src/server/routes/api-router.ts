@@ -4,7 +4,7 @@ import * as express from 'express';
 import { Router } from 'express';
 import * as nodemailer from 'nodemailer';
 import * as config from '../config';
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 
 export function apiRouter() {
   const router = Router();
@@ -58,7 +58,8 @@ export function apiRouter() {
     router.report('/libraries/*', (request, response) => {
       let requestPath = decodeURI(request.url);
       let fileName = path.join(dataPath, requestPath);
-      spawn('code', [fileName]);
+      /* Use exec instead of spawn to make this work on Windows. */
+      exec(`code "${fileName}"`);
       response.sendStatus(200);
     });
   }
