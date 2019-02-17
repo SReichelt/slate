@@ -5,7 +5,7 @@ Slate is an interactive theorem prover that is currently under development.
 ## Web access
 
 Slate is designed as a web application.
-Please visit http://sreichelt.github.io/slate/.
+Please visit https://sreichelt.github.io/slate/.
 
 ## Running Slate locally
 
