@@ -185,15 +185,19 @@ class App extends React.Component<AppProps, AppState> {
         })
         .catch((error) => {
           this.setState({
-            gitHubAccessRequest: undefined,
-            gitHubAccessToken: undefined
+            gitHubAccessRequest: undefined
           });
           this.props.alert.error('GitHub login failed: ' + error.message);
         });
     } else if (this.state.gitHubAccessToken) {
       GitHub.getGitHubUser(this.state.gitHubAccessToken)
         .then((user) => this.setState({gitHubUser: user}))
-        .catch(() => this.setState({gitHubAccessToken: undefined}));
+        .catch(() => {
+          this.setState({
+            gitHubAccessToken: undefined
+          });
+          window.localStorage.deleteItem('GitHubAccessToken');
+        });
     }
 
     let templateUri = '/display/templates.slate';
@@ -460,6 +464,7 @@ class App extends React.Component<AppProps, AppState> {
       gitHubAccessToken: undefined,
       gitHubUser: undefined
     });
+    window.localStorage.deleteItem('GitHubAccessToken');
   }
 }
 
