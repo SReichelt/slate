@@ -7,7 +7,6 @@
     "node": ">=6.9.5"
   },
   "scripts": {
-    "get-lib": "ts-node ./src/scripts/cloneLibraries.ts",
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "start": "node ./dist/server/server.js",

@@ -46,10 +46,9 @@ Please follow these steps:
 3. Make sure the programs `git`, `code`, `npm`, and `chrome-remote-debug` can be started from the command line, i.e. are accessible via the `PATH` environment variable.
 4. In a terminal, in a directory of your choice, run
    ```
-   git clone https://github.com/SReichelt/slate.git
+   git clone --recursive https://github.com/SReichelt/slate.git
    cd slate
    npm install
-   npm run-script get-lib
    ```
 5. Start Visual Studio Code, and open the workspace `Slate.code-workspace`.
 6. Now you should be able to execute the app via "Debug/Start" (F5). If successful, a browser will open.
