@@ -3,6 +3,8 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import CachedPromise from '../../data/cachedPromise';
 
+export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {}
+
 export class HLMUtils extends GenericUtils {
   isValueParamType(type: Fmt.Expression): boolean {
     return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol);
@@ -104,7 +106,7 @@ export class HLMUtils extends GenericUtils {
     return result;
   }
 
-  getStructuralCaseTerm(construction: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase): CachedPromise<Fmt.Expression> {
+  getStructuralCaseTerm(construction: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
     let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(construction);
     let resultPromise = constructionDefinitionPromise.then((constructionDefinition: Fmt.Definition) => {
       let constructorExpr = structuralCase._constructor as Fmt.DefinitionRefExpression;
@@ -127,7 +129,7 @@ export class HLMUtils extends GenericUtils {
         result = resultRef;
       }
       if (constructorDefinition.parameters.length) {
-        result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!);
+        result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!, markAsDefinition);
       }
       return result;
     });
@@ -151,12 +153,12 @@ export class HLMUtils extends GenericUtils {
     return resultRef;
   }
 
-  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.ParameterList, substitutedParameters: Fmt.ParameterList): Fmt.Expression {
+  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.ParameterList, substitutedParameters: Fmt.ParameterList, markAsDefinition: boolean = false): Fmt.Expression {
     for (let paramIndex = 0; paramIndex < originalParameters.length; paramIndex++) {
       let originalParam = originalParameters[paramIndex];
       let substitutedParam = substitutedParameters[paramIndex];
       expression = this.substituteVariable(expression, originalParam, (indices?: Fmt.Expression[]) => {
-        let substitutedExpression = new Fmt.VariableRefExpression;
+        let substitutedExpression = markAsDefinition ? new DefinitionVariableRefExpression : new Fmt.VariableRefExpression;
         substitutedExpression.variable = substitutedParam;
         substitutedExpression.indices = indices;
         return substitutedExpression;
@@ -164,7 +166,7 @@ export class HLMUtils extends GenericUtils {
       let originalType = originalParam.type.expression;
       if (originalType instanceof FmtHLM.MetaRefExpression_Binding) {
         let substitutedType = substitutedParam.type.expression as FmtHLM.MetaRefExpression_Binding;
-        expression = this.substituteParameters(expression, originalType.parameters, substitutedType.parameters);
+        expression = this.substituteParameters(expression, originalType.parameters, substitutedType.parameters, markAsDefinition);
       }
     }
     return expression;

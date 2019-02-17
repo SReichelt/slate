@@ -8,11 +8,11 @@
     "lib": ["es6"],
     "moduleResolution": "node",
     "types": ["node"],
+    "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true
+    "strictNullChecks": true
   }
 }
