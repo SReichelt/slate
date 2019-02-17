@@ -17,6 +17,7 @@ import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
 import { WebFileAccessor } from './data/webFileAccessor';
 import { GitHubFileAccessor } from './data/gitHubFileAccessor';
+import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
@@ -39,7 +40,14 @@ interface SelectionState {
   submitting: boolean;
 }
 
-interface AppState extends SelectionState {
+interface GitHubState {
+  gitHubClientID?: string;
+  gitHubAccessRequest?: Promise<string>;
+  gitHubAccessToken?: string;
+  gitHubUser?: string;
+}
+
+interface AppState extends SelectionState, GitHubState {
   verticalLayout: boolean;
   error?: string;
   templates?: Fmt.File;
@@ -87,13 +95,31 @@ class App extends React.Component<AppProps, AppState> {
       submitting: false,
       extraContentsVisible: false
     };
-    this.updateSelectionState(state);
+
+    let selectionURI = window.location.pathname;
+
+    let queryString = window.location.search;
+    if (queryString) {
+      let gitHubQueryStringResult = GitHub.parseGitHubQueryString(queryString);
+      if (gitHubQueryStringResult.path) {
+        selectionURI = gitHubQueryStringResult.path;
+      }
+      if (gitHubQueryStringResult.token) {
+        state.gitHubAccessRequest = gitHubQueryStringResult.token;
+      }
+    }
+
+    this.updateSelectionState(state, selectionURI);
     this.state = state;
-    this.updateTitle(state);
+    let title = this.updateTitle(state);
+
+    if (queryString) {
+      window.history.pushState(null, title, selectionURI);
+    }
   }
 
-  private updateSelectionState(state: SelectionState): boolean {
-    let path = this.libraryDataProvider.uriToPath(window.location.pathname);
+  private updateSelectionState(state: SelectionState, uri: string): boolean {
+    let path = this.libraryDataProvider.uriToPath(uri);
     if (path) {
       this.fillSelectionState(state, path);
       return true;
@@ -113,7 +139,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidMount(): void {
     window.onpopstate = () => {
-      // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
+      /* Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection. */
       let state: SelectionState = {
         selectedItemPath: undefined,
         selectedItemProvider: undefined,
@@ -122,7 +148,7 @@ class App extends React.Component<AppProps, AppState> {
         interactionHandler: undefined,
         submitting: false
       };
-      this.updateSelectionState(state);
+      this.updateSelectionState(state, window.location.pathname);
       this.setState(state);
     };
 
@@ -139,6 +165,30 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     };
+
+    GitHub.getGitHubClientID()
+      .then((clientID) => this.setState({gitHubClientID: clientID}))
+      .catch(() => {});
+
+    if (this.state.gitHubAccessRequest) {
+      this.state.gitHubAccessRequest
+        .then((token) => {
+          this.setState({
+            gitHubAccessRequest: undefined,
+            gitHubAccessToken: token
+          });
+          GitHub.getGitHubUser(token)
+            .then((user) => this.setState({gitHubUser: user}))
+            .catch(() => {});
+        })
+        .catch((error) => {
+          this.setState({
+            gitHubAccessRequest: undefined,
+            gitHubAccessToken: undefined
+          });
+          this.props.alert.error('GitHub login failed: ' + error.message);
+        });
+    }
 
     let templateUri = '/display/templates.slate';
     this.fileAccessor.readFile(templateUri)
@@ -185,6 +235,30 @@ class App extends React.Component<AppProps, AppState> {
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let buttons: any[] = [];
+
+    if (this.state.gitHubAccessToken) {
+      if (this.state.gitHubUser) {
+        buttons.push(this.state.gitHubUser);
+        buttons.push(' ');
+      }
+      buttons.push(
+        <Button toolTipText={'Logout (Warning: Does not log out of GitHub.)'} onClick={this.logoutOfGitHub} key={'Logout'}>
+          {getButtonIcon(ButtonType.Logout)}
+        </Button>
+      );
+      buttons.push(' ');
+    } else if (this.state.gitHubAccessRequest) {
+      buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
+      buttons.push('  Logging in... ');
+    } else if (this.state.gitHubClientID) {
+      buttons.push(
+        <Button toolTipText={'Login with GitHub'} onClick={this.loginWithGitHub} key={'Login'}>
+          {getButtonIcon(ButtonType.Login)}
+        </Button>
+      );
+      buttons.push(' ');
+    }
+
     if (this.state.selectedItemDefinition) {
       if (this.state.submitting) {
         buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
@@ -359,6 +433,21 @@ class App extends React.Component<AppProps, AppState> {
           this.props.alert.error('Error opening file: ' + error.message);
         });
     }
+  }
+
+  private loginWithGitHub = (): void => {
+    if (this.state.gitHubClientID) {
+      let location = window.location;
+      let baseURI = location.protocol + '//' + location.host + '/';
+      location.href = GitHub.getGitHubLoginURI(this.state.gitHubClientID, baseURI, location.pathname);
+    }
+  }
+
+  private logoutOfGitHub = (): void => {
+    this.setState({
+      gitHubAccessToken: undefined,
+      gitHubUser: undefined
+    });
   }
 }
 

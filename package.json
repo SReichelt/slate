@@ -24,11 +24,14 @@
   "repository": "github:sreichelt/slate",
   "homepage": "https://sreichelt.github.io/slate",
   "dependencies": {
+    "@types/query-string": "^6.2.0",
+    "@types/request": "^2.48.1",
     "express": "^4.16.4",
     "http-proxy-middleware": "^0.18.0",
     "markdown-escape": "^1.0.2",
     "mathjax": "^2.7.5",
     "nodemailer": "^4.7.0",
+    "query-string": "^6.2.0",
     "react": "^16.8.2",
     "react-alert": "^4.0.4",
     "react-alert-template-basic": "^1.0.0",
@@ -39,6 +42,7 @@
     "react-responsive-modal": "^3.6.0",
     "react-simplemde-editor": "^3.6.22",
     "react-split-pane": "^0.1.85",
+    "request": "^2.88.0",
     "tslib": "^1.9.2"
   },
   "devDependencies": {

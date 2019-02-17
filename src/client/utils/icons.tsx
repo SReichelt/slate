@@ -10,6 +10,8 @@ export enum ButtonType {
   Edit,
   OpenLocally,
   ViewSource,
+  Login,
+  Logout,
   RightArrow,
   DownArrow
 }
@@ -39,6 +41,10 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
     );
   case ButtonType.ViewSource:
     return '{⋯}';
+  case ButtonType.Login:
+    return 'Login';
+  case ButtonType.Logout:
+    return 'Logout';
   case ButtonType.RightArrow:
     return (
       <svg height="1em" width="1em" viewBox="-8 -8 16 16">
