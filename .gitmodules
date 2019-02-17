@@ -1,3 +1,4 @@
 [submodule "data/libraries/hlm"]
 	path = data/libraries/hlm
 	url = https://github.com/sreichelt/slate-hlm
+	branch = master
