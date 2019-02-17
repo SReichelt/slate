@@ -7,7 +7,7 @@ export function getGitHubClientID(): Promise<string> {
 
 export function getGitHubLoginURI(clientID: string, baseURI: string, path: string): string {
   let redirectURI = baseURI;
-  if (path) {
+  if (path && path !== '/') {
     redirectURI += '?path=' + encodeURI(path);
   }
   return `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=read:user%20public_repo&redirect_uri=${encodeURI(redirectURI)}`;

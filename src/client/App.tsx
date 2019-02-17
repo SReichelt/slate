@@ -463,7 +463,7 @@ class App extends React.Component<AppProps, AppState> {
       let protocol = location.protocol;
       let host = location.host;
       if (location.hostname !== 'localhost') {
-        protocol = 'https';
+        protocol = 'https:';
         host = location.hostname;
       }
       let baseURI = protocol + '//' + host + '/';
