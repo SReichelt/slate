@@ -25,20 +25,14 @@ $related(
           S = {S},
           T = {T}
         ).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      ))),
-      value = %in(
-        $../Sets/"Cartesian product"(
-            S = {S},
-            T = {T}
-          ).pair(
-            s = {s},
-            t = {t}
-        ),
-        R
-      )
+      parameters = #(u: %Binding(
+        S,
+        #(v: %Binding(
+          T,
+          #(p: %Prop)
+        ))
+      )),
+      value = p[s,t]
     }]
   )]
 }

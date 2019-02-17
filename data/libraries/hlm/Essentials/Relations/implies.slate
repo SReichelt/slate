@@ -1,0 +1,41 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition is equivalent to the first relation being a subset of the second if relations are encoded as subsets.
+ */
+$implies(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  )),
+  ⊂: %Element(%previous)
+): %Predicate {
+  display = [$Relation(
+    symbol = '⇒',
+    operands = [≺, ⊂],
+    space = ' ',
+    parenLevel = -3
+  )],
+  definition = [%forall(
+    #(
+      s: %Element(S),
+      t: %Element(T),
+      _1: %Constraint($related(
+        S = {S},
+        T = {T},
+        ≺ = {≺},
+        s = {s},
+        t = {t}
+      ))
+    ),
+    $related(
+      S = {S},
+      T = {T},
+      ≺ = {⊂},
+      s = {s},
+      t = {t}
+    )
+  )]
+}

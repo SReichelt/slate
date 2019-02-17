@@ -1,0 +1,37 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition is equivalent to the [generalized intersection](../Sets/Generalized%20intersection%20using%20power%20set) of relations if relations are encoded as subsets.
+ */
+$"generalized conjunction"(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  R: %Subset($Relations(
+    S = {S},
+    T = {T}
+  ))
+): %ExplicitOperator {
+  display = [$PrefixUnaryOperator(
+    symbol = '⋀',
+    operand = R
+  )],
+  definition = [$Relations(
+      S = {S},
+      T = {T}
+    ).relation(s = {
+      #(s: %Element(S)),
+      {t = {
+        #(t: %Element(T)),
+        {p = {%forall(
+          #(≺: %Element(R)),
+          $related(
+            S = {S},
+            T = {T},
+            s = {s},
+            t = {t},
+            ≺ = {≺}
+          )
+        )}}
+      }}
+  })]
+}

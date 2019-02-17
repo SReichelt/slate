@@ -1,6 +1,8 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks This definition encodes a relation from _S_ to _T_ as a proposition depending on an element of _S_ and an element of _T_ (up to equivalence). It would be equally possible to encode relations as subsets of the Cartesian product; the given definition is just more convenient.
+ *
  * @references * https://en.wikipedia.org/wiki/Binary_relation
  *             * http://mathworld.wolfram.com/Relation.html
  *             * https://proofwiki.org/wiki/Definition:Relation
@@ -16,24 +18,51 @@ $Relations(
     embedSubsets = %true
   )
 ): %Construction {
-  $relation(R: %Subset($../Sets/"Cartesian product"(
-    S = {S},
-    T = {T}
-  ))): %Constructor {
-    display = [$Parens(
-      body = R,
-      style = '()'
+  $relation(s: %Binding(
+    S,
+    #(t: %Binding(
+      T,
+      #(p: %Prop)
+    ))
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = p,
+        style = '[]'
+      ),
+      sub = $Group(items = [
+        $ElementRelation(
+          element = s,
+          set = S
+        ),
+        $ElementRelation(
+          element = t,
+          set = T
+        )
+      ])
     )],
     equalityDefinition = {
-      leftParameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      ))),
-      rightParameters = #("R'": %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      ))),
-      definition = [%setEquals(R, "R'")],
+      leftParameters = #(s: %Binding(
+        S,
+        #(t: %Binding(
+          T,
+          #(p: %Prop)
+        ))
+      )),
+      rightParameters = #(s: %Binding(
+        S,
+        #(t: %Binding(
+          T,
+          #(q: %Prop)
+        ))
+      )),
+      definition = [%forall(
+        #(
+          s: %Element(S),
+          t: %Element(T)
+        ),
+        %equiv(p[s,t], q[s,t])
+      )],
       isomorphic = %true
     }
   }

@@ -26,7 +26,7 @@ $"reflexive closure"(
         )
       )}
     ),
-    $../union(
+    $../disjunction(
       S = {S},
       T = {S},
       ≺ = {≺},

@@ -16,59 +16,44 @@ $"relation transform"(
   )],
   definition = [%structuralCases(
     ≺,
-    $../../Essentials/Relations/Relations(
-      S = {X},
-      T = {X}
-    ),
+    $../../Essentials/Relations/Endorelations(S = {X}),
     [{
-      constructor = $../../Essentials/Relations/Relations(
-          S = {X},
-          T = {X}
-        ).relation,
-      parameters = #(R: %Subset($../../Essentials/Sets/"Cartesian product"(
-        S = {X},
-        T = {X}
-      ))),
-      value = $../../Essentials/Relations/Relations(
-          S = {Y},
-          T = {Y}
-        ).relation(R = {%extendedSubset(
-          #(_r: %Element(R)),
-          %structuralCases(
-            _r,
-            $../../Essentials/Sets/"Cartesian product"(
-              S = {X},
-              T = {X}
-            ),
-            [{
-              constructor = $../../Essentials/Sets/"Cartesian product"(
-                  S = {X},
-                  T = {X}
-                ).pair,
-              parameters = #(
-                s: %Element(X),
-                t: %Element(X)
+      constructor = $../../Essentials/Relations/Endorelations(S = {X}).relation,
+      parameters = #(x_1: %Binding(
+        X,
+        #(x_2: %Binding(
+          %previous,
+          #(p: %Prop)
+        ))
+      )),
+      value = $../../Essentials/Relations/Endorelations(S = {Y}).relation(s = {
+          #(y_1: %Element(Y)),
+          {t = {
+            #(y_2: %Element(Y)),
+            {p = {p[
+              $../../Essentials/Functions/value(
+                X = {Y},
+                Y = {X},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X},
+                  Y = {Y},
+                  f = {φ}
+                )},
+                x = {y_1}
               ),
-              value = $../../Essentials/Sets/"Cartesian product"(
-                  S = {X},
-                  T = {X}
-                ).pair(
-                  s = {$../../Essentials/Functions/value(
-                    X = {X},
-                    Y = {Y},
-                    f = {φ},
-                    x = {s}
-                  )},
-                  t = {$../../Essentials/Functions/value(
-                    X = {X},
-                    Y = {Y},
-                    f = {φ},
-                    x = {t}
-                  )}
+              $../../Essentials/Functions/value(
+                X = {Y},
+                Y = {X},
+                f = {$../../Essentials/Functions/inverse(
+                  X = {X},
+                  Y = {Y},
+                  f = {φ}
+                )},
+                x = {y_2}
               )
-            }]
-          )
-      )})
+            ]}}
+          }}
+      })
     }]
   )]
 }

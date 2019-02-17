@@ -10,8 +10,11 @@ $Relations: %Section {
       title = 'Predicate as relation'
     ),
     %item($converse),
-    %item($intersection),
-    %item($union),
+    %item($implies),
+    %item($conjunction),
+    %item($disjunction),
+    %item($"generalized conjunction"),
+    %item($"generalized disjunction"),
     %item($mapping),
     %item($"mapping value"),
     %item(

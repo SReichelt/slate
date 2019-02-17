@@ -1,7 +1,7 @@
 %../../../logics/hlm%
 
 /**
- * @remarks This definition just provides some useful notation for rewriting rules for terms in _T_. It is actually equivalent to the cartesian product of _T_ with itself.
+ * @remarks This definition just provides some useful notation for rewriting rules for terms in _T_. It is actually equivalent to the Cartesian product of _T_ with itself.
  */
 $"Rewriting rules"(T: %Set(
   auto = %true,

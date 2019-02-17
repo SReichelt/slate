@@ -1,0 +1,26 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set of [binary digits](../Numbers/Natural/Subsets/Binary%20digits).
+ */
+$"Truth values": %Construction {
+  $"truth value"(p: %Prop): %Constructor {
+    display = [$Parens(
+      body = p,
+      style = '[]'
+    )],
+    equalityDefinition = {
+      leftParameters = #(p: %Prop),
+      rightParameters = #(q: %Prop),
+      definition = [%equiv(p, q)],
+      isomorphic = %true
+    }
+  }
+
+  display = ['𝓣𝓻𝓾𝓽𝓱'],
+  definitionDisplay = {
+    parameter = #(p: %Expr),
+    singularName = 'truth value',
+    pluralName = 'truth values'
+  }
+}

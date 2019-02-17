@@ -25,6 +25,7 @@ $Sets: %Section {
     %item($"Generalized union"),
     %item($"Generalized union using power set"),
     %item($"Generalized cartesian product"),
+    %item($"Truth values"),
     %subsection(
       $Choice,
       'Choice functions and axioms'

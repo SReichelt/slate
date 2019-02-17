@@ -19,51 +19,20 @@ $converse(
       styleClass = 'sans'
     )
   )],
-  definition = [%structuralCases(
-    ≺,
-    $Relations(
-      S = {S},
-      T = {T}
-    ),
-    [{
-      constructor = $Relations(
+  definition = [$Relations(
+      S = {T},
+      T = {S}
+    ).relation(s = {
+      #(t: %Element(T)),
+      {t = {
+        #(s: %Element(S)),
+        {p = {$related(
           S = {S},
-          T = {T}
-        ).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {T}
-      ))),
-      value = $Relations(
-          S = {T},
-          T = {S}
-        ).relation(R = {%extendedSubset(
-          #(_x: %Element(R)),
-          %structuralCases(
-            _x,
-            $../Sets/"Cartesian product"(
-              S = {S},
-              T = {T}
-            ),
-            [{
-              constructor = $../Sets/"Cartesian product"(
-                  S = {S},
-                  T = {T}
-                ).pair,
-              parameters = #(
-                s: %Element(S),
-                t: %Element(T)
-              ),
-              value = $../Sets/"Cartesian product"(
-                  S = {T},
-                  T = {S}
-                ).pair(
-                  s = {t},
-                  t = {s}
-              )
-            }]
-          )
-      )})
-    }]
-  )]
+          T = {T},
+          ≺ = {≺},
+          s = {s},
+          t = {t}
+        )}}
+      }}
+  })]
 }

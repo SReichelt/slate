@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks The generalized cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
+ * @remarks The generalized Cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
  *
  * @references * https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
  */

@@ -95,7 +95,7 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
   )
 }
 
-$UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 3, maxParenLevel: %Int = 2): %Template {
+$UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 3, maxParenLevel?: %Int): %Template {
   display = $OuterParens(
     body = [$InnerParens(
       body = operand,

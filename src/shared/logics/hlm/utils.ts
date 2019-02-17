@@ -4,8 +4,16 @@ import * as FmtHLM from './meta';
 import CachedPromise from '../../data/cachedPromise';
 
 export class HLMUtils extends GenericUtils {
+  isValueParamType(type: Fmt.Expression): boolean {
+    return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol);
+  }
+
   private getArgValueArg(argValue: Fmt.CompoundExpression, paramType: Fmt.Expression): Fmt.Expression | undefined {
-    if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
+    if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
+      let propArg = new FmtHLM.ObjectContents_PropArg;
+      propArg.fromCompoundExpression(argValue);
+      return propArg.formula;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
       let setArg = new FmtHLM.ObjectContents_SetArg;
       setArg.fromCompoundExpression(argValue);
       return setArg._set;
@@ -28,7 +36,7 @@ export class HLMUtils extends GenericUtils {
 
   getParameterArgument(param: Fmt.Parameter, targetParam?: Fmt.Parameter, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.Argument | undefined {
     let type = param.type.expression;
-    if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol || type instanceof FmtHLM.MetaRefExpression_Binding) {
+    if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binding) {
       let arg = new Fmt.Argument;
       arg.name = param.name;
       let argValue = new Fmt.CompoundExpression;
@@ -55,7 +63,11 @@ export class HLMUtils extends GenericUtils {
         let varExpr = new Fmt.VariableRefExpression;
         varExpr.variable = param;
         varExpr.indices = indices;
-        if (type instanceof FmtHLM.MetaRefExpression_Set) {
+        if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+          let propArg = new FmtHLM.ObjectContents_PropArg;
+          propArg.formula = varExpr;
+          propArg.toCompoundExpression(argValue);
+        } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = new FmtHLM.ObjectContents_SetArg;
           setArg._set = varExpr;
           setArg.toCompoundExpression(argValue);
@@ -161,7 +173,7 @@ export class HLMUtils extends GenericUtils {
   substituteArguments(expression: Fmt.Expression, parameters: Fmt.ParameterList, args: Fmt.ArgumentList, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
     for (let param of parameters) {
       let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol) {
+      if (this.isValueParamType(type)) {
         let argValue = args.getValue(param.name) as Fmt.CompoundExpression;
         let argValueArg = this.getArgValueArg(argValue, type)!;
         expression = this.substituteVariable(expression, param, (indices?: Fmt.Expression[]) => {

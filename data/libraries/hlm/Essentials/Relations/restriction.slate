@@ -1,7 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks This definition is not exactly standard but very simple. The main reason to include it is that the result is known to be a relation on _T_ instead of _S_, which is sometimes needed.
+ * @remarks This definition is not exactly standard but very simple. The main reason to include it is that the result is defined to be a relation on _T_ instead of _S_, which is sometimes needed.
  */
 $restriction(
   S: %Set(auto = %true),
@@ -15,31 +15,17 @@ $restriction(
     ),
     operand = ≺
   )],
-  definition = [%structuralCases(
-    ≺,
-    $Relations(
-      S = {S},
-      T = {S}
-    ),
-    [{
-      constructor = $Relations(
+  definition = [$Endorelations(S = {T}).relation(s = {
+      #(t: %Element(T)),
+      {t = {
+        #(u: %Element(T)),
+        {p = {$related(
           S = {S},
-          T = {S}
-        ).relation,
-      parameters = #(R: %Subset($../Sets/"Cartesian product"(
-        S = {S},
-        T = {S}
-      ))),
-      value = $Relations(
-          S = {T},
-          T = {T}
-        ).relation(R = {%subset(
-          #(t: %Element($../Sets/"Cartesian product"(
-            S = {T},
-            T = {T}
-          ))),
-          %in(t, R)
-      )})
-    }]
-  )]
+          T = {S},
+          ≺ = {≺},
+          s = {t},
+          t = {u}
+        )}}
+      }}
+  })]
 }

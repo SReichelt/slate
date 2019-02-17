@@ -3,14 +3,14 @@
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
   expressionTypes = [$Expr, $Bool, $Nat, $ParameterList, $DefinitionRef,
-                     $Set, $Subset, $Element, $Symbol, $Constraint, $Binding,
+                     $Prop, $Set, $Subset, $Element, $Symbol, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false, $left, $right,
                $empty, $previous,
                $enumeration, $subset, $extendedSubset, $setStructuralCases,
                $cases, $structuralCases,
-               $not, $and, $or, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
+               $not, $and, $or, $equiv, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
                %Any],
   lookup = %Any
 }
@@ -149,6 +149,11 @@ $Property: %ExpressionType {
   )
 }
 
+$Formula: %ExpressionType {}
+$SetTerm: %ExpressionType {}
+$ElementTerm: %ExpressionType {}
+$SymbolTerm: %ExpressionType {}
+
 $Bool: %ExpressionType {}
 $true: $Bool {}
 $false: $Bool {}
@@ -164,6 +169,9 @@ $EquationSide: %ExpressionType {}
 $left: $EquationSide {}
 $right: $EquationSide {}
 
+$Prop(auto: $Bool = $false): %ParameterType($Formula) {
+  argumentType = $PropArg
+}
 $Set(auto: $Bool = $false, embedSubsets: $Bool = $false): %ParameterType($SetTerm) {
   argumentType = $SetArg
 }
@@ -176,7 +184,7 @@ $Element(set: $SetTerm, auto: $Bool = $false): %ParameterType($ElementTerm) {
 $Symbol(auto: $Bool = $false): %ParameterType($SymbolTerm) {
   argumentType = $SymbolArg
 }
-$Constraint(formula: $Formula): %ParameterType($Formula) {
+$Constraint(formula: $Formula): %ParameterType {
   optional = %true,
   argumentType = $ConstraintArg
 }
@@ -191,6 +199,11 @@ $Def(element: $ElementTerm): %ParameterType($ElementTerm) {
   optional = %true
 }
 
+$PropArg: %ExpressionType {
+  members = #(
+    formula: $Formula
+  )
+}
 $SetArg: %ExpressionType {
   members = #(
     set: $SetTerm
@@ -225,11 +238,6 @@ $BindingArg: %ExpressionType {
   )
 }
 
-$SetTerm: %ExpressionType {}
-$ElementTerm: %ExpressionType {}
-$SymbolTerm: %ExpressionType {}
-$Formula: %ExpressionType {}
-
 $empty: %Any {}
 $previous: %Any {}
 
@@ -244,6 +252,7 @@ $structuralCases(term: $ElementTerm, construction: $Construction, cases: $Struct
 $not(formula: $Formula): $Formula {}
 $and(formulae...?: $Formula): $Formula {}
 $or(formulae...?: $Formula): $Formula {}
+$equiv(left: $Formula, right: $Formula): $Formula {}
 $forall(parameters: %ParameterList, formula[parameters]: $Formula): $Formula {}
 $exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $existsUnique(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}

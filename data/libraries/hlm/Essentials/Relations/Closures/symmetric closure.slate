@@ -25,7 +25,7 @@ $"symmetric closure"(
         )
       )}
     ),
-    $../union(
+    $../disjunction(
       S = {S},
       T = {S},
       ≺ = {≺},

@@ -12,9 +12,9 @@ $"reflexive symmetric closure"(
     $closure(
       S = {S},
       ≺ = {≺},
-      p = {$../../Properties/Properties.property(P = {%subset(
+      p = {$../../Properties/Properties(S = {$../Endorelations(S = {S})}).property(s = {
           #(⊂: %Element($../Endorelations(S = {S}))),
-          %and(
+          {p = {%and(
             $../reflexive(
               S = {S},
               ≺ = {⊂}
@@ -23,8 +23,8 @@ $"reflexive symmetric closure"(
               S = {S},
               ≺ = {⊂}
             )
-          )
-      )})}
+          )}}
+      })}
     ),
     $"symmetric closure"(
       S = {S},

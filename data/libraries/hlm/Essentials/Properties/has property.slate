@@ -14,8 +14,11 @@ $"has property"(
     $Properties(S = {S}),
     [{
       constructor = $Properties(S = {S}).property,
-      parameters = #(P: %Subset(S)),
-      value = %in(s, P)
+      parameters = #(t: %Binding(
+        S,
+        #(p: %Prop)
+      )),
+      value = p[s]
     }]
   )]
 }

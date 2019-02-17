@@ -1,9 +1,7 @@
 %../../../../logics/hlm%
 
 /**
- * @remarks Although a property (or unary relation) on _S_ is merely a subset of _S_ (i.e. the subset of all elements for which the property holds), it makes sense to introduce a construction along with a macro that converts suitable predicates to properties.
- *
- *          Other than that, this definition is identical to that of the [power set](../Sets/Power%20set).
+ * @remarks This definition encodes a property (aka unary relation) on _S_ as a proposition depending on an element of _S_ (up to equivalence). Since it is equally possible to encode a unary relation on _S_ as a subset of _S_, this definition is interchangeable with the definition of the [power set](../Sets/Power%20set). The given definition is just more convenient.
  *
  * @references * https://en.wikipedia.org/wiki/Property_(mathematics)
  */
@@ -11,15 +9,33 @@ $Properties(S: %Set(
   auto = %true,
   embedSubsets = %true
 )): %Construction {
-  $property(P: %Subset(S)): %Constructor {
-    display = [$Parens(
-      body = P,
-      style = '()'
+  $property(s: %Binding(
+    S,
+    #(p: %Prop)
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = p,
+        style = '[]'
+      ),
+      sub = $ElementRelation(
+        element = s,
+        set = S
+      )
     )],
     equalityDefinition = {
-      leftParameters = #(P: %Subset(S)),
-      rightParameters = #("P'": %Subset(S)),
-      definition = [%setEquals(P, "P'")],
+      leftParameters = #(s: %Binding(
+        S,
+        #(p: %Prop)
+      )),
+      rightParameters = #(s: %Binding(
+        S,
+        #(q: %Prop)
+      )),
+      definition = [%forall(
+        #(s: %Element(S)),
+        %equiv(p[s], q[s])
+      )],
       isomorphic = %true
     }
   }

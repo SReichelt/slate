@@ -1,0 +1,45 @@
+%../../../../logics/hlm%
+
+/**
+ * @remarks This definition is equivalent to the [intersection](../Sets/Intersection) of two relations if relations are encoded as subsets.
+ */
+$conjunction(
+  S: %Set(auto = %true),
+  T: %Set(auto = %true),
+  ≺: %Element($Relations(
+    S = {S},
+    T = {T}
+  )),
+  ⊂: %Element(%previous)
+): %ExplicitOperator {
+  display = [$Operator(
+    symbol = '∧',
+    operands = [≺, ⊂],
+    space = ' '
+  )],
+  definition = [$Relations(
+      S = {S},
+      T = {T}
+    ).relation(s = {
+      #(s: %Element(S)),
+      {t = {
+        #(t: %Element(T)),
+        {p = {%and(
+          $related(
+            S = {S},
+            T = {T},
+            ≺ = {≺},
+            s = {s},
+            t = {t}
+          ),
+          $related(
+            S = {S},
+            T = {T},
+            ≺ = {⊂},
+            s = {s},
+            t = {t}
+          )
+        )}}
+      }}
+  })]
+}

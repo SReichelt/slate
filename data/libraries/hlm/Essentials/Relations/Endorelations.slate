@@ -1,11 +1,59 @@
 %../../../../logics/hlm%
 
 /**
+ * @remarks Since endorelations are used often, we encode them as a separate construction with an appropriate embedding, mainly to improve rendering.
+ *
  * @references * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
  *             * http://mathworld.wolfram.com/Relation.html
  *             * https://proofwiki.org/wiki/Definition:Endorelation
  */
-$Endorelations(S: %Set): %SetOperator {
+$Endorelations(S: %Set(
+  auto = %true,
+  embedSubsets = %true
+)): %Construction {
+  $relation(s: %Binding(
+    S,
+    #(t: %Binding(
+      %previous,
+      #(p: %Prop)
+    ))
+  )): %Constructor {
+    display = [$SubSup(
+      body = $Parens(
+        body = p,
+        style = '[]'
+      ),
+      sub = $ElementRelation(
+        element = $Group(items = [s, t]),
+        set = S
+      )
+    )],
+    equalityDefinition = {
+      leftParameters = #(s: %Binding(
+        S,
+        #(t: %Binding(
+          %previous,
+          #(p: %Prop)
+        ))
+      )),
+      rightParameters = #(s: %Binding(
+        S,
+        #(t: %Binding(
+          %previous,
+          #(q: %Prop)
+        ))
+      )),
+      definition = [%forall(
+        #(
+          s: %Element(S),
+          t: %Element(%previous)
+        ),
+        %equiv(p[s,t], q[s,t])
+      )],
+      isomorphic = %true
+    }
+  }
+
   display = [$Function(
     function = '𝓡𝓮𝓵',
     arguments = [S]
@@ -15,8 +63,23 @@ $Endorelations(S: %Set): %SetOperator {
     singularName = ['relation', ' on ', S],
     pluralName = ['relations', ' on ', S]
   },
-  definition = [$Relations(
-    S = {S},
-    T = {S}
-  )]
+  embedding = {
+    parameter = #(≺: %Element($Relations(
+      S = {S},
+      T = {S}
+    ))),
+    target = $Endorelations(S = {S}).relation(s = {
+        #(s: %Element(S)),
+        {t = {
+          #(t: %Element(S)),
+          {p = {$related(
+            S = {S},
+            T = {S},
+            ≺ = {≺},
+            s = {s},
+            t = {t}
+          )}}
+        }}
+    })
+  }
 }
