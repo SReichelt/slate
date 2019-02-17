@@ -47,10 +47,15 @@ function runGitHubRequest(request: any, accessToken: string): Promise<any> {
     .then((response) => response.json());
 }
 
-export function getGitHubUser(accessToken: string): Promise<string> {
+export interface GitHubUserInfo {
+  login?: string;
+  avatarUrl?: string;
+}
+
+export function getGitHubUserInfo(accessToken: string): Promise<GitHubUserInfo> {
   let request = {
-    query: 'query { viewer { login } }'
+    query: 'query { viewer { login avatarUrl } }'
   };
   return runGitHubRequest(request, accessToken)
-    .then((result) => result.data.viewer.login);
+    .then((result) => result.data.viewer);
 }

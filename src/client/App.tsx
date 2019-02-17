@@ -44,7 +44,7 @@ interface GitHubState {
   gitHubClientID?: string;
   gitHubAccessRequest?: Promise<string>;
   gitHubAccessToken?: string;
-  gitHubUser?: string;
+  gitHubUserInfo?: GitHub.GitHubUserInfo;
 }
 
 interface AppState extends SelectionState, GitHubState {
@@ -179,8 +179,8 @@ class App extends React.Component<AppProps, AppState> {
             gitHubAccessToken: token
           });
           window.localStorage.setItem('GitHubAccessToken', token);
-          GitHub.getGitHubUser(token)
-            .then((user) => this.setState({gitHubUser: user}))
+          GitHub.getGitHubUserInfo(token)
+            .then((userInfo) => this.setState({gitHubUserInfo: userInfo}))
             .catch(() => {});
         })
         .catch((error) => {
@@ -190,13 +190,13 @@ class App extends React.Component<AppProps, AppState> {
           this.props.alert.error('GitHub login failed: ' + error.message);
         });
     } else if (this.state.gitHubAccessToken) {
-      GitHub.getGitHubUser(this.state.gitHubAccessToken)
-        .then((user) => this.setState({gitHubUser: user}))
+      GitHub.getGitHubUserInfo(this.state.gitHubAccessToken)
+        .then((userInfo) => this.setState({gitHubUserInfo: userInfo}))
         .catch(() => {
           this.setState({
             gitHubAccessToken: undefined
           });
-          window.localStorage.deleteItem('GitHubAccessToken');
+          window.localStorage.removeItem('GitHubAccessToken');
         });
     }
 
@@ -244,55 +244,61 @@ class App extends React.Component<AppProps, AppState> {
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
-    let buttons: any[] = [];
-
+    let leftButtons: any[] = [];
     if (this.state.gitHubAccessToken) {
-      if (this.state.gitHubUser) {
-        buttons.push(this.state.gitHubUser);
-        buttons.push(' ');
+      if (this.state.gitHubUserInfo) {
+        if (this.state.gitHubUserInfo.avatarUrl) {
+          leftButtons.push(<img src={this.state.gitHubUserInfo.avatarUrl} key={'Avatar'}/>);
+        }
+        if (this.state.gitHubUserInfo.login) {
+          leftButtons.push(this.state.gitHubUserInfo.login);
+        }
+        leftButtons.push(' ');
       }
-      buttons.push(
+      leftButtons.push(
         <Button toolTipText={'Logout (Warning: Does not log out of GitHub.)'} onClick={this.logoutOfGitHub} key={'Logout'}>
           {getButtonIcon(ButtonType.Logout)}
         </Button>
       );
-      buttons.push(' ');
+      leftButtons.push(' ');
     } else if (this.state.gitHubAccessRequest) {
-      buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
-      buttons.push('  Logging in... ');
+      leftButtons.push('Logging in... ');
+      leftButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
+      leftButtons.push(' ');
     } else if (this.state.gitHubClientID) {
-      buttons.push(
+      leftButtons.push(
         <Button toolTipText={'Login with GitHub'} onClick={this.loginWithGitHub} key={'Login'}>
           {getButtonIcon(ButtonType.Login)}
         </Button>
       );
-      buttons.push(' ');
+      leftButtons.push(' ');
     }
 
+    let rightButtons: any[] = [];
     if (this.state.selectedItemDefinition) {
       if (this.state.submitting) {
-        buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
-        buttons.push(' ');
+        rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
+        rightButtons.push(' ');
       } else if (this.state.editedDefinition) {
-        buttons.push(
+        rightButtons.push(
           <Button toolTipText={this.runningLocally ? 'Save' : 'Submit'} onClick={this.submit} key={'Submit'}>
             {getButtonIcon(this.runningLocally ? ButtonType.Save : ButtonType.Submit)}
           </Button>
         );
-        buttons.push(
+        rightButtons.push(
           <Button toolTipText={'Cancel'} onClick={() => this.setState({editedDefinition: undefined})} key={'Cancel'}>
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
         );
-        buttons.push(' ');
+        rightButtons.push(' ');
       } else {
-        buttons.push(
+        rightButtons.push(
           <Button toolTipText={'Edit'} onClick={this.edit} key={'Edit'}>
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
         if (this.runningLocally) {
-          buttons.push(
+          rightButtons.push(
             <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
               {getButtonIcon(ButtonType.OpenLocally)}
             </Button>
@@ -301,12 +307,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
     if (extraContents) {
-      buttons.push(
+      rightButtons.push(
         <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key={'ViewSource'}>
           {getButtonIcon(ButtonType.ViewSource)}
         </Button>
       );
     }
+
     let contentsPane = (
       <div className={'bottom-toolbar-container'}>
         <div className={'app-pane'} ref={(htmlNode) => (this.mainContentsPaneNode = htmlNode)}>
@@ -315,7 +322,12 @@ class App extends React.Component<AppProps, AppState> {
           </div>
         </div>
         <div className={'bottom-toolbar'}>
-          {buttons}
+          <div className={'left'}>
+            {leftButtons}
+          </div>
+          <div className={'right'}>
+            {rightButtons}
+          </div>
         </div>
       </div>
     );
@@ -462,9 +474,9 @@ class App extends React.Component<AppProps, AppState> {
   private logoutOfGitHub = (): void => {
     this.setState({
       gitHubAccessToken: undefined,
-      gitHubUser: undefined
+      gitHubUserInfo: undefined
     });
-    window.localStorage.deleteItem('GitHubAccessToken');
+    window.localStorage.removeItem('GitHubAccessToken');
   }
 }
 

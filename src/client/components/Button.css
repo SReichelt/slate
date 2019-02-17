@@ -11,3 +11,7 @@
   cursor: pointer;
   user-select: none;
 }
+
+.button svg {
+  vertical-align: middle;
+}

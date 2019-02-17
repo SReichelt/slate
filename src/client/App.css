@@ -101,7 +101,20 @@ body {
   height: 1.5em;
   border: solid 1px gray;
   background-color: #f0f0f0;
-  text-align: right;
+}
+
+.bottom-toolbar>.left {
+  float: left;
+}
+
+.bottom-toolbar>.right {
+  float: right;
+}
+
+.bottom-toolbar img {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
 }
 
 .Resizer.vertical {
