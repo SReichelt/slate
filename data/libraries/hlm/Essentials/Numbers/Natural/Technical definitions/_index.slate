@@ -1,9 +1,0 @@
-%../../../../../../logics/library%
-
-$"Technical definitions": %Section {
-  logic = 'hlm',
-  items = [
-    %item($"indexed element"),
-    %item($"bounded cardinality")
-  ]
-}

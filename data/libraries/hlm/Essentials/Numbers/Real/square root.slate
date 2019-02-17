@@ -1,9 +1,0 @@
-%../../../../../logics/hlm%
-
-$"square root"(a: %Element($Subsets/"Nonnegative numbers")): %ExplicitOperator {
-  display = [$Radical(radicand = a)],
-  definition = [$root(
-    a = {a},
-    n = {$../Natural/number(value = 2)}
-  )]
-}

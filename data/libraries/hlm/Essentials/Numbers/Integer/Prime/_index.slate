@@ -1,6 +1,0 @@
-%../../../../../../logics/library%
-
-$Prime: %Section {
-  logic = 'hlm',
-  items = [%item($"Prime and power divisibility criterion")]
-}

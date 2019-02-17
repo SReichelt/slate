@@ -1,9 +1,0 @@
-%../../../../logics/library%
-
-$Functions: %Section {
-  logic = 'hlm',
-  items = [
-    %item($"Finite sequences"),
-    %item($"Infinite sequences")
-  ]
-}

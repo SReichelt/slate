@@ -49,6 +49,7 @@ Please follow these steps:
    git clone https://github.com/SReichelt/slate.git
    cd slate
    npm install
+   npm run-script get-lib
    ```
 5. Start Visual Studio Code, and open the workspace `Slate.code-workspace`.
 6. Now you should be able to execute the app via "Debug/Start" (F5). If successful, a browser will open.

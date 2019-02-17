@@ -7,6 +7,7 @@
     "node": ">=6.9.5"
   },
   "scripts": {
+    "get-lib": "ts-node ./src/scripts/cloneLibraries.ts",
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "start": "node ./dist/server/server.js",
@@ -22,7 +23,7 @@
   "license": "MIT",
   "author": "Sebastian Reichelt",
   "repository": "github:sreichelt/slate",
-  "homepage": "http://sreichelt.github.io/slate",
+  "homepage": "https://sreichelt.github.io/slate",
   "dependencies": {
     "express": "^4.16.4",
     "http-proxy-middleware": "^0.18.0",

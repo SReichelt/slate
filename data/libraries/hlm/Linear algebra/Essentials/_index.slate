@@ -1,9 +1,0 @@
-%../../../../logics/library%
-
-$Essentials: %Section {
-  logic = 'hlm',
-  items = [
-    %item($Matrices),
-    %item($Vectors)
-  ]
-}

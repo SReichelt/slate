@@ -16,11 +16,14 @@ import * as FmtDisplay from '../shared/display/meta';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
 import { WebFileAccessor } from './data/webFileAccessor';
+import { GitHubFileAccessor } from './data/gitHubFileAccessor';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 
 const Loading = require('react-loading-animation');
+
+const Libraries = require('../../data/libraries/libraries.json');
 
 interface AppProps {
   alert: InjectedAlertProp;
@@ -45,8 +48,9 @@ interface AppState extends SelectionState {
 }
 
 class App extends React.Component<AppProps, AppState> {
-  private logic: Logic.Logic;
+  private runningLocally: boolean;
   private fileAccessor: FileAccessor;
+  private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
   private library: CachedPromise<Fmt.Definition>;
   private treePaneNode: HTMLElement | null = null;
@@ -56,9 +60,25 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
+    this.runningLocally = (process.env.NODE_ENV === 'development');
+
+    let librariesURIPrefix = '/libraries/';
+
+    if (this.runningLocally) {
+      this.fileAccessor = new WebFileAccessor;
+    } else {
+      let fileAccessor = new GitHubFileAccessor;
+      for (let libraryName of Object.keys(Libraries)) {
+        let uriPrefix = librariesURIPrefix + libraryName;
+        let library = Libraries[libraryName];
+        fileAccessor.setTarget(uriPrefix, library.repository, library.branch);
+      }
+      this.fileAccessor = fileAccessor;
+    }
+
     this.logic = Logics.hlm;
-    this.fileAccessor = new WebFileAccessor;
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, '/libraries/hlm', undefined, 'Library');
+    let libraryURI = librariesURIPrefix + 'hlm';
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, libraryURI, undefined, 'Library');
 
     this.library = this.libraryDataProvider.fetchLocalSection();
 
@@ -166,14 +186,13 @@ class App extends React.Component<AppProps, AppState> {
 
     let buttons: any[] = [];
     if (this.state.selectedItemDefinition) {
-      let runningLocally = (process.env.NODE_ENV === 'development');
       if (this.state.submitting) {
         buttons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
         buttons.push(' ');
       } else if (this.state.editedDefinition) {
         buttons.push(
-          <Button toolTipText={runningLocally ? 'Save' : 'Submit'} onClick={this.submit} key={'Submit'}>
-            {getButtonIcon(runningLocally ? ButtonType.Save : ButtonType.Submit)}
+          <Button toolTipText={this.runningLocally ? 'Save' : 'Submit'} onClick={this.submit} key={'Submit'}>
+            {getButtonIcon(this.runningLocally ? ButtonType.Save : ButtonType.Submit)}
           </Button>
         );
         buttons.push(
@@ -188,7 +207,7 @@ class App extends React.Component<AppProps, AppState> {
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         );
-        if (runningLocally) {
+        if (this.runningLocally) {
           buttons.push(
             <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
               {getButtonIcon(ButtonType.OpenLocally)}

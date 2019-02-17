@@ -1,8 +1,0 @@
-%../../../../../logics/hlm%
-
-$"Zero is the smallest number"(n: %Element($"Natural numbers")): %StandardTheorem {
-  claim = $"less or equal"(
-    n = {n},
-    m = {$number(value = 0)}
-  )
-}

@@ -1,9 +1,0 @@
-%../../../../../logics/hlm%
-
-$identity(𝐱: %Element($"Ordinal numbers")): %ExplicitOperator {
-  display = [$SubSup(
-    body = 'id',
-    sub = 𝐱
-  )],
-  definition = [$../../Functions/identity(X = {$Elements(𝐱 = {𝐱})})]
-}
