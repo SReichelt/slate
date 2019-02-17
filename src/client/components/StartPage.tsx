@@ -139,7 +139,7 @@ function StartPage(props: StartPageProps): any {
         Meanwhile, here is a screenshot of the original desktop version:
       </p>
       <p>
-        <img src="http://hlm.sourceforge.net/screenshots/input-formula.png" width="403pt" height="210pt" alt="Screenshot of formula input in desktop version"/>
+        <img src="/docs/screenshots/desktop/input-formula.png" width="403pt" height="210pt" alt="Screenshot of formula input in desktop version"/>
       </p>
       <h2>Foundations</h2>
       <p>
