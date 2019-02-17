@@ -93,7 +93,8 @@ class App extends React.Component<AppProps, AppState> {
     let state: AppState = {
       verticalLayout: window.innerHeight > window.innerWidth,
       submitting: false,
-      extraContentsVisible: false
+      extraContentsVisible: false,
+      gitHubAccessToken: window.localStorage.getItem('GitHubAccessToken') || undefined
     };
 
     let selectionURI = window.location.pathname;
@@ -177,6 +178,7 @@ class App extends React.Component<AppProps, AppState> {
             gitHubAccessRequest: undefined,
             gitHubAccessToken: token
           });
+          window.localStorage.setItem('GitHubAccessToken', token);
           GitHub.getGitHubUser(token)
             .then((user) => this.setState({gitHubUser: user}))
             .catch(() => {});
@@ -188,6 +190,10 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.props.alert.error('GitHub login failed: ' + error.message);
         });
+    } else if (this.state.gitHubAccessToken) {
+      GitHub.getGitHubUser(this.state.gitHubAccessToken)
+        .then((user) => this.setState({gitHubUser: user}))
+        .catch(() => this.setState({gitHubAccessToken: undefined}));
     }
 
     let templateUri = '/display/templates.slate';
@@ -438,7 +444,13 @@ class App extends React.Component<AppProps, AppState> {
   private loginWithGitHub = (): void => {
     if (this.state.gitHubClientID) {
       let location = window.location;
-      let baseURI = 'https://' + location.hostname + '/';
+      let protocol = location.protocol;
+      let host = location.host;
+      if (location.hostname !== 'localhost') {
+        protocol = 'https';
+        host = location.hostname;
+      }
+      let baseURI = protocol + '//' + host + '/';
       location.href = GitHub.getGitHubLoginURI(this.state.gitHubClientID, baseURI, location.pathname);
     }
   }
