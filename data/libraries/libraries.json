@@ -1,6 +1,7 @@
 {
   "hlm": {
-    "repository": "SReichelt/slate-hlm",
+    "owner": "SReichelt",
+    "repository": "slate-hlm",
     "branch": "master"
   }
 }

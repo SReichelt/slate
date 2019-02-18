@@ -24,8 +24,6 @@
   "repository": "github:sreichelt/slate",
   "homepage": "https://sreichelt.github.io/slate",
   "dependencies": {
-    "@types/query-string": "^6.2.0",
-    "@types/request": "^2.48.1",
     "express": "^4.16.4",
     "http-proxy-middleware": "^0.18.0",
     "markdown-escape": "^1.0.2",
@@ -43,7 +41,8 @@
     "react-simplemde-editor": "^3.6.22",
     "react-split-pane": "^0.1.85",
     "request": "^2.88.0",
-    "tslib": "^1.9.2"
+    "tslib": "^1.9.2",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.4",
@@ -55,6 +54,9 @@
     "@types/react": "^16.8.3",
     "@types/react-alert": "^4.0.0",
     "@types/react-dom": "^16.8.2",
+    "@types/query-string": "^6.2.0",
+    "@types/request": "^2.48.1",
+    "@types/utf8": "^2.1.6",
     "awesome-typescript-loader": "^5.2.1",
     "babel-polyfill": "^6.26.0",
     "concurrently": "^3.6.1",

@@ -14,8 +14,7 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/logics/library';
 import * as FmtDisplay from '../shared/display/meta';
 import { ButtonType, getButtonIcon } from './utils/icons';
-import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
-import { WebFileAccessor } from './data/webFileAccessor';
+import { FileContents } from '../shared/data/fileAccessor';
 import { GitHubFileAccessor } from './data/gitHubFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
@@ -25,6 +24,8 @@ import * as Logics from '../shared/logics/logics';
 const Loading = require('react-loading-animation');
 
 const Libraries = require('../../data/libraries/libraries.json');
+
+const librariesURIPrefix = '/libraries/';
 
 interface AppProps {
   alert: InjectedAlertProp;
@@ -43,8 +44,8 @@ interface SelectionState {
 interface GitHubState {
   gitHubClientID?: string;
   gitHubAccessRequest?: Promise<string>;
-  gitHubAccessToken?: string;
-  gitHubUserInfo?: GitHub.GitHubUserInfo;
+  gitHubAPIAccess?: GitHub.APIAccess;
+  gitHubUserInfo?: GitHub.UserInfo;
 }
 
 interface AppState extends SelectionState, GitHubState {
@@ -57,7 +58,7 @@ interface AppState extends SelectionState, GitHubState {
 
 class App extends React.Component<AppProps, AppState> {
   private runningLocally: boolean;
-  private fileAccessor: FileAccessor;
+  private fileAccessor: GitHubFileAccessor;
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
   private library: CachedPromise<Fmt.Definition>;
@@ -70,18 +71,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.runningLocally = (process.env.NODE_ENV === 'development');
 
-    let librariesURIPrefix = '/libraries/';
-
-    if (this.runningLocally) {
-      this.fileAccessor = new WebFileAccessor;
-    } else {
-      let fileAccessor = new GitHubFileAccessor;
+    this.fileAccessor = new GitHubFileAccessor;
+    if (!this.runningLocally) {
       for (let libraryName of Object.keys(Libraries)) {
         let uriPrefix = librariesURIPrefix + libraryName;
-        let library = Libraries[libraryName];
-        fileAccessor.setTarget(uriPrefix, library.repository, library.branch);
+        let repository = Libraries[libraryName];
+        this.fileAccessor.setTarget(uriPrefix, repository);
       }
-      this.fileAccessor = fileAccessor;
     }
 
     this.logic = Logics.hlm;
@@ -94,14 +90,18 @@ class App extends React.Component<AppProps, AppState> {
       verticalLayout: window.innerHeight > window.innerWidth,
       submitting: false,
       extraContentsVisible: false,
-      gitHubAccessToken: window.localStorage.getItem('GitHubAccessToken') || undefined
     };
+
+    let accessToken = window.localStorage.getItem('GitHubAccessToken');
+    if (accessToken) {
+      state.gitHubAPIAccess = new GitHub.APIAccess(accessToken);
+    }
 
     let selectionURI = window.location.pathname;
 
     let queryString = window.location.search;
     if (queryString) {
-      let gitHubQueryStringResult = GitHub.parseGitHubQueryString(queryString);
+      let gitHubQueryStringResult = GitHub.parseQueryString(queryString);
       if (gitHubQueryStringResult.path) {
         selectionURI = gitHubQueryStringResult.path;
       }
@@ -167,20 +167,21 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    GitHub.getGitHubClientID()
+    GitHub.getClientID()
       .then((clientID) => this.setState({gitHubClientID: clientID}))
       .catch(() => {});
 
     if (this.state.gitHubAccessRequest) {
       this.state.gitHubAccessRequest
         .then((token) => {
+          let apiAccess = new GitHub.APIAccess(token);
           this.setState({
             gitHubAccessRequest: undefined,
-            gitHubAccessToken: token
+            gitHubAPIAccess: apiAccess
           });
           window.localStorage.setItem('GitHubAccessToken', token);
-          GitHub.getGitHubUserInfo(token)
-            .then((userInfo) => this.setState({gitHubUserInfo: userInfo}))
+          apiAccess.getUserInfo()
+            .then((userInfo) => this.setGitHubUserInfo(userInfo))
             .catch(() => {});
         })
         .catch((error) => {
@@ -189,12 +190,12 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.props.alert.error('GitHub login failed: ' + error.message);
         });
-    } else if (this.state.gitHubAccessToken) {
-      GitHub.getGitHubUserInfo(this.state.gitHubAccessToken)
-        .then((userInfo) => this.setState({gitHubUserInfo: userInfo}))
+    } else if (this.state.gitHubAPIAccess) {
+      this.state.gitHubAPIAccess.getUserInfo()
+        .then((userInfo) => this.setGitHubUserInfo(userInfo))
         .catch(() => {
           this.setState({
-            gitHubAccessToken: undefined
+            gitHubAPIAccess: undefined
           });
           window.localStorage.removeItem('GitHubAccessToken');
         });
@@ -245,7 +246,7 @@ class App extends React.Component<AppProps, AppState> {
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let leftButtons: any[] = [];
-    if (this.state.gitHubAccessToken) {
+    if (this.state.gitHubAPIAccess) {
       if (this.state.gitHubUserInfo) {
         if (this.state.gitHubUserInfo.avatarUrl) {
           leftButtons.push(<img src={this.state.gitHubUserInfo.avatarUrl} key={'Avatar'}/>);
@@ -467,16 +468,42 @@ class App extends React.Component<AppProps, AppState> {
         host = location.hostname;
       }
       let baseURI = protocol + '//' + host + '/';
-      location.href = GitHub.getGitHubLoginURI(this.state.gitHubClientID, baseURI, location.pathname);
+      location.href = GitHub.getLoginURI(this.state.gitHubClientID, baseURI, location.pathname);
     }
   }
 
   private logoutOfGitHub = (): void => {
+    this.fileAccessor.setAPIAccess(undefined);
     this.setState({
-      gitHubAccessToken: undefined,
+      gitHubAPIAccess: undefined,
       gitHubUserInfo: undefined
     });
     window.localStorage.removeItem('GitHubAccessToken');
+  }
+
+  private setGitHubUserInfo(userInfo: GitHub.UserInfo): void {
+    this.setState({
+      gitHubUserInfo: userInfo
+    });
+    this.fileAccessor.setAPIAccess(this.state.gitHubAPIAccess);
+
+    // TODO re-download library
+    if (this.state.gitHubAPIAccess && userInfo.login) {
+      for (let libraryName of Object.keys(Libraries)) {
+        let repository = Libraries[libraryName];
+        this.state.gitHubAPIAccess.checkRepository(repository.repository)
+          .then((repositoryExists: boolean) => {
+            if (repositoryExists) {
+              let uriPrefix = librariesURIPrefix + libraryName;
+              if (repository.owner !== userInfo.login) {
+                repository.owner = userInfo.login;
+                repository.isFork = true;
+              }
+              this.fileAccessor.setTarget(uriPrefix, repository);
+            }
+          });
+      }
+    }
   }
 }
 
