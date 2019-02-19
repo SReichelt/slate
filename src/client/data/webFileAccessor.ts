@@ -1,4 +1,4 @@
-import { fetch, fetchText } from '../utils/fetch';
+import { fetchAny, fetchVoid, fetchText } from '../utils/fetch';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
@@ -14,7 +14,7 @@ export class WebFileAccessor implements FileAccessor {
       method: 'PUT',
       body: text
     };
-    let result = fetch(uri, options)
+    let result = fetchAny(uri, options)
       .then((response) => response.status === 200);
     return new CachedPromise(result);
   }
@@ -23,8 +23,7 @@ export class WebFileAccessor implements FileAccessor {
     let options: RequestInit = {
       method: 'REPORT'
     };
-    let result = fetch(uri, options)
-      .then(() => {});
+    let result = fetchVoid(uri, options);
     return new CachedPromise(result);
   }
 }

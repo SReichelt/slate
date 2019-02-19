@@ -1,6 +1,6 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
-import { fetch, fetchText } from '../utils/fetch';
+import { fetchAny, fetchText } from '../utils/fetch';
 
 export function getClientID(): Promise<string> {
   return fetchText('/github-auth/client-id');
@@ -54,7 +54,7 @@ export interface UserInfo {
 export class APIAccess {
   constructor(private accessToken: string) {}
 
-  private runRequest(method: string, path: string, request: any): Promise<any> {
+  private async runRequest(method: string, path: string, request: any): Promise<any> {
     let uri = `https://api.github.com${path}?${this.accessToken}`;
     let options: RequestInit = {
       method: method,
@@ -70,43 +70,51 @@ export class APIAccess {
     } else {
       options.body = JSON.stringify(request);
     }
-    return fetch(uri, options)
-      .then((response) => response.json());
+    let response = await fetch(uri, options);
+    if (!response.ok) {
+      throw new Error(`GitHub returned HTTP error ${response.status} (${response.statusText})`);
+    }
+    return response.json();
   }
 
   private runGraphQLRequest(request: any): Promise<any> {
     return this.runRequest('POST', '/graphql', request);
   }
 
-  getUserInfo(): Promise<UserInfo> {
+  async getUserInfo(): Promise<UserInfo> {
     let request = {
       query: 'query { viewer { login avatarUrl } }'
     };
-    return this.runGraphQLRequest(request)
-      .then((result) => result.data.viewer);
+    let result = await this.runGraphQLRequest(request);
+    return result.data.viewer;
   }
 
-  checkRepository(repository: string): Promise<boolean> {
+  async checkRepository(repository: string): Promise<boolean> {
     let request = {
       query: `query { viewer { repository(name: "${repository}") { name } } }`
     };
-    return this.runGraphQLRequest(request)
-      .then((result) => !!result.data.viewer.repository);
+    let result = await this.runGraphQLRequest(request);
+    return !!result.data.viewer.repository;
   }
 
-  updateFile(repository: Repository, path: string, text: string): Promise<void> {
+  async updateFile(repository: Repository, path: string, text: string): Promise<void> {
+    let apiPath = `/repos/${repository.owner}/${repository.repository}/contents${path}`;
     let getParameters = {
       ref: repository.branch
     };
-    return this.runRequest('GET', `/repos/${repository.owner}/${repository.repository}/contents${path}`, getParameters)
-      .then((result) => {
-        let putParameters = {
-          message: 'Contribution via web app',
-          content: btoa(utf8.encode(text)),
-          branch: repository.branch,
-          sha: result.sha
-        };
-        return this.runRequest('PUT', `/repos/${repository.owner}/${repository.repository}/contents${path}`, putParameters);
-      });
+    let getResult = await this.runRequest('GET', apiPath, getParameters);
+    let putParameters = {
+      message: 'Contribution via web app',
+      content: btoa(utf8.encode(text)),
+      branch: repository.branch,
+      sha: getResult.sha
+    };
+    let putResult = await this.runRequest('PUT', apiPath, putParameters);
+    let checkResult;
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      checkResult = await this.runRequest('GET', apiPath, getParameters);
+    } while (checkResult.sha === getResult.sha && checkResult.sha !== putResult.content.sha);
+    return putResult;
   }
 }
