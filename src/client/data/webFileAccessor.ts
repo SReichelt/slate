@@ -19,7 +19,7 @@ export class WebFileAccessor implements FileAccessor {
     return new CachedPromise(result);
   }
 
-  openFile(uri: string): CachedPromise<void> {
+  openFile(uri: string, openLocally: boolean): CachedPromise<void> {
     let options: RequestInit = {
       method: 'REPORT'
     };

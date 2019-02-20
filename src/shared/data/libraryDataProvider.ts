@@ -187,9 +187,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fileAccessor.writeFile!(uri, contents);
   }
 
-  openLocalItem(name: string): CachedPromise<void> {
+  openLocalItem(name: string, openLocally: boolean): CachedPromise<void> {
     let uri = this.uri + encodeURI(name) + fileExtension;
-    return this.fileAccessor.openFile!(uri);
+    return this.fileAccessor.openFile!(uri, openLocally);
   }
 
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo> {

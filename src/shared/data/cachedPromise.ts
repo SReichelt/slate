@@ -1,10 +1,10 @@
-class CachedPromise<R> {
+class CachedPromise<T> implements PromiseLike<T> {
   private sourceIsPromise: boolean = false;
 
-  constructor(private source: R | Promise<R>, allowPromise: boolean = true) {
+  constructor(private source: T | Promise<T>, allowPromise: boolean = true) {
     this.sourceIsPromise = allowPromise && (source instanceof Promise || Object.prototype.toString.call(source) === '[object Promise]');
     if (this.sourceIsPromise) {
-      (source as Promise<R>).then((result) => {
+      (source as Promise<T>).then((result) => {
         this.source = result;
         this.sourceIsPromise = false;
       });
@@ -15,43 +15,47 @@ class CachedPromise<R> {
     return new CachedPromise<U>(value, false);
   }
 
-  then<U>(onFulfilled: (value: R) => U | Promise<U> | CachedPromise<U>): CachedPromise<U> {
+  then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): CachedPromise<TResult1 | TResult2> {
     if (this.sourceIsPromise) {
-      return new CachedPromise<U>((this.source as Promise<R>).then((value) => {
-        let result = onFulfilled(value);
-        if (result instanceof CachedPromise) {
-          return result.source;
-        } else {
-          return result;
-        }
-      }));
+      return new CachedPromise<TResult1>((this.source as Promise<T>).then(
+        (value) => {
+          let result = onfulfilled ? onfulfilled(value) : value;
+          if (result instanceof CachedPromise) {
+            return result.source;
+          } else {
+            return result;
+          }
+        },
+        onrejected)
+      );
     } else {
       try {
-        let result = onFulfilled(this.source as R);
+        let value = this.source as T;
+        let result = onfulfilled ? onfulfilled(value) : value;
         if (result instanceof CachedPromise) {
           return result;
         } else {
-          return new CachedPromise<U>(result);
+          return new CachedPromise<TResult1>(result as any);
         }
       } catch (error) {
-        return new CachedPromise<U>(Promise.reject(error));
+        return new CachedPromise<TResult1>(Promise.reject(error));
       }
     }
   }
 
-  catch<U>(onRejected: (error: any) => U): CachedPromise<R | U> {
+  catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): CachedPromise<T | TResult> {
     if (this.sourceIsPromise) {
-      return new CachedPromise<R | U>((this.source as Promise<R>).catch(onRejected));
+      return new CachedPromise<T | TResult>((this.source as Promise<T>).catch(onrejected));
     } else {
       return this;
     }
   }
 
-  getImmediateResult(): R | undefined {
+  getImmediateResult(): T | undefined {
     if (this.sourceIsPromise) {
       return undefined;
     } else {
-      return this.source as R;
+      return this.source as T;
     }
   }
 }

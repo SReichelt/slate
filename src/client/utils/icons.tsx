@@ -8,7 +8,8 @@ export enum ButtonType {
   Submit,
   Cancel,
   Edit,
-  OpenLocally,
+  OpenInVSCode,
+  ViewInGitHub,
   ViewSource,
   Login,
   Logout,
@@ -49,8 +50,10 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
         <path d="M -6 4 L -4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
       </svg>
     );
-  case ButtonType.OpenLocally:
+  case ButtonType.OpenInVSCode:
     return getVSCodeLogo(enabled);
+  case ButtonType.ViewInGitHub:
+    return getGitHubLogo(enabled);
   case ButtonType.ViewSource:
     return '{⋯}';
   case ButtonType.Login:

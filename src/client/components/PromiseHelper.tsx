@@ -68,10 +68,10 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
   }
 }
 
-function renderPromise(promise: CachedPromise<any>): any {
+function renderPromise(promise: CachedPromise<any>, key?: string): any {
   let immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
-    return <PromiseHelper promise={promise}/>;
+    return <PromiseHelper promise={promise} key={key}/>;
   } else {
     return immediateResult;
   }

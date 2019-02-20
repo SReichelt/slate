@@ -3,56 +3,71 @@ import { FileContents } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
 
-interface GitHubTarget {
+export interface GitHubTarget {
   uriPrefix: string;
   repository: GitHub.Repository;
 }
 
+export interface GitHubConfig {
+  targets: GitHubTarget[];
+  apiAccess?: GitHub.APIAccess;
+}
+
 export class GitHubFileAccessor extends WebFileAccessor {
-  private targets: GitHubTarget[] = [];
-  private apiAccess?: GitHub.APIAccess;
+  constructor(private config: CachedPromise<GitHubConfig>) {
+    super();
+  }
 
   readFile(uri: string): CachedPromise<FileContents> {
-    for (let target of this.targets) {
-      if (uri.startsWith(target.uriPrefix)) {
-        let path = uri.substring(target.uriPrefix.length);
-        uri = GitHub.getDownloadURI(target.repository, path);
-      }
-    }
-
-    return super.readFile(uri);
-  }
-
-  writeFile(uri: string, text: string): CachedPromise<boolean> {
-    if (this.apiAccess) {
-      for (let target of this.targets) {
+    return this.config.then((config) => {
+      for (let target of config.targets) {
         if (uri.startsWith(target.uriPrefix)) {
           let path = uri.substring(target.uriPrefix.length);
-          let result = this.apiAccess.updateFile(target.repository, path, text)
-            .then(() => !target.repository.isFork);
-          return new CachedPromise(result);
+          uri = GitHub.getDownloadURL(target.repository, path);
+          break;
         }
       }
-    }
 
-    return super.writeFile(uri, text);
-  }
-
-  setTarget(uriPrefix: string, repository: GitHub.Repository): void {
-    for (let target of this.targets) {
-      if (target.uriPrefix === uriPrefix) {
-        target.repository = repository;
-        return;
-      }
-    }
-
-    this.targets.push({
-      uriPrefix: uriPrefix,
-      repository: repository
+      return super.readFile(uri);
     });
   }
 
-  setAPIAccess(apiAccess: GitHub.APIAccess | undefined): void {
-    this.apiAccess = apiAccess;
+  writeFile(uri: string, text: string): CachedPromise<boolean> {
+    return this.config.then((config) => {
+      if (config.apiAccess) {
+        for (let target of config.targets) {
+          if (uri.startsWith(target.uriPrefix)) {
+            let path = uri.substring(target.uriPrefix.length);
+            let result = config.apiAccess.updateFile(target.repository, path, text)
+              .then(() => !target.repository.isFork);
+            return new CachedPromise(result);
+          }
+        }
+      }
+
+      return super.writeFile(uri, text);
+    });
   }
+
+  openFile(uri: string, openLocally: boolean): CachedPromise<void> {
+    return this.config.then((config) => {
+      if (!openLocally) {
+        for (let target of config.targets) {
+          if (uri.startsWith(target.uriPrefix)) {
+            let path = uri.substring(target.uriPrefix.length);
+            let infoURL = GitHub.getInfoURL(target.repository, path);
+            window.open(infoURL, '_blank');
+            return;
+          }
+        }
+      }
+
+      return super.openFile(uri, openLocally);
+    });
+  }
+}
+
+class GitHubFileContents implements FileContents {
+  constructor(public text: string) {}
+  close(): void {}
 }

@@ -1,28 +1,32 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
-import { fetchAny, fetchText } from '../utils/fetch';
+import { fetchText } from '../utils/fetch';
 
 export function getClientID(): Promise<string> {
   return fetchText('/github-auth/client-id');
 }
 
-export function getLoginURI(clientID: string, baseURI: string, path: string): string {
-  let redirectURI = baseURI;
+export function getLoginURL(clientID: string, baseURL: string, path: string): string {
+  let redirectURL = baseURL;
   if (path && path !== '/') {
-    redirectURI += '?path=' + encodeURI(path);
+    redirectURL += '?path=' + encodeURI(path);
   }
-  return `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=read:user%20public_repo&redirect_uri=${encodeURI(redirectURI)}`;
+  return `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=public_repo&redirect_uri=${encodeURI(redirectURL)}`;
 }
 
 export interface Repository {
   owner: string;
-  repository: string;
+  name: string;
   branch: string;
   isFork?: boolean;
 }
 
-export function getDownloadURI(repository: Repository, path: string): string {
-  return `https://raw.githubusercontent.com/${repository.owner}/${repository.repository}/${repository.branch}${path}`;
+export function getInfoURL(repository: Repository, path: string): string {
+  return `https://github.com/${repository.owner}/${repository.name}/blob/${repository.branch}${path}`;
+}
+
+export function getDownloadURL(repository: Repository, path: string): string {
+  return `https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}${path}`;
 }
 
 export interface QueryStringResult {
@@ -55,7 +59,7 @@ export class APIAccess {
   constructor(private accessToken: string) {}
 
   private async runRequest(method: string, path: string, request: any): Promise<any> {
-    let uri = `https://api.github.com${path}?${this.accessToken}`;
+    let url = `https://api.github.com${path}?${this.accessToken}`;
     let options: RequestInit = {
       method: method,
       headers: {
@@ -65,12 +69,12 @@ export class APIAccess {
     };
     if (method === 'GET' || method === 'HEAD') {
       for (let key of Object.keys(request)) {
-        uri += `&${key}=${request[key]}`;
+        url += `&${encodeURI(key)}=${encodeURI(request[key])}`;
       }
     } else {
       options.body = JSON.stringify(request);
     }
-    let response = await fetch(uri, options);
+    let response = await fetch(url, options);
     if (!response.ok) {
       throw new Error(`GitHub returned HTTP error ${response.status} (${response.statusText})`);
     }
@@ -81,24 +85,43 @@ export class APIAccess {
     return this.runRequest('POST', '/graphql', request);
   }
 
-  async getUserInfo(): Promise<UserInfo> {
+  async getUserInfo(repositories: Repository[]): Promise<UserInfo> {
+    let repositoryQueries = '';
+    repositories.forEach((repository, index) => {
+      repositoryQueries += `repo${index}: repository(name: "${repository.name}") { nameWithOwner parent { nameWithOwner } } `;
+    });
     let request = {
-      query: 'query { viewer { login avatarUrl } }'
+      query: `query { viewer { login avatarUrl ${repositoryQueries}} }`
     };
     let result = await this.runGraphQLRequest(request);
-    return result.data.viewer;
+    let viewer = result.data.viewer;
+    repositories.forEach((repository, index) => {
+      let repo = viewer[`repo${index}`];
+      if (repo) {
+        let upstreamNameWithOwner = `${repository.owner}/${repository.name}`;
+        if (repo.nameWithOwner !== upstreamNameWithOwner) {
+          if (!repo.parent || repo.parent.nameWithOwner !== upstreamNameWithOwner) {
+            throw new Error(`Repository ${repo.nameWithOwner} was not forked from ${upstreamNameWithOwner}`);
+          }
+          repository.owner = viewer.login;
+          repository.isFork = true;
+        }
+      }
+    });
+    return viewer;
   }
 
-  async checkRepository(repository: string): Promise<boolean> {
-    let request = {
-      query: `query { viewer { repository(name: "${repository}") { name } } }`
+  async readFile(repository: Repository, path: string): Promise<string> {
+    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
+    let parameters = {
+      ref: repository.branch
     };
-    let result = await this.runGraphQLRequest(request);
-    return !!result.data.viewer.repository;
+    let result = await this.runRequest('GET', apiPath, parameters);
+    return utf8.decode(atob(result.content));
   }
 
   async updateFile(repository: Repository, path: string, text: string): Promise<void> {
-    let apiPath = `/repos/${repository.owner}/${repository.repository}/contents${path}`;
+    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
     let getParameters = {
       ref: repository.branch
     };
@@ -110,11 +133,13 @@ export class APIAccess {
       sha: getResult.sha
     };
     let putResult = await this.runRequest('PUT', apiPath, putParameters);
-    let checkResult;
-    do {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      checkResult = await this.runRequest('GET', apiPath, getParameters);
-    } while (checkResult.sha === getResult.sha && checkResult.sha !== putResult.content.sha);
+    if (putResult.content.sha !== getResult.sha) {
+      let checkResult;
+      do {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        checkResult = await this.runRequest('GET', apiPath, getParameters);
+      } while (checkResult.sha === getResult.sha);
+    }
     return putResult;
   }
 }
