@@ -748,6 +748,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                         if (!(rangeInfo.linkRange && rangeInfo.linkRange.contains(position))) {
                             signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, document);
                             if (signatureInfo && signatureInfo.parameters) {
+                                let argNameRange: vscode.Range | undefined = undefined;
                                 let filledParameters = new Set<Fmt.Parameter>();
                                 if (signatureInfo.arguments) {
                                     let argIndex = 0;
@@ -755,17 +756,24 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                         let argRangeInfo = parsedDocument.rangeMap.get(arg);
                                         if (argRangeInfo && !argRangeInfo.range.isEmpty) {
                                             if (argRangeInfo.range.contains(position)) {
-                                                signatureInfo = undefined;
+                                                if (!arg.name && arg.value instanceof Fmt.VariableRefExpression) {
+                                                    /* Looks like a variable, but could turn into an argument name. */
+                                                    argNameRange = argRangeInfo.range;
+                                                } else {
+                                                    signatureInfo = undefined;
+                                                }
                                                 break;
                                             }
-                                            let paramIndex = 0;
-                                            for (let param of signatureInfo.parameters) {
-                                                let paramIsList = param.list;
-                                                if (arg.name ? arg.name === param.name : paramIsList ? argIndex >= paramIndex : argIndex === paramIndex) {
-                                                    filledParameters.add(param);
-                                                    break;
+                                            if (arg.name || argRangeInfo.range.end.isBefore(position)) {
+                                                let paramIndex = 0;
+                                                for (let param of signatureInfo.parameters) {
+                                                    let paramIsList = param.list;
+                                                    if (arg.name ? arg.name === param.name : paramIsList ? argIndex >= paramIndex : argIndex === paramIndex) {
+                                                        filledParameters.add(param);
+                                                        break;
+                                                    }
+                                                    paramIndex++;
                                                 }
-                                                paramIndex++;
                                             }
                                         }
                                         argIndex++;
@@ -811,6 +819,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                                     }
                                                     result.push({
                                                         label: assignment,
+                                                        range: argNameRange,
                                                         insertText: insertText,
                                                         documentation: documentation,
                                                         kind: vscode.CompletionItemKind.Field
@@ -819,7 +828,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                             }
                                         }
                                     }
-                                    if (rangeInfo.object instanceof Fmt.MetaRefExpression) {
+                                    if (rangeInfo.object instanceof Fmt.MetaRefExpression || rangeInfo.object instanceof Fmt.CompoundExpression) {
                                         isEmptyExpression = true;
                                     }
                                 }
@@ -1042,10 +1051,19 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                             }
                         }
                     }
-                    if (rangeInfo.object instanceof Fmt.Expression || signatureInfo) {
+                    if (signatureInfo || (rangeInfo.object instanceof Fmt.Expression && !(rangeInfo.object instanceof Fmt.VariableRefExpression))) {
                         break;
                     }
                 }
+            }
+            let index = 0;
+            for (let item of result) {
+                let sortText = index.toString();
+                while (sortText.length < 10) {
+                    sortText = "0" + sortText;
+                }
+                item.sortText = sortText;
+                index++;
             }
             return result;
         }
