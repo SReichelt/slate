@@ -3,7 +3,7 @@
 $display: %MetaModel {
   definitionTypes = [$Template],
   expressionTypes = [$Bool, $Int, $String, $Expr],
-  functions = [$true, $false, $opt, $add, $for, $neg, %Any],
+  functions = [$true, $false, $not, $opt, $add, $for, $first, $last, $neg, %Any],
   lookup = 'templates.slate'
 }
 
@@ -20,11 +20,14 @@ $Expr: %ExpressionType {}
 
 $true: $Bool {}
 $false: $Bool {}
+$not(condition: $Bool): $Bool {}
 
 $opt(param: %Any, valueIfPresent?: %Any, valueIfMissing?: %Any): %Any {}
 
 $add(items...: $Int): $Int {}
 
 $for(param: %Any, dimension: %Int, item: %Any, separator?: %Any): %Any {}
+$first: $Bool {}
+$last: $Bool {}
 
 $neg(items...: %Any): %Any {}

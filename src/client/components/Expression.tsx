@@ -414,14 +414,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               break;
             case '{':
               openParen = '{';
-              if (optionalParenRight) {
+              if (optionalParenRight && optionalParenMaxLevel !== undefined && optionalParenMaxLevel >= 0) {
                 closeParen = '∣';
               }
               if (lineHeight) {
                 parenClassName = 'paren-curly-text';
               } else {
                 let bodyClassName = 'paren-curly-body';
-                if (optionalParenRight) {
+                if (closeParen) {
                   bodyClassName += ' paren-right-hairline';
                 }
                 parenResult = (

@@ -187,6 +187,35 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
   }
 }
 
+export class MetaRefExpression_not extends Fmt.MetaRefExpression {
+  condition: Fmt.Expression;
+
+  getName(): string {
+    return 'not';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.condition = argumentList.getValue('condition', 0);
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+    argumentList.add(this.condition);
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    let result = new MetaRefExpression_not;
+    let changed = false;
+    if (this.condition) {
+      result.condition = this.condition.substitute(fn, replacedParameters);
+      if (result.condition !== this.condition) {
+        changed = true;
+      }
+    }
+    return this.getSubstitutionResult(fn, result, changed);
+  }
+}
+
 export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
   param: Fmt.Expression;
   valueIfPresent?: Fmt.Expression;
@@ -342,6 +371,48 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
   }
 }
 
+export class MetaRefExpression_first extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'first';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_first;
+    }
+  }
+}
+
+export class MetaRefExpression_last extends Fmt.MetaRefExpression {
+  getName(): string {
+    return 'last';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new MetaRefExpression_last;
+    }
+  }
+}
+
 export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   items: Fmt.Expression[];
 
@@ -406,7 +477,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_Template};
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
-const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'neg': MetaRefExpression_neg, '': Fmt.GenericMetaRefExpression};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'not': MetaRefExpression_not, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'first': MetaRefExpression_first, 'last': MetaRefExpression_last, 'neg': MetaRefExpression_neg, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Fmt.MetaModel {
   constructor() {

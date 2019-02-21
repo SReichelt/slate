@@ -353,7 +353,11 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   }
 }
 
-type LoopBindingFn = ((param: string, dimension: number) => number | undefined) | undefined;
+interface LoopData {
+  getLoopBinding: (param: string, dimension: number) => number | undefined;
+  firstIteration: boolean;
+  lastIteration: boolean;
+}
 
 export class UserDefinedExpression extends ExpressionWithArgs {
   private negationsSatisfied?: number;
@@ -389,7 +393,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     return expression;
   }
 
-  private translateExpression(expression: Fmt.Expression, getLoopBinding: LoopBindingFn, result: any[]): void {
+  private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: any[]): void {
     if (expression instanceof Fmt.StringExpression) {
       result.push(expression.value);
     } else if (expression instanceof Fmt.IntegerExpression) {
@@ -402,10 +406,10 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         this.translateExpression(parameter.defaultValue, undefined, result);
         return;
       }
-      if (getLoopBinding) {
+      if (loopData) {
         let dimension = 0;
         while (arg instanceof Array) {
-          let index = getLoopBinding(param, dimension);
+          let index = loopData.getLoopBinding(param, dimension);
           if (index === undefined) {
             break;
           }
@@ -420,7 +424,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       for (let argument of expression.path.arguments) {
         if (argument.name) {
           let arg: any[] = [];
-          this.translateExpression(argument.value, getLoopBinding, arg);
+          this.translateExpression(argument.value, loopData, arg);
           if (arg.length === 1) {
             config.args[argument.name] = arg[0];
           } else {
@@ -441,6 +445,10 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         result.push(true);
       } else if (expression instanceof FmtDisplay.MetaRefExpression_false) {
         result.push(false);
+      } else if (expression instanceof FmtDisplay.MetaRefExpression_not) {
+        let arg: any[] = [];
+        this.translateExpression(expression.condition, loopData, arg);
+        result.push(!arg.some((value) => value));
       } else if (expression instanceof FmtDisplay.MetaRefExpression_opt) {
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
@@ -467,7 +475,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         }
         result.push(value);
       } else if (expression instanceof FmtDisplay.MetaRefExpression_for) {
-        let part: any[] = getLoopBinding ? result : [];
+        let part: any[] = loopData ? result : [];
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
         let arg = this.getOptionalArg(param);
@@ -481,32 +489,40 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           for (let index = 0; index < arg.length; index++) {
             if (index && expression.separator) {
               if (expression.separator instanceof Fmt.ArrayExpression) {
-                this.translateExpressionList(expression.separator.items, getLoopBinding, part);
+                this.translateExpressionList(expression.separator.items, loopData, part);
               } else {
-                this.translateExpression(expression.separator, getLoopBinding, part);
+                this.translateExpression(expression.separator, loopData, part);
               }
             }
-            let getNewLoopBinding = function(testParameter: string, testDimension: number): number | undefined {
-              if (testParameter === param && testDimension === dimension) {
-                return index;
-              } else if (getLoopBinding) {
-                return getLoopBinding(testParameter, testDimension);
-              } else {
-                return undefined;
-              }
+            let newLoopData: LoopData = {
+              getLoopBinding: (testParameter: string, testDimension: number): number | undefined => {
+                if (testParameter === param && testDimension === dimension) {
+                  return index;
+                } else if (loopData) {
+                  return loopData.getLoopBinding(testParameter, testDimension);
+                } else {
+                  return undefined;
+                }
+              },
+              firstIteration: index === 0,
+              lastIteration: index === arg.length - 1
             };
             if (expression.item instanceof Fmt.ArrayExpression) {
-              this.translateExpressionList(expression.item.items, getNewLoopBinding, part);
+              this.translateExpressionList(expression.item.items, newLoopData, part);
             } else {
-              this.translateExpression(expression.item, getNewLoopBinding, part);
+              this.translateExpression(expression.item, newLoopData, part);
             }
           }
         } else {
           throw new Error('Invalid use of "for"');
         }
-        if (!getLoopBinding) {
+        if (!loopData) {
           result.push(part);
         }
+      } else if (expression instanceof FmtDisplay.MetaRefExpression_first) {
+        result.push(loopData && loopData.firstIteration);
+      } else if (expression instanceof FmtDisplay.MetaRefExpression_last) {
+        result.push(loopData && loopData.lastIteration);
       } else if (expression instanceof FmtDisplay.MetaRefExpression_neg) {
         let index = 0;
         if (this.forcedInnerNegations < this.config.forceInnerNegations) {
@@ -528,16 +544,16 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       }
     } else if (expression instanceof Fmt.ArrayExpression) {
       let part: any[] = [];
-      this.translateExpressionList(expression.items, getLoopBinding, part);
+      this.translateExpressionList(expression.items, loopData, part);
       result.push(part);
     } else {
       throw new Error('Unsupported expression');
     }
   }
 
-  private translateExpressionList(expressions: Fmt.Expression[], getLoopBinding: LoopBindingFn, result: RenderedExpression[]): void {
+  private translateExpressionList(expressions: Fmt.Expression[], loopData: LoopData | undefined, result: RenderedExpression[]): void {
     for (let expression of expressions) {
-      this.translateExpression(expression, getLoopBinding, result);
+      this.translateExpression(expression, loopData, result);
     }
   }
 }

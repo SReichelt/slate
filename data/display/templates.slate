@@ -87,7 +87,9 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
       dimension = 0,
       item = $InnerParens(
         body = operands,
-        maxLevel = maxParenLevel
+        maxLevel = maxParenLevel,
+        left = %not(%first),
+        right = %not(%last)
       ),
       separator = [space, symbol, space]
     ),
@@ -99,9 +101,11 @@ $UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel
   display = $OuterParens(
     body = [$InnerParens(
       body = operand,
-      maxLevel = maxParenLevel
+      maxLevel = maxParenLevel,
+      right = %false
     ), space, symbol],
-    minLevel = minParenLevel
+    minLevel = minParenLevel,
+    left = %false
   )
 }
 
@@ -135,29 +139,22 @@ $TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Temp
 }
 
 $BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -2): %Template {
-  display = $OuterParens(
-    body = %for(
-      param = operands,
-      dimension = 0,
-      item = $InnerParens(
-        body = operands,
-        maxLevel = parenLevel
-      ),
-      separator = [space, symbol, space]
-    ),
-    minLevel = parenLevel
+  display = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
   )
 }
 
 $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
-  display = $OuterParens(
-    body = [symbol, space, $InnerParens(
-      body = operand,
-      maxLevel = parenLevel,
-      right = %false
-    )],
-    minLevel = parenLevel,
-    left = %false
+  display = $UnaryOperator(
+    symbol = symbol,
+    operand = operand,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
   )
 }
 
