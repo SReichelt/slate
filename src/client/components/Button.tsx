@@ -20,7 +20,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     };
   }
   
-  render(): any {
+  render(): React.ReactNode {
     let className = 'button';
     let onClick = undefined;
     let onMouseDown = undefined;
@@ -58,7 +58,11 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     if (this.props.selected) {
       className += ' selected';
     }
-    return <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}>{this.props.children}</div>;
+    return (
+      <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}>
+        {this.props.children}
+      </div>
+    );
   }
 }
 

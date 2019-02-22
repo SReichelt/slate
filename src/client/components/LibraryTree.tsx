@@ -12,7 +12,7 @@ const ToolTip = require('react-portal-tooltip').default;
 
 type OnItemClicked = (item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo) => void;
 
-let previewContents: any = null;
+let previewContents: React.ReactNode = null;
 
 interface LibraryTreeItemProps {
   libraryDataProvider: LibraryDataProvider;
@@ -121,12 +121,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     this.definitionPromise = undefined;
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let item = this.props.item;
     let className = 'tree-item hoverable';
-    let contents: any = null;
-    let icon: any = '\u2001';
-    let display: any = this.props.itemInfo.title;
+    let contents: React.ReactNode = null;
+    let icon: React.ReactNode = '\u2001';
+    let display: React.ReactNode = this.props.itemInfo.title;
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       if (this.state.definition) {
         let logic = this.props.libraryDataProvider.logic;
@@ -189,7 +189,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       display = <span className={'tree-item-minor'} key="minor">{display}</span>;
     }
     let href = this.props.libraryDataProvider.pathToURI(this.props.path);
-    let result: any = (
+    let result: React.ReactNode = (
       <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
         <div className={'tree-item-icon'}>{icon}</div>
         <div className={'tree-item-display'}>{display}</div>
@@ -207,7 +207,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     return result;
   }
 
-  private itemClicked = (event: any): void => {
+  private itemClicked = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
     if (event.button < 1 || this.props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
       event.preventDefault();
       this.clicked = true;
@@ -290,7 +290,7 @@ interface LibraryTreeProps {
   onItemClicked?: OnItemClicked;
 }
 
-function LibraryTree(props: LibraryTreeProps): any {
+function LibraryTree(props: LibraryTreeProps) {
   let render = props.section.then((section: Fmt.Definition) => {
     if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
       let items = section.contents.items as Fmt.ArrayExpression;

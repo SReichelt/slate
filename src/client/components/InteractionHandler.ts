@@ -58,7 +58,7 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
     return false;
   }
 
-  getPreviewContents(semanticLink: Display.SemanticLink): any {
+  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode {
     return null;
   }
 
@@ -105,7 +105,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     return semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression;
   }
 
-  getPreviewContents(semanticLink: Display.SemanticLink): any {
+  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode {
     let path = this.getPath(semanticLink);
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);

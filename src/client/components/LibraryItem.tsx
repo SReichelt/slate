@@ -18,7 +18,7 @@ export interface LibraryItemProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-export function renderLibraryItem(props: LibraryItemProps): any {
+export function renderLibraryItem(props: LibraryItemProps): React.ReactNode {
   let logic = props.libraryDataProvider.logic;
   let logicDisplay = logic.getDisplay();
 
@@ -59,7 +59,7 @@ class LibraryItem extends React.Component<LibraryItemProps> {
     }
   }
 
-  render(): any {
+  render(): React.ReactNode {
     return renderLibraryItem(this.props);
   }
 

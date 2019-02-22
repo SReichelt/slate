@@ -7,6 +7,7 @@ import LibraryTree from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import Button from './components/Button';
+import MenuButton from './components/MenuButton';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import renderPromise from './components/PromiseHelper';
 import CachedPromise from '../shared/data/cachedPromise';
@@ -229,13 +230,13 @@ class App extends React.Component<AppProps, AppState> {
     window.onpopstate = null;
   }
 
-  render(): any {
+  render(): React.ReactNode {
     if (this.state.error) {
       return <div className={'error'}>Error: {this.state.error}</div>;
     }
 
-    let mainContents: any = undefined;
-    let extraContents: any = undefined;
+    let mainContents: React.ReactNode = undefined;
+    let extraContents: React.ReactNode = undefined;
     if (this.state.selectedItemDefinition) {
       if (this.state.templates && this.state.selectedItemProvider) {
         let definition = this.state.editedDefinition ? CachedPromise.resolve(this.state.editedDefinition) : this.state.selectedItemDefinition;
@@ -249,35 +250,42 @@ class App extends React.Component<AppProps, AppState> {
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
-    let leftButtons: any[] = [];
+    let leftButtons: React.ReactNode[] = [];
     if (this.state.gitHubUserInfo) {
       let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
-        let buttonContents: any[] = [];
+        let userID: React.ReactNode[] = [];
         if (userInfo.avatarUrl) {
-          buttonContents.push(<img src={userInfo.avatarUrl} key={'Avatar'}/>);
+          userID.push(<img src={userInfo.avatarUrl} key={'Avatar'}/>);
         }
         if (userInfo.login) {
-          if (buttonContents.length) {
-            buttonContents.push(' ');
+          if (userID.length) {
+            userID.push(' ');
           }
-          buttonContents.push(userInfo.login);
+          userID.push(userInfo.login);
         }
+        let userMenu: React.ReactNode[] = [
+          (
+            <Button toolTipText={'Log out (Warning: Does not log out of GitHub.)'} onClick={this.logoutOfGitHub} key={'LogOut'}>
+              {getButtonIcon(ButtonType.LogOut)}
+            </Button>
+          )
+        ];
         return (
-          <Button toolTipText={'Logout (Warning: Does not log out of GitHub.)'} onClick={this.logoutOfGitHub} key={'Logout'}>
-            {buttonContents}
-          </Button>
+          <MenuButton menu={userMenu} key={'UserMenu'}>
+            {userID}
+          </MenuButton>
         );
       });
       leftButtons.push(renderPromise(loginInfoPromise, 'UserInfo'));
     } else if (this.state.gitHubClientID) {
       leftButtons.push(
-        <Button toolTipText={'Login with GitHub'} onClick={this.loginWithGitHub} key={'Login'}>
-          {getButtonIcon(ButtonType.Login)}
+        <Button toolTipText={'Log in with GitHub'} onClick={this.loginWithGitHub} key={'LogIn'}>
+          {getButtonIcon(ButtonType.LogIn)}
         </Button>
       );
     }
 
-    let rightButtons: any[] = [];
+    let rightButtons: React.ReactNode[] = [];
     if (this.state.selectedItemDefinition) {
       if (this.state.submitting) {
         rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);

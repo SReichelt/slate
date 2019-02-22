@@ -41,7 +41,7 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
     }
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let render = this.props.definition.then((definition: Fmt.Definition) => {
       let stream = new SourceCodeDisplay.SourceCodeStream;
       let writer = new FmtWriter.Writer(stream);

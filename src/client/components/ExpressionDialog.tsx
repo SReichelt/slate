@@ -16,7 +16,7 @@ interface ExpressionDialogProps {
 class ExpressionDialog extends React.Component<ExpressionDialogProps> {
   private interactionHandler = new ExpressionInteractionHandlerImpl;
 
-  render(): any {
+  render(): React.ReactNode {
     return [
       (
         <ExpressionDialogContents dialog={this.props.dialog} interactionHandler={this.interactionHandler} key={'contents'}/>
@@ -41,7 +41,7 @@ interface ExpressionDialogContentsProps {
 }
 
 class ExpressionDialogContents extends React.Component<ExpressionDialogContentsProps> {
-  render(): any {
+  render(): React.ReactNode {
     let rows = [];
     let index = 0;
     let separated = false;
@@ -99,7 +99,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     }
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let className = 'dialog-row';
     if (this.props.separated) {
       className += ' separated';

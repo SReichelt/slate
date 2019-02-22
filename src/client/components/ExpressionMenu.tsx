@@ -19,7 +19,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
     this.state = {};
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let rows = [];
     let index = 0;
     let separated = false;
@@ -78,8 +78,8 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
     };
   }
 
-  render(): any {
-    let cells: any = undefined;
+  render(): React.ReactNode {
+    let cells: React.ReactNode = undefined;
     let row = this.props.row;
     if (row instanceof Menu.ExpressionMenuItem) {
       cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={false}/>;
@@ -231,7 +231,7 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
     };
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let className = 'open-menu-item clickable';
     if (this.state.hovered || this.props.hoveredExternally) {
       className += ' hover';
@@ -293,7 +293,7 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
     }
   }
 
-  render(): any {
+  render(): React.ReactNode {
     let className = 'open-menu-item';
     if (this.state.hovered || this.state.editing || this.props.hoveredExternally) {
       className += ' hover';

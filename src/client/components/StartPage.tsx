@@ -35,7 +35,7 @@ function buildExample(names: string[]): Fmt.DefinitionRefExpression {
   return result;
 }
 
-function wrapExample(example: any, path: Fmt.Path, props: StartPageProps): any {
+function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageProps): React.ReactNode {
   let href = props.libraryDataProvider!.pathToURI(path);
   let onClick = (event: React.MouseEvent) => {
     if (event.button < 1) {
@@ -50,10 +50,10 @@ function wrapExample(example: any, path: Fmt.Path, props: StartPageProps): any {
   );
 }
 
-function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer, title?: string[]): any {
+function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer, title?: string[]): React.ReactNode {
   let example = buildExample(names);
   let expression = renderer.renderExampleExpression(example);
-  let result: any = <Expression expression={expression} interactionHandler={props.interactionHandler}/>;
+  let result: React.ReactNode = <Expression expression={expression} interactionHandler={props.interactionHandler}/>;
   if (title) {
     let titleLines = [];
     for (let line of title) {
@@ -70,7 +70,7 @@ function renderDefinitionExample(names: string[], props: StartPageProps, rendere
   return wrapExample(result, example.path, props);
 }
 
-function renderTheoremExample(names: string[], props: StartPageProps): any {
+function renderTheoremExample(names: string[], props: StartPageProps): React.ReactNode {
   let examplePath = buildExamplePath(names);
   let libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
   let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
@@ -83,8 +83,8 @@ function renderTheoremExample(names: string[], props: StartPageProps): any {
   return wrapExample(result, examplePath, props);
 }
 
-function StartPage(props: StartPageProps): any {
-  let exampleContainer: any = undefined;
+function StartPage(props: StartPageProps) {
+  let exampleContainer: React.ReactNode = undefined;
 
   if (props.libraryDataProvider && props.templates) {
     let dummyDefinition = new Fmt.Definition;
@@ -98,7 +98,7 @@ function StartPage(props: StartPageProps): any {
     ];
     exampleContainer = (
       <div className="examples">
-        {examples.map((example: any, index: number) => <div className="example-container" key={index}>{example}</div>)}
+        {examples.map((example: React.ReactNode, index: number) => <div className="example-container" key={index}>{example}</div>)}
       </div>
     );
   }

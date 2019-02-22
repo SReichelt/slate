@@ -5,11 +5,11 @@ import CachedPromise from '../../shared/data/cachedPromise';
 const Loading = require('react-loading-animation');
 
 interface PromiseHelperProps {
-  promise: CachedPromise<any>;
+  promise: CachedPromise<React.ReactNode>;
 }
 
 interface PromiseHelperState {
-  promiseResult?: any;
+  promiseResult?: React.ReactNode;
   errorMessage?: string;
 }
 
@@ -57,7 +57,7 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
     this.currentPromise = undefined;
   }
 
-  render(): any {
+  render(): React.ReactNode {
     if (this.state.promiseResult !== undefined) {
       return this.state.promiseResult;
     } else if (this.state.errorMessage) {
@@ -68,7 +68,7 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
   }
 }
 
-function renderPromise(promise: CachedPromise<any>, key?: string): any {
+function renderPromise<T>(promise: CachedPromise<T>, key?: string) {
   let immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
     return <PromiseHelper promise={promise} key={key}/>;

@@ -28,13 +28,13 @@ export interface ExpressionInteractionHandler {
   getURI(semanticLink: Display.SemanticLink): string | undefined;
   linkClicked(semanticLink: Display.SemanticLink): void;
   hasPreview(semanticLink: Display.SemanticLink): boolean;
-  getPreviewContents(semanticLink: Display.SemanticLink): any;
+  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode;
   enterBlocker(): void;
   leaveBlocker(): void;
   isBlocked(): boolean;
 }
 
-let previewContents: any = null;
+let previewContents: React.ReactNode = null;
 
 interface ExpressionProps {
   expression: Display.RenderedExpression;
@@ -155,11 +155,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  render(): any {
+  render(): React.ReactNode {
     return this.renderExpression(this.props.expression, 'expr', undefined, this.props.addInnerParens, this.props.addInnerParens);
   }
 
-  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): any {
+  private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): React.ReactNode {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
         className += ' ' + styleClass;
@@ -188,7 +188,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       }
     }
-    let result: any = null;
+    let result: React.ReactNode = null;
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
     } else if (expression instanceof Display.TextExpression) {
@@ -286,11 +286,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           colCount = row.length;
         }
       }
-      result = [];
+      let rows: React.ReactNode[] = [];
       let rowIndex = 0;
       for (let row of expression.items) {
         let colIndex = 0;
-        let columns: any[] = [];
+        let columns: React.ReactNode[] = [];
         for (let cell of row) {
           columns.push(
             <span className={'table-cell'} key={colIndex++}>
@@ -303,12 +303,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'table-cell'} key={colIndex++}/>
           );
         }
-        result.push(
+        rows.push(
           <span className={'table-row'} key={rowIndex++}>
             {columns}
           </span>
         );
       }
+      result = rows;
     } else if (expression instanceof Display.ParenExpression) {
       className += ' paren';
       let parenExpression = expression;
@@ -317,7 +318,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           return this.renderExpression(parenExpression.body, className, semanticLinks);
         } else {
           return parenExpression.body.getLineHeight().then((lineHeight: number) => {
-            let parenResult: any = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
+            let parenResult: React.ReactNode = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
             let handled = false;
             let openParen = '';
             let closeParen = '';
@@ -498,11 +499,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.SubSupExpression) {
       let subSupExpression = expression;
       let render = expression.body.getLineHeight().then((lineHeight: number) => {
-        let subSupResult: any = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
-        let sub: any = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let sup: any = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSub: any = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSup: any = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let subSupResult: React.ReactNode[] = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
+        let sub: React.ReactNode = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sup: React.ReactNode = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSub: React.ReactNode = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSup: React.ReactNode = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (sub) {
             subSupResult.push(<sub key="sub">{sub}</sub>);
@@ -561,7 +562,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               );
             }
           } else {
-            subSupResult = (
+            return (
               <span className={'subsup subsup-full'}>
                 <span className={'subsup-sup-row subsup-full-row'} key="sup">
                   {leftSup || leftSub ? leftSup || empty : null}
@@ -590,9 +591,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
       let bodyWithParens = new Display.InnerParenExpression(expression.body);
-      let over: any = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      let under: any = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      result = [
+      let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let rows: React.ReactNode[] = [
         (
           <span className={'overunder-body-row'} key="body">
             <span className={'overunder-body'}>
@@ -609,7 +610,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         )
       ];
       if (over) {
-        result.unshift(
+        rows.unshift(
           <span className={'overunder-over-row'} key="over">
             <span className={'overunder-over'}>
               {over}
@@ -619,6 +620,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         className += ' noover';
       }
+      result = rows;
     } else if (expression instanceof Display.FractionExpression) {
       className += ' fraction';
       result = [
@@ -738,7 +740,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.state.openMenu) {
         menuClassName += ' open';
       }
-      let menu: any = undefined;
+      let menu: React.ReactNode = undefined;
       if (this.state.openDialog) {
         menu = (
           <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={{modal: 'dialog'}} key={'dialog'}>
@@ -752,7 +754,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;
       let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
-      let cells: any;
+      let cells: React.ReactNode;
       if (expression instanceof Display.PlaceholderExpression) {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else {
@@ -836,10 +838,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return result;
   }
 
-  private convertText(text: string): any {
+  private convertText(text: string): React.ReactNode {
     let curText = '';
     let curStyle: string | undefined = undefined;
-    let result: any[] = [];
+    let result: React.ReactNode[] = [];
     let childIndex = 0;
     let flush = () => {
       if (curText) {
