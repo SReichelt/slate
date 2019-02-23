@@ -208,7 +208,10 @@ class App extends React.Component<AppProps, AppState> {
             for (let target of this.gitHubConfig.targets) {
               let repository = target.repository;
               if (repository.parentOwner && !repository.hasPullRequest) {
-                result = result.then(() => apiAccess.syncFork(repository, true));
+                result = result
+                  .then(() => apiAccess.fastForward(repository, false))
+                  .then(() => { repository.pullRequestAllowed = true; },
+                        () => { repository.hasLocalChanges = true; });
               }
             }
           }
@@ -288,7 +291,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         let userMenu: React.ReactNode[] = [
           (
-            <Button toolTipText={'Log out (Warning: Does not log out of GitHub.)'} onClick={this.logoutOfGitHub} key={'LogOut'}>
+            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} onClick={this.logOutOfGitHub} key={'LogOut'}>
               {getButtonIcon(ButtonType.LogOut)}
             </Button>
           )
@@ -302,7 +305,7 @@ class App extends React.Component<AppProps, AppState> {
       leftButtons.push(renderPromise(loginInfoPromise, 'UserInfo'));
     } else if (this.state.gitHubClientID) {
       leftButtons.push(
-        <Button toolTipText={'Log in with GitHub'} onClick={this.loginWithGitHub} key={'LogIn'}>
+        <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key={'LogIn'}>
           {getButtonIcon(ButtonType.LogIn)}
         </Button>
       );
@@ -506,7 +509,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private loginWithGitHub = (): void => {
+  private logInWithGitHub = (): void => {
     if (this.state.gitHubClientID) {
       let location = window.location;
       let protocol = location.protocol;
@@ -520,7 +523,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private logoutOfGitHub = (): void => {
+  private logOutOfGitHub = (): void => {
     this.discardGitHubLogin();
     location.reload();
   }

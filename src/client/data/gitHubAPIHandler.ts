@@ -20,6 +20,8 @@ export interface Repository {
   branch: string;
   parentOwner?: string;
   hasWriteAccess?: boolean;
+  hasLocalChanges?: boolean;
+  pullRequestAllowed?: boolean;
   hasPullRequest?: boolean;
 }
 
@@ -28,7 +30,13 @@ export function getInfoURL(repository: Repository, path: string): string {
 }
 
 export function getDownloadURL(repository: Repository, path: string): string {
-  return `https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}${path}`;
+  let owner = repository.owner;
+  if (repository.parentOwner && !repository.hasLocalChanges) {
+    /* If the repository has just been fast-forwarded, serve content from the parent repository instead.
+       Since raw.githubusercontent.com does not update immediately, we might receive outdated files otherwise. */
+    owner = repository.parentOwner;
+  }
+  return `https://raw.githubusercontent.com/${owner}/${repository.name}/${repository.branch}${path}`;
 }
 
 export interface QueryStringResult {
@@ -122,6 +130,8 @@ export class APIAccess {
           repository.owner = viewer.login;
           repository.hasWriteAccess = true;
           if (forkedRepo.ref && forkedRepo.ref.associatedPullRequests && forkedRepo.ref.associatedPullRequests.totalCount) {
+            repository.hasLocalChanges = true;
+            repository.pullRequestAllowed = true;
             repository.hasPullRequest = true;
           }
         }
@@ -134,7 +144,7 @@ export class APIAccess {
     return viewer;
   }
 
-  async syncFork(repository: Repository, force: boolean): Promise<void> {
+  async fastForward(repository: Repository, force: boolean): Promise<void> {
     if (!repository.parentOwner) {
       throw new Error('Cannot synchronize a repository that is not a fork');
     }
@@ -179,6 +189,7 @@ export class APIAccess {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await this.getUserInfo([repository]);
       } while (!repository.hasWriteAccess);
+      repository.pullRequestAllowed = true;
     }
 
     let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
@@ -195,6 +206,8 @@ export class APIAccess {
     };
     let putResult = await this.runRequest('PUT', apiPath, putParameters);
 
+    repository.hasLocalChanges = true;
+
     if (putResult.content.sha !== getResult.sha) {
       let checkResult;
       do {
@@ -203,7 +216,7 @@ export class APIAccess {
       } while (checkResult.sha === getResult.sha);
     }
 
-    if (repository.parentOwner) {
+    if (repository.parentOwner && repository.pullRequestAllowed) {
       let pullRequestPath = `/repos/${repository.parentOwner}/${repository.name}/pulls`;
       let pullRequestParameters = {
         title: putParameters.message,
@@ -215,6 +228,7 @@ export class APIAccess {
       if (!pullRequestResponse.ok && pullRequestResponse.status !== 422) {
         throw new Error(`Submission of pull request failed with HTTP error ${pullRequestResponse.status} (${pullRequestResponse.statusText})`);
       }
+      repository.hasPullRequest = true;
     }
   }
 }
