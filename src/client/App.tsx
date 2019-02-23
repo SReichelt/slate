@@ -16,9 +16,9 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/logics/library';
 import * as FmtDisplay from '../shared/display/meta';
 import { ButtonType, getButtonIcon } from './utils/icons';
-import { FileAccessor, FileContents } from '../shared/data/fileAccessor';
-import { WebFileAccessor } from './data/webFileAccessor';
-import { GitHubFileAccessor, GitHubConfig } from './data/gitHubFileAccessor';
+import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/fileAccessor';
+import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
+import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
@@ -35,6 +35,7 @@ interface AppProps {
 }
 
 interface SelectionState {
+  selectedItemRepository?: GitHub.Repository;
   selectedItemPath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
   selectedItemDefinition?: CachedPromise<Fmt.Definition>;
@@ -102,6 +103,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    let selectedLibraryName = 'hlm';
+
     if (this.runningLocally && !gitHubAPIAccess) {
       this.fileAccessor = new WebFileAccessor;
     } else {
@@ -116,6 +119,9 @@ class App extends React.Component<AppProps, AppState> {
           repository: repository
         });
         repositories.push(repository);
+        if (libraryName === selectedLibraryName) {
+          state.selectedItemRepository = repository;
+        }
       }
       let gitHubConfigPromise: CachedPromise<GitHubConfig>;
       if (gitHubAPIAccess) {
@@ -124,6 +130,22 @@ class App extends React.Component<AppProps, AppState> {
           return apiAccess.getUserInfo(repositories);
         });
         gitHubConfigPromise = state.gitHubUserInfo
+          .then(() => {
+            let result: CachedPromise<void> = CachedPromise.resolve();
+            if (this.gitHubConfig && this.gitHubConfig.apiAccess) {
+              let apiAccess = this.gitHubConfig.apiAccess;
+              for (let target of this.gitHubConfig.targets) {
+                let repository = target.repository;
+                if (repository.parentOwner && !repository.hasPullRequest) {
+                  result = result
+                    .then(() => apiAccess.fastForward(repository, false))
+                    .then(() => { repository.pullRequestAllowed = true; },
+                          () => { repository.hasLocalChanges = true; });
+                }
+              }
+            }
+            return result;
+          })
           .catch(() => {})
           .then(() => this.gitHubConfig!);
       } else {
@@ -133,8 +155,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.logic = Logics.hlm;
-    let libraryURI = librariesURIPrefix + 'hlm';
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, libraryURI, undefined, 'Library');
+    let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, undefined, 'Library');
 
     this.library = this.libraryDataProvider.fetchLocalSection();
 
@@ -200,28 +222,10 @@ class App extends React.Component<AppProps, AppState> {
       .catch(() => {});
 
     if (this.state.gitHubUserInfo) {
-      this.state.gitHubUserInfo.then(
-        () => {
-          let result: CachedPromise<void> = CachedPromise.resolve();
-          if (this.gitHubConfig && this.gitHubConfig.apiAccess) {
-            let apiAccess = this.gitHubConfig.apiAccess;
-            for (let target of this.gitHubConfig.targets) {
-              let repository = target.repository;
-              if (repository.parentOwner && !repository.hasPullRequest) {
-                result = result
-                  .then(() => apiAccess.fastForward(repository, false))
-                  .then(() => { repository.pullRequestAllowed = true; },
-                        () => { repository.hasLocalChanges = true; });
-              }
-            }
-          }
-          return result;
-        },
-        (error) => {
-          this.discardGitHubLogin();
-          this.props.alert.error('GitHub login failed: ' + error.message);
-        }
-      );
+      this.state.gitHubUserInfo.catch((error) => {
+        this.discardGitHubLogin();
+        this.props.alert.error('GitHub login failed: ' + error.message);
+      });
     }
 
     let templateUri = '/display/templates.slate';
@@ -317,9 +321,16 @@ class App extends React.Component<AppProps, AppState> {
         rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
         rightButtons.push(' ');
       } else if (this.state.editedDefinition) {
+        let willSubmit: boolean | undefined;
+        let repository = this.state.selectedItemRepository;
+        if (repository) {
+          willSubmit = repository.pullRequestAllowed;
+        } else {
+          willSubmit = !this.runningLocally;
+        }
         rightButtons.push(
-          <Button toolTipText={this.runningLocally ? 'Save' : 'Submit'} onClick={this.submit} key={'Submit'}>
-            {getButtonIcon(this.runningLocally ? ButtonType.Save : ButtonType.Submit)}
+          <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key={'Submit'}>
+            {getButtonIcon(willSubmit ? ButtonType.Submit : ButtonType.Save)}
           </Button>
         );
         rightButtons.push(
@@ -476,10 +487,16 @@ class App extends React.Component<AppProps, AppState> {
         submitting: true
       });
       libraryDataProvider.submitLocalItem(path.name, this.state.editedDefinition)
-        .then((appliedImmediately: boolean) => {
+        .then((writeFileResult: WriteFileResult) => {
           this.setState({submitting: false});
-          if (!appliedImmediately) {
-            this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+          if (writeFileResult instanceof GitHubWriteFileResult) {
+            if (writeFileResult.createdPullRequestURL) {
+              this.props.alert.info('GitHub pull request created successfully.');
+            }
+          } else if (writeFileResult instanceof WebWriteFileResult) {
+            if (!writeFileResult.writtenDirectly) {
+              this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+            }
           }
         })
         .catch((error) => {

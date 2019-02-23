@@ -181,7 +181,7 @@ export class APIAccess {
     return utf8.decode(atob(result.content));
   }
 
-  async updateFile(repository: Repository, path: string, text: string): Promise<void> {
+  async updateFile(repository: Repository, path: string, text: string): Promise<string | undefined> {
     if (!repository.hasWriteAccess) {
       let forkPath = `/repos/${repository.owner}/${repository.name}/forks`;
       await this.runRequest('POST', forkPath);
@@ -229,6 +229,12 @@ export class APIAccess {
         throw new Error(`Submission of pull request failed with HTTP error ${pullRequestResponse.status} (${pullRequestResponse.statusText})`);
       }
       repository.hasPullRequest = true;
+      if (pullRequestResponse.ok) {
+        let pullRequestResponseData = await pullRequestResponse.json();
+        return pullRequestResponseData.url;
+      }
     }
+
+    return undefined;
   }
 }

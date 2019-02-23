@@ -1,5 +1,5 @@
-import { WebFileAccessor } from './webFileAccessor';
-import { FileContents } from '../../shared/data/fileAccessor';
+import { WebFileAccessor, WebWriteFileResult } from './webFileAccessor';
+import { FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
 
@@ -32,14 +32,18 @@ export class GitHubFileAccessor extends WebFileAccessor {
     });
   }
 
-  writeFile(uri: string, text: string): CachedPromise<boolean> {
+  writeFile(uri: string, text: string): CachedPromise<WriteFileResult> {
     return this.config.then((config) => {
       if (config.apiAccess) {
         for (let target of config.targets) {
           if (uri.startsWith(target.uriPrefix)) {
             let path = uri.substring(target.uriPrefix.length);
             let result = config.apiAccess.updateFile(target.repository, path, text)
-              .then(() => !target.repository.parentOwner);
+              .then((createdPullRequestURL) => {
+                let writeFileResult = new GitHubWriteFileResult;
+                writeFileResult.createdPullRequestURL = createdPullRequestURL;
+                return writeFileResult;
+              });
             return new CachedPromise(result);
           }
         }
@@ -67,7 +71,6 @@ export class GitHubFileAccessor extends WebFileAccessor {
   }
 }
 
-class GitHubFileContents implements FileContents {
-  constructor(public text: string) {}
-  close(): void {}
+export class GitHubWriteFileResult implements WriteFileResult {
+  createdPullRequestURL?: string;
 }

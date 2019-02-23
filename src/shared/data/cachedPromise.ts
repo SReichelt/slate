@@ -29,8 +29,8 @@ class CachedPromise<T> implements PromiseLike<T> {
             return result;
           }
         },
-        onrejected)
-      );
+        onrejected
+      ));
     } else {
       try {
         let value = this.source as T;

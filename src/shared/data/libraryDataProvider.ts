@@ -1,5 +1,5 @@
 import { LibraryDataAccessor, LibraryItemInfo } from './libraryDataAccessor';
-import { FileAccessor, FileContents } from './fileAccessor';
+import { FileAccessor, FileContents, WriteFileResult } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as FmtReader from '../format/read';
@@ -176,7 +176,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
   }
 
-  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<boolean> {
+  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<WriteFileResult> {
     this.definitionCache.set(name, CachedPromise.resolve(definition));
     let uri = this.uri + encodeURI(name) + fileExtension;
     let file = new Fmt.File;
