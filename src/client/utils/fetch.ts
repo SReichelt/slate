@@ -1,19 +1,16 @@
-export function fetchAny(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  return window.fetch(input, init)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
-      }
-      return response;
-    });
+export async function fetchAny(input: RequestInfo, init?: RequestInit): Promise<Response> {
+  let response = await window.fetch(input, init);
+  if (!response.ok) {
+    throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
+  }
+  return response;
 }
 
-export function fetchVoid(input: RequestInfo, init?: RequestInit): Promise<void> {
-  return fetchAny(input, init)
-    .then(() => {});
+export async function fetchVoid(input: RequestInfo, init?: RequestInit): Promise<void> {
+  await fetchAny(input, init);
 }
 
-export function fetchText(input: RequestInfo, init?: RequestInit): Promise<string> {
-  return fetchAny(input, init)
-    .then((response) => response.text());
+export async function fetchText(input: RequestInfo, init?: RequestInit): Promise<string> {
+  let response = await fetchAny(input, init);
+  return await response.text();
 }

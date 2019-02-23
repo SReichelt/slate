@@ -46,7 +46,6 @@ interface SelectionState {
 
 interface GitHubState {
   gitHubClientID?: string;
-  gitHubAPIAccess?: CachedPromise<GitHub.APIAccess>;
   gitHubUserInfo?: CachedPromise<GitHub.UserInfo>;
 }
 
@@ -80,15 +79,16 @@ class App extends React.Component<AppProps, AppState> {
       extraContentsVisible: false,
     };
 
+    let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
     let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
     if (gitHubAccessToken) {
-      state.gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
+      gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
     }
 
     let selectionURI = window.location.pathname;
 
     let queryString = window.location.search;
-    if (queryString && !state.gitHubAPIAccess) {
+    if (queryString && !gitHubAPIAccess) {
       let gitHubQueryStringResult = GitHub.parseQueryString(queryString);
       if (gitHubQueryStringResult.path) {
         selectionURI = gitHubQueryStringResult.path;
@@ -98,11 +98,11 @@ class App extends React.Component<AppProps, AppState> {
           window.localStorage.setItem('GitHubAccessToken', accessToken);
           return new GitHub.APIAccess(accessToken);
         });
-        state.gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
+        gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
       }
     }
 
-    if (this.runningLocally && !state.gitHubAPIAccess) {
+    if (this.runningLocally && !gitHubAPIAccess) {
       this.fileAccessor = new WebFileAccessor;
     } else {
       this.gitHubConfig = {
@@ -118,8 +118,8 @@ class App extends React.Component<AppProps, AppState> {
         repositories.push(repository);
       }
       let gitHubConfigPromise: CachedPromise<GitHubConfig>;
-      if (state.gitHubAPIAccess) {
-        state.gitHubUserInfo = state.gitHubAPIAccess.then((apiAccess) => {
+      if (gitHubAPIAccess) {
+        state.gitHubUserInfo = gitHubAPIAccess.then((apiAccess) => {
           this.gitHubConfig!.apiAccess = apiAccess;
           return apiAccess.getUserInfo(repositories);
         });
@@ -200,10 +200,25 @@ class App extends React.Component<AppProps, AppState> {
       .catch(() => {});
 
     if (this.state.gitHubUserInfo) {
-      this.state.gitHubUserInfo.catch((error) => {
-        this.logoutOfGitHub();
-        this.props.alert.error('GitHub login failed: ' + error.message);
-      });
+      this.state.gitHubUserInfo.then(
+        () => {
+          let result: CachedPromise<void> = CachedPromise.resolve();
+          if (this.gitHubConfig && this.gitHubConfig.apiAccess) {
+            let apiAccess = this.gitHubConfig.apiAccess;
+            for (let target of this.gitHubConfig.targets) {
+              let repository = target.repository;
+              if (repository.parentOwner && !repository.hasPullRequest) {
+                result = result.then(() => apiAccess.syncFork(repository, true));
+              }
+            }
+          }
+          return result;
+        },
+        (error) => {
+          this.logoutOfGitHub();
+          this.props.alert.error('GitHub login failed: ' + error.message);
+        }
+      );
     }
 
     let templateUri = '/display/templates.slate';
@@ -501,10 +516,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.gitHubConfig) {
       this.gitHubConfig.apiAccess = undefined;
     }
-    this.setState({
-      gitHubAPIAccess: undefined,
-      gitHubUserInfo: undefined
-    });
+    this.setState({gitHubUserInfo: undefined});
     window.localStorage.removeItem('GitHubAccessToken');
   }
 }

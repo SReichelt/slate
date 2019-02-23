@@ -11,8 +11,11 @@ class CachedPromise<T> implements PromiseLike<T> {
     }
   }
 
-  static resolve<U>(value: U): CachedPromise<U> {
-    return new CachedPromise<U>(value, false);
+  static resolve<U>(value: U): CachedPromise<U>;
+  static resolve(): CachedPromise<void>;
+
+  static resolve<U>(value?: U): CachedPromise<U> {
+    return new CachedPromise<U>(value!, false);
   }
 
   then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): CachedPromise<TResult1 | TResult2> {

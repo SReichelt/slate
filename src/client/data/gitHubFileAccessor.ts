@@ -39,7 +39,7 @@ export class GitHubFileAccessor extends WebFileAccessor {
           if (uri.startsWith(target.uriPrefix)) {
             let path = uri.substring(target.uriPrefix.length);
             let result = config.apiAccess.updateFile(target.repository, path, text)
-              .then(() => !target.repository.isFork);
+              .then(() => !target.repository.parentOwner);
             return new CachedPromise(result);
           }
         }
