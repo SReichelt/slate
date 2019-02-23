@@ -215,7 +215,7 @@ class App extends React.Component<AppProps, AppState> {
           return result;
         },
         (error) => {
-          this.logoutOfGitHub();
+          this.discardGitHubLogin();
           this.props.alert.error('GitHub login failed: ' + error.message);
         }
       );
@@ -243,6 +243,14 @@ class App extends React.Component<AppProps, AppState> {
   componentWillUnmount(): void {
     window.onresize = null;
     window.onpopstate = null;
+  }
+
+  private discardGitHubLogin(): void {
+    if (this.gitHubConfig) {
+      this.gitHubConfig.apiAccess = undefined;
+    }
+    this.setState({gitHubUserInfo: undefined});
+    window.localStorage.removeItem('GitHubAccessToken');
   }
 
   render(): React.ReactNode {
@@ -513,11 +521,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private logoutOfGitHub = (): void => {
-    if (this.gitHubConfig) {
-      this.gitHubConfig.apiAccess = undefined;
-    }
-    this.setState({gitHubUserInfo: undefined});
-    window.localStorage.removeItem('GitHubAccessToken');
+    this.discardGitHubLogin();
+    location.reload();
   }
 }
 
