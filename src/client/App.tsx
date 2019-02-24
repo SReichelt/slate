@@ -324,7 +324,7 @@ class App extends React.Component<AppProps, AppState> {
         let willSubmit: boolean | undefined;
         let repository = this.state.selectedItemRepository;
         if (repository) {
-          willSubmit = repository.pullRequestAllowed;
+          willSubmit = repository.pullRequestAllowed || !repository.hasWriteAccess;
         } else {
           willSubmit = !this.runningLocally;
         }
