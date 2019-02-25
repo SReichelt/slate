@@ -137,7 +137,7 @@ export class APIAccess {
         }
       }
       let upstreamRepo = data[`upstreamRepo${index}`];
-      if (upstreamRepo && upstreamRepo.viewerPermission === 'WRITE') {
+      if (upstreamRepo && (upstreamRepo.viewerPermission === 'WRITE' || upstreamRepo.viewerPermission === 'ADMIN')) {
         repository.hasWriteAccess = true;
       }
     });
