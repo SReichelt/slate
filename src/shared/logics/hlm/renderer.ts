@@ -2004,6 +2004,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
             || sourceType instanceof FmtHLM.MetaRefExpression_ResolveDef) {
           source = new Display.TextExpression('def');
+          source.styleClasses = ['miniature'];
           // TODO link to definition
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem) {
           if (sourceType.theorem instanceof Fmt.DefinitionRefExpression) {

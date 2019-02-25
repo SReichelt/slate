@@ -6,7 +6,7 @@ $Parens(body: %Expr, style: %String): %Template {}
 $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 $OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): %Template {}
-$OverUnder(body: %Expr, over?: %Expr, under?: %Expr): %Template {}
+$OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template {}
 $Fraction(numerator: %Expr, denominator: %Expr): %Template {}
 $Radical(radicand: %Expr, degree?: %Expr): %Template {}
 
@@ -158,13 +158,14 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', paren
   )
 }
 
-$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
+$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
   display = $OuterParens(
     body = [
       $OverUnder(
         body = symbol,
         over = over,
-        under = under
+        under = under,
+        style = style
       ),
       space,
       $InnerParens(
@@ -525,11 +526,9 @@ $DependentProofStep(result: %Expr, source?: %Expr): %Template {
     %opt(
       source,
       $OverUnder(
-        body = $Style(
-          body = '⇒',
-          styleClass = 'shallow-symbol'
-        ),
-        over = source
+        body = '⇒',
+        over = source,
+        style = 'shallow'
       ),
       '⇒'
     ),

@@ -201,12 +201,22 @@ div.display-math {
 
 .overunder-body, .overunder-over, .overunder-under {
   display: table-cell;
+  height: 0.3em;
 }
 
-.overunder-body>.shallow-symbol {
+.overunder.shallow>.overunder-body-row>.overunder-body {
   position: relative;
-  height: 0.6em;
   top: -0.4em;
+}
+
+.overunder.noover.shallow>.overunder-body-row>.overunder-body {
+  position: initial;
+  top: initial;
+  line-height: 80%;
+}
+
+.overunder.noover.shallow>.overunder-body-row>.overunder-body * {
+  line-height: 80%;
 }
 
 .paren-large {
@@ -243,18 +253,15 @@ div.display-math {
 
 .paren-round-left, .paren-round-right, .paren-angle-left, .paren-angle-right {
   width: 1ex;
-  min-width: 1ex;
 }
 
 .paren-curly-left, .paren-curly-right {
   width: 1.2ex;
-  min-width: 1.2ex;
 }
 
 .paren-square-left {
   display: table-cell;
   width: 3pt;
-  min-width: 3pt;
   border-left: solid 1.5pt;
   border-top: solid 0.75pt;
   border-bottom: solid 0.75pt;
@@ -263,7 +270,6 @@ div.display-math {
 .paren-square-right {
   display: table-cell;
   width: 3pt;
-  min-width: 3pt;
   border-right: solid 1.5pt;
   border-top: solid 0.75pt;
   border-bottom: solid 0.75pt;
@@ -440,7 +446,6 @@ div.display-math {
 .radical-diagonal {
   display: table-cell;
   width: 1ex;
-  min-width: 1ex;
   position: relative;
 }
 

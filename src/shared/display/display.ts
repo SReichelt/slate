@@ -618,6 +618,10 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
         let overUnderExpression = new OverUnderExpression(this.getExpressionArg('body'));
         overUnderExpression.over = this.getOptionalExpressionArg('over');
         overUnderExpression.under = this.getOptionalExpressionArg('under');
+        let style = this.getOptionalArg('style');
+        if (style) {
+          overUnderExpression.styleClasses = [style];
+        }
         expression = overUnderExpression;
       }
       break;
