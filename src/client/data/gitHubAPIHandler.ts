@@ -25,6 +25,10 @@ export interface Repository {
   hasPullRequest?: boolean;
 }
 
+export function getRepositoryURL(repository: Repository): string {
+  return `https://github.com/${repository.owner}/${repository.name}/tree/${repository.branch}`;
+}
+
 export function getInfoURL(repository: Repository, path: string): string {
   return `https://github.com/${repository.owner}/${repository.name}/blob/${repository.branch}${path}`;
 }
@@ -63,6 +67,11 @@ export function parseQueryString(query: string): QueryStringResult {
 export interface UserInfo {
   login?: string;
   avatarUrl?: string;
+}
+
+export enum PullRequestState {
+  Created,
+  Updated
 }
 
 function quote(s: string) {
@@ -164,12 +173,6 @@ export class APIAccess {
       force: force
     };
     await this.runRequest('PATCH', forkPath, patchParameters);
-
-    let checkResult;
-    do {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      checkResult = await this.runRequest('GET', forkPath);
-    } while (checkResult.object.sha === getResult.object.sha);
   }
 
   async readFile(repository: Repository, path: string): Promise<string> {
@@ -181,7 +184,7 @@ export class APIAccess {
     return utf8.decode(atob(result.content));
   }
 
-  async updateFile(repository: Repository, path: string, text: string): Promise<string | undefined> {
+  async updateFile(repository: Repository, path: string, text: string): Promise<PullRequestState | undefined> {
     if (!repository.hasWriteAccess) {
       let forkPath = `/repos/${repository.owner}/${repository.name}/forks`;
       await this.runRequest('POST', forkPath);
@@ -229,10 +232,7 @@ export class APIAccess {
         throw new Error(`Submission of pull request failed with HTTP error ${pullRequestResponse.status} (${pullRequestResponse.statusText})`);
       }
       repository.hasPullRequest = true;
-      if (pullRequestResponse.ok) {
-        let pullRequestResponseData = await pullRequestResponse.json();
-        return pullRequestResponseData.url;
-      }
+      return pullRequestResponse.ok ? PullRequestState.Created : PullRequestState.Updated;
     }
 
     return undefined;

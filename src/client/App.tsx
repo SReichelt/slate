@@ -23,6 +23,7 @@ import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
+import Message from './components/Message';
 
 const Loading = require('react-loading-animation');
 
@@ -139,8 +140,8 @@ class App extends React.Component<AppProps, AppState> {
                 if (repository.parentOwner && !repository.hasPullRequest) {
                   result = result
                     .then(() => apiAccess.fastForward(repository, false))
-                    .then(() => { repository.pullRequestAllowed = true; },
-                          () => { repository.hasLocalChanges = true; });
+                    .then(() => void (repository.pullRequestAllowed = true))
+                    .catch(() => void (repository.hasLocalChanges = true));
                 }
               }
             }
@@ -270,11 +271,31 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedItemDefinition) {
       if (this.state.templates && this.state.selectedItemProvider) {
         let definition = this.state.editedDefinition ? CachedPromise.resolve(this.state.editedDefinition) : this.state.selectedItemDefinition;
-        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler}/>;
-        extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler}/>;
+        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+        extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+        if (this.state.editedDefinition) {
+          if (!this.state.gitHubUserInfo) {
+            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, your can submit your contribution as a pull request instead.</Message>, mainContents];
+          } else if (this.state.selectedItemRepository) {
+            let repository = this.state.selectedItemRepository;
+            if (!repository.hasWriteAccess) {
+              mainContents = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.</Message>, mainContents];
+            } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
+              mainContents = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContents];
+            }
+          }
+        }
       }
     } else {
-      mainContents = <StartPage libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onLinkClicked={this.linkClicked}/>;
+      mainContents = <StartPage libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onLinkClicked={this.linkClicked} key={'StartPage'}/>;
+      if (this.state.selectedItemRepository) {
+        let repository = this.state.selectedItemRepository;
+        if (repository.hasPullRequest) {
+          mainContents = [<Message type={'info'} key={'Message'}>Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+        } else if (repository.hasLocalChanges) {
+          mainContents = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+        }
+      }
     }
 
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
@@ -490,8 +511,9 @@ class App extends React.Component<AppProps, AppState> {
         .then((writeFileResult: WriteFileResult) => {
           this.setState({submitting: false});
           if (writeFileResult instanceof GitHubWriteFileResult) {
-            if (writeFileResult.createdPullRequestURL) {
-              this.props.alert.info('GitHub pull request created successfully.');
+            if (writeFileResult.pullRequestState !== undefined) {
+              let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
+              this.props.alert.info(`GitHub pull request ${action} successfully.`);
             }
           } else if (writeFileResult instanceof WebWriteFileResult) {
             if (!writeFileResult.writtenDirectly) {

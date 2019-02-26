@@ -253,15 +253,18 @@ div.display-math {
 
 .paren-round-left, .paren-round-right, .paren-angle-left, .paren-angle-right {
   width: 1ex;
+  min-width: 1ex;
 }
 
 .paren-curly-left, .paren-curly-right {
   width: 1.2ex;
+  min-width: 1.2ex;
 }
 
 .paren-square-left {
   display: table-cell;
   width: 3pt;
+  min-width: 3pt;
   border-left: solid 1.5pt;
   border-top: solid 0.75pt;
   border-bottom: solid 0.75pt;
@@ -270,6 +273,7 @@ div.display-math {
 .paren-square-right {
   display: table-cell;
   width: 3pt;
+  min-width: 3pt;
   border-right: solid 1.5pt;
   border-top: solid 0.75pt;
   border-bottom: solid 0.75pt;
@@ -446,6 +450,7 @@ div.display-math {
 .radical-diagonal {
   display: table-cell;
   width: 1ex;
+  min-width: 1ex;
   position: relative;
 }
 

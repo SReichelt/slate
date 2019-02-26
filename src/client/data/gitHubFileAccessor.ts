@@ -1,4 +1,4 @@
-import { WebFileAccessor, WebWriteFileResult } from './webFileAccessor';
+import { WebFileAccessor } from './webFileAccessor';
 import { FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
@@ -39,9 +39,9 @@ export class GitHubFileAccessor extends WebFileAccessor {
           if (uri.startsWith(target.uriPrefix)) {
             let path = uri.substring(target.uriPrefix.length);
             let result = config.apiAccess.updateFile(target.repository, path, text)
-              .then((createdPullRequestURL) => {
+              .then((pullRequestState) => {
                 let writeFileResult = new GitHubWriteFileResult;
-                writeFileResult.createdPullRequestURL = createdPullRequestURL;
+                writeFileResult.pullRequestState = pullRequestState;
                 return writeFileResult;
               });
             return new CachedPromise(result);
@@ -72,5 +72,5 @@ export class GitHubFileAccessor extends WebFileAccessor {
 }
 
 export class GitHubWriteFileResult implements WriteFileResult {
-  createdPullRequestURL?: string;
+  pullRequestState?: GitHub.PullRequestState;
 }
