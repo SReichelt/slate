@@ -6,14 +6,14 @@ const escapeForMarkdown = require('markdown-escape');
 
 class ScriptExpression extends Display.InnerParenExpression {}
 
-export function renderAsText(expression: Display.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
+export function renderAsText(expression: Display.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, indent: string = '', optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
   if ((optionalParenLeft || optionalParenRight)
       && optionalParenMaxLevel === undefined
       && (expression instanceof Display.SubSupExpression || expression instanceof Display.OverUnderExpression || expression instanceof Display.FractionExpression)) {
-    return renderAsText(new Display.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine);
+    return renderAsText(new Display.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine, indent);
   }
   if (expression instanceof Display.EmptyExpression) {
     return CachedPromise.resolve('');
@@ -28,12 +28,20 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return CachedPromise.resolve(text);
   } else if (expression instanceof Display.RowExpression) {
     if (expression.items.length === 1) {
-      return renderAsText(expression.items[0], outputMarkdown, true, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+      return renderAsText(expression.items[0], outputMarkdown, true, undefined, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else {
       return renderList(expression.items.map((item) => renderAsText(item, outputMarkdown, true)), '');
     }
   } else if (expression instanceof Display.ParagraphExpression) {
-    return renderList(expression.paragraphs.map((item) => renderAsText(item, outputMarkdown, singleLine)), singleLine ? ' ' : '\n\n');
+    let paragraphs = expression.paragraphs.map((item) => {
+      let ownIndent = '';
+      if (item.styleClasses && item.styleClasses.indexOf('display-math') >= 0 && !singleLine) {
+        ownIndent = '  ';
+      }
+      return renderAsText(item, outputMarkdown, singleLine, indent + ownIndent)
+        .then((result) => ownIndent + result);
+    });
+    return renderList(paragraphs, singleLine ? ' ' : '\n\n' + indent);
   } else if (expression instanceof Display.ListExpression) {
     let items = expression.items.map((item: Display.RenderedExpression, index: number) => {
       let prefix: string;
@@ -42,15 +50,17 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       } else {
         prefix = expression.style.replace('1', (index + 1).toString());
       }
-      return renderAsText(item, outputMarkdown, singleLine).then((text) => prefix + ' ' + text);
+      return renderAsText(item, outputMarkdown, singleLine, indent).then((text) => prefix + ' ' + text);
     });
-    return renderList(items, singleLine ? ', ' : outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n');
+    return renderList(items, singleLine ? ', ' : (outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Display.TableExpression) {
-    let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
     let isAligned = (expression.styleClasses && expression.styleClasses.indexOf('aligned') >= 0);
+    let isDefinitionList = (expression.styleClasses && expression.styleClasses.indexOf('definitions') >= 0);
+    let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
     let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
-    let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), separator));
-    return renderList(rows, singleLine ? ', ' : outputMarkdown ? '\\\n' : '\n');
+    let secondarySeparator = isDefinitionList ? '  ' : undefined;
+    let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), separator, secondarySeparator));
+    return renderList(rows, singleLine ? ', ' : (outputMarkdown ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Display.ParenExpression) {
     return expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
       let body = renderAsText(expression.body, outputMarkdown, true);
@@ -98,7 +108,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
       return renderAsText(expression.body, outputMarkdown, true);
     }
   } else if (expression instanceof Display.InnerParenExpression) {
-    let result = renderAsText(expression.body, outputMarkdown, true, expression.left, expression.right, expression.maxLevel);
+    let result = renderAsText(expression.body, outputMarkdown, true, undefined, expression.left, expression.right, expression.maxLevel);
     if (expression instanceof ScriptExpression) {
       result = result.then((text: string) => shrinkMathSpaces(text));
     }
@@ -153,14 +163,14 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return CachedPromise.resolve(expression.text);
   } else if (expression instanceof Display.IndirectExpression) {
     try {
-      return renderAsText(expression.resolve(), outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+      return renderAsText(expression.resolve(), outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } catch (error) {
       return CachedPromise.resolve(`[Error: ${error.message}]`);
     }
   } else if (expression instanceof Display.PromiseExpression) {
-    return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
+    return expression.promise.then((innerExpression: Display.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
   } else if (expression instanceof Display.DecoratedExpression) {
-    return renderAsText(expression.body, outputMarkdown, singleLine);
+    return renderAsText(expression.body, outputMarkdown, singleLine, indent);
   } else if (expression instanceof Display.PlaceholderExpression) {
     return CachedPromise.resolve('?');
   } else {
@@ -169,10 +179,15 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
   }
 }
 
-function renderList(items: CachedPromise<string>[], separator: string): CachedPromise<string> {
+function renderList(items: CachedPromise<string>[], separator: string, secondarySeparator?: string): CachedPromise<string> {
   let text = CachedPromise.resolve('');
+  let index = 0;
   for (let item of items) {
-    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedItem ? resolvedText ? resolvedText + separator + resolvedItem : resolvedItem : resolvedText));
+    if (secondarySeparator !== undefined && index > 1) {
+      separator = secondarySeparator;
+    }
+    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedText + separator + resolvedItem : resolvedItem));
+    index++;
   }
   return text;
 }
