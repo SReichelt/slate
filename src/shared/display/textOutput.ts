@@ -16,7 +16,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return renderAsText(new Display.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine);
   }
   if (expression instanceof Display.EmptyExpression) {
-    return CachedPromise.resolve('\u200b');
+    return CachedPromise.resolve('');
   } else if (expression instanceof Display.TextExpression) {
     let text = expression.text;
     if (outputMarkdown) {
@@ -47,7 +47,8 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     return renderList(items, singleLine ? ', ' : outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n');
   } else if (expression instanceof Display.TableExpression) {
     let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
-    let separator = isConstruction ? ' | ' : ' ';
+    let isAligned = (expression.styleClasses && expression.styleClasses.indexOf('aligned') >= 0);
+    let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
     let rows = expression.items.map((row: Display.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), separator));
     return renderList(rows, singleLine ? ', ' : outputMarkdown ? '\\\n' : '\n');
   } else if (expression instanceof Display.ParenExpression) {
@@ -171,7 +172,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
 function renderList(items: CachedPromise<string>[], separator: string): CachedPromise<string> {
   let text = CachedPromise.resolve('');
   for (let item of items) {
-    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedText + separator + resolvedItem : resolvedItem));
+    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedItem ? resolvedText ? resolvedText + separator + resolvedItem : resolvedItem : resolvedText));
   }
   return text;
 }

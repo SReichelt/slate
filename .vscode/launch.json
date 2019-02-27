@@ -27,6 +27,12 @@
                 "webpack:///*":    "*"
             },
             "timeout": 20000
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run tests",
+            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js"
         }
     ],
     "compounds": [
