@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
-    "test": "jest",
+    "test": "src/scripts/tidyLibrary.sh && jest",
     "test-accept": "jest --updateSnapshot",
     "start": "node ./dist/server/server.js",
     "start:prod": "cross-env NODE_ENV=production node ./dist/server/server.js",
