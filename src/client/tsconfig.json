@@ -8,6 +8,7 @@
     "lib": ["es6", "dom"],
     "jsx": "react",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

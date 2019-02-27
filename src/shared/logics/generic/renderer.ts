@@ -177,10 +177,6 @@ export abstract class GenericRenderer {
     }
   }
 
-  formatItemNumber(itemNumber: number[]): string {
-    return itemNumber.join('.');
-  }
-
   protected renderSubHeading(heading: string): Display.RenderedExpression {
     let subHeading = new Display.TextExpression(`${heading}.`);
     subHeading.styleClasses = ['sub-heading'];

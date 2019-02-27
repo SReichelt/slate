@@ -7,8 +7,14 @@ export interface LibraryDataAccessor {
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo>;
 }
 
+export type LibraryItemNumber = number[];
+
+export function formatItemNumber(itemNumber: LibraryItemNumber): string {
+  return itemNumber.join('.');
+}
+
 export interface LibraryItemInfo {
-  itemNumber: number[];
+  itemNumber: LibraryItemNumber;
   type?: string;
   title?: string;
 }

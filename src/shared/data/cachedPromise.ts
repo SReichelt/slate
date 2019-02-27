@@ -61,6 +61,14 @@ class CachedPromise<T> implements PromiseLike<T> {
       return this.source as T;
     }
   }
+
+  toPromise(): Promise<T> {
+    if (this.sourceIsPromise) {
+      return this.source as Promise<T>;
+    } else {
+      return Promise.resolve(this.source as T);
+    }
+  }
 }
 
 export default CachedPromise;

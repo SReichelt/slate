@@ -7,7 +7,7 @@ import * as Display from '../../display/display';
 import { HLMEditHandler } from './editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
-import { LibraryDataAccessor, LibraryItemInfo } from '../../data/libraryDataAccessor';
+import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
 interface ReplacementParameters {
@@ -178,7 +178,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         text = this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem ? 'Proposition' : 'Definition';
       }
       text += ' ';
-      text += this.formatItemNumber(info.itemNumber);
+      text += formatItemNumber(info.itemNumber);
       if (info.title) {
         let title = new Display.TextExpression(' (' + info.title + ')');
         title.styleClasses = ['title'];
@@ -2008,7 +2008,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           // TODO link to definition
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem) {
           if (sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
-            let itemNumberPromise = this.utils.getItemInfo(sourceType.theorem).then((itemInfo: LibraryItemInfo) => new Display.TextExpression(this.formatItemNumber(itemInfo.itemNumber)));
+            let itemNumberPromise = this.utils.getItemInfo(sourceType.theorem).then((itemInfo: LibraryItemInfo) => new Display.TextExpression(formatItemNumber(itemInfo.itemNumber)));
             source = new Display.PromiseExpression(itemNumberPromise);
             source.styleClasses = ['miniature'];
             this.setSemanticLink(source, sourceType.theorem);

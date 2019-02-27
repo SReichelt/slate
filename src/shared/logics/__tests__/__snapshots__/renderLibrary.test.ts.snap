@@ -1,0 +1,4726 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render hlm library: 1.1.1 data/libraries/hlm/Essentials/Sets/Empty%20set 1`] = `
+"Definition 1.1.1.  We define:
+
+∅ := ​ {}
+
+Remarks.
+
+This defines the empty set as an enumeration with no elements. Note that sets are a built-in concept in the HLM logic.
+
+References.
+
+* https://en.wikipedia.org/wiki/Empty_set
+* http://mathworld.wolfram.com/EmptySet.html
+* https://proofwiki.org/wiki/Definition:Empty_Set
+* https://ncatlab.org/nlab/show/empty+set"
+`;
+
+exports[`render hlm library: 1.1.2 data/libraries/hlm/Essentials/Sets/Empty%20set%20is%20subset%20of%20any%20set 1`] = `
+"Proposition 1.1.2.  Let S be a set. Then:
+
+∅ ⊆ S
+
+Proof.  Let x ∈ ∅. Then x ∈ S:
+
+x ∈ ∅
+
+⇒^def ⚡"
+`;
+
+exports[`render hlm library: 1.1.3 data/libraries/hlm/Essentials/Sets/empty 1`] = `
+"Definition 1.1.3.  Let S be a set. We define:
+
+S is empty  :⇔  ​ S = ∅
+​  ⇔  ​ S ⊆ ∅
+​  ⇔  ​ ∄ x ∈ S
+
+S is nonempty  :⇔  S is not empty
+
+Equivalence.
+
+1⇒2. Assume S = ∅. Then S ⊆ ∅:
+
+S = ∅
+
+⇒^def S ⊆ ∅
+2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
+
+Assume ∃ x ∈ S.
+
+S ⊆ ∅
+
+⇒^def ∀ s ∈ S : s ∈ ∅
+
+⇒ x ∈ ∅
+
+⇒^def ⚡
+3⇒1. Assume ∄ x ∈ S. Then S = ∅:
+
+⊆. Let a ∈ S. Then a ∈ ∅:
+
+We have ∃ x ∈ S:
+
+Choose x := a.
+⊇. 1.1.2 ⇒ ∅ ⊆ S
+
+Remarks.
+
+In HLM, multiple alternative definitions can be given for an operator or predicate, if they can be shown to be equal/equivalent. In proofs, the most convenient alternative can be selected at will, which reduces the number of necessary steps. Sometimes, it also makes sense to prove a property according to one alternative and then use it according to another."
+`;
+
+exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`] = `
+"Definition 1.1.4.  Let S be a set. We define:
+
+S is finite  :⇔  ​ |S| ∈ ℕ
+​  ⇔  ​ ∃ x ∈ ℕ : |S| = x
+​  ⇔  ​ ∃ y ∈ ℕ : |S| ≤ y
+​  ⇔  ​ ∃ z ∈ ℕ : |S| < z
+​  ⇔  ​ ∃ k ∈ ℕ, f : S ↔ ℕ_(<k)
+​  ⇔  ​ ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S
+​  ⇔  ​ ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective
+​  ⇔  ​ ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective
+
+S is infinite  :⇔  S is not finite
+
+Equivalence.
+
+1⇒5. Assume |S| ∈ ℕ. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
+
+|S| = |ℕ_(<|S|)|
+
+⇒^def ∃ r : S ↔ ℕ_(<|S|)
+
+Choose k := |S|, f := r.
+5⇒6. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
+
+Choose l := k, g := f^-1.
+6⇒1. Assume ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S. Then |S| ∈ ℕ:
+
+We have |ℕ_(<l)| = |S|:
+
+We show that ∃ s : S ↔ ℕ_(<l):
+
+Choose s := g.
+
+⇒^[l = |ℕ_(<l)|] l = |S|
+
+l ∈ ℕ
+
+⇒^[l = |S|] |S| ∈ ℕ
+5⇒7. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
+
+def ⇒ f is injective
+
+Choose m := k, h := f.
+7⇒8. Assume ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
+
+⇒^1.6.1.17.6 ℕ_(<m) ⊆ ℕ_(≤m)
+
+Choose n := m, i := h∣_S^(ℕ_(≤m)).
+8⇒3. Assume ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective. Then ∃ y ∈ ℕ : |S| ≤ y:
+
+i ∈ (S → ℕ_(≤n))
+
+⇒^def i ∈ (S → ℕ_(<(n+1)))
+
+Choose y := (n+1). We show that |S| ≤ (n+1):
+
+We show that ∃ t : S → ℕ_(<(n+1)) : t is injective:
+
+Choose t := i.
+3⇒5. Assume ∃ y ∈ ℕ : |S| ≤ y. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
+
+|S| ≤ y
+
+⇒^def ∃ u : S → ℕ_(<y) : u is injective
+
+Let T := u(S).
+
+Let o := |T|_≤y.
+
+Let v :  ℕ_(<o)  →  T, z  ↦  T[z].
+
+Choose k := o, f := v^-1 ∘ u∣_S^T.
+
+Remarks.
+
+This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
+
+Note also that the definition heavily relies on the embedding of the natural numbers into the cardinal numbers, which is completely transparent in HLM.
+
+These are just some example proofs, some equivalences are missing at the moment.
+
+References.
+
+* https://en.wikipedia.org/wiki/Finite_set
+* http://mathworld.wolfram.com/FiniteSet.html
+* https://proofwiki.org/wiki/Definition:Finite_Set
+* https://ncatlab.org/nlab/show/finite+set"
+`;
+
+exports[`render hlm library: 1.1.5 data/libraries/hlm/Essentials/Sets/Subsets%20of%20finite%20sets%20are%20finite 1`] = `
+"Proposition 1.1.5.  Let S be a finite set, T ⊆ S. Then:
+
+T is finite
+
+Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
+
+S is finite
+
+⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+
+Choose m := n, f := g∣_T. We show that g∣_T is injective:
+
+1.4.18 ⇒ g∣_T is injective
+
+Remarks.
+
+This is just an example proof. It could be rewritten in a very concise way as a proof about cardinals."
+`;
+
+exports[`render hlm library: 1.1.6 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
+"Definition 1.1.6.  Let U be a set, S, T ⊆ U. We define:
+
+S ∩ T := ​ {x ∈ U : x ∈ S and x ∈ T}
+
+Remarks.
+
+Due to the type system of HLM, it is impossible to define the intersection of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset _U_, although the intersection is, of course, independent of _U_. Since a suitable value for _U_ can always be inferred automatically, _U_ can be omitted from the notation.
+
+References.
+
+* https://en.wikipedia.org/wiki/Intersection_(set_theory)
+* http://mathworld.wolfram.com/Intersection.html
+* https://proofwiki.org/wiki/Definition:Set_Intersection"
+`;
+
+exports[`render hlm library: 1.1.7 data/libraries/hlm/Essentials/Sets/Intersection%20is%20associative 1`] = `
+"Proposition 1.1.7.  Let U be a set, R, S, T ⊆ U. Then:
+
+(R ∩ S) ∩ T = R ∩ (S ∩ T)
+
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_is_Associative"
+`;
+
+exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection%20is%20commutative 1`] = `
+"Proposition 1.1.8.  Let U be a set, S, T ⊆ U. Then:
+
+S ∩ T = T ∩ S
+
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_is_Commutative"
+`;
+
+exports[`render hlm library: 1.1.9 data/libraries/hlm/Essentials/Sets/Intersection%20is%20subset%20of%20argument 1`] = `
+"Proposition 1.1.9.  Let U be a set, S, T ⊆ U. Then:
+
+S ∩ T ⊆ S
+
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_is_Subset"
+`;
+
+exports[`render hlm library: 1.1.10 data/libraries/hlm/Essentials/Sets/Union 1`] = `
+"Definition 1.1.10.  Let U be a set, S, T ⊆ U. We define:
+
+S ∪ T := ​ {x ∈ U : x ∈ S or x ∈ T}
+
+Remarks.
+
+Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset _U_, although the intersection is, of course, independent of _U_. Since a suitable value for _U_ can always be inferred automatically, _U_ can be omitted from the notation.
+
+References.
+
+* https://en.wikipedia.org/wiki/Union_(set_theory)
+* http://mathworld.wolfram.com/Union.html
+* https://proofwiki.org/wiki/Definition:Set_Union"
+`;
+
+exports[`render hlm library: 1.1.11 data/libraries/hlm/Essentials/Sets/Union%20is%20associative 1`] = `
+"Proposition 1.1.11.  Let U be a set, R, S, T ⊆ U. Then:
+
+(R ∪ S) ∪ T = R ∪ (S ∪ T)
+
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Union_is_Associative"
+`;
+
+exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union%20is%20commutative 1`] = `
+"Proposition 1.1.12.  Let U be a set, S, T ⊆ U. Then:
+
+S ∪ T = T ∪ S
+
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Union_is_Commutative"
+`;
+
+exports[`render hlm library: 1.1.13 data/libraries/hlm/Essentials/Sets/Union%20is%20superset%20of%20argument 1`] = `
+"Proposition 1.1.13.  Let U be a set, S, T ⊆ U. Then:
+
+S ⊆ S ∪ T
+
+No proof."
+`;
+
+exports[`render hlm library: 1.1.14 data/libraries/hlm/Essentials/Sets/Relative%20complement 1`] = `
+"Definition 1.1.14.  Let U be a set, S, T ⊆ U. We define:
+
+S ∖ T := ​ {x ∈ U : x ∈ S and x ∉ T}
+​ = ​ {x ∈ S : x ∉ T}
+
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
+* http://mathworld.wolfram.com/SetDifference.html
+* https://proofwiki.org/wiki/Definition:Set_Difference"
+`;
+
+exports[`render hlm library: 1.1.15 data/libraries/hlm/Essentials/Sets/Disjoint%20union 1`] = `
+"Definition 1.1.15.  Let S, T be sets. We define:
+
+S ⊎ T :=: {l(s) | s ∈ S, r(t) | t ∈ T}
+
+l(s) = l(s')  :⇔  ​ s = s' (s ∈ S, s' ∈ S)
+
+r(t) = r(t')  :⇔  ​ t = t' (t ∈ T, t' ∈ T)
+
+For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' ⊎ T' as elements of S ⊎ T.
+
+Remarks.
+
+In contrast to the definition of set union, the disjoint union of sets is a “construction,” which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two “constructors.”
+
+Note that the set and its constructors are introduced at the same time, hence the non-standard notation “:=:”. The notation on both sides can be specified freely.
+
+A construction always includes definitions of equality for each constructor. In this case, those definitions are what one might expect. (Different constructors are never considered equal.)
+
+References.
+
+* https://en.wikipedia.org/wiki/Disjoint_union
+* http://mathworld.wolfram.com/DisjointUnion.html
+* https://proofwiki.org/wiki/Definition:Disjoint_Union_(Set_Theory)"
+`;
+
+exports[`render hlm library: 1.1.16 data/libraries/hlm/Essentials/Sets/Cartesian%20product 1`] = `
+"Definition 1.1.16.  Let S, T be sets. We define:
+
+S × T :=: {(s, t) | s ∈ S, t ∈ T}
+
+(s, t) = (s', t')  :⇔  ​ s = s' and t = t' (s ∈ S, t ∈ T, s' ∈ S, t' ∈ T)
+
+For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' × T' as elements of S × T.
+
+Remarks.
+
+The Cartesian product is, again, a “construction.” Note that HLM does not have any built-in notion of “tuple” – it is actually defined here as a constructor, with the usual notation.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cartesian_product
+* http://mathworld.wolfram.com/CartesianProduct.html
+* https://proofwiki.org/wiki/Definition:Cartesian_Product"
+`;
+
+exports[`render hlm library: 1.1.17 data/libraries/hlm/Essentials/Sets/Power%20set 1`] = `
+"Definition 1.1.17.  Let S be a set. We define:
+
+𝒫(S) :=: {(T) | T ⊆ S}
+
+(T) = (T')  :⇔  ​ T = T' (T ⊆ S, T' ⊆ S)
+
+For S' ⊆ S, we canonically treat elements of 𝒫(S') as elements of 𝒫(S).
+
+Remarks.
+
+The power set is another example of a construction. It is slightly nonstandard in that its elements are not actual subsets but terms that are built using the constructor of this construction. To highlight this difference, parentheses are used. There is no significant practical difference, however.
+
+References.
+
+* https://en.wikipedia.org/wiki/Power_set
+* http://mathworld.wolfram.com/PowerSet.html
+* https://proofwiki.org/wiki/Definition:Power_Set
+* https://ncatlab.org/nlab/show/power+set
+* https://coq.inria.fr/library/Coq.Sets.Powerset.html"
+`;
+
+exports[`render hlm library: 1.1.18 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
+"Definition 1.1.18.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+
+⋂_(i ∈ I) S_i := ​ {x ∈ U : ∀ j ∈ I : x ∈ S_j}
+
+Remarks.
+
+Similarly to the definition of the intersection of two sets, we have to specify a common superset _U_ for all sets. As a side effect, _I_ is allowed to be empty, in which case the result is simply _U_.
+
+References.
+
+* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections
+* https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
+`;
+
+exports[`render hlm library: 1.1.19 data/libraries/hlm/Essentials/Sets/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.19.  Let U be a set, S ⊆ 𝒫(U). We define:
+
+⋂S := ​ ⋂_((T) ∈ S) T
+
+References.
+
+* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
+`;
+
+exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generalized%20union 1`] = `
+"Definition 1.1.20.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+
+⋃_(i ∈ I) S_i := ​ {x ∈ U : ∃ j ∈ I : x ∈ S_j}
+
+References.
+
+* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions
+* https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
+`;
+
+exports[`render hlm library: 1.1.21 data/libraries/hlm/Essentials/Sets/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.21.  Let U be a set, S ⊆ 𝒫(U). We define:
+
+⋃S := ​ ⋃_((T) ∈ S) T
+
+References.
+
+* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
+`;
+
+exports[`render hlm library: 1.1.22 data/libraries/hlm/Essentials/Sets/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.22.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+
+∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
+
+(s_j)_(j ∈ I) = (s'_j)_(j ∈ I)  :⇔  ​ ∀ j ∈ I : s_j = s'_j (s_j ∈ S_j for each j ∈ I, s'_j ∈ S_j for each j ∈ I)
+
+Remarks.
+
+The generalized Cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
+* https://proofwiki.org/wiki/Definition:Cartesian_Product/Family_of_Sets"
+`;
+
+exports[`render hlm library: 1.1.23 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
+"Definition 1.1.23.  We define:
+
+𝓣𝓻𝓾𝓽𝓱 :=: {[p] | p is a proposition}
+
+[p] = [q]  :⇔  ​ [p  ⇔  q] (p, q are propositions)
+
+We write “let p be a truth value” for “let p ∈ 𝓣𝓻𝓾𝓽𝓱.”
+
+Remarks.
+
+This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set of [binary digits](../Numbers/Natural/Subsets/Binary%20digits).
+
+References.
+
+* https://en.wikipedia.org/wiki/Truth_value
+* https://proofwiki.org/wiki/Definition:Truth_Value
+* https://ncatlab.org/nlab/show/truth+value"
+`;
+
+exports[`render hlm library: 1.1.24.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.24.1.  Let S be a set. We define:
+
+𝓒𝓱𝓸𝓲𝓬𝓮(S) := ​ {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
+
+We write “let f be a choice function on S” for “let f ∈ 𝓒𝓱𝓸𝓲𝓬𝓮(S).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
+`;
+
+exports[`render hlm library: 1.1.24.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.24.2.  Let S be a set. We define:
+
+S has a choice function  :⇔  ​ 𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
+`;
+
+exports[`render hlm library: 1.1.24.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.24.3 (Axiom of choice).  We define:
+
+AC  :⇔  ​ ∀ sets S : S has a choice function
+
+Remarks.
+
+This is the simplest formulation of the axiom of choice that can be formalized in HLM. The standard formulation is not directly applicable because an indexed family of arbitrary sets cannot be defined as an object – there is no suitable equality definition.
+
+It is possible to state, as a theorem, that AC implies that the [Cartesian product](../Generalized%20cartesian%20product) of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
+
+HLM actually does not have “axioms” as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
+* The simplest solution is to add “assume AC” as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
+* A preferred method is to replace this with “assume _S_ has a choice function” for a suitable _S_.
+* Better yet, build the result explicitly from a given choice function.
+
+Hopefully this will not be too inconvenient. It does have a few advantages:
+* In particular cases where the axiom of choice is not needed, this fact becomes clear immediately.
+* It is possible to state and prove relationships between the axiom of choice and other statements. (Again, it is preferable to state these equivalences as theorems about particular sets.)
+
+As a last resort, HLM could be extended in two different ways:
+* A choice operator could be included in the logic. (This would likely imply global choice, though.)
+* The user interface could provide a mode that hides all references to the axiom of choice, and manages them automatically based on dependencies.
+
+References.
+
+* https://en.wikipedia.org/wiki/Axiom_of_choice
+* http://mathworld.wolfram.com/AxiomofChoice.html
+* https://proofwiki.org/wiki/Axiom:Axiom_of_Choice"
+`;
+
+exports[`render hlm library: 1.2.1 data/libraries/hlm/Essentials/Properties/Properties 1`] = `
+"Definition 1.2.1.  Let S be a set. We define:
+
+𝓟𝓻𝓹(S) :=: {[p_s]_(s ∈ S) | p_s is a proposition for each s ∈ S}
+
+[p_s]_(s ∈ S) = [q_s]_(s ∈ S)  :⇔  ​ ∀ s ∈ S : [p_s  ⇔  q_s] (p_s is a proposition for each s ∈ S, q_s is a proposition for each s ∈ S)
+
+For S' ⊆ S, we canonically treat elements of 𝓟𝓻𝓹(S') as elements of 𝓟𝓻𝓹(S).
+
+We write “let p be a property on S” for “let p ∈ 𝓟𝓻𝓹(S).”
+
+Remarks.
+
+This definition encodes a property (aka unary relation) on _S_ as a proposition depending on an element of _S_ (up to equivalence). Since it is equally possible to encode a unary relation on _S_ as a subset of _S_, this definition is interchangeable with the definition of the [power set](../Sets/Power%20set). The given definition is just more convenient.
+
+References.
+
+* https://en.wikipedia.org/wiki/Property_(mathematics)
+* https://proofwiki.org/wiki/Definition:Propositional_Function"
+`;
+
+exports[`render hlm library: 1.2.2 data/libraries/hlm/Essentials/Properties/has%20property 1`] = `
+"Definition 1.2.2.  Let S be a set, p be a property on S, s ∈ S. We define
+
+s is p
+
+by:
+
+s is [p_t]_(t ∈ S)  :⇔  ​ p_s (p_t is a proposition for each t ∈ S)
+
+Remarks.
+
+“_s_ is _p_” is shorthand for “_s_ has property _p_.”"
+`;
+
+exports[`render hlm library: 1.2.3 data/libraries/hlm/Essentials/Properties/predicate 1`] = `
+"Definition 1.2.3 (Predicate as property).
+
+Remarks.
+
+This is a macro to convert a predicate taking an element of _S_ to a property on _S_."
+`;
+
+exports[`render hlm library: 1.3.1 data/libraries/hlm/Essentials/Relations/Relations 1`] = `
+"Definition 1.3.1.  Let S, T be sets. We define:
+
+𝓡𝓮𝓵(S, T) :=: {[p_s,t]_s ∈ S,t ∈ T | p_s,t is a proposition for each s ∈ S and t ∈ T}
+
+[p_s,t]_s ∈ S,t ∈ T = [q_s,t]_s ∈ S,t ∈ T  :⇔  ​ ∀ s ∈ S, t ∈ T : [p_s,t  ⇔  q_s,t] (p_s,t is a proposition for each s ∈ S and t ∈ T, q_s,t is a proposition for each s ∈ S and t ∈ T)
+
+For S' ⊆ S and T' ⊆ T, we canonically treat elements of 𝓡𝓮𝓵(S', T') as elements of 𝓡𝓮𝓵(S, T).
+
+We write “let ≺ be a relation from S to T” for “let ≺ ∈ 𝓡𝓮𝓵(S, T).”
+
+Remarks.
+
+This definition encodes a relation from _S_ to _T_ as a proposition depending on an element of _S_ and an element of _T_ (up to equivalence). It would be equally possible to encode relations as subsets of the Cartesian product; the given definition is just more convenient.
+
+References.
+
+* https://en.wikipedia.org/wiki/Binary_relation
+* http://mathworld.wolfram.com/Relation.html
+* https://proofwiki.org/wiki/Definition:Relation
+* https://ncatlab.org/nlab/show/relation#binary_relations"
+`;
+
+exports[`render hlm library: 1.3.2 data/libraries/hlm/Essentials/Relations/related 1`] = `
+"Definition 1.3.2.  Let S, T be sets, ≺ be a relation from S to T, s ∈ S, t ∈ T. We define
+
+s ≺ t
+
+by:
+
+s [p_u,v]_u ∈ S,v ∈ T t  :⇔  ​ p_s,t (p_u,v is a proposition for each u ∈ S and v ∈ T)"
+`;
+
+exports[`render hlm library: 1.3.3 data/libraries/hlm/Essentials/Relations/predicate 1`] = `
+"Definition 1.3.3 (Predicate as relation).
+
+Remarks.
+
+This is a macro to convert a predicate taking elements of _S_ and _T_ to a relation from _S_ to _T_."
+`;
+
+exports[`render hlm library: 1.3.4 data/libraries/hlm/Essentials/Relations/converse 1`] = `
+"Definition 1.3.4.  Let S, T be sets, ≺ be a relation from S to T. We define:
+
+≺^T := ​ [s ≺ t]_t ∈ T,s ∈ S
+
+References.
+
+* https://en.wikipedia.org/wiki/Converse_relation
+* https://proofwiki.org/wiki/Definition:Inverse_Relation"
+`;
+
+exports[`render hlm library: 1.3.5 data/libraries/hlm/Essentials/Relations/implies 1`] = `
+"Definition 1.3.5.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+
+(≺ ⇒ ⊂)  :⇔  ​ ∀ s ∈ S, t ∈ T s.t. s ≺ t : s ⊂ t
+
+Remarks.
+
+This definition is equivalent to the first relation being a subset of the second if relations are encoded as subsets."
+`;
+
+exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/conjunction 1`] = `
+"Definition 1.3.6.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+
+≺ ∧ ⊂ := ​ [s ≺ t and s ⊂ t]_s ∈ S,t ∈ T
+
+Remarks.
+
+This definition is equivalent to the [intersection](../Sets/Intersection) of two relations if relations are encoded as subsets."
+`;
+
+exports[`render hlm library: 1.3.7 data/libraries/hlm/Essentials/Relations/disjunction 1`] = `
+"Definition 1.3.7.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+
+≺ ∨ ⊂ := ​ [s ≺ t or s ⊂ t]_s ∈ S,t ∈ T
+
+Remarks.
+
+This definition is equivalent to the [union](../Sets/Union) of two relations if relations are encoded as subsets."
+`;
+
+exports[`render hlm library: 1.3.8 data/libraries/hlm/Essentials/Relations/generalized%20conjunction 1`] = `
+"Definition 1.3.8.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
+
+⋀R := ​ [∀ ≺ ∈ R : s ≺ t]_s ∈ S,t ∈ T
+
+Remarks.
+
+This definition is equivalent to the [generalized intersection](../Sets/Generalized%20intersection%20using%20power%20set) of relations if relations are encoded as subsets."
+`;
+
+exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/generalized%20disjunction 1`] = `
+"Definition 1.3.9.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
+
+⋁R := ​ [∃ ≺ ∈ R : s ≺ t]_s ∈ S,t ∈ T
+
+Remarks.
+
+This definition is equivalent to the [generalized union](../Sets/Generalized%20union%20using%20power%20set) of relations if relations are encoded as subsets."
+`;
+
+exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapping 1`] = `
+"Definition 1.3.10.  Let S, T be sets, ≺ be a relation from S to T. We define:
+
+≺ is a mapping  :⇔  ​ ∀ s ∈ S : ∃! t ∈ T : s ≺ t
+
+Remarks.
+
+In this library, “mapping” and “[function](../Functions/Functions)” are not synonymous but interchangeable, via a [definition](../Functions/mapping%20as%20function) that turns a mapping into a function. The difference is not fundamental but a matter of convenience.
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_(mathematics)
+* http://mathworld.wolfram.com/Function.html
+* https://proofwiki.org/wiki/Definition:Mapping"
+`;
+
+exports[`render hlm library: 1.3.11 data/libraries/hlm/Essentials/Relations/mapping%20value 1`] = `
+"Definition 1.3.11.  Let S, T be sets, ≺ be a mapping from S to T, s ∈ S. For t ∈ T, we define:
+
+≺(s) = t  :⇔  ​ s ≺ t
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation"
+`;
+
+exports[`render hlm library: 1.3.12 data/libraries/hlm/Essentials/Relations/Endorelations 1`] = `
+"Definition 1.3.12 (Endorelations).  Let S be a set. We define:
+
+𝓡𝓮𝓵(S) :=: {[p_s,t]_(s,t ∈ S) | p_s,t is a proposition for each s, t ∈ S}
+
+[p_s,t]_(s,t ∈ S) = [q_s,t]_(s,t ∈ S)  :⇔  ​ ∀ s, t ∈ S : [p_s,t  ⇔  q_s,t] (p_s,t is a proposition for each s, t ∈ S, q_s,t is a proposition for each s, t ∈ S)
+
+𝓡𝓮𝓵(S, S) ​ ⊆: 𝓡𝓮𝓵(S) via
+≺ ​ = [s ≺ t]_(s,t ∈ S)
+
+Well-definedness.  No proof.
+
+For S' ⊆ S, we canonically treat elements of 𝓡𝓮𝓵(S') as elements of 𝓡𝓮𝓵(S).
+
+We write “let ≺ be a relation on S” for “let ≺ ∈ 𝓡𝓮𝓵(S).”
+
+Remarks.
+
+Since endorelations are used often, we encode them as a separate construction with an appropriate embedding, mainly to improve rendering.
+
+References.
+
+* https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
+* http://mathworld.wolfram.com/Relation.html
+* https://proofwiki.org/wiki/Definition:Endorelation"
+`;
+
+exports[`render hlm library: 1.3.13 data/libraries/hlm/Essentials/Relations/restriction 1`] = `
+"Definition 1.3.13.  Let S be a set, ≺ be a relation on S, T ⊆ S. We define:
+
+≺∣_T := ​ [t ≺ u]_(t,u ∈ T)
+
+Remarks.
+
+This definition is not exactly standard but very simple. The main reason to include it is that the result is defined to be a relation on _T_ instead of _S_, which is sometimes needed."
+`;
+
+exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/equality 1`] = `
+"Definition 1.3.14.  Let S be a set. We define:
+
+=_S := ​ [s = t]_(s,t ∈ S)
+
+References.
+
+* https://en.wikipedia.org/wiki/Binary_relation#Particular_binary_relations: identity relation
+* https://proofwiki.org/wiki/Definition:Diagonal_Relation"
+`;
+
+exports[`render hlm library: 1.3.15 data/libraries/hlm/Essentials/Relations/reflexive 1`] = `
+"Definition 1.3.15.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is reflexive  :⇔  ​ ∀ s ∈ S : s ≺ s
+
+References.
+
+* https://en.wikipedia.org/wiki/Reflexive_relation
+* http://mathworld.wolfram.com/Reflexive.html
+* https://proofwiki.org/wiki/Definition:Reflexive_Relation
+* https://ncatlab.org/nlab/show/reflexive+relation"
+`;
+
+exports[`render hlm library: 1.3.16 data/libraries/hlm/Essentials/Relations/connex 1`] = `
+"Definition 1.3.16.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is connex  :⇔  ​ ∀ s, t ∈ S : [s ≺ t or t ≺ s]
+
+References.
+
+* https://en.wikipedia.org/wiki/Connex_relation"
+`;
+
+exports[`render hlm library: 1.3.17 data/libraries/hlm/Essentials/Relations/symmetric 1`] = `
+"Definition 1.3.17.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is symmetric  :⇔  ​ ∀ s, t ∈ S s.t. s ≺ t : t ≺ s
+​  ⇔  ​ ≺ = ≺^T
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Symmetric_relation
+* http://mathworld.wolfram.com/SymmetricRelation.html
+* https://proofwiki.org/wiki/Definition:Symmetric_Relation
+* https://ncatlab.org/nlab/show/symmetric+relation"
+`;
+
+exports[`render hlm library: 1.3.18 data/libraries/hlm/Essentials/Relations/antisymmetric 1`] = `
+"Definition 1.3.18.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is antisymmetric  :⇔  ​ ∀ s, t ∈ S s.t. s ≺ t and t ≺ s : s = t
+
+References.
+
+* https://en.wikipedia.org/wiki/Antisymmetric_relation
+* http://mathworld.wolfram.com/AntisymmetricRelation.html
+* https://proofwiki.org/wiki/Definition:Antisymmetric_Relation"
+`;
+
+exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/transitive 1`] = `
+"Definition 1.3.19.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is transitive  :⇔  ​ ∀ s, t, u ∈ S s.t. s ≺ t and t ≺ u : s ≺ u
+
+References.
+
+* https://en.wikipedia.org/wiki/Transitive_relation
+* https://proofwiki.org/wiki/Definition:Transitive_Relation
+* https://ncatlab.org/nlab/show/transitive+relation"
+`;
+
+exports[`render hlm library: 1.3.20 data/libraries/hlm/Essentials/Relations/preorder 1`] = `
+"Definition 1.3.20.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is a preorder  :⇔  ​ ≺ is reflexive and ≺ is transitive
+
+References.
+
+* https://en.wikipedia.org/wiki/Preorder
+* http://mathworld.wolfram.com/Preorder.html
+* https://proofwiki.org/wiki/Definition:Preordering
+* https://ncatlab.org/nlab/show/preorder"
+`;
+
+exports[`render hlm library: 1.3.21 data/libraries/hlm/Essentials/Relations/partial%20order 1`] = `
+"Definition 1.3.21.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is a partial order  :⇔  ​ ≺ is reflexive and ≺ is antisymmetric and ≺ is transitive
+​  ⇔  ​ ≺ is a preorder and ≺ is antisymmetric
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition"
+`;
+
+exports[`render hlm library: 1.3.22 data/libraries/hlm/Essentials/Relations/total%20order 1`] = `
+"Definition 1.3.22.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is a total order  :⇔  ​ ≺ is connex and ≺ is antisymmetric and ≺ is transitive
+​  ⇔  ​ ≺ is a partial order and ≺ is connex
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Total_order"
+`;
+
+exports[`render hlm library: 1.3.23 data/libraries/hlm/Essentials/Relations/lower%20bound 1`] = `
+"Definition 1.3.23.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
+
+s is a ≺-lower bound of T  :⇔  ​ ∀ t ∈ T : s ≺ t"
+`;
+
+exports[`render hlm library: 1.3.24 data/libraries/hlm/Essentials/Relations/upper%20bound 1`] = `
+"Definition 1.3.24.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
+
+s is a ≺-upper bound of T  :⇔  ​ ∀ t ∈ T : t ≺ s
+​  ⇔  ​ s is a ≺^T-lower bound of T
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.3.25 data/libraries/hlm/Essentials/Relations/least%20element 1`] = `
+"Definition 1.3.25.  Let S be a set, ≺ be a relation on S, T ⊆ S, t ∈ T. We define:
+
+t is a ≺-least element of T  :⇔  ​ t is a ≺-lower bound of T
+
+References.
+
+* https://en.wikipedia.org/wiki/Greatest_and_least_elements"
+`;
+
+exports[`render hlm library: 1.3.26 data/libraries/hlm/Essentials/Relations/greatest%20element 1`] = `
+"Definition 1.3.26.  Let S be a set, ≺ be a relation on S, T ⊆ S, t ∈ T. We define:
+
+t is a ≺-greatest element of T  :⇔  ​ t is a ≺-upper bound of T
+​  ⇔  ​ t is a ≺^T-least element of T
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Greatest_and_least_elements"
+`;
+
+exports[`render hlm library: 1.3.27 data/libraries/hlm/Essentials/Relations/well-order 1`] = `
+"Definition 1.3.27.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is a well-order  :⇔  ​ ≺ is a total order and ∀ T ⊆ S s.t. T is nonempty : ∃ t ∈ T : t is a ≺-least element of T
+
+References.
+
+* https://en.wikipedia.org/wiki/Well-order"
+`;
+
+exports[`render hlm library: 1.3.28 data/libraries/hlm/Essentials/Relations/equivalence 1`] = `
+"Definition 1.3.28.  Let S be a set, ≺ be a relation on S. We define:
+
+≺ is an equivalence relation  :⇔  ​ ≺ is a preorder and ≺ is symmetric
+
+References.
+
+* https://en.wikipedia.org/wiki/Equivalence_relation
+* http://mathworld.wolfram.com/EquivalenceRelation.html
+* https://proofwiki.org/wiki/Definition:Equivalence_Relation
+* https://ncatlab.org/nlab/show/equivalence+relation"
+`;
+
+exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/Equivalence%20classes 1`] = `
+"Definition 1.3.29 (Equivalence classes).  Let S be a set, ∼ be an equivalence relation on S. We define:
+
+S∕∼ :=: {[s]_∼ | s ∈ S}
+
+[s]_∼ = [t]_∼  :⇔  ​ s ∼ t (s ∈ S, t ∈ S)
+
+Reflexivity.  No proof.
+
+Symmetry.  No proof.
+
+Transitivity.  No proof.
+
+Remarks.
+
+This definition uses the “construction” concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
+
+A more traditional definition where equivalence classes are subsets of _S_ is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
+
+In the end, there may need to be two different but interchangeable definitions of equivalence classes.
+
+References.
+
+* https://en.wikipedia.org/wiki/Equivalence_class
+* http://mathworld.wolfram.com/EquivalenceClass.html
+* https://proofwiki.org/wiki/Definition:Equivalence_Class
+* https://ncatlab.org/nlab/show/equivalence+class"
+`;
+
+exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succession 1`] = `
+"Definition 1.3.30 (Succession).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
+
+⪯ ≪ ⊑ := ​ [{{s_a ⪯ s_b if a = l(s_a) (s_a ∈ S), false if a = r(t_a) (t_a ∈ T) if b = l(s_b) (s_b ∈ S), {true if a = l(s_a) (s_a ∈ S), t_a ⊑ t_b if a = r(t_a) (t_a ∈ T) if b = r(t_b) (t_b ∈ T)]_(a,b ∈ S ⊎ T)
+
+Remarks.
+
+This definition constructs a partial order on the disjoint union of two sets _S_ and _T_ from partial orders on _S_ and _T_. Elements of _S_ are always considered smaller than elements of _T_. This is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum)."
+`;
+
+exports[`render hlm library: 1.3.31 data/libraries/hlm/Essentials/Relations/lexicographical%20order 1`] = `
+"Definition 1.3.31 (Lexicographical order).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
+
+⪯ ∠ ⊑ := ​ [s ⪯ s' and [s ≠ s' or t ⊑ t']]_((s,t),(s',t') ∈ S×T)
+
+Remarks.
+
+This definition constructs a partial order on the Cartesian product of two sets _S_ and _T_ from partial orders on _S_ and _T_, combining the two partial orders lexicographically. It is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product)."
+`;
+
+exports[`render hlm library: 1.3.32.1 data/libraries/hlm/Essentials/Relations/Closures/closure 1`] = `
+"Definition 1.3.32.1.  Let S be a set, ≺ be a relation on S, p be a property on 𝓡𝓮𝓵(S). We define:
+
+cl_p(≺) := ​ ⋀{⊂ ∈ 𝓡𝓮𝓵(S) : [≺ ⇒ ⊂] and ⊂ is p}
+
+Remarks.
+
+This is an attempt at a general definition of the closure of a relation with respect to a property, i.e. the smallest relation that contains the original relation and satisfies the property. Note that it only works for properties that are closed under generalized conjunctions aka intersections, which should probably be included as a requirement.
+
+References.
+
+* https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures"
+`;
+
+exports[`render hlm library: 1.3.32.2 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20closure 1`] = `
+"Definition 1.3.32.2.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^= := ​ cl_reflexive(≺)
+​ = ​ ≺ ∨ =_S
+
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Reflexive_closure
+* http://mathworld.wolfram.com/ReflexiveClosure.html
+* https://proofwiki.org/wiki/Definition:Reflexive_Closure"
+`;
+
+exports[`render hlm library: 1.3.32.3 data/libraries/hlm/Essentials/Relations/Closures/symmetric%20closure 1`] = `
+"Definition 1.3.32.3.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^↔ := ​ cl_symmetric(≺)
+​ = ​ ≺ ∨ ≺^T
+
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Symmetric_closure
+* https://proofwiki.org/wiki/Definition:Symmetric_Closure"
+`;
+
+exports[`render hlm library: 1.3.32.4 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20closure 1`] = `
+"Definition 1.3.32.4.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^⇔ := ​ cl_([⊂ is reflexive and ⊂ is symmetric]_(⊂∈𝓡𝓮𝓵(S)))(≺)
+​ = ​ (≺^=)^↔
+​ = ​ (≺^↔)^=
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.3.32.5 data/libraries/hlm/Essentials/Relations/Closures/transitive%20closure 1`] = `
+"Definition 1.3.32.5.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^+ := ​ cl_transitive(≺)
+
+References.
+
+* https://en.wikipedia.org/wiki/Transitive_closure
+* http://mathworld.wolfram.com/TransitiveClosure.html
+* https://proofwiki.org/wiki/Definition:Transitive_Closure_(Relation_Theory)"
+`;
+
+exports[`render hlm library: 1.3.32.6 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20transitive%20closure 1`] = `
+"Definition 1.3.32.6.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^∗ := ​ cl_preorder(≺)
+​ = ​ (≺^+)^=
+​ = ​ (≺^=)^+
+
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive closure
+* https://proofwiki.org/wiki/Definition:Reflexive_Transitive_Closure"
+`;
+
+exports[`render hlm library: 1.3.32.7 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20transitive%20closure 1`] = `
+"Definition 1.3.32.7.  Let S be a set, ≺ be a relation on S. We define:
+
+≺^≡ := ​ cl_equivalence relation(≺)
+
+References.
+
+* https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive symmetric closure"
+`;
+
+exports[`render hlm library: 1.4.1 data/libraries/hlm/Essentials/Functions/Functions 1`] = `
+"Definition 1.4.1.  Let X, Y be sets. We define:
+
+(X → Y) :=: {(X  →  Y, x  ↦  y_x) | y_x ∈ Y for each x ∈ X}
+
+(X  →  Y, x  ↦  y_x) = (X  →  Y, x  ↦  y'_x)  :⇔  ​ ∀ x ∈ X : y_x = y'_x (y_x ∈ Y for each x ∈ X, y'_x ∈ Y for each x ∈ X)
+
+We write “let f : X → Y be a function” for “let f ∈ (X → Y).”
+
+We write “let f :  X  →  Y, x  ↦  y_x” for “let f := (X  →  Y, x  ↦  y_x).”
+
+Remarks.
+
+This definition uses a feature of the HLM logic called “bindings.” It is [equivalent](mapping%20as%function) to the usual set-theoretic definition, which is called “[mapping](../Relations/mapping)” in this library to distinguish the two definitions.
+
+The major advantage of the definition using bindings is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
+
+Function [extensionality](https://en.wikipedia.org/wiki/Extensionality) is a consequence of the requirement to specify an equality definition for the constructor.
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_(mathematics)
+* http://mathworld.wolfram.com/Function.html
+* https://proofwiki.org/wiki/Definition:Mapping
+* https://ncatlab.org/nlab/show/function"
+`;
+
+exports[`render hlm library: 1.4.2 data/libraries/hlm/Essentials/Functions/value 1`] = `
+"Definition 1.4.2.  Let X, Y be sets, f : X → Y be a function, x ∈ X. We define
+
+f(x)
+
+by:
+
+(X  →  Y, z  ↦  y_z)(x) := ​ y_x (y_z ∈ Y for each z ∈ X)
+
+Remarks.
+
+This definition works due to the special way that functions are defined. The [corresponding definition](../Relations/mapping%20value) for mappings is an implicit definition.
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation"
+`;
+
+exports[`render hlm library: 1.4.3 data/libraries/hlm/Essentials/Functions/operator 1`] = `
+"Definition 1.4.3 (Operator as function).
+
+Remarks.
+
+This is a macro to convert an operator taking an element of _X_ and returning an element of _Y_ to a function from _X_ to _Y_."
+`;
+
+exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Image 1`] = `
+"Definition 1.4.4.  Let X, Y be sets, f : X → Y be a function, S ⊆ X. We define:
+
+f(S) := ​ {f(x) : x ∈ S}
+
+References.
+
+* https://en.wikipedia.org/wiki/Image_(mathematics)
+* https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset"
+`;
+
+exports[`render hlm library: 1.4.5 data/libraries/hlm/Essentials/Functions/Preimage 1`] = `
+"Definition 1.4.5.  Let X, Y be sets, f : X → Y be a function, S ⊆ Y. We define:
+
+f^-1(S) := ​ {x ∈ X : f(x) ∈ S}
+
+References.
+
+* https://en.wikipedia.org/wiki/Preimage"
+`;
+
+exports[`render hlm library: 1.4.6 data/libraries/hlm/Essentials/Functions/mapping%20as%20function 1`] = `
+"Definition 1.4.6.  Let S, T be sets, ≺ be a mapping from S to T. We define:
+
+(≺) :  S  →  T, s  ↦  ≺(s)
+
+Remarks.
+
+This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward as well.)"
+`;
+
+exports[`render hlm library: 1.4.7 data/libraries/hlm/Essentials/Functions/identity 1`] = `
+"Definition 1.4.7.  Let X be a set. We define:
+
+id_X :  X  →  X, x  ↦  x
+
+References.
+
+* https://en.wikipedia.org/wiki/Identity_function
+* https://proofwiki.org/wiki/Definition:Identity_Mapping"
+`;
+
+exports[`render hlm library: 1.4.8 data/libraries/hlm/Essentials/Functions/generalized%20restriction 1`] = `
+"Definition 1.4.8.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function. We define:
+
+f∣_A^B :  A  →  B, x  ↦  f(x)
+
+Remarks.
+
+This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously extends the codomain to a superset _B_ of _Y_.
+
+It might seem tempting to remove the need for this definition by implicitly treating a function to _Y_ as a function to a superset _B_ of _Y_, without explicitly specifying _B_. However, this might lead to confusion as the resulting function may not be surjective even though the original function is."
+`;
+
+exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/codomain%20restriction 1`] = `
+"Definition 1.4.9.  Let X be a set, A ⊆ X, Y be a set, B ⊆ Y, f : X → Y be a function such that f(A) ⊆ B. We define:
+
+f∣_A^B :  A  →  B, x  ↦  f(x)
+
+Remarks.
+
+This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition."
+`;
+
+exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/restriction 1`] = `
+"Definition 1.4.10.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. We define:
+
+f∣_A := ​ f∣_A^Y
+
+References.
+
+* https://en.wikipedia.org/wiki/Restriction_(mathematics)"
+`;
+
+exports[`render hlm library: 1.4.11 data/libraries/hlm/Essentials/Functions/composition 1`] = `
+"Definition 1.4.11.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions. We define:
+
+g ∘ f :  X  →  Z, x  ↦  g(f(x))
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_composition
+* http://mathworld.wolfram.com/Composition.html
+* https://proofwiki.org/wiki/Definition:Composition_of_Mappings"
+`;
+
+exports[`render hlm library: 1.4.12 data/libraries/hlm/Essentials/Functions/Composition%20is%20associative 1`] = `
+"Proposition 1.4.12.  Let W, X, Y, Z be sets, f : W → X, g : X → Y, h : Y → Z be functions. Then:
+
+(h ∘ g) ∘ f = h ∘ (g ∘ f)
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Function_composition#Properties
+* http://mathworld.wolfram.com/Composition.html
+* https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative"
+`;
+
+exports[`render hlm library: 1.4.13 data/libraries/hlm/Essentials/Functions/cartesian%20product 1`] = `
+"Definition 1.4.13.  Let V, W, X, Y be sets, f : V → W, g : X → Y be functions. We define:
+
+f × g :  V × X  →  W × Y, (v, x)  ↦  (f(v), g(x))
+
+Remarks.
+
+This definition is not standard in mathematics but convenient in some cases."
+`;
+
+exports[`render hlm library: 1.4.14 data/libraries/hlm/Essentials/Functions/injective 1`] = `
+"Definition 1.4.14.  Let X, Y be sets, f : X → Y be a function. We define:
+
+f is injective  :⇔  ​ ∀ a, b ∈ X s.t. f(a) = f(b) : a = b
+​  ⇔  ​ ∀ c ∈ Y, d, e ∈ f^-1({c}) : d = e
+​  ⇔  ​ ∀ y ∈ f(X) : ∃! x ∈ X : f(x) = y
+​  ⇔  ​ X is empty or ∃ g : Y → X : g ∘ f = id_X
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Injective_function
+* http://mathworld.wolfram.com/Injection.html
+* https://proofwiki.org/wiki/Definition:Injection"
+`;
+
+exports[`render hlm library: 1.4.15 data/libraries/hlm/Essentials/Functions/surjective 1`] = `
+"Definition 1.4.15.  Let X, Y be sets, f : X → Y be a function. We define:
+
+f is surjective  :⇔  ​ ∀ y ∈ Y : ∃ x ∈ X : f(x) = y
+​  ⇔  ​ Y ⊆ f(X)
+​  ⇔  ​ f(X) = Y
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Surjective_function
+* http://mathworld.wolfram.com/Surjection.html
+* https://proofwiki.org/wiki/Definition:Surjection"
+`;
+
+exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/bijective 1`] = `
+"Definition 1.4.16.  Let X, Y be sets, f : X → Y be a function. We define:
+
+f is bijective  :⇔  ​ f is injective and f is surjective
+​  ⇔  ​ ∀ y ∈ Y : ∃! x ∈ X : f(x) = y
+​  ⇔  ​ ∃ g : Y → X : [g ∘ f = id_X and f ∘ g = id_Y]
+​  ⇔  ​ ∃! h : Y → X : [h ∘ f = id_X and f ∘ h = id_Y]
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Bijective_function
+* http://mathworld.wolfram.com/Bijection.html
+* https://proofwiki.org/wiki/Definition:Bijection
+* https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse"
+`;
+
+exports[`render hlm library: 1.4.17 data/libraries/hlm/Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
+"Proposition 1.4.17.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be an injective function. Then:
+
+f∣_A^B is injective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.18 data/libraries/hlm/Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
+"Corollary 1.4.18.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be an injective function. Then:
+
+f∣_A is injective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.19 data/libraries/hlm/Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
+"Proposition 1.4.19.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
+
+f is surjective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.20 data/libraries/hlm/Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
+"Corollary 1.4.20.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
+
+f is surjective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.21 data/libraries/hlm/Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
+"Proposition 1.4.21.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
+
+f∣_A^(f(A)) is surjective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.22 data/libraries/hlm/Essentials/Functions/Bijections 1`] = `
+"Definition 1.4.22.  Let X, Y be sets. We define:
+
+(X ↔ Y) := ​ {f : X → Y : f is bijective}
+
+We write “let f : X ↔ Y be a bijection” for “let f ∈ (X ↔ Y).”
+
+Remarks.
+
+Bijections are important enough to warrant their own notation. A bidirectional arrow seems appropriate, even though it does not appear to be standard.
+
+References.
+
+* https://en.wikipedia.org/wiki/Bijective_function
+* http://mathworld.wolfram.com/Bijection.html
+* https://proofwiki.org/wiki/Definition:Bijection"
+`;
+
+exports[`render hlm library: 1.4.23 data/libraries/hlm/Essentials/Functions/inverse 1`] = `
+"Definition 1.4.23.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
+
+f^-1 = g  :⇔  ​ g ∘ f = id_X
+​  ⇔  ​ f ∘ g = id_Y
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Inverse_function
+* http://mathworld.wolfram.com/InverseFunction.html
+* https://proofwiki.org/wiki/Definition:Inverse_Mapping"
+`;
+
+exports[`render hlm library: 1.4.24 data/libraries/hlm/Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
+"Proposition 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
+
+(f^-1)^-1 = f
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.25 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
+"Corollary 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
+
+f^-1(f(x)) = x
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.26 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
+"Corollary 1.4.26.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
+
+f(f^-1(y)) = y
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.27.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
+"Definition 1.4.27.1.  Let X, Y, Z be sets. We define:
+
+𝓞𝓹(X, Y, Z) := ​ (X × Y → Z)
+
+We write “let ∗ : X × Y → Z be an operation” for “let ∗ ∈ 𝓞𝓹(X, Y, Z).”
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
+`;
+
+exports[`render hlm library: 1.4.27.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
+"Definition 1.4.27.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
+
+x ∗ y := ​ ∗(x, y)"
+`;
+
+exports[`render hlm library: 1.4.27.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
+"Definition 1.4.27.3 (Operator as operation).
+
+Remarks.
+
+This is a macro to convert an operator taking elements of _X_ and _Y_ and returning an element of _Z_ to an operation from _X_ and _Y_ to _Z_."
+`;
+
+exports[`render hlm library: 1.4.27.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
+"Definition 1.4.27.4 (Inner operations).  Let X be a set. We define:
+
+𝓞𝓹(X) := ​ 𝓞𝓹(X, X, X)
+
+We write “let ∗ : X × X → X be an operation on X” for “let ∗ ∈ 𝓞𝓹(X).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Binary_operation
+* http://mathworld.wolfram.com/BinaryOperation.html
+* https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
+`;
+
+exports[`render hlm library: 1.4.27.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
+"Definition 1.4.27.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
+
+∗ is associative  :⇔  ​ ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)"
+`;
+
+exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
+"Definition 1.4.27.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
+
+∗ is commutative  :⇔  ​ ∀ x, y ∈ X : x ∗ y = y ∗ x"
+`;
+
+exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Sequences/Finite%20sequences 1`] = `
+"Definition 1.5.1.  Let S be a set. We define:
+
+S^∗ :=: {(a_k)_(k < n) | n ∈ ℕ, a_k ∈ S for each k ∈ ℕ_(<n)}
+
+(a_k)_(k < n) = (a'_k)_(k < n')  :⇔  ​ n = n' and ∀ k ∈ ℕ_(<n) : a_k = a'_k (n ∈ ℕ, a_k ∈ S for each k ∈ ℕ_(<n), n' ∈ ℕ, a'_k ∈ S for each k ∈ ℕ_(<n'))
+
+We write “let a be a finite sequence on S” for “let a ∈ S^∗.”
+
+Remarks.
+
+Finite sequences could alternatively be defined inductively (i.e. as lists). However, the given definition is closer to the definition of [infinite sequences](Infinite%20sequences), and often more useful in mathematical contexts.
+
+References.
+
+* https://en.wikipedia.org/wiki/Sequence
+* http://mathworld.wolfram.com/Sequence.html
+* https://proofwiki.org/wiki/Definition:Finite_Sequence
+* https://ncatlab.org/nlab/show/free+monoid
+* https://coq.inria.fr/library/Coq.Lists.List.html"
+`;
+
+exports[`render hlm library: 1.5.2 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
+"Definition 1.5.2.  Let S be a set. We define:
+
+S^ω :=: {(a_n)_(n ∈ ℕ) | a_n ∈ S for each n ∈ ℕ}
+
+(a_n)_(n ∈ ℕ) = (a'_n)_(n ∈ ℕ)  :⇔  ​ ∀ n ∈ ℕ : a_n = a'_n (a_n ∈ S for each n ∈ ℕ, a'_n ∈ S for each n ∈ ℕ)
+
+We write “let a be a sequence on S” for “let a ∈ S^ω.”
+
+Remarks.
+
+We omit the word “infinite” because infinite sequences are used much more frequently than finite ones.
+
+We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily deconstruct a sequence into its elements and the ability to omit _S_ from the constructor.
+
+Sequences of particular sets are treated in appropriate subsections concerning those sets.
+
+References.
+
+* https://en.wikipedia.org/wiki/Sequence
+* http://mathworld.wolfram.com/Sequence.html
+* https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
+* https://ncatlab.org/nlab/show/sequence"
+`;
+
+exports[`render hlm library: 1.6.1.1 data/libraries/hlm/Essentials/Numbers/Natural/Natural%20numbers 1`] = `
+"Definition 1.6.1.1.  We define:
+
+ℕ :=: {(0), (n+1) | n ∈ ℕ}
+
+(m+1) = (n+1)  :⇔  ​ m = n (m ∈ ℕ, n ∈ ℕ)
+
+Remarks.
+
+The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the “successor” constructor, but we could just as well write “S(_n_)”. The notation is justified by an appropriate [proposition](Addition%20of%20one%20yields%20successor).
+
+In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_number
+* http://mathworld.wolfram.com/NonnegativeInteger.html
+* https://proofwiki.org/wiki/Definition:Natural_Numbers
+* https://ncatlab.org/nlab/show/natural+number
+* https://coq.inria.fr/library/Coq.Init.Nat.html
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html
+* http://oeis.org/A001477"
+`;
+
+exports[`render hlm library: 1.6.1.2 data/libraries/hlm/Essentials/Numbers/Natural/number 1`] = `
+"Definition 1.6.1.2 (Positional notation).
+
+Remarks.
+
+Positional notation is implemented as a macro, i.e. using additional code that is injected into the proof checker. Therefore, no definition is given here.
+
+References.
+
+* https://en.wikipedia.org/wiki/Positional_notation
+* https://coq.inria.fr/library/Coq.Init.Nat.html#of_uint_acc"
+`;
+
+exports[`render hlm library: 1.6.1.3 data/libraries/hlm/Essentials/Numbers/Natural/sum 1`] = `
+"Definition 1.6.1.3.  Let m, n ∈ ℕ. We define
+
+m + n
+
+by:
+
+m + (0) := ​ m
+
+m + (x+1) := ​ ((m + x)+1) (x ∈ ℕ)
+
+Remarks.
+
+Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the “+” symbols appearing in this definition are part of the notation of the successor constructor.
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_number#Addition
+* https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers
+* https://coq.inria.fr/library/Coq.Init.Nat.html#add
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.add"
+`;
+
+exports[`render hlm library: 1.6.1.4 data/libraries/hlm/Essentials/Numbers/Natural/Addition%20of%20one%20yields%20successor 1`] = `
+"Proposition 1.6.1.4.  Let n ∈ ℕ. Then:
+
+(n+1) = n + 1
+
+No proof.
+
+Remarks.
+
+This proposition justifies the notation for the successor constructor."
+`;
+
+exports[`render hlm library: 1.6.1.5 data/libraries/hlm/Essentials/Numbers/Natural/Sum%20is%20associative 1`] = `
+"Proposition 1.6.1.5.
+
++ is associative
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_associativity
+* https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative"
+`;
+
+exports[`render hlm library: 1.6.1.6 data/libraries/hlm/Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
+"Lemma 1.6.1.6.  Let n ∈ ℕ. Then:
+
+0 + n = n
+
+Proof.  We show that {0 if n = (0), ((0 + x)+1) if n = (x+1) (x ∈ ℕ) = n:
+
+1. We show that 0 = 0: Trivial.
+2. Let x ∈ ℕ. Then ((0 + x)+1) = (x+1):
+
+1.6.1.6 ⇒ 0 + x = x
+
+⇒ ((0 + x)+1) = (x+1)
+
+References.
+
+* https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_identity_element
+* https://proofwiki.org/wiki/Identity_Element_of_Natural_Number_Addition_is_Zero
+* https://proofwiki.org/wiki/Natural_Number_Addition_Commutes_with_Zero
+* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_l
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l"
+`;
+
+exports[`render hlm library: 1.6.1.7 data/libraries/hlm/Essentials/Numbers/Natural/Successor%20can%20be%20pulled%20over%20addition 1`] = `
+"Lemma 1.6.1.7.  Let m, n ∈ ℕ. Then:
+
+(m+1) + n = ((m + n)+1)
+
+Proof.  We show that {(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1) (x ∈ ℕ) = ((m + n)+1):
+
+1. We show that (m+1) = (m+1): Trivial.
+2. Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
+
+1.6.1.7 ⇒ (m+1) + x = ((m + x)+1)
+
+⇒ (((m+1) + x)+1) = (((m + x)+1)+1)
+
+References.
+
+* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l"
+`;
+
+exports[`render hlm library: 1.6.1.8 data/libraries/hlm/Essentials/Numbers/Natural/Sum%20is%20commutative 1`] = `
+"Proposition 1.6.1.8.
+
++ is commutative
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_commutativity
+* https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative"
+`;
+
+exports[`render hlm library: 1.6.1.9 data/libraries/hlm/Essentials/Numbers/Natural/less%20or%20equal 1`] = `
+"Definition 1.6.1.9.  Let m, n ∈ ℕ. We define:
+
+m ≤ n  :⇔  ​ ∃ x ∈ ℕ : m + x = n
+​  ⇔  ​ {true if m = 0, y ≤ n and y ≠ n if m = y + 1 (y ∈ ℕ)
+​  ⇔  ​ m = n or {false if n = 0, m ≤ z if n = z + 1 (z ∈ ℕ)
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_number#Order
+* https://proofwiki.org/wiki/Definition:Ordering_on_Natural_Numbers
+* https://coq.inria.fr/library/Coq.Init.Nat.html#leb
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.leb"
+`;
+
+exports[`render hlm library: 1.6.1.10 data/libraries/hlm/Essentials/Numbers/Natural/less 1`] = `
+"Definition 1.6.1.10.  Let m, n ∈ ℕ. We define:
+
+m < n  :⇔  ​ m ≱ n
+​  ⇔  ​ m + 1 ≤ n
+​  ⇔  ​ m ≤ n and m ≠ n
+​  ⇔  ​ ∃ x ∈ ℕ_+ : m + x = n
+​  ⇔  ​ m ≠ n and {true if m = 0, y < n if m = y + 1 (y ∈ ℕ)
+​  ⇔  ​ {false if n = 0, m < z or m = z if n = z + 1 (z ∈ ℕ)
+
+Equivalence.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Init.Nat.html#ltb
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.ltb"
+`;
+
+exports[`render hlm library: 1.6.1.11 data/libraries/hlm/Essentials/Numbers/Natural/Less%20or%20equal%20is%20a%20total%20order 1`] = `
+"Proposition 1.6.1.11.
+
+≤ is a total order
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.12 data/libraries/hlm/Essentials/Numbers/Natural/Less%20and%20less%20or%20equal%20combine%20to%20less 1`] = `
+"Proposition 1.6.1.12.  Let a, b, c ∈ ℕ such that a < b and b ≤ c. Then:
+
+a < c
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.13 data/libraries/hlm/Essentials/Numbers/Natural/Less%20or%20equal%20and%20less%20combine%20to%20less 1`] = `
+"Proposition 1.6.1.13.  Let a, b, c ∈ ℕ such that a ≤ b and b < c. Then:
+
+a < c
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.14 data/libraries/hlm/Essentials/Numbers/Natural/Zero%20is%20the%20smallest%20number 1`] = `
+"Proposition 1.6.1.14.  Let n ∈ ℕ. Then:
+
+n ≥ 0
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.15 data/libraries/hlm/Essentials/Numbers/Natural/Zero%20is%20the%20only%20number%20less%20than%20or%20equal%20to%20zero 1`] = `
+"Proposition 1.6.1.15.  Let n ∈ ℕ such that n ≤ 0. Then:
+
+n = 0
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.16 data/libraries/hlm/Essentials/Numbers/Natural/Successor%20is%20always%20greater 1`] = `
+"Proposition 1.6.1.16.  Let n ∈ ℕ. Then:
+
+n + 1 > n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.1 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.1.17.1.  Let n ∈ ℕ. We define:
+
+ℕ_(<n) := ​ {m ∈ ℕ : m < n}
+
+References.
+
+* http://mathworld.wolfram.com/InitialSegment.html
+* https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based"
+`;
+
+exports[`render hlm library: 1.6.1.17.2 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.1.17.2.  Let n ∈ ℕ. We define:
+
+ℕ_(≤n) := ​ {m ∈ ℕ : m ≤ n}
+​ = ​ ℕ_(<(n+1))
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.3 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.1.17.3.  Let n ∈ ℕ. We define:
+
+ℕ_(≥n) := ​ {m ∈ ℕ : m ≥ n}
+​ = ​ ℕ ∖ ℕ_(<n)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.4 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.1.17.4.  Let n ∈ ℕ. We define:
+
+ℕ_(>n) := ​ {m ∈ ℕ : m > n}
+​ = ​ ℕ ∖ ℕ_(≤n)
+​ = ​ ℕ_(≥(n+1))
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.5 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Positive%20numbers 1`] = `
+"Definition 1.6.1.17.5.  We define:
+
+ℕ_+ := ​ ℕ_(>0)
+​ = ​ {m ∈ ℕ : m > 0}
+​ = ​ {n ∈ ℕ : n ≠ 0}
+​ = ​ ℕ ∖ {0}
+​ = ​ {a ∈ ℕ : ∃ b ∈ ℕ : b + 1 = a}
+​ = ​ {c ∈ ℕ : ∃! d ∈ ℕ : d + 1 = c}
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Axiom:Axiomatization_of_1-Based_Natural_Numbers
+* http://oeis.org/A000027"
+`;
+
+exports[`render hlm library: 1.6.1.17.6 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Exclusive%20initial%20segment%20is%20subset%20of%20inclusive%20segment 1`] = `
+"Proposition 1.6.1.17.6.  Let n ∈ ℕ. Then:
+
+ℕ_(<n) ⊆ ℕ_(≤n)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.7 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Initial%20segments%20are%20finite 1`] = `
+"Proposition 1.6.1.17.7.  Let n ∈ ℕ. Then:
+
+ℕ_(<n) is finite
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.17.8 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Binary%20digits 1`] = `
+"Definition 1.6.1.17.8.  We define:
+
+Bit := ​ ℕ_(≤1)
+​ = ​ {0, 1}
+
+Equality.  No proof.
+
+Remarks.
+
+There are, of course, many equivalent definitions of binary digits. The simplest definition would be a construction with two constructors. However, we also want the sets to be embedded in the natural numbers, and (currently) this requires everything to be mapped to a single constructor of the target set. So we simply define binary digits as a subset of the natural numbers.
+
+In some cases, the set of [truth values](../../../Sets/Truth%20values) may be more convenient to use.
+
+References.
+
+* https://en.wikipedia.org/wiki/Bit
+* http://mathworld.wolfram.com/Bit.html"
+`;
+
+exports[`render hlm library: 1.6.1.18 data/libraries/hlm/Essentials/Numbers/Natural/Finiteness%20criterion%20lemma 1`] = `
+"Lemma 1.6.1.18.  Let M ⊆ ℕ, k ∈ ℕ, f : ℕ_(≤k) ↔ M be a bijection. Then:
+
+∃ m ∈ M : ∀ n ∈ M : n ≤ m
+
+Proof.  We have {∃ a ∈ M : ∀ b ∈ M : b ≤ a if k = 0, ∃ c ∈ M : ∀ d ∈ M : d ≤ c if k = x + 1 (x ∈ ℕ):
+
+1. Assume k = 0. Then ∃ a ∈ M : ∀ b ∈ M : b ≤ a:
+
+Choose a := f(0).
+2. Let x ∈ ℕ such that k = x + 1. Then ∃ c ∈ M : ∀ d ∈ M : d ≤ c:
+
+Let S := ℕ_(≤x).
+
+1.6.1.18 ⇒ ∃ i ∈ M : ∀ j ∈ f(S) : j ≤ i
+
+Choose c := {f(k) if f(k) > i, i if f(k) ≤ i.
+
+Remarks.
+
+This lemma is necessary to prove the following theorem. _k_ and _f_ do not appear in the result, but they enable a proof via structural induction on _k_."
+`;
+
+exports[`render hlm library: 1.6.1.19 data/libraries/hlm/Essentials/Numbers/Natural/Finiteness%20criterion 1`] = `
+"Proposition 1.6.1.19.  Let M ⊆ ℕ. Then the following are equivalent:
+
+1. M is finite
+2. M is empty or ∃ m ∈ M : m is a ≤-greatest element of M
+3. ∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
+4. ∃ b ∈ ℕ : M ⊆ ℕ_(<b)
+
+Proof.
+
+1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
+
+⇒^def ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
+
+We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
+
+1. Assume l = 0. Then M is empty:
+
+We show that ∄ c ∈ M:
+
+Assume ∃ c ∈ M.
+
+f ∈ (ℕ_(<l) ↔ M)
+
+⇒^def f is bijective
+
+⇒^def f is surjective
+
+⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
+
+⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
+
+s ∈ ℕ_(<0)
+
+⇒^def s < 0
+
+⇒^1.6.1.14 s ≥ 0
+2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
+
+⇒^1.6.1.18 ∃ y ∈ M : ∀ z ∈ M : z ≤ y
+2⇒3. Assume M is empty or ∃ m ∈ M : ∀ n ∈ M : n ≤ m. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
+
+1. Assume M is empty.
+
+⇒^def M = ∅
+
+Choose a := 0. We show that M ⊆ ℕ_(≤0):
+
+1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
+
+⇒^[M = ∅] M ⊆ ℕ_(≤0)
+2. Assume ∃ m ∈ M : ∀ n ∈ M : n ≤ m.
+
+Choose a := m. We show that M ⊆ ℕ_(≤m):
+
+Let x ∈ M. Then x ∈ ℕ_(≤m):
+
+We show that x ≤ m:
+
+∀ n ∈ M : n ≤ m
+
+⇒ x ≤ m
+3⇒4. Assume ∃ a ∈ ℕ : M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
+
+∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
+
+⇒^def M ⊆ ℕ_(<(a+1))
+
+Choose b := (a+1).
+4⇒1. Assume ∃ b ∈ ℕ : M ⊆ ℕ_(<b). Then M is finite:
+
+⇒^1.6.1.17.7 ℕ_(<b) is finite
+
+⇒^1.1.5 M is finite"
+`;
+
+exports[`render hlm library: 1.6.1.20 data/libraries/hlm/Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
+"Proposition 1.6.1.20.  Let a, b, c ∈ ℕ such that a + c = b + c. Then:
+
+a = b
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.21 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20a%20positive%20number%20is%20injective 1`] = `
+"Proposition 1.6.1.21.  Let a, b ∈ ℕ, c ∈ ℕ_+ such that a ⋅ c = b ⋅ c. Then:
+
+a = b
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.22 data/libraries/hlm/Essentials/Numbers/Natural/difference 1`] = `
+"Definition 1.6.1.22.  Let n ∈ ℕ, m ∈ ℕ_(≤n). For x ∈ ℕ_(≤n), we define:
+
+n − m = x  :⇔  ​ n = x + m
+
+Well-definedness.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Subtraction/Natural_Numbers
+* https://coq.inria.fr/library/Coq.Init.Nat.html#sub (truncated subtraction, thus incompatible with integer subtraction)
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.sub (ditto)"
+`;
+
+exports[`render hlm library: 1.6.1.23 data/libraries/hlm/Essentials/Numbers/Natural/product 1`] = `
+"Definition 1.6.1.23.  Let m, n ∈ ℕ. We define
+
+m ⋅ n
+
+by:
+
+m ⋅ 0 := ​ 0
+
+m ⋅ (x + 1) := ​ m ⋅ x + m (x ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_number#Multiplication
+* https://proofwiki.org/wiki/Definition:Multiplication/Natural_Numbers
+* https://coq.inria.fr/library/Coq.Init.Nat.html#mul
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.mul"
+`;
+
+exports[`render hlm library: 1.6.1.24 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20one%20is%20neutral 1`] = `
+"Proposition 1.6.1.24.  Let n ∈ ℕ. Then:
+
+n ⋅ 1 = n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.25 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20associative 1`] = `
+"Proposition 1.6.1.25.
+
+⋅ is associative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.26 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20commutative 1`] = `
+"Proposition 1.6.1.26.
+
+⋅ is commutative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.27 data/libraries/hlm/Essentials/Numbers/Natural/divisible 1`] = `
+"Definition 1.6.1.27.  Let m ∈ ℕ_+, n ∈ ℕ. We define:
+
+m ∣ n  :⇔  ​ ∃ x ∈ ℕ : m ⋅ x = n
+
+Remarks.
+
+The constraint that _m_ is nonzero is not really necessary but added for consistency with the definition of the [set of divisors](Divisors).
+
+References.
+
+* https://en.wikipedia.org/wiki/Divisor
+* http://mathworld.wolfram.com/Divisor.html
+* https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers"
+`;
+
+exports[`render hlm library: 1.6.1.28 data/libraries/hlm/Essentials/Numbers/Natural/Divisors 1`] = `
+"Definition 1.6.1.28.  Let n ∈ ℕ. We define:
+
+Div_ℕ(n) := ​ {m ∈ ℕ_+ : m ∣ n}
+
+Remarks.
+
+We specifically exclude 0 from the list of its own divisors in order to simplify the definition of [division](quotient).
+
+References.
+
+* http://oeis.org/A027750"
+`;
+
+exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natural/Divisors%20are%20less%20or%20equal 1`] = `
+"Proposition 1.6.1.29.  Let m, n ∈ ℕ_+ such that m ∣ n. Then:
+
+m ≤ n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.30 data/libraries/hlm/Essentials/Numbers/Natural/Divisibility%20criterion 1`] = `
+"Proposition 1.6.1.30.  Let a ∈ ℕ_+, b ∈ ℕ such that a ∣ b, c ∈ ℕ. Then the following are equivalent:
+
+1. a ∣ c
+2. a ∣ (b + c)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.31 data/libraries/hlm/Essentials/Numbers/Natural/even 1`] = `
+"Definition 1.6.1.31.  Let n ∈ ℕ. We define:
+
+n is even  :⇔  ​ {true if n = 0, x is odd if n = x + 1 (x ∈ ℕ)
+​  ⇔  ​ 2 ∣ n
+
+n is odd  :⇔  n is not even
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Parity_(mathematics)
+* http://mathworld.wolfram.com/EvenNumber.html
+* https://coq.inria.fr/library/Coq.Init.Nat.html#even
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.even
+* http://oeis.org/A005843"
+`;
+
+exports[`render hlm library: 1.6.1.32 data/libraries/hlm/Essentials/Numbers/Natural/quotient 1`] = `
+"Definition 1.6.1.32.  Let n ∈ ℕ, m ∈ Div_ℕ(n). For x ∈ ℕ, we define:
+
+n/m = x  :⇔  ​ n = x ⋅ m
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Quotient
+* https://coq.inria.fr/library/Coq.Init.Nat.html#div (truncated division, thus incompatible with division of rational numbers)
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)"
+`;
+
+exports[`render hlm library: 1.6.1.33 data/libraries/hlm/Essentials/Numbers/Natural/power 1`] = `
+"Definition 1.6.1.33.  Let m, n ∈ ℕ. We define
+
+m^n
+
+by:
+
+m^0 := ​ 1
+
+m^(x+1) := ​ m^x ⋅ m (x ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Exponentiation#Integer_exponents
+* https://proofwiki.org/wiki/Definition:Power_(Algebra)#Natural_Numbers
+* https://coq.inria.fr/library/Coq.Init.Nat.html#pow
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow"
+`;
+
+exports[`render hlm library: 1.6.1.34 data/libraries/hlm/Essentials/Numbers/Natural/inductive 1`] = `
+"Definition 1.6.1.34.  Let M ⊆ ℕ. We define:
+
+M is inductive  :⇔  ​ 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M
+
+Remarks.
+
+This definition should be considered part of the [induction principle](Induction%20principle).
+
+References.
+
+* https://en.wikipedia.org/wiki/Inductive_set (but uses a 1-based definition)
+* http://mathworld.wolfram.com/InductiveSet.html
+* https://proofwiki.org/wiki/Definition:Inductive_Set (also uses a 1-based definition)"
+`;
+
+exports[`render hlm library: 1.6.1.35 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20lemma 1`] = `
+"Lemma 1.6.1.35.  Let M ⊆ ℕ such that M is inductive, n ∈ ℕ. Then:
+
+n ∈ M
+
+Proof.  We have {n ∈ M if n = 0, n ∈ M if n = x + 1 (x ∈ ℕ):
+
+1. We show that 0 ∈ M:
+
+M is inductive
+
+⇒^def 0 ∈ M
+2. Let x ∈ ℕ. Then x + 1 ∈ M:
+
+1.6.1.35 ⇒ x ∈ M
+
+M is inductive
+
+⇒^def ∀ m ∈ M : m + 1 ∈ M
+
+⇒ x + 1 ∈ M"
+`;
+
+exports[`render hlm library: 1.6.1.36 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
+"Theorem 1.6.1.36 (Induction principle).  Let M ⊆ ℕ. Then the following are equivalent:
+
+1. M is inductive
+2. M = ℕ
+
+Proof.
+
+1⇒2. ⊆. Trivial.
+⊇. Let n ∈ ℕ. Then n ∈ M:
+
+1.6.1.35 ⇒ n ∈ M
+
+Remarks.
+
+Structural induction on the natural numbers is a direct consequence of their definition as a construction. This set-theoretic form of the induction principle is provable from it.
+
+References.
+
+* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Set"
+`;
+
+exports[`render hlm library: 1.6.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
+"Corollary 1.6.1.37 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and ∀ m ∈ ℕ s.t. m is p : m + 1 is p. Then:
+
+∀ n ∈ ℕ : n is p
+
+No proof.
+
+Remarks.
+
+This is just a slight reformulation based on the definition of a [property](../../Properties/Properties).
+
+References.
+
+* https://en.wikipedia.org/wiki/Mathematical_induction
+* http://mathworld.wolfram.com/PrincipleofMathematicalInduction.html
+* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Predicate"
+`;
+
+exports[`render hlm library: 1.6.1.38 data/libraries/hlm/Essentials/Numbers/Natural/Well-ordering%20principle 1`] = `
+"Theorem 1.6.1.38 (Well-ordering principle).
+
+≤ is a well-order
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Well-ordering_principle
+* http://mathworld.wolfram.com/WellOrderingPrinciple.html
+* https://proofwiki.org/wiki/Well-Ordering_Principle"
+`;
+
+exports[`render hlm library: 1.6.1.39 data/libraries/hlm/Essentials/Numbers/Natural/minimum 1`] = `
+"Definition 1.6.1.39.  Let M ⊆ ℕ such that M is nonempty. For m ∈ M, we define:
+
+min(M) = m  :⇔  ​ ∀ n ∈ M : m ≤ n
+​  ⇔  ​ ∀ l ∈ M s.t. l ≤ m : l = m
+​  ⇔  ​ ∄ k ∈ M : k < m
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.1.40 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
+"Definition 1.6.1.40.  Let n ∈ ℕ. We define
+
+n!
+
+by:
+
+0! := ​ 1
+
+(x + 1)! := ​ x! ⋅ n (x ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Factorial
+* http://mathworld.wolfram.com/Factorial.html
+* https://proofwiki.org/wiki/Definition:Factorial
+* https://coq.inria.fr/library/Coq.Arith.Factorial.html#fact"
+`;
+
+exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
+"Definition 1.6.1.41.  Let n, k ∈ ℕ. We define
+
+(n, k)
+
+by:
+
+(n, 0) := ​ 1
+
+(0, x + 1) := ​ 0 (x ∈ ℕ)
+
+(m + 1, x + 1) := ​ (m, x) + (m, x + 1) (m ∈ ℕ, x ∈ ℕ)
+
+Remarks.
+
+We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition.
+
+References.
+
+* https://en.wikipedia.org/wiki/Pascal%27s_rule"
+`;
+
+exports[`render hlm library: 1.6.1.42 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
+"Proposition 1.6.1.42.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
+
+(n, k) = (n!)/(k! ⋅ (n − k)!)
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Binomial_coefficient
+* http://mathworld.wolfram.com/BinomialCoefficient.html
+* https://proofwiki.org/wiki/Definition:Binomial_Coefficient
+* https://coq.inria.fr/library/Coq.Reals.Binomial.html#C"
+`;
+
+exports[`render hlm library: 1.6.1.43.1 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20sum%20(exclusive) 1`] = `
+"Definition 1.6.1.43.1.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
+
+∑_(i < n) a_i
+
+by:
+
+∑_(i < 0) a_i := ​ 0
+
+∑_(i < m+1) a_i := ​ (∑_(j < m) a_j) + a_m (m ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Summation
+* http://mathworld.wolfram.com/Sum.html
+* https://proofwiki.org/wiki/Definition:Summation"
+`;
+
+exports[`render hlm library: 1.6.1.43.2 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20distributive%20over%20sum 1`] = `
+"Proposition 1.6.1.43.2.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
+
+∑_(j < n) (a_j + b_j) = (∑_(k < n) a_k) + (∑_(l < n) b_l)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.3 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20grows 1`] = `
+"Proposition 1.6.1.43.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+
+∑_(j < m) a_j ≤ ∑_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.4 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.43.4.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+
+a_j ≤ ∑_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.5 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20constant 1`] = `
+"Proposition 1.6.1.43.5.  Let n, a ∈ ℕ. Then:
+
+∑_(i < n) a = n ⋅ a
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.6 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20variable 1`] = `
+"Proposition 1.6.1.43.6.  Let n ∈ ℕ. Then:
+
+∑_(i < n) i = (n, 2)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.7 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20product%20(exclusive) 1`] = `
+"Definition 1.6.1.43.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
+
+∏_(i < n) a_i
+
+by:
+
+∏_(i < 0) a_i := ​ 1
+
+∏_(i < m+1) a_i := ​ (∏_(j < m) a_j) ⋅ a_m (m ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
+* http://mathworld.wolfram.com/Product.html
+* https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
+`;
+
+exports[`render hlm library: 1.6.1.43.8 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20distributive%20over%20product 1`] = `
+"Proposition 1.6.1.43.8.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
+
+∏_(j < n) (a_j ⋅ b_j) = (∏_(k < n) a_k) ⋅ (∏_(l < n) b_l)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.9 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20multiplies 1`] = `
+"Proposition 1.6.1.43.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+
+∏_(j < m) a_j ∣ ∏_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.10 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20grows 1`] = `
+"Proposition 1.6.1.43.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+
+∏_(j < m) a_j ≤ ∏_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.11 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
+"Proposition 1.6.1.43.11.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+
+a_j ∣ ∏_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.43.12 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.43.12.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+
+a_j ≤ ∏_(k < n) a_k
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.44.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
+"Definition 1.6.1.44.1.  Let n ∈ ℕ_(>1). We define:
+
+n is prime  :⇔  ​ ∀ m ∈ ℕ_+ s.t. m ∣ n : [m = 1 or m = n]
+​  ⇔  ​ ∀ l ∈ ℕ_(>1) s.t. l ∣ n : l = n
+​  ⇔  ​ Div_ℕ(n) ⊆ {1, n}
+​  ⇔  ​ Div_ℕ(n) = {1, n}
+​  ⇔  ​ |Div_ℕ(n)| = 2
+​  ⇔  ​ ∀ a, b ∈ ℕ s.t. n = a ⋅ b : [[a = 1 and b = n] or [a = n and b = 1]]
+​  ⇔  ​ ∄ c, d ∈ ℕ_(<n) : n = c ⋅ d
+​  ⇔  ​ ∀ e, f ∈ ℕ s.t. n ∣ e ⋅ f : [n ∣ e or n ∣ f]
+
+n is composite  :⇔  n is not prime
+
+Equivalence.  No proof.
+
+Remarks.
+
+Note that this definition presupposes that _n_ is greater than 1. Otherwise, not all equivalences would hold.
+
+In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the [set of prime numbers](Prime%20numbers), no such explicit exclusion of 1 is necessary.
+
+References.
+
+* https://en.wikipedia.org/wiki/Prime_number
+* https://en.wikipedia.org/wiki/Euclid%27s_lemma
+* http://mathworld.wolfram.com/PrimeNumber.html
+* https://proofwiki.org/wiki/Definition:Prime_Number
+* https://ncatlab.org/nlab/show/prime+number
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime"
+`;
+
+exports[`render hlm library: 1.6.1.44.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
+"Example 1.6.1.44.2.
+
+2 is prime
+
+No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime_2"
+`;
+
+exports[`render hlm library: 1.6.1.44.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
+"Definition 1.6.1.44.3.  We define:
+
+ℙ := ​ {n ∈ ℕ_(>1) : n is prime}
+
+References.
+
+* https://en.wikipedia.org/wiki/Prime_number
+* http://mathworld.wolfram.com/PrimeNumber.html
+* https://proofwiki.org/wiki/Definition:Prime_Number#Notation
+* http://oeis.org/A000040"
+`;
+
+exports[`render hlm library: 1.6.1.44.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
+"Proposition 1.6.1.44.4.  Let n ∈ ℕ_(>1). Then:
+
+∃ p ∈ ℙ : p ∣ n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.44.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
+"Theorem 1.6.1.44.5 (Euclid's theorem).
+
+ℙ is infinite
+
+Proof.  Assume ℙ is finite.
+
+⇒^def ∃ n ∈ ℕ, f : ℕ_(<n) ↔ ℙ
+
+Let a := ∏_(i < n) f(i).
+
+1.6.1.43.10 ⇒ 1 ≤ a
+
+Let b := a + 1.
+
+1.6.1.16 ⇒ b > a
+
+⇒^1.6.1.13 b > 1
+
+⇒^1.6.1.44.4 ∃ p ∈ ℙ : p ∣ b
+
+⇒^def p ∣ (a + 1)
+
+⇒^1.6.1.43.11 f(f^-1(p)) ∣ a
+
+⇒^1.4.26 p ∣ a
+
+⇒^1.6.1.30 p ∣ 1
+
+⇒^1.6.1.29 p ≤ 1
+
+p ∈ ℙ
+
+⇒^def p > 1
+
+References.
+
+* https://en.wikipedia.org/wiki/Euclid%27s_theorem
+* http://mathworld.wolfram.com/EuclidsTheorems.html
+* https://proofwiki.org/wiki/Euclid%27s_Theorem"
+`;
+
+exports[`render hlm library: 1.6.1.44.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.6.1.44.6.  Let p ∈ ℙ, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
+
+1. p ∣ m
+2. p ∣ m^n
+3. p^n ∣ m^n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
+"Definition 1.6.1.45.  Let m, n ∈ ℕ. We define:
+
+m and n are coprime  :⇔  ​ ∀ a ∈ ℕ_+ s.t. a ∣ m and a ∣ n : a = 1
+​  ⇔  ​ ∄ b ∈ ℕ_(>1) : [b ∣ m and b ∣ n]
+​  ⇔  ​ Div_ℕ(m) ∩ Div_ℕ(n) ⊆ {1}
+​  ⇔  ​ Div_ℕ(m) ∩ Div_ℕ(n) = {1}
+​  ⇔  ​ ∄ p ∈ ℙ : [p ∣ m and p ∣ n]
+
+Equivalence.  No proof.
+
+Remarks.
+
+Note that in addition to this definition for natural numbers, there is a compatible [definition for integers](../Integer/coprime).
+
+References.
+
+* https://en.wikipedia.org/wiki/Coprime_integers
+* http://mathworld.wolfram.com/RelativelyPrime.html
+* https://proofwiki.org/wiki/Definition:Coprime/Integers
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)"
+`;
+
+exports[`render hlm library: 1.6.1.46 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
+"Proposition 1.6.1.46.  Let m, n ∈ ℕ_(>1). Then:
+
+m and m ⋅ n are not coprime
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.47.1 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/indexed%20element 1`] = `
+"Definition 1.6.1.47.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
+
+M[n]
+
+by:
+
+M[0] := ​ m
+
+M[x + 1] := ​ (M ∖ {m})[x] (x ∈ ℕ)
+
+Remarks.
+
+This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite), and to provide a [way](../Sequences/finite%20sequence) of obtaining a sequence from a finite set of natural numbers."
+`;
+
+exports[`render hlm library: 1.6.1.47.2 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/bounded%20cardinality 1`] = `
+"Definition 1.6.1.47.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
+
+|M|_≤n
+
+by:
+
+|M|_≤0 := ​ 0
+
+|M|_≤x+1 := ​ {|M ∖ {min(M)}|_≤x + 1 if M is nonempty, 0 if M is empty (x ∈ ℕ)
+
+Remarks.
+
+This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
+`;
+
+exports[`render hlm library: 1.6.1.48.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/finite%20sequence 1`] = `
+"Definition 1.6.1.48.1.  Let M ⊆ ℕ such that M is finite. We define:
+
+seq_fin(M) := ​ (M[n])_(n < |M|)
+
+Remarks.
+
+This definition produces a sorted finite sequence from a finite subset of natural numbers."
+`;
+
+exports[`render hlm library: 1.6.1.48.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence 1`] = `
+"Definition 1.6.1.48.2.  Let M ⊆ ℕ such that M is infinite. We define:
+
+seq_inf(M) := ​ (M[n])_(n ∈ ℕ)
+
+Remarks.
+
+This definition produces a sorted infinite sequence from an infinite subset of natural numbers."
+`;
+
+exports[`render hlm library: 1.6.2.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Natural%20cardinality%20lemma 1`] = `
+"Lemma 1.6.2.1.  Let m, n ∈ ℕ, f : ℕ_(<m) ↔ ℕ_(<n) be a bijection. Then:
+
+m = n
+
+No proof.
+
+Remarks.
+
+This lemma is part of the well-definedness proof of the embedding of the natural numbers into the cardinal numbers."
+`;
+
+exports[`render hlm library: 1.6.2.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinal%20numbers 1`] = `
+"Definition 1.6.2.2.  We define:
+
+𝓒𝓻𝓭 :=: {|S| | S is a set}
+
+|S| = |T|  :⇔  ​ ∃ f : S ↔ T (S, T are sets)
+
+ℕ ​ ⊆: 𝓒𝓻𝓭 via
+n ​ = |ℕ_(<n)|
+
+Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
+
+|ℕ_(<m)| = |ℕ_(<n)|
+
+⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
+
+1.6.2.1 ⇒ m = n
+
+Remarks.
+
+In HLM, cardinal numbers have a very simple definition as a construction with one constructor, which can be conveniently equipped with a notation that matches mathematical practice.
+
+Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the “deconstruction” of cardinal numbers into sets are automatically well-defined.
+
+HLM does not distinguish between sets and proper classes; instead there are rules preventing certain circularities. Thus, the set of cardinals can be treated like any other set in most situations.
+
+When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions, including e.g. the definition of [finiteness](../../Sets/finite).
+
+In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as [magmas](../../../Algebra/Magmas/Magmas). This is especially visible in the use of this definition in the [category of sets](../../../Category%20theory/Individual%20categories/cardinals).
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number
+* http://mathworld.wolfram.com/CardinalNumber.html
+* https://proofwiki.org/wiki/Definition:Cardinal
+* https://ncatlab.org/nlab/show/cardinal+number"
+`;
+
+exports[`render hlm library: 1.6.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Elements 1`] = `
+"Definition 1.6.2.3.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define
+
+El(𝐱)
+
+by:
+
+El(|S|) := ​ S (S is a set)
+
+We write “let a ∈ 𝐱” for “let a ∈ El(𝐱).”
+
+Remarks.
+
+This definition retrieves a representative set from a cardinal number, and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 1.6.2.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms 1`] = `
+"Definition 1.6.2.4.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+Hom(𝐱, 𝐲) := ​ (El(𝐱) → El(𝐲))
+
+We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”
+
+Remarks.
+
+The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between representative sets.
+
+Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal."
+`;
+
+exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/Isomorphisms 1`] = `
+"Definition 1.6.2.5.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+Iso(𝐱, 𝐲) := ​ {φ : 𝐱 → 𝐲 : φ is bijective}
+​ = ​ (El(𝐱) ↔ El(𝐲))
+
+We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/identity 1`] = `
+"Definition 1.6.2.6.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
+
+id_𝐱 := ​ id_(El(𝐱))"
+`;
+
+exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
+"Definition 1.6.2.7.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+𝐱 ≤ 𝐲  :⇔  ​ ∃ φ : 𝐱 → 𝐲 : φ is injective
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number"
+`;
+
+exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
+"Definition 1.6.2.8.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+𝐱 < 𝐲  :⇔  ​ 𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲
+
+Remarks.
+
+Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”."
+`;
+
+exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
+"Proposition 1.6.2.9.
+
+≤ is a partial order
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
+"Proposition 1.6.2.10.  The following are equivalent:
+
+1. AC
+2. ≤ is a total order
+
+No proof.
+
+Remarks.
+
+The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total."
+`;
+
+exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
+"Proposition 1.6.2.11.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+
+1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
+2. Iso(𝐱, 𝐲) is nonempty
+3. 𝐱 = 𝐲
+
+No proof.
+
+References.
+
+* [https://en.wikipedia.org/wiki/Schröder-Bernstein_theorem](https://en.wikipedia.org/wiki/Schr%C3%B6der-Bernstein_theorem)
+* http://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
+* [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)"
+`;
+
+exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
+"Definition 1.6.2.12.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+
+𝐱 + 𝐲
+
+by:
+
+|X| + |Y| := ​ |X ⊎ Y| (X, Y are sets)
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_addition
+* http://mathworld.wolfram.com/CardinalAddition.html
+* https://proofwiki.org/wiki/Definition:Sum_of_Cardinals"
+`;
+
+exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
+"Definition 1.6.2.13.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+
+𝐱 ⋅ 𝐲
+
+by:
+
+|X| ⋅ |Y| := ​ |X × Y| (X, Y are sets)
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_multiplication
+* http://mathworld.wolfram.com/CardinalMultiplication.html
+* https://proofwiki.org/wiki/Definition:Product_of_Cardinals"
+`;
+
+exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
+"Definition 1.6.2.14.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+
+𝐱^𝐲
+
+by:
+
+|X|^|Y| := ​ |Y → X| (X, Y are sets)
+
+References.
+
+* http://mathworld.wolfram.com/CardinalExponentiation.html
+* https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
+* https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals"
+`;
+
+exports[`render hlm library: 1.6.2.15 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.6.2.15.  Let S be a set. Then:
+
+|𝒫(S)| = 2^|S|
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
+* http://mathworld.wolfram.com/CardinalExponentiation.html"
+`;
+
+exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordinal%20numbers 1`] = `
+"Definition 1.6.3.1.  We define:
+
+𝓞𝓻𝓭 :=: {[S, ⪯] | S is a set, ⪯ is a well-order on S}
+
+[S, ⪯] = [T, ⊑]  :⇔  ​ ∃ φ : S ↔ T : φ[⪯] = ⊑ (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
+
+ℕ ​ ⊆: 𝓞𝓻𝓭 via
+n ​ = [ℕ_(<n), ≤∣_(ℕ_(<n))]
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Elements 1`] = `
+"Definition 1.6.3.2.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define
+
+El(𝐱)
+
+by:
+
+El([S, ⪯]) := ​ S (S is a set, ⪯ is a relation on S with suitable conditions)
+
+We write “let a ∈ 𝐱” for “let a ∈ El(𝐱).”
+
+Remarks.
+
+This definition retrieves a representative set from an ordinal number, and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 1.6.3.3 data/libraries/hlm/Essentials/Numbers/Ordinal/before 1`] = `
+"Definition 1.6.3.3.  Let 𝐱 ∈ 𝓞𝓻𝓭, a, b ∈ 𝐱. We define:
+
+a ≤ b  :⇔  ​ {a ⪯ b if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.3.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms 1`] = `
+"Definition 1.6.3.4.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+Hom(𝐱, 𝐲) := ​ {f : El(𝐱) → El(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+
+We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”"
+`;
+
+exports[`render hlm library: 1.6.3.5 data/libraries/hlm/Essentials/Numbers/Ordinal/Isomorphisms 1`] = `
+"Definition 1.6.3.5.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+Iso(𝐱, 𝐲) := ​ {homomorphisms φ : 𝐱 → 𝐲 : φ is bijective}
+​ = ​ {f : El(𝐱) ↔ El(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+
+We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/identity 1`] = `
+"Definition 1.6.3.6.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define:
+
+id_𝐱 := ​ id_(El(𝐱))"
+`;
+
+exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
+"Definition 1.6.3.7.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+𝐱 ≤ 𝐲  :⇔  ​ ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective"
+`;
+
+exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
+"Definition 1.6.3.8.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+𝐱 < 𝐲  :⇔  ​ 𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲"
+`;
+
+exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
+"Proposition 1.6.3.9.
+
+≤ is a well-order
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
+"Proposition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+
+1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
+2. Iso(𝐱, 𝐲) is nonempty
+3. 𝐱 = 𝐲
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
+"Definition 1.6.3.11.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+
+𝐱 + 𝐲
+
+by:
+
+[X, ⪯] + [Y, ⊑] := ​ [X ⊎ Y, ⪯ ≪ ⊑] (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
+"Definition 1.6.3.12.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+
+𝐱 ⋅ 𝐲
+
+by:
+
+[X, ⪯] ⋅ [Y, ⊑] := ​ [X × Y, ⪯ ∠ ⊑] (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.4.1 data/libraries/hlm/Essentials/Numbers/Integer/Integers 1`] = `
+"Definition 1.6.4.1.  We define:
+
+ℤ :=: {(n-m) | n, m ∈ ℕ}
+
+(n-m) = (n'-m')  :⇔  ​ n + m' = n' + m (n, m ∈ ℕ, n', m' ∈ ℕ)
+
+Reflexivity.  No proof.
+
+Symmetry.  No proof.
+
+Transitivity.  No proof.
+
+ℕ ​ ⊆: ℤ via
+x ​ = (x-0)
+
+Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
+
+(x-0) = (y-0)
+
+⇒^def x + 0 = y + 0
+
+⇒^def x = y
+
+Remarks.
+
+This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by a [proposition](Actual%20difference%20equals%20formal%20difference).
+
+Since an equality definition for each constructor is always part of a construction, we do not need to build the equivalence classes explicitly, they are implicit in the choice of the equality definition.
+
+When defining a construction, another set can be embedded in the newly defined set, so in this case, we embed the natural numbers. Note that they are also embedded in the cardinal numbers.
+
+References.
+
+* https://en.wikipedia.org/wiki/Integer
+* http://mathworld.wolfram.com/Integer.html
+* https://proofwiki.org/wiki/Definition:Integer
+* https://ncatlab.org/nlab/show/integer
+* https://coq.inria.fr/library/Coq.ZArith.BinInt.html (but uses a different encoding as an inductive data type with three constructors)"
+`;
+
+exports[`render hlm library: 1.6.4.2 data/libraries/hlm/Essentials/Numbers/Integer/sum 1`] = `
+"Definition 1.6.4.2.  Let a, b ∈ ℤ. We define
+
+a + b
+
+by:
+
+(n_a-m_a) + (n_b-m_b) := ​ ((n_a + n_b)-(m_a + m_b)) (n_a, m_a ∈ ℕ, n_b, m_b ∈ ℕ)
+
+Well-definedness.  No proof.
+
+Remarks.
+
+Note that the sums on the right are sums of natural numbers.
+
+References.
+
+* https://en.wikipedia.org/wiki/Integer#Construction
+* https://proofwiki.org/wiki/Definition:Addition/Integers
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.add (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.3 data/libraries/hlm/Essentials/Numbers/Integer/Sum%20is%20associative 1`] = `
+"Proposition 1.6.4.3.
+
++ is associative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.4 data/libraries/hlm/Essentials/Numbers/Integer/Sum%20is%20commutative 1`] = `
+"Proposition 1.6.4.4.
+
++ is commutative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.5 data/libraries/hlm/Essentials/Numbers/Integer/inverse 1`] = `
+"Definition 1.6.4.5.  Let a ∈ ℤ. We define
+
+−a
+
+by:
+
+−(n_a-m_a) := ​ (m_a-n_a) (n_a, m_a ∈ ℕ)
+
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.opp (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.6 data/libraries/hlm/Essentials/Numbers/Integer/difference 1`] = `
+"Definition 1.6.4.6.  Let b, a ∈ ℤ. We define
+
+b − a
+
+by:
+
+(n_b-m_b) − (n_a-m_a) := ​ ((n_b + m_a)-(m_b + n_a)) (n_b, m_b ∈ ℕ, n_a, m_a ∈ ℕ)
+​ = ​ b + (−a)
+
+Equality.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.sub (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.7 data/libraries/hlm/Essentials/Numbers/Integer/Actual%20difference%20equals%20formal%20difference 1`] = `
+"Proposition 1.6.4.7.  Let n, m ∈ ℕ. Then:
+
+(n-m) = n − m
+
+No proof.
+
+Remarks.
+
+This proposition justifies the notation used for the constructor. Note that the subtraction on the right is subtraction on integers, i.e. on the embedding of the natural numbers _m_ and _n_ into the integers."
+`;
+
+exports[`render hlm library: 1.6.4.8 data/libraries/hlm/Essentials/Numbers/Integer/less%20or%20equal 1`] = `
+"Definition 1.6.4.8.  Let a, b ∈ ℤ. We define
+
+a ≤ b
+
+by:
+
+(n_a-m_a) ≤ (n_b-m_b)  :⇔  ​ n_a + m_b ≤ n_b + m_a (n_a, m_a ∈ ℕ, n_b, m_b ∈ ℕ)
+​  ⇔  ​ ∃ x ∈ ℕ : a + x = b
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof.
+
+Remarks.
+
+Note that the comparison on the right is comparison on natural numbers.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.leb (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.9 data/libraries/hlm/Essentials/Numbers/Integer/less 1`] = `
+"Definition 1.6.4.9.  Let a, b ∈ ℤ. We define:
+
+a < b  :⇔  ​ a ≱ b
+​  ⇔  ​ a + 1 ≤ b
+​  ⇔  ​ a ≤ b and a ≠ b
+
+Equivalence.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.ltb (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.10.1 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.4.10.1.  Let a ∈ ℤ. We define:
+
+ℤ_(<a) := ​ {b ∈ ℤ : b < a}"
+`;
+
+exports[`render hlm library: 1.6.4.10.2 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.4.10.2.  Let a ∈ ℤ. We define:
+
+ℤ_(≤a) := ​ {b ∈ ℤ : b ≤ a}
+​ = ​ ℤ_(<(a+1))
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.3 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.4.10.3.  Let a ∈ ℤ. We define:
+
+ℤ_(≥a) := ​ {b ∈ ℤ : b ≥ a}
+​ = ​ ℤ ∖ ℤ_(<a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.4 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.4.10.4.  Let a ∈ ℤ. We define:
+
+ℤ_(>a) := ​ {b ∈ ℤ : b > a}
+​ = ​ ℤ ∖ ℤ_(≤a)
+​ = ​ ℤ_(≥(a+1))
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.5 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Hole 1`] = `
+"Definition 1.6.4.10.5.  Let a ∈ ℤ. We define:
+
+ℤ_(≠a) := ​ {b ∈ ℤ : b ≠ a}
+​ = ​ ℤ_(<a) ∪ ℤ_(>a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.6 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Negative%20numbers 1`] = `
+"Definition 1.6.4.10.6.  We define:
+
+ℤ_− := ​ ℤ_(<0)
+​ = ​ {a ∈ ℤ : a < 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.7 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Nonpositive%20numbers 1`] = `
+"Definition 1.6.4.10.7.  We define:
+
+ℤ_0^− := ​ ℤ_(≤0)
+​ = ​ {a ∈ ℤ : a ≤ 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.10.8 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Nonnegative%20numbers 1`] = `
+"Definition 1.6.4.10.8.  We define:
+
+ℤ_0^+ := ​ ℤ_(≥0)
+​ = ​ {a ∈ ℤ : a ≥ 0}
+​ = ​ ℕ
+
+Equality.  No proof.
+
+Remarks.
+
+Due to the embedding of natural numbers into integers, this is just an alias for the set of natural numbers."
+`;
+
+exports[`render hlm library: 1.6.4.10.9 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Positive%20numbers 1`] = `
+"Definition 1.6.4.10.9.  We define:
+
+ℤ_+ := ​ ℤ_(>0)
+​ = ​ {a ∈ ℤ : a > 0}
+​ = ​ ℕ_+
+
+Equality.  No proof.
+
+Remarks.
+
+Due to the embedding of natural numbers into integers, this is just an alias for the set of positive natural numbers."
+`;
+
+exports[`render hlm library: 1.6.4.10.10 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Nonzero%20numbers 1`] = `
+"Definition 1.6.4.10.10.  We define:
+
+ℤ_± := ​ ℤ_(≠0)
+​ = ​ {a ∈ ℤ : a ≠ 0}
+​ = ​ ℤ_− ∪ ℤ_+
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.11 data/libraries/hlm/Essentials/Numbers/Integer/absolute 1`] = `
+"Definition 1.6.4.11.  Let a ∈ ℤ. We define:
+
+|a| := ​ {a if a ≥ 0, −a if a < 0
+
+References.
+
+* https://en.wikipedia.org/wiki/Absolute_value
+* http://mathworld.wolfram.com/AbsoluteValue.html
+* https://proofwiki.org/wiki/Definition:Absolute_Value
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs"
+`;
+
+exports[`render hlm library: 1.6.4.12 data/libraries/hlm/Essentials/Numbers/Integer/product 1`] = `
+"Definition 1.6.4.12.  Let a, b ∈ ℤ. We define
+
+a ⋅ b
+
+by:
+
+(n_a-m_a) ⋅ (n_b-m_b) := ​ ((n_a ⋅ n_b + m_a ⋅ m_b)-(n_a ⋅ m_b + m_a ⋅ n_b)) (n_a, m_a ∈ ℕ, n_b, m_b ∈ ℕ)
+
+Well-definedness.  No proof.
+
+Remarks.
+
+Note that the sums and products on the right are operations on natural numbers.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul (but uses a different encoding)"
+`;
+
+exports[`render hlm library: 1.6.4.13 data/libraries/hlm/Essentials/Numbers/Integer/Product%20is%20associative 1`] = `
+"Proposition 1.6.4.13.
+
+⋅ is associative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.14 data/libraries/hlm/Essentials/Numbers/Integer/Product%20is%20commutative 1`] = `
+"Proposition 1.6.4.14.
+
+⋅ is commutative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.15 data/libraries/hlm/Essentials/Numbers/Integer/divisible 1`] = `
+"Definition 1.6.4.15.  Let a ∈ ℤ_±, b ∈ ℤ. We define:
+
+a ∣ b  :⇔  ​ ∃ x ∈ ℤ : a ⋅ x = b
+​  ⇔  ​ |a| ∣ |b|
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.4.16 data/libraries/hlm/Essentials/Numbers/Integer/Divisors 1`] = `
+"Definition 1.6.4.16.  Let b ∈ ℤ. We define:
+
+Div_ℤ(b) := ​ {a ∈ ℤ_± : a ∣ b}"
+`;
+
+exports[`render hlm library: 1.6.4.17 data/libraries/hlm/Essentials/Numbers/Integer/quotient 1`] = `
+"Definition 1.6.4.17.  Let b ∈ ℤ, a ∈ Div_ℤ(b). For x ∈ ℤ, we define:
+
+b/a = x  :⇔  ​ b = x ⋅ a
+
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.div (truncated division, thus incompatible with division of rational numbers)"
+`;
+
+exports[`render hlm library: 1.6.4.18 data/libraries/hlm/Essentials/Numbers/Integer/power 1`] = `
+"Definition 1.6.4.18.  Let a ∈ ℤ, n ∈ ℕ. We define
+
+a^n
+
+by:
+
+a^0 := ​ 1
+
+a^(x+1) := ​ a^x ⋅ a (x ∈ ℕ)
+
+References.
+
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.pow"
+`;
+
+exports[`render hlm library: 1.6.4.19 data/libraries/hlm/Essentials/Numbers/Integer/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
+"Proposition 1.6.4.19.  Let a, b, c ∈ ℤ such that a + c = b + c. Then:
+
+a = b
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.20 data/libraries/hlm/Essentials/Numbers/Integer/Multiplication%20of%20a%20nonzero%20number%20is%20injective 1`] = `
+"Proposition 1.6.4.20.  Let a, b ∈ ℤ, c ∈ ℤ_± such that a ⋅ c = b ⋅ c. Then:
+
+a = b
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.21 data/libraries/hlm/Essentials/Numbers/Integer/Power%20base%20product%20law 1`] = `
+"Proposition 1.6.4.21.  Let a, b ∈ ℤ, n ∈ ℕ. Then:
+
+(a ⋅ b)^n = a^n ⋅ b^n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/Integer/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.6.4.22.1.  Let p ∈ ℙ, a ∈ ℤ, n ∈ ℕ_+. Then the following are equivalent:
+
+1. p ∣ a
+2. p ∣ a^n
+3. p^n ∣ a^n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.4.23 data/libraries/hlm/Essentials/Numbers/Integer/coprime 1`] = `
+"Definition 1.6.4.23.  Let a, b ∈ ℤ. We define:
+
+a and b are coprime  :⇔  ​ ∀ c ∈ ℤ_+ s.t. c ∣ a and c ∣ b : c = 1
+​  ⇔  ​ ∄ d ∈ ℤ_(>1) : [d ∣ a and d ∣ b]
+​  ⇔  ​ ∀ e ∈ ℤ_± s.t. e ∣ a and e ∣ b : |e| = 1
+​  ⇔  ​ Div_ℤ(a) ∩ Div_ℤ(b) ⊆ {1, −1}
+​  ⇔  ​ Div_ℤ(a) ∩ Div_ℤ(b) = {1, −1}
+​  ⇔  ​ ∄ p ∈ ℙ : [p ∣ a and p ∣ b]
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Coprime_integers
+* http://mathworld.wolfram.com/RelativelyPrime.html
+* https://proofwiki.org/wiki/Definition:Coprime/Integers
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime"
+`;
+
+exports[`render hlm library: 1.6.5.1 data/libraries/hlm/Essentials/Numbers/Rational/Rational%20numbers 1`] = `
+"Definition 1.6.5.1.  We define:
+
+ℚ :=: {(n/d) | n ∈ ℤ, d ∈ ℕ_+}
+
+(n/d) = (n'/d')  :⇔  ​ n ⋅ d' = n' ⋅ d (n ∈ ℤ, d ∈ ℕ_+, n' ∈ ℤ, d' ∈ ℕ_+)
+
+Reflexivity.  No proof.
+
+Symmetry.  No proof.
+
+Transitivity.  No proof.
+
+ℤ ​ ⊆: ℚ via
+x ​ = (x/1)
+
+Well-definedness.  No proof.
+
+Remarks.
+
+This definition is rather similar to the definition of [integers](../Integer/Integers). Again, the constructor notation is later justified by a [proposition](Actual%20quotient%20equals%20formal%20quotient).
+
+Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of [comparison](less%20or%20equal) would probably need to be split into several cases.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number
+* http://mathworld.wolfram.com/RationalNumber.html
+* https://proofwiki.org/wiki/Definition:Rational_Number
+* https://ncatlab.org/nlab/show/rational+number
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html"
+`;
+
+exports[`render hlm library: 1.6.5.2 data/libraries/hlm/Essentials/Numbers/Rational/sum 1`] = `
+"Definition 1.6.5.2.  Let a, b ∈ ℚ. We define
+
+a + b
+
+by:
+
+(n_a/d_a) + (n_b/d_b) := ​ ((n_a ⋅ d_b + n_b ⋅ d_a)/(d_a ⋅ d_b)) (n_a ∈ ℤ, d_a ∈ ℕ_+, n_b ∈ ℤ, d_b ∈ ℕ_+)
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Addition
+* https://proofwiki.org/wiki/Definition:Addition/Rational_Numbers
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qplus"
+`;
+
+exports[`render hlm library: 1.6.5.3 data/libraries/hlm/Essentials/Numbers/Rational/inverse 1`] = `
+"Definition 1.6.5.3.  Let a ∈ ℚ. We define
+
+−a
+
+by:
+
+−(n_a/d_a) := ​ ((−n_a)/d_a) (n_a ∈ ℤ, d_a ∈ ℕ_+)
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Inverse
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qopp"
+`;
+
+exports[`render hlm library: 1.6.5.4 data/libraries/hlm/Essentials/Numbers/Rational/difference 1`] = `
+"Definition 1.6.5.4.  Let b, a ∈ ℚ. We define
+
+b − a
+
+by:
+
+(n_b/d_b) − (n_a/d_a) := ​ ((n_b ⋅ d_a − n_a ⋅ d_b)/(d_b ⋅ d_a)) (n_b ∈ ℤ, d_b ∈ ℕ_+, n_a ∈ ℤ, d_a ∈ ℕ_+)
+​ = ​ b + (−a)
+
+Equality.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Subtraction
+* https://proofwiki.org/wiki/Definition:Subtraction/Rational_Numbers"
+`;
+
+exports[`render hlm library: 1.6.5.5 data/libraries/hlm/Essentials/Numbers/Rational/less%20or%20equal 1`] = `
+"Definition 1.6.5.5.  Let a, b ∈ ℚ. We define
+
+a ≤ b
+
+by:
+
+(n_a/d_a) ≤ (n_b/d_b)  :⇔  ​ n_a ⋅ d_b ≤ n_b ⋅ d_a (n_a ∈ ℤ, d_a ∈ ℕ_+, n_b ∈ ℤ, d_b ∈ ℕ_+)
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Ordering"
+`;
+
+exports[`render hlm library: 1.6.5.6 data/libraries/hlm/Essentials/Numbers/Rational/less 1`] = `
+"Definition 1.6.5.6.  Let a, b ∈ ℚ. We define:
+
+a < b  :⇔  ​ a ≱ b
+​  ⇔  ​ a ≤ b and a ≠ b
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.1 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.5.7.1.  Let a ∈ ℚ. We define:
+
+ℚ_(<a) := ​ {b ∈ ℚ : b < a}"
+`;
+
+exports[`render hlm library: 1.6.5.7.2 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.5.7.2.  Let a ∈ ℚ. We define:
+
+ℚ_(≤a) := ​ {b ∈ ℚ : b ≤ a}"
+`;
+
+exports[`render hlm library: 1.6.5.7.3 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.5.7.3.  Let a ∈ ℚ. We define:
+
+ℚ_(≥a) := ​ {b ∈ ℚ : b ≥ a}
+​ = ​ ℚ ∖ ℚ_(<a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.4 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.5.7.4.  Let a ∈ ℚ. We define:
+
+ℚ_(>a) := ​ {b ∈ ℚ : b > a}
+​ = ​ ℚ ∖ ℚ_(≤a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.5 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Hole 1`] = `
+"Definition 1.6.5.7.5.  Let a ∈ ℚ. We define:
+
+ℚ_(≠a) := ​ {b ∈ ℚ : b ≠ a}
+​ = ​ ℚ_(<a) ∪ ℚ_(>a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.6 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Negative%20numbers 1`] = `
+"Definition 1.6.5.7.6.  We define:
+
+ℚ_− := ​ ℚ_(<0)
+​ = ​ {a ∈ ℚ : a < 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.7 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Nonpositive%20numbers 1`] = `
+"Definition 1.6.5.7.7.  We define:
+
+ℚ_0^− := ​ ℚ_(≤0)
+​ = ​ {a ∈ ℚ : a ≤ 0}
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Negative/Rational_Number"
+`;
+
+exports[`render hlm library: 1.6.5.7.8 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Nonnegative%20numbers 1`] = `
+"Definition 1.6.5.7.8.  We define:
+
+ℚ_0^+ := ​ ℚ_(≥0)
+​ = ​ {a ∈ ℚ : a ≥ 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.9 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Positive%20numbers 1`] = `
+"Definition 1.6.5.7.9.  We define:
+
+ℚ_+ := ​ ℚ_(>0)
+​ = ​ {a ∈ ℚ : a > 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.7.10 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Nonzero%20numbers 1`] = `
+"Definition 1.6.5.7.10.  We define:
+
+ℚ_± := ​ ℚ_(≠0)
+​ = ​ {a ∈ ℚ : a ≠ 0}
+​ = ​ ℚ_− ∪ ℚ_+
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.8 data/libraries/hlm/Essentials/Numbers/Rational/absolute 1`] = `
+"Definition 1.6.5.8.  Let a ∈ ℚ. We define:
+
+|a| := ​ {a if a ≥ 0, −a if a < 0
+
+References.
+
+* https://en.wikipedia.org/wiki/Absolute_value
+* http://mathworld.wolfram.com/AbsoluteValue.html
+* https://proofwiki.org/wiki/Definition:Absolute_Value
+* https://coq.inria.fr/library/Coq.QArith.Qabs.html"
+`;
+
+exports[`render hlm library: 1.6.5.9 data/libraries/hlm/Essentials/Numbers/Rational/product 1`] = `
+"Definition 1.6.5.9.  Let a, b ∈ ℚ. We define
+
+a ⋅ b
+
+by:
+
+(n_a/d_a) ⋅ (n_b/d_b) := ​ ((n_a ⋅ n_b)/(d_a ⋅ d_b)) (n_a ∈ ℤ, d_a ∈ ℕ_+, n_b ∈ ℤ, d_b ∈ ℕ_+)
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Multiplication
+* https://proofwiki.org/wiki/Definition:Multiplication/Rational_Numbers
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qmult"
+`;
+
+exports[`render hlm library: 1.6.5.10 data/libraries/hlm/Essentials/Numbers/Rational/quotient 1`] = `
+"Definition 1.6.5.10.  Let b ∈ ℚ, a ∈ ℚ_±. For x ∈ ℚ, we define:
+
+b/a = x  :⇔  ​ b = x ⋅ a
+
+Well-definedness.  No proof.
+
+Remarks.
+
+Although it is possible to specify an explicit definition for the division of rational numbers, that definition is not quite as straightforward as one would like because in our definition of rational numbers as pairs of a numerator and a denominator, we force the denominator to be positive.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Division
+* https://proofwiki.org/wiki/Definition:Division/Rational_Numbers
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qdiv"
+`;
+
+exports[`render hlm library: 1.6.5.11 data/libraries/hlm/Essentials/Numbers/Rational/Actual%20quotient%20equals%20formal%20quotient 1`] = `
+"Proposition 1.6.5.11.  Let n ∈ ℤ, d ∈ ℕ_+. Then:
+
+(n/d) = n/d
+
+No proof.
+
+Remarks.
+
+This proposition justifies the notation used for the constructor. Note that the division on the right is division on rational numbers, i.e. on the embedding of the integers _b_ and _a_ into the rational numbers."
+`;
+
+exports[`render hlm library: 1.6.5.12 data/libraries/hlm/Essentials/Numbers/Rational/power 1`] = `
+"Definition 1.6.5.12.  Let a ∈ ℚ, n ∈ ℕ. We define
+
+a^n
+
+by:
+
+a^0 := ​ 1
+
+a^(x+1) := ​ a^x ⋅ a (x ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Exponentiation_to_integer_power
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower_positive"
+`;
+
+exports[`render hlm library: 1.6.5.13 data/libraries/hlm/Essentials/Numbers/Rational/power%20to%20integer 1`] = `
+"Definition 1.6.5.13.  Let a ∈ ℚ, b ∈ ℤ such that a ≠ 0 or b ≥ 0. We define:
+
+a^b := ​ {a^b if b ≥ 0, 1/(a^(−b)) if b < 0
+
+Remarks.
+
+The exponentiation on the right uses the previous definition, which is possible because the exponents are nonnegative.
+
+References.
+
+* https://en.wikipedia.org/wiki/Rational_number#Exponentiation_to_integer_power
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower"
+`;
+
+exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/converges 1`] = `
+"Definition 1.6.5.14.1.  Let 𝐚 be a sequence on ℚ, l ∈ ℚ. We define
+
+𝐚 converges to l
+
+by:
+
+(a_n)_(n ∈ ℕ) converges to l  :⇔  ​ ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : |a_m − l| < ε (a_n ∈ ℚ for each n ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/convergent 1`] = `
+"Definition 1.6.5.14.2.  Let 𝐚 be a sequence on ℚ. We define:
+
+𝐚 is convergent  :⇔  ​ ∃ l ∈ ℚ : 𝐚 converges to l
+
+𝐚 is divergent  :⇔  𝐚 is not convergent"
+`;
+
+exports[`render hlm library: 1.6.5.14.3 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/limit 1`] = `
+"Definition 1.6.5.14.3.  Let a_n ∈ ℚ for each n ∈ ℕ, let 𝐚 := (a_m)_(m ∈ ℕ), assume 𝐚 is convergent. For l ∈ ℚ, we define:
+
+lim_(n → ∞) a_n = l  :⇔  ​ 𝐚 converges to l
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.14.4 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/cauchy 1`] = `
+"Definition 1.6.5.14.4.  Let 𝐚 be a sequence on ℚ. We define
+
+𝐚 is Cauchy
+
+by:
+
+(a_n)_(n ∈ ℕ) is Cauchy  :⇔  ​ ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ l, m ∈ ℕ_(≥n) : |a_l − a_m| < ε (a_n ∈ ℚ for each n ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.5.14.5 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20sum 1`] = `
+"Definition 1.6.5.14.5.  Let 𝐚, 𝐛 be sequences on ℚ. We define
+
+𝐚 + 𝐛
+
+by:
+
+(a_n)_(n ∈ ℕ) + (b_n)_(n ∈ ℕ) := ​ (a_n + b_n)_(n ∈ ℕ) (a_n ∈ ℚ for each n ∈ ℕ, b_n ∈ ℚ for each n ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.5.14.6 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20inverse 1`] = `
+"Definition 1.6.5.14.6.  Let 𝐚 be a sequence on ℚ. We define
+
+−𝐚
+
+by:
+
+−(a_n)_(n ∈ ℕ) := ​ (−a_n)_(n ∈ ℕ) (a_n ∈ ℚ for each n ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.5.14.7 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20difference 1`] = `
+"Definition 1.6.5.14.7.  Let 𝐛, 𝐚 be sequences on ℚ. We define
+
+𝐛 − 𝐚
+
+by:
+
+(b_n)_(n ∈ ℕ) − (a_n)_(n ∈ ℕ) := ​ (b_n − a_n)_(n ∈ ℕ) (b_n ∈ ℚ for each n ∈ ℕ, a_n ∈ ℚ for each n ∈ ℕ)
+​ = ​ 𝐛 + (−𝐚)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.5.14.8 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20product 1`] = `
+"Definition 1.6.5.14.8.  Let 𝐚, 𝐛 be sequences on ℚ. We define
+
+𝐚 ⋅ 𝐛
+
+by:
+
+(a_n)_(n ∈ ℕ) ⋅ (b_n)_(n ∈ ℕ) := ​ (a_n ⋅ b_n)_(n ∈ ℕ) (a_n ∈ ℚ for each n ∈ ℕ, b_n ∈ ℚ for each n ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.6.1 data/libraries/hlm/Essentials/Numbers/Real/Real%20numbers 1`] = `
+"Definition 1.6.6.1.  We define:
+
+ℝ :=: {[r] | r is a Cauchy sequence on ℚ}
+
+[r] = [r']  :⇔  ​ r − r' converges to 0 (r is a sequence on ℚ, r' is a sequence on ℚ with suitable conditions)
+
+Reflexivity.  No proof.
+
+Symmetry.  No proof.
+
+Transitivity.  No proof.
+
+ℚ ​ ⊆: ℝ via
+x ​ = [(x)_(k ∈ ℕ)]
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.2 data/libraries/hlm/Essentials/Numbers/Real/sum 1`] = `
+"Definition 1.6.6.2.  Let a, b ∈ ℝ. We define
+
+a + b
+
+by:
+
+[r_a] + [r_b] := ​ [r_a + r_b] (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.3 data/libraries/hlm/Essentials/Numbers/Real/inverse 1`] = `
+"Definition 1.6.6.3.  Let a ∈ ℝ. We define
+
+−a
+
+by:
+
+−[r_a] := ​ [−r_a] (r_a is a sequence on ℚ with suitable conditions)
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.4 data/libraries/hlm/Essentials/Numbers/Real/difference 1`] = `
+"Definition 1.6.6.4.  Let b, a ∈ ℝ. We define
+
+b − a
+
+by:
+
+[r_b] − [r_a] := ​ [r_b − r_a] (r_b is a sequence on ℚ, r_a is a sequence on ℚ with suitable conditions)
+​ = ​ b + (−a)
+
+Equality.  No proof.
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.5 data/libraries/hlm/Essentials/Numbers/Real/less%20or%20equal 1`] = `
+"Definition 1.6.6.5.  Let a, b ∈ ℝ. We define
+
+a ≤ b
+
+by:
+
+[(x_n)_(n ∈ ℕ)] ≤ [(y_n)_(n ∈ ℕ)]  :⇔  ​ ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : x_m ≤ y_m + ε ((x_n)_(n ∈ ℕ) is a sequence on ℚ, (y_n)_(n ∈ ℕ) is a sequence on ℚ with suitable conditions)
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.6 data/libraries/hlm/Essentials/Numbers/Real/less 1`] = `
+"Definition 1.6.6.6.  Let a, b ∈ ℝ. We define:
+
+a < b  :⇔  ​ a ≱ b
+​  ⇔  ​ a ≤ b and a ≠ b
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.1 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.6.7.1.  Let a ∈ ℝ. We define:
+
+ℝ_(<a) := ​ {b ∈ ℝ : b < a}"
+`;
+
+exports[`render hlm library: 1.6.6.7.2 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.6.7.2.  Let a ∈ ℝ. We define:
+
+ℝ_(≤a) := ​ {b ∈ ℝ : b ≤ a}"
+`;
+
+exports[`render hlm library: 1.6.6.7.3 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.6.7.3.  Let a ∈ ℝ. We define:
+
+ℝ_(≥a) := ​ {b ∈ ℝ : b ≥ a}
+​ = ​ ℝ ∖ ℝ_(<a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.4 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.6.7.4.  Let a ∈ ℝ. We define:
+
+ℝ_(>a) := ​ {b ∈ ℝ : b > a}
+​ = ​ ℝ ∖ ℝ_(≤a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.5 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Hole 1`] = `
+"Definition 1.6.6.7.5.  Let a ∈ ℝ. We define:
+
+ℝ_(≠a) := ​ {b ∈ ℝ : b ≠ a}
+​ = ​ ℝ_(<a) ∪ ℝ_(>a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.6 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Negative%20numbers 1`] = `
+"Definition 1.6.6.7.6.  We define:
+
+ℝ_− := ​ ℝ_(<0)
+​ = ​ {a ∈ ℝ : a < 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.7 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Nonpositive%20numbers 1`] = `
+"Definition 1.6.6.7.7.  We define:
+
+ℝ_0^− := ​ ℝ_(≤0)
+​ = ​ {a ∈ ℝ : a ≤ 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.8 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Nonnegative%20numbers 1`] = `
+"Definition 1.6.6.7.8.  We define:
+
+ℝ_0^+ := ​ ℝ_(≥0)
+​ = ​ {a ∈ ℝ : a ≥ 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.9 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Positive%20numbers 1`] = `
+"Definition 1.6.6.7.9.  We define:
+
+ℝ_+ := ​ ℝ_(>0)
+​ = ​ {a ∈ ℝ : a > 0}
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.7.10 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Nonzero%20numbers 1`] = `
+"Definition 1.6.6.7.10.  We define:
+
+ℝ_± := ​ ℝ_(≠0)
+​ = ​ {a ∈ ℝ : a ≠ 0}
+​ = ​ ℝ_− ∪ ℝ_+
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.8 data/libraries/hlm/Essentials/Numbers/Real/product 1`] = `
+"Definition 1.6.6.8.  Let a, b ∈ ℝ. We define
+
+a ⋅ b
+
+by:
+
+[r_a] ⋅ [r_b] := ​ [r_a ⋅ r_b] (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.9 data/libraries/hlm/Essentials/Numbers/Real/quotient 1`] = `
+"Definition 1.6.6.9.  Let b ∈ ℝ, a ∈ ℝ_±. For x ∈ ℝ, we define:
+
+b/a = x  :⇔  ​ b = x ⋅ a
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.10 data/libraries/hlm/Essentials/Numbers/Real/power 1`] = `
+"Definition 1.6.6.10.  Let a ∈ ℝ, n ∈ ℕ. We define
+
+a^n
+
+by:
+
+a^0 := ​ 1
+
+a^(x+1) := ​ a^x ⋅ a (x ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.6.11 data/libraries/hlm/Essentials/Numbers/Real/power%20to%20integer 1`] = `
+"Definition 1.6.6.11.  Let a ∈ ℝ, b ∈ ℤ such that a ≠ 0 or b ≥ 0. We define:
+
+a^b := ​ {a^b if b ≥ 0, 1/(a^(−b)) if b < 0"
+`;
+
+exports[`render hlm library: 1.6.6.12 data/libraries/hlm/Essentials/Numbers/Real/Power%20base%20product%20law 1`] = `
+"Proposition 1.6.6.12.  Let a, b ∈ ℝ, n ∈ ℕ. Then:
+
+(a ⋅ b)^n = a^n ⋅ b^n
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.6.13 data/libraries/hlm/Essentials/Numbers/Real/Power%20base%20quotient%20law 1`] = `
+"Proposition 1.6.6.13.  Let b ∈ ℝ, a ∈ ℝ_±, n ∈ ℕ_+. Then:
+
+(b/a)^n = (b^n)/(a^n)
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.6.14 data/libraries/hlm/Essentials/Numbers/Real/root 1`] = `
+"Definition 1.6.6.14.  Let a ∈ ℝ_0^+, n ∈ ℕ. For r ∈ ℝ_0^+, we define:
+
+n√a = r  :⇔  ​ a = r^n
+
+Well-definedness.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.15 data/libraries/hlm/Essentials/Numbers/Real/square%20root 1`] = `
+"Definition 1.6.6.15.  Let a ∈ ℝ_0^+. We define:
+
+√a := ​ 2√a"
+`;
+
+exports[`render hlm library: 1.6.6.16 data/libraries/hlm/Essentials/Numbers/Real/rational 1`] = `
+"Definition 1.6.6.16.  Let a ∈ ℝ. We define:
+
+a is rational  :⇔  ​ a ∈ ℚ
+​  ⇔  ​ ∃ b ∈ ℤ_±, c ∈ ℤ : a = c/b
+​  ⇔  ​ ∃! d ∈ ℤ_+, e ∈ ℤ s.t. d and e are coprime : a = e/d
+
+a is irrational  :⇔  a is not rational
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.6.17 data/libraries/hlm/Essentials/Numbers/Real/Roots%20of%20primes%20are%20irrational 1`] = `
+"Theorem 1.6.6.17.  Let p ∈ ℙ, n ∈ ℕ_(>1). Then:
+
+n√p is irrational
+
+Proof.  Assume n√p is rational.
+
+⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b/a
+
+⇒^def p = (b/a)^n
+
+⇒^1.6.6.13 p = (b^n)/(a^n)
+
+⇒^def p ⋅ a^n = b^n
+
+We have p ∣ b^n:
+
+We show that ∃ x ∈ ℤ : p ⋅ x = b^n:
+
+Choose x := a^n.
+
+⇒^1.6.4.22.1 p ∣ b
+
+⇒^def ∃ y ∈ ℤ : p ⋅ y = b
+
+n ∈ ℕ_(>1)
+
+⇒^def n > 1
+
+⇒^def ∃ m ∈ ℕ_+ : 1 + m = n
+
+m ∈ ℕ_+
+
+⇒^def ∃ l ∈ ℕ : 1 + l = m
+
+p ⋅ a^n = b^n
+
+⇒^def b^m ⋅ b = a^n ⋅ p
+
+⇒^def (b^l ⋅ b) ⋅ b = a^n ⋅ p
+
+⇒^[p⋅y = b] (b^l ⋅ (p ⋅ y)) ⋅ (p ⋅ y) = a^n ⋅ p
+
+⇒^1.6.4.20 (b^l ⋅ (p ⋅ y)) ⋅ y = a^n
+
+We have p ∣ a^n:
+
+We show that ∃ z ∈ ℤ : p ⋅ z = a^n:
+
+Choose z := (b^l ⋅ y) ⋅ y.
+
+⇒^1.6.4.22.1 p ∣ a
+
+We have ∃ q ∈ ℙ : [q ∣ a and q ∣ b]:
+
+Choose q := p.
+
+a and b are coprime
+
+⇒^def ∄ r ∈ ℙ : [r ∣ a and r ∣ b]
+
+References.
+
+* https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for _n_ = 2)
+* https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for _n_ = 2)"
+`;
+
+exports[`render hlm library: 1.6.6.18 data/libraries/hlm/Essentials/Numbers/Real/Square%20root%20of%20two%20is%20irrational 1`] = `
+"Corollary 1.6.6.18.
+
+√2 is irrational
+
+Proof.
+
+1.6.1.44.2 ⇒ 2 is prime
+
+⇒^1.6.6.17 2√2 is irrational"
+`;
+
+exports[`render hlm library: 1.6.6.19.1 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20sums%20and%20products/inductive%20sum%20(exclusive) 1`] = `
+"Definition 1.6.6.19.1.  Let n ∈ ℕ, let a_i ∈ ℝ for each i ∈ ℕ_(<n). We define
+
+∑_(i < n) a_i
+
+by:
+
+∑_(i < 0) a_i := ​ 0
+
+∑_(i < m+1) a_i := ​ (∑_(j < m) a_j) + a_m (m ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.6.19.2 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20sums%20and%20products/inductive%20product%20(exclusive) 1`] = `
+"Definition 1.6.6.19.2.  Let n ∈ ℕ, let a_i ∈ ℝ for each i ∈ ℕ_(<n). We define
+
+∏_(i < n) a_i
+
+by:
+
+∏_(i < 0) a_i := ​ 1
+
+∏_(i < m+1) a_i := ​ (∏_(j < m) a_j) ⋅ a_m (m ∈ ℕ)"
+`;
+
+exports[`render hlm library: 1.6.7.1 data/libraries/hlm/Essentials/Numbers/Complex/Complex%20numbers 1`] = `
+"Definition 1.6.7.1.  We define:
+
+ℂ :=: {(r+i𝒊) | r, i ∈ ℝ}
+
+(r+i𝒊) = (r'+i'𝒊)  :⇔  ​ r = r' and i = i' (r, i ∈ ℝ, r', i' ∈ ℝ)
+
+ℝ ​ ⊆: ℂ via
+r ​ = (r+0𝒊)
+
+Well-definedness.  No proof.
+
+Remarks.
+
+The constructor notation is later justified by a [proposition](Actual%20linear%20combination%20equals%20formal%20linear%20combination)."
+`;
+
+exports[`render hlm library: 1.6.7.2 data/libraries/hlm/Essentials/Numbers/Complex/imaginary%20unit 1`] = `
+"Definition 1.6.7.2.  We define:
+
+𝒊 := ​ (0+1𝒊)"
+`;
+
+exports[`render hlm library: 1.6.7.3 data/libraries/hlm/Essentials/Numbers/Complex/sum 1`] = `
+"Definition 1.6.7.3.  Let a, b ∈ ℂ. We define
+
+a + b
+
+by:
+
+(r_a+i_a𝒊) + (r_b+i_b𝒊) := ​ ((r_a + r_b)+(i_a + i_b)𝒊) (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+`;
+
+exports[`render hlm library: 1.6.7.4 data/libraries/hlm/Essentials/Numbers/Complex/Sum%20is%20associative 1`] = `
+"Proposition 1.6.7.4.
+
++ is associative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.7.5 data/libraries/hlm/Essentials/Numbers/Complex/Sum%20is%20commutative 1`] = `
+"Proposition 1.6.7.5.
+
++ is commutative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.7.6 data/libraries/hlm/Essentials/Numbers/Complex/inverse 1`] = `
+"Definition 1.6.7.6.  Let a ∈ ℂ. We define
+
+−a
+
+by:
+
+−(r_a+i_a𝒊) := ​ ((−r_a)+(−i_a)𝒊) (r_a, i_a ∈ ℝ)"
+`;
+
+exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Complex/difference 1`] = `
+"Definition 1.6.7.7.  Let b, a ∈ ℂ. We define
+
+b − a
+
+by:
+
+(r_b+i_b𝒊) − (r_a+i_a𝒊) := ​ ((r_b − r_a)+(i_b − i_a)𝒊) (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
+​ = ​ b + (−a)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.6.7.8 data/libraries/hlm/Essentials/Numbers/Complex/product 1`] = `
+"Definition 1.6.7.8.  Let a, b ∈ ℂ. We define
+
+a ⋅ b
+
+by:
+
+(r_a+i_a𝒊) ⋅ (r_b+i_b𝒊) := ​ ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊) (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+`;
+
+exports[`render hlm library: 1.6.7.9 data/libraries/hlm/Essentials/Numbers/Complex/Product%20is%20associative 1`] = `
+"Proposition 1.6.7.9.
+
+⋅ is associative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.7.10 data/libraries/hlm/Essentials/Numbers/Complex/Product%20is%20commutative 1`] = `
+"Proposition 1.6.7.10.
+
+⋅ is commutative
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.7.11 data/libraries/hlm/Essentials/Numbers/Complex/Actual%20linear%20combination%20equals%20formal%20linear%20combination 1`] = `
+"Proposition 1.6.7.11.  Let r, i ∈ ℝ. Then:
+
+(r+i𝒊) = r + i ⋅ 𝒊
+
+No proof.
+
+Remarks.
+
+This proposition justifies the notation used for the constructor. Note that the operations on the right are operations on complex numbers, i.e. on the embedding of the real numbers _r_ and _i_ into the complex numbers."
+`;
+
+exports[`render hlm library: 2.1.1 data/libraries/hlm/Algebra/Isomorphisms/element%20transform 1`] = `
+"Definition 2.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X. We define:
+
+φ[x] := ​ φ(x)
+
+Remarks.
+
+The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of “isomorphism” that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
+
+Each of the definitions transforms an object defined on *X* into the equivalent object defined on *Y*, according to the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
+`;
+
+exports[`render hlm library: 2.1.2 data/libraries/hlm/Algebra/Isomorphisms/function%20transform 1`] = `
+"Definition 2.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X be a function. We define
+
+φ[f]
+
+by:
+
+φ[(X  →  X, x  ↦  z_x)] := ​ (Y  →  Y, y  ↦  φ(z_(φ^-1(y)))) (z_x ∈ X for each x ∈ X)
+​ = ​ φ ∘ (f ∘ φ^-1)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.1.3 data/libraries/hlm/Algebra/Isomorphisms/inner%20operation%20transform 1`] = `
+"Definition 2.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X. We define
+
+φ[∗]
+
+by:
+
+φ[(X × X  →  X, x  ↦  z_x)] := ​ (Y × Y  →  Y, (y_1, y_2)  ↦  φ(z_(φ^-1(y_1),φ^-1(y_2)))) (z_x ∈ X for each x ∈ X × X)
+​ = ​ φ ∘ (∗ ∘ (φ × φ)^-1)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/relation%20transform 1`] = `
+"Definition 2.1.4.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
+
+φ[≺]
+
+by:
+
+φ[[p_x_1,x_2]_(x_1,x_2 ∈ X)] := ​ [p_φ^-1(y_1),φ^-1(y_2)]_(y_1,y_2 ∈ Y) (p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)"
+`;
+
+exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transform 1`] = `
+"Definition 2.1.5.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
+
+(φ_1, φ_2, φ_3)[∙]
+
+by:
+
+(φ_1, φ_2, φ_3)[(X_1 × X_2  →  X_3, x  ↦  z_x)] := ​ (Y_1 × Y_2  →  Y_3, (y_1, y_2)  ↦  φ_3(z_((φ_1)^-1(y_1),(φ_2)^-1(y_2)))) (z_x ∈ X_3 for each x ∈ X_1 × X_2)
+​ = ​ φ_3 ∘ (∙ ∘ (φ_1 × φ_2)^-1)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.2.1 data/libraries/hlm/Algebra/Magmas/Magmas 1`] = `
+"Definition 2.2.1.  We define:
+
+𝓜𝓪𝓰 :=: {[S, ∗] | S is a set, ∗ : S × S → S is an operation on S}
+
+[S, ∗] = [T, ⋆]  :⇔  ​ ∃ φ : S ↔ T : φ[∗] = ⋆ (S is a set, ∗ : S × S → S is an operation on S, T is a set, ⋆ : T × T → T is an operation on T)
+
+We write “let 𝐌 be a magma” for “let 𝐌 ∈ 𝓜𝓪𝓰.”
+
+Remarks.
+
+Strictly speaking, the elements of this set are not magmas but isomorphism classes of magmas. Due to the rules of HLM, it is not even possible to define magmas (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
+
+References.
+
+* https://en.wikipedia.org/wiki/Magma_(algebra)"
+`;
+
+exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Magmas/Elements 1`] = `
+"Definition 2.2.2.  Let 𝐌 be a magma. We define
+
+El(𝐌)
+
+by:
+
+El([M, ∗]) := ​ M (M is a set, ∗ : M × M → M is an operation on M)
+
+We write “let a ∈ 𝐌” for “let a ∈ El(𝐌).”
+
+Remarks.
+
+This definition retrieves a representative set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.2.3 data/libraries/hlm/Algebra/Magmas/operation 1`] = `
+"Definition 2.2.3.  Let 𝐌 be a magma, a, b ∈ 𝐌. We define:
+
+a • b := ​ {a ∗ b if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the magma."
+`;
+
+exports[`render hlm library: 2.2.4 data/libraries/hlm/Algebra/Magmas/associative 1`] = `
+"Definition 2.2.4.  Let 𝐌 be a magma. We define
+
+𝐌 is associative
+
+by:
+
+[M, ∗] is associative  :⇔  ​ ∗ is associative (M is a set, ∗ : M × M → M is an operation on M)"
+`;
+
+exports[`render hlm library: 2.2.5 data/libraries/hlm/Algebra/Magmas/commutative 1`] = `
+"Definition 2.2.5.  Let 𝐌 be a magma. We define
+
+𝐌 is commutative
+
+by:
+
+[M, ∗] is commutative  :⇔  ​ ∗ is commutative (M is a set, ∗ : M × M → M is an operation on M)"
+`;
+
+exports[`render hlm library: 2.2.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms 1`] = `
+"Definition 2.2.6.  Let 𝐌, 𝐍 be magmas. We define:
+
+Hom(𝐌, 𝐍) := ​ {f : El(𝐌) → El(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
+`;
+
+exports[`render hlm library: 2.2.7 data/libraries/hlm/Algebra/Magmas/Isomorphisms 1`] = `
+"Definition 2.2.7.  Let 𝐌, 𝐍 be magmas. We define:
+
+Iso(𝐌, 𝐍) := ​ {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+​ = ​ {f : El(𝐌) ↔ El(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+
+We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.2.8 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
+"Definition 2.2.8.  Let 𝐌 be a magma. We define:
+
+id_𝐌 := ​ id_(El(𝐌))"
+`;
+
+exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Magmas/Equality%20criterion 1`] = `
+"Proposition 2.2.9.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
+
+1. Iso(𝐌, 𝐍) is nonempty
+2. 𝐌 = 𝐍
+
+No proof."
+`;
+
+exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Magmas/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.2.10.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+
+φ^-1 ∈ Iso(𝐍, 𝐌)
+
+No proof."
+`;
+
+exports[`render hlm library: 2.2.11.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
+"Definition 2.2.11.1.  Let S be a set. We define:
+
+𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) :=: {(s) | s ∈ S, a^b | a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S)}
+
+(s) = (s')  :⇔  ​ s = s' (s ∈ S, s' ∈ S)
+
+a^b = a'^b'  :⇔  ​ a = a' and b = b' (a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S), a', b' ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S))
+
+S ​ ⊆: 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) via
+x ​ = (x)
+
+Well-definedness.  No proof.
+
+For S' ⊆ S, we canonically treat elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S') as elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S).
+
+Remarks.
+
+This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma."
+`;
+
+exports[`render hlm library: 2.2.11.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
+"Definition 2.2.11.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
+
+free_𝓜𝓰𝓶(S) := ​ [T, (T × T  →  T, (a, b)  ↦  a^b)]"
+`;
+
+exports[`render hlm library: 2.2.11.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
+"Definition 2.2.11.3.  Let 𝐌 be a magma, S ⊆ El(𝐌). We define:
+
+𝐌 is free on S  :⇔  ​ 𝐌 = free_𝓜𝓰𝓶(S)
+​  ⇔  ​ ∀ magmas 𝐍, f : S → El(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.2.11.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
+"Definition 2.2.11.4.  Let 𝐌 be a magma. We define:
+
+𝐌 is free  :⇔  ​ ∃ S ⊆ El(𝐌) : 𝐌 is free on S"
+`;
+
+exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `
+"Definition 3.1.1.  Let S be a set, m, n ∈ ℕ. We define:
+
+S^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
+
+For S' ⊆ S, we canonically treat elements of S'^(m×n) as elements of S^(m×n)."
+`;
+
+exports[`render hlm library: 3.1.2 data/libraries/hlm/Linear%20algebra/Essentials/Vectors 1`] = `
+"Definition 3.1.2.  Let S be a set, n ∈ ℕ. We define:
+
+S^n := ​ S^(1×n)"
+`;
+
+exports[`render hlm library: 4.1 data/libraries/hlm/Category%20theory/Categories 1`] = `
+"Definition 4.1.  Let U be a symbol. We define:
+
+𝓒𝓪𝓽_U :=: {[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U | O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_𝐖,𝐗, g ∈ M_𝐗,𝐘, h ∈ M_𝐘,𝐙 : (h ∘_𝐗,𝐘,𝐙 g) ∘_𝐖,𝐗,𝐙 f = h ∘_𝐖,𝐘,𝐙 (g ∘_𝐖,𝐗,𝐘 f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘 : [i_𝐘 ∘_𝐗,𝐘,𝐘 f = f and f ∘_𝐗,𝐗,𝐘 i_𝐗 = f]], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘, g ∈ M_𝐘,𝐗 s.t. f ∘_𝐘,𝐗,𝐘 g = i_𝐘 and g ∘_𝐗,𝐘,𝐗 f = i_𝐗 : f = g]}
+
+[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_U  :⇔  ​ ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ[𝐀],φ[𝐁] f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : ψ_𝐂,𝐂[i_𝐂] = j_(φ[𝐂])] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : (ψ_𝐃,𝐄, ψ_𝐄,𝐅, ψ_𝐃,𝐅)[∘_𝐃,𝐄,𝐅] = ∙_φ[𝐃],φ[𝐄],φ[𝐅]] (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
+
+We write “let 𝓒 be a category in U” for “let 𝓒 ∈ 𝓒𝓪𝓽_U.”
+
+Remarks.
+
+This definition of categories includes the additional requirement that all categories are [skeletal](https://en.wikipedia.org/wiki/Skeleton_(category_theory)). The reasoning behind this is that I expect the equality definition above, which is derived purely syntactically, to be equivalent to _isomorphism_ of categories, not _equivalence_. That is, without this restriction, two isomorphic categories would be considered equal, but two equivalent categories would not necessarily be. (This needs to be verified.)
+
+For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
+
+The symbol _U_ is required to be able to define a category of (smaller) categories, which would normally be prevented by non-circularity rules. A symbol parameter essentially creates multiple distinct copies of a definition, in particular these definitions are considered distinct in the context of non-circularity. So the set of categories “in _U_” can be used to build a category “in _V_” if _V_ is a different symbol. _V_ is then considered “larger.” Informally, _U_ denotes a “universe.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Category_(mathematics)
+* http://mathworld.wolfram.com/Category.html
+* https://proofwiki.org/wiki/Definition:Category
+* https://ncatlab.org/nlab/show/category"
+`;
+
+exports[`render hlm library: 4.2 data/libraries/hlm/Category%20theory/Objects 1`] = `
+"Definition 4.2.  Let U be a symbol, 𝓒 be a category in U. We define
+
+Ob(𝓒)
+
+by:
+
+Ob([O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U) := ​ O (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+
+We write “let 𝐗 ∈ 𝓒” for “let 𝐗 ∈ Ob(𝓒).”
+
+Remarks.
+
+This definition retrieves a representative set of objects from a category (which is actually an equivalence class of categories), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 4.3 data/libraries/hlm/Category%20theory/Morphisms 1`] = `
+"Definition 4.3.  Let U be a symbol, 𝓒 be a category in U, 𝐗, 𝐘 ∈ 𝓒. We define:
+
+(𝐗 → 𝐘) := ​ {M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+
+We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ (𝐗 → 𝐘).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Morphism
+* http://mathworld.wolfram.com/Morphism.html
+* https://proofwiki.org/wiki/Definition:Morphism
+* https://ncatlab.org/nlab/show/morphism"
+`;
+
+exports[`render hlm library: 4.4 data/libraries/hlm/Category%20theory/identity 1`] = `
+"Definition 4.4.  Let U be a symbol, 𝓒 be a category in U, 𝐗 ∈ 𝓒. We define:
+
+id_𝐗 := ​ {i_𝐗 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Identity_Morphism"
+`;
+
+exports[`render hlm library: 4.5 data/libraries/hlm/Category%20theory/composition 1`] = `
+"Definition 4.5.  Let U be a symbol, 𝓒 be a category in U, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
+
+g ∘ f := ​ {g ∘_𝐗,𝐘,𝐙 f if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Composition_of_Morphisms"
+`;
+
+exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
+"Definition 4.6.1.  Let U be a symbol, 𝓒, 𝓓 be categories in U. We define:
+
+(𝓒 → 𝓓) :=: {(𝓒  →  𝓓, 𝐗  ↦  𝐃_𝐗, (f : 𝐘 → 𝐙)  ↦  d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
+
+(𝓒  →  𝓓, 𝐗  ↦  𝐃_𝐗, (f : 𝐘 → 𝐙)  ↦  d_𝐘,𝐙,f) = (𝓒  →  𝓓, 𝐗  ↦  𝐃'_𝐗, (f : 𝐘 → 𝐙)  ↦  d'_𝐘,𝐙,f)  :⇔  ​ [∀ 𝐗 ∈ 𝓒 : 𝐃_𝐗 = 𝐃'_𝐗] and ∀ 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 : d_𝐘,𝐙,f = d'_𝐘,𝐙,f (𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, 𝐃'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d'_𝐘,𝐙,f : 𝐃'_𝐘 → 𝐃'_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙 with suitable conditions)
+
+We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ (𝓒 → 𝓓).”
+
+We write “let F :  𝓒  →  𝓓, 𝐗  ↦  𝐃_𝐗, (f : 𝐘 → 𝐙)  ↦  d_𝐘,𝐙,f” for “let F := (𝓒  →  𝓓, 𝐗  ↦  𝐃_𝐗, (f : 𝐘 → 𝐙)  ↦  d_𝐘,𝐙,f).”
+
+Remarks.
+
+This definition requires both categories to live in a common universe, which is not strictly required.
+
+References.
+
+* https://en.wikipedia.org/wiki/Functor
+* http://mathworld.wolfram.com/Functor.html
+* https://proofwiki.org/wiki/Definition:Functor
+* https://ncatlab.org/nlab/show/functor"
+`;
+
+exports[`render hlm library: 4.6.2 data/libraries/hlm/Category%20theory/Functors/object%20value 1`] = `
+"Definition 4.6.2.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
+
+F(𝐗)
+
+by:
+
+(𝓒  →  𝓓, 𝐀  ↦  𝐃_𝐀, (f : 𝐁 → 𝐂)  ↦  d_𝐁,𝐂,f)(𝐗) := ​ 𝐃_𝐗 (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, d_𝐁,𝐂,f : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and f : 𝐁 → 𝐂 with suitable conditions)"
+`;
+
+exports[`render hlm library: 4.6.3 data/libraries/hlm/Category%20theory/Functors/morphism%20value 1`] = `
+"Definition 4.6.3.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
+
+F(f)
+
+by:
+
+(𝓒  →  𝓓, 𝐀  ↦  𝐃_𝐀, (f : 𝐁 → 𝐂)  ↦  d_𝐁,𝐂,f)(f) := ​ d_𝐘,𝐙,f (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, d_𝐁,𝐂,f : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and f : 𝐁 → 𝐂 with suitable conditions)"
+`;
+
+exports[`render hlm library: 4.6.4 data/libraries/hlm/Category%20theory/Functors/identity 1`] = `
+"Definition 4.6.4.  Let U be a symbol, 𝓒 be a category in U. We define:
+
+id_𝓒 :  𝓒  →  𝓒, 𝐗  ↦  𝐗, (f : 𝐘 → 𝐙)  ↦  f"
+`;
+
+exports[`render hlm library: 4.6.5 data/libraries/hlm/Category%20theory/Functors/composition 1`] = `
+"Definition 4.6.5.  Let U be a symbol, 𝓒, 𝓓, 𝓔 be categories in U, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
+
+G ∘ F :  𝓒  →  𝓔, 𝐗  ↦  G(F(𝐗)), (f : 𝐘 → 𝐙)  ↦  G(F(f))"
+`;
+
+exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
+"Definition 4.7.1.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors. We define:
+
+(F ⇀ G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
+
+(n_𝐗)_(𝐗 ∈ 𝓒) = (m_𝐗)_(𝐗 ∈ 𝓒)  :⇔  ​ ∀ 𝐗 ∈ 𝓒 : n_𝐗 = m_𝐗 (n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒, m_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒)
+
+We write “let η : F ⇀ G be an infranatural transformation” for “let η ∈ (F ⇀ G).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_transformation"
+`;
+
+exports[`render hlm library: 4.7.2 data/libraries/hlm/Category%20theory/Natural%20transformations/component 1`] = `
+"Definition 4.7.2.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
+
+η_𝐗
+
+by:
+
+((n_𝐘)_(𝐘 ∈ 𝓒))_𝐗 := ​ n_𝐗 (n_𝐘 : F(𝐘) → G(𝐘) is a morphism for each 𝐘 ∈ 𝓒)"
+`;
+
+exports[`render hlm library: 4.7.3 data/libraries/hlm/Category%20theory/Natural%20transformations/identity 1`] = `
+"Definition 4.7.3.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor. We define:
+
+id_F := ​ (id_(F(𝐗)))_(𝐗 ∈ 𝓒)
+​ = ​ (F(id_𝐗))_(𝐗 ∈ 𝓒)
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 4.7.4 data/libraries/hlm/Category%20theory/Natural%20transformations/vertical%20composition 1`] = `
+"Definition 4.7.4.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
+
+ε ∘ η := ​ (ε_𝐗 ∘ η_𝐗)_(𝐗 ∈ 𝓒)
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_transformation#Operations_with_natural_transformations"
+`;
+
+exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
+"Definition 4.7.5.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors. We define:
+
+(F ⇒ G) := ​ {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
+
+We write “let η : F ⇒ G be a natural transformation” for “let η ∈ (F ⇒ G).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_transformation
+* http://mathworld.wolfram.com/NaturalTransformation.html
+* https://proofwiki.org/wiki/Definition:Natural_Transformation
+* https://ncatlab.org/nlab/show/natural+transformation"
+`;
+
+exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Individual%20categories/elements 1`] = `
+"Definition 4.8.1.  Let U be a symbol, S be a set. We define:
+
+𝐄𝐥𝐞𝐦_U(S) := ​ [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e})  →  ({d} ∩ {f}), x  ↦  e)_(d,e,f ∈ S)]_U
+
+Remarks.
+
+This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of morphism composition implies that _d_=_e_=_f_.
+
+References.
+
+* https://en.wikipedia.org/wiki/Discrete_category
+* https://ncatlab.org/nlab/show/discrete+category#CategoricalMeaning"
+`;
+
+exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Individual%20categories/cardinals 1`] = `
+"Definition 4.8.2.  Let U be a symbol. We define:
+
+𝐒𝐞𝐭_U := ​ [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_U
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of sets, i.e. cardinal numbers. In HLM, arbitrary sets cannot be used as objects because it is impossible to ask whether two arbitrary sets are equal. However, cardinal numbers work fine as a replacement. The situation with other categories is similar.
+
+References.
+
+* https://en.wikipedia.org/wiki/Category_of_sets
+* https://ncatlab.org/nlab/show/Set"
+`;
+
+exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Individual%20categories/ordinals 1`] = `
+"Definition 4.8.3.  Let U be a symbol. We define:
+
+𝐖𝐨𝐬𝐞𝐭_U := ​ [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_U
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers."
+`;
+
+exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Individual%20categories/magmas 1`] = `
+"Definition 4.8.4.  Let U be a symbol. We define:
+
+𝐌𝐚𝐠_U := ​ [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_U
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of magmas.
+
+References.
+
+* https://en.wikipedia.org/wiki/Category_of_magmas"
+`;
+
+exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+"Definition 4.8.5.  Let U, V be symbols. We define:
+
+𝐂𝐚𝐭_U,V := ​ [𝓒𝓪𝓽_U, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_U), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_U), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_U)]_V
+
+Remarks.
+
+This defines the category of small categories, or, more generally, a category in _V_ of all categories in _U_.
+
+References.
+
+* https://en.wikipedia.org/wiki/Category_of_small_categories
+* https://ncatlab.org/nlab/show/Cat"
+`;
+
+exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+"Definition 4.8.6.  Let U be a symbol, 𝓒, 𝓓 be categories in U, V be a symbol. We define:
+
+𝐅𝐮𝐧_V(𝓒, 𝓓) := ​ [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_V
+
+References.
+
+* https://en.wikipedia.org/wiki/Functor_category
+* https://ncatlab.org/nlab/show/functor+category"
+`;
+
+exports[`render hlm library: 5.1 data/libraries/hlm/Formal%20systems/Variables 1`] = `
+"Definition 5.1.  We define:
+
+𝓥𝓪𝓻 :=: {(n) | n ∈ ℕ}
+
+(m) = (n)  :⇔  ​ m = n (m ∈ ℕ, n ∈ ℕ)
+
+Remarks.
+
+This definition formalizes an infinite supply of variables. Each variable is identified by a natural number, but that number is not used anywhere. In fact, any infinite set would do.
+
+Variables, therefore, do not carry a name. Instead, we use bound variables in HLM to model variables in the target language, and these bound variables have a name in HLM.
+
+As a consequence, α-equivalent terms are never distinguishable."
+`;
+
+exports[`render hlm library: 5.2 data/libraries/hlm/Formal%20systems/Fresh%20variables 1`] = `
+"Definition 5.2.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+
+Fresh(V) := ​ 𝓥𝓪𝓻 ∖ V
+
+Remarks.
+
+This is just the subset of variables that do not appear in _V_. It should be used whenever a new bound variable is needed."
+`;
+
+exports[`render hlm library: 5.3 data/libraries/hlm/Formal%20systems/Rewriting%20rules 1`] = `
+"Definition 5.3.  Let T be a set. We define:
+
+𝓡𝓮𝔀𝓻(T) :=: {l → r | l, r ∈ T}
+
+(l → r) = (l' → r')  :⇔  ​ l = l' and r = r' (l, r ∈ T, l', r' ∈ T)
+
+For T' ⊆ T, we canonically treat elements of 𝓡𝓮𝔀𝓻(T') as elements of 𝓡𝓮𝔀𝓻(T).
+
+Remarks.
+
+This definition just provides some useful notation for rewriting rules for terms in _T_. It is actually equivalent to the Cartesian product of _T_ with itself."
+`;
+
+exports[`render hlm library: 5.4.1 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Terms 1`] = `
+"Definition 5.4.1.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+
+𝓣_V :=: {(x) | x ∈ V, λx. M_x | M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), [∀ x, y ∈ Fresh(V) : M_x[x := y] = M_y], M N | M, N ∈ 𝓣_V}
+
+(x) = (y)  :⇔  ​ x = y (x ∈ V, y ∈ V)
+
+λx. M_x = λx. M'_x  :⇔  ​ ∀ x ∈ Fresh(V) : M_x = M'_x (M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), M'_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V) with suitable conditions)
+​  ⇔  ​ ∃ x ∈ Fresh(V) : M_x = M'_x
+
+M N = M' N'  :⇔  ​ M = M' and N = N' (M, N ∈ 𝓣_V, M', N' ∈ 𝓣_V)
+
+V ​ ⊆: 𝓣_V via
+x ​ = (x)
+
+Well-definedness.  No proof.
+
+For V' ⊆ V, we canonically treat elements of 𝓣_V' as elements of 𝓣_V.
+
+Remarks.
+
+This formalization of the untyped lambda calculus is fairly standard except for one thing: The right side of a lambda abstraction depends on the value of the bound variable used to define it (which is kind of the point of bound variables). To prevent wild pseudo-terms that actually differ in nontrivial ways depending on the variable, there needs to be an additional substitutability constraint. Although substitution is defined later, we can use it in this case because we are applying it to subterms only (i.e. we are employing mutual induction).
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus
+* https://ncatlab.org/nlab/show/lambda-calculus#https://ncatlab.org/nlab/show/lambda-calculus#pure_lambda_calculus"
+`;
+
+exports[`render hlm library: 5.4.2 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/substitution 1`] = `
+"Definition 5.4.2.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite, T ∈ 𝓣_V, x ∈ V, R ∈ 𝓣_(V ∖ {x}). We define
+
+T[x := R]
+
+by:
+
+(y)[x := R] := ​ {R if x = y, y if x ≠ y (y ∈ V)
+
+(λy. M_y)[x := R] := ​ λz. M_z[x := R] (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V) with suitable conditions)
+
+(M N)[x := R] := ​ M[x := R] N[x := R] (M, N ∈ 𝓣_V)
+
+Remarks.
+
+Note that we do not allow _x_ to appear free in _R_. This ensures that _x_ does not appear free in the result either, which is important for e.g. the definition of [beta reduction](beta%20reduction).
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Substitution
+* https://ncatlab.org/nlab/show/substitution#avoiding+variable+capture"
+`;
+
+exports[`render hlm library: 5.4.3 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/rewritable 1`] = `
+"Definition 5.4.3.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite, ℜ ⊆ 𝓡𝓮𝔀𝓻(𝓣_V), L, R ∈ 𝓣_V. We define:
+
+L →_ℜ R  :⇔  ​ (L → R) ∈ ℜ or {false if R = (z) (z ∈ V), {false if L = (y) (y ∈ V), ∀ v ∈ Fresh(V) : M_v →_ℜ N_v if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V) with suitable conditions), false if L = M N (M, N ∈ 𝓣_V) if R = λz. N_z (N_z ∈ 𝓣_(V ∪ {z}) for each z ∈ Fresh(V) with suitable conditions), {false if L = (y) (y ∈ V), false if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V) with suitable conditions), [M →_ℜ O and N = P] or [M = O and N →_ℜ P] if L = M N (M, N ∈ 𝓣_V) if R = O P (O, P ∈ 𝓣_V)
+
+Remarks.
+
+This definition checks whether a rewrite rule matches a pair of terms. It considers both the pair itself as well as all subterms. Structural induction on both sides makes the definition a bit complicated."
+`;
+
+exports[`render hlm library: 5.4.4 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/beta%20reduction 1`] = `
+"Definition 5.4.4.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+
+β_V := ​ {(λz. M_z) N → M_y[y := N] : M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), N ∈ 𝓣_V, y ∈ Fresh(V)}
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B2-reduction
+* https://ncatlab.org/nlab/show/beta-reduction"
+`;
+
+exports[`render hlm library: 5.4.5 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/eta%20conversion 1`] = `
+"Definition 5.4.5.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+
+η_V := ​ {λz. M z → M : M ∈ 𝓣_V}
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#%CE%B7-conversion
+* https://ncatlab.org/nlab/show/eta-conversion"
+`;
+
+exports[`render hlm library: 5.4.6.1 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Combinators/identity 1`] = `
+"Definition 5.4.6.1.  We define:
+
+𝗜 := ​ λx. x
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Standard_terms"
+`;
+
+exports[`render hlm library: 5.4.6.2 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Combinators/constant 1`] = `
+"Definition 5.4.6.2.  We define:
+
+𝗞 := ​ λx. λy. x
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Standard_terms"
+`;
+
+exports[`render hlm library: 5.4.6.3 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Combinators/substitution 1`] = `
+"Definition 5.4.6.3.  We define:
+
+𝗦 := ​ λx. λy. λz. (x z) (y z)
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Standard_terms"
+`;
+
+exports[`render hlm library: 5.4.6.4 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Combinators/omega 1`] = `
+"Definition 5.4.6.4.  We define:
+
+𝞈 := ​ λx. x x
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Standard_terms"
+`;
+
+exports[`render hlm library: 5.4.6.5 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Combinators/fixed-point 1`] = `
+"Definition 5.4.6.5.  We define:
+
+𝗬 := ​ λf. (λx. f (x x)) (λx. f (x x))
+
+References.
+
+* https://en.wikipedia.org/wiki/Lambda_calculus#Standard_terms"
+`;
