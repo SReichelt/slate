@@ -1475,7 +1475,6 @@ exports[`render hlm library: 1.6.1.3 data/libraries/hlm/Essentials/Numbers/Natur
 by:
 
   m + (0) := m
-  
   m + (x+1) := ((m + x)+1)  (x ∈ ℕ)
 
 Remarks.
@@ -1884,7 +1883,6 @@ exports[`render hlm library: 1.6.1.23 data/libraries/hlm/Essentials/Numbers/Natu
 by:
 
   m ⋅ 0 := 0
-  
   m ⋅ (x + 1) := m ⋅ x + m  (x ∈ ℕ)
 
 References.
@@ -2007,7 +2005,6 @@ exports[`render hlm library: 1.6.1.33 data/libraries/hlm/Essentials/Numbers/Natu
 by:
 
   m^0 := 1
-  
   m^(x+1) := m^x ⋅ m  (x ∈ ℕ)
 
 References.
@@ -2131,7 +2128,6 @@ exports[`render hlm library: 1.6.1.40 data/libraries/hlm/Essentials/Numbers/Natu
 by:
 
   0! := 1
-  
   (x + 1)! := x! ⋅ n  (x ∈ ℕ)
 
 References.
@@ -2150,9 +2146,7 @@ exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natu
 by:
 
   (n, 0) := 1
-  
   (0, x + 1) := 0  (x ∈ ℕ)
-  
   (m + 1, x + 1) := (m, x) + (m, x + 1)  (m ∈ ℕ, x ∈ ℕ)
 
 Remarks.
@@ -2187,7 +2181,6 @@ exports[`render hlm library: 1.6.1.43.1 data/libraries/hlm/Essentials/Numbers/Na
 by:
 
   ∑_(i < 0) a_i := 0
-  
   ∑_(i < m+1) a_i := (∑_(j < m) a_j) + a_m  (m ∈ ℕ)
 
 References.
@@ -2245,7 +2238,6 @@ exports[`render hlm library: 1.6.1.43.7 data/libraries/hlm/Essentials/Numbers/Na
 by:
 
   ∏_(i < 0) a_i := 1
-  
   ∏_(i < m+1) a_i := (∏_(j < m) a_j) ⋅ a_m  (m ∈ ℕ)
 
 References.
@@ -2451,7 +2443,6 @@ exports[`render hlm library: 1.6.1.47.1 data/libraries/hlm/Essentials/Numbers/Na
 by:
 
   M[0] := m
-  
   M[x + 1] := (M ∖ {m})[x]  (x ∈ ℕ)
 
 Remarks.
@@ -2467,7 +2458,6 @@ exports[`render hlm library: 1.6.1.47.2 data/libraries/hlm/Essentials/Numbers/Na
 by:
 
   |M|_≤0 := 0
-  
   |M|_≤x+1 := {|M ∖ {min(M)}|_≤x + 1 if M is nonempty, 0 if M is empty  (x ∈ ℕ)
 
 Remarks.
@@ -3166,7 +3156,6 @@ exports[`render hlm library: 1.6.4.18 data/libraries/hlm/Essentials/Numbers/Inte
 by:
 
   a^0 := 1
-  
   a^(x+1) := a^x ⋅ a  (x ∈ ℕ)
 
 References.
@@ -3499,7 +3488,6 @@ exports[`render hlm library: 1.6.5.12 data/libraries/hlm/Essentials/Numbers/Rati
 by:
 
   a^0 := 1
-  
   a^(x+1) := a^x ⋅ a  (x ∈ ℕ)
 
 References.
@@ -3794,7 +3782,6 @@ exports[`render hlm library: 1.6.6.10 data/libraries/hlm/Essentials/Numbers/Real
 by:
 
   a^0 := 1
-  
   a^(x+1) := a^x ⋅ a  (x ∈ ℕ)"
 `;
 
@@ -3933,7 +3920,6 @@ exports[`render hlm library: 1.6.6.19.1 data/libraries/hlm/Essentials/Numbers/Re
 by:
 
   ∑_(i < 0) a_i := 0
-  
   ∑_(i < m+1) a_i := (∑_(j < m) a_j) + a_m  (m ∈ ℕ)"
 `;
 
@@ -3945,7 +3931,6 @@ exports[`render hlm library: 1.6.6.19.2 data/libraries/hlm/Essentials/Numbers/Re
 by:
 
   ∏_(i < 0) a_i := 1
-  
   ∏_(i < m+1) a_i := (∏_(j < m) a_j) ⋅ a_m  (m ∈ ℕ)"
 `;
 
@@ -4628,9 +4613,7 @@ exports[`render hlm library: 5.4.2 data/libraries/hlm/Formal%20systems/Untyped%2
 by:
 
   (y)[x := R] := {R if x = y, y if x ≠ y  (y ∈ V)
-  
   (λy. M_y)[x := R] := λz. M_z[x := R]  (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V) with suitable conditions)
-  
   (M N)[x := R] := M[x := R] N[x := R]  (M, N ∈ 𝓣_V)
 
 Remarks.

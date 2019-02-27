@@ -36,7 +36,7 @@ export function renderAsText(expression: Display.RenderedExpression, outputMarkd
     let paragraphs = expression.paragraphs.map((item) => {
       let ownIndent = '';
       if (item.styleClasses && item.styleClasses.indexOf('display-math') >= 0 && !singleLine) {
-        ownIndent = '  ';
+        ownIndent = outputMarkdown ? '\u2007' : '  ';
       }
       return renderAsText(item, outputMarkdown, singleLine, indent + ownIndent)
         .then((result) => ownIndent + result);
@@ -186,7 +186,7 @@ function renderList(items: CachedPromise<string>[], separator: string, secondary
     if (secondarySeparator !== undefined && index > 1) {
       separator = secondarySeparator;
     }
-    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedText + separator + resolvedItem : resolvedItem));
+    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedItem ? resolvedText + separator + resolvedItem : resolvedText : resolvedItem));
     index++;
   }
   return text;
