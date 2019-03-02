@@ -274,7 +274,7 @@ class App extends React.Component<AppProps, AppState> {
         mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
         extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
         if (this.state.editedDefinition) {
-          if (!this.state.gitHubUserInfo) {
+          if (!this.state.gitHubUserInfo && !this.runningLocally) {
             mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, your can submit your contribution as a pull request instead.</Message>, mainContents];
           } else if (this.state.selectedItemRepository) {
             let repository = this.state.selectedItemRepository;
