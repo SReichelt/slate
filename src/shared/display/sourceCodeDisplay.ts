@@ -27,6 +27,10 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
     back.range.items.push(text);
   }
 
+  error(message: string): void {
+    this.write('?');
+  }
+
   startRange(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean): void {
     let back = this.stack[this.stack.length - 1];
     let isMathematical = back.isMathematical;

@@ -5,6 +5,7 @@ import * as Logic from '../logic';
 import { GenericRenderer, RenderedVariable } from '../generic/renderer';
 import * as Display from '../../display/display';
 import { HLMEditHandler } from './editHandler';
+import { PlaceholderExpression } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
@@ -27,19 +28,22 @@ interface ParameterListState {
   abbreviate: boolean;
   forcePlural: boolean;
   enableSpecializations: boolean;
+  markAsDummy: boolean;
+  addPlaceholder: boolean;
   elementParameterOverrides?: ElementParameterOverrides;
   started: boolean;
   inLetExpr: boolean;
   inConstraint: boolean;
   inDefinition: boolean;
   inDefinitionDisplayGroup: boolean;
+  associatedDefinition?: Fmt.Definition;
 }
 
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
-  utils: HLMUtils;
-  renderUtils: HLMRenderUtils;
+  protected utils: HLMUtils;
+  protected renderUtils: HLMRenderUtils;
 
-  constructor(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editHandler?: HLMEditHandler) {
+  constructor(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, protected editHandler?: HLMEditHandler) {
     super(definition, includeProofs, libraryDataAccessor, templates, editHandler);
     this.utils = new HLMUtils(definition, libraryDataAccessor);
     this.renderUtils = new HLMRenderUtils(definition, this.utils);
@@ -58,12 +62,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let hasCases = false;
     if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
       let hasParameters = false;
-      if (definition.parameters.length) {
+      if (definition.parameters.length || this.editHandler) {
         hasParameters = true;
         if (space) {
           row.push(new Display.TextExpression(space));
         }
-        row.push(this.renderParameterList(definition.parameters, true, false, false));
+        row.push(this.renderParameterList(definition.parameters, true, false, false, true, definition));
         space = ' ';
       }
       if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
@@ -139,7 +143,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (definition.parameters.length) {
           let extractedConstraints: Fmt.Parameter[] = [];
           let reducedParameters = this.renderUtils.extractConstraints(definition.parameters, extractedConstraints);
-          let parameters = this.renderParameterList(reducedParameters, false, false, false);
+          let parameters = this.renderParameterList(reducedParameters, false, false, false, false, definition);
           let addendum = new Display.RowExpression([new Display.TextExpression('if '), parameters]);
           addendum.styleClasses = ['addendum'];
           if (extractedConstraints.length) {
@@ -192,19 +196,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  renderParameterList(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
+  renderParameterList(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, canEdit: boolean, associatedDefinition?: Fmt.Definition, elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
     let initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
       abbreviate: abbreviate,
       forcePlural: forcePlural,
       enableSpecializations: true,
+      markAsDummy: false,
+      addPlaceholder: canEdit && this.editHandler !== undefined,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
       inConstraint: false,
       inDefinition: false,
-      inDefinitionDisplayGroup: false
+      inDefinitionDisplayGroup: false,
+      associatedDefinition: associatedDefinition
     };
     return this.renderParameters(parameters, initialState, undefined);
   }
@@ -216,6 +223,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       abbreviate: true,
       forcePlural: forcePlural,
       enableSpecializations: true,
+      markAsDummy: false,
+      addPlaceholder: false,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -227,7 +236,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderParameters(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Display.RenderedExpression[]): Display.RenderedExpression {
-    let state = Object.assign({}, initialState);
+    let state: ParameterListState = {...initialState};
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
     resolveDefinitions = this.extractParameterDefinitions(parameters, resolveDefinitions);
     let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
@@ -293,6 +302,32 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (currentGroup.length) {
       this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
     }
+    if (state.addPlaceholder) {
+      if (row.length) {
+        row.push(new Display.TextExpression(' '));
+      }
+      let stateCopy: ParameterListState = {
+        ...state,
+        addPlaceholder: false,
+        markAsDummy: true
+      };
+      if (stateCopy.started) {
+        stateCopy.fullSentence = false;
+        stateCopy.started = false;
+      }
+      let parameterRenderFn = (parameter: Fmt.Parameter) => this.renderParameters([parameter], stateCopy, indices);
+      let parameterInsertFn = (parameter: Fmt.Parameter) => {
+        parameters.push(parameter);
+        if (stateCopy.associatedDefinition) {
+          let contents = stateCopy.associatedDefinition.contents;
+          if (contents instanceof FmtHLM.ObjectContents_Definition) {
+            contents.display = undefined;
+            contents.definitionDisplay = undefined;
+          }
+        }
+      };
+      row.push(this.editHandler!.getParameterPlaceholder(parameterRenderFn, parameterInsertFn));
+    }
     if (state.started && state.fullSentence && !indices) {
       row.push(new Display.TextExpression('.'));
       state.started = false;
@@ -338,11 +373,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         abbreviate: true,
         forcePlural: false,
         enableSpecializations: state.enableSpecializations,
+        markAsDummy: false,
+        addPlaceholder: state.addPlaceholder,
         started: false,
         inLetExpr: false,
         inConstraint: false,
         inDefinition: false,
-        inDefinitionDisplayGroup: false
+        inDefinitionDisplayGroup: false,
+        associatedDefinition: state.associatedDefinition
       };
 
       let variables: Fmt.Parameter[] = [param];
@@ -390,12 +428,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addConstraint(type: FmtHLM.MetaRefExpression_Constraint, state: ParameterListState, row: Display.RenderedExpression[]): void {
-    if (state.started && state.inLetExpr && !state.inDefinition) {
+    if (state.inLetExpr && !state.inDefinition) {
+      let connective: string;
       if (state.inConstraint) {
-        row.push(new Display.TextExpression(' and '));
+        connective = 'and ';
       } else {
-        row.push(new Display.TextExpression(state.abbreviate ? ' s.t. ' : ' such that '));
+        connective = state.abbreviate ? 's.t. ' : 'such that ';
       }
+      if (state.started) {
+        connective = ' ' + connective;
+      }
+      row.push(new Display.TextExpression(connective));
     } else {
       if (state.started) {
         row.push(new Display.TextExpression(', '));
@@ -420,25 +463,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addRegularParameterGroup(parameters: Fmt.Parameter[], type: Fmt.Expression, definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[]): void {
-    if (state.sentence) {
-      if (state.started) {
-        row.push(new Display.TextExpression(', '));
-        if (!state.inLetExpr) {
-          row.push(new Display.TextExpression('let '));
-        }
-      } else {
-        row.push(new Display.TextExpression(state.fullSentence ? 'Let ' : 'let '));
-      }
-    } else {
-      if (state.started) {
-        row.push(new Display.TextExpression(', '));
-      }
+    if (state.started) {
+      row.push(new Display.TextExpression(', '));
+    }
+    if (state.sentence && !state.inLetExpr) {
+      row.push(new Display.TextExpression(state.fullSentence && !state.started ? 'Let ' : 'let '));
     }
     state.inLetExpr = true;
     state.inConstraint = false;
     state.inDefinition = false;
 
-    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, false, state.elementParameterOverrides);
+    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.markAsDummy, state.elementParameterOverrides);
     let variableDisplay: Display.RenderedExpression | undefined;
     let noun: PropertyInfo = {
       isFeature: false,
@@ -734,7 +769,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let element = this.renderUtils.convertStructuralCaseToOverride(term.parameters, term.term, elementParameterOverrides);
       return this.renderTemplate('SetBuilder', {
                                    'element': this.renderElementTerm(element),
-                                   'constraint': this.renderParameterList(term.parameters, false, false, false, elementParameterOverrides)
+                                   'constraint': this.renderParameterList(term.parameters, false, false, false, true, undefined, elementParameterOverrides)
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       return this.renderStructuralCases(term.term, term.construction, term.cases, this.renderSetTerm.bind(this));
@@ -811,33 +846,33 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       return this.renderTemplate('UniversalQuantification', {
-                                   'parameters': this.renderParameterList(formula.parameters, false, true, true),
+                                   'parameters': this.renderParameterList(formula.parameters, false, true, true, true),
                                    'formula': this.renderFormula(formula.formula)
                                  },
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
       if (formula.formula) {
         return this.renderTemplate('ExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false),
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false, true),
                                      'formula': this.renderFormula(formula.formula)
                                    },
                                    negationCount);
       } else {
         return this.renderTemplate('PlainExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false)
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false, true)
                                    },
                                    negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       if (formula.formula) {
         return this.renderTemplate('UniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false),
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false, true),
                                      'formula': this.renderFormula(formula.formula)
                                    },
                                    negationCount);
       } else {
         return this.renderTemplate('PlainUniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false)
+                                     'parameters': this.renderParameterList(formula.parameters, false, true, false, true)
                                    },
                                    negationCount);
       }
@@ -904,7 +939,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         extractedConstraints = [];
         extractedParameters = parameters;
       }
-      let parameterList = this.renderParameterList(extractedParameters, false, false, false, elementParameterOverrides);
+      let parameterList = this.renderParameterList(extractedParameters, false, false, false, false, undefined, elementParameterOverrides);
       if (extractedConstraints.length) {
         let caseRow = [parameterList, new Display.TextExpression(' with suitable conditions')];
         parameterList = new Display.RowExpression(caseRow);
@@ -934,6 +969,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return new Display.PromiseExpression(expressionPromise);
     } else if (expression instanceof FmtHLM.MetaRefExpression_previous) {
       return new Display.TextExpression('…');
+    } else if (expression instanceof PlaceholderExpression) {
+      return new Display.PlaceholderExpression(expression.placeholderType);
     } else {
       return new Display.ErrorExpression('Unknown expression type');
     }
@@ -1281,8 +1318,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let rows = definition.innerDefinitions.map((innerDefinition) => {
           let constructorDef = this.renderDefinedSymbol([definition, innerDefinition]);
           let row = [constructorDef];
-          if (innerDefinition.parameters.length) {
-            row.push(this.renderParameterList(innerDefinition.parameters, false, false, false));
+          if (innerDefinition.parameters.length || this.editHandler) {
+            row.push(this.renderParameterList(innerDefinition.parameters, false, false, false, true, innerDefinition));
           }
           return row;
         });
@@ -1295,7 +1332,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    });
       } else {
         let renderDefinitionRef = (elementParameterOverrides?: ElementParameterOverrides) => {
-          if (elementParameterOverrides) {
+          if (elementParameterOverrides && elementParameterOverrides.size) {
             let parameterOverrides: ParameterOverrides = {
               elementParameterOverrides: elementParameterOverrides
             };
@@ -1565,6 +1602,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         abbreviate: false,
         forcePlural: false,
         enableSpecializations: true,
+        markAsDummy: false,
+        addPlaceholder: false,
         started: false,
         inLetExpr: false,
         inConstraint: false,
@@ -1606,6 +1645,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             abbreviate: true,
             forcePlural: false,
             enableSpecializations: true,
+            markAsDummy: false,
+            addPlaceholder: false,
             started: false,
             inLetExpr: false,
             inConstraint: false,
@@ -1752,7 +1793,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             if (spacing) {
               row.push(new Display.TextExpression(spacing));
             }
-            row.push(this.renderParameterList(proof.parameters, true, false, false));
+            row.push(this.renderParameterList(proof.parameters, true, false, false, false));
             spacing = ' ';
             hasContents = true;
           }
@@ -1971,7 +2012,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         paragraphs.push(new Display.RowExpression(startRow));
       }
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
-        paragraphs.push(this.renderParameterList([step], true, false, false));
+        paragraphs.push(this.renderParameterList([step], true, false, false, false));
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider
                  || type instanceof FmtHLM.MetaRefExpression_Embed) {
         let result = this.utils.getProofStepResult(step);
@@ -2080,7 +2121,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let definition = definitions[definitions.length - 1];
     let contents = definition.contents;
     if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
-      this.addParameterListParts(definition.parameters, result);
+      this.addParameterListParts(definition.parameters, definition, result);
       for (let innerDefinition of definition.innerDefinitions) {
         this.addDefinitionParts(definitions.concat(innerDefinition), result);
       }
@@ -2103,8 +2144,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else if (contents instanceof FmtHLM.ObjectContents_Constructor) {
           if (contents.equalityDefinition) {
             let equalityDefinition = contents.equalityDefinition;
-            this.addParameterListParts(equalityDefinition.leftParameters, result);
-            this.addParameterListParts(equalityDefinition.rightParameters, result);
+            this.addParameterListParts(equalityDefinition.leftParameters, undefined, result);
+            this.addParameterListParts(equalityDefinition.rightParameters, undefined, result);
             if (equalityDefinition.definition instanceof Fmt.ArrayExpression) {
               for (let item of equalityDefinition.definition.items) {
                 this.addFormulaParts(item, result);
@@ -2210,18 +2251,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addParameterListParts(parameters: Fmt.Parameter[], result: Logic.ObjectRenderFns): void {
+  private addParameterListParts(parameters: Fmt.Parameter[], associatedDefinition: Fmt.Definition | undefined, result: Logic.ObjectRenderFns): void {
     let initialState: ParameterListState = {
       fullSentence: true,
       sentence: true,
       abbreviate: false,
       forcePlural: false,
       enableSpecializations: true,
+      markAsDummy: false,
+      addPlaceholder: false,
       started: false,
       inLetExpr: false,
       inConstraint: false,
       inDefinition: false,
-      inDefinitionDisplayGroup: false
+      inDefinitionDisplayGroup: false,
+      associatedDefinition: associatedDefinition
     };
     let currentGroup: Fmt.Parameter[] = [];
     for (let param of parameters) {
@@ -2275,7 +2319,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addProofParts(proof: FmtHLM.ObjectContents_Proof, result: Logic.ObjectRenderFns): void {
     if (this.includeProofs) {
       if (proof.parameters) {
-        this.addParameterListParts(proof.parameters, result);
+        this.addParameterListParts(proof.parameters, undefined, result);
       }
       if (proof.goal) {
         let goal = proof.goal;
@@ -2290,7 +2334,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addProofStepParts(step: Fmt.Parameter, result: Logic.ObjectRenderFns): void {
     let type = step.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
-      this.addParameterListParts([step], result);
+      this.addParameterListParts([step], undefined, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.addFormulaParts(type.statement, result);
       if (type.proof) {

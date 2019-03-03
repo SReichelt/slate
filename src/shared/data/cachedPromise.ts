@@ -18,6 +18,10 @@ class CachedPromise<T> implements PromiseLike<T> {
     return new CachedPromise<U>(value!, false);
   }
 
+  static reject<U = never>(reason?: any): CachedPromise<U> {
+    return new CachedPromise<U>(Promise.reject(reason));
+  }
+
   then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): CachedPromise<TResult1 | TResult2> {
     if (this.sourceIsPromise) {
       return new CachedPromise<TResult1>((this.source as Promise<T>).then(

@@ -6,6 +6,16 @@ import * as Dialog from '../../display/dialog';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { GenericRenderer, RenderedVariable } from './renderer';
 
+export class PlaceholderExpression extends Fmt.Expression {
+  constructor(public placeholderType: any) {
+    super();
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters?: Fmt.ReplacedParameter[]): Fmt.Expression {
+    return this;
+  }
+}
+
 export abstract class GenericEditHandler {
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
   }

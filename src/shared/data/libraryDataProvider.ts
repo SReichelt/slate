@@ -177,14 +177,18 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<WriteFileResult> {
-    this.definitionCache.set(name, CachedPromise.resolve(definition));
-    let uri = this.uri + encodeURI(name) + fileExtension;
-    let file = new Fmt.File;
-    file.metaModelPath = this.getLogicMetaModelPath();
-    file.definitions = new Fmt.DefinitionList;
-    file.definitions.push(definition);
-    let contents = FmtWriter.writeString(file);
-    return this.fileAccessor.writeFile!(uri, contents);
+    try {
+      this.definitionCache.set(name, CachedPromise.resolve(definition));
+      let uri = this.uri + encodeURI(name) + fileExtension;
+      let file = new Fmt.File;
+      file.metaModelPath = this.getLogicMetaModelPath();
+      file.definitions = new Fmt.DefinitionList;
+      file.definitions.push(definition);
+      let contents = FmtWriter.writeString(file);
+      return this.fileAccessor.writeFile!(uri, contents);
+    } catch (error) {
+      return CachedPromise.reject(error);
+    }
   }
 
   openLocalItem(name: string, openLocally: boolean): CachedPromise<void> {

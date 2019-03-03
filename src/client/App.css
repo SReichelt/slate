@@ -11,7 +11,7 @@ body {
   margin: 2pt;
 }
 
-.hoverable.selected, .menu.open .menu-dropdown-cell, .open-menu .selected {
+.hoverable.selected, .menu.open .menu-placeholder-cell, .menu.open .menu-dropdown-cell, .open-menu .selected {
   background-color: #f2cd00;
 }
 
@@ -47,7 +47,7 @@ body {
   background-color: #f8e8a0;
 }
 
-.menu.hover .menu-dropdown-cell, .menu.open .menu-dropdown-cell {
+.menu.hover .menu-placeholder-cell, .menu.open .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .menu.open .menu-dropdown-cell {
   color: #606060;
 }
 
@@ -101,6 +101,7 @@ body {
   height: 1.5em;
   border: solid 1px gray;
   background-color: #f0f0f0;
+  z-index: 1;
 }
 
 .bottom-toolbar>.left {

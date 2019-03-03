@@ -511,6 +511,10 @@ div.display-math {
   margin: -1px;
 }
 
+.open-menu .dummy {
+  color: #a0a0a0;
+}
+
 .bold {
   font-weight: bold!important;
   font-style: normal;
@@ -608,14 +612,20 @@ div.display-math {
   user-select: none;
 }
 
+.menu-container * {
+  cursor: default!important;
+}
+
 .menu {
   display: inline-table;
-  border: solid 1px #e0e0e0;
+  border: solid 1px #d0d0d0;
   border-radius: 2px;
   border-collapse: initial;
   border-spacing: 0;
-  margin-bottom: 1px;
-  vertical-align: middle;
+}
+
+.placeholder>.menu {
+  vertical-align: text-bottom;
 }
 
 .menu-row {
@@ -639,7 +649,14 @@ div.display-math {
 }
 
 .menu-placeholder-cell {
-  padding: 1px;
+  padding: 2pt;
+}
+
+.menu-placeholder {
+  display: flex;
+  width: 0.75em;
+  height: 0.75em;
+  position: relative;
 }
 
 .menu-dropdown-cell {

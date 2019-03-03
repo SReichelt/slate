@@ -9,6 +9,7 @@
   background-color: #f8f8f8;
   cursor: default;
   box-shadow: 1pt 2pt 5pt silver;
+  white-space: nowrap;
   user-select: none;
 }
 

@@ -6,7 +6,7 @@ import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
 import ExpressionDialog from './ExpressionDialog';
-import { getDefinitionIcon } from '../utils/icons';
+import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import Modal from 'react-responsive-modal';
@@ -715,10 +715,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.PlaceholderExpression) {
       className += ' placeholder';
       if (expression instanceof Display.InsertPlaceholderExpression) {
-        result = '+';
+        result = getButtonIcon(ButtonType.Insert);
       } else {
         result = getDefinitionIcon(expression.placeholderType);
       }
+      result = <span className={'menu-placeholder'}>{result}</span>;
     } else {
       className += ' error';
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';

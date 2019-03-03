@@ -3,6 +3,7 @@ import { isSpecialCharacter, isNumericalCharacter } from './common';
 
 export interface OutputStream {
   write(str: string): void;
+  error(message: string): void;
   startRange?(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean): void;
   endRange?(): void;
 }
@@ -12,6 +13,10 @@ export class StringOutputStream implements OutputStream {
 
   write(str: string): void {
     this.str += str;
+  }
+
+  error(message: string): void {
+    throw new Error(message);
   }
 }
 
@@ -84,7 +89,7 @@ export class Writer {
       } else if (path instanceof Fmt.NamedPathItem) {
         this.writeIdentifier(path.name, path, false);
       } else {
-        throw new Error('Unsupported path item type');
+        this.error('Unsupported path item type');
       }
     });
   }
@@ -364,7 +369,7 @@ export class Writer {
       } else if (expression instanceof Fmt.ArrayExpression) {
         this.writeExpressionList(expression.items, indent, false);
       } else {
-        throw new Error('Unsupported expression type');
+        this.error('Unsupported expression type');
       }
     });
   }
@@ -544,6 +549,10 @@ export class Writer {
         this.stream.endRange();
       }
     }
+  }
+
+  private error(message: string): void {
+    this.stream.error(message);
   }
 }
 
