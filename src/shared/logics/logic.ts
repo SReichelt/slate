@@ -15,6 +15,7 @@ export enum LogicDefinitionType {
   Constructor,
   SetOperator,
   Operator,
+  SymbolOperator,
   Predicate,
   Theorem
 }

@@ -305,6 +305,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (state.addPlaceholder) {
       if (row.length) {
         row.push(new Display.TextExpression(' '));
+      } else if (state.started) {
+        /* Occurs if bound parameter list is empty. */
+        row.push(new Display.TextExpression(', '));
       }
       let stateCopy: ParameterListState = {
         ...state,
@@ -315,7 +318,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         stateCopy.fullSentence = false;
         stateCopy.started = false;
       }
-      let parameterRenderFn = (parameter: Fmt.Parameter) => this.renderParameters([parameter], stateCopy, indices);
+      let parameterRenderFn = (parameter: Fmt.Parameter) => {
+        let renderedParameter = this.renderParameters([parameter], stateCopy, indices);
+        if (parameter.type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
+          let bindingRow = [
+            new Display.InsertPlaceholderExpression,
+            renderedParameter
+          ];
+          return new Display.RowExpression(bindingRow);
+        }
+        return renderedParameter;
+      };
       let parameterInsertFn = (parameter: Fmt.Parameter) => {
         parameters.push(parameter);
         if (stateCopy.associatedDefinition) {

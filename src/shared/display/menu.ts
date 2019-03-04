@@ -28,6 +28,7 @@ export class StandardExpressionMenuRow extends ExpressionMenuRow {
   title: string | Display.RenderedExpression;
   titleAction?: ExpressionMenuAction;
   subMenu?: ExpressionMenuBase;
+  previewSubMenu: boolean = true;
 }
 
 export class ExpressionMenuSeparator extends ExpressionMenuRow {

@@ -2,7 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
-import * as Logic from '../logic';
+import { HLMTermType } from './hlm';
 import { GenericEditHandler, PlaceholderExpression } from '../generic/editHandler';
 
 export type ParameterRenderFn = (parameter: Fmt.Parameter) => Display.RenderedExpression;
@@ -12,28 +12,34 @@ export class HLMEditHandler extends GenericEditHandler {
   getParameterPlaceholder(parameterRenderFn: ParameterRenderFn, parameterInsertFn: ParameterInsertFn): Display.RenderedExpression {
     let insertButton = new Display.InsertPlaceholderExpression;
     let semanticLink = new Display.SemanticLink(insertButton, false, false);
+
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
+
       // TODO automatically modify names based on context
+      // TODO hide certain parameters depending on parameter list
+
       let elementParameter = new Fmt.Parameter;
       elementParameter.name = 'x';
       let elementTypeExpression = new FmtHLM.MetaRefExpression_Element;
-      elementTypeExpression._set = new PlaceholderExpression(Logic.LogicDefinitionType.SetOperator);
+      elementTypeExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
       let elementType = new Fmt.Type;
       elementType.expression = elementTypeExpression;
       elementType.arrayDimensions = 0;
       elementParameter.type = elementType;
       this.addParameterPlaceholderRow(elementParameter, parameterRenderFn, parameterInsertFn, menu.rows);
+
       let subsetParameter = new Fmt.Parameter;
       subsetParameter.name = 'S';
       let subsetTypeExpression = new FmtHLM.MetaRefExpression_Subset;
-      subsetTypeExpression.superset = new PlaceholderExpression(Logic.LogicDefinitionType.SetOperator);
+      subsetTypeExpression.superset = new PlaceholderExpression(HLMTermType.SetTerm);
       let subsetType = new Fmt.Type;
       subsetType.expression = subsetTypeExpression;
       subsetType.arrayDimensions = 0;
       subsetParameter.type = subsetType;
       this.addParameterPlaceholderRow(subsetParameter, parameterRenderFn, parameterInsertFn, menu.rows);
+
       let setParameter = new Fmt.Parameter;
       setParameter.name = 'S';
       let setType = new Fmt.Type;
@@ -41,6 +47,55 @@ export class HLMEditHandler extends GenericEditHandler {
       setType.arrayDimensions = 0;
       setParameter.type = setType;
       this.addParameterPlaceholderRow(setParameter, parameterRenderFn, parameterInsertFn, menu.rows);
+
+      let constraintParameter = new Fmt.Parameter;
+      constraintParameter.name = '_1';
+      let constraintTypeExpression = new FmtHLM.MetaRefExpression_Constraint;
+      constraintTypeExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+      let constraintType = new Fmt.Type;
+      constraintType.expression = constraintTypeExpression;
+      constraintType.arrayDimensions = 0;
+      constraintParameter.type = constraintType;
+      this.addParameterPlaceholderRow(constraintParameter, parameterRenderFn, parameterInsertFn, menu.rows);
+
+      menu.rows.push(new Menu.ExpressionMenuSeparator);
+
+      let advancedSubMenu = new Menu.ExpressionMenu;
+      advancedSubMenu.rows = [];
+
+      let symbolParameter = new Fmt.Parameter;
+      symbolParameter.name = 'X';
+      let symbolType = new Fmt.Type;
+      symbolType.expression = new FmtHLM.MetaRefExpression_Symbol;
+      symbolType.arrayDimensions = 0;
+      symbolParameter.type = symbolType;
+      this.addParameterPlaceholderRow(symbolParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
+      let propParameter = new Fmt.Parameter;
+      propParameter.name = 'p';
+      let propType = new Fmt.Type;
+      propType.expression = new FmtHLM.MetaRefExpression_Prop;
+      propType.arrayDimensions = 0;
+      propParameter.type = propType;
+      this.addParameterPlaceholderRow(propParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
+      let bindingParameter = new Fmt.Parameter;
+      bindingParameter.name = 'i';
+      let bindingTypeExpression = new FmtHLM.MetaRefExpression_Binding;
+      bindingTypeExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
+      bindingTypeExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+      let bindingType = new Fmt.Type;
+      bindingType.expression = bindingTypeExpression;
+      bindingType.arrayDimensions = 0;
+      bindingParameter.type = bindingType;
+      this.addParameterPlaceholderRow(bindingParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
+      let advanced = new Menu.StandardExpressionMenuRow;
+      advanced.title = 'Advanced';
+      advanced.subMenu = advancedSubMenu;
+      advanced.previewSubMenu = false;
+      menu.rows.push(advanced);
+
       return menu;
     };
     insertButton.semanticLinks = [semanticLink];

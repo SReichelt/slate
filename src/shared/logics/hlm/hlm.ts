@@ -9,3 +9,10 @@ export class HLM implements Logic.Logic {
   getMetaModel = FmtHLM.getMetaModel;
   getDisplay(): HLMDisplay { return this.display; }
 }
+
+export enum HLMTermType {
+  SetTerm = Logic.LogicDefinitionType.SetOperator,
+  ElementTerm = Logic.LogicDefinitionType.Operator,
+  SymbolTerm = Logic.LogicDefinitionType.SymbolOperator,
+  Formula = Logic.LogicDefinitionType.Predicate
+}
