@@ -55,6 +55,7 @@ interface ExpressionState {
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private semanticLinks?: Display.SemanticLink[];
+  private hasMenu = false;
   private windowClickListener?: () => void;
   private interactionBlocked = false;
   private hoveredChildren: Expression[] = [];
@@ -119,6 +120,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     this.hoveredChildren = [];
     this.updateHover();
+  }
+
+  private clearHoverAndMenuRecursively(): void {
+    if (this.props.parent) {
+      this.props.parent.clearHoverAndMenuRecursively();
+    }
+    this.clearHoverAndMenu();
   }
 
   private cleanupDependentState(): void {
@@ -729,7 +737,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (semanticLinks && semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
       className += ' definition';
     }
-    let hasMenu = this.props.interactionHandler && onMenuOpened;
+    let hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
+    this.hasMenu = hasMenu;
     if (hasMenu || expression instanceof Display.PlaceholderExpression) {
       let menuClassName = 'menu';
       if (this.state.hovered) {
@@ -778,7 +787,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.state.hovered) {
         className += ' hover';
       }
-      if (this.props.interactionHandler && semanticLinks && semanticLinks.length) {
+      if (this.props.interactionHandler && semanticLinks && semanticLinks.length && !this.isPartOfMenu()) {
         className += ' interactive';
         let uriLink: Display.SemanticLink | undefined = undefined;
         let uri: string | undefined = undefined;
@@ -1181,6 +1190,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
+  private isPartOfMenu(): boolean {
+    if (this.props.parent) {
+      return this.props.parent.hasMenu || this.props.parent.isPartOfMenu();
+    } else {
+      return false;
+    }
+  }
+
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {
     if (event.button < 1) {
       this.stopPropagation(event);
@@ -1198,12 +1215,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           this.disableWindowClickListener();
         }
         this.setState({openMenu: undefined});
+        this.addToHoveredChildren();
       } else {
         if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
           return;
         }
         this.enableInteractionBlocker();
-        this.clearHoverAndMenu();
+        this.clearHoverAndMenuRecursively();
         this.setState({openMenu: onMenuOpened()});
         this.enableWindowClickListener();
       }

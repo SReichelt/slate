@@ -612,10 +612,6 @@ div.display-math {
   user-select: none;
 }
 
-.menu-container * {
-  cursor: default!important;
-}
-
 .menu {
   display: inline-table;
   border: solid 1px #d0d0d0;

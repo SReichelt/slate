@@ -11,6 +11,10 @@ body {
   margin: 2pt;
 }
 
+.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
+  background-color: #ffd700;
+}
+
 .hoverable.selected, .menu.open .menu-placeholder-cell, .menu.open .menu-dropdown-cell, .open-menu .selected {
   background-color: #f2cd00;
 }
@@ -19,16 +23,12 @@ body {
   background-color: #e0c000;
 }
 
-.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
-  background-color: #ffd700;
-}
-
-.example:hover {
-  background-color: #fff09b;
-}
-
-.expr.definition.hover, .expr.definition.hover span {
+.expr.definition.hover, .expr.definition.hover span, .expr.definition>.menu.hover .menu-placeholder-cell, .expr.definition>.menu.hover .menu-dropdown-cell {
   background-color: #80ff00;
+}
+
+.expr.definition>.menu.open .menu-placeholder-cell, .expr.definition>.menu.open .menu-dropdown-cell {
+  background-color: #74e700;
 }
 
 .menu.hover {
@@ -39,12 +39,24 @@ body {
   border-color: #a0a0a0;
 }
 
+.example:hover {
+  background-color: #fff09b;
+}
+
 .menu.hover .menu-cell {
   background-color: #fdefbd;
 }
 
+.expr.definition>.menu.hover .menu-cell {
+  background-color: #daffb5;
+}
+
 .menu.open .menu-cell {
   background-color: #f8e8a0;
+}
+
+.expr.definition>.menu.open .menu-cell {
+  background-color: #c9fc97;
 }
 
 .menu.hover .menu-placeholder-cell, .menu.open .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .menu.open .menu-dropdown-cell {
