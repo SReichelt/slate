@@ -13,6 +13,5 @@ export class HLM implements Logic.Logic {
 export enum HLMTermType {
   SetTerm = Logic.LogicDefinitionType.SetOperator,
   ElementTerm = Logic.LogicDefinitionType.Operator,
-  SymbolTerm = Logic.LogicDefinitionType.SymbolOperator,
   Formula = Logic.LogicDefinitionType.Predicate
 }

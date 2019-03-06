@@ -3,7 +3,7 @@
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
   expressionTypes = [$Expr, $Bool, $Nat, $ParameterList, $DefinitionRef,
-                     $Prop, $Set, $Subset, $Element, $Symbol, $Constraint, $Binding,
+                     $Prop, $Set, $Subset, $Element, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false, $left, $right,
@@ -152,7 +152,6 @@ $Property: %ExpressionType {
 $Formula: %ExpressionType {}
 $SetTerm: %ExpressionType {}
 $ElementTerm: %ExpressionType {}
-$SymbolTerm: %ExpressionType {}
 
 $Bool: %ExpressionType {}
 $true: $Bool {}
@@ -180,9 +179,6 @@ $Subset(superset: $SetTerm, auto: $Bool = $false, embedSubsets: $Bool = $false):
 }
 $Element(set: $SetTerm, auto: $Bool = $false): %ParameterType($ElementTerm) {
   argumentType = $ElementArg
-}
-$Symbol(auto: $Bool = $false): %ParameterType($SymbolTerm) {
-  argumentType = $SymbolArg
 }
 $Constraint(formula: $Formula): %ParameterType {
   optional = %true,
@@ -219,11 +215,6 @@ $ElementArg: %ExpressionType {
   members = #(
     element: $ElementTerm,
     elementProof?: $Proof
-  )
-}
-$SymbolArg: %ExpressionType {
-  members = #(
-    symbol: $SymbolTerm
   )
 }
 $ConstraintArg: %ExpressionType {

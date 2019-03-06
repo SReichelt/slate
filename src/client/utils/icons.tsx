@@ -119,13 +119,6 @@ export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, ite
         <rect x="-4" y="-4" width="8" height="8" fill="red" stroke="black" strokeWidth="0.5"/>
       </svg>
     );
-  case Logic.LogicDefinitionType.SymbolOperator:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <line x1="-5" y1="-7" x2="5" y2="7" stroke="black" strokeWidth="2"/>
-        <line x1="-5" y1="7" x2="5" y2="-7" stroke="black" strokeWidth="2"/>
-      </svg>
-    );
   case Logic.LogicDefinitionType.Predicate:
     return (
       <svg height="1em" width="1em" viewBox="-8 -8 16 16">

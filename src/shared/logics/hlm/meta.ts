@@ -1758,37 +1758,6 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
   }
 }
 
-export class MetaRefExpression_Symbol extends Fmt.MetaRefExpression {
-  auto?: Fmt.Expression;
-
-  getName(): string {
-    return 'Symbol';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.auto = argumentList.getOptionalValue('auto', 0);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    if (this.auto !== undefined) {
-      argumentList.add(this.auto, 'auto');
-    }
-  }
-
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Symbol;
-    let changed = false;
-    if (this.auto) {
-      result.auto = this.auto.substitute(fn, replacedParameters);
-      if (result.auto !== this.auto) {
-        changed = true;
-      }
-    }
-    return this.getSubstitutionResult(fn, result, changed);
-  }
-}
-
 export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
   formula: Fmt.Expression;
 
@@ -2078,36 +2047,6 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     if (this.elementProof) {
       result.elementProof = new ObjectContents_Proof;
       if (this.elementProof.substituteExpression(fn, result.elementProof!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    return changed;
-  }
-}
-
-export class ObjectContents_SymbolArg extends Fmt.ObjectContents {
-  symbol: Fmt.Expression;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.symbol = argumentList.getValue('symbol', 0);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    argumentList.add(this.symbol, 'symbol');
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SymbolArg {
-    let result = new ObjectContents_SymbolArg;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SymbolArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    if (this.symbol) {
-      result.symbol = this.symbol.substitute(fn, replacedParameters);
-      if (result.symbol !== this.symbol) {
         changed = true;
       }
     }
@@ -4275,7 +4214,7 @@ class ArgumentTypeContext extends Fmt.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'ParameterList': MetaRefExpression_ParameterList, 'DefinitionRef': MetaRefExpression_DefinitionRef, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Symbol': MetaRefExpression_Symbol, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'ParameterList': MetaRefExpression_ParameterList, 'DefinitionRef': MetaRefExpression_DefinitionRef, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'ResolveDef': MetaRefExpression_ResolveDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'left': MetaRefExpression_left, 'right': MetaRefExpression_right, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Fmt.MetaModel {

@@ -358,8 +358,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return ((paramType instanceof FmtHLM.MetaRefExpression_Prop && firstParamType instanceof FmtHLM.MetaRefExpression_Prop)
             || (paramType instanceof FmtHLM.MetaRefExpression_Set && firstParamType instanceof FmtHLM.MetaRefExpression_Set)
             || (paramType instanceof FmtHLM.MetaRefExpression_Subset && firstParamType instanceof FmtHLM.MetaRefExpression_Subset && paramType.superset instanceof FmtHLM.MetaRefExpression_previous)
-            || (paramType instanceof FmtHLM.MetaRefExpression_Element && firstParamType instanceof FmtHLM.MetaRefExpression_Element && paramType._set instanceof FmtHLM.MetaRefExpression_previous)
-            || (paramType instanceof FmtHLM.MetaRefExpression_Symbol && firstParamType instanceof FmtHLM.MetaRefExpression_Symbol));
+            || (paramType instanceof FmtHLM.MetaRefExpression_Element && firstParamType instanceof FmtHLM.MetaRefExpression_Element && paramType._set instanceof FmtHLM.MetaRefExpression_previous));
   }
 
   private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[]): void {
@@ -549,9 +548,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
       noun.singular = 'set';
       noun.plural = 'sets';
-    } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
-      noun.singular = 'symbol';
-      noun.plural = 'symbols';
     }
     let properties = this.renderUtils.extractProperties(parameters, noun, remainingParameters, remainingDefinitions);
     this.replaceName(noun.singular, noun.definitionRef, noun.extracted, singular);
@@ -811,14 +807,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else {
       return this.renderGenericExpression(term);
     }
-  }
-
-  renderSymbolTerm(term: Fmt.Expression): Display.RenderedExpression {
-    return this.setSemanticLink(this.renderSymbolTermInternal(term), term);
-  }
-
-  private renderSymbolTermInternal(term: Fmt.Expression): Display.RenderedExpression {
-    return this.renderGenericExpression(term);
   }
 
   renderFormula(formula: Fmt.Expression): Display.RenderedExpression {
@@ -1246,13 +1234,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_ElementArg);
         if (arg) {
           resultArgs.push(this.renderElementTerm(arg.element));
-        } else {
-          resultArgs.push(new Display.ErrorExpression('Undefined argument'));
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
-        let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_SymbolArg);
-        if (arg) {
-          resultArgs.push(this.renderSymbolTerm(arg.symbol));
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
@@ -2413,8 +2394,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (paramType instanceof FmtHLM.MetaRefExpression_Prop
           || paramType instanceof FmtHLM.MetaRefExpression_Set
           || paramType instanceof FmtHLM.MetaRefExpression_Subset
-          || paramType instanceof FmtHLM.MetaRefExpression_Element
-          || paramType instanceof FmtHLM.MetaRefExpression_Symbol) {
+          || paramType instanceof FmtHLM.MetaRefExpression_Element) {
         renderedVariable = this.renderVariable(param, indices);
         auto = paramType.auto instanceof FmtHLM.MetaRefExpression_true;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {

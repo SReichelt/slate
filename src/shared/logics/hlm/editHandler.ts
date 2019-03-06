@@ -71,14 +71,6 @@ export class HLMEditHandler extends GenericEditHandler {
       propParameter.type = propType;
       this.addParameterPlaceholderRow(propParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
 
-      let symbolParameter = new Fmt.Parameter;
-      symbolParameter.name = 'X';
-      let symbolType = new Fmt.Type;
-      symbolType.expression = new FmtHLM.MetaRefExpression_Symbol;
-      symbolType.arrayDimensions = 0;
-      symbolParameter.type = symbolType;
-      this.addParameterPlaceholderRow(symbolParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
-
       advancedSubMenu.rows.push(new Menu.ExpressionMenuSeparator);
 
       let elementDefinitionParameter = new Fmt.Parameter;

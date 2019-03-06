@@ -7,7 +7,7 @@ export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {
 
 export class HLMUtils extends GenericUtils {
   isValueParamType(type: Fmt.Expression): boolean {
-    return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Symbol);
+    return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element);
   }
 
   private getArgValueArg(argValue: Fmt.CompoundExpression, paramType: Fmt.Expression): Fmt.Expression | undefined {
@@ -27,10 +27,6 @@ export class HLMUtils extends GenericUtils {
       let elementArg = new FmtHLM.ObjectContents_ElementArg;
       elementArg.fromCompoundExpression(argValue);
       return elementArg.element;
-    } else if (paramType instanceof FmtHLM.MetaRefExpression_Symbol) {
-      let symbolArg = new FmtHLM.ObjectContents_SymbolArg;
-      symbolArg.fromCompoundExpression(argValue);
-      return symbolArg.symbol;
     } else {
       return undefined;
     }
@@ -81,10 +77,6 @@ export class HLMUtils extends GenericUtils {
           let elementArg = new FmtHLM.ObjectContents_ElementArg;
           elementArg.element = varExpr;
           elementArg.toCompoundExpression(argValue);
-        } else if (type instanceof FmtHLM.MetaRefExpression_Symbol) {
-          let symbolArg = new FmtHLM.ObjectContents_SymbolArg;
-          symbolArg.symbol = varExpr;
-          symbolArg.toCompoundExpression(argValue);
         }
       }
       arg.value = argValue;
