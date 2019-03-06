@@ -223,7 +223,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             }
           };
         }
-        result = <input value={expression.text} size={expression.text.length + 1} onChange={(event) => onChange(event.target.value)} onFocus={(event) => this.highlightPermanently(event)} onBlur={() => this.clearPermanentHighlight()} ref={ref}/>;
+        result = <input value={expression.text} size={expression.text.length + 1} onChange={(event) => onChange(event.target.value)} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref}/>;
       } else {
         let text = expression.text;
         if (text) {
@@ -1156,7 +1156,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         setTimeout(update, 250);
-      } else {
+      } else if (this.state.showPreview) {
         this.setState({showPreview: false});
       }
     }
@@ -1168,7 +1168,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private onHoverChanged = (hover: Object[]): void => {
     let hovered = this.isHovered(hover);
-    this.setState({hovered: hovered});
+    if (this.state.hovered !== hovered) {
+      this.setState({hovered: hovered});
+    }
   }
 
   private isHovered(hover: Object[]): boolean {
