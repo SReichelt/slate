@@ -200,25 +200,51 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
     } else if (expression instanceof Display.TextExpression) {
-      let text = expression.text;
-      if (text) {
-        let firstChar = text.charAt(0);
-        let lastChar = text.charAt(text.length - 1);
-        if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
-          className += ' space-start';
-        }
-        if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
-          className += ' charcorner-tr';
-          if (lastChar === 'T' || lastChar === 'Y') {
-            className += ' charcorner-large';
+      if (this.props.interactionHandler && expression.onTextChanged) {
+        let onChange = (newText: string) => {
+          expression.text = newText;
+          this.forceUpdate();
+          if (expression.onTextChanged) {
+            expression.onTextChanged(newText);
           }
+          if (this.props.interactionHandler) {
+            this.props.interactionHandler.expressionChanged();
+          }
+          setTimeout(() => this.highlightPermanently(), 0);
+        };
+        let ref = undefined;
+        if (expression.requestTextInput) {
+          ref = (htmlNode: HTMLInputElement | null) => {
+            if (htmlNode) {
+              expression.requestTextInput = false;
+              htmlNode.select();
+              htmlNode.focus();
+              setTimeout(() => this.highlightPermanently(), 0);
+            }
+          };
         }
-        if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
-          className += ' charcorner-bl';
-        }
-        result = this.convertText(text);
+        result = <input value={expression.text} size={expression.text.length + 1} onChange={(event) => onChange(event.target.value)} onFocus={(event) => this.highlightPermanently(event)} onBlur={() => this.clearPermanentHighlight()} ref={ref}/>;
       } else {
-        result = '\u200b';
+        let text = expression.text;
+        if (text) {
+          let firstChar = text.charAt(0);
+          let lastChar = text.charAt(text.length - 1);
+          if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
+            className += ' space-start';
+          }
+          if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
+            className += ' charcorner-tr';
+            if (lastChar === 'T' || lastChar === 'Y') {
+              className += ' charcorner-large';
+            }
+          }
+          if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
+            className += ' charcorner-bl';
+          }
+          result = this.convertText(text);
+        } else {
+          result = '\u200b';
+        }
       }
     } else if (expression instanceof Display.RowExpression) {
       if (expression.items.length === 1) {
@@ -1156,12 +1182,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return false;
   }
 
-  private highlightPermanently(event: React.SyntheticEvent<HTMLElement>): void {
+  private highlightPermanently(event?: React.SyntheticEvent<HTMLElement>): void {
     this.clearAllPermanentHighlights();
     if (!this.semanticLinks) {
       return;
     }
-    this.stopPropagation(event);
+    if (event) {
+      this.stopPropagation(event);
+    }
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
     this.enableWindowClickListener();

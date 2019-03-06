@@ -659,11 +659,18 @@ div.display-math {
   font-size: 50%;
 }
 
+.expr input, .expr textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.expr input {
+  text-align: center;
+}
+
 .expr textarea {
   width: 100%;
 	min-height: 4em;
-  font-family: inherit;
-  font-size: inherit;
 }
 
 .expr .CodeMirror, .expr .CodeMirror-scroll {

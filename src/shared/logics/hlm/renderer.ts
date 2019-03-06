@@ -5,7 +5,7 @@ import * as Logic from '../logic';
 import { GenericRenderer, RenderedVariable } from '../generic/renderer';
 import * as Display from '../../display/display';
 import { HLMEditHandler } from './editHandler';
-import { PlaceholderExpression } from '../generic/editHandler';
+import { PlaceholderExpression, GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
@@ -338,6 +338,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             contents.definitionDisplay = undefined;
           }
         }
+        GenericEditHandler.lastInsertedParameter = parameter;
       };
       row.push(this.editHandler!.getParameterPlaceholder(parameterRenderFn, parameterInsertFn));
     }

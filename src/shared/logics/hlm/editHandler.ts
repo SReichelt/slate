@@ -63,6 +63,14 @@ export class HLMEditHandler extends GenericEditHandler {
       let advancedSubMenu = new Menu.ExpressionMenu;
       advancedSubMenu.rows = [];
 
+      let propParameter = new Fmt.Parameter;
+      propParameter.name = 'p';
+      let propType = new Fmt.Type;
+      propType.expression = new FmtHLM.MetaRefExpression_Prop;
+      propType.arrayDimensions = 0;
+      propParameter.type = propType;
+      this.addParameterPlaceholderRow(propParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
       let symbolParameter = new Fmt.Parameter;
       symbolParameter.name = 'X';
       let symbolType = new Fmt.Type;
@@ -71,13 +79,29 @@ export class HLMEditHandler extends GenericEditHandler {
       symbolParameter.type = symbolType;
       this.addParameterPlaceholderRow(symbolParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
 
-      let propParameter = new Fmt.Parameter;
-      propParameter.name = 'p';
-      let propType = new Fmt.Type;
-      propType.expression = new FmtHLM.MetaRefExpression_Prop;
-      propType.arrayDimensions = 0;
-      propParameter.type = propType;
-      this.addParameterPlaceholderRow(propParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+      advancedSubMenu.rows.push(new Menu.ExpressionMenuSeparator);
+
+      let elementDefinitionParameter = new Fmt.Parameter;
+      elementDefinitionParameter.name = 'x';
+      let elementDefinitionTypeExpression = new FmtHLM.MetaRefExpression_Def;
+      elementDefinitionTypeExpression.element = new PlaceholderExpression(HLMTermType.ElementTerm);
+      let elementDefinitionType = new Fmt.Type;
+      elementDefinitionType.expression = elementDefinitionTypeExpression;
+      elementDefinitionType.arrayDimensions = 0;
+      elementDefinitionParameter.type = elementDefinitionType;
+      this.addParameterPlaceholderRow(elementDefinitionParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
+      let setDefinitionParameter = new Fmt.Parameter;
+      setDefinitionParameter.name = 'S';
+      let setDefinitionTypeExpression = new FmtHLM.MetaRefExpression_SetDef;
+      setDefinitionTypeExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
+      let setDefinitionType = new Fmt.Type;
+      setDefinitionType.expression = setDefinitionTypeExpression;
+      setDefinitionType.arrayDimensions = 0;
+      setDefinitionParameter.type = setDefinitionType;
+      this.addParameterPlaceholderRow(setDefinitionParameter, parameterRenderFn, parameterInsertFn, advancedSubMenu.rows);
+
+      advancedSubMenu.rows.push(new Menu.ExpressionMenuSeparator);
 
       let bindingParameter = new Fmt.Parameter;
       bindingParameter.name = 'i';

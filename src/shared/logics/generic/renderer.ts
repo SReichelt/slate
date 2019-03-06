@@ -53,7 +53,11 @@ export abstract class GenericRenderer {
       }
       suffixes.push(new Display.TextExpression(rest));
     }
-    let result: Display.RenderedExpression = new Display.TextExpression(name);
+    let text = new Display.TextExpression(name);
+    if (isDefinition && this.editHandler) {
+      this.editHandler.addVariableNameEditor(text, param);
+    }
+    let result: Display.RenderedExpression = text;
     if (suffixes) {
       let subExpression = new Display.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': suffixes});

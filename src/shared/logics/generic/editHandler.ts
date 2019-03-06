@@ -17,6 +17,8 @@ export class PlaceholderExpression extends Fmt.Expression {
 }
 
 export abstract class GenericEditHandler {
+  static lastInsertedParameter?: Fmt.Parameter;
+
   constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
   }
 
@@ -436,6 +438,14 @@ export abstract class GenericEditHandler {
       renderedTemplateArguments[variable.param.name] = variable.display;
     }
     return renderedTemplateArguments;
+  }
+
+  addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter) {
+    text.onTextChanged = (newText: string) => param.name = newText;
+    if (GenericEditHandler.lastInsertedParameter === param) {
+      text.requestTextInput = true;
+      GenericEditHandler.lastInsertedParameter = undefined;
+    }
   }
 
   addDefinitionRemarkEditor(markdown: Display.MarkdownExpression, definition: Fmt.Definition, allKinds: string[], kind: string): void {
