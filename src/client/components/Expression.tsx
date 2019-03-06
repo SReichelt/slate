@@ -1156,8 +1156,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         setTimeout(update, 250);
-      } else if (this.state.showPreview) {
-        this.setState({showPreview: false});
+      } else {
+        this.setState((prevState: ExpressionState) => prevState.showPreview ? {showPreview: false} : null);
       }
     }
   }
@@ -1168,9 +1168,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private onHoverChanged = (hover: Object[]): void => {
     let hovered = this.isHovered(hover);
-    if (this.state.hovered !== hovered) {
-      this.setState({hovered: hovered});
-    }
+    this.setState((prevState: ExpressionState) => prevState.hovered !== hovered ? {hovered: hovered} : null);
   }
 
   private isHovered(hover: Object[]): boolean {
