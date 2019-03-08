@@ -95,6 +95,37 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Definition, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.properties || objectContents.properties) {
+      if (!this.properties || !objectContents.properties || this.properties.length !== objectContents.properties.length) {
+        return false;
+      }
+      for (let i = 0; i < this.properties.length; i++) {
+        let leftItem = this.properties[i];
+        let rightItem = objectContents.properties[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    if (this.display || objectContents.display) {
+      if (!this.display || !objectContents.display || !this.display.isEquivalentTo(objectContents.display, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.definitionDisplay || objectContents.definitionDisplay) {
+      if (!this.definitionDisplay || !objectContents.definitionDisplay || !this.definitionDisplay.isEquivalentTo(objectContents.definitionDisplay, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
@@ -176,6 +207,38 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_DefinitionDisplay, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameter || objectContents.parameter) {
+      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.display || objectContents.display) {
+      if (!this.display || !objectContents.display || !this.display.isEquivalentTo(objectContents.display, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.singularName || objectContents.singularName) {
+      if (!this.singularName || !objectContents.singularName || !this.singularName.isEquivalentTo(objectContents.singularName, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.pluralName || objectContents.pluralName) {
+      if (!this.pluralName || !objectContents.pluralName || !this.pluralName.isEquivalentTo(objectContents.pluralName, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.nameOptional || objectContents.nameOptional) {
+      if (!this.nameOptional || !objectContents.nameOptional || !this.nameOptional.isEquivalentTo(objectContents.nameOptional, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_Construction extends ObjectContents_Definition {
@@ -220,6 +283,18 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Construction, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.embedding || objectContents.embedding) {
+      if (!this.embedding || !objectContents.embedding || !this.embedding.isEquivalentTo(objectContents.embedding, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
@@ -240,6 +315,13 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Construction;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Construction)) {
+      return false;
+    }
+    return true;
   }
 
   getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
@@ -318,6 +400,28 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Embedding, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameter || objectContents.parameter) {
+      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.target || objectContents.target) {
+      if (!this.target || !objectContents.target || !this.target.isEquivalentTo(objectContents.target, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
+      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_Constructor extends ObjectContents_Definition {
@@ -384,6 +488,23 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Constructor, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.equalityDefinition || objectContents.equalityDefinition) {
+      if (!this.equalityDefinition || !objectContents.equalityDefinition || !this.equalityDefinition.isEquivalentTo(objectContents.equalityDefinition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.rewrite || objectContents.rewrite) {
+      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
@@ -404,6 +525,13 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Constructor;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Constructor)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -586,6 +714,62 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_EqualityDefinition, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.leftParameters || objectContents.leftParameters) {
+      if (!this.leftParameters || !objectContents.leftParameters || !this.leftParameters.isEquivalentTo(objectContents.leftParameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.rightParameters || objectContents.rightParameters) {
+      if (!this.rightParameters || !objectContents.rightParameters || !this.rightParameters.isEquivalentTo(objectContents.rightParameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.definition || objectContents.definition) {
+      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equivalenceProofs || objectContents.equivalenceProofs) {
+      if (!this.equivalenceProofs || !objectContents.equivalenceProofs || this.equivalenceProofs.length !== objectContents.equivalenceProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equivalenceProofs.length; i++) {
+        let leftItem = this.equivalenceProofs[i];
+        let rightItem = objectContents.equivalenceProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    if (this.reflexivityProof || objectContents.reflexivityProof) {
+      if (!this.reflexivityProof || !objectContents.reflexivityProof || !this.reflexivityProof.isEquivalentTo(objectContents.reflexivityProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.symmetryProof || objectContents.symmetryProof) {
+      if (!this.symmetryProof || !objectContents.symmetryProof || !this.symmetryProof.isEquivalentTo(objectContents.symmetryProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.transitivityProof || objectContents.transitivityProof) {
+      if (!this.transitivityProof || !objectContents.transitivityProof || !this.transitivityProof.isEquivalentTo(objectContents.transitivityProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.isomorphic || objectContents.isomorphic) {
+      if (!this.isomorphic || !objectContents.isomorphic || !this.isomorphic.isEquivalentTo(objectContents.isomorphic, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
@@ -626,6 +810,23 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
       }
     }
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_RewriteDefinition, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.value || objectContents.value) {
+      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.theorem || objectContents.theorem) {
+      if (!this.theorem || !objectContents.theorem || !this.theorem.isEquivalentTo(objectContents.theorem, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -729,6 +930,42 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_SetOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.definition || objectContents.definition) {
+      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equalityProofs || objectContents.equalityProofs) {
+      if (!this.equalityProofs || !objectContents.equalityProofs || this.equalityProofs.length !== objectContents.equalityProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equalityProofs.length; i++) {
+        let leftItem = this.equalityProofs[i];
+        let rightItem = objectContents.equalityProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    if (this.setRestriction || objectContents.setRestriction) {
+      if (!this.setRestriction || !objectContents.setRestriction || !this.setRestriction.isEquivalentTo(objectContents.setRestriction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.setRestrictionProof || objectContents.setRestrictionProof) {
+      if (!this.setRestrictionProof || !objectContents.setRestrictionProof || !this.setRestrictionProof.isEquivalentTo(objectContents.setRestrictionProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
@@ -749,6 +986,13 @@ export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_SetOperator;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_SetOperator)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -774,6 +1018,13 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Operator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_Operator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
 }
 
@@ -877,6 +1128,42 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_ExplicitOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.definition || objectContents.definition) {
+      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equalityProofs || objectContents.equalityProofs) {
+      if (!this.equalityProofs || !objectContents.equalityProofs || this.equalityProofs.length !== objectContents.equalityProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equalityProofs.length; i++) {
+        let leftItem = this.equalityProofs[i];
+        let rightItem = objectContents.equalityProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    if (this.setRestriction || objectContents.setRestriction) {
+      if (!this.setRestriction || !objectContents.setRestriction || !this.setRestriction.isEquivalentTo(objectContents.setRestriction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.setRestrictionProof || objectContents.setRestrictionProof) {
+      if (!this.setRestrictionProof || !objectContents.setRestrictionProof || !this.setRestrictionProof.isEquivalentTo(objectContents.setRestrictionProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
@@ -897,6 +1184,13 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_ExplicitOperator;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ExplicitOperator)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1009,6 +1303,42 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_ImplicitOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameter || objectContents.parameter) {
+      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.definition || objectContents.definition) {
+      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equivalenceProofs || objectContents.equivalenceProofs) {
+      if (!this.equivalenceProofs || !objectContents.equivalenceProofs || this.equivalenceProofs.length !== objectContents.equivalenceProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equivalenceProofs.length; i++) {
+        let leftItem = this.equivalenceProofs[i];
+        let rightItem = objectContents.equivalenceProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
+      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
@@ -1029,6 +1359,13 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_ImplicitOperator;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ImplicitOperator)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1055,6 +1392,13 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_MacroOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
@@ -1075,6 +1419,13 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_MacroOperator;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_MacroOperator)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1149,6 +1500,32 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Predicate, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.definition || objectContents.definition) {
+      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equivalenceProofs || objectContents.equivalenceProofs) {
+      if (!this.equivalenceProofs || !objectContents.equivalenceProofs || this.equivalenceProofs.length !== objectContents.equivalenceProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equivalenceProofs.length; i++) {
+        let leftItem = this.equivalenceProofs[i];
+        let rightItem = objectContents.equivalenceProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
@@ -1169,6 +1546,13 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Predicate;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Predicate)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1242,6 +1626,32 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_StandardTheorem, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.claim || objectContents.claim) {
+      if (!this.claim || !objectContents.claim || !this.claim.isEquivalentTo(objectContents.claim, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.proofs || objectContents.proofs) {
+      if (!this.proofs || !objectContents.proofs || this.proofs.length !== objectContents.proofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.proofs.length; i++) {
+        let leftItem = this.proofs[i];
+        let rightItem = objectContents.proofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
@@ -1262,6 +1672,13 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_StandardTheorem;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_StandardTheorem)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1335,6 +1752,32 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_EquivalenceTheorem, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.conditions || objectContents.conditions) {
+      if (!this.conditions || !objectContents.conditions || !this.conditions.isEquivalentTo(objectContents.conditions, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.equivalenceProofs || objectContents.equivalenceProofs) {
+      if (!this.equivalenceProofs || !objectContents.equivalenceProofs || this.equivalenceProofs.length !== objectContents.equivalenceProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.equivalenceProofs.length; i++) {
+        let leftItem = this.equivalenceProofs[i];
+        let rightItem = objectContents.equivalenceProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression {
@@ -1355,6 +1798,13 @@ export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression 
     } else {
       return new MetaRefExpression_EquivalenceTheorem;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_EquivalenceTheorem)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -1403,6 +1853,21 @@ export class ObjectContents_Property extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Property, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.property !== objectContents.property) {
+      return false;
+    }
+    if (this.theorem || objectContents.theorem) {
+      if (!this.theorem || !objectContents.theorem || !this.theorem.isEquivalentTo(objectContents.theorem, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
@@ -1423,6 +1888,13 @@ export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Bool;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Bool)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -1445,6 +1917,13 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
       return new MetaRefExpression_true;
     }
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_true)) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_false extends Fmt.MetaRefExpression {
@@ -1465,6 +1944,13 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_false;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_false)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -1487,6 +1973,13 @@ export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
       return new MetaRefExpression_Nat;
     }
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Nat)) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
@@ -1507,6 +2000,13 @@ export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Expr;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Expr)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -1529,6 +2029,13 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
       return new MetaRefExpression_ParameterList;
     }
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ParameterList)) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_DefinitionRef extends Fmt.MetaRefExpression {
@@ -1549,6 +2056,13 @@ export class MetaRefExpression_DefinitionRef extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_DefinitionRef;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_DefinitionRef)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -1571,6 +2085,13 @@ export class MetaRefExpression_left extends Fmt.MetaRefExpression {
       return new MetaRefExpression_left;
     }
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_left)) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_right extends Fmt.MetaRefExpression {
@@ -1591,6 +2112,13 @@ export class MetaRefExpression_right extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_right;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_right)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -1622,6 +2150,18 @@ export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Prop)) {
+      return false;
+    }
+    if (this.auto || expression.auto) {
+      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -1664,6 +2204,23 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Set)) {
+      return false;
+    }
+    if (this.auto || expression.auto) {
+      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.embedSubsets || expression.embedSubsets) {
+      if (!this.embedSubsets || !expression.embedSubsets || !this.embedSubsets.isEquivalentTo(expression.embedSubsets, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -1716,6 +2273,28 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Subset)) {
+      return false;
+    }
+    if (this.superset || expression.superset) {
+      if (!this.superset || !expression.superset || !this.superset.isEquivalentTo(expression.superset, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.auto || expression.auto) {
+      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.embedSubsets || expression.embedSubsets) {
+      if (!this.embedSubsets || !expression.embedSubsets || !this.embedSubsets.isEquivalentTo(expression.embedSubsets, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
@@ -1756,6 +2335,23 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Element)) {
+      return false;
+    }
+    if (this._set || expression._set) {
+      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.auto || expression.auto) {
+      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
@@ -1784,6 +2380,18 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Constraint)) {
+      return false;
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -1830,6 +2438,23 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Binding)) {
+      return false;
+    }
+    if (this._set || expression._set) {
+      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
@@ -1859,6 +2484,18 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_SetDef)) {
+      return false;
+    }
+    if (this._set || expression._set) {
+      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
@@ -1887,6 +2524,18 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Def)) {
+      return false;
+    }
+    if (this.element || expression.element) {
+      if (!this.element || !expression.element || !this.element.isEquivalentTo(expression.element, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -1918,6 +2567,18 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_PropArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.formula || objectContents.formula) {
+      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_SetArg extends Fmt.ObjectContents {
@@ -1947,6 +2608,18 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
       }
     }
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_SetArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this._set || objectContents._set) {
+      if (!this._set || !objectContents._set || !this._set.isEquivalentTo(objectContents._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2000,6 +2673,23 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_SubsetArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this._set || objectContents._set) {
+      if (!this._set || !objectContents._set || !this._set.isEquivalentTo(objectContents._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.subsetProof || objectContents.subsetProof) {
+      if (!this.subsetProof || !objectContents.subsetProof || !this.subsetProof.isEquivalentTo(objectContents.subsetProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_ElementArg extends Fmt.ObjectContents {
@@ -2052,6 +2742,23 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_ElementArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.element || objectContents.element) {
+      if (!this.element || !objectContents.element || !this.element.isEquivalentTo(objectContents.element, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.elementProof || objectContents.elementProof) {
+      if (!this.elementProof || !objectContents.elementProof || !this.elementProof.isEquivalentTo(objectContents.elementProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
@@ -2094,6 +2801,18 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
       }
     }
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_ConstraintArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.proof || objectContents.proof) {
+      if (!this.proof || !objectContents.proof || !this.proof.isEquivalentTo(objectContents.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2148,6 +2867,23 @@ export class ObjectContents_BindingArg extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_BindingArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameter || objectContents.parameter) {
+      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.arguments || objectContents.arguments) {
+      if (!this.arguments || !objectContents.arguments || !this.arguments.isEquivalentTo(objectContents.arguments, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_empty extends Fmt.MetaRefExpression {
@@ -2169,6 +2905,13 @@ export class MetaRefExpression_empty extends Fmt.MetaRefExpression {
       return new MetaRefExpression_empty;
     }
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_empty)) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_previous extends Fmt.MetaRefExpression {
@@ -2189,6 +2932,13 @@ export class MetaRefExpression_previous extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_previous;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_previous)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -2240,6 +2990,27 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_enumeration)) {
+      return false;
+    }
+    if (this.terms || expression.terms) {
+      if (!this.terms || !expression.terms || this.terms.length !== expression.terms.length) {
+        return false;
+      }
+      for (let i = 0; i < this.terms.length; i++) {
+        let leftItem = this.terms[i];
+        let rightItem = expression.terms[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
@@ -2285,6 +3056,23 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_subset)) {
+      return false;
+    }
+    if (this.parameter || expression.parameter) {
+      if (!this.parameter || !expression.parameter || !this.parameter.isEquivalentTo(expression.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
@@ -2329,6 +3117,23 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_extendedSubset)) {
+      return false;
+    }
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2402,6 +3207,37 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_setStructuralCases)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.construction || expression.construction) {
+      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.cases || expression.cases) {
+      if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
+        return false;
+      }
+      for (let i = 0; i < this.cases.length; i++) {
+        let leftItem = this.cases[i];
+        let rightItem = expression.cases[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
@@ -2455,6 +3291,27 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_cases)) {
+      return false;
+    }
+    if (this.cases || expression.cases) {
+      if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
+        return false;
+      }
+      for (let i = 0; i < this.cases.length; i++) {
+        let leftItem = this.cases[i];
+        let rightItem = expression.cases[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 }
 
@@ -2528,6 +3385,37 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_structuralCases)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.construction || expression.construction) {
+      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.cases || expression.cases) {
+      if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
+        return false;
+      }
+      for (let i = 0; i < this.cases.length; i++) {
+        let leftItem = this.cases[i];
+        let rightItem = expression.cases[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_not extends Fmt.MetaRefExpression {
@@ -2556,6 +3444,18 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_not)) {
+      return false;
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2607,6 +3507,27 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_and)) {
+      return false;
+    }
+    if (this.formulae || expression.formulae) {
+      if (!this.formulae || !expression.formulae || this.formulae.length !== expression.formulae.length) {
+        return false;
+      }
+      for (let i = 0; i < this.formulae.length; i++) {
+        let leftItem = this.formulae[i];
+        let rightItem = expression.formulae[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_or extends Fmt.MetaRefExpression {
@@ -2657,6 +3578,27 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_or)) {
+      return false;
+    }
+    if (this.formulae || expression.formulae) {
+      if (!this.formulae || !expression.formulae || this.formulae.length !== expression.formulae.length) {
+        return false;
+      }
+      for (let i = 0; i < this.formulae.length; i++) {
+        let leftItem = this.formulae[i];
+        let rightItem = expression.formulae[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
@@ -2694,6 +3636,23 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_equiv)) {
+      return false;
+    }
+    if (this.left || expression.left) {
+      if (!this.left || !expression.left || !this.left.isEquivalentTo(expression.left, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.right || expression.right) {
+      if (!this.right || !expression.right || !this.right.isEquivalentTo(expression.right, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2739,6 +3698,23 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_forall)) {
+      return false;
+    }
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2787,6 +3763,23 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_exists)) {
+      return false;
+    }
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
@@ -2834,6 +3827,23 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_existsUnique)) {
+      return false;
+    }
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.formula || expression.formula) {
+      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_in extends Fmt.MetaRefExpression {
@@ -2871,6 +3881,23 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_in)) {
+      return false;
+    }
+    if (this.element || expression.element) {
+      if (!this.element || !expression.element || !this.element.isEquivalentTo(expression.element, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this._set || expression._set) {
+      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -2910,6 +3937,23 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_sub)) {
+      return false;
+    }
+    if (this.subset || expression.subset) {
+      if (!this.subset || !expression.subset || !this.subset.isEquivalentTo(expression.subset, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.superset || expression.superset) {
+      if (!this.superset || !expression.superset || !this.superset.isEquivalentTo(expression.superset, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
@@ -2948,6 +3992,23 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_setEquals)) {
+      return false;
+    }
+    if (this.left || expression.left) {
+      if (!this.left || !expression.left || !this.left.isEquivalentTo(expression.left, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.right || expression.right) {
+      if (!this.right || !expression.right || !this.right.isEquivalentTo(expression.right, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
@@ -2985,6 +4046,23 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_equals)) {
+      return false;
+    }
+    if (this.left || expression.left) {
+      if (!this.left || !expression.left || !this.left.isEquivalentTo(expression.left, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.right || expression.right) {
+      if (!this.right || !expression.right || !this.right.isEquivalentTo(expression.right, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3058,6 +4136,37 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_structural)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.construction || expression.construction) {
+      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.cases || expression.cases) {
+      if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
+        return false;
+      }
+      for (let i = 0; i < this.cases.length; i++) {
+        let leftItem = this.cases[i];
+        let rightItem = expression.cases[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class ObjectContents_Case extends Fmt.ObjectContents {
@@ -3118,6 +4227,28 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
       }
     }
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_Case, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.formula || objectContents.formula) {
+      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.value || objectContents.value) {
+      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
+      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3210,6 +4341,38 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       }
     }
     return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_StructuralCase, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this._constructor || objectContents._constructor) {
+      if (!this._constructor || !objectContents._constructor || !this._constructor.isEquivalentTo(objectContents._constructor, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.parameters || objectContents.parameters) {
+      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.value || objectContents.value) {
+      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.rewrite || objectContents.rewrite) {
+      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
+      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3309,6 +4472,38 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Proof, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this._from !== undefined || objectContents._from !== undefined) {
+      if (this._from === undefined || objectContents._from === undefined || !this._from.eq(objectContents._from)) {
+        return false;
+      }
+    }
+    if (this._to !== undefined || objectContents._to !== undefined) {
+      if (this._to === undefined || objectContents._to === undefined || !this._to.eq(objectContents._to)) {
+        return false;
+      }
+    }
+    if (this.parameters || objectContents.parameters) {
+      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.goal || objectContents.goal) {
+      if (!this.goal || !objectContents.goal || !this.goal.isEquivalentTo(objectContents.goal, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.steps || objectContents.steps) {
+      if (!this.steps || !objectContents.steps || !this.steps.isEquivalentTo(objectContents.steps, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
@@ -3352,6 +4547,23 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
     }
     result.index = this.index;
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Consider)) {
+      return false;
+    }
+    if (this.variable || expression.variable) {
+      if (!this.variable || !expression.variable || !this.variable.isEquivalentTo(expression.variable, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.index !== undefined || expression.index !== undefined) {
+      if (this.index === undefined || expression.index === undefined || !this.index.eq(expression.index)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3404,6 +4616,23 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_State)) {
+      return false;
+    }
+    if (this.statement || expression.statement) {
+      if (!this.statement || !expression.statement || !this.statement.isEquivalentTo(expression.statement, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
@@ -3443,6 +4672,23 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_UseDef)) {
+      return false;
+    }
+    if (this.side || expression.side) {
+      if (!this.side || !expression.side || !this.side.isEquivalentTo(expression.side, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.result || expression.result) {
+      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3509,6 +4755,32 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_UseCases)) {
+      return false;
+    }
+    if (this.side || expression.side) {
+      if (!this.side || !expression.side || !this.side.isEquivalentTo(expression.side, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.caseProofs || expression.caseProofs) {
+      if (!this.caseProofs || !expression.caseProofs || this.caseProofs.length !== expression.caseProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.caseProofs.length; i++) {
+        let leftItem = this.caseProofs[i];
+        let rightItem = expression.caseProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
@@ -3544,6 +4816,18 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_UseForAll)) {
+      return false;
+    }
+    if (this.arguments || expression.arguments) {
+      if (!this.arguments || !expression.arguments || !this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3582,6 +4866,18 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_UseExists)) {
+      return false;
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3630,6 +4926,28 @@ export class MetaRefExpression_Embed extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Embed)) {
+      return false;
+    }
+    if (this.construction || expression.construction) {
+      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.input || expression.input) {
+      if (!this.input || !expression.input || !this.input.isEquivalentTo(expression.input, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.output || expression.output) {
+      if (!this.output || !expression.output || !this.output.isEquivalentTo(expression.output, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_SetExtend extends Fmt.MetaRefExpression {
@@ -3659,6 +4977,18 @@ export class MetaRefExpression_SetExtend extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_SetExtend)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Extend extends Fmt.MetaRefExpression {
@@ -3687,6 +5017,18 @@ export class MetaRefExpression_Extend extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Extend)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3742,6 +5084,28 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Substitute)) {
+      return false;
+    }
+    if (this.source || expression.source) {
+      if (!this.source || !expression.source || !this.source.isEquivalentTo(expression.source, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.sourceSide || expression.sourceSide) {
+      if (!this.sourceSide || !expression.sourceSide || !this.sourceSide.isEquivalentTo(expression.sourceSide, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.result || expression.result) {
+      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_ResolveDef extends Fmt.MetaRefExpression {
@@ -3770,6 +5134,18 @@ export class MetaRefExpression_ResolveDef extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ResolveDef)) {
+      return false;
+    }
+    if (this.result || expression.result) {
+      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3808,6 +5184,23 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_UseTheorem)) {
+      return false;
+    }
+    if (this.theorem || expression.theorem) {
+      if (!this.theorem || !expression.theorem || !this.theorem.isEquivalentTo(expression.theorem, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.result || expression.result) {
+      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3858,6 +5251,23 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveDef)) {
+      return false;
+    }
+    if (this.side || expression.side) {
+      if (!this.side || !expression.side || !this.side.isEquivalentTo(expression.side, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_ProveNeg extends Fmt.MetaRefExpression {
@@ -3896,6 +5306,18 @@ export class MetaRefExpression_ProveNeg extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveNeg)) {
+      return false;
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
@@ -3933,6 +5355,18 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveForAll)) {
+      return false;
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -3991,6 +5425,23 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveExists)) {
+      return false;
+    }
+    if (this.arguments || expression.arguments) {
+      if (!this.arguments || !expression.arguments || !this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.proof || expression.proof) {
+      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -4056,6 +5507,23 @@ export class MetaRefExpression_ProveSetEquals extends Fmt.MetaRefExpression {
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveSetEquals)) {
+      return false;
+    }
+    if (this.subsetProof || expression.subsetProof) {
+      if (!this.subsetProof || !expression.subsetProof || !this.subsetProof.isEquivalentTo(expression.subsetProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.supersetProof || expression.supersetProof) {
+      if (!this.supersetProof || !expression.supersetProof || !this.supersetProof.isEquivalentTo(expression.supersetProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
@@ -4120,6 +5588,32 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveCases)) {
+      return false;
+    }
+    if (this.side || expression.side) {
+      if (!this.side || !expression.side || !this.side.isEquivalentTo(expression.side, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.caseProofs || expression.caseProofs) {
+      if (!this.caseProofs || !expression.caseProofs || this.caseProofs.length !== expression.caseProofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.caseProofs.length; i++) {
+        let leftItem = this.caseProofs[i];
+        let rightItem = expression.caseProofs[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 }
 
@@ -4192,6 +5686,37 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveByInduction)) {
+      return false;
+    }
+    if (this.term || expression.term) {
+      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.construction || expression.construction) {
+      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.cases || expression.cases) {
+      if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
+        return false;
+      }
+      for (let i = 0; i < this.cases.length; i++) {
+        let leftItem = this.cases[i];
+        let rightItem = expression.cases[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
   }
 }
 

@@ -45,6 +45,21 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Section, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.logic !== objectContents.logic) {
+      return false;
+    }
+    if (this.items || objectContents.items) {
+      if (!this.items || !objectContents.items || !this.items.isEquivalentTo(objectContents.items, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
@@ -65,6 +80,13 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Section;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Section)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -91,6 +113,13 @@ export class ObjectContents_Library extends ObjectContents_Section {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
   }
+
+  isEquivalentTo(objectContents: ObjectContents_Library, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
+  }
 }
 
 export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
@@ -111,6 +140,13 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
     } else {
       return new MetaRefExpression_Library;
     }
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Library)) {
+      return false;
+    }
+    return true;
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
@@ -175,6 +211,24 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     result.title = this.title;
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_item)) {
+      return false;
+    }
+    if (this.ref || expression.ref) {
+      if (!this.ref || !expression.ref || !this.ref.isEquivalentTo(expression.ref, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.type !== expression.type) {
+      return false;
+    }
+    if (this.title !== expression.title) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
@@ -214,6 +268,21 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     }
     result.title = this.title;
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_subsection)) {
+      return false;
+    }
+    if (this.ref || expression.ref) {
+      if (!this.ref || !expression.ref || !this.ref.isEquivalentTo(expression.ref, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.title !== expression.title) {
+      return false;
+    }
+    return true;
   }
 }
 

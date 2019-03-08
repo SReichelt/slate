@@ -381,6 +381,49 @@ function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string
   return outFileStr;
 }
 
+function outputComparisonCode(inFile: Fmt.File, left: string, right: string, contentType: string | undefined, remainingArrayDimensions: number, indent: string): string {
+  let outFileStr = '';
+  if (remainingArrayDimensions) {
+    let index = 'i';
+    let leftItem = 'leftItem';
+    let rightItem = 'rightItem';
+    if (remainingArrayDimensions - 1) {
+      index += remainingArrayDimensions - 1;
+      leftItem += remainingArrayDimensions - 1;
+      rightItem += remainingArrayDimensions - 1;
+    }
+    outFileStr += `${indent}if (${left} || ${right}) {\n`;
+    outFileStr += `${indent}  if (!${left} || !${right} || ${left}.length !== ${right}.length) {\n`;
+    outFileStr += `${indent}    return false;\n`;
+    outFileStr += `${indent}  }\n`;
+    outFileStr += `${indent}  for (let ${index} = 0; ${index} < ${left}.length; ${index}++) {\n`;
+    outFileStr += `${indent}    let ${leftItem} = ${left}[${index}];\n`;
+    outFileStr += `${indent}    let ${rightItem} = ${right}[${index}];\n`;
+    outFileStr += outputComparisonCode(inFile, leftItem, rightItem, contentType, remainingArrayDimensions - 1, `${indent}    `);
+    outFileStr += `${indent}  }\n`;
+    outFileStr += `${indent}}\n`;
+  } else {
+    if (contentType === 'Fmt.BN') {
+      outFileStr += `${indent}if (${left} !== undefined || ${right} !== undefined) {\n`;
+      outFileStr += `${indent}  if (${left} === undefined || ${right} === undefined || !${left}.eq(${right})) {\n`;
+      outFileStr += `${indent}    return false;\n`;
+      outFileStr += `${indent}  }\n`;
+      outFileStr += `${indent}}\n`;
+    } else if (contentType === 'string') {
+      outFileStr += `${indent}if (${left} !== ${right}) {\n`;
+      outFileStr += `${indent}  return false;\n`;
+      outFileStr += `${indent}}\n`;
+    } else {
+      outFileStr += `${indent}if (${left} || ${right}) {\n`;
+      outFileStr += `${indent}  if (!${left} || !${right} || !${left}.isEquivalentTo(${right}, fn, replacedParameters)) {\n`;
+      outFileStr += `${indent}    return false;\n`;
+      outFileStr += `${indent}  }\n`;
+      outFileStr += `${indent}}\n`;
+    }
+  }
+  return outFileStr;
+}
+
 function outputDefinitionList(visibleTypeNames: string[], list?: Fmt.Expression, secondaryList?: Fmt.Expression): string {
   let outFileStr = `{`;
   if (list instanceof Fmt.ArrayExpression) {
@@ -517,6 +560,25 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `    return changed;\n`;
       outFileStr += `  }\n`;
+      outFileStr += `\n`;
+      outFileStr += `  isEquivalentTo(objectContents: ObjectContents_${definition.name}, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+      outFileStr += `    if (this === objectContents && !replacedParameters.length) {\n`;
+      outFileStr += `      return true;\n`;
+      outFileStr += `    }\n`;
+      if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+        for (let member of definition.contents.members) {
+          let memberName = translateMemberName(member.name);
+          let contentType = getMemberContentType(inFile, member.type);
+          let arrayDimensions = contentType ? member.type.arrayDimensions : 0;
+          outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `objectContents.${memberName}`, contentType, arrayDimensions, '    ');
+        }
+      }
+      if (superDefinition) {
+        outFileStr += `    return super.isEquivalentTo(objectContents, fn, replacedParameters);\n`;
+      } else {
+        outFileStr += `    return true;\n`;
+      }
+      outFileStr += `  }\n`;
       outFileStr += `}\n\n`;
     }
 
@@ -567,7 +629,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    let changed = false;\n`;
         for (let parameter of definition.parameters) {
           let memberName = translateMemberName(parameter.name);
-          if (parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) {
+          if ((parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) && !parameter.list) {
             outFileStr += `    result.${memberName} = this.${memberName};\n`;
           } else {
             let contentType = getMemberContentType(inFile, parameter.type);
@@ -588,6 +650,22 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `      return new MetaRefExpression_${definition.name};\n`;
         outFileStr += `    }\n`;
       }
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
+      outFileStr += `  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {\n`;
+      outFileStr += `    if (!(expression instanceof MetaRefExpression_${definition.name})) {\n`;
+      outFileStr += `      return false;\n`;
+      outFileStr += `    }\n`;
+      for (let parameter of definition.parameters) {
+        let memberName = translateMemberName(parameter.name);
+        let contentType = getMemberContentType(inFile, parameter.type);
+        let arrayDimensions = contentType ? parameter.type.arrayDimensions : 0;
+        if (parameter.list) {
+          arrayDimensions++;
+        }
+        outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `expression.${memberName}`, contentType, arrayDimensions, '    ');
+      }
+      outFileStr += `    return true;\n`;
       outFileStr += `  }\n`;
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes instanceof Fmt.ArrayExpression && definition.contents.innerDefinitionTypes.items.length) {
         outFileStr += `\n`;

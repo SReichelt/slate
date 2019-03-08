@@ -5,7 +5,9 @@ export class File {
   definitions: DefinitionList = Object.create(DefinitionList.prototype);
 }
 
+export type ExpressionTraversalFn = (expression: Expression) => void;
 export type ExpressionSubstitutionFn = ((expression: Expression) => Expression) | undefined;
+export type ExpressionUnificationFn = ((left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean) | undefined;
 
 export interface ReplacedParameter {
   original: Parameter;
@@ -20,6 +22,25 @@ export abstract class PathItem {
   }
 
   abstract substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): PathItem;
+
+  isEquivalentTo(pathItem: PathItem, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === pathItem && !replacedParameters.length) {
+      return true;
+    }
+    let origReplacedParametersLength = replacedParameters.length;
+    if (this.parentPath || pathItem.parentPath) {
+      if (!(this.parentPath && pathItem.parentPath && this.parentPath.isEquivalentTo(pathItem.parentPath, fn, replacedParameters))) {
+        return false;
+      }
+    }
+    if (this.matches(pathItem, fn, replacedParameters)) {
+      return true;
+    }
+    replacedParameters.length = origReplacedParametersLength;
+    return false;
+  }
+
+  protected abstract matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean;
 }
 
 export class NamedPathItem extends PathItem {
@@ -41,6 +62,10 @@ export class NamedPathItem extends PathItem {
     }
     return this;
   }
+
+  protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return pathItem instanceof NamedPathItem && this.name === pathItem.name;
+  }
 }
 
 export class ParentPathItem extends PathItem {
@@ -57,6 +82,10 @@ export class ParentPathItem extends PathItem {
     }
     return this;
   }
+
+  protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return pathItem instanceof ParentPathItem;
+  }
 }
 
 export class IdentityPathItem extends PathItem {
@@ -72,6 +101,10 @@ export class IdentityPathItem extends PathItem {
       return new IdentityPathItem;
     }
     return this;
+  }
+
+  protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return pathItem instanceof IdentityPathItem;
   }
 }
 
@@ -95,6 +128,10 @@ export class Path extends NamedPathItem {
       return result;
     }
     return this;
+  }
+
+  protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return pathItem instanceof Path && this.name === pathItem.name && this.arguments.isEquivalentTo(pathItem.arguments);
   }
 }
 
@@ -177,19 +214,38 @@ export class Parameter {
     }
     if (newType !== this.type.expression || newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || !fn) {
       let result = new Parameter;
+      replacedParameters.push({original: this, replacement: result});
       result.name = this.name;
       result.type = new Type;
-      result.type.expression = newType;
+      /* Need to re-evaluate type because it can depend on the parameter itself. */
+      result.type.expression = this.type.expression.substitute(fn, replacedParameters);
       result.type.arrayDimensions = this.type.arrayDimensions;
       result.defaultValue = newDefaultValue;
       result.optional = this.optional;
       result.list = this.list;
       result.dependencies = newDependencies;
-      replacedParameters.push({original: this, replacement: result});
       return result;
     } else {
       return this;
     }
+  }
+
+  isEquivalentTo(parameter: Parameter, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === parameter && !replacedParameters.length) {
+      return true;
+    }
+    /* Compare everything except names. */
+    if (this.optional === parameter.optional && this.list === parameter.list) {
+      let origReplacedParametersLength = replacedParameters.length;
+      replacedParameters.push({original: this, replacement: parameter});
+      if (this.type.isEquivalentTo(parameter.type, fn, replacedParameters)
+          && Expression.areExpressionsEquivalent(this.defaultValue, parameter.defaultValue, fn, replacedParameters)
+          && Expression.areExpressionListsEquivalent(this.dependencies, parameter.dependencies, fn, replacedParameters)) {
+        return true;
+      }
+      replacedParameters.length = origReplacedParametersLength;
+    }
+    return false;
   }
 }
 
@@ -230,6 +286,23 @@ export class ParameterList extends Array<Parameter> {
     }
     return changed;
   }
+
+  isEquivalentTo(parameters: ParameterList, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === parameters && !replacedParameters.length) {
+      return true;
+    }
+    if (this.length !== parameters.length) {
+      return false;
+    }
+    let origReplacedParametersLength = replacedParameters.length;
+    for (let i = 0; i < this.length; i++) {
+      if (!this[i].isEquivalentTo(parameters[i], fn, replacedParameters)) {
+        replacedParameters.length = origReplacedParametersLength;
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class Argument {
@@ -250,6 +323,14 @@ export class Argument {
     } else {
       return this;
     }
+  }
+
+  isEquivalentTo(arg: Argument, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === arg && !replacedParameters.length) {
+      return true;
+    }
+    return this.name === arg.name
+           && this.value.isEquivalentTo(arg.value, fn, replacedParameters);
   }
 }
 
@@ -340,6 +421,23 @@ export class ArgumentList extends Array<Argument> {
     }
     return changed;
   }
+
+  isEquivalentTo(args: ArgumentList, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === args && !replacedParameters.length) {
+      return true;
+    }
+    if (this.length !== args.length) {
+      return false;
+    }
+    let origReplacedParametersLength = replacedParameters.length;
+    for (let i = 0; i < this.length; i++) {
+      if (!this[i].isEquivalentTo(args[i], fn, replacedParameters)) {
+        replacedParameters.length = origReplacedParametersLength;
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export class Type {
@@ -360,6 +458,14 @@ export class Type {
     } else {
       return this;
     }
+  }
+
+  isEquivalentTo(type: Type, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === type && !replacedParameters.length) {
+      return true;
+    }
+    return this.arrayDimensions === type.arrayDimensions
+           && this.expression.isEquivalentTo(type.expression, fn, replacedParameters);
   }
 }
 
@@ -407,21 +513,74 @@ export abstract class Expression {
     return this.substitute(undefined, replacedParameters);
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    let substitutionFn = (expression: Expression) => {
+      fn(expression);
+      return expression;
+    };
+    this.substitute(substitutionFn);
+  }
+
   abstract substitute(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression;
 
   protected getSubstitutionResult(fn: ExpressionSubstitutionFn, expression: Expression, changed: boolean): Expression {
     if (fn) {
       return fn(changed ? expression : this);
     } else {
+      /* Special case used by clone(). Don't return 'this', even if unchanged. */
       return expression;
     }
+  }
+
+  isEquivalentTo(expression: Expression, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (this === expression && !replacedParameters.length) {
+      return true;
+    }
+    let origReplacedParametersLength = replacedParameters.length;
+    if (this.matches(expression, fn, replacedParameters)) {
+      return true;
+    }
+    if (fn && fn(this, expression, replacedParameters)) {
+      return true;
+    }
+    replacedParameters.length = origReplacedParametersLength;
+    return false;
+  }
+
+  protected abstract matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean;
+
+  static areExpressionsEquivalent(left: Expression | undefined, right: Expression | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (!left && !right) {
+      return true;
+    }
+    if (left && right) {
+      return left.isEquivalentTo(right, fn, replacedParameters);
+    }
+    return false;
+  }
+
+  static areExpressionListsEquivalent(left: Expression[] | undefined, right: Expression[] | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+    if (!left && !right) {
+      return true;
+    }
+    if (left && right && left.length === right.length) {
+      let origReplacedParametersLength = replacedParameters.length;
+      for (let i = 0; i < left.length; i++) {
+        if (!left[i].isEquivalentTo(right[i], fn, replacedParameters)) {
+          replacedParameters.length = origReplacedParametersLength;
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 }
 
 export class IntegerExpression extends Expression {
   value: BN;
 
-  substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
+  substitute(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -429,6 +588,11 @@ export class IntegerExpression extends Expression {
       result.value = this.value;
       return result;
     }
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof IntegerExpression
+           && this.value.eq(expression.value);
   }
 }
 
@@ -443,6 +607,11 @@ export class StringExpression extends Expression {
       result.value = this.value;
       return result;
     }
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof StringExpression
+           && this.value === expression.value;
   }
 }
 
@@ -468,6 +637,12 @@ export class VariableRefExpression extends Expression {
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof VariableRefExpression
+           && this.variable.findReplacement(replacedParameters) === expression.variable
+           && Expression.areExpressionListsEquivalent(this.indices, expression.indices, fn, replacedParameters);
   }
 }
 
@@ -515,6 +690,12 @@ export class GenericMetaRefExpression extends MetaRefExpression {
     let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof GenericMetaRefExpression
+           && this.name === expression.name
+           && this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters);
+  }
 }
 
 export class DefinitionRefExpression extends ObjectRefExpression {
@@ -526,6 +707,11 @@ export class DefinitionRefExpression extends ObjectRefExpression {
     let changed = (result.path !== this.path);
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof DefinitionRefExpression
+           && this.path.isEquivalentTo(expression.path, fn, replacedParameters);
+  }
 }
 
 export class ParameterExpression extends Expression {
@@ -536,6 +722,11 @@ export class ParameterExpression extends Expression {
     let changed = this.parameters.substituteExpression(fn, result.parameters, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
   }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof ParameterExpression
+           && this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters);
+  }
 }
 
 export class CompoundExpression extends Expression {
@@ -545,6 +736,11 @@ export class CompoundExpression extends Expression {
     let result = new CompoundExpression;
     let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof CompoundExpression
+           && this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters);
   }
 }
 
@@ -563,6 +759,11 @@ export class ArrayExpression extends Expression {
       result.items.push(newItem);
     }
     return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    return expression instanceof ArrayExpression
+           && Expression.areExpressionListsEquivalent(this.items, expression.items, fn, replacedParameters);
   }
 }
 
