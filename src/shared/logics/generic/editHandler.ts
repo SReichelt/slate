@@ -14,6 +14,11 @@ export class PlaceholderExpression extends Fmt.Expression {
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters?: Fmt.ReplacedParameter[]): Fmt.Expression {
     return this;
   }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    return expression instanceof PlaceholderExpression
+           && this.placeholderType === expression.placeholderType;
+  }
 }
 
 export abstract class GenericEditHandler {
