@@ -37,7 +37,7 @@ export abstract class GenericRenderer {
     return config;
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterListToEdit?: Fmt.Parameter[]): Display.RenderedExpression {
     let name = param.name;
     let suffixes: Display.RenderedExpression[] | undefined = undefined;
     let underscorePos = name.indexOf('_');
@@ -55,7 +55,7 @@ export abstract class GenericRenderer {
     }
     let text = new Display.TextExpression(name);
     if (isDefinition && this.editHandler) {
-      this.editHandler.addVariableNameEditor(text, param);
+      this.editHandler.addVariableNameEditor(text, param, parameterListToEdit);
     }
     let result: Display.RenderedExpression = text;
     if (suffixes) {

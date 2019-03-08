@@ -127,4 +127,18 @@ export class HLMEditHandler extends GenericEditHandler {
     item.action = action;
     rows.push(item);
   }
+
+  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
+    // TODO also support creation of bindings with multiple parameters
+    let paramClone = super.addParameterToGroup(param, parameterList);
+    if (paramClone) {
+      let type = paramClone.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+        type.superset = new FmtHLM.MetaRefExpression_previous;
+      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+        type._set = new FmtHLM.MetaRefExpression_previous;
+      }
+    }
+    return paramClone;
+  }
 }

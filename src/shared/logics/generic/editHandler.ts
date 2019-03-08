@@ -445,8 +445,31 @@ export abstract class GenericEditHandler {
     return renderedTemplateArguments;
   }
 
-  addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter) {
-    text.onTextChanged = (newText: string) => param.name = newText;
+  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
+    if (parameterList) {
+      let index = parameterList.indexOf(param);
+      if (index >= 0) {
+        let paramClone = param.clone();
+        // TODO modify name
+        parameterList.splice(index + 1, 0, paramClone);
+        return paramClone;
+      }
+    }
+    return undefined;
+  }
+
+  addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.Parameter[]) {
+    text.onTextChanged = (newText: string) => {
+      if (newText.endsWith(',')) {
+        param.name = newText.substring(0, newText.length - 1);
+        let paramClone = this.addParameterToGroup(param, parameterList);
+        if (paramClone) {
+          GenericEditHandler.lastInsertedParameter = paramClone;
+        }
+      } else {
+        param.name = newText;
+      }
+    };
     if (GenericEditHandler.lastInsertedParameter === param) {
       text.requestTextInput = true;
       GenericEditHandler.lastInsertedParameter = undefined;

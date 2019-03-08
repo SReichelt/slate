@@ -29,7 +29,7 @@ interface ParameterListState {
   forcePlural: boolean;
   enableSpecializations: boolean;
   markAsDummy: boolean;
-  addPlaceholder: boolean;
+  parameterListToEdit?: Fmt.Parameter[];
   elementParameterOverrides?: ElementParameterOverrides;
   started: boolean;
   inLetExpr: boolean;
@@ -204,7 +204,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       forcePlural: forcePlural,
       enableSpecializations: true,
       markAsDummy: false,
-      addPlaceholder: canEdit && this.editHandler !== undefined,
+      parameterListToEdit: canEdit && this.editHandler ? parameters : undefined,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -224,7 +224,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       forcePlural: forcePlural,
       enableSpecializations: true,
       markAsDummy: false,
-      addPlaceholder: false,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -302,7 +301,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (currentGroup.length) {
       this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
     }
-    if (state.addPlaceholder) {
+    if (state.parameterListToEdit) {
       if (row.length) {
         row.push(new Display.TextExpression(' '));
       } else if (state.started) {
@@ -311,7 +310,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       let stateCopy: ParameterListState = {
         ...state,
-        addPlaceholder: false,
+        parameterListToEdit: undefined,
         markAsDummy: true
       };
       if (stateCopy.started) {
@@ -330,7 +329,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return renderedParameter;
       };
       let parameterInsertFn = (parameter: Fmt.Parameter) => {
-        parameters.push(parameter);
+        state.parameterListToEdit!.push(parameter);
         if (stateCopy.associatedDefinition) {
           let contents = stateCopy.associatedDefinition.contents;
           if (contents instanceof FmtHLM.ObjectContents_Definition) {
@@ -387,7 +386,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         forcePlural: false,
         enableSpecializations: state.enableSpecializations,
         markAsDummy: false,
-        addPlaceholder: state.addPlaceholder,
         started: false,
         inLetExpr: false,
         inConstraint: false,
@@ -424,17 +422,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.addRegularParameterGroup(currentVariableGroup, currentVariableGroupType, currentDefinition, undefined, undefined, forEachState, indices, forEachRow);
 
-      let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
+      let innerState = {
+        ...state,
+        parameterListToEdit: state.parameterListToEdit ? innerParameters : undefined
+      };
+      let innerIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
       for (let variable of variables) {
-        newIndices.push(this.renderVariable(variable));
+        innerIndices.push(this.renderVariable(variable));
       }
-      row.push(this.renderParameters(innerParameters, state, newIndices));
+      row.push(this.renderParameters(innerParameters, innerState, innerIndices));
+      if (!innerState.started && !innerState.parameterListToEdit) {
+        row.push(new Display.TextExpression('?'));
+      }
 
       row.push(...forEachRow);
-
-      state.inLetExpr = false;
-      state.inConstraint = false;
-      state.inDefinition = false;
     }
 
     state.started = true;
@@ -486,7 +487,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.inConstraint = false;
     state.inDefinition = false;
 
-    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.markAsDummy, state.elementParameterOverrides);
+    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.markAsDummy, state.parameterListToEdit, state.elementParameterOverrides);
     let variableDisplay: Display.RenderedExpression | undefined;
     let noun: PropertyInfo = {
       isFeature: false,
@@ -720,8 +721,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Display.RenderedExpression[], markAsDummy: boolean = false, elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
-    let items = parameters.map((param) => this.renderVariable(param, indices, true, markAsDummy, elementParameterOverrides));
+  renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Display.RenderedExpression[], markAsDummy: boolean = false, parameterListToEdit?: Fmt.Parameter[], elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
+    let items = parameters.map((param) => this.renderVariable(param, indices, true, markAsDummy, parameterListToEdit, elementParameterOverrides));
     if (items.length === 1) {
       return items[0];
     } else {
@@ -729,7 +730,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterListToEdit?: Fmt.Parameter[], elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
     if (elementParameterOverrides) {
       let variableOverride = elementParameterOverrides.get(param);
       if (variableOverride) {
@@ -737,7 +738,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return new Display.PromiseExpression(termPromise);
       }
     }
-    return super.renderVariable(param, indices, isDefinition, isDummy);
+    return super.renderVariable(param, indices, isDefinition, isDummy, parameterListToEdit);
   }
 
   renderDefinedSymbol(definitions: Fmt.Definition[]): Display.RenderedExpression {
@@ -957,7 +958,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let indices = expression.indices ? expression.indices.map((term) => this.renderElementTerm(term)) : undefined;
       let isDefinition = expression instanceof DefinitionVariableRefExpression;
       let elementParameterOverrides = parameterOverrides ? parameterOverrides.elementParameterOverrides : undefined;
-      return this.renderVariable(expression.variable, indices, isDefinition, false, elementParameterOverrides);
+      return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       let childPaths: Fmt.Path[] = [];
       this.utils.splitPath(expression.path, childPaths);
@@ -1168,7 +1169,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         bindingArgumentList = this.renderUtils.convertBoundStructuralCasesToOverrides([parameter], bindingArgumentList, elementParameterOverrides);
       }
-      let variableDefinition = this.renderVariableDefinitions([parameter], undefined, markAsDummy, elementParameterOverrides);
+      let variableDefinition = this.renderVariableDefinitions([parameter], undefined, markAsDummy, undefined, elementParameterOverrides);
       if (combineBindings) {
         resultArgs.push(this.renderTemplate('Binding', {
                                               'variable': variableDefinition,
@@ -1258,7 +1259,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else {
       let isDefinition = parameterOverrides && parameterOverrides.replacementParameters ? parameterOverrides.replacementParameters.isDefinition : false;
-      resultArgs.push(this.renderVariable(paramToDisplay, indices, isDefinition, markAsDummy, elementParameterOverrides));
+      resultArgs.push(this.renderVariable(paramToDisplay, indices, isDefinition, markAsDummy, undefined, elementParameterOverrides));
     }
   }
 
@@ -1598,7 +1599,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         forcePlural: false,
         enableSpecializations: true,
         markAsDummy: false,
-        addPlaceholder: false,
         started: false,
         inLetExpr: false,
         inConstraint: false,
@@ -1641,7 +1641,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             forcePlural: false,
             enableSpecializations: true,
             markAsDummy: false,
-            addPlaceholder: false,
             started: false,
             inLetExpr: false,
             inConstraint: false,
@@ -2254,7 +2253,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       forcePlural: false,
       enableSpecializations: true,
       markAsDummy: false,
-      addPlaceholder: false,
       started: false,
       inLetExpr: false,
       inConstraint: false,
