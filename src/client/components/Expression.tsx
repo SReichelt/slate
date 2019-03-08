@@ -200,7 +200,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
     } else if (expression instanceof Display.TextExpression) {
-      if (this.props.interactionHandler && expression.onTextChanged) {
+      if (this.props.interactionHandler && expression.onTextChanged && !this.isPartOfMenu()) {
         let onChange = (newText: string) => {
           expression.text = newText;
           this.forceUpdate();

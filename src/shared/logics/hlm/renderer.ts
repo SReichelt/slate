@@ -4,7 +4,7 @@ import * as FmtDisplay from '../../display/meta';
 import * as Logic from '../logic';
 import { GenericRenderer, RenderedVariable } from '../generic/renderer';
 import * as Display from '../../display/display';
-import { HLMEditHandler } from './editHandler';
+import { HLMEditHandler, ParameterSelection } from './editHandler';
 import { PlaceholderExpression, GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
@@ -308,38 +308,38 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         /* Occurs if bound parameter list is empty. */
         row.push(new Display.TextExpression(', '));
       }
-      let stateCopy: ParameterListState = {
-        ...state,
-        parameterListToEdit: undefined,
-        markAsDummy: true
-      };
-      if (stateCopy.started) {
-        stateCopy.fullSentence = false;
-        stateCopy.started = false;
-      }
-      let parameterRenderFn = (parameter: Fmt.Parameter) => {
-        let renderedParameter = this.renderParameters([parameter], stateCopy, indices);
-        if (parameter.type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
-          let bindingRow = [
-            new Display.InsertPlaceholderExpression,
-            renderedParameter
-          ];
-          return new Display.RowExpression(bindingRow);
+      let insertButton = new Display.InsertPlaceholderExpression;
+      if (this.editHandler) {
+        let stateCopy: ParameterListState = {
+          ...state,
+          parameterListToEdit: undefined,
+          markAsDummy: true
+        };
+        if (stateCopy.started) {
+          stateCopy.fullSentence = false;
+          stateCopy.started = false;
         }
-        return renderedParameter;
-      };
-      let parameterInsertFn = (parameter: Fmt.Parameter) => {
-        state.parameterListToEdit!.push(parameter);
-        if (stateCopy.associatedDefinition) {
-          let contents = stateCopy.associatedDefinition.contents;
-          if (contents instanceof FmtHLM.ObjectContents_Definition) {
-            contents.display = undefined;
-            contents.definitionDisplay = undefined;
+        let parameterRenderFn = (parameter: Fmt.Parameter) => this.renderParameters([parameter], stateCopy, indices);
+        let parameterInsertFn = (parameter: Fmt.Parameter) => {
+          state.parameterListToEdit!.push(parameter);
+          if (stateCopy.associatedDefinition) {
+            let contents = stateCopy.associatedDefinition.contents;
+            if (contents instanceof FmtHLM.ObjectContents_Definition) {
+              contents.display = undefined;
+              contents.definitionDisplay = undefined;
+            }
           }
-        }
-        GenericEditHandler.lastInsertedParameter = parameter;
-      };
-      row.push(this.editHandler!.getParameterPlaceholder(parameterRenderFn, parameterInsertFn));
+          GenericEditHandler.lastInsertedParameter = parameter;
+        };
+        let parameterSelection: ParameterSelection = {
+          allowConstraint: parameters.length !== 0 || state.fullSentence,
+          allowProposition: state.associatedDefinition !== undefined && (state.parameterListToEdit !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
+          allowDefinition: state.fullSentence,
+          allowBinding: state.associatedDefinition !== undefined
+        };
+        this.editHandler.addParameterMenu(insertButton, parameterRenderFn, parameterInsertFn, parameterSelection);
+      }
+      row.push(insertButton);
     }
     if (state.started && state.fullSentence && !indices) {
       row.push(new Display.TextExpression('.'));
@@ -353,7 +353,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private combineParameter(param: Fmt.Parameter, firstParam: Fmt.Parameter): boolean {
     let paramType = param.type.expression;
     let firstParamType = firstParam.type.expression;
-    // TODO also compare expressions, to make merged parameter lists shorter
     return ((paramType instanceof FmtHLM.MetaRefExpression_Prop && firstParamType instanceof FmtHLM.MetaRefExpression_Prop)
             || (paramType instanceof FmtHLM.MetaRefExpression_Set && firstParamType instanceof FmtHLM.MetaRefExpression_Set)
             || (paramType instanceof FmtHLM.MetaRefExpression_Subset && firstParamType instanceof FmtHLM.MetaRefExpression_Subset && paramType.superset instanceof FmtHLM.MetaRefExpression_previous)
@@ -424,16 +423,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
       let innerState = {
         ...state,
-        parameterListToEdit: state.parameterListToEdit ? innerParameters : undefined
+        parameterListToEdit: state.parameterListToEdit || !innerParameters.length ? innerParameters : undefined
       };
       let innerIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
       for (let variable of variables) {
         innerIndices.push(this.renderVariable(variable));
       }
       row.push(this.renderParameters(innerParameters, innerState, innerIndices));
-      if (!innerState.started && !innerState.parameterListToEdit) {
-        row.push(new Display.TextExpression('?'));
-      }
 
       row.push(...forEachRow);
     }
