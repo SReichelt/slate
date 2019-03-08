@@ -461,10 +461,15 @@ export abstract class GenericEditHandler {
   addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.Parameter[]) {
     text.onTextChanged = (newText: string) => {
       if (newText.endsWith(',')) {
-        param.name = newText.substring(0, newText.length - 1);
-        let paramClone = this.addParameterToGroup(param, parameterList);
-        if (paramClone) {
-          GenericEditHandler.lastInsertedParameter = paramClone;
+        let newName = newText.substring(0, newText.length - 1);
+        if (newName) {
+          param.name = newName;
+        }
+        if (param.name) {
+          let paramClone = this.addParameterToGroup(param, parameterList);
+          if (paramClone) {
+            GenericEditHandler.lastInsertedParameter = paramClone;
+          }
         }
       } else {
         param.name = newText;
