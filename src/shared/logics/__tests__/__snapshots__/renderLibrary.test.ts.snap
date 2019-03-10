@@ -300,9 +300,9 @@ exports[`render hlm library: 1.1.15 data/libraries/hlm/Essentials/Sets/Disjoint%
 
   S ⊎ T :=: {l(s) | s ∈ S, r(t) | t ∈ T}
 
-  l(s) = l(s')  :⇔  s = s'  (s ∈ S, s' ∈ S)
+  l(s) = l(s')  :⇔  s = s'  (s, s' ∈ S)
 
-  r(t) = r(t')  :⇔  t = t'  (t ∈ T, t' ∈ T)
+  r(t) = r(t')  :⇔  t = t'  (t, t' ∈ T)
 
 For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' ⊎ T' as elements of S ⊎ T.
 
@@ -346,7 +346,7 @@ exports[`render hlm library: 1.1.17 data/libraries/hlm/Essentials/Sets/Power%20s
 
   𝒫(S) :=: {(T) | T ⊆ S}
 
-  (T) = (T')  :⇔  T = T'  (T ⊆ S, T' ⊆ S)
+  (T) = (T')  :⇔  T = T'  (T, T' ⊆ S)
 
 For S' ⊆ S, we canonically treat elements of 𝒫(S') as elements of 𝒫(S).
 
@@ -884,7 +884,7 @@ exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/Equi
 
   S∕∼ :=: {[s]_∼ | s ∈ S}
 
-  [s]_∼ = [t]_∼  :⇔  s ∼ t  (s ∈ S, t ∈ S)
+  [s]_∼ = [t]_∼  :⇔  s ∼ t  (s, t ∈ S)
 
   Reflexivity.  No proof.
 
@@ -1435,7 +1435,7 @@ exports[`render hlm library: 1.6.1.1 data/libraries/hlm/Essentials/Numbers/Natur
 
   ℕ :=: {(0), (n+1) | n ∈ ℕ}
 
-  (m+1) = (n+1)  :⇔  m = n  (m ∈ ℕ, n ∈ ℕ)
+  (m+1) = (n+1)  :⇔  m = n  (m, n ∈ ℕ)
 
 Remarks.
 
@@ -2815,7 +2815,7 @@ exports[`render hlm library: 1.6.4.1 data/libraries/hlm/Essentials/Numbers/Integ
 
   ℤ :=: {(n-m) | n, m ∈ ℕ}
 
-  (n-m) = (n'-m')  :⇔  n + m' = n' + m  (n, m ∈ ℕ, n', m' ∈ ℕ)
+  (n-m) = (n'-m')  :⇔  n + m' = n' + m  (n, m, n', m' ∈ ℕ)
 
   Reflexivity.  No proof.
 
@@ -3939,7 +3939,7 @@ exports[`render hlm library: 1.6.7.1 data/libraries/hlm/Essentials/Numbers/Compl
 
   ℂ :=: {(r+i𝒊) | r, i ∈ ℝ}
 
-  (r+i𝒊) = (r'+i'𝒊)  :⇔  r = r' and i = i'  (r, i ∈ ℝ, r', i' ∈ ℝ)
+  (r+i𝒊) = (r'+i'𝒊)  :⇔  r = r' and i = i'  (r, i, r', i' ∈ ℝ)
 
 ℝ ⊆: ℂ via
 r = (r+0𝒊)
@@ -4216,9 +4216,9 @@ exports[`render hlm library: 2.2.11.1 data/libraries/hlm/Algebra/Magmas/Free%20m
 
   𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) :=: {(s) | s ∈ S, a^b | a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S)}
 
-  (s) = (s')  :⇔  s = s'  (s ∈ S, s' ∈ S)
+  (s) = (s')  :⇔  s = s'  (s, s' ∈ S)
 
-  a^b = a'^b'  :⇔  a = a' and b = b'  (a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S), a', b' ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S))
+  a^b = a'^b'  :⇔  a = a' and b = b'  (a, b, a', b' ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S))
 
 S ⊆: 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) via
 x = (x)
@@ -4268,13 +4268,13 @@ exports[`render hlm library: 3.1.2 data/libraries/hlm/Linear%20algebra/Essential
 `;
 
 exports[`render hlm library: 4.1 data/libraries/hlm/Category%20theory/Categories 1`] = `
-"Definition 4.1.  Let U be a symbol. We define:
+"Definition 4.1.  Let u ∈ ℕ. We define:
 
-  𝓒𝓪𝓽_U :=: {[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U | O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_𝐖,𝐗, g ∈ M_𝐗,𝐘, h ∈ M_𝐘,𝐙 : (h ∘_𝐗,𝐘,𝐙 g) ∘_𝐖,𝐗,𝐙 f = h ∘_𝐖,𝐘,𝐙 (g ∘_𝐖,𝐗,𝐘 f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘 : [i_𝐘 ∘_𝐗,𝐘,𝐘 f = f and f ∘_𝐗,𝐗,𝐘 i_𝐗 = f]], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘, g ∈ M_𝐘,𝐗 s.t. f ∘_𝐘,𝐗,𝐘 g = i_𝐘 and g ∘_𝐗,𝐘,𝐗 f = i_𝐗 : f = g]}
+  𝓒𝓪𝓽_u :=: {[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u | O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_𝐖,𝐗, g ∈ M_𝐗,𝐘, h ∈ M_𝐘,𝐙 : (h ∘_𝐗,𝐘,𝐙 g) ∘_𝐖,𝐗,𝐙 f = h ∘_𝐖,𝐘,𝐙 (g ∘_𝐖,𝐗,𝐘 f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘 : [i_𝐘 ∘_𝐗,𝐘,𝐘 f = f and f ∘_𝐗,𝐗,𝐘 i_𝐗 = f]], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘, g ∈ M_𝐘,𝐗 s.t. f ∘_𝐘,𝐗,𝐘 g = i_𝐘 and g ∘_𝐗,𝐘,𝐗 f = i_𝐗 : f = g]}
 
-  [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_U  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ[𝐀],φ[𝐁] f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : ψ_𝐂,𝐂[i_𝐂] = j_(φ[𝐂])] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : (ψ_𝐃,𝐄, ψ_𝐄,𝐅, ψ_𝐃,𝐅)[∘_𝐃,𝐄,𝐅] = ∙_φ[𝐃],φ[𝐄],φ[𝐅]]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
+  [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ[𝐀],φ[𝐁] f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : ψ_𝐂,𝐂[i_𝐂] = j_(φ[𝐂])] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : (ψ_𝐃,𝐄, ψ_𝐄,𝐅, ψ_𝐃,𝐅)[∘_𝐃,𝐄,𝐅] = ∙_φ[𝐃],φ[𝐄],φ[𝐅]]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
 
-We write “let 𝓒 be a category in U” for “let 𝓒 ∈ 𝓒𝓪𝓽_U.”
+We write “let 𝓒 be an u-small category” for “let 𝓒 ∈ 𝓒𝓪𝓽_u.”
 
 Remarks.
 
@@ -4282,7 +4282,7 @@ This definition of categories includes the additional requirement that all categ
 
 For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
 
-The symbol _U_ is required to be able to define a category of (smaller) categories, which would normally be prevented by non-circularity rules. A symbol parameter essentially creates multiple distinct copies of a definition, in particular these definitions are considered distinct in the context of non-circularity. So the set of categories “in _U_” can be used to build a category “in _V_” if _V_ is a different symbol. _V_ is then considered “larger.” Informally, _U_ denotes a “universe.”
+The natural number _u_ is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, _u_ can be regarded as a “universe size” that is relevant only in the context of category theory. (The “universes” that are implicit in other contexts are already large enough.)
 
 References.
 
@@ -4293,13 +4293,13 @@ References.
 `;
 
 exports[`render hlm library: 4.2 data/libraries/hlm/Category%20theory/Objects 1`] = `
-"Definition 4.2.  Let U be a symbol, 𝓒 be a category in U. We define
+"Definition 4.2.  Let u ∈ ℕ, 𝓒 be an u-small category. We define
 
   Ob(𝓒)
 
 by:
 
-  Ob([O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U) := O  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  Ob([O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u) := O  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 We write “let 𝐗 ∈ 𝓒” for “let 𝐗 ∈ Ob(𝓒).”
 
@@ -4309,9 +4309,9 @@ This definition retrieves a representative set of objects from a category (which
 `;
 
 exports[`render hlm library: 4.3 data/libraries/hlm/Category%20theory/Morphisms 1`] = `
-"Definition 4.3.  Let U be a symbol, 𝓒 be a category in U, 𝐗, 𝐘 ∈ 𝓒. We define:
+"Definition 4.3.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
 
-  (𝐗 → 𝐘) := {M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  (𝐗 → 𝐘) := {M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ (𝐗 → 𝐘).”
 
@@ -4324,9 +4324,9 @@ References.
 `;
 
 exports[`render hlm library: 4.4 data/libraries/hlm/Category%20theory/identity 1`] = `
-"Definition 4.4.  Let U be a symbol, 𝓒 be a category in U, 𝐗 ∈ 𝓒. We define:
+"Definition 4.4.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗 ∈ 𝓒. We define:
 
-  id_𝐗 := {i_𝐗 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  id_𝐗 := {i_𝐗 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 References.
 
@@ -4334,9 +4334,9 @@ References.
 `;
 
 exports[`render hlm library: 4.5 data/libraries/hlm/Category%20theory/composition 1`] = `
-"Definition 4.5.  Let U be a symbol, 𝓒 be a category in U, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
+"Definition 4.5.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
 
-  g ∘ f := {g ∘_𝐗,𝐘,𝐙 f if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_U (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  g ∘ f := {g ∘_𝐗,𝐘,𝐙 f if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 References.
 
@@ -4344,7 +4344,7 @@ References.
 `;
 
 exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
-"Definition 4.6.1.  Let U be a symbol, 𝓒, 𝓓 be categories in U. We define:
+"Definition 4.6.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
   (𝓒 → 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
 
@@ -4367,7 +4367,7 @@ References.
 `;
 
 exports[`render hlm library: 4.6.2 data/libraries/hlm/Category%20theory/Functors/object%20value 1`] = `
-"Definition 4.6.2.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
+"Definition 4.6.2.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
 
   F(𝐗)
 
@@ -4377,7 +4377,7 @@ by:
 `;
 
 exports[`render hlm library: 4.6.3 data/libraries/hlm/Category%20theory/Functors/morphism%20value 1`] = `
-"Definition 4.6.3.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
+"Definition 4.6.3.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
 
   F(f)
 
@@ -4387,19 +4387,19 @@ by:
 `;
 
 exports[`render hlm library: 4.6.4 data/libraries/hlm/Category%20theory/Functors/identity 1`] = `
-"Definition 4.6.4.  Let U be a symbol, 𝓒 be a category in U. We define:
+"Definition 4.6.4.  Let u ∈ ℕ, 𝓒 be an u-small category. We define:
 
   id_𝓒 :  𝓒 → 𝓒, 𝐗 ↦ 𝐗, (f : 𝐘 → 𝐙) ↦ f"
 `;
 
 exports[`render hlm library: 4.6.5 data/libraries/hlm/Category%20theory/Functors/composition 1`] = `
-"Definition 4.6.5.  Let U be a symbol, 𝓒, 𝓓, 𝓔 be categories in U, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
+"Definition 4.6.5.  Let u ∈ ℕ, 𝓒, 𝓓, 𝓔 be u-small categories, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
 
   G ∘ F :  𝓒 → 𝓔, 𝐗 ↦ G(F(𝐗)), (f : 𝐘 → 𝐙) ↦ G(F(f))"
 `;
 
 exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
-"Definition 4.7.1.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors. We define:
+"Definition 4.7.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
 
   (F ⇀ G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
 
@@ -4413,7 +4413,7 @@ References.
 `;
 
 exports[`render hlm library: 4.7.2 data/libraries/hlm/Category%20theory/Natural%20transformations/component 1`] = `
-"Definition 4.7.2.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
+"Definition 4.7.2.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
 
   η_𝐗
 
@@ -4423,7 +4423,7 @@ by:
 `;
 
 exports[`render hlm library: 4.7.3 data/libraries/hlm/Category%20theory/Natural%20transformations/identity 1`] = `
-"Definition 4.7.3.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F : 𝓒 → 𝓓 be a functor. We define:
+"Definition 4.7.3.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor. We define:
 
   id_F := (id_(F(𝐗)))_(𝐗 ∈ 𝓒)
    = (F(id_𝐗))_(𝐗 ∈ 𝓒)
@@ -4432,7 +4432,7 @@ Equality.  No proof."
 `;
 
 exports[`render hlm library: 4.7.4 data/libraries/hlm/Category%20theory/Natural%20transformations/vertical%20composition 1`] = `
-"Definition 4.7.4.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
+"Definition 4.7.4.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
 
   ε ∘ η := (ε_𝐗 ∘ η_𝐗)_(𝐗 ∈ 𝓒)
 
@@ -4442,7 +4442,7 @@ References.
 `;
 
 exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
-"Definition 4.7.5.  Let U be a symbol, 𝓒, 𝓓 be categories in U, F, G : 𝓒 → 𝓓 be functors. We define:
+"Definition 4.7.5.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
 
   (F ⇒ G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
 
@@ -4457,9 +4457,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Individual%20categories/elements 1`] = `
-"Definition 4.8.1.  Let U be a symbol, S be a set. We define:
+"Definition 4.8.1.  Let u ∈ ℕ, S be a set. We define:
 
-  𝐄𝐥𝐞𝐦_U(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_U
+  𝐄𝐥𝐞𝐦_u(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_u
 
 Remarks.
 
@@ -4472,9 +4472,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Individual%20categories/cardinals 1`] = `
-"Definition 4.8.2.  Let U be a symbol. We define:
+"Definition 4.8.2.  Let u ∈ ℕ. We define:
 
-  𝐒𝐞𝐭_U := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_U
+  𝐒𝐞𝐭_u := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_u
 
 Remarks.
 
@@ -4487,9 +4487,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Individual%20categories/ordinals 1`] = `
-"Definition 4.8.3.  Let U be a symbol. We define:
+"Definition 4.8.3.  Let u ∈ ℕ. We define:
 
-  𝐖𝐨𝐬𝐞𝐭_U := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_U
+  𝐖𝐨𝐬𝐞𝐭_u := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_u
 
 Remarks.
 
@@ -4497,9 +4497,9 @@ The objects of this category are actually isomorphism classes of well-ordered se
 `;
 
 exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Individual%20categories/magmas 1`] = `
-"Definition 4.8.4.  Let U be a symbol. We define:
+"Definition 4.8.4.  Let u ∈ ℕ. We define:
 
-  𝐌𝐚𝐠_U := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_U
+  𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u
 
 Remarks.
 
@@ -4511,9 +4511,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
-"Definition 4.8.5.  Let U, V be symbols. We define:
+"Definition 4.8.5.  Let u ∈ ℕ. We define:
 
-  𝐂𝐚𝐭_U,V := [𝓒𝓪𝓽_U, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_U), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_U), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_U)]_V
+  𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
 Remarks.
 
@@ -4526,9 +4526,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.6.  Let U be a symbol, 𝓒, 𝓓 be categories in U, V be a symbol. We define:
+"Definition 4.8.6.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
-  𝐅𝐮𝐧_V(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_V
+  𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
 
 References.
 
@@ -4541,13 +4541,13 @@ exports[`render hlm library: 5.1 data/libraries/hlm/Formal%20systems/Variables 1
 
   𝓥𝓪𝓻 :=: {(n) | n ∈ ℕ}
 
-  (m) = (n)  :⇔  m = n  (m ∈ ℕ, n ∈ ℕ)
+  (m) = (n)  :⇔  m = n  (m, n ∈ ℕ)
 
 Remarks.
 
 This definition formalizes an infinite supply of variables. Each variable is identified by a natural number, but that number is not used anywhere. In fact, any infinite set would do.
 
-Variables, therefore, do not carry a name. Instead, we use bound variables in HLM to model variables in the target language, and these bound variables have a name in HLM.
+Therefore, variables in the modelled language do not carry a name. Instead, we use bound variables in HLM (i.e. in the meta language) to model variables in the target language, and these bound variables have a name in HLM.
 
 As a consequence, α-equivalent terms are never distinguishable."
 `;
@@ -4567,7 +4567,7 @@ exports[`render hlm library: 5.3 data/libraries/hlm/Formal%20systems/Rewriting%2
 
   𝓡𝓮𝔀𝓻(T) :=: {l → r | l, r ∈ T}
 
-  (l → r) = (l' → r')  :⇔  l = l' and r = r'  (l, r ∈ T, l', r' ∈ T)
+  (l → r) = (l' → r')  :⇔  l = l' and r = r'  (l, r, l', r' ∈ T)
 
 For T' ⊆ T, we canonically treat elements of 𝓡𝓮𝔀𝓻(T') as elements of 𝓡𝓮𝔀𝓻(T).
 
@@ -4581,12 +4581,12 @@ exports[`render hlm library: 5.4.1 data/libraries/hlm/Formal%20systems/Untyped%2
 
   𝓣_V :=: {(x) | x ∈ V, λx. M_x | M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), [∀ x, y ∈ Fresh(V) : M_x[x := y] = M_y], M N | M, N ∈ 𝓣_V}
 
-  (x) = (y)  :⇔  x = y  (x ∈ V, y ∈ V)
+  (x) = (y)  :⇔  x = y  (x, y ∈ V)
 
   λx. M_x = λx. M'_x  :⇔  ∀ x ∈ Fresh(V) : M_x = M'_x  (M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), M'_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V) with suitable conditions)
     ⇔  ∃ x ∈ Fresh(V) : M_x = M'_x
 
-  M N = M' N'  :⇔  M = M' and N = N'  (M, N ∈ 𝓣_V, M', N' ∈ 𝓣_V)
+  M N = M' N'  :⇔  M = M' and N = N'  (M, N, M', N' ∈ 𝓣_V)
 
 V ⊆: 𝓣_V via
 x = (x)
@@ -4612,7 +4612,7 @@ exports[`render hlm library: 5.4.2 data/libraries/hlm/Formal%20systems/Untyped%2
 
 by:
 
-  (y)[x := R] := {R if x = y, y if x ≠ y  (y ∈ V)
+  (y)[x := R] := {R if x = y, (y) if x ≠ y  (y ∈ V)
   (λy. M_y)[x := R] := λz. M_z[x := R]  (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V) with suitable conditions)
   (M N)[x := R] := M[x := R] N[x := R]  (M, N ∈ 𝓣_V)
 
