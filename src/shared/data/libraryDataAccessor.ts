@@ -1,7 +1,9 @@
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
+import * as Logic from '../logics/logic';
 
 export interface LibraryDataAccessor {
+  logic: Logic.Logic;
   fetchSubsection(path: Fmt.Path): CachedPromise<Fmt.Definition>;
   fetchItem(path: Fmt.Path): CachedPromise<Fmt.Definition>;
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo>;

@@ -55,7 +55,7 @@ interface ExpressionState {
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private htmlNode: HTMLElement | null = null;
   private semanticLinks?: Display.SemanticLink[];
-  private hasMenu = false;
+  private hasPermanentMenu = false;
   private windowClickListener?: () => void;
   private interactionBlocked = false;
   private hoveredChildren: Expression[] = [];
@@ -189,10 +189,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return this.renderExpression(new Display.ParenExpression(expression, optionalParenStyle), className, semanticLinks);
     }
     let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
+    let alwaysShowMenu = false;
     if (semanticLinks) {
       for (let semanticLink of semanticLinks) {
         if (semanticLink.onMenuOpened) {
           onMenuOpened = semanticLink.onMenuOpened;
+          alwaysShowMenu = semanticLink.alwaysShowMenu || expression instanceof Display.PlaceholderExpression;
         }
       }
     }
@@ -200,7 +202,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
     } else if (expression instanceof Display.TextExpression) {
-      if (this.props.interactionHandler && expression.onTextChanged && !this.isPartOfMenu()) {
+      if (this.props.interactionHandler && expression.onTextChanged) {
         let onChange = (newText: string) => {
           expression.text = newText;
           this.forceUpdate();
@@ -764,14 +766,18 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       className += ' definition';
     }
     let hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
-    this.hasMenu = hasMenu;
+    let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
+    this.hasPermanentMenu = hasMenu && alwaysShowMenu;
     if (hasMenu || expression instanceof Display.PlaceholderExpression) {
       let menuClassName = 'menu';
       if (this.state.hovered) {
         menuClassName += ' hover';
       }
-      if (this.props.interactionHandler) {
+      if (hasMenu) {
         menuClassName += ' interactive';
+        if (!hasVisibleMenu) {
+          menuClassName += ' hidden';
+        }
       }
       if (this.state.openMenu) {
         menuClassName += ' open';
@@ -788,20 +794,23 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let onMouseEnter = hasMenu ? () => this.addToHoveredChildren() : undefined;
       let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;
-      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
+      let onMouseDown = hasVisibleMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
+      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let cells: React.ReactNode;
       if (expression instanceof Display.PlaceholderExpression) {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
-      } else {
+      } else if (hasVisibleMenu) {
         cells = [
           <span className={'menu-cell'} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
+      } else {
+        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
       }
       result = (
         <span className={className + ' menu-container'}>
-          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}
             </span>
@@ -813,7 +822,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.state.hovered) {
         className += ' hover';
       }
-      if (this.props.interactionHandler && semanticLinks && semanticLinks.length && !this.isPartOfMenu()) {
+      if (this.props.interactionHandler && semanticLinks && semanticLinks.length && !this.isPartOfPermanentMenu()) {
         className += ' interactive';
         let uriLink: Display.SemanticLink | undefined = undefined;
         let uri: string | undefined = undefined;
@@ -827,8 +836,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         if (uri && process.env.NODE_ENV !== 'development') {
           /* This causes nested anchors, which, strictly speaking, are illegal.
-            However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
-            So we do this anyway, but only in production mode, to prevent warnings from React. */
+             However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+             So we do this anyway, but only in production mode, to prevent warnings from React. */
           result = (
             <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
@@ -1218,12 +1227,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private isPartOfMenu(): boolean {
+  private isPartOfPermanentMenu(): boolean {
     if (this.props.parent) {
-      return this.props.parent.hasMenu || this.props.parent.isPartOfMenu();
+      return this.props.parent.hasPermanentMenu || this.props.parent.isPartOfPermanentMenu();
     } else {
       return false;
     }
+  }
+
+  private isDirectlyHighlighted(): boolean {
+    return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
   }
 
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {

@@ -3,6 +3,8 @@
 // tslint:disable:variable-name
 
 import * as Fmt from '../format/format';
+import * as Ctx from '../format/context';
+import * as Meta from '../format/metaModel';
 
 export class ObjectContents_Template extends Fmt.ObjectContents {
   display?: Fmt.Expression;
@@ -14,7 +16,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     if (this.display !== undefined) {
-      argumentList.add(this.display, 'display');
+      argumentList.add(this.display, 'display', true);
     }
   }
 
@@ -261,7 +263,7 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.condition);
+    argumentList.add(this.condition, undefined, false);
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -306,12 +308,12 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.param);
+    argumentList.add(this.param, undefined, false);
     if (this.valueIfPresent !== undefined) {
-      argumentList.add(this.valueIfPresent, 'valueIfPresent');
+      argumentList.add(this.valueIfPresent, 'valueIfPresent', true);
     }
     if (this.valueIfMissing !== undefined) {
-      argumentList.add(this.valueIfMissing, 'valueIfMissing');
+      argumentList.add(this.valueIfMissing, 'valueIfMissing', true);
     }
   }
 
@@ -385,7 +387,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     for (let itemsArg of this.items) {
-      argumentList.add(itemsArg);
+      argumentList.add(itemsArg, undefined, true);
     }
   }
 
@@ -451,13 +453,13 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.param);
+    argumentList.add(this.param, undefined, false);
     let dimensionExpr = new Fmt.IntegerExpression;
     dimensionExpr.value = this.dimension;
-    argumentList.add(dimensionExpr);
-    argumentList.add(this.item);
+    argumentList.add(dimensionExpr, undefined, false);
+    argumentList.add(this.item, undefined, false);
     if (this.separator !== undefined) {
-      argumentList.add(this.separator, 'separator');
+      argumentList.add(this.separator, 'separator', true);
     }
   }
 
@@ -593,7 +595,7 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     for (let itemsArg of this.items) {
-      argumentList.add(itemsArg);
+      argumentList.add(itemsArg, undefined, true);
     }
   }
 
@@ -635,20 +637,20 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   }
 }
 
-class DefinitionContentsContext extends Fmt.DerivedContext {
-  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+class DefinitionContentsContext extends Ctx.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ParameterTypeContext extends Fmt.DerivedContext {
-  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+class ParameterTypeContext extends Ctx.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ArgumentTypeContext extends Fmt.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {
+class ArgumentTypeContext extends Ctx.DerivedContext {
+  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
@@ -657,7 +659,7 @@ const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_T
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'not': MetaRefExpression_not, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'first': MetaRefExpression_first, 'last': MetaRefExpression_last, 'neg': MetaRefExpression_neg, '': Fmt.GenericMetaRefExpression};
 
-export class MetaModel extends Fmt.MetaModel {
+export class MetaModel extends Meta.MetaModel {
   constructor() {
     super('display',
           new Fmt.StandardMetaDefinitionFactory(definitionTypes),
@@ -665,15 +667,15 @@ export class MetaModel extends Fmt.MetaModel {
           new Fmt.StandardMetaDefinitionFactory(functions));
   }
 
-  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Ctx.Context): Ctx.Context {
     return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
   }
 
-  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
-  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
     let parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
       let type = parent.type.expression;
@@ -684,7 +686,7 @@ export class MetaModel extends Fmt.MetaModel {
       }
     }
     if (parent instanceof Fmt.CompoundExpression) {
-      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+      for (let currentContext = previousContext; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
           return previousContext;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
@@ -698,11 +700,11 @@ export class MetaModel extends Fmt.MetaModel {
     return super.getNextArgumentContext(argument, argumentIndex, previousContext);
   }
 
-  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     let parent = context.parentObject;
     if (parent instanceof Fmt.CompoundExpression) {
-      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+      for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
           break;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
@@ -716,7 +718,7 @@ export class MetaModel extends Fmt.MetaModel {
 
 export const metaModel = new MetaModel;
 
-export function getMetaModel(path: Fmt.Path) {
+export function getMetaModel(path: Fmt.Path): MetaModel {
   if (path.name !== 'display') {
     throw new Error('File of type "display" expected');
   }

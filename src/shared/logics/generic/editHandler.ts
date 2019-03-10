@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as Edit from '../../format/edit';
 import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
@@ -21,13 +22,26 @@ export class PlaceholderExpression extends Fmt.Expression {
   }
 }
 
+export type SetDisplayFn = (display: Fmt.Expression | undefined) => void;
+export type SetDisplayItemFn = (displayItem: Fmt.Expression | undefined) => void;
+
+export type RenderParameterFn = (parameter: Fmt.Parameter) => Display.RenderedExpression;
+export type InsertParameterFn = (parameter: Fmt.Parameter) => void;
+
+export type RenderExpressionFn = (expression: Fmt.Expression) => Display.RenderedExpression;
+export type InsertExpressionFn = (expression: Fmt.Expression) => void;
+export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
+
 export abstract class GenericEditHandler {
+  protected editAnalysis = new Edit.EditAnalysis;
+
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
+  constructor(definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
+    this.editAnalysis.analyzeDefinition(definition, libraryDataAccessor.logic.getRootContext());
   }
 
-  addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
+  addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
     let displayItem = display instanceof Fmt.ArrayExpression && display.items.length === 1 ? display.items[0] : undefined;
     let onSetDisplayItem = (newDisplayItem: Fmt.Expression | undefined) => {
       if (newDisplayItem) {
@@ -53,10 +67,10 @@ export abstract class GenericEditHandler {
       }
       return menu;
     };
+    semanticLink.alwaysShowMenu = true;
   }
 
-  private addDisplayItemMenu(expression: Display.RenderedExpression, displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
-    let semanticLink = new Display.SemanticLink(expression, false, false);
+  private addDisplayItemMenu(semanticLink: Display.SemanticLink, displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     semanticLink.onMenuOpened = () => {
       let isDefault = !displayItem && !canRemove;
       let menu = new Menu.ExpressionMenu;
@@ -70,10 +84,10 @@ export abstract class GenericEditHandler {
       }
       return menu;
     };
-    expression.semanticLinks = [semanticLink];
+    semanticLink.alwaysShowMenu = true;
   }
 
-  private addDisplayMenuRows(rows: Menu.ExpressionMenuRow[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
+  private addDisplayMenuRows(rows: Menu.ExpressionMenuRow[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     if (defaultValue || canRemove) {
       rows.push(
         this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault, canRemove ? 'Remove' : 'Default'),
@@ -102,7 +116,7 @@ export abstract class GenericEditHandler {
     }
   }
 
-  private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, isDefault: boolean, title: string = 'Default'): Menu.ExpressionMenuRow {
+  private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression | undefined, onSetDisplayItem: SetDisplayItemFn, isDefault: boolean, title: string = 'Default'): Menu.ExpressionMenuRow {
     let defaultAction = new Menu.ImmediateExpressionMenuAction;
     defaultAction.onExecute = () => onSetDisplayItem(undefined);
     let defaultRow = new Menu.StandardExpressionMenuRow;
@@ -120,7 +134,7 @@ export abstract class GenericEditHandler {
     return defaultRow;
   }
 
-  private getDisplayMenuFalseRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+  private getDisplayMenuFalseRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
     let falseRow = new Menu.StandardExpressionMenuRow;
     falseRow.title = 'False';
     let falseAction = new Menu.ImmediateExpressionMenuAction;
@@ -130,7 +144,7 @@ export abstract class GenericEditHandler {
     return falseRow;
   }
 
-  private getDisplayMenuTrueRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+  private getDisplayMenuTrueRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
     let trueRow = new Menu.StandardExpressionMenuRow;
     trueRow.title = 'True';
     let trueAction = new Menu.ImmediateExpressionMenuAction;
@@ -140,7 +154,7 @@ export abstract class GenericEditHandler {
     return trueRow;
   }
 
-  private getDisplayMenuIntegerRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void): Menu.ExpressionMenuRow {
+  private getDisplayMenuIntegerRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
     let integerItem = new Menu.ExpressionMenuTextInput;
     let integerRow = new Menu.StandardExpressionMenuRow;
     integerRow.title = 'Number';
@@ -162,7 +176,7 @@ export abstract class GenericEditHandler {
     return integerRow;
   }
 
-  private getDisplayMenuTextRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
+  private getDisplayMenuTextRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
     let textItem = new Menu.ExpressionMenuTextInput;
     let textRow = new Menu.StandardExpressionMenuRow;
     textRow.title = title;
@@ -184,7 +198,7 @@ export abstract class GenericEditHandler {
     return textRow;
   }
 
-  private getDisplayMenuVariablesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
+  private getDisplayMenuVariablesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
     let variablesRow = new Menu.StandardExpressionMenuRow;
     variablesRow.title = 'Variable';
     let variablesGroup = new Menu.ExpressionMenuItemList;
@@ -209,7 +223,7 @@ export abstract class GenericEditHandler {
     return variablesRow;
   }
 
-  private getDisplayMenuTemplatesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getDisplayMenuTemplatesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let templatesRow = new Menu.StandardExpressionMenuRow;
     templatesRow.title = 'Template';
     let templateMenu = new Menu.ExpressionMenu;
@@ -227,7 +241,7 @@ export abstract class GenericEditHandler {
     return templatesRow;
   }
 
-  private getDisplayMenuTemplateRow(template: Fmt.Definition, displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getDisplayMenuTemplateRow(template: Fmt.Definition, displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let templateRow = new Menu.StandardExpressionMenuRow;
     let title = new Display.TextExpression(template.name);
     title.styleClasses = ['source-code'];
@@ -251,7 +265,7 @@ export abstract class GenericEditHandler {
     return templateRow;
   }
 
-  private getTemplateDialog(template: Fmt.Definition, displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getTemplateDialog(template: Fmt.Definition, displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let titleItem = new Dialog.ExpressionDialogInfoItem;
     titleItem.info = new Display.TextExpression(template.name);
@@ -304,7 +318,7 @@ export abstract class GenericEditHandler {
     return dialog;
   }
 
-  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], renderedVariables: Display.RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Display.RenderedExpression {
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], renderedVariables: Display.RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Display.RenderedExpression {
     if (arrayDimensions) {
       if (value instanceof Fmt.ArrayExpression) {
         let items: Display.RenderedExpression[] = [];
@@ -322,12 +336,14 @@ export abstract class GenericEditHandler {
         let group = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
         if (arrayDimensions === 1) {
           let insertButton = new Display.InsertPlaceholderExpression;
+          let semanticLink = new Display.SemanticLink(insertButton, false, false);
           let onInsertItem = (newValue: Fmt.Expression | undefined) => {
             if (newValue) {
               value.items.push(newValue);
             }
           };
-          this.addDisplayItemMenu(insertButton, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
+          this.addDisplayItemMenu(semanticLink, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
+          insertButton.semanticLinks = [semanticLink];
           if (group) {
             return new Display.RowExpression([
               group,
@@ -351,13 +367,15 @@ export abstract class GenericEditHandler {
     } else {
       let valueOrDefault = value || defaultValue;
       let renderedValue = valueOrDefault ? renderer.renderDisplayExpression(valueOrDefault, renderedVariables) : new Display.EmptyExpression;
+      let semanticLink = new Display.SemanticLink(renderedValue, false, false);
       let onGetDefault = () => defaultValue ? renderer.renderDisplayExpression(defaultValue, renderedVariables) : undefined;
-      this.addDisplayItemMenu(renderedValue, value, onSetDisplayItem, onGetDefault(), variables, type, isTopLevel, canRemove, isPredicate, renderer);
+      this.addDisplayItemMenu(semanticLink, value, onSetDisplayItem, onGetDefault(), variables, type, isTopLevel, canRemove, isPredicate, renderer);
+      renderedValue.semanticLinks = [semanticLink];
       return renderedValue;
     }
   }
 
-  private getDisplayMenuNegationRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getDisplayMenuNegationRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let negationRow = new Menu.StandardExpressionMenuRow;
     negationRow.title = 'With negation';
     let negationAction = new Menu.DialogExpressionMenuAction;
@@ -367,7 +385,7 @@ export abstract class GenericEditHandler {
     return negationRow;
   }
 
-  private getNegationDialog(displayItem: Fmt.Expression | undefined, onSetDisplayItem: (displayItem: Fmt.Expression | undefined) => void, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getNegationDialog(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [];
@@ -405,7 +423,7 @@ export abstract class GenericEditHandler {
     return dialog;
   }
 
-  private getDisplayMenuAlternativesRow(display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getDisplayMenuAlternativesRow(display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let alternativesRow = new Menu.StandardExpressionMenuRow;
     alternativesRow.title = 'Multiple alternatives';
     let alternativesAction = new Menu.DialogExpressionMenuAction;
@@ -415,7 +433,7 @@ export abstract class GenericEditHandler {
     return alternativesRow;
   }
 
-  private getAlternativesDialog(display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getAlternativesDialog(display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [];

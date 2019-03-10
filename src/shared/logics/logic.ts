@@ -1,11 +1,14 @@
 import * as Fmt from '../format/format';
+import * as Ctx from '../format/context';
+import * as Meta from '../format/metaModel';
 import * as Display from '../display/display';
 import { LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataAccessor';
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
   name: string;
-  getMetaModel: Fmt.MetaModelGetter;
+  getMetaModel: Meta.MetaModelGetter;
+  getRootContext(): Ctx.Context;
   getDisplay(): LogicDisplay;
 }
 

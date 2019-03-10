@@ -37,7 +37,7 @@ export abstract class GenericRenderer {
     return config;
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterListToEdit?: Fmt.Parameter[]): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.Parameter[]): Display.RenderedExpression {
     let name = param.name;
     let suffixes: Display.RenderedExpression[] | undefined = undefined;
     let underscorePos = name.indexOf('_');
@@ -55,7 +55,7 @@ export abstract class GenericRenderer {
     }
     let text = new Display.TextExpression(name);
     if (isDefinition && this.editHandler) {
-      this.editHandler.addVariableNameEditor(text, param, parameterListToEdit);
+      this.editHandler.addVariableNameEditor(text, param, parameterList);
     }
     let result: Display.RenderedExpression = text;
     if (suffixes) {
@@ -80,23 +80,23 @@ export abstract class GenericRenderer {
     return this.renderTemplate('Negation', {'operand': expression});
   }
 
-  protected setSemanticLink(expression: Display.RenderedExpression, linkedObject: Object): Display.RenderedExpression {
+  protected addSemanticLink(expression: Display.RenderedExpression, linkedObject: Object): Display.SemanticLink {
     let semanticLink = new Display.SemanticLink(linkedObject);
     if (expression.semanticLinks) {
       expression.semanticLinks.unshift(semanticLink);
     } else {
       expression.semanticLinks = [semanticLink];
     }
-    return expression;
+    return semanticLink;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.RenderedExpression {
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
     let semanticLink = new Display.SemanticLink(linkedObject, true);
     if (this.editHandler) {
       this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, isPredicate, this);
     }
     expression.semanticLinks = [semanticLink];
-    return expression;
+    return semanticLink;
   }
 
   protected findBestMatch(items: Fmt.Expression[], argumentLists?: (Fmt.ArgumentList | undefined)[]): Fmt.Expression | undefined {

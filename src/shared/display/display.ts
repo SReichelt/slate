@@ -652,6 +652,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
 
 export class SemanticLink {
   onMenuOpened?: () => Menu.ExpressionMenu;
+  alwaysShowMenu: boolean = false;
 
   constructor(public linkedObject: Object, public isDefinition: boolean = false, public isMathematical: boolean = true) {}
 }

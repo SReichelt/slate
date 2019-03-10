@@ -11,7 +11,7 @@ body {
   margin: 2pt;
 }
 
-.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .open-menu .hover, .open-menu .selected.hover {
+.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .menu.hidden.hover .menu-cell, .open-menu .hover, .open-menu .selected.hover {
   background-color: #ffd700;
 }
 

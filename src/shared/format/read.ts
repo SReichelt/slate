@@ -1,4 +1,6 @@
 import * as Fmt from './format';
+import * as Ctx from './context';
+import * as Meta from './metaModel';
 import { isWhitespaceCharacter, isSpecialCharacter, isNumericalCharacter } from './common';
 
 export interface Location {
@@ -76,7 +78,7 @@ export type ErrorHandler = (msg: string, range: Range) => void;
 
 export interface ObjectRangeInfo {
   object: Object;
-  context?: Fmt.Context;
+  context?: Ctx.Context;
   metaDefinitions?: Fmt.MetaDefinitionFactory;
   range: Range;
   nameRange?: Range;
@@ -110,7 +112,7 @@ export class Reader {
   private triedChars: string[] = [];
   private atError = false;
 
-  constructor(private stream: InputStream, private reportError: ErrorHandler, private getMetaModel: Fmt.MetaModelGetter, private reportRange?: RangeHandler) {}
+  constructor(private stream: InputStream, private reportError: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private reportRange?: RangeHandler) {}
 
   readFile(): Fmt.File {
     let fileStart = this.markStart();
@@ -118,12 +120,12 @@ export class Reader {
     this.readChar('%');
     file.metaModelPath = this.readPath(undefined);
     this.readChar('%');
-    let metaModel: Fmt.MetaModel | undefined;
+    let metaModel: Meta.MetaModel | undefined;
     try {
       metaModel = this.getMetaModel(file.metaModelPath);
     } catch (error) {
       this.error(error.message, this.markEnd(fileStart));
-      metaModel = new Fmt.DummyMetaModel(file.metaModelPath.name);
+      metaModel = new Meta.DummyMetaModel(file.metaModelPath.name);
     }
     let context = metaModel.getRootContext();
     this.readDefinitions(file.definitions, metaModel.definitionTypes, context);
@@ -134,7 +136,7 @@ export class Reader {
     return file;
   }
 
-  readPath(context: Fmt.Context | undefined): Fmt.Path {
+  readPath(context: Ctx.Context | undefined): Fmt.Path {
     let pathStart = this.markStart();
     let linkStart = pathStart;
     let parentPath: Fmt.PathItem | undefined = undefined;
@@ -183,7 +185,7 @@ export class Reader {
     }
   }
 
-  readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): void {
+  readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): void {
     let definitionsStart = this.markStart();
     for (;;) {
       let documentationItems = this.skipWhitespace();
@@ -197,7 +199,7 @@ export class Reader {
     this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
-  tryReadDefinition(documentationItems: RawDocumentationItem[] | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Definition | undefined {
+  tryReadDefinition(documentationItems: RawDocumentationItem[] | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Definition | undefined {
     let definitionStart = this.markStart();
     if (!this.tryReadChar('$')) {
       return undefined;
@@ -206,7 +208,7 @@ export class Reader {
     let nameStart = this.markStart();
     definition.name = this.readIdentifier();
     let nameRange = this.markEnd(nameStart);
-    context = new Fmt.ParentInfoContext(definition, context);
+    context = new Ctx.ParentInfoContext(definition, context);
     this.readOptionalParameterList(definition.parameters, context);
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     definition.type = this.readType(metaDefinitions, typeContext);
@@ -267,7 +269,7 @@ export class Reader {
     return definition;
   }
 
-  tryReadParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): boolean {
+  tryReadParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): boolean {
     let parameterListStart = this.markStart();
     if (!this.tryReadChar('(')) {
       return false;
@@ -278,19 +280,19 @@ export class Reader {
     return true;
   }
 
-  readParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): void {
+  readParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): void {
     this.skipWhitespace();
     if (!this.tryReadParameterList(parameters, context)) {
       this.error('Parameter list expected');
     }
   }
 
-  readOptionalParameterList(parameters: Fmt.ParameterList, context: Fmt.Context): void {
+  readOptionalParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): void {
     this.skipWhitespace();
     this.tryReadParameterList(parameters, context);
   }
 
-  readParameters(parameters: Fmt.ParameterList, context: Fmt.Context): void {
+  readParameters(parameters: Fmt.ParameterList, context: Ctx.Context): void {
     this.skipWhitespace();
     let parameter = this.tryReadParameter(context);
     if (parameter) {
@@ -305,7 +307,7 @@ export class Reader {
     }
   }
 
-  tryReadParameter(context: Fmt.Context): Fmt.Parameter | undefined {
+  tryReadParameter(context: Ctx.Context): Fmt.Parameter | undefined {
     let parameterStart = this.markStart();
     let name = this.tryReadIdentifier();
     if (!name) {
@@ -336,12 +338,12 @@ export class Reader {
     return parameter;
   }
 
-  readParameter(context: Fmt.Context): Fmt.Parameter {
+  readParameter(context: Ctx.Context): Fmt.Parameter {
     this.skipWhitespace();
     return this.tryReadParameter(context) || this.error('Parameter expected') || new Fmt.Parameter;
   }
 
-  tryReadArgumentList(args: Fmt.ArgumentList, context: Fmt.Context): boolean {
+  tryReadArgumentList(args: Fmt.ArgumentList, context: Ctx.Context): boolean {
     let argumentListStart = this.markStart();
     if (!this.tryReadChar('(')) {
       return false;
@@ -352,12 +354,12 @@ export class Reader {
     return true;
   }
 
-  readOptionalArgumentList(args: Fmt.ArgumentList, context: Fmt.Context): void {
+  readOptionalArgumentList(args: Fmt.ArgumentList, context: Ctx.Context): void {
     this.skipWhitespace();
     this.tryReadArgumentList(args, context);
   }
 
-  readArguments(args: Fmt.ArgumentList, context: Fmt.Context): void {
+  readArguments(args: Fmt.ArgumentList, context: Ctx.Context): void {
     this.skipWhitespace();
     let argIndex = 0;
     let arg = this.tryReadArgument(argIndex, args, context);
@@ -374,7 +376,7 @@ export class Reader {
     }
   }
 
-  tryReadArgument(argIndex: number, previousArgs: Fmt.ArgumentList, context: Fmt.Context): Fmt.Argument | undefined {
+  tryReadArgument(argIndex: number, previousArgs: Fmt.ArgumentList, context: Ctx.Context): Fmt.Argument | undefined {
     let argStart = this.markStart();
     let arg = new Fmt.Argument;
     let nameRange: Range | undefined = undefined;
@@ -404,12 +406,12 @@ export class Reader {
     return arg;
   }
 
-  readArgument(argIndex: number, previousArguments: Fmt.ArgumentList, context: Fmt.Context): Fmt.Argument {
+  readArgument(argIndex: number, previousArguments: Fmt.ArgumentList, context: Ctx.Context): Fmt.Argument {
     this.skipWhitespace();
     return this.tryReadArgument(argIndex, previousArguments, context) || this.error('Argument expected') || new Fmt.Argument;
   }
 
-  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Type | undefined {
+  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Type | undefined {
     if (!this.tryReadChar(':')) {
       return undefined;
     }
@@ -429,12 +431,12 @@ export class Reader {
     return type;
   }
 
-  readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Type {
+  readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Type {
     this.skipWhitespace();
     return this.tryReadType(metaDefinitions, context) || this.error('Type expected') || new Fmt.Type;
   }
 
-  readExpressions(context: Fmt.Context): Fmt.Expression[] {
+  readExpressions(context: Ctx.Context): Fmt.Expression[] {
     let expressions: Fmt.Expression[] = [];
     this.skipWhitespace();
     let expression = this.tryReadExpression(false, context.metaModel.functions, context);
@@ -449,7 +451,7 @@ export class Reader {
     return expressions;
   }
 
-  tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Expression | undefined {
+  tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Expression | undefined {
     let expressionStart = this.markStart();
     let expression: Fmt.Expression | undefined = undefined;
     let nameRange: Range | undefined = undefined;
@@ -469,7 +471,7 @@ export class Reader {
         genericExpression.name = name;
         expression = genericExpression;
       }
-      context = new Fmt.ParentInfoContext(expression, context);
+      context = new Ctx.ParentInfoContext(expression, context);
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
       this.readOptionalArgumentList(args, context);
       try {
@@ -481,7 +483,7 @@ export class Reader {
       // Other expressions not allowed in this case.
     } else if (this.tryReadChar('$')) {
       let definitionRefExpression = new Fmt.DefinitionRefExpression;
-      context = new Fmt.ParentInfoContext(definitionRefExpression, context);
+      context = new Ctx.ParentInfoContext(definitionRefExpression, context);
       definitionRefExpression.path = this.readPath(context);
       expression = definitionRefExpression;
     } else {
@@ -493,13 +495,13 @@ export class Reader {
         // Other expressions not allowed in this case.
       } else if (this.tryReadChar('{')) {
         let compoundExpression = new Fmt.CompoundExpression;
-        context = new Fmt.ParentInfoContext(compoundExpression, context);
+        context = new Ctx.ParentInfoContext(compoundExpression, context);
         this.readArguments(compoundExpression.arguments, context);
         this.readChar('}');
         expression = compoundExpression;
       } else if (this.tryReadChar('#')) {
         let parameterExpression = new Fmt.ParameterExpression;
-        context = new Fmt.ParentInfoContext(parameterExpression, context);
+        context = new Ctx.ParentInfoContext(parameterExpression, context);
         this.readParameterList(parameterExpression.parameters, context);
         expression = parameterExpression;
       } else if (this.tryReadChar('[')) {
@@ -529,7 +531,7 @@ export class Reader {
     return expression;
   }
 
-  private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Fmt.Context): Fmt.Expression {
+  private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): Fmt.Expression {
     let expression = new Fmt.VariableRefExpression;
     try {
       expression.variable = context.getVariable(identifier);
@@ -544,7 +546,7 @@ export class Reader {
     return expression;
   }
 
-  readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Fmt.Context): Fmt.Expression {
+  readExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Expression {
     this.skipWhitespace();
     let expression = this.tryReadExpression(isType, metaDefinitions, context);
     if (!expression) {
@@ -913,7 +915,7 @@ export class Reader {
     return this.markedStart;
   }
 
-  private markEnd(start: Location, object?: Object, context?: Fmt.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, linkRange?: Range, signatureRange?: Range): Range {
+  private markEnd(start: Location, object?: Object, context?: Ctx.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, linkRange?: Range, signatureRange?: Range): Range {
     if (!this.markedEnd) {
       this.markedEnd = this.stream.getLocation();
     }
@@ -970,7 +972,7 @@ export class Reader {
 }
 
 
-export function readStream(stream: InputStream, fileName: string, getMetaModel: Fmt.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
+export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
   let reportError = (msg: string, range: Range) => {
     let line = range.start.line + 1;
     let col = range.start.col + 1;
@@ -984,6 +986,6 @@ export function readStream(stream: InputStream, fileName: string, getMetaModel: 
   return reader.readFile();
 }
 
-export function readString(str: string, fileName: string, getMetaModel: Fmt.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
+export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
   return readStream(new StringInputStream(str), fileName, getMetaModel, reportRange);
 }

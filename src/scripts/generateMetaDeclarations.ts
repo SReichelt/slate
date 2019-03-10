@@ -212,7 +212,9 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
   let contentType = getMemberContentType(inFile, type);
   if (list) {
     if (optional) {
-      outFileStr += `${indent}let initialized = false;\n`;
+      outFileStr += `${indent}if (this.${memberName}) {\n`;
+      outFileStr += `${indent}  this.${memberName} = undefined;\n`;
+      outFileStr += `${indent}}\n`;
     } else {
       outFileStr += `${indent}this.${memberName} = [];\n`;
     }
@@ -223,9 +225,8 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
     outFileStr += `${indent}    break;\n`;
     outFileStr += `${indent}  }\n`;
     if (optional) {
-      outFileStr += `${indent}  if (!initialized) {\n`;
+      outFileStr += `${indent}  if (!this.${memberName}) {\n`;
       outFileStr += `${indent}    this.${memberName} = [];\n`;
-      outFileStr += `${indent}    initialized = true;\n`;
       outFileStr += `${indent}  }\n`;
     }
     outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}!`, type, contentType, true, type.arrayDimensions, `${indent}  `);
@@ -248,16 +249,16 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
   return outFileStr;
 }
 
-function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, list: boolean, named: boolean, contentType: string | undefined, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, optional: boolean, list: boolean, named: boolean, contentType: string | undefined, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   if (list) {
     let item = argName + 'Arg';
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, false, false, contentType, targetIsList, remainingArrayDimensions, `${indent}  `);
+    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, true, false, false, contentType, targetIsList, remainingArrayDimensions, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     let outputBegin = targetIsList ? `${target}.push(` : `${target}.add(`;
-    let outputEnd = named ? `, '${argName}')` : `)`;
+    let outputEnd = targetIsList ? `)` : named ? `, '${argName}', ${optional})` : `, undefined, ${optional})`;
     if (contentType) {
       let variableName = argName + 'Expr';
       if (targetIsList) {
@@ -275,7 +276,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
           item += remainingArrayDimensions - 1;
         }
         outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-        outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type, false, false, contentType, true, remainingArrayDimensions - 1, `${indent}  `);
+        outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type, true, false, false, contentType, true, remainingArrayDimensions - 1, `${indent}  `);
         outFileStr += `${indent}}\n`;
         outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
       } else {
@@ -326,10 +327,10 @@ function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type
   let contentType = getMemberContentType(inFile, type);
   if (optional) {
     outFileStr += `${indent}if (${source} !== undefined) {\n`;
-    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, list, named, contentType, false, type.arrayDimensions, `${indent}  `);
+    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, contentType, false, type.arrayDimensions, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
-    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, list, named, contentType, false, type.arrayDimensions, indent);
+    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, contentType, false, type.arrayDimensions, indent);
   }
   return outFileStr;
 }
@@ -841,7 +842,7 @@ function outputMemberDependencyCode(inFile: Fmt.File, visibleTypeNames: string[]
         for (let dependency of member.dependencies) {
           if (dependency instanceof Fmt.DefinitionRefExpression && !dependency.path.parentPath) {
             if (!hasParentRestriction) {
-              outFileStr += `${indent}  for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {\n`;
+              outFileStr += `${indent}  for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {\n`;
               hasParentRestriction = true;
             }
             let dependencyDefinition = inFile.definitions.getDefinition(dependency.path.name);
@@ -888,9 +889,9 @@ function outputParameterDependencyCode(inFile: Fmt.File, parameters: Fmt.Paramet
       if (param.dependencies) {
         for (let dependency of param.dependencies) {
           if (dependency instanceof FmtMeta.MetaRefExpression_self) {
-            outFileStr += `${indent}  for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+            outFileStr += `${indent}  for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {\n`;
             outFileStr += `${indent}    if (currentContext instanceof ParameterTypeContext) {\n`;
-            outFileStr += `${indent}      context = new Fmt.ParameterContext(currentContext.parameter, context);\n`;
+            outFileStr += `${indent}      context = new Ctx.ParameterContext(currentContext.parameter, context);\n`;
             outFileStr += `${indent}      break;\n`;
             outFileStr += `${indent}    }\n`;
             outFileStr += `${indent}  }\n`;
@@ -917,7 +918,7 @@ function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, inden
     let path = param.type.expression.path;
     if (path.parentPath) {
       if (path.parentPath instanceof Fmt.NamedPathItem) {
-        outFileStr += `${indent}context = new Fmt.DerivedContext(context);\n`;
+        outFileStr += `${indent}context = new Ctx.DerivedContext(context);\n`;
         let metaModelName = path.parentPath.name;
         if (metaModelName) {
           metaModelName = metaModelName.charAt(0).toUpperCase() + metaModelName.substring(1);
@@ -938,20 +939,20 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
   let outFileStr = '';
   let metaModel = inFile.definitions[0];
   if (metaModel && metaModel.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-    outFileStr += `class DefinitionContentsContext extends Fmt.DerivedContext {\n`;
-    outFileStr += `  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {\n`;
+    outFileStr += `class DefinitionContentsContext extends Ctx.DerivedContext {\n`;
+    outFileStr += `  constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {\n`;
     outFileStr += `    super(parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `}\n`;
     outFileStr += `\n`;
-    outFileStr += `class ParameterTypeContext extends Fmt.DerivedContext {\n`;
-    outFileStr += `  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {\n`;
+    outFileStr += `class ParameterTypeContext extends Ctx.DerivedContext {\n`;
+    outFileStr += `  constructor(public parameter: Fmt.Parameter, parentContext: Ctx.Context) {\n`;
     outFileStr += `    super(parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `}\n`;
     outFileStr += `\n`;
-    outFileStr += `class ArgumentTypeContext extends Fmt.DerivedContext {\n`;
-    outFileStr += `  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {\n`;
+    outFileStr += `class ArgumentTypeContext extends Ctx.DerivedContext {\n`;
+    outFileStr += `  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {\n`;
     outFileStr += `    super(parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `}\n`;
@@ -971,7 +972,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
         break;
       }
     }
-    outFileStr += `export class MetaModel extends Fmt.MetaModel {\n`;
+    outFileStr += `export class MetaModel extends Meta.MetaModel {\n`;
     outFileStr += `  constructor() {\n`;
     outFileStr += `    super('${metaModel.name}',\n`;
     outFileStr += `          new Fmt.StandardMetaDefinitionFactory(definitionTypes),\n`;
@@ -979,15 +980,15 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `          new Fmt.StandardMetaDefinitionFactory(functions));\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Ctx.Context): Ctx.Context {\n`;
     outFileStr += `    return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {\n`;
     outFileStr += `    return new ParameterTypeContext(parameter, parentContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {\n`;
     outFileStr += `    let parent = previousContext.parentObject;\n`;
     outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
     if (metaModel.contents.definitionTypes instanceof Fmt.ArrayExpression) {
@@ -1014,7 +1015,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     }
     outFileStr += `    }\n`;
     outFileStr += `    if (parent instanceof Fmt.CompoundExpression) {\n`;
-    outFileStr += `      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+    outFileStr += `      for (let currentContext = previousContext; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {\n`;
     outFileStr += `        if (currentContext instanceof ArgumentTypeContext) {\n`;
     outFileStr += `          return previousContext;\n`;
     outFileStr += `        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {\n`;
@@ -1028,7 +1029,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `    return super.getNextArgumentContext(argument, argumentIndex, previousContext);\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {\n`;
+    outFileStr += `  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {\n`;
     outFileStr += `    let context = parentContext;\n`;
     outFileStr += `    let parent = context.parentObject;\n`;
     if (metaModel.contents.definitionTypes instanceof Fmt.ArrayExpression) {
@@ -1056,7 +1057,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
       }
     }
     outFileStr += `    if (parent instanceof Fmt.CompoundExpression) {\n`;
-    outFileStr += `      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {\n`;
+    outFileStr += `      for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {\n`;
     outFileStr += `        if (currentContext instanceof ArgumentTypeContext) {\n`;
     for (let definition of inFile.definitions) {
       if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
@@ -1110,7 +1111,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
         if (definitionExportCode) {
           if (!hasExports) {
             outFileStr += `\n`;
-            outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {\n`;
+            outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {\n`;
             outFileStr += `    let context = parentContext;\n`;
             hasExports = true;
           }
@@ -1128,7 +1129,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `\n`;
     outFileStr += `export const metaModel = new MetaModel;\n`;
     outFileStr += `\n`;
-    outFileStr += `export function getMetaModel(path: Fmt.Path) {\n`;
+    outFileStr += `export function getMetaModel(path: Fmt.Path): MetaModel {\n`;
     outFileStr += `  if (path.name !== '${metaModel.name}') {\n`;
     outFileStr += `    throw new Error('File of type "${metaModel.name}" expected');\n`;
     outFileStr += `  }\n`;
@@ -1167,6 +1168,8 @@ function generate(inFileName: string, outFileName: string, ReferencedMetaModels:
     relPathStr += item + '/';
   }
   outFileStr += `import * as Fmt from '${relPathStr}format';\n`;
+  outFileStr += `import * as Ctx from '${relPathStr}context';\n`;
+  outFileStr += `import * as Meta from '${relPathStr}metaModel';\n`;
   for (let ref of ReferencedMetaModels) {
     let refName = ref.inFileName.split('/').pop()!.split('.')[0]!;
     refName = refName[0].toUpperCase() + refName.substring(1);

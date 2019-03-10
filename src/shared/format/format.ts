@@ -308,6 +308,7 @@ export class ParameterList extends Array<Parameter> {
 export class Argument {
   name?: string;
   value: Expression;
+  optional?: boolean;
 
   clone(replacedParameters: ReplacedParameter[] = []): Argument {
     return this.substituteExpression(undefined, replacedParameters);
@@ -319,6 +320,7 @@ export class Argument {
       let result = new Argument;
       result.name = this.name;
       result.value = newValue;
+      result.optional = this.optional;
       return result;
     } else {
       return this;
@@ -360,10 +362,11 @@ export class ArgumentList extends Array<Argument> {
     return value;
   }
 
-  add(value: Expression, name?: string): void {
+  add(value: Expression, name?: string, optional?: boolean): void {
     let arg = new Argument;
     arg.name = name;
     arg.value = value;
+    arg.optional = optional;
     this.push(arg);
   }
 
@@ -796,74 +799,6 @@ export class DocumentationItem {
   }
 }
 
-
-export abstract class Context {
-  constructor(public metaModel: MetaModel, public parentObject?: Object) {}
-
-  abstract getVariables(): Parameter[];
-  abstract getVariable(name: string): Parameter;
-}
-
-export class EmptyContext extends Context {
-  getVariables(): Parameter[] {
-    return [];
-  }
-
-  getVariable(name: string): Parameter {
-    throw new Error(`Variable "${name}" not found`);
-  }
-}
-
-export class DerivedContext extends Context {
-  constructor(public parentContext: Context) {
-    super(parentContext.metaModel, parentContext.parentObject);
-  }
-
-  getVariables(): Parameter[] {
-    return this.parentContext.getVariables();
-  }
-
-  getVariable(name: string): Parameter {
-    return this.parentContext.getVariable(name);
-  }
-}
-
-export class ParentInfoContext extends DerivedContext {
-  constructor(parentObject: Object, parentContext: Context) {
-    super(parentContext);
-    this.parentObject = parentObject;
-  }
-}
-
-export class ParameterContext extends DerivedContext {
-  constructor(public parameter: Parameter, parentContext: Context) {
-    super(parentContext);
-  }
-
-  getVariables(): Parameter[] {
-    return this.parentContext.getVariables().concat(this.parameter);
-  }
-
-  getVariable(name: string): Parameter {
-    if (this.parameter.name === name) {
-      return this.parameter;
-    }
-    return this.parentContext.getVariable(name);
-  }
-}
-
-export class DummyContext extends Context {
-  getVariables(): Parameter[] {
-    return [];
-  }
-
-  getVariable(name: string): Parameter {
-    let param = new Parameter;
-    param.name = name;
-    return param;
-  }
-}
-
 export interface MetaDefinitionList {
   [name: string]: {new(): MetaRefExpression};
 }
@@ -900,69 +835,3 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
     return true;
   }
 }
-
-export class MetaModel {
-  constructor(public name: string, public definitionTypes: MetaDefinitionFactory, public expressionTypes: MetaDefinitionFactory, public functions: MetaDefinitionFactory) {}
-
-  getRootContext(): Context {
-    return new EmptyContext(this);
-  }
-
-  getDefinitionTypeContext(definition: Definition, parentContext: Context): Context {
-    return parentContext;
-  }
-
-  getDefinitionContentsContext(definition: Definition, parentContext: Context): Context {
-    return this.getParameterListContext(definition.parameters, parentContext);
-  }
-
-  getParameterTypeContext(parameter: Parameter, parentContext: Context): Context {
-    return parentContext;
-  }
-
-  getNextParameterContext(parameter: Parameter, previousContext: Context): Context {
-    return this.getParameterContext(parameter, previousContext);
-  }
-
-  getNextArgumentContext(argument: Argument, argumentIndex: number, previousContext: Context): Context {
-    if (argument.value instanceof ParameterExpression) {
-      return this.getParameterListContext(argument.value.parameters, previousContext);
-    } else {
-      return previousContext;
-    }
-  }
-
-  getArgumentValueContext(argument: Argument, argumentIndex: number, previousArguments: ArgumentList, parentContext: Context): Context {
-    return parentContext;
-  }
-
-  protected getParameterContext(parameter: Parameter, parentContext: Context): Context {
-    let typeContext = this.getExports(parameter.type.expression, parentContext);
-    return new ParameterContext(parameter, typeContext);
-  }
-
-  protected getParameterListContext(parameters: ParameterList, parentContext: Context): Context {
-    let context = parentContext;
-    for (let param of parameters) {
-      context = this.getParameterContext(param, context);
-    }
-    return context;
-  }
-
-  protected getExports(expression: Expression, parentContext: Context): Context {
-    return parentContext;
-  }
-}
-
-export class DummyMetaModel extends MetaModel {
-  constructor(name: string) {
-    let dummyFactory = new GenericMetaDefinitionFactory;
-    super(name, dummyFactory, dummyFactory, dummyFactory);
-  }
-
-  getRootContext(): Context {
-    return new DummyContext(this);
-  }
-}
-
-export type MetaModelGetter = (path: Path) => MetaModel;

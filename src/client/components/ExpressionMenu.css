@@ -11,6 +11,7 @@
   box-shadow: 1pt 2pt 5pt silver;
   white-space: nowrap;
   user-select: none;
+  font-size: initial;
 }
 
 .open-menu-wrapper {

@@ -620,6 +620,10 @@ div.display-math {
   border-spacing: 0;
 }
 
+.menu.hidden {
+  border: solid 1px #e0e0e0;
+}
+
 .placeholder>.menu {
   vertical-align: text-bottom;
 }
@@ -630,10 +634,9 @@ div.display-math {
 
 .menu-cell {
   display: table-cell;
-  padding: 1px 3px;
+  padding: 2px 3px;
   cursor: default;
   background-color: #f8f8f8;
-  overflow: hidden;
 }
 
 .menu-placeholder-cell, .menu-dropdown-cell {
@@ -664,7 +667,7 @@ div.display-math {
   font-size: inherit;
 }
 
-.expr input {
+.expr>input {
   text-align: center;
 }
 

@@ -3,6 +3,8 @@
 // tslint:disable:variable-name
 
 import * as Fmt from '../format/format';
+import * as Ctx from '../format/context';
+import * as Meta from '../format/metaModel';
 
 export class ObjectContents_Section extends Fmt.ObjectContents {
   logic: string;
@@ -22,9 +24,9 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     argumentList.length = 0;
     let logicExpr = new Fmt.StringExpression;
     logicExpr.value = this.logic;
-    argumentList.add(logicExpr, 'logic');
+    argumentList.add(logicExpr, 'logic', false);
     if (this.items !== undefined) {
-      argumentList.add(this.items, 'items');
+      argumentList.add(this.items, 'items', true);
     }
   }
 
@@ -185,16 +187,16 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.ref);
+    argumentList.add(this.ref, undefined, false);
     if (this.type !== undefined) {
       let typeExpr = new Fmt.StringExpression;
       typeExpr.value = this.type;
-      argumentList.add(typeExpr, 'type');
+      argumentList.add(typeExpr, 'type', true);
     }
     if (this.title !== undefined) {
       let titleExpr = new Fmt.StringExpression;
       titleExpr.value = this.title;
-      argumentList.add(titleExpr, 'title');
+      argumentList.add(titleExpr, 'title', true);
     }
   }
 
@@ -251,10 +253,10 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.ref);
+    argumentList.add(this.ref, undefined, false);
     let titleExpr = new Fmt.StringExpression;
     titleExpr.value = this.title;
-    argumentList.add(titleExpr);
+    argumentList.add(titleExpr, undefined, false);
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -286,20 +288,20 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   }
 }
 
-class DefinitionContentsContext extends Fmt.DerivedContext {
-  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+class DefinitionContentsContext extends Ctx.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ParameterTypeContext extends Fmt.DerivedContext {
-  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+class ParameterTypeContext extends Ctx.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ArgumentTypeContext extends Fmt.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Fmt.Context) {
+class ArgumentTypeContext extends Ctx.DerivedContext {
+  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
@@ -308,7 +310,7 @@ const definitionTypes: Fmt.MetaDefinitionList = {'Library': MetaRefExpression_Li
 const expressionTypes: Fmt.MetaDefinitionList = {};
 const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection, '': Fmt.GenericMetaRefExpression};
 
-export class MetaModel extends Fmt.MetaModel {
+export class MetaModel extends Meta.MetaModel {
   constructor() {
     super('library',
           new Fmt.StandardMetaDefinitionFactory(definitionTypes),
@@ -316,15 +318,15 @@ export class MetaModel extends Fmt.MetaModel {
           new Fmt.StandardMetaDefinitionFactory(functions));
   }
 
-  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Ctx.Context): Ctx.Context {
     return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
   }
 
-  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
-  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
     let parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
       let type = parent.type.expression;
@@ -336,7 +338,7 @@ export class MetaModel extends Fmt.MetaModel {
       }
     }
     if (parent instanceof Fmt.CompoundExpression) {
-      for (let currentContext = previousContext; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+      for (let currentContext = previousContext; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
           return previousContext;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
@@ -350,11 +352,11 @@ export class MetaModel extends Fmt.MetaModel {
     return super.getNextArgumentContext(argument, argumentIndex, previousContext);
   }
 
-  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     let parent = context.parentObject;
     if (parent instanceof Fmt.CompoundExpression) {
-      for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+      for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
           break;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
@@ -368,7 +370,7 @@ export class MetaModel extends Fmt.MetaModel {
 
 export const metaModel = new MetaModel;
 
-export function getMetaModel(path: Fmt.Path) {
+export function getMetaModel(path: Fmt.Path): MetaModel {
   if (path.name !== 'library') {
     throw new Error('File of type "library" expected');
   }

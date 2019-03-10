@@ -2,6 +2,7 @@ import { LibraryDataAccessor, LibraryItemInfo } from './libraryDataAccessor';
 import { FileAccessor, FileContents, WriteFileResult } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
+import * as Meta from '../format/metaModel';
 import * as FmtReader from '../format/read';
 import * as FmtWriter from '../format/write';
 import * as FmtLibrary from '../logics/library';
@@ -104,7 +105,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return false;
   }
 
-  private fetchDefinition(name: string, getMetaModel: Fmt.MetaModelGetter): CachedPromise<Fmt.Definition> {
+  private fetchDefinition(name: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
     let result = this.definitionCache.get(name);
     if (!result) {
       let uri = this.uri + encodeURI(name) + fileExtension;
