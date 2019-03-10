@@ -1,13 +1,15 @@
 import * as Fmt from './format';
+import * as Ctx from './context';
+import * as Meta from './metaModel';
 import * as FmtMeta from './meta';
 
-export class DynamicMetaModel extends Fmt.MetaModel {
+export class DynamicMetaModel extends Meta.MetaModel {
   fileName: string;
   definitions: Fmt.DefinitionList;
-  private getReferencedMetaModel: Fmt.MetaModelGetter;
+  private getReferencedMetaModel: Meta.MetaModelGetter;
   objectContentsMap: Map<Fmt.ArgumentList, DynamicObjectContents>;
 
-  constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Fmt.MetaModelGetter) {
+  constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Meta.MetaModelGetter) {
     let definitions = file.definitions;
     let metaModelDefinition = definitions[0];
     let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
@@ -24,15 +26,15 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     functions.metaModel = this;
   }
 
-  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Fmt.Context): Fmt.Context {
+  getDefinitionContentsContext(definition: Fmt.Definition, parentContext: Ctx.Context): Ctx.Context {
     return new DefinitionContentsContext(definition, super.getDefinitionContentsContext(definition, parentContext));
   }
 
-  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+  getParameterTypeContext(parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
     return new ParameterTypeContext(parameter, parentContext);
   }
 
-  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Fmt.Context): Fmt.Context {
+  getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
     if (this.getParentTypeDefinition(previousContext) || previousContext.parentObject instanceof DynamicMetaRefExpression) {
       // Specific dependencies handled in getArgumentValueContext.
       return previousContext;
@@ -42,14 +44,14 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     }
   }
 
-  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Fmt.Context): Fmt.Context {
+  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     let parentTypeDefinition = this.getParentTypeDefinition(context);
     if (parentTypeDefinition) {
       let member = this.findMember(parentTypeDefinition, argument.name, argumentIndex).result;
       if (member) {
-        for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
-          if (context instanceof DefinitionContentsContext || context instanceof Fmt.ParentInfoContext) {
+        for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
+          if (context instanceof DefinitionContentsContext || context instanceof Ctx.ParentInfoContext) {
             let stop = true;
             if (member.dependencies) {
               for (let dependency of member.dependencies) {
@@ -85,9 +87,9 @@ export class DynamicMetaModel extends Fmt.MetaModel {
         if (metaParameter.dependencies) {
           for (let dependency of metaParameter.dependencies) {
             if (dependency instanceof FmtMeta.MetaRefExpression_self) {
-              for (let currentContext = context; currentContext instanceof Fmt.DerivedContext; currentContext = currentContext.parentContext) {
+              for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
                 if (currentContext instanceof ParameterTypeContext) {
-                  context = new Fmt.ParameterContext(currentContext.parameter, context);
+                  context = new Ctx.ParameterContext(currentContext.parameter, context);
                   break;
                 }
               }
@@ -103,12 +105,12 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return context;
   }
 
-  private getParentTypeDefinition(context: Fmt.Context): Fmt.Definition | undefined {
+  private getParentTypeDefinition(context: Ctx.Context): Fmt.Definition | undefined {
     let parent = context.parentObject;
     if (parent instanceof Fmt.Definition && parent.type.expression instanceof DynamicMetaRefExpression) {
       return parent.type.expression.metaDefinition;
     } else if (parent instanceof Fmt.CompoundExpression) {
-      for (; context instanceof Fmt.DerivedContext; context = context.parentContext) {
+      for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
         if (context instanceof ArgumentTypeContext) {
           return this.definitions.getDefinition(context.metaDefinitionName);
         } else if (context.parentObject !== parent && !(context.parentObject instanceof Fmt.ArrayExpression)) {
@@ -119,7 +121,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return undefined;
   }
 
-  private getArgumentTypeContext(type: Fmt.Type, parentContext: Fmt.Context): Fmt.Context {
+  private getArgumentTypeContext(type: Fmt.Type, parentContext: Ctx.Context): Ctx.Context {
     if (type.expression instanceof Fmt.DefinitionRefExpression) {
       let context = new ArgumentTypeContext(type.expression.path.name, parentContext);
       let parentPath = type.expression.path.parentPath;
@@ -134,7 +136,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return parentContext;
   }
 
-  protected getExports(expression: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     if (expression instanceof DynamicMetaRefExpression) {
       let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
@@ -149,7 +151,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return context;
   }
 
-  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, parentContext: Fmt.Context): Fmt.Context {
+  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     let index = parameterList.indexOf(parameter);
     if (index >= 0) {
@@ -161,7 +163,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return context;
   }
 
-  private getMemberArgumentExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, member: Fmt.Parameter, parentContext: Fmt.Context): {result: Fmt.Context, memberCount: number} {
+  private getMemberArgumentExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, member: Fmt.Parameter, parentContext: Ctx.Context): {result: Ctx.Context, memberCount: number} {
     let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
@@ -184,7 +186,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     return {result: context, memberCount: parentMemberCount};
   }
 
-  private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Fmt.Context): Fmt.Context {
+  private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
     if (expression instanceof Fmt.ArrayExpression) {
       let context = parentContext;
       for (let item of expression.items) {
@@ -201,7 +203,7 @@ export class DynamicMetaModel extends Fmt.MetaModel {
     }
   }
 
-  private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Fmt.Context): {result: Fmt.Context, memberCount: number} {
+  private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Ctx.Context): {result: Ctx.Context, memberCount: number} {
     let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
@@ -501,20 +503,20 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
   }
 }
 
-class DefinitionContentsContext extends Fmt.DerivedContext {
-  constructor(public definition: Fmt.Definition, parentContext: Fmt.Context) {
+class DefinitionContentsContext extends Ctx.DerivedContext {
+  constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ParameterTypeContext extends Fmt.DerivedContext {
-  constructor(public parameter: Fmt.Parameter, parentContext: Fmt.Context) {
+class ParameterTypeContext extends Ctx.DerivedContext {
+  constructor(public parameter: Fmt.Parameter, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
 
-class ArgumentTypeContext extends Fmt.DerivedContext {
-  constructor(public metaDefinitionName: string, parentContext: Fmt.Context) {
+class ArgumentTypeContext extends Ctx.DerivedContext {
+  constructor(public metaDefinitionName: string, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }

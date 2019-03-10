@@ -465,7 +465,7 @@ div.display-math {
   font-size: 98%;
 }
 
-.var, .var * {
+.var, .var>* {
   font-family: 'TeX-Var', serif;
   font-style: italic;
 }
@@ -503,6 +503,11 @@ div.display-math {
   overflow: visible;
   white-space: nowrap;
   font-size: 70%;
+}
+
+.ellipsis {
+  line-height: initial;
+  font-size: smaller;
 }
 
 .dummy {
@@ -644,6 +649,9 @@ div.display-math {
   vertical-align: middle;
   color: #808080;
   background-color: #e0e0e0;
+}
+
+.menu.interactive>.menu-row>.menu-placeholder-cell, .menu.interactive>.menu-row>.menu-dropdown-cell {
   cursor: pointer;
 }
 
@@ -669,6 +677,10 @@ div.display-math {
 
 .expr>input {
   text-align: center;
+  color: inherit;
+  background-color: inherit;
+  border: solid 1px silver;
+  border-radius: 2px;
 }
 
 .expr textarea {

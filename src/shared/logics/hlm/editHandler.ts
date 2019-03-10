@@ -82,12 +82,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
-    let parameter = new Fmt.Parameter;
-    parameter.name = defaultName;
-    let parameterType = new Fmt.Type;
-    parameterType.expression = type;
-    parameterType.arrayDimensions = 0;
-    parameter.type = parameterType;
+    let parameter = this.createParameter(type, defaultName);
 
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => onInsertParam(parameter);
@@ -96,6 +91,16 @@ export class HLMEditHandler extends GenericEditHandler {
     item.expression = onRenderParam(parameter);
     item.action = action;
     return item;
+  }
+
+  private createParameter(type: Fmt.Expression, defaultName: string): Fmt.Parameter {
+    let parameter = new Fmt.Parameter;
+    parameter.name = defaultName;
+    let parameterType = new Fmt.Type;
+    parameterType.expression = type;
+    parameterType.arrayDimensions = 0;
+    parameter.type = parameterType;
+    return parameter;
   }
 
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
@@ -112,14 +117,14 @@ export class HLMEditHandler extends GenericEditHandler {
     return paramClone;
   }
 
-  addSetTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn): void {
+  addSetTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, allowSubset: boolean): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
-      this.addSetTermMenuWithEditInfo(semanticLink, term, onRenderTerm, expressionEditInfo);
+      this.addSetTermMenuWithEditInfo(semanticLink, term, onRenderTerm, allowSubset, expressionEditInfo);
     }
   }
 
-  private addSetTermMenuWithEditInfo(semanticLink: Display.SemanticLink, term: Fmt.Expression | undefined, onRenderTerm: RenderExpressionFn, expressionEditInfo: Edit.ExpressionEditInfo): void {
+  private addSetTermMenuWithEditInfo(semanticLink: Display.SemanticLink, term: Fmt.Expression | undefined, onRenderTerm: RenderExpressionFn, allowSubset: boolean, expressionEditInfo: Edit.ExpressionEditInfo): void {
     // TODO select item if existing term is not a placeholder
     // TODO pre-fill terms according to existing term
     semanticLink.onMenuOpened = () => {
@@ -140,6 +145,13 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       menu.rows.push(this.getEnumerationRow(expressionEditInfo, onRenderTerm));
+
+      if (allowSubset) {
+        menu.rows.push(
+          this.getSubsetRow(expressionEditInfo, onRenderTerm),
+          this.getSetCasesRow(expressionEditInfo, onRenderTerm)
+        );
+      }
 
       return menu;
     };
@@ -244,6 +256,44 @@ export class HLMEditHandler extends GenericEditHandler {
     enumerationRow.title = 'Enumeration';
     enumerationRow.subMenu = this.getExpressionItem(enumerationExpression, expressionEditInfo, onRenderTerm);
     return enumerationRow;
+  }
+
+  private getSubsetRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let subsetExpression = new FmtHLM.MetaRefExpression_subset;
+    let elementType = new FmtHLM.MetaRefExpression_Element;
+    elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+    subsetExpression.parameter = this.createParameter(elementType, 'x');
+    subsetExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+
+    let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset;
+    extendedSubsetExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    extendedSubsetExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
+
+    let subsetMenu = new Menu.ExpressionMenu;
+    subsetMenu.rows = [
+      this.getExpressionItem(subsetExpression, expressionEditInfo, onRenderTerm),
+      this.getExpressionItem(extendedSubsetExpression, expressionEditInfo, onRenderTerm)
+    ];
+    let subsetRow = new Menu.StandardExpressionMenuRow;
+    subsetRow.title = 'Subset';
+    subsetRow.subMenu = subsetMenu;
+    return subsetRow;
+  }
+
+  private getSetCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let structuralExpression = new FmtHLM.MetaRefExpression_setStructuralCases;
+    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.cases = [];
+
+    let casesMenu = new Menu.ExpressionMenu;
+    casesMenu.rows = [
+      this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderTerm),
+    ];
+    let casesRow = new Menu.StandardExpressionMenuRow;
+    casesRow.title = 'Cases';
+    casesRow.subMenu = casesMenu;
+    return casesRow;
   }
 
   private getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {

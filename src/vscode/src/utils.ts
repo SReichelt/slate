@@ -2,11 +2,12 @@
 
 import * as vscode from 'vscode';
 import * as Fmt from '../../shared/format/format';
+import * as Ctx from '../../shared/format/context';
 import * as FmtReader from '../../shared/format/read';
 
 export interface RangeInfo {
     object: Object;
-    context?: Fmt.Context;
+    context?: Ctx.Context;
     metaDefinitions?: Fmt.MetaDefinitionFactory;
     range: vscode.Range;
     nameRange?: vscode.Range;

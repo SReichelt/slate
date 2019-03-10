@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as Fmt from '../../shared/format/format';
+import * as Meta from '../../shared/format/metaModel';
 import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
@@ -49,10 +50,10 @@ export function getMetaModel(sourceFileName: string, metaModelPath: Fmt.Path): F
   return new FmtDynamic.DynamicMetaModel(file, fileName, (otherPath: Fmt.Path) => getMetaModel(fileName, otherPath));
 }
 
-export function getMetaModelWithFallback(sourceFileName: string, metaModelPath: Fmt.Path): Fmt.MetaModel {
+export function getMetaModelWithFallback(sourceFileName: string, metaModelPath: Fmt.Path): Meta.MetaModel {
   try {
     return getMetaModel(sourceFileName, metaModelPath);
   } catch (error) {
-    return new Fmt.DummyMetaModel(metaModelPath.name);
+    return new Meta.DummyMetaModel(metaModelPath.name);
   }
 }

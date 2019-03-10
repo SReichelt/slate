@@ -182,7 +182,8 @@ export class Parameter {
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;
-    for (let replacedParameter of replacedParameters) {
+    for (let index = replacedParameters.length - 1; index >= 0; index--) {
+      let replacedParameter = replacedParameters[index];
       if (result === replacedParameter.original) {
         result = replacedParameter.replacement;
       }

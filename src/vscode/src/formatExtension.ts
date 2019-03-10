@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as Fmt from '../../shared/format/format';
+import * as Ctx from '../../shared/format/context';
+import * as Meta from '../../shared/format/metaModel';
 import { escapeIdentifier } from '../../shared/format/common';
 import * as FmtDynamic from '../../shared/format/dynamic';
 import * as FmtMeta from '../../shared/format/meta';
@@ -158,7 +160,7 @@ interface ReferencedDefinition {
     arguments?: Fmt.ArgumentList;
 }
 
-function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, context?: Fmt.Context, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): ReferencedDefinition | null | undefined {
+function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, context?: Ctx.Context, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): ReferencedDefinition | null | undefined {
     if (object instanceof FmtDynamic.DynamicMetaRefExpression && parsedDocument.metaModelDocuments) {
         let metaModelDocument = parsedDocument.metaModelDocuments.get(object.metaModel);
         if (metaModelDocument && (!restrictToUri || areUrisEqual(restrictToUri, metaModelDocument.uri))) {
@@ -491,7 +493,7 @@ class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
                 try {
                     let contents = readRange(uri);
                     if (contents) {
-                        let file = FmtReader.readString(contents, uri.fsPath, (path: Fmt.Path) => new Fmt.DummyMetaModel(path.name));
+                        let file = FmtReader.readString(contents, uri.fsPath, (path: Fmt.Path) => new Meta.DummyMetaModel(path.name));
                         let location = new vscode.Location(uri, undefined!);
                         for (let definition of file.definitions) {
                             if (matchesQuery(definition.name.toLowerCase(), query)) {
@@ -1326,7 +1328,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         rangeMap: new Map<Object, RangeInfo>(),
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
     };
-    let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Fmt.MetaModel => {
+    let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
         if (metaModelCache) {
             let parsedMetaModel = metaModelCache.get(metaModelFileName);

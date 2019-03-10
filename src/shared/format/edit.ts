@@ -58,7 +58,7 @@ export class EditAnalysis {
       this.analyzeExpression(parameter.defaultValue, true, (newValue) => parameter.defaultValue = newValue, context);
     }
     if (parameter.dependencies) {
-      this.analyzeExpressions(parameter.dependencies, context);
+      this.analyzeExpressions(parameter.dependencies, true, context);
     }
   }
 
@@ -115,7 +115,7 @@ export class EditAnalysis {
     context = new Ctx.ParentInfoContext(expression, context);
     if (expression instanceof Fmt.VariableRefExpression) {
       if (expression.indices) {
-        this.analyzeExpressions(expression.indices, context);
+        this.analyzeExpressions(expression.indices, false, context);
       }
     } else if (expression instanceof Fmt.MetaRefExpression) {
       if (expression instanceof Fmt.GenericMetaRefExpression) {
@@ -133,11 +133,11 @@ export class EditAnalysis {
     } else if (expression instanceof Fmt.CompoundExpression) {
       this.analyzeArgumentList(expression.arguments, undefined, context);
     } else if (expression instanceof Fmt.ArrayExpression) {
-      this.analyzeExpressions(expression.items, context);
+      this.analyzeExpressions(expression.items, true, context);
     }
   }
 
-  analyzeExpressions(expressions: Fmt.Expression[], context: Ctx.Context): void {
+  analyzeExpressions(expressions: Fmt.Expression[], canRemove: boolean, context: Ctx.Context): void {
     for (let index = 0; index < expressions.length; index++) {
       let onSetValue = (newValue: Fmt.Expression | undefined) => {
         if (newValue) {
@@ -146,7 +146,7 @@ export class EditAnalysis {
           expressions.splice(index, 1);
         }
       };
-      this.analyzeExpression(expressions[index], true, onSetValue, context);
+      this.analyzeExpression(expressions[index], canRemove, onSetValue, context);
     }
   }
 }
