@@ -184,6 +184,8 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(variableRow);
       }
 
+      menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
+
       return menu;
     };
   }
@@ -195,7 +197,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  private addFormulaMenuWithEditInfo(semanticLink: Display.SemanticLink, formula: Fmt.Expression | undefined, onRenderTerm: RenderExpressionFn, expressionEditInfo: Edit.ExpressionEditInfo): void {
+  private addFormulaMenuWithEditInfo(semanticLink: Display.SemanticLink, formula: Fmt.Expression | undefined, onRenderFormula: RenderExpressionFn, expressionEditInfo: Edit.ExpressionEditInfo): void {
     // TODO select item if existing term is not a placeholder
     // TODO pre-fill formulas according to existing term
     semanticLink.onMenuOpened = () => {
@@ -210,10 +212,12 @@ export class HLMEditHandler extends GenericEditHandler {
         let type = variable.type.expression;
         return type instanceof FmtHLM.MetaRefExpression_Prop;
       };
-      let variableRow = this.getVariableRow(expressionEditInfo, isAllowed, onRenderTerm);
+      let variableRow = this.getVariableRow(expressionEditInfo, isAllowed, onRenderFormula);
       if (variableRow) {
         menu.rows.push(variableRow);
       }
+
+      menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
 
       return menu;
     };
@@ -288,7 +292,52 @@ export class HLMEditHandler extends GenericEditHandler {
 
     let casesMenu = new Menu.ExpressionMenu;
     casesMenu.rows = [
+      // TODO add "induction on <parameter>" / "decompose <parameter>" as a special case
+      this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderTerm)
+    ];
+    let casesRow = new Menu.StandardExpressionMenuRow;
+    casesRow.title = 'Cases';
+    casesRow.subMenu = casesMenu;
+    return casesRow;
+  }
+
+  private getElementCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let structuralExpression = new FmtHLM.MetaRefExpression_structuralCases;
+    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.cases = [];
+
+    let caseExpression = new FmtHLM.MetaRefExpression_cases;
+    let positiveCase = new FmtHLM.ObjectContents_Case;
+    positiveCase.formula = new PlaceholderExpression(HLMTermType.Formula);
+    positiveCase.value = new PlaceholderExpression(HLMTermType.ElementTerm);
+    let negativeCase = new FmtHLM.ObjectContents_Case;
+    negativeCase.formula = new PlaceholderExpression(HLMTermType.Formula);
+    negativeCase.value = new PlaceholderExpression(HLMTermType.ElementTerm);
+    caseExpression.cases = [positiveCase, negativeCase];
+
+    let casesMenu = new Menu.ExpressionMenu;
+    casesMenu.rows = [
+      // TODO add "induction on <parameter>" / "decompose <parameter>" as a special case
       this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderTerm),
+      this.getExpressionItem(caseExpression, expressionEditInfo, onRenderTerm)
+    ];
+    let casesRow = new Menu.StandardExpressionMenuRow;
+    casesRow.title = 'Cases';
+    casesRow.subMenu = casesMenu;
+    return casesRow;
+  }
+
+  private getFormulaCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let structuralExpression = new FmtHLM.MetaRefExpression_structural;
+    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.cases = [];
+
+    let casesMenu = new Menu.ExpressionMenu;
+    casesMenu.rows = [
+      // TODO add "induction on <parameter>" / "decompose <parameter>" as a special case
+      this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderFormula)
     ];
     let casesRow = new Menu.StandardExpressionMenuRow;
     casesRow.title = 'Cases';
@@ -307,6 +356,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn): void {
+    let insertButton = new Display.InsertPlaceholderExpression;
+    let semanticLink = new Display.SemanticLink(insertButton, false, false);
     let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
     if (parentExpressionEditInfo) {
       let expressionEditInfo: Edit.ExpressionEditInfo = {
@@ -314,20 +365,18 @@ export class HLMEditHandler extends GenericEditHandler {
         onSetValue: (newValue) => onInsertTerm(newValue!),
         context: parentExpressionEditInfo.context
       };
-      let insertButton = new Display.InsertPlaceholderExpression;
-      let semanticLink = new Display.SemanticLink(insertButton, false, false);
       this.addElementTermMenuWithEditInfo(semanticLink, undefined, onRenderTerm, expressionEditInfo);
-      insertButton.semanticLinks = [semanticLink];
-      if (items.length) {
-        let lastItemWithButton = [
-          items[items.length - 1],
-          new Display.TextExpression(' '),
-          insertButton
-        ];
-        items[items.length - 1] = new Display.RowExpression(lastItemWithButton);
-      } else {
-        items.push(insertButton);
-      }
+    }
+    insertButton.semanticLinks = [semanticLink];
+    if (items.length) {
+      let lastItemWithButton = [
+        items[items.length - 1],
+        new Display.TextExpression(' '),
+        insertButton
+      ];
+      items[items.length - 1] = new Display.RowExpression(lastItemWithButton);
+    } else {
+      items.push(insertButton);
     }
   }
 }
