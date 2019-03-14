@@ -217,7 +217,12 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(variableRow);
       }
 
-      menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
+      menu.rows.push(
+        this.getConnectiveRow(expressionEditInfo, onRenderFormula),
+        this.getQuantifierRow(expressionEditInfo, onRenderFormula),
+        this.getRelationRow(expressionEditInfo, onRenderFormula),
+        this.getFormulaCasesRow(expressionEditInfo, onRenderFormula)
+      );
 
       return menu;
     };
@@ -233,6 +238,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, isAllowed: (variable: Fmt.Parameter) => boolean, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow | undefined {
+    // TODO highlight variables
     let variableItems: Menu.ExpressionMenuItem[] = [];
     for (let variable of expressionEditInfo.context.getVariables()) {
       if (isAllowed(variable)) {
@@ -326,6 +332,132 @@ export class HLMEditHandler extends GenericEditHandler {
     casesRow.title = 'Cases';
     casesRow.subMenu = casesMenu;
     return casesRow;
+  }
+
+  private getConnectiveRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let andExpression = new FmtHLM.MetaRefExpression_and;
+    andExpression.formulae = [new PlaceholderExpression(HLMTermType.Formula), new PlaceholderExpression(HLMTermType.Formula)];
+    let orExpression = new FmtHLM.MetaRefExpression_or;
+    orExpression.formulae = [new PlaceholderExpression(HLMTermType.Formula), new PlaceholderExpression(HLMTermType.Formula)];
+    let equivExpression = new FmtHLM.MetaRefExpression_equiv;
+    equivExpression.left = new PlaceholderExpression(HLMTermType.Formula);
+    equivExpression.right = new PlaceholderExpression(HLMTermType.Formula);
+
+    let mainList = new Menu.ExpressionMenuItemList;
+    mainList.items = [
+      this.getExpressionItem(andExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(orExpression, expressionEditInfo, onRenderFormula)
+    ];
+    mainList.extraSpace = true;
+    let secondaryList = new Menu.ExpressionMenuItemList;
+    secondaryList.items = [
+      this.getExpressionItem(equivExpression, expressionEditInfo, onRenderFormula)
+    ];
+    secondaryList.extraSpace = true;
+    let connectiveMenu = new Menu.ExpressionMenu;
+    connectiveMenu.rows = [
+      mainList,
+      secondaryList
+    ];
+    let connectiveRow = new Menu.StandardExpressionMenuRow;
+    connectiveRow.title = 'Connective';
+    connectiveRow.subMenu = connectiveMenu;
+    return connectiveRow;
+  }
+
+  private getQuantifierRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let forallExpression = new FmtHLM.MetaRefExpression_forall;
+    forallExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    forallExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    let existsExpression = new FmtHLM.MetaRefExpression_exists;
+    existsExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    existsExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    let existsUniqueExpression = new FmtHLM.MetaRefExpression_existsUnique;
+    existsUniqueExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    existsUniqueExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    let negatedExistsExpression = new FmtHLM.MetaRefExpression_not;
+    negatedExistsExpression.formula = existsExpression;
+
+    let mainList = new Menu.ExpressionMenuItemList;
+    mainList.items = [
+      this.getExpressionItem(forallExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(existsExpression, expressionEditInfo, onRenderFormula)
+    ];
+    mainList.extraSpace = true;
+    let secondaryList = new Menu.ExpressionMenuItemList;
+    secondaryList.items = [
+      this.getExpressionItem(existsUniqueExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(negatedExistsExpression, expressionEditInfo, onRenderFormula)
+    ];
+    secondaryList.extraSpace = true;
+    let quantifierMenu = new Menu.ExpressionMenu;
+    quantifierMenu.rows = [
+      mainList,
+      secondaryList
+    ];
+    let quantifierRow = new Menu.StandardExpressionMenuRow;
+    quantifierRow.title = 'Quantifier';
+    quantifierRow.subMenu = quantifierMenu;
+    return quantifierRow;
+  }
+
+  private getRelationRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let equalsExpression = new FmtHLM.MetaRefExpression_equals;
+    equalsExpression.left = new PlaceholderExpression(HLMTermType.ElementTerm);
+    equalsExpression.right = new PlaceholderExpression(HLMTermType.ElementTerm);
+    let inExpression = new FmtHLM.MetaRefExpression_in;
+    inExpression.element = new PlaceholderExpression(HLMTermType.ElementTerm);
+    inExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
+    let subExpression = new FmtHLM.MetaRefExpression_sub;
+    subExpression.subset = new PlaceholderExpression(HLMTermType.SetTerm);
+    subExpression.superset = new PlaceholderExpression(HLMTermType.SetTerm);
+    let setEqualsExpression = new FmtHLM.MetaRefExpression_setEquals;
+    setEqualsExpression.left = new PlaceholderExpression(HLMTermType.SetTerm);
+    setEqualsExpression.right = new PlaceholderExpression(HLMTermType.SetTerm);
+    let negatedEqualsExpression = new FmtHLM.MetaRefExpression_not;
+    negatedEqualsExpression.formula = equalsExpression;
+    let negatedInExpression = new FmtHLM.MetaRefExpression_not;
+    negatedInExpression.formula = inExpression;
+    let negatedSubExpression = new FmtHLM.MetaRefExpression_not;
+    negatedSubExpression.formula = subExpression;
+    let negatedSetEqualsExpression = new FmtHLM.MetaRefExpression_not;
+    negatedSetEqualsExpression.formula = setEqualsExpression;
+
+    let mainList = new Menu.ExpressionMenuItemList;
+    mainList.items = [
+      this.getExpressionItem(equalsExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(inExpression, expressionEditInfo, onRenderFormula)
+    ];
+    mainList.extraSpace = true;
+    let secondaryList = new Menu.ExpressionMenuItemList;
+    secondaryList.items = [
+      this.getExpressionItem(subExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(setEqualsExpression, expressionEditInfo, onRenderFormula)
+    ];
+    secondaryList.extraSpace = true;
+    let negatedMainList = new Menu.ExpressionMenuItemList;
+    negatedMainList.items = [
+      this.getExpressionItem(negatedEqualsExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(negatedInExpression, expressionEditInfo, onRenderFormula)
+    ];
+    negatedMainList.extraSpace = true;
+    let negatedSecondaryList = new Menu.ExpressionMenuItemList;
+    negatedSecondaryList.items = [
+      this.getExpressionItem(negatedSubExpression, expressionEditInfo, onRenderFormula),
+      this.getExpressionItem(negatedSetEqualsExpression, expressionEditInfo, onRenderFormula)
+    ];
+    negatedSecondaryList.extraSpace = true;
+    let relationMenu = new Menu.ExpressionMenu;
+    relationMenu.rows = [
+      mainList,
+      secondaryList,
+      negatedMainList,
+      negatedSecondaryList
+    ];
+    let relationRow = new Menu.StandardExpressionMenuRow;
+    relationRow.title = 'Relation';
+    relationRow.subMenu = relationMenu;
+    return relationRow;
   }
 
   private getFormulaCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {

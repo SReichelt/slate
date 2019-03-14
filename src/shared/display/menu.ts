@@ -9,6 +9,7 @@ export class ExpressionMenu extends ExpressionMenuBase {
 }
 
 export abstract class ExpressionMenuRow extends ExpressionMenuBase {
+  extraSpace: boolean = false;
   selected: boolean = false;
 }
 

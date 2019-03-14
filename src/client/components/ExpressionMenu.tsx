@@ -87,7 +87,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
     if (row instanceof Menu.ExpressionMenuItem) {
       cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally}/>;
     } else if (row instanceof Menu.ExpressionMenuItemList) {
-      cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally}/>);
+      cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave}/>);
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
       let contentCell = undefined;
       let onClick = undefined;
@@ -211,6 +211,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
     let className = 'open-menu-row';
     if (this.props.separated) {
       className += ' separated';
+    }
+    if (row.extraSpace) {
+      className += ' extra-space';
     }
     return (
       <tr className={className}>

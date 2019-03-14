@@ -28,7 +28,7 @@
   right: auto;
 }
 
-.open-menu-row>th, .open-menu-arrow {
+.open-menu, .open-menu-row>th, .open-menu-arrow {
   font-family: sans-serif;
   font-weight: normal;
   font-style: initial;
@@ -69,6 +69,10 @@
 
 .open-menu-content-cell {
   padding: 0;
+}
+
+.open-menu-row.extra-space>* {
+  padding: 2pt;
 }
 
 .open-menu-item input {
