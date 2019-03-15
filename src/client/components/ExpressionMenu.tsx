@@ -16,6 +16,8 @@ interface ExpressionMenuState {
 }
 
 class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenuState> {
+  private scrolled = false;
+
   constructor(props: ExpressionMenuProps) {
     super(props);
     this.state = {};
@@ -38,9 +40,21 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         separated = false;
       }
     }
-    // TODO adjust position to fit in window
+    let className = 'open-menu';
+    if (this.props.menu.variable) {
+      className += ' variable';
+    }
+    let ref = (htmlNode: HTMLDivElement | null) => {
+      if (htmlNode && !this.scrolled) {
+        this.scrolled = true;
+        htmlNode.scrollIntoView({
+          block: 'end',
+          inline: 'end'
+        });
+      }
+    };
     return (
-      <div className={'open-menu'}>
+      <div className={className} ref={ref}>
         <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
           <tbody>
             {rows}
@@ -193,9 +207,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         );
         if (this.props.subMenuOpen) {
           let subMenu = (
-            <div className={'open-menu-wrapper'} key={'subMenu'}>
-              <ExpressionMenu menu={row.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered} interactionHandler={this.props.interactionHandler}/>
-            </div>
+            <ExpressionMenu menu={row.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered} interactionHandler={this.props.interactionHandler} key={'subMenu'}/>
           );
           title = [title, subMenu];
         }

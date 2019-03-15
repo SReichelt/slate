@@ -3,8 +3,6 @@
   top: 100%;
   left: 0;
   z-index: 100;
-  max-height: 20em;
-  overflow: auto;
   border: solid 1px #a0a0a0;
   background-color: #f8f8f8;
   cursor: default;
@@ -14,18 +12,14 @@
   font-size: initial;
 }
 
-.open-menu-wrapper {
-  position: absolute;
+.open-menu-title-cell>.open-menu {
   top: 0;
   left: 100%;
 }
 
-.open-menu-wrapper .open-menu {
-  position: fixed;
-  top: auto;
-  bottom: auto;
-  left: auto;
-  right: auto;
+.open-menu.variable {
+  max-height: 20em;
+  overflow: auto;
 }
 
 .open-menu, .open-menu-row>th, .open-menu-arrow {

@@ -7,6 +7,7 @@ export abstract class ExpressionMenuBase {
 
 export class ExpressionMenu extends ExpressionMenuBase {
   rows: ExpressionMenuRow[];
+  variable: boolean = false;
 
   isSelected(): boolean {
     return this.rows.some((row) => row.isSelected());
@@ -32,6 +33,7 @@ export class ExpressionMenuItem extends ExpressionMenuCell {
 
 export class ExpressionMenuItemList extends ExpressionMenuRow {
   items: ExpressionMenuItem[];
+  variable: boolean = false;
 
   isSelected(): boolean {
     return super.isSelected() || this.items.some((item) => item.selected);

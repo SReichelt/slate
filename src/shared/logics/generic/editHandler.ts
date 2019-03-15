@@ -228,6 +228,7 @@ export abstract class GenericEditHandler {
         templateMenu.rows.push(templateRow);
       }
     }
+    templateMenu.variable = true;
     let templatesRow = new Menu.StandardExpressionMenuRow;
     templatesRow.title = 'Template';
     templatesRow.subMenu = templateMenu;
@@ -500,6 +501,7 @@ export abstract class GenericEditHandler {
     if (variableItems.length) {
       let variableList = new Menu.ExpressionMenuItemList;
       variableList.items = variableItems;
+      variableList.variable = true;
       let variableRow = new Menu.StandardExpressionMenuRow;
       variableRow.title = 'Variable';
       variableRow.subMenu = variableList;
