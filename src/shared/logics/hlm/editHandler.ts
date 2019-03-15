@@ -373,7 +373,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let andExpression = new FmtHLM.MetaRefExpression_and;
     andExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
     let orExpression = new FmtHLM.MetaRefExpression_or;
-    orExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, ] : [leftPlaceholder, rightPlaceholder];
+    orExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
 
     let mainList = new Menu.ExpressionMenuItemList;
     mainList.items = [

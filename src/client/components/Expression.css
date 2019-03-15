@@ -641,7 +641,7 @@ div.display-math {
   display: table-cell;
   padding: 2px 3px;
   cursor: default;
-  background-color: #f8f8f8;
+  background-color: #fcfcfc;
 }
 
 .menu-placeholder-cell, .menu-dropdown-cell {
