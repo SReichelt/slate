@@ -130,7 +130,6 @@ export abstract class GenericEditHandler {
     } else {
       defaultRow.titleAction = defaultAction;
     }
-    defaultRow.selected = isDefault;
     return defaultRow;
   }
 
@@ -156,12 +155,8 @@ export abstract class GenericEditHandler {
 
   private getDisplayMenuIntegerRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
     let integerItem = new Menu.ExpressionMenuTextInput;
-    let integerRow = new Menu.StandardExpressionMenuRow;
-    integerRow.title = 'Number';
-    integerRow.subMenu = integerItem;
     if (displayItem instanceof Fmt.IntegerExpression) {
       integerItem.selected = true;
-      integerRow.selected = true;
       integerItem.text = displayItem.value.toString();
     } else {
       integerItem.text = '';
@@ -173,17 +168,16 @@ export abstract class GenericEditHandler {
       onSetDisplayItem(newDisplayItem);
     };
     integerItem.action = integerAction;
+    let integerRow = new Menu.StandardExpressionMenuRow;
+    integerRow.title = 'Number';
+    integerRow.subMenu = integerItem;
     return integerRow;
   }
 
   private getDisplayMenuTextRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
     let textItem = new Menu.ExpressionMenuTextInput;
-    let textRow = new Menu.StandardExpressionMenuRow;
-    textRow.title = title;
-    textRow.subMenu = textItem;
     if (displayItem instanceof Fmt.StringExpression) {
       textItem.selected = true;
-      textRow.selected = true;
       textItem.text = displayItem.value;
     } else {
       textItem.text = '';
@@ -195,12 +189,13 @@ export abstract class GenericEditHandler {
       onSetDisplayItem(newDisplayItem);
     };
     textItem.action = textAction;
+    let textRow = new Menu.StandardExpressionMenuRow;
+    textRow.title = title;
+    textRow.subMenu = textItem;
     return textRow;
   }
 
   private getDisplayMenuVariablesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
-    let variablesRow = new Menu.StandardExpressionMenuRow;
-    variablesRow.title = 'Variable';
     let variablesGroup = new Menu.ExpressionMenuItemList;
     variablesGroup.items = [];
     for (let variable of variables) {
@@ -208,7 +203,6 @@ export abstract class GenericEditHandler {
       variableItem.expression = variable.display;
       if (displayItem instanceof Fmt.VariableRefExpression && displayItem.variable === variable.param) {
         variableItem.selected = true;
-        variablesRow.selected = true;
       }
       let variableAction = new Menu.ImmediateExpressionMenuAction;
       variableAction.onExecute = () => {
@@ -219,24 +213,23 @@ export abstract class GenericEditHandler {
       variableItem.action = variableAction;
       variablesGroup.items.push(variableItem);
     }
+    let variablesRow = new Menu.StandardExpressionMenuRow;
+    variablesRow.title = 'Variable';
     variablesRow.subMenu = variablesGroup;
     return variablesRow;
   }
 
   private getDisplayMenuTemplatesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let templatesRow = new Menu.StandardExpressionMenuRow;
-    templatesRow.title = 'Template';
     let templateMenu = new Menu.ExpressionMenu;
     templateMenu.rows = [];
     for (let template of this.templates.definitions) {
       if (!complexExpressionRequired || template.parameters.length) {
         let templateRow = this.getDisplayMenuTemplateRow(template, displayItem, onSetDisplayItem, variables, isPredicate, renderer);
         templateMenu.rows.push(templateRow);
-        if (templateRow.selected) {
-          templatesRow.selected = true;
-        }
       }
     }
+    let templatesRow = new Menu.StandardExpressionMenuRow;
+    templatesRow.title = 'Template';
     templatesRow.subMenu = templateMenu;
     return templatesRow;
   }

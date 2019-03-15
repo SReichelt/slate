@@ -790,7 +790,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </Modal>
         );
       } else if (this.state.openMenu) {
-        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'}/>;
+        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
       }
       let onMouseEnter = hasMenu ? () => this.addToHoveredChildren() : undefined;
       let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;

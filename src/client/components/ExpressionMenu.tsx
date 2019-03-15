@@ -2,12 +2,13 @@ import * as React from 'react';
 import './ExpressionMenu.css';
 import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
-import Expression from './Expression';
+import Expression, { ExpressionInteractionHandler } from './Expression';
 
 interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
   hoveredExternally?: boolean;
+  interactionHandler?: ExpressionInteractionHandler;
 }
 
 interface ExpressionMenuState {
@@ -33,7 +34,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
         let hoveredExternally = this.props.hoveredExternally && index === 0;
         let subMenuOpen = (this.state.openSubMenu === row);
-        rows.push(<ExpressionMenuRow row={row} separated={separated} key={index++} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen}/>);
+        rows.push(<ExpressionMenuRow row={row} separated={separated} key={index++} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler}/>);
         separated = false;
       }
     }
@@ -58,6 +59,7 @@ interface ExpressionMenuRowProps {
   onLeave?: () => void;
   hoveredExternally?: boolean;
   subMenuOpen?: boolean;
+  interactionHandler?: ExpressionInteractionHandler;
 }
 
 interface ExpressionMenuRowState {
@@ -85,9 +87,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
     let cells: React.ReactNode = undefined;
     let row = this.props.row;
     if (row instanceof Menu.ExpressionMenuItem) {
-      cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally}/>;
+      cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally} interactionHandler={this.props.interactionHandler}/>;
     } else if (row instanceof Menu.ExpressionMenuItemList) {
-      cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave}/>);
+      cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} interactionHandler={this.props.interactionHandler}/>);
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
       let contentCell = undefined;
       let onClick = undefined;
@@ -98,7 +100,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         if (row.subMenu instanceof Menu.ExpressionMenu && row.subMenu.rows.length) {
           subMenuMainRow = row.subMenu.rows[0];
           for (let subMenuRow of row.subMenu.rows) {
-            if (subMenuRow.selected) {
+            if (subMenuRow.isSelected()) {
               subMenuMainRow = subMenuRow;
               break;
             }
@@ -120,7 +122,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
             }
           };
           if (subMenuMainRow instanceof Menu.ExpressionMenuItem) {
-            contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered}/>;
+            contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered} interactionHandler={this.props.interactionHandler}/>;
             if (!titleAction) {
               titleAction = subMenuMainRow.action;
             }
@@ -139,7 +141,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
               <td className={'open-menu-content-cell'} key={'content'}>
                 <table className={'open-menu-content-cell-table'}>
                   <tbody>
-                    <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} subMenuOpen={false}/>
+                    <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} subMenuOpen={false} interactionHandler={this.props.interactionHandler}/>
                   </tbody>
                 </table>
               </td>
@@ -165,7 +167,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {
         titleCellClassName += ' hover';
       }
-      if (row.selected) {
+      if (row.isSelected()) {
         titleCellClassName += ' selected';
       }
       let hasSubMenu = false;
@@ -192,7 +194,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         if (this.props.subMenuOpen) {
           let subMenu = (
             <div className={'open-menu-wrapper'} key={'subMenu'}>
-              <ExpressionMenu menu={row.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered}/>
+              <ExpressionMenu menu={row.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered} interactionHandler={this.props.interactionHandler}/>
             </div>
           );
           title = [title, subMenu];
@@ -230,6 +232,7 @@ interface ExpressionMenuItemProps {
   onEnter?: () => void;
   onLeave?: () => void;
   hoveredExternally?: boolean;
+  interactionHandler?: ExpressionInteractionHandler;
 }
 
 interface ExpressionMenuItemState {
@@ -253,16 +256,23 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
     if (this.props.item.selected) {
       className += ' selected';
     }
+    let expression = this.props.item.expression;
     let onMouseEnter = () => {
       this.setState({hovered: true});
       if (this.props.onEnter) {
         this.props.onEnter();
+      }
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.hoverChanged(expression.semanticLinks || []);
       }
     };
     let onMouseLeave = () => {
       this.setState({hovered: false});
       if (this.props.onLeave) {
         this.props.onLeave();
+      }
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.hoverChanged([]);
       }
     };
     let onClick = (event: React.MouseEvent) => {
@@ -271,7 +281,7 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
     };
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
-        <Expression expression={this.props.item.expression} tooltipPosition={'right'}/>
+        <Expression expression={expression} tooltipPosition={'right'}/>
       </td>
     );
   }

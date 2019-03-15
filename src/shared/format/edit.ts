@@ -4,6 +4,7 @@ import * as Ctx from './context';
 export type SetExpressionFn = (newValue: Fmt.Expression | undefined) => void;
 
 export interface ExpressionEditInfo {
+  expression?: Fmt.Expression;
   optional: boolean;
   onSetValue: SetExpressionFn;
   context: Ctx.Context;
@@ -108,6 +109,7 @@ export class EditAnalysis {
 
   analyzeExpression(expression: Fmt.Expression, optional: boolean, onSetValue: SetExpressionFn, context: Ctx.Context): void {
     this.expressionEditInfo.set(expression, {
+      expression: expression,
       optional: optional,
       onSetValue: onSetValue,
       context: context
