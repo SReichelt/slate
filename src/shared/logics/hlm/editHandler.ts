@@ -13,6 +13,38 @@ export interface ParameterSelection {
   allowBinding: boolean;
 }
 
+export interface SetTermSelection {
+  allowEnumeration: boolean;
+  allowSubset: boolean;
+  allowCases: boolean;
+}
+
+export const fullSetTermSelection: SetTermSelection = {
+  allowEnumeration: true,
+  allowSubset: true,
+  allowCases: true
+};
+
+export interface ElementTermSelection {
+  allowCases: boolean;
+}
+
+export const fullElementTermSelection: ElementTermSelection = {
+  allowCases: true
+};
+
+export interface FormulaSelection {
+  allowTruthValue: boolean;
+  allowEquiv: boolean;
+  allowCases: boolean;
+}
+
+export const fullFormulaSelection: FormulaSelection = {
+  allowTruthValue: true,
+  allowEquiv: true,
+  allowCases: true
+};
+
 export class HLMEditHandler extends GenericEditHandler {
   addParameterMenu(semanticLink: Display.SemanticLink, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
     semanticLink.onMenuOpened = () => {
@@ -117,14 +149,14 @@ export class HLMEditHandler extends GenericEditHandler {
     return paramClone;
   }
 
-  addSetTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, allowSubset: boolean): void {
+  addSetTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
-      this.addSetTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, allowSubset);
+      this.addSetTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
   }
 
-  private addSetTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, allowSubset: boolean): void {
+  private addSetTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
@@ -142,27 +174,30 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(variableRow);
       }
 
-      menu.rows.push(this.getEnumerationRow(expressionEditInfo, onRenderTerm));
+      if (termSelection.allowEnumeration) {
+        menu.rows.push(this.getEnumerationRow(expressionEditInfo, onRenderTerm));
+      }
 
-      if (allowSubset) {
-        menu.rows.push(
-          this.getSubsetRow(expressionEditInfo, onRenderTerm),
-          this.getSetCasesRow(expressionEditInfo, onRenderTerm)
-        );
+      if (termSelection.allowSubset) {
+        menu.rows.push(this.getSubsetRow(expressionEditInfo, onRenderTerm));
+      }
+
+      if (termSelection.allowCases) {
+        menu.rows.push(this.getSetCasesRow(expressionEditInfo, onRenderTerm));
       }
 
       return menu;
     };
   }
 
-  addElementTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn): void {
+  addElementTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
-      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm);
+      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
   }
 
-  private addElementTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): void {
+  private addElementTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
@@ -180,20 +215,22 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(variableRow);
       }
 
-      menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
+      if (termSelection.allowCases) {
+        menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
+      }
 
       return menu;
     };
   }
 
-  addFormulaMenu(semanticLink: Display.SemanticLink, formula: Fmt.Expression, onRenderTerm: RenderExpressionFn): void {
+  addFormulaMenu(semanticLink: Display.SemanticLink, formula: Fmt.Expression, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(formula);
     if (expressionEditInfo) {
-      this.addFormulaMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm);
+      this.addFormulaMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderFormula, formulaSelection);
     }
   }
 
-  private addFormulaMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): void {
+  private addFormulaMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
@@ -212,11 +249,14 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       menu.rows.push(
-        this.getConnectiveRow(expressionEditInfo, onRenderFormula),
+        this.getConnectiveRow(expressionEditInfo, onRenderFormula, formulaSelection),
         this.getQuantifierRow(expressionEditInfo, onRenderFormula),
         this.getRelationRow(expressionEditInfo, onRenderFormula),
-        this.getFormulaCasesRow(expressionEditInfo, onRenderFormula)
       );
+
+      if (formulaSelection.allowCases) {
+        menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
+      }
 
       return menu;
     };
@@ -327,14 +367,13 @@ export class HLMEditHandler extends GenericEditHandler {
     return casesRow;
   }
 
-  private getConnectiveRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let equivExpression = new FmtHLM.MetaRefExpression_equiv;
-    equivExpression.left = expressionEditInfo.expression || new PlaceholderExpression(HLMTermType.Formula);
-    equivExpression.right = new PlaceholderExpression(HLMTermType.Formula);
+  private getConnectiveRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): Menu.ExpressionMenuRow {
+    let leftPlaceholder = expressionEditInfo.expression || new PlaceholderExpression(HLMTermType.Formula);
+    let rightPlaceholder = new PlaceholderExpression(HLMTermType.Formula);
     let andExpression = new FmtHLM.MetaRefExpression_and;
-    andExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, equivExpression.right] : [equivExpression.left, equivExpression.right];
+    andExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
     let orExpression = new FmtHLM.MetaRefExpression_or;
-    orExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, equivExpression.right] : [equivExpression.left, equivExpression.right];
+    orExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, ] : [leftPlaceholder, rightPlaceholder];
 
     let mainList = new Menu.ExpressionMenuItemList;
     mainList.items = [
@@ -342,16 +381,30 @@ export class HLMEditHandler extends GenericEditHandler {
       this.getExpressionItem(orExpression, expressionEditInfo, onRenderFormula)
     ];
     mainList.extraSpace = true;
-    let secondaryList = new Menu.ExpressionMenuItemList;
-    secondaryList.items = [
-      this.getExpressionItem(equivExpression, expressionEditInfo, onRenderFormula)
-    ];
-    secondaryList.extraSpace = true;
     let connectiveMenu = new Menu.ExpressionMenu;
-    connectiveMenu.rows = [
-      mainList,
-      secondaryList
-    ];
+    connectiveMenu.rows = [mainList];
+    if (formulaSelection.allowTruthValue) {
+      let trueExpression = new FmtHLM.MetaRefExpression_and;
+      let falseExpression = new FmtHLM.MetaRefExpression_or;
+      let truthValueList = new Menu.ExpressionMenuItemList;
+      truthValueList.items = [
+        this.getExpressionItem(trueExpression, expressionEditInfo, onRenderFormula),
+        this.getExpressionItem(falseExpression, expressionEditInfo, onRenderFormula)
+      ];
+      truthValueList.extraSpace = true;
+      connectiveMenu.rows.push(truthValueList);
+    }
+    if (formulaSelection.allowEquiv) {
+      let equivExpression = new FmtHLM.MetaRefExpression_equiv;
+      equivExpression.left = leftPlaceholder;
+      equivExpression.right = rightPlaceholder;
+      let equivList = new Menu.ExpressionMenuItemList;
+      equivList.items = [
+        this.getExpressionItem(equivExpression, expressionEditInfo, onRenderFormula)
+      ];
+      equivList.extraSpace = true;
+      connectiveMenu.rows.push(equivList);
+    }
     let connectiveRow = new Menu.StandardExpressionMenuRow;
     connectiveRow.title = 'Connective';
     connectiveRow.subMenu = connectiveMenu;
@@ -487,6 +540,11 @@ export class HLMEditHandler extends GenericEditHandler {
       if (Object.getPrototypeOf(newExpression) === Object.getPrototypeOf(origExpression)) {
         if (newExpression instanceof Fmt.VariableRefExpression && origExpression instanceof Fmt.VariableRefExpression) {
           item.selected = newExpression.variable === origExpression.variable;
+        } else if ((newExpression instanceof FmtHLM.MetaRefExpression_and && origExpression instanceof FmtHLM.MetaRefExpression_and)
+                   || (newExpression instanceof FmtHLM.MetaRefExpression_or && origExpression instanceof FmtHLM.MetaRefExpression_or)) {
+          let origEmpty = !origExpression.formulae || !origExpression.formulae.length;
+          let newEmpty = !newExpression.formulae || !newExpression.formulae.length;
+          item.selected = (newEmpty === origEmpty);
         } else {
           item.selected = true;
         }
@@ -495,7 +553,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn): void {
+  addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let insertButton = new Display.InsertPlaceholderExpression;
     let semanticLink = new Display.SemanticLink(insertButton, false, false);
     let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
@@ -505,7 +563,7 @@ export class HLMEditHandler extends GenericEditHandler {
         onSetValue: (newValue) => onInsertTerm(newValue!),
         context: parentExpressionEditInfo.context
       };
-      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm);
+      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
     insertButton.semanticLinks = [semanticLink];
     if (items.length) {
