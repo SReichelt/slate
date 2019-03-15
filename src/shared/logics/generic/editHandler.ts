@@ -456,6 +456,79 @@ export abstract class GenericEditHandler {
     return renderedTemplateArguments;
   }
 
+  protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
+    let parameter = this.createParameter(type, defaultName);
+
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => onInsertParam(parameter);
+
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderParam(parameter);
+    item.action = action;
+    return item;
+  }
+
+  protected createParameter(type: Fmt.Expression, defaultName: string): Fmt.Parameter {
+    let parameter = new Fmt.Parameter;
+    parameter.name = defaultName;
+    let parameterType = new Fmt.Type;
+    parameterType.expression = type;
+    parameterType.arrayDimensions = 0;
+    parameter.type = parameterType;
+    return parameter;
+  }
+
+  protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, isAllowed: (variable: Fmt.Parameter) => boolean, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow | undefined {
+    let variables = expressionEditInfo.context.getVariables();
+    let variableItems: Menu.ExpressionMenuItem[] = [];
+    let variableNames = new Set<string>();
+    for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
+      let variable = variables[variableIndex];
+      if (variableNames.has(variable.name)) {
+        // Cannot reference shadowed variable.
+        continue;
+      } else {
+        variableNames.add(variable.name);
+      }
+      if (isAllowed(variable)) {
+        let variableRefExpression = new Fmt.VariableRefExpression;
+        variableRefExpression.variable = variable;
+        // TODO add placeholders for indices
+        variableItems.unshift(this.getExpressionItem(variableRefExpression, expressionEditInfo, onRenderTerm));
+      }
+    }
+    if (variableItems.length) {
+      let variableList = new Menu.ExpressionMenuItemList;
+      variableList.items = variableItems;
+      let variableRow = new Menu.StandardExpressionMenuRow;
+      variableRow.title = 'Variable';
+      variableRow.subMenu = variableList;
+      return variableRow;
+    }
+    return undefined;
+  }
+
+  protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => expressionEditInfo.onSetValue(expression);
+
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderExpression(expression);
+    item.action = action;
+    let origExpression = expressionEditInfo.expression;
+    if (origExpression) {
+      let newExpression = expression;
+      if (Object.getPrototypeOf(newExpression) === Object.getPrototypeOf(origExpression)) {
+        if (newExpression instanceof Fmt.VariableRefExpression && origExpression instanceof Fmt.VariableRefExpression) {
+          item.selected = newExpression.variable === origExpression.variable;
+        } else {
+          item.selected = true;
+        }
+      }
+    }
+    return item;
+  }
+
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
     if (parameterList) {
       let index = parameterList.indexOf(param);

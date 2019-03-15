@@ -191,7 +191,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidMount(): void {
     window.onpopstate = () => {
-      /* Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection. */
+      // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
       let state: SelectionState = {
         selectedItemPath: undefined,
         selectedItemProvider: undefined,

@@ -112,8 +112,12 @@ export class DynamicMetaModel extends Meta.MetaModel {
     } else if (parent instanceof Fmt.CompoundExpression) {
       for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
         if (context instanceof ArgumentTypeContext) {
-          return this.definitions.getDefinition(context.metaDefinitionName);
-        } else if (context.parentObject !== parent && !(context.parentObject instanceof Fmt.ArrayExpression)) {
+          let definition = this.definitions.getDefinition(context.metaDefinitionName);
+          if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType) {
+            return definition;
+          }
+        }
+        if (context.parentObject !== parent && !(context.parentObject instanceof Fmt.ArrayExpression)) {
           break;
         }
       }

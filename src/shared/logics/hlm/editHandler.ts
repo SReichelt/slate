@@ -113,28 +113,6 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
-  private getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
-    let parameter = this.createParameter(type, defaultName);
-
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = () => onInsertParam(parameter);
-
-    let item = new Menu.ExpressionMenuItem;
-    item.expression = onRenderParam(parameter);
-    item.action = action;
-    return item;
-  }
-
-  private createParameter(type: Fmt.Expression, defaultName: string): Fmt.Parameter {
-    let parameter = new Fmt.Parameter;
-    parameter.name = defaultName;
-    let parameterType = new Fmt.Type;
-    parameterType.expression = type;
-    parameterType.arrayDimensions = 0;
-    parameter.type = parameterType;
-    return parameter;
-  }
-
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
     // TODO also support creation of bindings with multiple parameters
     let paramClone = super.addParameterToGroup(param, parameterList);
@@ -269,27 +247,6 @@ export class HLMEditHandler extends GenericEditHandler {
     removeRow.title = 'Remove';
     removeRow.titleAction = action;
     return removeRow;
-  }
-
-  private getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, isAllowed: (variable: Fmt.Parameter) => boolean, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow | undefined {
-    let variableItems: Menu.ExpressionMenuItem[] = [];
-    for (let variable of expressionEditInfo.context.getVariables()) {
-      if (isAllowed(variable)) {
-        let variableRefExpression = new Fmt.VariableRefExpression;
-        variableRefExpression.variable = variable;
-        // TODO add placeholders for indices
-        variableItems.push(this.getExpressionItem(variableRefExpression, expressionEditInfo, onRenderTerm));
-      }
-    }
-    if (variableItems.length) {
-      let variableList = new Menu.ExpressionMenuItemList;
-      variableList.items = variableItems;
-      let variableRow = new Menu.StandardExpressionMenuRow;
-      variableRow.title = 'Variable';
-      variableRow.subMenu = variableList;
-      return variableRow;
-    }
-    return undefined;
   }
 
   private getEnumerationRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
@@ -523,33 +480,28 @@ export class HLMEditHandler extends GenericEditHandler {
     return casesRow;
   }
 
-  private getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = () => expressionEditInfo.onSetValue(expression);
+  protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
+    let item = super.getExpressionItem(expression, expressionEditInfo, onRenderExpression);
 
-    let item = new Menu.ExpressionMenuItem;
-    item.expression = onRenderExpression(expression);
-    item.action = action;
-    let origExpression = expressionEditInfo.expression;
-    if (origExpression) {
-      let newExpression = expression;
-      while (origExpression instanceof FmtHLM.MetaRefExpression_not && newExpression instanceof FmtHLM.MetaRefExpression_not) {
-        origExpression = origExpression.formula;
-        newExpression = newExpression.formula;
-      }
-      if (Object.getPrototypeOf(newExpression) === Object.getPrototypeOf(origExpression)) {
-        if (newExpression instanceof Fmt.VariableRefExpression && origExpression instanceof Fmt.VariableRefExpression) {
-          item.selected = newExpression.variable === origExpression.variable;
+    if (item.selected) {
+      let origExpression = expressionEditInfo.expression;
+      if (origExpression) {
+        let newExpression = expression;
+        while (origExpression instanceof FmtHLM.MetaRefExpression_not && newExpression instanceof FmtHLM.MetaRefExpression_not) {
+          origExpression = origExpression.formula;
+          newExpression = newExpression.formula;
+        }
+        if (Object.getPrototypeOf(newExpression) !== Object.getPrototypeOf(origExpression)) {
+          item.selected = false;
         } else if ((newExpression instanceof FmtHLM.MetaRefExpression_and && origExpression instanceof FmtHLM.MetaRefExpression_and)
                    || (newExpression instanceof FmtHLM.MetaRefExpression_or && origExpression instanceof FmtHLM.MetaRefExpression_or)) {
           let origEmpty = !origExpression.formulae || !origExpression.formulae.length;
           let newEmpty = !newExpression.formulae || !newExpression.formulae.length;
           item.selected = (newEmpty === origEmpty);
-        } else {
-          item.selected = true;
         }
       }
     }
+
     return item;
   }
 

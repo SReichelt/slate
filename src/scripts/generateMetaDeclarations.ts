@@ -912,6 +912,60 @@ function outputParameterDependencyCode(inFile: Fmt.File, parameters: Fmt.Paramet
   return outFileStr;
 }
 
+function outputDefinitionMemberDependencyCode(inFile: Fmt.File, definitionTypes: Fmt.Expression | undefined, visibleTypeNames: string[], indent: string): string {
+  let outFileStr = '';
+  if (definitionTypes instanceof Fmt.ArrayExpression) {
+    for (let definitionType of definitionTypes.items) {
+      if (definitionType instanceof Fmt.DefinitionRefExpression) {
+        let definition = inFile.definitions.getDefinition(definitionType.path.name);
+        if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
+          let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', `${indent}  `);
+          if (memberDependencyCode) {
+            outFileStr += `${indent}if (type instanceof MetaRefExpression_${definitionType.path.name}) {\n`;
+            outFileStr += memberDependencyCode;
+            outFileStr += `${indent}}\n`;
+          }
+          outFileStr += outputDefinitionMemberDependencyCode(inFile, definition.contents.innerDefinitionTypes, visibleTypeNames, indent);
+        }
+      }
+    }
+  }
+  return outFileStr;
+}
+
+function outputExpressionMemberDependencyCode(inFile: Fmt.File, visibleTypeNames: string[], indent: string): string {
+  let outFileStr = '';
+  for (let definition of inFile.definitions) {
+    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+      let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', `${indent}  `);
+      if (memberDependencyCode) {
+        outFileStr += `${indent}if (currentContext.objectContentsClass === ObjectContents_${definition.name}) {\n`;
+        outFileStr += memberDependencyCode;
+        outFileStr += `${indent}}\n`;
+      }
+    }
+  }
+  return outFileStr;
+}
+
+function outputDefinitionParameterDependencyCode(inFile: Fmt.File, visibleTypeNames: string[], indent: string): string {
+  let outFileStr = '';
+  for (let definition of inFile.definitions) {
+    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+      continue;
+    }
+    if (isVisibleType(visibleTypeNames, definition)) {
+      let parameterDependencyCode = outputParameterDependencyCode(inFile, definition.parameters, 'argument', 'argumentIndex', 'previousArguments', 'context', '        ');
+      if (parameterDependencyCode) {
+        outFileStr += `${indent}if (parent instanceof MetaRefExpression_${definition.name}) {\n`;
+        outFileStr += parameterDependencyCode;
+        outFileStr += `${indent}}\n`;
+      }
+    }
+  }
+  return outFileStr;
+}
+
 function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, indent: string): string {
   let outFileStr = '';
   if (param.type.expression instanceof Fmt.DefinitionRefExpression) {
@@ -927,7 +981,7 @@ function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, inden
       }
     } else {
       let typeDefinition = inFile.definitions.getDefinition(path.name);
-      if (hasObjectContents(inFile, typeDefinition)) {
+      if (typeDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, typeDefinition)) {
         outFileStr += `${indent}context = new ArgumentTypeContext(ObjectContents_${path.name}, context);\n`;
       }
     }
@@ -1032,71 +1086,29 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `  getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {\n`;
     outFileStr += `    let context = parentContext;\n`;
     outFileStr += `    let parent = context.parentObject;\n`;
-    if (metaModel.contents.definitionTypes instanceof Fmt.ArrayExpression) {
-      let hasMemberDependencies = false;
-      for (let definitionType of metaModel.contents.definitionTypes.items) {
-        if (definitionType instanceof Fmt.DefinitionRefExpression) {
-          let definition = inFile.definitions.getDefinition(definitionType.path.name);
-          let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', '          ');
-          if (memberDependencyCode) {
-            if (!hasMemberDependencies) {
-              outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
-              outFileStr += `      let type = parent.type.expression;\n`;
-              outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
-              hasMemberDependencies = true;
-            }
-            outFileStr += `        if (type instanceof MetaRefExpression_${definitionType.path.name}) {\n`;
-            outFileStr += memberDependencyCode;
-            outFileStr += `        }\n`;
-          }
-        }
-      }
-      if (hasMemberDependencies) {
-        outFileStr += `      }\n`;
-        outFileStr += `    }\n`;
-      }
+    let definitionMemberDependencyCode = outputDefinitionMemberDependencyCode(inFile, metaModel.contents.definitionTypes, visibleTypeNames, '        ');
+    if (definitionMemberDependencyCode) {
+      outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
+      outFileStr += `      let type = parent.type.expression;\n`;
+      outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
+      outFileStr += definitionMemberDependencyCode;
+      outFileStr += `      }\n`;
+      outFileStr += `    }\n`;
     }
     outFileStr += `    if (parent instanceof Fmt.CompoundExpression) {\n`;
     outFileStr += `      for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {\n`;
     outFileStr += `        if (currentContext instanceof ArgumentTypeContext) {\n`;
-    for (let definition of inFile.definitions) {
-      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
-        continue;
-      }
-      if (hasObjectContents(inFile, definition)) {
-        let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', '            ');
-        if (memberDependencyCode) {
-          outFileStr += `          if (currentContext.objectContentsClass === ObjectContents_${definition.name}) {\n`;
-          outFileStr += memberDependencyCode;
-          outFileStr += `          }\n`;
-        }
-      }
-    }
+    outFileStr += outputExpressionMemberDependencyCode(inFile, visibleTypeNames, '          ');
     outFileStr += `          break;\n`;
     outFileStr += `        } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {\n`;
     outFileStr += `          break;\n`;
     outFileStr += `        }\n`;
     outFileStr += `      }\n`;
     outFileStr += `    }\n`;
-    let hasParameterDependencies = false;
-    for (let definition of inFile.definitions) {
-      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
-        continue;
-      }
-      if (isVisibleType(visibleTypeNames, definition)) {
-        let parameterDependencyCode = outputParameterDependencyCode(inFile, definition.parameters, 'argument', 'argumentIndex', 'previousArguments', 'context', '        ');
-        if (parameterDependencyCode) {
-          if (!hasParameterDependencies) {
-            outFileStr += `    if (parent instanceof Fmt.MetaRefExpression) {\n`;
-            hasParameterDependencies = true;
-          }
-          outFileStr += `      if (parent instanceof MetaRefExpression_${definition.name}) {\n`;
-          outFileStr += parameterDependencyCode;
-          outFileStr += `      }\n`;
-        }
-      }
-    }
-    if (hasParameterDependencies) {
+    let parameterDependencyCode = outputDefinitionParameterDependencyCode(inFile, visibleTypeNames, '      ');
+    if (parameterDependencyCode) {
+      outFileStr += `    if (parent instanceof Fmt.MetaRefExpression) {\n`;
+      outFileStr += parameterDependencyCode;
       outFileStr += `    }\n`;
     }
     outFileStr += `    return context;\n`;

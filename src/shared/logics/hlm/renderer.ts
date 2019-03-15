@@ -323,7 +323,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (row.length) {
         row.push(new Display.TextExpression(' '));
       } else if (state.started) {
-        /* Occurs if bound parameter list is empty. */
+        // Occurs if bound parameter list is empty.
         row.push(new Display.TextExpression(', '));
       }
       let insertButton = new Display.InsertPlaceholderExpression;
@@ -404,7 +404,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         abbreviate: true,
         forcePlural: false,
         enableSpecializations: state.enableSpecializations,
-        markAsDummy: false,
+        markAsDummy: state.markAsDummy,
         started: false,
         inLetExpr: false,
         inConstraint: false,

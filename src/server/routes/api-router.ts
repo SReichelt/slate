@@ -58,7 +58,7 @@ export function apiRouter() {
     router.report('/libraries/*', (request, response) => {
       let requestPath = decodeURI(request.url);
       let fileName = path.join(dataPath, requestPath);
-      /* Use exec instead of spawn to make this work on Windows. */
+      // Use exec instead of spawn to make this work on Windows.
       exec(`code "${fileName}"`);
       response.sendStatus(200);
     });

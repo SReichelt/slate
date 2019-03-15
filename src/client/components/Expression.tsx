@@ -719,7 +719,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         if ('ontouchstart' in window) {
-          /* SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device. */
+          // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           return <textarea value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
           let options: SimpleMDE.Options = {

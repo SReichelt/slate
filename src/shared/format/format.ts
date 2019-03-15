@@ -218,7 +218,7 @@ export class Parameter {
       replacedParameters.push({original: this, replacement: result});
       result.name = this.name;
       result.type = new Type;
-      /* Need to re-evaluate type because it can depend on the parameter itself. */
+      // Need to re-evaluate type because it can depend on the parameter itself.
       result.type.expression = this.type.expression.substitute(fn, replacedParameters);
       result.type.arrayDimensions = this.type.arrayDimensions;
       result.defaultValue = newDefaultValue;
@@ -235,7 +235,7 @@ export class Parameter {
     if (this === parameter && !replacedParameters.length) {
       return true;
     }
-    /* Compare everything except names. */
+    // Compare everything except names.
     if (this.optional === parameter.optional && this.list === parameter.list) {
       let origReplacedParametersLength = replacedParameters.length;
       replacedParameters.push({original: this, replacement: parameter});
@@ -531,7 +531,7 @@ export abstract class Expression {
     if (fn) {
       return fn(changed ? expression : this);
     } else {
-      /* Special case used by clone(). Don't return 'this', even if unchanged. */
+      // Special case used by clone(). Don't return 'this', even if unchanged.
       return expression;
     }
   }

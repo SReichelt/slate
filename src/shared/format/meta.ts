@@ -841,23 +841,14 @@ export class MetaModel extends Meta.MetaModel {
       let type = parent.type.expression;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_DefinitionType) {
-          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-          }
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
             let membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(membersValue.parameters, context);
             }
           }
-          if (argument.name === 'innerDefinitionTypes' || (argument.name === undefined && argumentIndex === 3)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-          }
         }
         if (type instanceof MetaRefExpression_ExpressionType) {
-          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-          }
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
             let membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
@@ -866,17 +857,11 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_ParameterType) {
-          if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-          }
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
             let membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(membersValue.parameters, context);
             }
-          }
-          if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 4)) {
-            context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
           }
         }
       }
@@ -884,56 +869,6 @@ export class MetaModel extends Meta.MetaModel {
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
-          if (currentContext.objectContentsClass === ObjectContents_DefinedType) {
-            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-            }
-            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-              let membersValue = previousArguments.getOptionalValue('members', 1);
-              if (membersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(membersValue.parameters, context);
-              }
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_DefinitionType) {
-            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-            }
-            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-              let membersValue = previousArguments.getOptionalValue('members', 1);
-              if (membersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(membersValue.parameters, context);
-              }
-            }
-            if (argument.name === 'innerDefinitionTypes' || (argument.name === undefined && argumentIndex === 3)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_ExpressionType) {
-            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-            }
-            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-              let membersValue = previousArguments.getOptionalValue('members', 1);
-              if (membersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(membersValue.parameters, context);
-              }
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_ParameterType) {
-            if (argument.name === 'superType' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinedType, context);
-            }
-            if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-              let membersValue = previousArguments.getOptionalValue('members', 1);
-              if (membersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(membersValue.parameters, context);
-              }
-            }
-            if (argument.name === 'argumentType' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new ArgumentTypeContext(ObjectContents_ExpressionType, context);
-            }
-          }
           break;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
           break;

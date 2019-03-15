@@ -5816,6 +5816,32 @@ export class MetaModel extends Meta.MetaModel {
             context = new ArgumentTypeContext(ObjectContents_Embedding, context);
           }
         }
+        if (type instanceof MetaRefExpression_Constructor) {
+          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
+            context = new ArgumentTypeContext(ObjectContents_Property, context);
+          }
+          if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtDisplay.metaModel;
+          }
+          if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 3)) {
+            for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
+              if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_Construction) {
+                break;
+              }
+              if (context instanceof ArgumentTypeContext && context.objectContentsClass === ObjectContents_Construction) {
+                break;
+              }
+            }
+            context = new ArgumentTypeContext(ObjectContents_EqualityDefinition, context);
+          }
+          if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_RewriteDefinition, context);
+          }
+        }
         if (type instanceof MetaRefExpression_SetOperator) {
           if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
             context = new ArgumentTypeContext(ObjectContents_Property, context);
@@ -5922,18 +5948,6 @@ export class MetaModel extends Meta.MetaModel {
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
-          if (currentContext.objectContentsClass === ObjectContents_Definition) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-          }
           if (currentContext.objectContentsClass === ObjectContents_DefinitionDisplay) {
             if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
               let parameterValue = previousArguments.getOptionalValue('parameter', 0);
@@ -5956,21 +5970,6 @@ export class MetaModel extends Meta.MetaModel {
               context.metaModel = FmtDisplay.metaModel;
             }
           }
-          if (currentContext.objectContentsClass === ObjectContents_Construction) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 3)) {
-              context = new ArgumentTypeContext(ObjectContents_Embedding, context);
-            }
-          }
           if (currentContext.objectContentsClass === ObjectContents_Embedding) {
             if (argument.name === 'target' || (argument.name === undefined && argumentIndex === 1)) {
               let parameterValue = previousArguments.getOptionalValue('parameter', 0);
@@ -5980,32 +5979,6 @@ export class MetaModel extends Meta.MetaModel {
             }
             if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 2)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_Constructor) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 3)) {
-              for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
-                if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_Construction) {
-                  break;
-                }
-                if (context instanceof ArgumentTypeContext && context.objectContentsClass === ObjectContents_Construction) {
-                  break;
-                }
-              }
-              context = new ArgumentTypeContext(ObjectContents_EqualityDefinition, context);
-            }
-            if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new ArgumentTypeContext(ObjectContents_RewriteDefinition, context);
             }
           }
           if (currentContext.objectContentsClass === ObjectContents_EqualityDefinition) {
@@ -6040,119 +6013,6 @@ export class MetaModel extends Meta.MetaModel {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
             }
           }
-          if (currentContext.objectContentsClass === ObjectContents_SetOperator) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-            if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 6)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_Operator) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_ExplicitOperator) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-            if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 6)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_ImplicitOperator) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 4)) {
-              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
-              if (parameterValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(parameterValue.parameters, context);
-              }
-            }
-            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 5)) {
-              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
-              if (parameterValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(parameterValue.parameters, context);
-              }
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 6)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_MacroOperator) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_Predicate) {
-            if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Property, context);
-            }
-            if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtDisplay.metaModel;
-            }
-            if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
-            }
-            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_StandardTheorem) {
-            if (argument.name === 'proofs' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_EquivalenceTheorem) {
-            if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 1)) {
-              context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
           if (currentContext.objectContentsClass === ObjectContents_SubsetArg) {
             if (argument.name === 'subsetProof' || (argument.name === undefined && argumentIndex === 1)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
@@ -6182,9 +6042,6 @@ export class MetaModel extends Meta.MetaModel {
             }
           }
           if (currentContext.objectContentsClass === ObjectContents_StructuralCase) {
-            if (argument.name === 'constructor' || (argument.name === undefined && argumentIndex === 0)) {
-              context = new ArgumentTypeContext(ObjectContents_Constructor, context);
-            }
             if (argument.name === 'value' || (argument.name === undefined && argumentIndex === 2)) {
               let parametersValue = previousArguments.getOptionalValue('parameters', 1);
               if (parametersValue instanceof Fmt.ParameterExpression) {
@@ -6243,9 +6100,6 @@ export class MetaModel extends Meta.MetaModel {
         }
       }
       if (parent instanceof MetaRefExpression_setStructuralCases) {
-        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
-          context = new ArgumentTypeContext(ObjectContents_Construction, context);
-        }
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
           context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
         }
@@ -6256,9 +6110,6 @@ export class MetaModel extends Meta.MetaModel {
         }
       }
       if (parent instanceof MetaRefExpression_structuralCases) {
-        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
-          context = new ArgumentTypeContext(ObjectContents_Construction, context);
-        }
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
           context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
         }
@@ -6288,9 +6139,6 @@ export class MetaModel extends Meta.MetaModel {
         }
       }
       if (parent instanceof MetaRefExpression_structural) {
-        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
-          context = new ArgumentTypeContext(ObjectContents_Construction, context);
-        }
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
           context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
         }
@@ -6308,11 +6156,6 @@ export class MetaModel extends Meta.MetaModel {
       if (parent instanceof MetaRefExpression_UseExists) {
         if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
           context = new ArgumentTypeContext(ObjectContents_Proof, context);
-        }
-      }
-      if (parent instanceof MetaRefExpression_Embed) {
-        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 0)) {
-          context = new ArgumentTypeContext(ObjectContents_Construction, context);
         }
       }
       if (parent instanceof MetaRefExpression_ProveDef) {
@@ -6349,9 +6192,6 @@ export class MetaModel extends Meta.MetaModel {
         }
       }
       if (parent instanceof MetaRefExpression_ProveByInduction) {
-        if (argument.name === 'construction' || (argument.name === undefined && argumentIndex === 1)) {
-          context = new ArgumentTypeContext(ObjectContents_Construction, context);
-        }
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
           context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
         }

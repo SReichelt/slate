@@ -739,6 +739,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             let result: vscode.CompletionItem[] = [];
+            let variableNames = new Set<string>();
             for (let rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
@@ -759,7 +760,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                         if (argRangeInfo && !argRangeInfo.range.isEmpty) {
                                             if (argRangeInfo.range.contains(position)) {
                                                 if (!arg.name && arg.value instanceof Fmt.VariableRefExpression) {
-                                                    /* Looks like a variable, but could turn into an argument name. */
+                                                    // Looks like a variable, but could turn into an argument name.
                                                     argNameRange = argRangeInfo.range;
                                                 } else {
                                                     signatureInfo = undefined;
@@ -837,7 +838,15 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                             }
                         }
                         if (((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || rangeInfo.object instanceof Fmt.VariableRefExpression) && rangeInfo.context) {
-                            for (let param of rangeInfo.context.getVariables()) {
+                            let variables = rangeInfo.context.getVariables();
+                            for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
+                                let param = variables[variableIndex];
+                                if (variableNames.has(param.name)) {
+                                    // Cannot reference shadowed variable.
+                                    continue;
+                                } else {
+                                    variableNames.add(param.name);
+                                }
                                 let paramRangeInfo = parsedDocument.rangeMap.get(param);
                                 if (paramRangeInfo && paramRangeInfo.nameRange) {
                                     let paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
@@ -848,7 +857,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                             documentation = new vscode.MarkdownString;
                                             documentation.appendCodeblock(paramDefinition);
                                         }
-                                        result.push({
+                                        result.unshift({
                                             label: paramCode,
                                             range: rangeInfo.object instanceof Fmt.VariableRefExpression ? rangeInfo.nameRange || rangeInfo.range : undefined,
                                             documentation: documentation,

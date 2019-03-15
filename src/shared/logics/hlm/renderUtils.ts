@@ -278,7 +278,7 @@ export class HLMRenderUtils {
         if (bindingArg.value instanceof Fmt.CompoundExpression && bindingArg.value.arguments.length) {
           let expression = bindingArg.value.arguments[0].value;
           if (expression instanceof Fmt.ParameterExpression) {
-            /* Looks like a nested binding argument; recurse into it. */
+            // Looks like a nested binding argument; recurse into it.
             if (bindingArg.value.arguments.length > 1) {
               let nestedArgumentsExpression = bindingArg.value.arguments[1].value;
               if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
@@ -295,7 +295,7 @@ export class HLMRenderUtils {
               }
             }
           } else {
-            /* We expect this to be a regular argument. */
+            // We expect this to be a regular argument.
             let newExpression = this.convertStructuralCaseToOverride(allowedParameters, expression, elementParameterOverrides);
             if (newExpression !== expression) {
               bindingArg = bindingArg.clone();
