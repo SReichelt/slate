@@ -246,6 +246,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let removeRow = new Menu.StandardExpressionMenuRow;
     removeRow.title = 'Remove';
     removeRow.titleAction = action;
+    removeRow.iconType = 'remove';
     return removeRow;
   }
 

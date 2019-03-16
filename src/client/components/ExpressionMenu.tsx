@@ -3,6 +3,7 @@ import './ExpressionMenu.css';
 import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import Expression, { ExpressionInteractionHandler } from './Expression';
+import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 
 interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
@@ -176,6 +177,24 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         };
         if (titleAction instanceof Menu.DialogExpressionMenuAction) {
           title = [title, '...'];
+        }
+      }
+      if (row.iconType !== undefined) {
+        let icon: React.ReactNode = undefined;
+        if (typeof row.iconType === 'string') {
+          switch (row.iconType) {
+            case 'remove':
+              icon = getButtonIcon(ButtonType.Remove);
+              break;
+          }
+        } else {
+          icon = getDefinitionIcon(row.iconType);
+        }
+        if (icon) {
+          title = [
+            <span className={'open-menu-title-cell-icon'} key={'icon'}>{icon}</span>,
+            title
+          ];
         }
       }
       if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {

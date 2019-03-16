@@ -90,7 +90,7 @@ export abstract class GenericEditHandler {
   private addDisplayMenuRows(rows: Menu.ExpressionMenuRow[], displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, defaultValue: Display.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     if (defaultValue || canRemove) {
       rows.push(
-        this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault, canRemove ? 'Remove' : 'Default'),
+        this.getDisplayMenuDefaultRow(defaultValue, onSetDisplayItem, isDefault, canRemove),
         new Menu.ExpressionMenuSeparator
       );
     }
@@ -116,11 +116,14 @@ export abstract class GenericEditHandler {
     }
   }
 
-  private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression | undefined, onSetDisplayItem: SetDisplayItemFn, isDefault: boolean, title: string = 'Default'): Menu.ExpressionMenuRow {
+  private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression | undefined, onSetDisplayItem: SetDisplayItemFn, isDefault: boolean, isRemoveRow: boolean): Menu.ExpressionMenuRow {
     let defaultAction = new Menu.ImmediateExpressionMenuAction;
     defaultAction.onExecute = () => onSetDisplayItem(undefined);
     let defaultRow = new Menu.StandardExpressionMenuRow;
-    defaultRow.title = title;
+    defaultRow.title = isRemoveRow ? 'Remove' : 'Default';
+    if (isRemoveRow) {
+      defaultRow.iconType = 'remove';
+    }
     if (renderedDefault) {
       let defaultItem = new Menu.ExpressionMenuItem;
       defaultItem.expression = renderedDefault;

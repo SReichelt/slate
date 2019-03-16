@@ -55,6 +55,19 @@
   cursor: pointer;
 }
 
+.open-menu-title-cell-icon {
+  display: inline-block;
+  vertical-align: middle;
+  padding-right: 2pt;
+}
+
+.open-menu-title-cell-icon svg {
+  position: initial;
+  width: initial;
+  height: initial;
+  vertical-align: middle;
+}
+
 .open-menu-arrow {
   position: absolute;
   right: 0;

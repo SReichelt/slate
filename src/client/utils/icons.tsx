@@ -15,7 +15,8 @@ export enum ButtonType {
   LogOut,
   RightArrow,
   DownArrow,
-  Insert
+  Insert,
+  Remove
 }
 
 function getVSCodeLogo(enabled: boolean = true): React.ReactNode {
@@ -90,6 +91,14 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
     return (
       <svg height="1em" width="1em" viewBox="-8 -8 16 16">
         <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={enabled ? 'lime' : 'none'} stroke={enabled ? 'darkgreen' : 'gray'} strokeWidth="0.5"/>
+      </svg>
+    );
+  case ButtonType.Remove:
+    return (
+      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+        <rect x="-7" y="-7" width="14" height="14" rx="2" ry="2" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'maroon' : 'gray'} strokeWidth="0.5"/>
+        <line x1="-4" y1="-4" x2="4" y2="4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2"/>
+        <line x1="-4" y1="4" x2="4" y2="-4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2"/>
       </svg>
     );
   default:
