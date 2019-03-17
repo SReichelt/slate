@@ -33,6 +33,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
+  getRootProvider(): LibraryDataProvider {
+    if (this.parent) {
+      return this.parent.getRootProvider();
+    } else {
+      return this;
+    }
+  }
+
   getProviderForSection(path?: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
     if (!path) {
       return this;
@@ -81,6 +89,32 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     result.arguments = path.arguments;
     result.parentPath = parentProvider.getPath();
     return result;
+  }
+
+  getRelativePath(absolutePath: Fmt.Path): Fmt.Path {
+    if (this.parent) {
+      let result = this.parent.getRelativePath(absolutePath);
+      let pathItem: Fmt.PathItem = result;
+      let prevPathItem: Fmt.PathItem | undefined = undefined;
+      for (;;) {
+        if (pathItem.parentPath) {
+          if (!(pathItem instanceof Fmt.Path)) {
+            prevPathItem = pathItem;
+          }
+          pathItem = pathItem.parentPath!;
+        } else {
+          if (prevPathItem && pathItem instanceof Fmt.NamedPathItem && pathItem.name === this.childName) {
+            prevPathItem.parentPath = undefined;
+          } else {
+            pathItem.parentPath = new Fmt.ParentPathItem;
+          }
+          break;
+        }
+      }
+      return result;
+    } else {
+      return absolutePath.clone() as Fmt.Path;
+    }
   }
 
   arePathsEqual(path1?: Fmt.PathItem, path2?: Fmt.PathItem): boolean {

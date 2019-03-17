@@ -65,7 +65,6 @@ class App extends React.Component<AppProps, AppState> {
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
-  private library: CachedPromise<Fmt.Definition>;
   private treePaneNode: HTMLElement | null = null;
   private mainContentsPaneNode: HTMLElement | null = null;
   private extraContentsPaneNode: HTMLElement | null = null;
@@ -158,8 +157,6 @@ class App extends React.Component<AppProps, AppState> {
     this.logic = Logics.hlm;
     let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
     this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, undefined, 'Library');
-
-    this.library = this.libraryDataProvider.fetchLocalSection();
 
     this.updateSelectionState(state, selectionURI);
     this.state = state;
@@ -275,11 +272,11 @@ class App extends React.Component<AppProps, AppState> {
         extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
         if (this.state.editedDefinition) {
           if (!this.state.gitHubUserInfo && !this.runningLocally) {
-            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, your can submit your contribution as a pull request instead.</Message>, mainContents];
+            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, your can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
           } else if (this.state.selectedItemRepository) {
             let repository = this.state.selectedItemRepository;
             if (!repository.hasWriteAccess) {
-              mainContents = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.</Message>, mainContents];
+              mainContents = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
             } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
               mainContents = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContents];
             }
@@ -427,7 +424,7 @@ class App extends React.Component<AppProps, AppState> {
         <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
           <div className={'app-pane'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
             <div className={'app-tree'}>
-              <LibraryTree libraryDataProvider={this.libraryDataProvider} section={this.library} itemNumber={[]} templates={this.state.templates} parentScrollPane={this.treePaneNode} isLast={true} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>
+              <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>
             </div>
           </div>
           {contentsPane}

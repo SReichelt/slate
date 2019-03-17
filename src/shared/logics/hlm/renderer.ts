@@ -1340,7 +1340,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         bindingArgumentList = this.renderUtils.convertBoundStructuralCasesToOverrides([parameter], bindingArgumentList, elementParameterOverrides);
       }
-      let variableDefinition = this.renderVariableDefinitions([parameter], undefined, markAsDummy, undefined, elementParameterOverrides);
+      let variableDefinition = this.renderVariable(parameter, undefined, argumentLists !== undefined, markAsDummy, undefined, elementParameterOverrides);
       if (combineBindings) {
         resultArgs.push(this.renderTemplate('Binding', {
                                               'variable': variableDefinition,
@@ -1518,7 +1518,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let parameterOverrides: ParameterOverrides = {
               elementParameterOverrides: elementParameterOverrides
             };
-            return this.renderDefinitionRef([definition], undefined, false, 0, parameterOverrides);
+            return this.readOnlyRenderer.renderDefinitionRef([definition], undefined, false, 0, parameterOverrides);
           }
           return definitionRef;
         };
@@ -1735,7 +1735,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         });
         let supersetWithText = new Display.RowExpression([supersetDefinition, new Display.TextExpression(' via')]);
         rows.push([subset, supersetWithText]);
-        let subsetElement = this.renderVariableDefinitions([embedding.parameter]);
+        let subsetElement = this.renderVariable(embedding.parameter, undefined, true);
         let targetTerm = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
         let target = this.renderElementTerm(targetTerm, fullElementTermSelection);
         let supersetElement = this.renderTemplate('EqualityRelation', {

@@ -3,6 +3,7 @@ import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 import * as Display from '../display/display';
 import { LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataAccessor';
+import { LibraryDataProvider } from '../data/libraryDataProvider';
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
@@ -24,7 +25,8 @@ export enum LogicDefinitionType {
 
 export interface LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
-  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, editing: boolean): LogicRenderer;
+  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): LogicRenderer;
+  getDefinitionEditor(definition: Fmt.Definition, includeProofs: boolean, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, editing: boolean): LogicRenderer;
 }
 
 export type RenderFn = () => Display.RenderedExpression;

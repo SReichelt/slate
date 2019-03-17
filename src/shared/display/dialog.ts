@@ -1,4 +1,6 @@
+import * as Fmt from '../format/format';
 import * as Display from './display';
+import { LibraryDataProvider } from '../data/libraryDataProvider';
 
 export class ExpressionDialog {
   items: ExpressionDialogItem[];
@@ -18,4 +20,11 @@ export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
   title: string | Display.RenderedExpression;
   onGetValue: () => Display.RenderedExpression;
+}
+
+export class ExpressionDialogTreeItem extends ExpressionDialogItem {
+  libraryDataProvider: LibraryDataProvider;
+  templates?: Fmt.File;
+  onFilter?: (definition: Fmt.Definition) => boolean;
+  selectedItemPath?: Fmt.Path;
 }

@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as Edit from '../../format/edit';
 import * as FmtHLM from './meta';
+import * as Logic from '../logic';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import { HLMTermType } from './hlm';
@@ -143,11 +144,11 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getRemoveRow(expressionEditInfo));
       }
 
-      let isAllowed = (variable: Fmt.Parameter) => {
+      let isVariableAllowed = (variable: Fmt.Parameter) => {
         let type = variable.type.expression;
         return type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef;
       };
-      let variableRow = this.getVariableRow(expressionEditInfo, isAllowed, onRenderTerm);
+      let variableRow = this.getVariableRow(expressionEditInfo, isVariableAllowed, onRenderTerm);
       if (variableRow) {
         menu.rows.push(variableRow);
       }
@@ -163,6 +164,12 @@ export class HLMEditHandler extends GenericEditHandler {
       if (termSelection.allowCases) {
         menu.rows.push(this.getSetCasesRow(expressionEditInfo, onRenderTerm));
       }
+
+      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+        let type = definition.type.expression;
+        return type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction;
+      };
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], isDefinitionAllowed, onRenderTerm));
 
       return menu;
     };
@@ -184,11 +191,11 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getRemoveRow(expressionEditInfo));
       }
 
-      let isAllowed = (variable: Fmt.Parameter) => {
+      let isVariableAllowed = (variable: Fmt.Parameter) => {
         let type = variable.type.expression;
         return type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def;
       };
-      let variableRow = this.getVariableRow(expressionEditInfo, isAllowed, onRenderTerm);
+      let variableRow = this.getVariableRow(expressionEditInfo, isVariableAllowed, onRenderTerm);
       if (variableRow) {
         menu.rows.push(variableRow);
       }
@@ -196,6 +203,12 @@ export class HLMEditHandler extends GenericEditHandler {
       if (termSelection.allowCases) {
         menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
       }
+
+      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+        let type = definition.type.expression;
+        return type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_Constructor;
+      };
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], isDefinitionAllowed, onRenderTerm));
 
       return menu;
     };
@@ -217,11 +230,11 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getRemoveRow(expressionEditInfo));
       }
 
-      let isAllowed = (variable: Fmt.Parameter) => {
+      let isVariableAllowed = (variable: Fmt.Parameter) => {
         let type = variable.type.expression;
         return type instanceof FmtHLM.MetaRefExpression_Prop;
       };
-      let variableRow = this.getVariableRow(expressionEditInfo, isAllowed, onRenderFormula);
+      let variableRow = this.getVariableRow(expressionEditInfo, isVariableAllowed, onRenderFormula);
       if (variableRow) {
         menu.rows.push(variableRow);
       }
@@ -235,6 +248,12 @@ export class HLMEditHandler extends GenericEditHandler {
       if (formulaSelection.allowCases) {
         menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
       }
+
+      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+        let type = definition.type.expression;
+        return type instanceof FmtHLM.MetaRefExpression_Predicate;
+      };
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], isDefinitionAllowed, onRenderFormula));
 
       return menu;
     };

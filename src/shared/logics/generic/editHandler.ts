@@ -1,10 +1,11 @@
 import * as Fmt from '../../format/format';
 import * as Edit from '../../format/edit';
+import * as Logic from '../logic';
 import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
+import { LibraryDataProvider } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
 
 export class PlaceholderExpression extends Fmt.Expression {
@@ -37,8 +38,8 @@ export abstract class GenericEditHandler {
 
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File) {
-    this.editAnalysis.analyzeDefinition(definition, libraryDataAccessor.logic.getRootContext());
+  constructor(definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected templates: Fmt.File) {
+    this.editAnalysis.analyzeDefinition(definition, libraryDataProvider.logic.getRootContext());
   }
 
   addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
@@ -482,7 +483,7 @@ export abstract class GenericEditHandler {
     return parameter;
   }
 
-  protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, isAllowed: (variable: Fmt.Parameter) => boolean, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow | undefined {
+  protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, isAllowed: (variable: Fmt.Parameter) => boolean, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow | undefined {
     let variables = expressionEditInfo.context.getVariables();
     let variableItems: Menu.ExpressionMenuItem[] = [];
     let variableNames = new Set<string>();
@@ -498,7 +499,7 @@ export abstract class GenericEditHandler {
         let variableRefExpression = new Fmt.VariableRefExpression;
         variableRefExpression.variable = variable;
         // TODO add placeholders for indices
-        variableItems.unshift(this.getExpressionItem(variableRefExpression, expressionEditInfo, onRenderTerm));
+        variableItems.unshift(this.getExpressionItem(variableRefExpression, expressionEditInfo, onRenderExpression));
       }
     }
     if (variableItems.length) {
@@ -511,6 +512,40 @@ export abstract class GenericEditHandler {
       return variableRow;
     }
     return undefined;
+  }
+
+  protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], isAllowed: (definition: Fmt.Definition) => boolean, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let action = new Menu.DialogExpressionMenuAction;
+    action.onOpen = () => {
+      let treeItem = new Dialog.ExpressionDialogTreeItem;
+      treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
+      treeItem.templates = this.templates;
+      treeItem.onFilter = isAllowed;
+      if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
+        treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(expressionEditInfo.expression.path);
+      }
+      let dialog = new Dialog.ExpressionDialog;
+      dialog.items = [
+        treeItem
+      ];
+      dialog.onOK = () => {
+        if (treeItem.selectedItemPath) {
+          let expression = new Fmt.DefinitionRefExpression;
+          expression.path = this.libraryDataProvider.getRelativePath(treeItem.selectedItemPath);
+          expressionEditInfo.onSetValue(expression);
+        }
+      };
+      return dialog;
+    };
+
+    let definitionRow = new Menu.StandardExpressionMenuRow;
+    definitionRow.title = 'Definition';
+    definitionRow.titleAction = action;
+    definitionRow.iconType = definitionTypes[0];
+    if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
+      definitionRow.selected = true;
+    }
+    return definitionRow;
   }
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {

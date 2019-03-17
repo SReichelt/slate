@@ -38,3 +38,8 @@
   background-color: #f0f0f0;
   text-align: right;
 }
+
+.dialog-overlay {
+  z-index: 20;
+  background-color: #00000080;
+}

@@ -784,8 +784,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let menu: React.ReactNode = undefined;
       if (this.state.openDialog) {
+        let modalClassNames = {
+          modal: 'dialog',
+          overlay: 'dialog-overlay'
+        };
         menu = (
-          <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={{modal: 'dialog'}} key={'dialog'}>
+          <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={modalClassNames} key={'dialog'}>
             <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>
           </Modal>
         );

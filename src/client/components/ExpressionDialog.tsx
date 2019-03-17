@@ -1,11 +1,16 @@
 import * as React from 'react';
 import './ExpressionDialog.css';
+import * as Fmt from '../../shared/format/format';
+import * as FmtLibrary from '../../shared/logics/library';
 import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
+import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
 import Button from './Button';
 import Expression, { ExpressionInteractionHandler } from './Expression';
+import EmbeddedLibraryTree from './EmbeddedLibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 import { getButtonIcon, ButtonType } from '../utils/icons';
+import CachedPromise from '../../shared/data/cachedPromise';
 
 interface ExpressionDialogProps {
   dialog: Dialog.ExpressionDialog;
@@ -131,6 +136,19 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
           </th>
           <td className={'dialog-cell'}>
             <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler} key={'value'}/>
+          </td>
+        </tr>
+      );
+    } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
+      let item = this.props.item;
+      let onItemClicked = (libraryItem: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void => {
+        item.selectedItemPath = libraryDataProvider.getAbsolutePath(path);
+        this.forceUpdate();
+      };
+      return (
+        <tr className={className}>
+          <td className={'dialog-cell'} colSpan={2}>
+            <EmbeddedLibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={onItemClicked}/>
           </td>
         </tr>
       );

@@ -629,10 +629,6 @@ div.display-math {
   border: solid 1px #e0e0e0;
 }
 
-.placeholder>.menu {
-  vertical-align: text-bottom;
-}
-
 .menu-row {
   display: table-row;
 }
@@ -661,8 +657,8 @@ div.display-math {
 
 .menu-placeholder {
   display: flex;
-  width: 0.75em;
-  height: 0.75em;
+  width: 0.7em;
+  height: 0.7em;
   position: relative;
 }
 
@@ -670,20 +666,25 @@ div.display-math {
   font-size: 50%;
 }
 
-.expr input, .expr textarea {
+.expr>input, .expr>textarea {
   font-family: inherit;
   font-size: inherit;
 }
 
 .expr>input {
   text-align: center;
-  color: inherit;
-  background-color: inherit;
+  color: black;
+  background-color: white;
   border: solid 1px silver;
   border-radius: 2px;
 }
 
-.expr textarea {
+.expr.hover>input {
+  color: inherit;
+  background-color: inherit;
+}
+
+.expr>textarea {
   width: 100%;
 	min-height: 4em;
 }

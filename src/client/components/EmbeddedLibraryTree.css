@@ -1,0 +1,10 @@
+.embedded-tree-pane {
+  width: 15em;
+  height: 20em;
+  border: solid 1px gray;
+  overflow: auto;
+}
+
+.embedded-tree {
+  padding: 2pt;
+}

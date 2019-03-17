@@ -10,7 +10,13 @@ export interface RenderedVariable {
 }
 
 export abstract class GenericRenderer {
-  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {}
+  private variableNameEditHandler?: GenericEditHandler;
+
+  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {
+    // Variable names can be edited even in some cases where the rest is read-only.
+    // Derived classes can reset editHandler but not variableNameEditHandler.
+    this.variableNameEditHandler = editHandler;
+  }
 
   renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
     let template: Fmt.Definition;
@@ -54,8 +60,8 @@ export abstract class GenericRenderer {
       suffixes.push(new Display.TextExpression(rest));
     }
     let text = new Display.TextExpression(name);
-    if (isDefinition && this.editHandler) {
-      this.editHandler.addVariableNameEditor(text, param, parameterList);
+    if (isDefinition && this.variableNameEditHandler) {
+      this.variableNameEditHandler.addVariableNameEditor(text, param, parameterList);
     }
     let result: Display.RenderedExpression = text;
     if (suffixes) {

@@ -24,7 +24,7 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
         if (item instanceof FmtLibrary.MetaRefExpression_item) {
           let ref = item.ref as Fmt.DefinitionRefExpression;
           let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
-          let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates, false);
+          let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
           let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), true, true, true);
           if (renderedDefinition) {
             let renderedText = renderAsText(renderedDefinition, false, false);
