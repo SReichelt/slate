@@ -272,7 +272,7 @@ class App extends React.Component<AppProps, AppState> {
         extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
         if (this.state.editedDefinition) {
           if (!this.state.gitHubUserInfo && !this.runningLocally) {
-            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, your can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
+            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
           } else if (this.state.selectedItemRepository) {
             let repository = this.state.selectedItemRepository;
             if (!repository.hasWriteAccess) {
