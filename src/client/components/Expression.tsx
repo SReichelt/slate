@@ -798,7 +798,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let onMouseEnter = hasMenu ? () => this.addToHoveredChildren() : undefined;
       let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;
-      let onMouseDown = hasVisibleMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
+      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let cells: React.ReactNode;
