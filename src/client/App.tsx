@@ -433,12 +433,12 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private treeItemClicked = (item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void => {
+  private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
     this.navigate({
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
       selectedItemDefinition: definitionPromise,
-      selectedItemInfo: CachedPromise.resolve(itemInfo),
+      selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined,
       interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined,
       editedDefinition: undefined,
       submitting: false

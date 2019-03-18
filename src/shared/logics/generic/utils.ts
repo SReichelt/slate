@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as FmtUtils from '../../format/utils';
 import { LibraryDataAccessor, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -14,10 +15,7 @@ export class GenericUtils {
   }
 
   getOuterDefinition(expression: Fmt.DefinitionRefExpression): CachedPromise<Fmt.Definition> {
-    let path = expression.path;
-    while (path.parentPath instanceof Fmt.Path) {
-      path = path.parentPath;
-    }
+    let path = FmtUtils.getOuterPath(expression.path);
     return this.getDefinition(path);
   }
 

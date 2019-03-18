@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './LibraryTree.css';
 import * as Fmt from '../../shared/format/format';
+import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
 import Expression from './Expression';
@@ -11,13 +12,14 @@ import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
 const ToolTip = require('react-portal-tooltip').default;
 
 export type OnFilter = (definition: Fmt.Definition) => boolean;
-export type OnItemClicked = (item: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo) => void;
+export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo) => void;
 
 let previewContents: React.ReactNode = null;
 
 interface LibraryTreeItemProps {
   libraryDataProvider: LibraryDataProvider;
-  item: FmtLibrary.MetaRefExpression_item | FmtLibrary.MetaRefExpression_subsection;
+  outerDefinition?: Fmt.Definition;
+  isSubsection: boolean;
   path: Fmt.Path;
   itemInfo: LibraryItemInfo;
   templates?: Fmt.File;
@@ -25,6 +27,7 @@ interface LibraryTreeItemProps {
   isSingle: boolean;
   isLast: boolean;
   onFilter?: OnFilter;
+  selected: boolean;
   selectedChildPath?: Fmt.Path;
   onItemClicked?: OnItemClicked;
 }
@@ -68,37 +71,43 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         props.parentScrollPane.addEventListener('scroll', this.onScroll);
       }
     }
-    if (props.item !== this.props.item
-        || (props.item instanceof FmtLibrary.MetaRefExpression_item && this.definitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.definitionPromise))) {
+    if (props.isSubsection !== this.props.isSubsection
+        || props.outerDefinition !== this.props.outerDefinition
+        || (!props.isSubsection && this.definitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.definitionPromise))) {
       this.updateItem(props);
     }
-    if (!props.libraryDataProvider.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {
+    if (!FmtUtils.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {
       this.updateSelection(props);
     }
   }
 
   private updateItem(props: LibraryTreeItemProps): void {
-    let autoOpen = props.item instanceof FmtLibrary.MetaRefExpression_subsection && props.isSingle;
+    let autoOpen = props.isSubsection && props.isSingle;
     this.setState({opened: autoOpen});
 
-    let definitionPromise: CachedPromise<Fmt.Definition> | undefined = undefined;
-    if (props.item instanceof FmtLibrary.MetaRefExpression_item) {
-      definitionPromise = props.libraryDataProvider.fetchItem(props.path);
-    } else if (props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
-      definitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
-    }
-    this.definitionPromise = definitionPromise;
+    if (props.outerDefinition) {
+      let definition = props.outerDefinition.innerDefinitions.getDefinition(props.path.name);
+      this.setState({definition: definition});
+    } else {
+      let definitionPromise: CachedPromise<Fmt.Definition> | undefined = undefined;
+      if (props.isSubsection) {
+        definitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
+      } else {
+        definitionPromise = props.libraryDataProvider.fetchItem(props.path);
+      }
+      this.definitionPromise = definitionPromise;
 
-    if (definitionPromise) {
-      definitionPromise
-        .then((definition: Fmt.Definition) => {
-          if (this.definitionPromise === definitionPromise) {
-            this.setState({definition: definition});
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      if (definitionPromise) {
+        definitionPromise
+          .then((definition: Fmt.Definition) => {
+            if (this.definitionPromise === definitionPromise) {
+              this.setState({definition: definition});
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
 
     this.clicked = false;
@@ -106,10 +115,10 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
   private updateSelection(props: LibraryTreeItemProps): void {
     if (props.selectedChildPath && !this.clicked) {
-      if (props.item instanceof FmtLibrary.MetaRefExpression_item) {
-        setTimeout(this.scrollIntoView, 100);
-      } else if (props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
+      if (props.isSubsection) {
         this.setState({opened: true});
+      } else {
+        setTimeout(this.scrollIntoView, 100);
       }
     } else {
       this.clicked = false;
@@ -124,26 +133,52 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   render(): React.ReactNode {
-    let item = this.props.item;
     let className = 'tree-item hoverable';
     let contents: React.ReactNode = null;
     let icon: React.ReactNode = '\u2001';
-    let display: React.ReactNode = this.props.itemInfo.title;
-    if (item instanceof FmtLibrary.MetaRefExpression_item) {
+    let display: React.ReactNode = this.props.itemInfo ? this.props.itemInfo.title : undefined;
+    let clickable = true;
+    if (this.props.isSubsection) {
+      if (this.state.opened) {
+        icon = getButtonIcon(ButtonType.DownArrow);
+        if (this.definitionPromise) {
+          contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.definitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
+        }
+      } else {
+        icon = getButtonIcon(ButtonType.RightArrow);
+      }
+    } else {
+      let definition = this.state.definition;
       if (this.props.onFilter) {
-        if (!this.state.definition || !this.props.onFilter(this.state.definition)) {
+        if (!definition) {
           return null;
         }
+        let innerDefinitions: Fmt.Definition[] = [];
+        if (definition.innerDefinitions.length) {
+          for (let innerDefinition of definition.innerDefinitions) {
+            if (this.props.onFilter(innerDefinition)) {
+              innerDefinitions.push(innerDefinition);
+            }
+          }
+        }
+        if (!this.props.onFilter(definition)) {
+          if (!innerDefinitions.length) {
+            return null;
+          }
+          clickable = false;
+          contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider} outerDefinition={definition} innerDefinitions={innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
+        }
       }
-      if (this.state.definition) {
+      if (definition) {
         let logic = this.props.libraryDataProvider.logic;
         let logicDisplay = logic.getDisplay();
-        let definitionType = logicDisplay.getDefinitionType(this.state.definition);
+        let definitionType = logicDisplay.getDefinitionType(definition);
         let definitionIcon = getDefinitionIcon(definitionType, this.props.itemInfo);
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
-          let renderer = logicDisplay.getDefinitionRenderer(this.state.definition, false, this.props.libraryDataProvider, this.props.templates);
-          let summary = renderer.renderDefinitionSummary();
+          let outerDefinition = this.props.outerDefinition || definition;
+          let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, false, this.props.libraryDataProvider, this.props.templates);
+          let summary = renderer.renderDefinitionSummary(definition);
           if (summary) {
             let summaryExpression = <Expression expression={summary} key="summary"/>;
             if (display === undefined) {
@@ -154,12 +189,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
           }
           if (this.refreshTooltip) {
             this.refreshTooltip = false;
-          } else if (display !== undefined && this.props.parentScrollPane && !this.props.selectedChildPath) {
+          } else if (display !== undefined && this.props.parentScrollPane && !this.props.selected) {
             let showPreview = false;
             if (this.state.showPreview) {
-              let definition = renderer.renderDefinition(undefined, false, true, false);
-              if (definition) {
-                previewContents = <Expression expression={definition}/>;
+              let renderedDefinition = renderer.renderDefinition(undefined, false, true, false);
+              if (renderedDefinition) {
+                previewContents = <Expression expression={renderedDefinition}/>;
                 showPreview = true;
               }
             }
@@ -176,32 +211,34 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
           }
         }
       }
-      if (this.props.selectedChildPath) {
+      if (this.props.selected) {
         className += ' selected';
-      }
-    } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-      if (this.state.opened) {
-        icon = getButtonIcon(ButtonType.DownArrow);
-        if (this.definitionPromise) {
-          contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.definitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
-        }
-      } else {
-        icon = getButtonIcon(ButtonType.RightArrow);
       }
     }
     if (display === undefined) {
       display = this.props.path.name;
     }
-    if (this.props.itemInfo.type === 'lemma') {
+    if (this.props.itemInfo && this.props.itemInfo.type === 'lemma') {
       display = <span className={'tree-item-minor'} key="minor">{display}</span>;
     }
-    let href = this.props.libraryDataProvider.pathToURI(this.props.path);
-    let result: React.ReactNode = (
-      <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-        <div className={'tree-item-icon'}>{icon}</div>
-        <div className={'tree-item-display'}>{display}</div>
-      </a>
-    );
+    let result: React.ReactNode = [
+      <div className={'tree-item-icon'} key="icon">{icon}</div>,
+      <div className={'tree-item-display'} key="display">{display}</div>
+    ];
+    if (clickable) {
+      let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
+      result = (
+        <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          {result}
+        </a>
+      );
+    } else {
+      result = (
+        <div className={className} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          {result}
+        </div>
+      );
+    }
     if (contents) {
       let contentsRow = (
         <div className={'tree-item-contents'} key="contents">
@@ -214,17 +251,17 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     return result;
   }
 
-  private itemClicked = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void => {
-    if (event.button < 1 || this.props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
+  private itemClicked = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+    if (event.button < 1 || this.props.isSubsection) {
       event.preventDefault();
       this.clicked = true;
-      if (this.props.item instanceof FmtLibrary.MetaRefExpression_subsection) {
+      if (this.props.isSubsection) {
         if (this.props.isLast && !this.state.opened) {
           setTimeout(this.scrollIntoView, 100);
         }
         this.setState((prevState) => ({opened: !prevState.opened}));
-      } else if (this.props.item instanceof FmtLibrary.MetaRefExpression_item && this.props.onItemClicked && this.definitionPromise) {
-        this.props.onItemClicked(this.props.item, this.props.libraryDataProvider, this.props.path, this.definitionPromise, this.props.itemInfo);
+      } else if (this.props.onItemClicked) {
+        this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.definitionPromise, this.props.itemInfo);
       }
     }
   }
@@ -296,60 +333,95 @@ interface LibraryTreeProps {
 }
 
 interface InnerLibraryTreeProps extends LibraryTreeProps {
-  section: CachedPromise<Fmt.Definition>;
+  section?: CachedPromise<Fmt.Definition>;
+  outerDefinition?: Fmt.Definition;
+  innerDefinitions?: Fmt.Definition[];
   itemNumber: number[];
   isLast: boolean;
 }
 
-function InnerLibraryTree(props: InnerLibraryTreeProps) {
-  let render = props.section.then((section: Fmt.Definition) => {
-    if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
-      let items = section.contents.items as Fmt.ArrayExpression;
-      let selectedItemPathHead: Fmt.NamedPathItem | undefined = undefined;
-      let selectedItemPathTail: Fmt.Path | undefined = undefined;
-      if (props.selectedItemPath) {
-        let item: Fmt.PathItem | undefined = props.selectedItemPath;
-        selectedItemPathTail = new Fmt.Path;
-        selectedItemPathTail.name = props.selectedItemPath.name;
-        selectedItemPathHead = selectedItemPathTail;
-        for (; item instanceof Fmt.NamedPathItem; item = item.parentPath) {
-          let itemCopy = new Fmt.NamedPathItem;
-          itemCopy.name = item.name;
-          if (item.parentPath) {
-            selectedItemPathHead.parentPath = itemCopy;
-          }
-          selectedItemPathHead = itemCopy;
-        }
-      }
-      return (
-        <div className={'tree'}>
-          {items.items.map((item: Fmt.Expression, index: number) => {
-            if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
-              let path = (item.ref as Fmt.DefinitionRefExpression).path;
-              let selectedChildPath: Fmt.Path | undefined = undefined;
-              if (selectedItemPathHead && path.name === selectedItemPathHead.name) {
-                selectedChildPath = selectedItemPathTail;
-              }
-              let first = index === 0;
-              let last = index === items.items.length - 1;
-              let itemInfo: LibraryItemInfo = {
-                itemNumber: [...props.itemNumber, index + 1],
-                type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
-                title: item.title
-              };
-              return <LibraryTreeItem libraryDataProvider={props.libraryDataProvider} item={item} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isSingle={first && last} isLast={props.isLast && last} onFilter={props.onFilter} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name}/>;
-            } else {
-              return null;
-            }
-          })}
-        </div>
-      );
-    } else {
-      return <div className={'error'}>Error: Invalid section content type</div>;
-    }
-  });
+function renderLibraryTree(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
+  let parentPath: Fmt.Path | undefined = undefined;
+  if (props.outerDefinition) {
+    parentPath = new Fmt.Path;
+    parentPath.name = props.outerDefinition.name;
+  }
 
-  return renderPromise(render);
+  let selectedItemPathHead: Fmt.NamedPathItem | undefined = undefined;
+  let selectedItemPathTail: Fmt.Path | undefined = undefined;
+  if (props.selectedItemPath) {
+    if (props.selectedItemPath.parentPath) {
+      let item: Fmt.PathItem | undefined = props.selectedItemPath;
+      selectedItemPathTail = new Fmt.Path;
+      selectedItemPathTail.name = props.selectedItemPath.name;
+      selectedItemPathHead = selectedItemPathTail;
+      for (item = item.parentPath; item instanceof Fmt.NamedPathItem; item = item.parentPath) {
+        let itemCopy = new Fmt.NamedPathItem;
+        itemCopy.name = item.name;
+        if (item.parentPath) {
+          selectedItemPathHead.parentPath = itemCopy;
+        }
+        selectedItemPathHead = itemCopy;
+      }
+    } else {
+      selectedItemPathHead = props.selectedItemPath;
+    }
+  }
+
+  return (
+    <div className={'tree'}>
+      {items.map((item: Fmt.Expression | Fmt.Definition, index: number) => {
+        if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof Fmt.Definition) {
+          let isSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
+          let path: Fmt.Path;
+          if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
+            path = (item.ref as Fmt.DefinitionRefExpression).path;
+          } else {
+            path = new Fmt.Path;
+            path.name = item.name;
+            path.parentPath = parentPath;
+          }
+          let selected = false;
+          let selectedChildPath: Fmt.Path | undefined = undefined;
+          if (selectedItemPathHead && path.name === selectedItemPathHead.name) {
+            if (selectedItemPathTail) {
+              selectedChildPath = selectedItemPathTail;
+            } else {
+              selected = true;
+            }
+          }
+          let first = index === 0;
+          let last = index === items.length - 1;
+          let itemInfo: LibraryItemInfo = {
+            itemNumber: [...props.itemNumber, index + 1],
+            type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
+            title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
+          };
+          return <LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isSingle={first && last} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name}/>;
+        } else {
+          return null;
+        }
+      })}
+    </div>
+  );
+}
+
+function InnerLibraryTree(props: InnerLibraryTreeProps) {
+  if (props.section) {
+    let render = props.section.then((section: Fmt.Definition) => {
+      if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
+        let items = section.contents.items as Fmt.ArrayExpression;
+        return renderLibraryTree(props, items.items);
+      } else {
+        return <div className={'error'}>Error: Invalid section content type</div>;
+      }
+    });
+    return renderPromise(render);
+  } else if (props.innerDefinitions) {
+    return renderLibraryTree(props, props.innerDefinitions);
+  } else {
+    return null;
+  }
 }
 
 function LibraryTree(props: LibraryTreeProps) {

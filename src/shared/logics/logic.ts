@@ -34,6 +34,6 @@ export type ObjectRenderFns = Map<Object, RenderFn>;
 
 export interface LogicRenderer {
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
-  renderDefinitionSummary(): Display.RenderedExpression | undefined;
+  renderDefinitionSummary(innerDefinition?: Fmt.Definition): Display.RenderedExpression | undefined;
   getDefinitionParts(): ObjectRenderFns;
 }

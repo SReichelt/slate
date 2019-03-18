@@ -133,8 +133,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  renderDefinitionSummary(multiLine: boolean = false): Display.RenderedExpression | undefined {
-    let definition = this.definition;
+  renderDefinitionSummary(innerDefinition?: Fmt.Definition, multiLine: boolean = false): Display.RenderedExpression | undefined {
+    let definition = innerDefinition || this.definition;
     let contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
       let claim: Display.RenderedExpression | undefined = undefined;
@@ -186,7 +186,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       }
     } else if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
-      return this.renderDefinitionRef([definition], undefined, true);
+      let definitions = [definition];
+      if (definition !== this.definition) {
+        definitions.unshift(this.definition);
+      }
+      return this.renderDefinitionRef(definitions, undefined, true);
     }
     return undefined;
   }

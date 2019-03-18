@@ -141,7 +141,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
       let item = this.props.item;
-      let onItemClicked = (libraryItem: FmtLibrary.MetaRefExpression_item, libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo: LibraryItemInfo): void => {
+      let onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
         item.selectedItemPath = libraryDataProvider.getAbsolutePath(path);
         this.forceUpdate();
       };

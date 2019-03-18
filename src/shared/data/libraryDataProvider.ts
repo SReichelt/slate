@@ -117,28 +117,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
-  arePathsEqual(path1?: Fmt.PathItem, path2?: Fmt.PathItem): boolean {
-    if (path1 === path2) {
-      return true;
-    }
-    if (!path1 || !path2) {
-      return false;
-    }
-    if (!this.arePathsEqual(path1.parentPath, path2.parentPath)) {
-      return false;
-    }
-    if (path1 instanceof Fmt.NamedPathItem && path2 instanceof Fmt.NamedPathItem) {
-      return path1.name === path2.name;
-    }
-    if (path1 instanceof Fmt.ParentPathItem && path2 instanceof Fmt.ParentPathItem) {
-      return true;
-    }
-    if (path1 instanceof Fmt.IdentityPathItem && path2 instanceof Fmt.IdentityPathItem) {
-      return true;
-    }
-    return false;
-  }
-
   private fetchDefinition(name: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
     let result = this.definitionCache.get(name);
     if (!result) {
@@ -160,25 +138,29 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
     let result = this.fetchDefinition(name, FmtLibrary.getMetaModel);
     if (prefetchContents) {
-      result = result.then((definition: Fmt.Definition) => {
+      result.then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
           let items = definition.contents.items as Fmt.ArrayExpression;
           let index = 0;
           for (let item of items.items) {
             if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
-              let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
-              let prefetchQueueItem: PrefetchQueueItem = {
-                path: (item.ref as Fmt.DefinitionRefExpression).path,
-                isSubsection: item instanceof FmtLibrary.MetaRefExpression_subsection,
-                itemNumber: itemNumber
-              };
-              this.prefetchQueue.push(prefetchQueueItem);
+              let path = (item.ref as Fmt.DefinitionRefExpression).path;
+              if (!path.parentPath && !this.definitionCache.get(path.name)) {
+                let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
+                let prefetchQueueItem: PrefetchQueueItem = {
+                  path: path,
+                  isSubsection: item instanceof FmtLibrary.MetaRefExpression_subsection,
+                  itemNumber: itemNumber
+                };
+                this.prefetchQueue.push(prefetchQueueItem);
+              }
             }
             index++;
           }
-          this.triggerPrefetching();
+          if (this.prefetchQueue.length) {
+            this.triggerPrefetching();
+          }
         }
-        return definition;
       });
     }
     return result;

@@ -76,7 +76,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
   let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
   let expressionPromise = definitionPromise.then((definition) => {
     let definitionRenderer = new HLMRenderer(definition, false, libraryDataProvider, props.templates!);
-    return definitionRenderer.renderDefinitionSummary(true)!;
+    return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
   let expression = new Display.PromiseExpression(expressionPromise);
   let result = <Expression expression={expression}/>;
