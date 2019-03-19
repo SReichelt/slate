@@ -663,6 +663,8 @@ div.display-math {
 }
 
 .menu-dropdown-cell {
+  font-style: normal;
+  font-weight: normal;
   font-size: 50%;
 }
 
