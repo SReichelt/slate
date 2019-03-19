@@ -523,6 +523,10 @@ export abstract class GenericEditHandler {
       treeItem.onFilter = isAllowed;
       if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(expressionEditInfo.expression.path);
+      } else {
+        let dummyPath = new Fmt.Path;
+        dummyPath.name = '';
+        treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
       let dialog = new Dialog.ExpressionDialog;
       dialog.items = [
