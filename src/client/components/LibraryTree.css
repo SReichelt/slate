@@ -47,3 +47,8 @@
   font-size: smaller;
   color: gray;
 }
+
+.filtering {
+  float: right;
+  vertical-align: middle;
+}

@@ -9,6 +9,7 @@ import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
 import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
 
+const Loading = require('react-loading-animation');
 const ToolTip = require('react-portal-tooltip').default;
 
 export type OnFilter = (definition: Fmt.Definition) => boolean;
@@ -66,7 +67,6 @@ interface LibraryTreeItemProps {
   itemInfo: LibraryItemInfo;
   templates?: Fmt.File;
   parentScrollPane: HTMLElement | null;
-  isSingle: boolean;
   isLast: boolean;
   onFilter?: OnFilter;
   selected: boolean;
@@ -76,6 +76,7 @@ interface LibraryTreeItemProps {
 
 interface LibraryTreeItemState {
   definition?: Fmt.Definition;
+  filtering: boolean;
   filtered: boolean;
   opened: boolean;
   showPreview: boolean;
@@ -93,6 +94,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
     this.state = {
       opened: false,
+      filtering: false,
       filtered: false,
       showPreview: false
     };
@@ -126,10 +128,10 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 
   private updateItem(props: LibraryTreeItemProps): void {
-    let autoOpen = props.isSubsection && props.isSingle;
     this.setState({
+      filtering: props.onFilter !== undefined,
       filtered: false,
-      opened: autoOpen
+      opened: false
     });
 
     if (props.outerDefinition) {
@@ -138,9 +140,10 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (props.onFilter) {
         checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter)
           .then((visible: boolean) => {
-            if (!visible) {
-              this.setState({filtered: true});
-            }
+            this.setState({
+              filtering: false,
+              filtered: !visible
+            });
           });
       }
     } else {
@@ -160,8 +163,11 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
               if (props.onFilter) {
                 checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter)
                   .then((visible: boolean) => {
-                    if (this.definitionPromise === definitionPromise && !visible) {
-                      this.setState({filtered: true});
+                    if (this.definitionPromise === definitionPromise) {
+                      this.setState({
+                        filtering: false,
+                        filtered: !visible
+                      });
                     }
                   });
               }
@@ -274,6 +280,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     }
     if (this.props.itemInfo && this.props.itemInfo.type === 'lemma') {
       display = <span className={'tree-item-minor'} key="minor">{display}</span>;
+    }
+    if (this.state.filtering) {
+      display = [display, <div className={'filtering'} key="filtering"><Loading width={'1em'} height={'1em'}/></div>];
     }
     let result: React.ReactNode = [
       <div className={'tree-item-icon'} key="icon">{icon}</div>,
@@ -444,14 +453,13 @@ function renderLibraryTree(props: InnerLibraryTreeProps, items: (Fmt.Expression 
           selected = true;
         }
       }
-      let first = index === 0;
       let last = index === items.length - 1;
       let itemInfo: LibraryItemInfo = {
         itemNumber: [...props.itemNumber, index + 1],
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isSingle={first && last} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name}/>);
     }
     index++;
   }

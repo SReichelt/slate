@@ -1216,9 +1216,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || display.path.name === 'AssociativeOperator'
             || display.path.name === 'Relation'
             || display.path.name === 'TextualRelation'
-            || display.path.name === 'BooleanOperator'
-            || display.path.name === 'FunctionOperator') {
+            || display.path.name === 'BooleanOperator') {
           abbr = display.path.arguments.getValue('symbol');
+        } else if (display.path.name === 'FunctionOperator') {
+          abbr = display.path.arguments.getOptionalValue('symbol');
+          if (abbr === undefined) {
+            let symbol = new Fmt.StringExpression;
+            symbol.value = '→';
+            abbr = symbol;
+          }
         } else if (display.path.name === 'Function') {
           abbr = display.path.arguments.getValue('function');
         } else if (display.path.name === 'Property'
