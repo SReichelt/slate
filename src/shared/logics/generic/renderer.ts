@@ -43,7 +43,7 @@ export abstract class GenericRenderer {
     return config;
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.Parameter[]): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList): Display.RenderedExpression {
     let name = param.name;
     let suffixes: Display.RenderedExpression[] | undefined = undefined;
     let underscorePos = name.indexOf('_');

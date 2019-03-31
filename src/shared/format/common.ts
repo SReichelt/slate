@@ -115,6 +115,26 @@ export function escapeIdentifier(identifier: string): string {
   return escaped;
 }
 
+export function getNextDefaultName(name: string): string {
+  if (name.length === 1) {
+    let charCode = name.charCodeAt(0);
+    if (charCode >= 0x41 && charCode <= 0x5a) {
+      return String.fromCharCode(charCode === 0x5a ? 0x41 : charCode + 1);
+    }
+    if (charCode >= 0x61 && charCode <= 0x7a) {
+      return String.fromCharCode(charCode === 0x7a ? 0x61 : charCode + 1);
+    }
+  }
+  if (name.startsWith('_')) {
+    let numStr = name.substring(1);
+    let num = parseInt(numStr, 10);
+    if (name === `_${num}`) {
+      return `_${num + 1}`;
+    }
+  }
+  return name;
+}
+
 export function translateMemberName(name: string): string {
   switch (name) {
   case 'break':

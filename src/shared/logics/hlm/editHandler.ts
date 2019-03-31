@@ -47,27 +47,25 @@ export const fullFormulaSelection: FormulaSelection = {
 };
 
 export class HLMEditHandler extends GenericEditHandler {
-  addParameterMenu(semanticLink: Display.SemanticLink, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
+  addParameterMenu(semanticLink: Display.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
       menu.rows = [];
 
-      // TODO automatically modify names based on context
-
       let elementType = new FmtHLM.MetaRefExpression_Element;
       elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
-      menu.rows.push(this.getParameterPlaceholderItem(elementType, 'x', onRenderParam, onInsertParam));
+      menu.rows.push(this.getParameterPlaceholderItem(elementType, 'x', parameterList, onRenderParam, onInsertParam));
 
       let subsetType = new FmtHLM.MetaRefExpression_Subset;
       subsetType.superset = new PlaceholderExpression(HLMTermType.SetTerm);
-      menu.rows.push(this.getParameterPlaceholderItem(subsetType, 'S', onRenderParam, onInsertParam));
+      menu.rows.push(this.getParameterPlaceholderItem(subsetType, 'S', parameterList, onRenderParam, onInsertParam));
 
-      menu.rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', onRenderParam, onInsertParam));
+      menu.rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', parameterList, onRenderParam, onInsertParam));
 
       if (parameterSelection.allowConstraint) {
         let constraintType = new FmtHLM.MetaRefExpression_Constraint;
         constraintType.formula = new PlaceholderExpression(HLMTermType.Formula);
-        menu.rows.push(this.getParameterPlaceholderItem(constraintType, '_1', onRenderParam, onInsertParam));
+        menu.rows.push(this.getParameterPlaceholderItem(constraintType, '_1', parameterList, onRenderParam, onInsertParam));
       }
 
       if (parameterSelection.allowProposition || parameterSelection.allowDefinition || parameterSelection.allowBinding) {
@@ -76,7 +74,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
         if (parameterSelection.allowProposition) {
           advancedSubMenu.rows.push(
-            this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Prop, 'p', onRenderParam, onInsertParam),
+            this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Prop, 'p', parameterList, onRenderParam, onInsertParam),
             new Menu.ExpressionMenuSeparator
           );
         }
@@ -84,11 +82,11 @@ export class HLMEditHandler extends GenericEditHandler {
         if (parameterSelection.allowDefinition) {
           let elementDefinitionType = new FmtHLM.MetaRefExpression_Def;
           elementDefinitionType.element = new PlaceholderExpression(HLMTermType.ElementTerm);
-          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(elementDefinitionType, 'x', onRenderParam, onInsertParam));
+          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(elementDefinitionType, 'x', parameterList, onRenderParam, onInsertParam));
 
           let setDefinitionType = new FmtHLM.MetaRefExpression_SetDef;
           setDefinitionType._set = new PlaceholderExpression(HLMTermType.SetTerm);
-          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(setDefinitionType, 'S', onRenderParam, onInsertParam));
+          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(setDefinitionType, 'S', parameterList, onRenderParam, onInsertParam));
 
           advancedSubMenu.rows.push(new Menu.ExpressionMenuSeparator);
         }
@@ -97,7 +95,7 @@ export class HLMEditHandler extends GenericEditHandler {
           let bindingType = new FmtHLM.MetaRefExpression_Binding;
           bindingType._set = new PlaceholderExpression(HLMTermType.SetTerm);
           bindingType.parameters = Object.create(Fmt.ParameterList.prototype);
-          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(bindingType, 'i', onRenderParam, onInsertParam));
+          advancedSubMenu.rows.push(this.getParameterPlaceholderItem(bindingType, 'i', parameterList, onRenderParam, onInsertParam));
         }
 
         let advanced = new Menu.StandardExpressionMenuRow;
@@ -114,7 +112,7 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
-  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
+  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {
     // TODO also support creation of bindings with multiple parameters
     let paramClone = super.addParameterToGroup(param, parameterList);
     if (paramClone) {

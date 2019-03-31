@@ -7,6 +7,7 @@ import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
 import { LibraryDataProvider } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
+import { getNextDefaultName } from '../../format/common';
 
 export class PlaceholderExpression extends Fmt.Expression {
   constructor(public placeholderType: any) {
@@ -461,7 +462,9 @@ export abstract class GenericEditHandler {
     return renderedTemplateArguments;
   }
 
-  protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
+  protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
+    defaultName = this.getUnusedDefaultName(defaultName, parameterList);
+
     let parameter = this.createParameter(type, defaultName);
 
     let action = new Menu.ImmediateExpressionMenuAction;
@@ -471,6 +474,22 @@ export abstract class GenericEditHandler {
     item.expression = onRenderParam(parameter);
     item.action = action;
     return item;
+  }
+
+  protected getUnusedDefaultName(defaultName: string, parameterList: Fmt.ParameterList): string {
+    let newName = defaultName;
+    let suffix = '';
+    let context = this.editAnalysis.newParameterContext.get(parameterList);
+    if (context) {
+      let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
+      while (variableNames.indexOf(newName + suffix) >= 0) {
+        newName = getNextDefaultName(newName);
+        if (newName === defaultName) {
+          suffix += '\'';
+        }
+      }
+    }
+    return newName + suffix;
   }
 
   protected createParameter(type: Fmt.Expression, defaultName: string): Fmt.Parameter {
@@ -573,12 +592,12 @@ export abstract class GenericEditHandler {
     return item;
   }
 
-  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.Parameter[]): Fmt.Parameter | undefined {
+  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {
     if (parameterList) {
       let index = parameterList.indexOf(param);
       if (index >= 0) {
         let paramClone = param.clone();
-        // TODO modify name
+        paramClone.name = this.getUnusedDefaultName(paramClone.name, parameterList);
         parameterList.splice(index + 1, 0, paramClone);
         return paramClone;
       }
@@ -586,7 +605,7 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.Parameter[]) {
+  addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.ParameterList) {
     text.onTextChanged = (newText: string) => {
       if (newText.endsWith(',')) {
         let newName = newText.substring(0, newText.length - 1);
