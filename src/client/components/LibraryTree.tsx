@@ -12,10 +12,15 @@ import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
 const Loading = require('react-loading-animation');
 const ToolTip = require('react-portal-tooltip').default;
 
-export type OnFilter = (definition: Fmt.Definition) => boolean;
+export type OnFilter = (path: Fmt.Path, definition: Fmt.Definition) => CachedPromise<boolean>;
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo) => void;
 
-function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, definition: Fmt.Definition, onFilter: OnFilter): CachedPromise<boolean> {
+interface VisibilityResult {
+  visible: CachedPromise<boolean>;
+  selectable: CachedPromise<boolean>;
+}
+
+function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, definition: Fmt.Definition, onFilter: OnFilter): VisibilityResult {
   if (isSubsection) {
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
     let resultPromise = CachedPromise.resolve(false);
@@ -35,7 +40,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
               } else {
                 itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false);
               }
-              return itemDefinitionPromise.then((itemDefinition: Fmt.Definition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, onFilter));
+              return itemDefinitionPromise.then((itemDefinition: Fmt.Definition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, onFilter).visible);
             } else {
               return false;
             }
@@ -43,17 +48,29 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
         });
       }
     }
-    return resultPromise;
+    return {
+      visible: resultPromise,
+      selectable: CachedPromise.resolve(false)
+    };
   } else {
-    if (onFilter(definition)) {
-      return CachedPromise.resolve(true);
-    }
+    let ownResultPromise = onFilter(libraryDataProvider.getAbsolutePath(path), definition);
+    let resultPromise = ownResultPromise;
     for (let innerDefinition of definition.innerDefinitions) {
-      if (onFilter(innerDefinition)) {
-        return CachedPromise.resolve(true);
-      }
+      resultPromise = resultPromise.then((currentResult: boolean) => {
+        if (currentResult) {
+          return true;
+        } else {
+          let innerPath = new Fmt.Path;
+          innerPath.name = innerDefinition.name;
+          innerPath.parentPath = path;
+          return checkVisibility(libraryDataProvider, innerPath, false, innerDefinition, onFilter).visible;
+        }
+      });
     }
-    return CachedPromise.resolve(false);
+    return {
+      visible: resultPromise,
+      selectable: ownResultPromise
+    };
   }
 }
 
@@ -76,6 +93,7 @@ interface LibraryTreeItemProps {
 
 interface LibraryTreeItemState {
   definition?: Fmt.Definition;
+  clickable: boolean;
   filtering: boolean;
   filtered: boolean;
   opened: boolean;
@@ -93,6 +111,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     super(props);
 
     this.state = {
+      clickable: true,
       opened: false,
       filtering: false,
       filtered: false,
@@ -129,6 +148,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
   private updateItem(props: LibraryTreeItemProps): void {
     this.setState({
+      clickable: props.isSubsection || props.onFilter === undefined,
       filtering: props.onFilter !== undefined,
       filtered: false,
       opened: false
@@ -138,13 +158,18 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       let definition = props.outerDefinition.innerDefinitions.getDefinition(props.path.name);
       this.setState({definition: definition});
       if (props.onFilter) {
-        checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter)
-          .then((visible: boolean) => {
-            this.setState({
-              filtering: false,
-              filtered: !visible
-            });
+        let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter);
+        visibilityResult.visible.then((visible: boolean) => {
+          this.setState({
+            filtering: false,
+            filtered: !visible
           });
+        });
+        visibilityResult.selectable.then((selectable: boolean) => {
+          this.setState({
+            clickable: selectable
+          });
+        });
       }
     } else {
       let definitionPromise: CachedPromise<Fmt.Definition> | undefined = undefined;
@@ -161,15 +186,24 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
             if (this.definitionPromise === definitionPromise) {
               this.setState({definition: definition});
               if (props.onFilter) {
-                checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter)
-                  .then((visible: boolean) => {
+                let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, props.onFilter);
+                visibilityResult.visible.then((visible: boolean) => {
+                  if (this.definitionPromise === definitionPromise) {
+                    this.setState({
+                      filtering: false,
+                      filtered: !visible
+                    });
+                  }
+                });
+                if (!props.isSubsection) {
+                  visibilityResult.selectable.then((selectable: boolean) => {
                     if (this.definitionPromise === definitionPromise) {
                       this.setState({
-                        filtering: false,
-                        filtered: !visible
+                        clickable: selectable
                       });
                     }
                   });
+                }
               }
             }
           })
@@ -209,7 +243,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     let contents: React.ReactNode = null;
     let icon: React.ReactNode = '\u2001';
     let display: React.ReactNode = this.props.itemInfo ? this.props.itemInfo.title : undefined;
-    let clickable = true;
     if (this.props.isSubsection) {
       if (this.state.opened) {
         icon = getButtonIcon(ButtonType.DownArrow);
@@ -224,9 +257,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (definition && this.props.onFilter) {
         if (definition.innerDefinitions.length) {
           contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider} outerDefinition={definition} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
-        }
-        if (!this.props.onFilter(definition)) {
-          clickable = false;
         }
       }
       if (definition) {
@@ -288,7 +318,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       <div className={'tree-item-icon'} key="icon">{icon}</div>,
       <div className={'tree-item-display'} key="display">{display}</div>
     ];
-    if (clickable) {
+    if (this.state.clickable) {
       let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
       result = (
         <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>

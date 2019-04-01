@@ -83,11 +83,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   getAbsolutePath(path: Fmt.Path): Fmt.Path {
-    let parentProvider = this.getProviderForSection(path.parentPath);
     let result = new Fmt.Path;
     result.name = path.name;
     result.arguments = path.arguments;
-    result.parentPath = parentProvider.getPath();
+    if (path.parentPath instanceof Fmt.Path) {
+      result.parentPath = this.getAbsolutePath(path.parentPath);
+    } else {
+      let parentProvider = this.getProviderForSection(path.parentPath);
+      result.parentPath = parentProvider.getPath();
+    }
     return result;
   }
 

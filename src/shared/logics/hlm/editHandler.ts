@@ -4,8 +4,11 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
-import { HLMTermType } from './hlm';
 import { GenericEditHandler, PlaceholderExpression, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
+import { LibraryDataProvider } from '../../data/libraryDataProvider';
+import { HLMTermType } from './hlm';
+import { HLMUtils } from './utils';
+import CachedPromise from '../../data/cachedPromise';
 
 export interface ParameterSelection {
   allowConstraint: boolean;
@@ -47,6 +50,13 @@ export const fullFormulaSelection: FormulaSelection = {
 };
 
 export class HLMEditHandler extends GenericEditHandler {
+  protected utils: HLMUtils;
+
+  constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File) {
+    super(definition, libraryDataProvider, templates);
+    this.utils = new HLMUtils(definition, libraryDataProvider);
+  }
+
   addParameterMenu(semanticLink: Display.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
     semanticLink.onMenuOpened = () => {
       let menu = new Menu.ExpressionMenu;
@@ -163,11 +173,15 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getSetCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
         let type = definition.type.expression;
-        return type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction;
+        if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
+          return this.getDefinitionRefExpressions(path, definition);
+        } else {
+          return undefined;
+        }
       };
-      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], isDefinitionAllowed, onRenderTerm));
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], onGetExpressions, onRenderTerm));
 
       return menu;
     };
@@ -202,11 +216,15 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
         let type = definition.type.expression;
-        return type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_Constructor;
+        if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_MacroOperator || type instanceof FmtHLM.MetaRefExpression_Constructor) {
+          return this.getDefinitionRefExpressions(path, definition);
+        } else {
+          return undefined;
+        }
       };
-      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], isDefinitionAllowed, onRenderTerm));
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], onGetExpressions, onRenderTerm));
 
       return menu;
     };
@@ -247,11 +265,22 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
       }
 
-      let isDefinitionAllowed = (definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
         let type = definition.type.expression;
-        return type instanceof FmtHLM.MetaRefExpression_Predicate;
+        if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
+          return this.getDefinitionRefExpressions(path, definition).then((expressions: Fmt.Expression[]) => {
+            let negatedExpressions = expressions.map((expression: Fmt.Expression) => {
+              let negatedExpression = new FmtHLM.MetaRefExpression_not;
+              negatedExpression.formula = expression;
+              return negatedExpression;
+            });
+            return expressions.concat(negatedExpressions);
+          });
+        } else {
+          return undefined;
+        }
       };
-      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], isDefinitionAllowed, onRenderFormula));
+      menu.rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], onGetExpressions, onRenderFormula));
 
       return menu;
     };
@@ -521,6 +550,13 @@ export class HLMEditHandler extends GenericEditHandler {
     }
 
     return item;
+  }
+
+  private getDefinitionRefExpressions(path: Fmt.Path, definition: Fmt.Definition): CachedPromise<Fmt.Expression[]> {
+    // TODO
+    let expression = new Fmt.DefinitionRefExpression;
+    expression.path = path;
+    return CachedPromise.resolve([expression]);
   }
 
   addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {

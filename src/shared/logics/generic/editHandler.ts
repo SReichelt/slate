@@ -8,6 +8,7 @@ import * as Dialog from '../../display/dialog';
 import { LibraryDataProvider } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
 import { getNextDefaultName } from '../../format/common';
+import CachedPromise from '../../data/cachedPromise';
 
 export class PlaceholderExpression extends Fmt.Expression {
   constructor(public placeholderType: any) {
@@ -33,6 +34,8 @@ export type InsertParameterFn = (parameter: Fmt.Parameter) => void;
 export type RenderExpressionFn = (expression: Fmt.Expression) => Display.RenderedExpression;
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
+
+export type GetExpressionsFn = (path: Fmt.Path, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   protected editAnalysis = new Edit.EditAnalysis;
@@ -533,13 +536,20 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], isAllowed: (definition: Fmt.Definition) => boolean, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
+  protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
     let action = new Menu.DialogExpressionMenuAction;
     action.onOpen = () => {
       let treeItem = new Dialog.ExpressionDialogTreeItem;
       treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
       treeItem.templates = this.templates;
-      treeItem.onFilter = isAllowed;
+      treeItem.onFilter = (path: Fmt.Path, definition: Fmt.Definition) => {
+        let expressionsPromise = onGetExpressions(path, definition);
+        if (expressionsPromise) {
+          return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
+        } else {
+          return CachedPromise.resolve(false);
+        }
+      };
       if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(expressionEditInfo.expression.path);
       } else {
@@ -548,11 +558,13 @@ export abstract class GenericEditHandler {
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
       let dialog = new Dialog.ExpressionDialog;
+      // TODO preview/selection
       dialog.items = [
         treeItem
       ];
       dialog.onOK = () => {
         if (treeItem.selectedItemPath) {
+          // TODO
           let expression = new Fmt.DefinitionRefExpression;
           expression.path = this.libraryDataProvider.getRelativePath(treeItem.selectedItemPath);
           expressionEditInfo.onSetValue(expression);
@@ -607,6 +619,8 @@ export abstract class GenericEditHandler {
 
   addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.ParameterList) {
     text.onTextChanged = (newText: string) => {
+      // TODO prevent empty variable names (but allow them temporarily)
+      // TODO prevent shadowing of other variables
       if (newText.endsWith(',')) {
         let newName = newText.substring(0, newText.length - 1);
         if (newName) {

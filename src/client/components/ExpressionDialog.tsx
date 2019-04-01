@@ -1,7 +1,6 @@
 import * as React from 'react';
 import './ExpressionDialog.css';
 import * as Fmt from '../../shared/format/format';
-import * as FmtLibrary from '../../shared/logics/library';
 import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
 import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
