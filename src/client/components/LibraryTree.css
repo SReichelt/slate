@@ -5,18 +5,31 @@
   user-select: none;
 }
 
-.tree-item {
+.tree-item-row {
   display: table-row;
+  background-color: #fcfcfc;
+}
+
+.tree-item-row:nth-child(odd) {
+  background-color: #f0f0f0;
+}
+
+.tree-item {
+  display: table-cell;
   text-decoration: initial;
-  color: initial;
-  background-color: initial;
+  color: #000000;
 }
 
 .tree-item-contents {
+  display: table;
+  width: 100%;
+}
+
+.tree-item-contents-row {
   display: table-row;
 }
 
-.tree-item-icon {
+.tree-item-icon, .tree-item-indent {
   display: table-cell;
   width: 1em;
   min-width: 1em;

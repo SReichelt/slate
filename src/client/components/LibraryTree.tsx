@@ -89,6 +89,7 @@ interface LibraryTreeItemProps {
   selected: boolean;
   selectedChildPath?: Fmt.Path;
   onItemClicked?: OnItemClicked;
+  indent: number;
 }
 
 interface LibraryTreeItemState {
@@ -141,7 +142,8 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         || (!props.isSubsection && this.definitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.definitionPromise))) {
       this.updateItem(props);
     }
-    if (!FmtUtils.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {
+    if (props.selected !== this.props.selected
+        || !FmtUtils.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {
       this.updateSelection(props);
     }
   }
@@ -218,11 +220,9 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
   private updateSelection(props: LibraryTreeItemProps): void {
     if (props.selectedChildPath && !this.clicked) {
-      if (props.isSubsection) {
-        this.setState({opened: true});
-      } else {
-        setTimeout(this.scrollIntoView, 100);
-      }
+      this.setState({opened: true});
+    } else if (props.selected && !this.clicked) {
+      setTimeout(this.scrollIntoView, 100);
     } else {
       this.clicked = false;
     }
@@ -247,7 +247,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (this.state.opened) {
         icon = getButtonIcon(ButtonType.DownArrow);
         if (this.definitionPromise) {
-          contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.definitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.definitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1}/>;
         }
       } else {
         icon = getButtonIcon(ButtonType.RightArrow);
@@ -256,7 +256,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       let definition = this.state.definition;
       if (definition && this.props.onFilter) {
         if (definition.innerDefinitions.length) {
-          contents = <InnerLibraryTree libraryDataProvider={this.props.libraryDataProvider} outerDefinition={definition} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked}/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} outerDefinition={definition} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1}/>;
         }
       }
       if (definition) {
@@ -314,32 +314,38 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.state.filtering) {
       display = [display, <div className={'filtering'} key="filtering"><Loading width={'1em'} height={'1em'}/></div>];
     }
-    let result: React.ReactNode = [
+    let columns: React.ReactNodeArray = [
       <div className={'tree-item-icon'} key="icon">{icon}</div>,
       <div className={'tree-item-display'} key="display">{display}</div>
     ];
+    for (let i = this.props.indent; i > 0; i--) {
+      columns.unshift(<div className={'tree-item-indent'}/>);
+    }
+    let treeItemContents = (
+      <div className={'tree-item-contents'}>
+        <div className={'tree-item-contents-row'}>
+          {columns}
+        </div>
+      </div>
+    );
+    let treeItem: React.ReactNode;
     if (this.state.clickable) {
       let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
-      result = (
+      treeItem = (
         <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-          {result}
+          {treeItemContents}
         </a>
       );
     } else {
-      result = (
+      treeItem = (
         <div className={className} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-          {result}
+          {treeItemContents}
         </div>
       );
     }
+    let result: React.ReactNode = <div className={'tree-item-row'}>{treeItem}</div>;
     if (contents) {
-      let contentsRow = (
-        <div className={'tree-item-contents'} key="contents">
-          <div className={'tree-item-icon'}/>
-          <div className={'tree-item-content-display'}>{contents}</div>
-        </div>
-      );
-      result = [result, contentsRow];
+      result = [result, contents];
     }
     return result;
   }
@@ -430,10 +436,11 @@ interface InnerLibraryTreeProps extends LibraryTreeProps {
   outerDefinition?: Fmt.Definition;
   innerDefinitions?: Fmt.Definition[];
   itemNumber: number[];
+  indent: number;
   isLast: boolean;
 }
 
-function renderLibraryTree(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
+function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
   let parentPath: Fmt.Path | undefined = undefined;
   if (props.outerDefinition) {
     parentPath = new Fmt.Path;
@@ -489,31 +496,27 @@ function renderLibraryTree(props: InnerLibraryTreeProps, items: (Fmt.Expression 
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
     }
     index++;
   }
 
-  return (
-    <div className={'tree'}>
-      {treeItems}
-    </div>
-  );
+  return <>{treeItems}</>;
 }
 
-function InnerLibraryTree(props: InnerLibraryTreeProps) {
+function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
   if (props.section) {
     let render = props.section.then((section: Fmt.Definition) => {
       if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
         let items = section.contents.items as Fmt.ArrayExpression;
-        return renderLibraryTree(props, items.items);
+        return renderLibraryTreeItems(props, items.items);
       } else {
-        return <div className={'error'}>Error: Invalid section content type</div>;
+        return <div className={'tree-item error'}>Error: Invalid section content type</div>;
       }
     });
     return renderPromise(render);
   } else if (props.innerDefinitions) {
-    return renderLibraryTree(props, props.innerDefinitions);
+    return renderLibraryTreeItems(props, props.innerDefinitions);
   } else {
     return null;
   }
@@ -524,9 +527,15 @@ function LibraryTree(props: LibraryTreeProps) {
     ...props,
     section: props.libraryDataProvider.fetchLocalSection(),
     itemNumber: [],
+    indent: 0,
     isLast: true
   };
-  return InnerLibraryTree(innerProps);
+  let treeItems = InnerLibraryTreeItems(innerProps);
+  return (
+    <div className={'tree'}>
+      {treeItems}
+    </div>
+  );
 }
 
 export default LibraryTree;
