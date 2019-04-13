@@ -16,7 +16,7 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
 
   componentDidMount(): void {
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
     }
   }
 
@@ -26,17 +26,17 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
       this.timer = undefined;
     }
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
     }
   }
 
   componentWillReceiveProps(props: SourceCodeViewProps): void {
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+        this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
       }
       if (props.interactionHandler) {
-        props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+        props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
   }

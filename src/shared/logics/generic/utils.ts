@@ -7,6 +7,9 @@ export class GenericUtils {
   constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor) {}
 
   getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
+    if (path.parentPath instanceof Fmt.Path) {
+      throw new Error('Unexpected path to inner definition');
+    }
     if (!path.parentPath && path.name === this.definition.name) {
       return CachedPromise.resolve(this.definition);
     } else {
@@ -20,10 +23,7 @@ export class GenericUtils {
   }
 
   getItemInfo(expression: Fmt.DefinitionRefExpression): CachedPromise<LibraryItemInfo> {
-    let path = expression.path;
-    while (path.parentPath instanceof Fmt.Path) {
-      path = path.parentPath;
-    }
+    let path = FmtUtils.getOuterPath(expression.path);
     return this.libraryDataAccessor.getItemInfo(path);
   }
 

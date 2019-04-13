@@ -81,24 +81,30 @@ interface ExpressionDialogItemProps {
 
 class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
   componentDidMount(): void {
+    this.props.item.registerChangeListener(this.onItemChanged);
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
     }
   }
 
   componentWillUnmount(): void {
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
     }
+    this.props.item.unregisterChangeListener(this.onItemChanged);
   }
 
   componentWillReceiveProps(props: ExpressionDialogItemProps): void {
+    if (props.item !== this.props.item) {
+      this.props.item.unregisterChangeListener(this.onItemChanged);
+      props.item.registerChangeListener(this.onItemChanged);
+    }
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+        this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
       }
       if (props.interactionHandler) {
-        props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+        props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
   }
@@ -134,26 +140,34 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
             {title}
           </th>
           <td className={'dialog-cell'}>
-            <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler} key={'value'}/>
+            <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
           </td>
         </tr>
       );
+    } else if (this.props.item instanceof Dialog.ExpressionDialogSelectionItem) {
+      let selectionItem = this.props.item;
+      return selectionItem.items.map((item: any, index: number) => (
+        <tr className={className} key={index}>
+          <td className={'dialog-cell'} colSpan={2}>
+            <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+          </td>
+        </tr>
+      ));
     } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
-      let item = this.props.item;
-      let onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
-        item.selectedItemPath = libraryDataProvider.getAbsolutePath(path);
-        this.forceUpdate();
-      };
       return (
         <tr className={className}>
           <td className={'dialog-cell'} colSpan={2}>
-            <EmbeddedLibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={onItemClicked}/>
+            <EmbeddedLibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked}/>
           </td>
         </tr>
       );
     } else {
       return undefined;
     }
+  }
+
+  private onItemChanged = () => {
+    this.forceUpdate();
   }
 
   private onExpressionChanged = (editorUpdateRequired: boolean) => {

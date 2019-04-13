@@ -173,10 +173,10 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getSetCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
         let type = definition.type.expression;
         if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
-          return this.getDefinitionRefExpressions(path, definition);
+          return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition);
         } else {
           return undefined;
         }
@@ -216,10 +216,10 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
         let type = definition.type.expression;
         if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_MacroOperator || type instanceof FmtHLM.MetaRefExpression_Constructor) {
-          return this.getDefinitionRefExpressions(path, definition);
+          return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition);
         } else {
           return undefined;
         }
@@ -265,10 +265,10 @@ export class HLMEditHandler extends GenericEditHandler {
         menu.rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
       }
 
-      let onGetExpressions = (path: Fmt.Path, definition: Fmt.Definition) => {
+      let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
         let type = definition.type.expression;
         if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
-          return this.getDefinitionRefExpressions(path, definition).then((expressions: Fmt.Expression[]) => {
+          return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition).then((expressions: Fmt.Expression[]) => {
             let negatedExpressions = expressions.map((expression: Fmt.Expression) => {
               let negatedExpression = new FmtHLM.MetaRefExpression_not;
               negatedExpression.formula = expression;
@@ -552,11 +552,62 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  private getDefinitionRefExpressions(path: Fmt.Path, definition: Fmt.Definition): CachedPromise<Fmt.Expression[]> {
-    // TODO
+  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): CachedPromise<Fmt.Expression[]> {
     let expression = new Fmt.DefinitionRefExpression;
-    expression.path = path;
+    expression.path = this.createPathWithArguments(expressionEditInfo, path, outerDefinition, definition);
     return CachedPromise.resolve([expression]);
+  }
+
+  private createPathWithArguments(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): Fmt.Path {
+    let result = new Fmt.Path;
+    result.name = path.name;
+    this.fillArguments(expressionEditInfo, definition.parameters, result.arguments);
+    if (path.parentPath instanceof Fmt.Path) {
+      result.parentPath = this.createPathWithArguments(expressionEditInfo, path.parentPath, outerDefinition, outerDefinition);
+    } else {
+      result.parentPath = path.parentPath;
+    }
+    return result;
+  }
+
+  private fillArguments(expressionEditInfo: Edit.ExpressionEditInfo, params: Fmt.ParameterList, args: Fmt.ArgumentList): void {
+    for (let param of params) {
+      let paramType = param.type.expression;
+      let arg: Fmt.ObjectContents | undefined = undefined;
+      if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
+        let propArg = new FmtHLM.ObjectContents_PropArg;
+        propArg.formula = new PlaceholderExpression(HLMTermType.Formula);
+        arg = propArg;
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
+        let setArg = new FmtHLM.ObjectContents_SetArg;
+        setArg._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        arg = setArg;
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Subset) {
+        let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
+        subsetArg._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        arg = subsetArg;
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
+        let elementArg = new FmtHLM.ObjectContents_ElementArg;
+        elementArg.element = new PlaceholderExpression(HLMTermType.ElementTerm);
+        arg = elementArg;
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+        let bindingArg = new FmtHLM.ObjectContents_BindingArg;
+        let elementType = new FmtHLM.MetaRefExpression_Element;
+        elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        bindingArg.parameter = this.createParameter(elementType, 'i', expressionEditInfo.context);
+        bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
+        this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
+        arg = bindingArg;
+      }
+      if (arg) {
+        let argValue = new Fmt.CompoundExpression;
+        arg.toCompoundExpression(argValue);
+        let argument = new Fmt.Argument;
+        argument.name = param.name;
+        argument.value = argValue;
+        args.push(argument);
+      }
+    }
   }
 
   addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {

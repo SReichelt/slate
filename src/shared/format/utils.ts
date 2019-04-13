@@ -28,3 +28,12 @@ export function arePathsEqual(path1?: Fmt.PathItem, path2?: Fmt.PathItem): boole
   }
   return false;
 }
+
+export function getInnerDefinition(outerDefinition: Fmt.Definition, path: Fmt.Path): Fmt.Definition {
+  if (path.parentPath instanceof Fmt.Path) {
+    let parentDefinition = getInnerDefinition(outerDefinition, path.parentPath);
+    return parentDefinition.innerDefinitions.getDefinition(path.name);
+  } else {
+    return outerDefinition;
+  }
+}

@@ -1,11 +1,13 @@
 import * as Fmt from '../../format/format';
+import * as Ctx from '../../format/context';
+import * as FmtUtils from '../../format/utils';
 import * as Edit from '../../format/edit';
 import * as Logic from '../logic';
 import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { LibraryDataProvider } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
 import { getNextDefaultName } from '../../format/common';
 import CachedPromise from '../../data/cachedPromise';
@@ -35,7 +37,7 @@ export type RenderExpressionFn = (expression: Fmt.Expression) => Display.Rendere
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
-export type GetExpressionsFn = (path: Fmt.Path, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
+export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   protected editAnalysis = new Edit.EditAnalysis;
@@ -466,9 +468,8 @@ export abstract class GenericEditHandler {
   }
 
   protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
-    defaultName = this.getUnusedDefaultName(defaultName, parameterList);
-
-    let parameter = this.createParameter(type, defaultName);
+    let context = this.editAnalysis.newParameterContext.get(parameterList);
+    let parameter = this.createParameter(type, defaultName, context);
 
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => onInsertParam(parameter);
@@ -479,23 +480,23 @@ export abstract class GenericEditHandler {
     return item;
   }
 
-  protected getUnusedDefaultName(defaultName: string, parameterList: Fmt.ParameterList): string {
+  protected getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
     let newName = defaultName;
     let suffix = '';
-    let context = this.editAnalysis.newParameterContext.get(parameterList);
-    if (context) {
-      let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
-      while (variableNames.indexOf(newName + suffix) >= 0) {
-        newName = getNextDefaultName(newName);
-        if (newName === defaultName) {
-          suffix += '\'';
-        }
+    let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
+    while (variableNames.indexOf(newName + suffix) >= 0) {
+      newName = getNextDefaultName(newName);
+      if (newName === defaultName) {
+        suffix += '\'';
       }
     }
     return newName + suffix;
   }
 
-  protected createParameter(type: Fmt.Expression, defaultName: string): Fmt.Parameter {
+  protected createParameter(type: Fmt.Expression, defaultName: string, context?: Ctx.Context): Fmt.Parameter {
+    if (context) {
+      defaultName = this.getUnusedDefaultName(defaultName, context);
+    }
     let parameter = new Fmt.Parameter;
     parameter.name = defaultName;
     let parameterType = new Fmt.Type;
@@ -542,32 +543,53 @@ export abstract class GenericEditHandler {
       let treeItem = new Dialog.ExpressionDialogTreeItem;
       treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
       treeItem.templates = this.templates;
-      treeItem.onFilter = (path: Fmt.Path, definition: Fmt.Definition) => {
-        let expressionsPromise = onGetExpressions(path, definition);
+      treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+        let relativePath = this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
+        let expressionsPromise = onGetExpressions(relativePath, outerDefinition, definition);
         if (expressionsPromise) {
           return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
         } else {
           return CachedPromise.resolve(false);
         }
       };
+      let selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>();
+      selectionItem.items = [];
+      selectionItem.onRenderItem = onRenderExpression;
+      treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo) => {
+        let absolutePath = libraryDataProvider.getAbsolutePath(path);
+        let relativePath = this.libraryDataProvider.getRelativePath(absolutePath);
+        treeItem.selectedItemPath = absolutePath;
+        treeItem.changed();
+        if (!outerDefinitionPromise) {
+          outerDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path));
+        }
+        outerDefinitionPromise.then((outerDefinition: Fmt.Definition) => {
+          let definition = FmtUtils.getInnerDefinition(outerDefinition, path);
+          let expressionsPromise = onGetExpressions(relativePath, outerDefinition, definition);
+          if (expressionsPromise) {
+            expressionsPromise.then((expressions: Fmt.Expression[]) => {
+              selectionItem.items = expressions;
+              selectionItem.selectedItem = expressions.length ? expressions[0] : undefined;
+              selectionItem.changed();
+            });
+          }
+        });
+      };
       if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
-        treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(expressionEditInfo.expression.path);
+        treeItem.onItemClicked(this.libraryDataProvider, expressionEditInfo.expression.path);
       } else {
         let dummyPath = new Fmt.Path;
         dummyPath.name = '';
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
       let dialog = new Dialog.ExpressionDialog;
-      // TODO preview/selection
       dialog.items = [
-        treeItem
+        treeItem,
+        selectionItem
       ];
       dialog.onOK = () => {
-        if (treeItem.selectedItemPath) {
-          // TODO
-          let expression = new Fmt.DefinitionRefExpression;
-          expression.path = this.libraryDataProvider.getRelativePath(treeItem.selectedItemPath);
-          expressionEditInfo.onSetValue(expression);
+        if (selectionItem.selectedItem) {
+          expressionEditInfo.onSetValue(selectionItem.selectedItem);
         }
       };
       return dialog;
@@ -609,7 +631,10 @@ export abstract class GenericEditHandler {
       let index = parameterList.indexOf(param);
       if (index >= 0) {
         let paramClone = param.clone();
-        paramClone.name = this.getUnusedDefaultName(paramClone.name, parameterList);
+        let context = this.editAnalysis.newParameterContext.get(parameterList);
+        if (context) {
+          paramClone.name = this.getUnusedDefaultName(paramClone.name, context);
+        }
         parameterList.splice(index + 1, 0, paramClone);
         return paramClone;
       }

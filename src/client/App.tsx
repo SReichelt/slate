@@ -433,7 +433,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
+  private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
     this.navigate({
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,

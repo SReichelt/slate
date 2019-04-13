@@ -121,6 +121,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
+  getRelativePathWithProvider(libraryDataProvider: LibraryDataProvider, path: Fmt.Path): Fmt.Path {
+    if (libraryDataProvider === this) {
+      return path;
+    } else {
+      return this.getRelativePath(libraryDataProvider.getAbsolutePath(path));
+    }
+  }
+
   private fetchDefinition(name: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
     let result = this.definitionCache.get(name);
     if (!result) {

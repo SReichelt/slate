@@ -19,11 +19,11 @@ export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
 
 export interface ExpressionInteractionHandler {
-  registerExpressionChangeHandler(handler: OnExpressionChanged): void;
-  unregisterExpressionChangeHandler(handler: OnExpressionChanged): void;
+  registerExpressionChangeListener(listener: OnExpressionChanged): void;
+  unregisterExpressionChangeListener(listener: OnExpressionChanged): void;
   expressionChanged(editorUpdateRequired?: boolean): void;
-  registerHoverChangeHandler(handler: OnHoverChanged): void;
-  unregisterHoverChangeHandler(handler: OnHoverChanged): void;
+  registerHoverChangeListener(listener: OnHoverChanged): void;
+  unregisterHoverChangeListener(listener: OnHoverChanged): void;
   hoverChanged(hover: Display.SemanticLink[]): void;
   getURI(semanticLink: Display.SemanticLink): string | undefined;
   linkClicked(semanticLink: Display.SemanticLink): void;
@@ -76,14 +76,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   componentDidMount(): void {
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.registerHoverChangeHandler(this.onHoverChanged);
+      this.props.interactionHandler.registerHoverChangeListener(this.onHoverChanged);
     }
   }
 
   componentWillUnmount(): void {
     this.cleanupDependentState();
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
+      this.props.interactionHandler.unregisterHoverChangeListener(this.onHoverChanged);
     }
   }
 
@@ -93,10 +93,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterHoverChangeHandler(this.onHoverChanged);
+        this.props.interactionHandler.unregisterHoverChangeListener(this.onHoverChanged);
       }
       if (props.interactionHandler) {
-        props.interactionHandler.registerHoverChangeHandler(this.onHoverChanged);
+        props.interactionHandler.registerHoverChangeListener(this.onHoverChanged);
       }
     }
     this.updateOptionalProps(props);

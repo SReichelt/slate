@@ -38,23 +38,23 @@ export function renderLibraryItem(props: LibraryItemProps): React.ReactNode {
 class LibraryItem extends React.Component<LibraryItemProps> {
   componentDidMount(): void {
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
     }
   }
 
   componentWillUnmount(): void {
     if (this.props.interactionHandler) {
-      this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+      this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
     }
   }
 
   componentWillReceiveProps(props: LibraryItemProps): void {
     if (props.interactionHandler !== this.props.interactionHandler) {
       if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterExpressionChangeHandler(this.onExpressionChanged);
+        this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
       }
       if (props.interactionHandler) {
-        props.interactionHandler.registerExpressionChangeHandler(this.onExpressionChanged);
+        props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
   }

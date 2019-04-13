@@ -8,41 +8,41 @@ import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
 export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHandler {
-  private expressionChangeHandlers: OnExpressionChanged[] = [];
-  private hoverChangeHandlers: OnHoverChanged[] = [];
+  private expressionChangeListeners: OnExpressionChanged[] = [];
+  private hoverChangeListeners: OnHoverChanged[] = [];
   private blockCounter = 0;
 
-  registerExpressionChangeHandler(handler: OnExpressionChanged): void {
-    this.expressionChangeHandlers.push(handler);
+  registerExpressionChangeListener(listener: OnExpressionChanged): void {
+    this.expressionChangeListeners.push(listener);
   }
 
-  unregisterExpressionChangeHandler(handler: OnExpressionChanged): void {
-    let index = this.expressionChangeHandlers.indexOf(handler);
+  unregisterExpressionChangeListener(listener: OnExpressionChanged): void {
+    let index = this.expressionChangeListeners.indexOf(listener);
     if (index >= 0) {
-      this.expressionChangeHandlers.splice(index, 1);
+      this.expressionChangeListeners.splice(index, 1);
     }
   }
 
   expressionChanged(editorUpdateRequired: boolean = true): void {
-    for (let handler of this.expressionChangeHandlers) {
+    for (let handler of this.expressionChangeListeners) {
       handler(editorUpdateRequired);
     }
   }
 
-  registerHoverChangeHandler(handler: OnHoverChanged): void {
-    this.hoverChangeHandlers.push(handler);
+  registerHoverChangeListener(listener: OnHoverChanged): void {
+    this.hoverChangeListeners.push(listener);
   }
 
-  unregisterHoverChangeHandler(handler: OnHoverChanged): void {
-    let index = this.hoverChangeHandlers.indexOf(handler);
+  unregisterHoverChangeListener(listener: OnHoverChanged): void {
+    let index = this.hoverChangeListeners.indexOf(listener);
     if (index >= 0) {
-      this.hoverChangeHandlers.splice(index, 1);
+      this.hoverChangeListeners.splice(index, 1);
     }
   }
 
   hoverChanged(hover: Display.SemanticLink[]): void {
     let objects = hover.map((semanticLink) => semanticLink.linkedObject);
-    for (let handler of this.hoverChangeHandlers) {
+    for (let handler of this.hoverChangeListeners) {
       handler(objects);
     }
   }
