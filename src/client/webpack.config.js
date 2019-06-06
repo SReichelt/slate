@@ -59,10 +59,7 @@ module.exports = {
             loader: 'style-loader'
           },
           {
-            loader: 'css-loader',
-            options: {
-              minimize: config.IS_PRODUCTION
-            }
+            loader: 'css-loader'
           }
         ]
       },
