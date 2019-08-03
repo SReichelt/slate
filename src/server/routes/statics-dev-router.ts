@@ -7,7 +7,8 @@ export function staticsDevRouter() {
   // All the assets are hosted by Webpack on localhost:8080 (Webpack-dev-server)
   router.use('/public', proxy(
     {
-      target: 'http://localhost:8080/'
+      target: 'http://localhost:8080/',
+      ws: true
     }));
 
   // Any route should render the web app html (hosted by by Webpack-dev-server)
