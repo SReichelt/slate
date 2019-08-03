@@ -9,6 +9,7 @@ import { LibraryDataProvider } from '../../data/libraryDataProvider';
 import { HLMTermType } from './hlm';
 import { HLMUtils } from './utils';
 import CachedPromise from '../../data/cachedPromise';
+import { findBestMatch, reorderArguments } from '../generic/displayMatching';
 
 export interface ParameterSelection {
   allowConstraint: boolean;
@@ -552,20 +553,64 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): CachedPromise<Fmt.Expression[]> {
-    let expression = new Fmt.DefinitionRefExpression;
-    expression.path = this.createPathWithArguments(expressionEditInfo, path, outerDefinition, definition);
-    return CachedPromise.resolve([expression]);
+  protected getSelectedDefinition(expressionEditInfo: Edit.ExpressionEditInfo): Fmt.DefinitionRefExpression | undefined {
+    let expression = expressionEditInfo.expression;
+    while (expression instanceof FmtHLM.MetaRefExpression_not) {
+      expression = expression.formula;
+    }
+    if (expression instanceof Fmt.DefinitionRefExpression) {
+      return expression;
+    }
+    return undefined;
   }
 
-  private createPathWithArguments(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): Fmt.Path {
-    let result = new Fmt.Path;
-    result.name = path.name;
-    this.fillArguments(expressionEditInfo, definition.parameters, result.arguments);
-    if (path.parentPath instanceof Fmt.Path) {
-      result.parentPath = this.createPathWithArguments(expressionEditInfo, path.parentPath, outerDefinition, outerDefinition);
-    } else {
-      result.parentPath = path.parentPath;
+  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): CachedPromise<Fmt.Expression[]> {
+    let resultPaths = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition);
+    return CachedPromise.resolve(resultPaths.map((resultPath: Fmt.Path) => {
+      let expression = new Fmt.DefinitionRefExpression;
+      expression.path = resultPath;
+      return expression;
+    }));
+  }
+
+  private createPathsWithArguments(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): Fmt.Path[] {
+    let displayItems: Fmt.Expression[] | undefined = undefined;
+    let displayExpressions: (Fmt.Expression | undefined)[] = [undefined];
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
+      let display = definition.contents.display;
+      if (display instanceof Fmt.ArrayExpression && display.items.length > 1) {
+        displayItems = display.items;
+        displayExpressions = display.items;
+      }
+    }
+    let result: Fmt.Path[] = [];
+    for (let displayExpression of displayExpressions) {
+      let parentPaths: (Fmt.PathItem | undefined)[] = [];
+      if (path.parentPath instanceof Fmt.Path) {
+        parentPaths = this.createPathsWithArguments(expressionEditInfo, path.parentPath, outerDefinition, outerDefinition);
+      } else {
+        parentPaths = [path.parentPath];
+      }
+      for (let parentPath of parentPaths) {
+        let resultPath = new Fmt.Path;
+        resultPath.name = path.name;
+        this.fillArguments(expressionEditInfo, definition.parameters, resultPath.arguments);
+        resultPath.parentPath = parentPath;
+        if (displayExpression) {
+          reorderArguments(resultPath.arguments, displayExpression);
+          if (displayItems && result.length) {
+            // Ignore items that cannot be distinguished by argument order.
+            let argumentLists: Fmt.ArgumentList[] = [resultPath.arguments];
+            if (parentPath instanceof Fmt.Path) {
+              argumentLists.unshift(parentPath.arguments);
+            }
+            if (findBestMatch(displayItems, argumentLists) !== displayExpression) {
+              continue;
+            }
+          }
+        }
+        result.push(resultPath);
+      }
     }
     return result;
   }

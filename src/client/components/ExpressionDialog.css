@@ -33,6 +33,11 @@
   padding-right: 1em;
 }
 
+.dialog-selection-table {
+  border: solid 1px gray;
+  padding: 2pt;
+}
+
 .dialog-button-row {
   border-top: solid 1px gray;
   background-color: #f0f0f0;

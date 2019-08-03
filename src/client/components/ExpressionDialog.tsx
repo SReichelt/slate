@@ -1,15 +1,12 @@
 import * as React from 'react';
 import './ExpressionDialog.css';
-import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
-import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
 import Button from './Button';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import EmbeddedLibraryTree from './EmbeddedLibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 import { getButtonIcon, ButtonType } from '../utils/icons';
-import CachedPromise from '../../shared/data/cachedPromise';
 
 interface ExpressionDialogProps {
   dialog: Dialog.ExpressionDialog;
@@ -146,13 +143,42 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogSelectionItem) {
       let selectionItem = this.props.item;
-      return selectionItem.items.map((item: any, index: number) => (
-        <tr className={className} key={index}>
-          <td className={'dialog-cell'} colSpan={2}>
-            <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
-          </td>
-        </tr>
-      ));
+      if (selectionItem.items.length) {
+        return (
+          <tr className={className}>
+            <td className={'dialog-cell'} colSpan={2}>
+              <table className={'dialog-selection-table'}>
+                <tbody>
+                  {selectionItem.items.map((item: any, index: number) => {
+                    let radioCell = null;
+                    if (selectionItem.items.length > 1) {
+                      let onClick = () => {
+                        selectionItem.selectedItem = item;
+                        selectionItem.changed();
+                      };
+                      radioCell = (
+                        <td className={'dialog-selection-radio-cell'}>
+                          <input type={'radio'} checked={selectionItem.selectedItem === item} onClick={onClick}/>
+                        </td>
+                      );
+                    }
+                    return (
+                      <tr className={'dialog-selection-row'} key={index}>
+                        {radioCell}
+                        <td className={'dialog-selection-content-cell'}>
+                          <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        );
+      } else {
+        return null;
+      }
     } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
       return (
         <tr className={className}>

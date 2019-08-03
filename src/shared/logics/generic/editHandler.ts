@@ -538,6 +538,8 @@ export abstract class GenericEditHandler {
   }
 
   protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let selectedDefinition = this.getSelectedDefinition(expressionEditInfo);
+
     let action = new Menu.DialogExpressionMenuAction;
     action.onOpen = () => {
       let treeItem = new Dialog.ExpressionDialogTreeItem;
@@ -575,8 +577,8 @@ export abstract class GenericEditHandler {
           }
         });
       };
-      if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
-        treeItem.onItemClicked(this.libraryDataProvider, expressionEditInfo.expression.path);
+      if (selectedDefinition) {
+        treeItem.onItemClicked(this.libraryDataProvider, selectedDefinition.path);
       } else {
         let dummyPath = new Fmt.Path;
         dummyPath.name = '';
@@ -599,11 +601,13 @@ export abstract class GenericEditHandler {
     definitionRow.title = 'Definition';
     definitionRow.titleAction = action;
     definitionRow.iconType = definitionTypes[0];
-    if (expressionEditInfo.expression instanceof Fmt.DefinitionRefExpression) {
+    if (selectedDefinition) {
       definitionRow.selected = true;
     }
     return definitionRow;
   }
+
+  protected abstract getSelectedDefinition(expressionEditInfo: Edit.ExpressionEditInfo): Fmt.DefinitionRefExpression | undefined;
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
     let action = new Menu.ImmediateExpressionMenuAction;

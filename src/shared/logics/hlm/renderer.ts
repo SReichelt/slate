@@ -3,6 +3,7 @@ import * as FmtHLM from './meta';
 import * as FmtDisplay from '../../display/meta';
 import * as Logic from '../logic';
 import { GenericRenderer, RenderedVariable } from '../generic/renderer';
+import { findBestMatch } from '../generic/displayMatching';
 import * as Display from '../../display/display';
 import { HLMTermType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
@@ -555,7 +556,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             if (definitionDisplay.display
                 && definitionDisplay.display instanceof Fmt.ArrayExpression
                 && definitionDisplay.display.items.length) {
-              let display = this.findBestMatch(definitionDisplay.display.items, argumentLists)!;
+              let display = findBestMatch(definitionDisplay.display.items, argumentLists)!;
               variableDisplay = this.renderDisplayExpression(display, args);
               this.addSemanticLink(variableDisplay, definitionRef);
             }
@@ -1227,7 +1228,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderDefinitionDisplayExpression(displayExpression: Fmt.Expression | undefined, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression | undefined {
     if (displayExpression instanceof Fmt.ArrayExpression
         && displayExpression.items.length) {
-      let display = this.findBestMatch(displayExpression.items, argumentLists)!;
+      let display = findBestMatch(displayExpression.items, argumentLists)!;
       if (omitArguments && display instanceof Fmt.DefinitionRefExpression) {
         let abbr: Fmt.Expression | undefined = undefined;
         if (display.path.name === 'Operator'
@@ -1651,7 +1652,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   if (definitionDisplay.display
                       && definitionDisplay.display instanceof Fmt.ArrayExpression
                       && definitionDisplay.display.items.length) {
-                    let display = this.findBestMatch(definitionDisplay.display.items, argumentLists)!;
+                    let display = findBestMatch(definitionDisplay.display.items, argumentLists)!;
                     let result = this.renderDisplayExpression(display, args);
                     this.addSemanticLink(result, definitionRef);
                     return result;
