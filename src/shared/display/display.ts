@@ -296,9 +296,32 @@ export class RenderedTemplateConfig {
 }
 
 export abstract class ExpressionWithArgs extends IndirectExpression {
+  protected negationsSatisfied?: number;
+  protected forcedInnerNegations: number = 0;
+
   constructor(protected config: RenderedTemplateConfig) {
     super();
   }
+
+  protected doResolve(): RenderedExpression {
+    this.negationsSatisfied = undefined;
+    this.forcedInnerNegations = 0;
+    let expression = this.doResolveExpressionWithArgs();
+    if (this.negationsSatisfied === undefined) {
+      this.negationsSatisfied = 0;
+    }
+    while (this.negationsSatisfied < this.config.negationCount) {
+      if (this.config.negationFallbackFn) {
+        expression = this.config.negationFallbackFn(expression);
+        this.negationsSatisfied++;
+      } else {
+        throw new Error('Unsatisfied negation');
+      }
+    }
+    return expression;
+  }
+
+  protected abstract doResolveExpressionWithArgs(): RenderedExpression;
 
   protected toRenderedExpression(expression: any): RenderedExpression {
     if (expression instanceof RenderedExpression) {
@@ -363,37 +386,19 @@ interface LoopData {
 }
 
 export class UserDefinedExpression extends ExpressionWithArgs {
-  private negationsSatisfied?: number;
-  private forcedInnerNegations: number = 0;
-
   constructor(private display: Fmt.Expression, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
     super(config);
   }
 
-  protected doResolve(): RenderedExpression {
+  protected doResolveExpressionWithArgs(): RenderedExpression {
     let result: any[] = [];
-    this.negationsSatisfied = undefined;
-    this.forcedInnerNegations = 0;
     this.translateExpression(this.display, undefined, result);
     let row = this.toRenderedExpressionList(result);
-    let expression: RenderedExpression;
     if (row.length === 1) {
-      expression = row[0];
+      return row[0];
     } else {
-      expression = new RowExpression(row);
+      return new RowExpression(row);
     }
-    if (this.negationsSatisfied === undefined) {
-      this.negationsSatisfied = 0;
-    }
-    while (this.negationsSatisfied < this.config.negationCount) {
-      if (this.config.negationFallbackFn) {
-        expression = this.config.negationFallbackFn(expression);
-        this.negationsSatisfied++;
-      } else {
-        throw new Error('Unsatisfied negation');
-      }
-    }
-    return expression;
   }
 
   private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: any[]): void {
@@ -437,7 +442,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           throw new Error('Arguments must be named');
         }
       }
-      if (expression === this.display && this.negationsSatisfied === undefined) {
+      if (expression === this.display && this.config.negationCount && this.negationsSatisfied === undefined) {
         config.negationCount = this.config.negationCount;
         config.negationFallbackFn = this.config.negationFallbackFn;
         this.negationsSatisfied = this.config.negationCount;
@@ -566,7 +571,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     super(config);
   }
 
-  protected doResolve(): RenderedExpression {
+  protected doResolveExpressionWithArgs(): RenderedExpression {
     let expression: RenderedExpression | undefined = undefined;
     switch (this.template.name) {
     case 'Style':
@@ -639,6 +644,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
         let display = this.template.contents.display;
         if (display) {
           expression = new UserDefinedExpression(display, this.config, this.allTemplates);
+          this.negationsSatisfied = this.config.negationCount;
         }
       }
     }
