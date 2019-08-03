@@ -129,6 +129,16 @@ $Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: 
   )
 }
 
+$Verb(symbol: %Expr, operand: %Expr, parenLevel: %Int = -1): %Template {
+  display = $UnaryOperator(
+    symbol = symbol,
+    operand = operand,
+    space = ' ',
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
+  )
+}
+
 $TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Template {
   display = $Relation(
     symbol = symbol,
@@ -149,7 +159,7 @@ $BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLe
 }
 
 $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
-  display = $UnaryOperator(
+  display = $PrefixUnaryOperator(
     symbol = symbol,
     operand = operand,
     space = space,
@@ -225,14 +235,14 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
   )
 }
 
-$Property(operand: %Expr, property: %String, article?: %String): %Template {
-  display = $TextualRelation(
-    symbol = [%neg('is', 'is not'), %opt(article, [' ', article])],
-    operands = [operand, property]
+$Property(operand: %Expr, property: %Expr, article?: %String): %Template {
+  display = $Verb(
+    symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property],
+    operand = operand
   )
 }
 
-$NounProperty(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
+$NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   display = $Property(
     operand = operand,
     property = singular,
@@ -240,24 +250,30 @@ $NounProperty(operand: %Expr, singular: %String, plural: %String, article: %Stri
   )
 }
 
-$Feature(operand: %Expr, singular: %String, plural: %String, article: %String = 'a'): %Template {
+$NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   display = $TextualRelation(
-    symbol = [%neg('has', 'does not have'), ' ', article],
-    operands = [operand, singular]
+    symbol = [%neg('is', 'is not'), ' ', article, ' ', singular, ' of'],
+    operands = operands
   )
 }
 
-$MultiProperty(operands: %Expr[], property: %String): %Template {
-  display = $TextualRelation(
-    symbol = %neg('are', 'are not'),
-    operands = [
+$Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+  display = $Verb(
+    symbol = [%neg('has', 'does not have'), ' ', article, ' ', singular],
+    operand = operand
+  )
+}
+
+$MultiProperty(operands: %Expr[], property: %Expr): %Template {
+  display = $Verb(
+    symbol = [%neg('are', 'are not'), ' ', property],
+    operand = [
       %for(
         param = operands,
         dimension = 0,
         item = operands,
         separator = ' and '
-      ),
-      property
+      )
     ]
   )
 }

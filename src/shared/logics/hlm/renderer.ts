@@ -1262,6 +1262,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             abbr = negationList;
           }
         } else if (display.path.name === 'NounProperty'
+                   || display.path.name === 'NounRelation'
                    || display.path.name === 'Feature') {
           abbr = display.path.arguments.getValue('singular');
         }
