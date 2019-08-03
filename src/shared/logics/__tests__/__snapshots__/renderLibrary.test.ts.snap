@@ -2535,16 +2535,16 @@ References.
 * https://ncatlab.org/nlab/show/cardinal+number"
 `;
 
-exports[`render hlm library: 1.6.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Elements 1`] = `
+exports[`render hlm library: 1.6.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Carrier 1`] = `
 "Definition 1.6.2.3.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define
 
-  El(𝐱)
+  Carrier(𝐱)
 
 by:
 
-  El(|S|) := S  (S is a set)
+  Carrier(|S|) := S  (S is a set)
 
-We write “let a ∈ 𝐱” for “let a ∈ El(𝐱).”
+We write “let a ∈ 𝐱” for “let a ∈ Carrier(𝐱).”
 
 Remarks.
 
@@ -2554,7 +2554,7 @@ This definition retrieves a representative set from a cardinal number, and enabl
 exports[`render hlm library: 1.6.2.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms 1`] = `
 "Definition 1.6.2.4.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
 
-  Hom(𝐱, 𝐲) := (El(𝐱) → El(𝐲))
+  Hom(𝐱, 𝐲) := (Carrier(𝐱) → Carrier(𝐲))
 
 We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”
 
@@ -2569,7 +2569,7 @@ exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardi
 "Definition 1.6.2.5.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
 
   Iso(𝐱, 𝐲) := {φ : 𝐱 → 𝐲 : φ is bijective}
-   = (El(𝐱) ↔ El(𝐲))
+   = (Carrier(𝐱) ↔ Carrier(𝐲))
 
 We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
 
@@ -2579,7 +2579,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/identity 1`] = `
 "Definition 1.6.2.6.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
 
-  id_𝐱 := id_(El(𝐱))"
+  id_𝐱 := id_(Carrier(𝐱))"
 `;
 
 exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
@@ -2713,16 +2713,16 @@ n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.6.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Elements 1`] = `
+exports[`render hlm library: 1.6.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Carrier 1`] = `
 "Definition 1.6.3.2.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define
 
-  El(𝐱)
+  Carrier(𝐱)
 
 by:
 
-  El([S, ⪯]) := S  (S is a set, ⪯ is a relation on S with suitable conditions)
+  Carrier([S, ⪯]) := S  (S is a set, ⪯ is a relation on S with suitable conditions)
 
-We write “let a ∈ 𝐱” for “let a ∈ El(𝐱).”
+We write “let a ∈ 𝐱” for “let a ∈ Carrier(𝐱).”
 
 Remarks.
 
@@ -2738,7 +2738,7 @@ exports[`render hlm library: 1.6.3.3 data/libraries/hlm/Essentials/Numbers/Ordin
 exports[`render hlm library: 1.6.3.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms 1`] = `
 "Definition 1.6.3.4.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
 
-  Hom(𝐱, 𝐲) := {f : El(𝐱) → El(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+  Hom(𝐱, 𝐲) := {f : Carrier(𝐱) → Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
 
 We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”"
 `;
@@ -2747,7 +2747,7 @@ exports[`render hlm library: 1.6.3.5 data/libraries/hlm/Essentials/Numbers/Ordin
 "Definition 1.6.3.5.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
 
   Iso(𝐱, 𝐲) := {homomorphisms φ : 𝐱 → 𝐲 : φ is bijective}
-   = {f : El(𝐱) ↔ El(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+   = {f : Carrier(𝐱) ↔ Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
 
 We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
 
@@ -2757,7 +2757,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/identity 1`] = `
 "Definition 1.6.3.6.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define:
 
-  id_𝐱 := id_(El(𝐱))"
+  id_𝐱 := id_(Carrier(𝐱))"
 `;
 
 exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
@@ -4123,20 +4123,20 @@ References.
 * https://en.wikipedia.org/wiki/Magma_(algebra)"
 `;
 
-exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Magmas/Elements 1`] = `
+exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Magmas/Carrier 1`] = `
 "Definition 2.2.2.  Let 𝐌 be a magma. We define
 
-  El(𝐌)
+  Carrier(𝐌)
 
 by:
 
-  El([M, ∗]) := M  (M is a set, ∗ : M × M → M is an operation on M)
+  Carrier([M, ∗]) := M  (M is a set, ∗ : M × M → M is an operation on M)
 
-We write “let a ∈ 𝐌” for “let a ∈ El(𝐌).”
+We write “let a ∈ 𝐌” for “let a ∈ Carrier(𝐌).”
 
 Remarks.
 
-This definition retrieves a representative set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation."
+This definition retrieves a representative carrier set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation."
 `;
 
 exports[`render hlm library: 2.2.3 data/libraries/hlm/Algebra/Magmas/operation 1`] = `
@@ -4172,7 +4172,7 @@ by:
 exports[`render hlm library: 2.2.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms 1`] = `
 "Definition 2.2.6.  Let 𝐌, 𝐍 be magmas. We define:
 
-  Hom(𝐌, 𝐍) := {f : El(𝐌) → El(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
@@ -4181,7 +4181,7 @@ exports[`render hlm library: 2.2.7 data/libraries/hlm/Algebra/Magmas/Isomorphism
 "Definition 2.2.7.  Let 𝐌, 𝐍 be magmas. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : El(𝐌) ↔ El(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -4191,7 +4191,7 @@ Equality.  No proof."
 exports[`render hlm library: 2.2.8 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
 "Definition 2.2.8.  Let 𝐌 be a magma. We define:
 
-  id_𝐌 := id_(El(𝐌))"
+  id_𝐌 := id_(Carrier(𝐌))"
 `;
 
 exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Magmas/Equality%20criterion 1`] = `
@@ -4239,10 +4239,10 @@ exports[`render hlm library: 2.2.11.2 data/libraries/hlm/Algebra/Magmas/Free%20m
 `;
 
 exports[`render hlm library: 2.2.11.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
-"Definition 2.2.11.3.  Let 𝐌 be a magma, S ⊆ El(𝐌). We define:
+"Definition 2.2.11.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   𝐌 is free on S  :⇔  𝐌 = free_𝓜𝓰𝓶(S)
-    ⇔  ∀ magmas 𝐍, f : S → El(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
+    ⇔  ∀ magmas 𝐍, f : S → Carrier(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
 
 Equivalence.  No proof."
 `;
@@ -4250,7 +4250,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.2.11.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
 "Definition 2.2.11.4.  Let 𝐌 be a magma. We define:
 
-  𝐌 is free  :⇔  ∃ S ⊆ El(𝐌) : 𝐌 is free on S"
+  𝐌 is free  :⇔  ∃ S ⊆ Carrier(𝐌) : 𝐌 is free on S"
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `
