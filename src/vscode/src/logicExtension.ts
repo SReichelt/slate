@@ -13,11 +13,177 @@ import { FileContents } from '../../shared/data/fileAccessor';
 import { WorkspaceFileAccessor } from './workspaceFileAccessor';
 import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
 import { fileExtension } from '../../fs/format/dynamic';
-import { convertRange } from './utils';
+import { RangeInfo, convertRangeInfo } from './utils';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 const languageId = 'slate';
 const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
+
+export class ParseDocumentEvent {
+    document: vscode.TextDocument;
+    file: Fmt.File;
+    diagnostics: vscode.Diagnostic[];
+}
+
+export class HoverEvent {
+    document: vscode.TextDocument;
+    object: Object;
+    targetMetaModelName: string;
+    hoverTexts: Thenable<vscode.MarkdownString[]>;
+}
+
+interface Library {
+    libraryDataProvider: LibraryDataProvider;
+}
+
+interface LibraryDocument {
+    library: Library;
+    documentLibraryDataProvider: LibraryDataProvider;
+    file: Fmt.File;
+    isSection: boolean;
+    rangeList: RangeInfo[];
+    rangeMap: Map<Object, RangeInfo>;
+}
+
+class LibraryDocumentProvider {
+    private libraries = new Map<string, Library>();
+    private documents = new Map<vscode.TextDocument, LibraryDocument>();
+
+    constructor(private fileAccessor: WorkspaceFileAccessor) {}
+
+    parseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
+        let isSection = (event.file.metaModelPath.name === 'library');
+        let rangeList: RangeInfo[] = [];
+        let rangeMap = new Map<Object, RangeInfo>();
+        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
+            let rangeInfo = convertRangeInfo(info);
+            rangeList.push(rangeInfo);
+            rangeMap.set(info.object, rangeInfo);
+        };
+        if (isSection) {
+            event.file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel, reportRange);
+        }
+        let library = this.getLibrary(event, isSection);
+        if (!library) {
+            return undefined;
+        }
+        let path = library.libraryDataProvider.uriToPath(event.document.uri.toString());
+        if (!path) {
+            return undefined;
+        }
+        let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
+        if (!isSection) {
+            event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
+        }
+        let libraryDocument: LibraryDocument = {
+            library: library,
+            documentLibraryDataProvider: documentLibraryDataProvider,
+            file: event.file,
+            isSection: isSection,
+            rangeList: rangeList,
+            rangeMap: rangeMap
+        };
+        this.documents.set(event.document, libraryDocument);
+        return libraryDocument;
+    }
+
+    private getLibrary(event: ParseDocumentEvent, isSection: boolean): Library | undefined {
+        let libraryBaseUri = this.getLibraryBaseUri(event);
+        let libraryName = this.getLibraryName(event, libraryBaseUri);
+        if (!libraryName) {
+            return undefined;
+        }
+        let library = this.libraries.get(libraryName);
+        if (!library) {
+            let logicName = this.getLogicName(event, isSection);
+            if (!logicName) {
+                return undefined;
+            }
+            let logic = Logics.logics.find((value: Logic.Logic) => value.name === logicName);
+            if (!logic) {
+                return undefined;
+            }
+            let libraryUri = libraryBaseUri + libraryName;
+            library = {libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, 'Library')};
+            this.libraries.set(libraryName, library);
+        }
+        return library;
+    }
+
+    private getLibraryBaseUri(event: ParseDocumentEvent): string | undefined {
+        let workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
+        if (!workspaceFolder) {
+            return undefined;
+        }
+        return workspaceFolder.uri.toString() + '/data/libraries/';
+    }
+
+    private getLibraryName(event: ParseDocumentEvent, libraryBaseUri: string | undefined): string | undefined {
+        let documentUri = event.document.uri.toString();
+        if (!libraryBaseUri || !documentUri.startsWith(libraryBaseUri)) {
+            return undefined;
+        }
+        let relativeUri = documentUri.substring(libraryBaseUri.length);
+        let slashPos = relativeUri.indexOf('/');
+        return slashPos >= 0 ? relativeUri.substring(0, slashPos) : relativeUri;
+    }
+
+    private getLogicName(event: ParseDocumentEvent, isSection: boolean): string | undefined {
+        if (isSection) {
+            if (event.file.definitions.length) {
+                let contents = event.file.definitions[0].contents;
+                if (contents instanceof FmtLibrary.ObjectContents_Section) {
+                    return contents.logic;
+                }
+            }
+            return undefined;
+        } else {
+            return event.file.metaModelPath.name;
+        }
+    }
+
+    getDocument(document: vscode.TextDocument): LibraryDocument | undefined {
+        return this.documents.get(document);
+    }
+}
+
+class SlateDiagnosticsProvider {
+    constructor(private libraryDocumentProvider: LibraryDocumentProvider) {}
+
+    checkDocument(event: ParseDocumentEvent, libraryDocument: LibraryDocument): void {
+        if (libraryDocument.isSection) {
+            return;
+        }
+        if (libraryDocument.file.definitions.length) {
+            let definition = libraryDocument.file.definitions[0];
+            let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
+            checker.checkDefinition(definition).then((checkResult: Logic.LogicCheckResult) => {
+                for (let diagnostic of checkResult.diagnostics) {
+                    event.diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
+                }
+            });
+        }
+    }
+
+    private getRange(libraryDocument: LibraryDocument, diagnostic: Logic.LogicCheckDiagnostic): vscode.Range {
+        let range = libraryDocument.rangeMap.get(diagnostic.object);
+        if (range) {
+            return range.range;
+        } else {
+            let dummyPosition = new vscode.Position(0, 0);
+            return new vscode.Range(dummyPosition, dummyPosition);
+        }
+    }
+
+    private getSeverity(diagnostic: Logic.LogicCheckDiagnostic): vscode.DiagnosticSeverity {
+        switch (diagnostic.severity) {
+        case Logic.DiagnosticSeverity.Error:
+            return vscode.DiagnosticSeverity.Error;
+        case Logic.DiagnosticSeverity.Warning:
+            return vscode.DiagnosticSeverity.Warning;
+        }
+    }
+}
 
 class SlateCodeLens extends vscode.CodeLens {
     constructor(range: vscode.Range, public renderFn: Logic.RenderFn) {
@@ -28,55 +194,55 @@ class SlateCodeLens extends vscode.CodeLens {
 class SlateCodeLensProvider implements vscode.CodeLensProvider {
     public templates?: Fmt.File;
 
-    constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>, public onDidChangeCodeLenses: vscode.Event<void>) {}
+    constructor(private libraryDocumentProvider: LibraryDocumentProvider, public onDidChangeCodeLenses: vscode.Event<void>) {}
 
     provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
-        let documentLibraryDataProvider = this.documentLibraryDataProviders.get(document);
-        if (documentLibraryDataProvider && this.templates) {
-            let libraryDataProvider = documentLibraryDataProvider;
+        let libraryDocument = this.libraryDocumentProvider.getDocument(document);
+        if (libraryDocument && this.templates) {
+            let libraryDataProvider = libraryDocument.documentLibraryDataProvider;
             let templates = this.templates;
-            try {
-                let result: vscode.CodeLens[] = [];
-                if (document.uri.toString().endsWith('_index' + fileExtension)) {
-                    let reportRange = (info: FmtReader.ObjectRangeInfo) => {
-                        if (token.isCancellationRequested) {
-                            return;
-                        }
-                        if (info.object instanceof FmtLibrary.MetaRefExpression_item && info.object.ref instanceof Fmt.DefinitionRefExpression) {
-                            let ref = info.object.ref;
-                            result.push(new SlateCodeLens(convertRange(info.range), () => {
-                                let item = libraryDataProvider.fetchItem(ref.path);
-                                let expression = item.then((definition) => {
-                                    let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, false, libraryDataProvider, templates);
+            let result: vscode.CodeLens[] = [];
+            if (libraryDocument.isSection) {
+                for (let range of libraryDocument.rangeList) {
+                    if (token.isCancellationRequested) {
+                        break;
+                    }
+                    if (range.object instanceof FmtLibrary.MetaRefExpression_item && range.object.ref instanceof Fmt.DefinitionRefExpression) {
+                        let ref = range.object.ref;
+                        result.push(new SlateCodeLens(range.range, () => {
+                            let item = libraryDataProvider.fetchItem(ref.path);
+                            let expression = item.then((definition) => {
+                                let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, false, libraryDataProvider, templates);
+                                try {
                                     return renderer.renderDefinitionSummary() || new Display.EmptyExpression;
-                                });
-                                return new Display.PromiseExpression(expression);
-                            }));
-                        }
-                    };
-                    FmtReader.readString(document.getText(), document.fileName, FmtLibrary.getMetaModel, reportRange);
-                } else {
-                    let ranges: FmtReader.ObjectRangeInfo[] = [];
-                    let reportRange = (info: FmtReader.ObjectRangeInfo) => ranges.push(info);
-                    let file = FmtReader.readString(document.getText(), document.fileName, documentLibraryDataProvider.logic.getMetaModel, reportRange);
-                    if (file.definitions.length) {
-                        let definition = file.definitions[0];
-                        let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
+                                } catch (error) {
+                                    return new Display.ErrorExpression(error.message);
+                                }
+                            });
+                            return new Display.PromiseExpression(expression);
+                        }));
+                    }
+                }
+            } else {
+                if (libraryDocument.file.definitions.length) {
+                    let definition = libraryDocument.file.definitions[0];
+                    let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
+                    try {
                         let parts = renderer.getDefinitionParts();
-                        for (let info of ranges) {
+                        for (let range of libraryDocument.rangeList) {
                             if (token.isCancellationRequested) {
                                 break;
                             }
-                            let part = parts.get(info.object);
+                            let part = parts.get(range.object);
                             if (part) {
-                                result.push(new SlateCodeLens(convertRange(info.range), part));
+                                result.push(new SlateCodeLens(range.range, part));
                             }
                         }
+                    } catch (error) {
                     }
                 }
-                return result;
-            } catch (error) {
             }
+            return result;
         }
         return undefined;
     }
@@ -98,12 +264,12 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
 class SlateLogicHoverProvider {
     public templates?: Fmt.File;
 
-    constructor(private documentLibraryDataProviders: Map<vscode.TextDocument, LibraryDataProvider>) {}
+    constructor(private libraryDocumentProvider: LibraryDocumentProvider) {}
 
     provideHover(event: HoverEvent): void {
-        let documentLibraryDataProvider = this.documentLibraryDataProviders.get(event.document);
-        if (documentLibraryDataProvider && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === documentLibraryDataProvider.logic.name) {
-            let targetDataProvider = documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
+        let libraryDocument = this.libraryDocumentProvider.getDocument(event.document);
+        if (libraryDocument && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === libraryDocument.documentLibraryDataProvider.logic.name) {
+            let targetDataProvider = libraryDocument.documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
             let templates = this.templates;
             let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
@@ -122,70 +288,21 @@ class SlateLogicHoverProvider {
     }
 }
 
-export class ParseDocumentEvent {
-    document: vscode.TextDocument;
-    metaModelName: string;
-}
-
-export class HoverEvent {
-    document: vscode.TextDocument;
-    object: Object;
-    targetMetaModelName: string;
-    hoverTexts: Thenable<vscode.MarkdownString[]>;
-}
-
 export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onShowHover: vscode.Event<HoverEvent>): void {
     let fileAccessor = new WorkspaceFileAccessor;
-    let rootLibraryDataProviders = new Map<string, LibraryDataProvider>();
-    let documentLibraryDataProviders = new Map<vscode.TextDocument, LibraryDataProvider>();
+    let libraryDocumentProvider = new LibraryDocumentProvider(fileAccessor);
+    let diagnosticsProvider = new SlateDiagnosticsProvider(libraryDocumentProvider);
     let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
     context.subscriptions.push(changeCodeLensesEventEmitter);
-    let codeLensProvider = new SlateCodeLensProvider(documentLibraryDataProviders, changeCodeLensesEventEmitter.event);
-    let hoverProvider = new SlateLogicHoverProvider(documentLibraryDataProviders);
+    let codeLensProvider = new SlateCodeLensProvider(libraryDocumentProvider, changeCodeLensesEventEmitter.event);
+    let hoverProvider = new SlateLogicHoverProvider(libraryDocumentProvider);
+
     context.subscriptions.push(
         onDidParseDocument((event: ParseDocumentEvent) => {
             try {
-                let workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
-                if (!workspaceFolder) {
-                    return;
-                }
-                let libraryBaseUri = workspaceFolder.uri.toString() + '/data/libraries/';
-                let documentUri = event.document.uri.toString();
-                if (!documentUri.startsWith(libraryBaseUri)) {
-                    return;
-                }
-                let relativeUri = documentUri.substring(libraryBaseUri.length);
-                let slashPos = relativeUri.indexOf('/');
-                let libraryName = slashPos >= 0 ? relativeUri.substring(0, slashPos) : relativeUri;
-                let logicName: string | undefined = undefined;
-                if (event.metaModelName === 'library') {
-                    let file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel);
-                    if (file.definitions.length) {
-                        let contents = file.definitions[0].contents;
-                        if (contents instanceof FmtLibrary.ObjectContents_Section) {
-                            logicName = contents.logic;
-                        }
-                    }
-                } else {
-                    logicName = event.metaModelName;
-                }
-                if (!logicName) {
-                    return;
-                }
-                let rootLibraryDataProvider = rootLibraryDataProviders.get(libraryName);
-                if (!rootLibraryDataProvider) {
-                    let logic = Logics.logics.find((value: Logic.Logic) => value.name === logicName);
-                    if (!logic) {
-                        return;
-                    }
-                    let libraryUri = libraryBaseUri + libraryName;
-                    rootLibraryDataProvider = new LibraryDataProvider(logic, fileAccessor, libraryUri, undefined, 'Library');
-                    rootLibraryDataProviders.set(libraryName, rootLibraryDataProvider);
-                }
-                let path = rootLibraryDataProvider.uriToPath(documentUri);
-                if (path) {
-                    let documentLibraryDataProvider = rootLibraryDataProvider.getProviderForSection(path.parentPath);
-                    documentLibraryDataProviders.set(event.document, documentLibraryDataProvider);
+                let document = libraryDocumentProvider.parseDocument(event);
+                if (document) {
+                    diagnosticsProvider.checkDocument(event, document);
                     changeCodeLensesEventEmitter.fire();
                 }
             } catch (error) {
@@ -195,6 +312,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
         vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
+
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
         let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/display/templates' + fileExtension;
         fileAccessor.readFile(templatesUri)

@@ -10,7 +10,27 @@ export interface Logic {
   name: string;
   getMetaModel: Meta.MetaModelGetter;
   getRootContext(): Ctx.Context;
+  getChecker(): LogicChecker;
   getDisplay(): LogicDisplay;
+}
+
+export enum DiagnosticSeverity {
+  Error,
+  Warning
+}
+
+export interface LogicCheckDiagnostic {
+  object: Object;
+  severity: DiagnosticSeverity;
+  message: string;
+}
+
+export interface LogicCheckResult {
+  diagnostics: LogicCheckDiagnostic[];
+}
+
+export interface LogicChecker {
+  checkDefinition(definition: Fmt.Definition): CachedPromise<LogicCheckResult>;
 }
 
 export enum LogicDefinitionType {

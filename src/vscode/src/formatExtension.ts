@@ -1410,7 +1410,7 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
         if (parseEventEmitter && parsedDocument.file) {
-            parseEventEmitter.fire({document: document, metaModelName: parsedDocument.file.metaModelPath.name});
+            parseEventEmitter.fire({document: document, file: parsedDocument.file, diagnostics: diagnostics});
         }
         return parsedDocument;
     } else {
@@ -1433,7 +1433,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             parsedFileCache.delete(event.document.uri.fsPath);
-            parseDocument(event.document, diagnosticCollection, parsedDocuments);
+            parseDocument(event.document, diagnosticCollection, parsedDocuments, parseEventEmitter);
             if (parseAllTimer) {
                 clearTimeout(parseAllTimer);
                 parseAllTimer = undefined;
@@ -1445,7 +1445,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 try {
                     for (let document of vscode.workspace.textDocuments) {
                         if (document !== event.document) {
-                            parseDocument(document, diagnosticCollection, parsedDocuments);
+                            parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
                         }
                     }
                 } finally {
