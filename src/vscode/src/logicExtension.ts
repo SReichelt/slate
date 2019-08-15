@@ -23,6 +23,7 @@ export class ParseDocumentEvent {
     document: vscode.TextDocument;
     file: Fmt.File;
     diagnostics: vscode.Diagnostic[];
+    onCheckFinished: () => void;
 }
 
 export class HoverEvent {
@@ -161,6 +162,7 @@ class SlateDiagnosticsProvider {
                 for (let diagnostic of checkResult.diagnostics) {
                     event.diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 }
+                event.onCheckFinished();
             });
         }
     }

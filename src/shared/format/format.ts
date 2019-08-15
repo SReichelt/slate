@@ -131,7 +131,7 @@ export class Path extends NamedPathItem {
   }
 
   protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
-    return pathItem instanceof Path && this.name === pathItem.name && this.arguments.isEquivalentTo(pathItem.arguments);
+    return pathItem instanceof Path && this.name === pathItem.name && this.arguments.isEquivalentTo(pathItem.arguments, fn, replacedParameters);
   }
 }
 

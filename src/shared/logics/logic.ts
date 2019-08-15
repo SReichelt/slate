@@ -14,9 +14,12 @@ export interface Logic {
   getDisplay(): LogicDisplay;
 }
 
-export enum DiagnosticSeverity {
-  Error,
-  Warning
+export interface LogicChecker {
+  checkDefinition(definition: Fmt.Definition): CachedPromise<LogicCheckResult>;
+}
+
+export interface LogicCheckResult {
+  diagnostics: LogicCheckDiagnostic[];
 }
 
 export interface LogicCheckDiagnostic {
@@ -25,12 +28,9 @@ export interface LogicCheckDiagnostic {
   message: string;
 }
 
-export interface LogicCheckResult {
-  diagnostics: LogicCheckDiagnostic[];
-}
-
-export interface LogicChecker {
-  checkDefinition(definition: Fmt.Definition): CachedPromise<LogicCheckResult>;
+export enum DiagnosticSeverity {
+  Error,
+  Warning
 }
 
 export enum LogicDefinitionType {
