@@ -7,6 +7,7 @@
   vertical-align: middle;
   text-align: center;
   font-family: sans-serif;
+  white-space: nowrap;
   background-color: #e0e0e0;
   cursor: pointer;
   user-select: none;
