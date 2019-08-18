@@ -4258,6 +4258,8 @@ exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essential
 
   S^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
 
+  (a_i,j)_i < m,j < n = (b_i,j)_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
+
 For S' ⊆ S, we canonically treat elements of S'^(m×n) as elements of S^(m×n)."
 `;
 

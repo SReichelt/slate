@@ -118,7 +118,8 @@ class HLMDefinitionChecker {
     if (!rightParameters.isEquivalentTo(leftParameters, unificationFn)) {
       this.error(rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
-    this.checkEquivalentFormulas(equalityDefinition.definition, equalityDefinition.equivalenceProofs, this.rootContext);
+    let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
+    this.checkEquivalenceList(equalityDefinition.definition, equalityDefinition.equivalenceProofs, checkItem, this.rootContext);
     this.checkProof(equalityDefinition.reflexivityProof, this.rootContext);
     this.checkProof(equalityDefinition.symmetryProof, this.rootContext);
     this.checkProof(equalityDefinition.transitivityProof, this.rootContext);
@@ -144,21 +145,25 @@ class HLMDefinitionChecker {
   }
 
   private checkSetOperator(contents: FmtHLM.ObjectContents_SetOperator): void {
-    this.checkEquivalentSetTerms(contents.definition, contents.equalityProofs, this.rootContext);
+    let checkItem = (term: Fmt.Expression) => this.checkSetTerm(term, this.rootContext);
+    this.checkEquivalenceList(contents.definition, contents.equalityProofs, checkItem, this.rootContext);
   }
 
   private checkExplicitOperator(contents: FmtHLM.ObjectContents_ExplicitOperator): void {
-    this.checkEquivalentElementTerms(contents.definition, contents.equalityProofs, this.rootContext);
+    let checkItem = (term: Fmt.Expression) => this.checkElementTerm(term, this.rootContext);
+    this.checkEquivalenceList(contents.definition, contents.equalityProofs, checkItem, this.rootContext);
   }
 
   private checkImplicitOperator(contents: FmtHLM.ObjectContents_ImplicitOperator): void {
     this.checkParameter(contents.parameter, this.rootContext);
-    this.checkEquivalentFormulas(contents.definition, contents.equivalenceProofs, this.rootContext);
+    let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
+    this.checkEquivalenceList(contents.definition, contents.equivalenceProofs, checkItem, this.rootContext);
     this.checkProof(contents.wellDefinednessProof, this.rootContext);
   }
 
   private checkPredicate(contents: FmtHLM.ObjectContents_Predicate): void {
-    this.checkEquivalentFormulas(contents.definition, contents.equivalenceProofs, this.rootContext);
+    let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
+    this.checkEquivalenceList(contents.definition, contents.equivalenceProofs, checkItem, this.rootContext);
   }
 
   private checkStandardTheorem(contents: FmtHLM.ObjectContents_StandardTheorem): void {
@@ -167,7 +172,8 @@ class HLMDefinitionChecker {
   }
 
   private checkEquivalenceTheorem(contents: FmtHLM.ObjectContents_EquivalenceTheorem): void {
-    this.checkEquivalentFormulas(contents.conditions, contents.equivalenceProofs, this.rootContext);
+    let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
+    this.checkEquivalenceList(contents.conditions, contents.equivalenceProofs, checkItem, this.rootContext);
   }
 
   private checkMacroOperator(contents: FmtHLM.ObjectContents_MacroOperator): void {
@@ -304,7 +310,8 @@ class HLMDefinitionChecker {
     if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Set || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Subset || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_SetDef)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise.then(() => this.utils.getOuterDefinition(term)
+      this.promise = this.promise
+        .then(() => this.utils.getOuterDefinition(term))
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
             this.checkDefinitionRefExpression(term, [definition], [true], context);
@@ -312,8 +319,7 @@ class HLMDefinitionChecker {
             this.error(term, 'Referenced definition must be a construction or set operator');
           }
         })
-        .catch((error) => this.error(term, error.message))
-      );
+        .catch((error) => this.error(term, error.message));
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms) {
         for (let item of term.terms) {
@@ -341,7 +347,8 @@ class HLMDefinitionChecker {
     if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise.then(() => this.utils.getOuterDefinition(term)
+      this.promise = this.promise
+        .then(() => this.utils.getOuterDefinition(term))
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction && term.path.parentPath instanceof Fmt.Path && !(term.path.parentPath.parentPath instanceof Fmt.Path)) {
             let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
@@ -352,8 +359,7 @@ class HLMDefinitionChecker {
             this.error(term, 'Referenced definition must be a constructor or operator');
           }
         })
-        .catch((error) => this.error(term, error.message))
-      );
+        .catch((error) => this.error(term, error.message));
     } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
       // TODO check that cases form a partition
       for (let item of term.cases) {
@@ -372,7 +378,8 @@ class HLMDefinitionChecker {
     if (formula instanceof Fmt.VariableRefExpression && formula.variable.type.expression instanceof FmtHLM.MetaRefExpression_Prop) {
       this.checkVariableRefExpression(formula, context);
     } else if (formula instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise.then(() => this.utils.getOuterDefinition(formula)
+      this.promise = this.promise
+        .then(() => this.utils.getOuterDefinition(formula))
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
             this.checkDefinitionRefExpression(formula, [definition], [true], context);
@@ -380,8 +387,7 @@ class HLMDefinitionChecker {
             this.error(formula, 'Referenced definition must be a predicate');
           }
         })
-        .catch((error) => this.error(formula, error.message))
-      );
+        .catch((error) => this.error(formula, error.message));
     } else if (formula instanceof FmtHLM.MetaRefExpression_not) {
       this.checkFormula(formula.formula, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
@@ -467,34 +473,16 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkEquivalentSetTerms(expression: Fmt.Expression, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+  private checkEquivalenceList(expression: Fmt.Expression, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, checkItem: (expression: Fmt.Expression) => void, context: HLMCheckerContext): void {
     if (expression instanceof Fmt.ArrayExpression) {
-      for (let term of expression.items) {
-        this.checkSetTerm(term, context);
+      if (expression.items.length) {
+        for (let item of expression.items) {
+          checkItem(item);
+        }
+        this.checkProofs(equivalenceProofs, context);
+      } else {
+        this.error(expression, 'At least one item expected');
       }
-      this.checkProofs(equivalenceProofs, context);
-    } else {
-      this.error(expression, 'Array expression expected');
-    }
-  }
-
-  private checkEquivalentElementTerms(expression: Fmt.Expression, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
-    if (expression instanceof Fmt.ArrayExpression) {
-      for (let term of expression.items) {
-        this.checkElementTerm(term, context);
-      }
-      this.checkProofs(equivalenceProofs, context);
-    } else {
-      this.error(expression, 'Array expression expected');
-    }
-  }
-
-  private checkEquivalentFormulas(expression: Fmt.Expression, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
-    if (expression instanceof Fmt.ArrayExpression) {
-      for (let formula of expression.items) {
-        this.checkFormula(formula, context);
-      }
-      this.checkProofs(equivalenceProofs, context);
     } else {
       this.error(expression, 'Array expression expected');
     }

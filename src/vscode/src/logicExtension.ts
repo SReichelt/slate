@@ -100,7 +100,7 @@ class LibraryDocumentProvider {
             if (!logicName) {
                 return undefined;
             }
-            let logic = Logics.logics.find((value: Logic.Logic) => value.name === logicName);
+            let logic = Logics.findLogic(logicName);
             if (!logic) {
                 return undefined;
             }

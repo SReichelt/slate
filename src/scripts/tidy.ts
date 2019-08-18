@@ -6,18 +6,19 @@ import { getMetaModelWithFallback } from '../fs/format/dynamic';
 import * as Logics from '../shared/logics/logics';
 
 function tidy(fileName: string): void {
-  let fileStr: string = fs.readFileSync(fileName, 'utf8');
+  let fileStr = fs.readFileSync(fileName, 'utf8');
   let getMetaModel = (path: Fmt.Path) => {
-    for (let logic of Logics.logics) {
-      if (path.name === logic.name) {
-        return logic.getMetaModel(path);
-      }
+    let logic = Logics.findLogic(path.name);
+    if (logic) {
+      return logic.getMetaModel(path);
     }
     return getMetaModelWithFallback(fileName, path);
   };
-  let file: Fmt.File = FmtReader.readString(fileStr, fileName, getMetaModel);
-  fileStr = FmtWriter.writeString(file);
-  fs.writeFileSync(fileName, fileStr, 'utf8');
+  let file = FmtReader.readString(fileStr, fileName, getMetaModel);
+  let newFileStr = FmtWriter.writeString(file);
+  if (newFileStr !== fileStr) {
+    fs.writeFileSync(fileName, newFileStr, 'utf8');
+  }
 }
 
 if (process.argv.length < 3) {
