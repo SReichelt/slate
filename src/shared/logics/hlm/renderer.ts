@@ -891,14 +891,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderElementTermInternal(term: Fmt.Expression): Display.RenderedExpression {
     if (term instanceof FmtHLM.MetaRefExpression_cases) {
-      let rows = term.cases.map((structuralCase) => {
-        let value = this.renderElementTerm(structuralCase.value, fullElementTermSelection);
+      let rows = term.cases.map((item) => {
+        let value = this.renderElementTerm(item.value, fullElementTermSelection);
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: false
         };
-        let formula = this.renderFormula(structuralCase.formula, formulaSelection);
+        let formula = this.renderFormula(item.formula, formulaSelection);
         return this.buildCaseRow(value, formula);
       });
       return this.renderTemplate('Cases', {
@@ -1349,7 +1349,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let bindingArgumentList: Fmt.ArgumentList | undefined = undefined;
     let newIndices = indices;
     if (argumentLists) {
-      let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_BindingArg);
+      let arg = this.utils.getArgument(argumentLists, param, FmtHLM.ObjectContents_BindingArg);
       if (arg) {
         parameter = arg.parameter;
         bindingArgumentList = arg.arguments;
@@ -1412,7 +1412,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     if (argumentLists) {
       if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-        let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_PropArg);
+        let arg = this.utils.getArgument(argumentLists, param, FmtHLM.ObjectContents_PropArg);
         if (arg) {
           let formulaSelection: FormulaSelection = {
             allowTruthValue: true,
@@ -1424,35 +1424,35 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_SetArg);
+        let arg = this.utils.getArgument(argumentLists, param, FmtHLM.ObjectContents_SetArg);
         if (arg) {
           resultArgs.push(this.renderSetTerm(arg._set, fullSetTermSelection));
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_SubsetArg);
+        let arg = this.utils.getArgument(argumentLists, param, FmtHLM.ObjectContents_SubsetArg);
         if (arg) {
           resultArgs.push(this.renderSetTerm(arg._set, fullSetTermSelection));
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let arg = this.getArgument(argumentLists, param, FmtHLM.ObjectContents_ElementArg);
+        let arg = this.utils.getArgument(argumentLists, param, FmtHLM.ObjectContents_ElementArg);
         if (arg) {
           resultArgs.push(this.renderElementTerm(arg.element, fullElementTermSelection));
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
-        let arg = this.getRawArgument(argumentLists, param);
+        let arg = this.utils.getRawArgument(argumentLists, param);
         if (arg instanceof Fmt.IntegerExpression) {
           resultArgs.push(new Display.TextExpression(arg.value.toString()));
         } else {
           resultArgs.push(new Display.ErrorExpression('Undefined argument'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
-        let arg = this.getRawArgument(argumentLists, param);
+        let arg = this.utils.getRawArgument(argumentLists, param);
         if (arg instanceof Fmt.DefinitionRefExpression) {
           let definitionRef = this.renderGenericExpression(arg, true);
           this.addSemanticLink(definitionRef, arg);
@@ -1467,26 +1467,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let isDefinition = parameterOverrides && parameterOverrides.replacementParameters ? parameterOverrides.replacementParameters.isDefinition : false;
       resultArgs.push(this.renderVariable(paramToDisplay, indices, isDefinition, markAsDummy, undefined, elementParameterOverrides));
     }
-  }
-
-  private getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
-    for (let argumentList of argumentLists) {
-      let value = argumentList.getOptionalValue(param.name);
-      if (value) {
-        return value;
-      }
-    }
-    return undefined;
-  }
-
-  private getArgument<ContentClass extends Fmt.ObjectContents>(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter, contentClass: {new(): ContentClass}): ContentClass | undefined {
-    let arg = this.getRawArgument(argumentLists, param);
-    if (arg instanceof Fmt.CompoundExpression) {
-      let contents = new contentClass;
-      contents.fromCompoundExpression(arg);
-      return contents;
-    }
-    return undefined;
   }
 
   private addDefinitionContents(paragraphs: Display.RenderedExpression[], definitionRef: Display.RenderedExpression, cases: ExtractedStructuralCase[] | undefined, includeExtras: boolean): void {

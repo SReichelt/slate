@@ -158,7 +158,7 @@ class SlateDiagnosticsProvider {
         if (libraryDocument.file.definitions.length) {
             let definition = libraryDocument.file.definitions[0];
             let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
-            checker.checkDefinition(definition).then((checkResult: Logic.LogicCheckResult) => {
+            checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
                 for (let diagnostic of checkResult.diagnostics) {
                     event.diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 }

@@ -15,7 +15,7 @@ export interface Logic {
 }
 
 export interface LogicChecker {
-  checkDefinition(definition: Fmt.Definition): CachedPromise<LogicCheckResult>;
+  checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor): CachedPromise<LogicCheckResult>;
 }
 
 export interface LogicCheckResult {
