@@ -32,21 +32,7 @@ function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDa
         let ref = item.ref as Fmt.DefinitionRefExpression;
         promise = promise
           .then(() => libraryDataProvider.fetchItem(ref.path))
-          .then((itemDefinition: Fmt.Definition) => checker.checkDefinition(itemDefinition, libraryDataProvider))
-          .then((checkResult: Logic.LogicCheckResult) => {
-            for (let diagnostic of checkResult.diagnostics) {
-              let severity = 'Unknown';
-              switch (diagnostic.severity) {
-              case Logic.DiagnosticSeverity.Error:
-                severity = 'Error';
-                break;
-              case Logic.DiagnosticSeverity.Warning:
-                severity = 'Warning';
-                break;
-              }
-              console.error(`${libraryDataProvider.pathToURI(ref.path)}: ${severity}: ${diagnostic.message}`);
-            }
-          });
+          .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path, checker));
       } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
         let ref = item.ref as Fmt.DefinitionRefExpression;
         let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
@@ -57,6 +43,23 @@ function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDa
     }
   }
   return promise;
+}
+
+function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path, checker: Logic.LogicChecker): CachedPromise<void> {
+  return checker.checkDefinition(definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+    for (let diagnostic of checkResult.diagnostics) {
+      let severity = 'Unknown';
+      switch (diagnostic.severity) {
+      case Logic.DiagnosticSeverity.Error:
+        severity = 'Error';
+        break;
+      case Logic.DiagnosticSeverity.Warning:
+        severity = 'Warning';
+        break;
+      }
+      console.error(`${libraryDataProvider.pathToURI(itemPath)}: ${severity}: ${diagnostic.message}`);
+    }
+  });
 }
 
 if (process.argv.length !== 3) {
