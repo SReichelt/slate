@@ -22,8 +22,6 @@ const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file'
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
     file: Fmt.File;
-    diagnostics: vscode.Diagnostic[];
-    onCheckFinished: () => void;
 }
 
 export class HoverEvent {
@@ -35,9 +33,11 @@ export class HoverEvent {
 
 interface Library {
     libraryDataProvider: LibraryDataProvider;
+    diagnosticCollection: vscode.DiagnosticCollection;
 }
 
 interface LibraryDocument {
+    document: vscode.TextDocument;
     library: Library;
     documentLibraryDataProvider: LibraryDataProvider;
     file: Fmt.File;
@@ -77,6 +77,7 @@ class LibraryDocumentProvider {
             event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
         }
         let libraryDocument: LibraryDocument = {
+            document: event.document,
             library: library,
             documentLibraryDataProvider: documentLibraryDataProvider,
             file: event.file,
@@ -105,7 +106,10 @@ class LibraryDocumentProvider {
                 return undefined;
             }
             let libraryUri = libraryBaseUri + libraryName;
-            library = {libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, 'Library')};
+            library = {
+                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, 'Library'),
+                diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + libraryName)
+            };
             this.libraries.set(libraryName, library);
         }
         return library;
@@ -151,7 +155,7 @@ class LibraryDocumentProvider {
 class SlateDiagnosticsProvider {
     constructor(private libraryDocumentProvider: LibraryDocumentProvider) {}
 
-    checkDocument(event: ParseDocumentEvent, libraryDocument: LibraryDocument): void {
+    checkDocument(libraryDocument: LibraryDocument): void {
         if (libraryDocument.isSection) {
             return;
         }
@@ -159,10 +163,11 @@ class SlateDiagnosticsProvider {
             let definition = libraryDocument.file.definitions[0];
             let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
             checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+                let diagnostics: vscode.Diagnostic[] = [];
                 for (let diagnostic of checkResult.diagnostics) {
-                    event.diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
+                    diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 }
-                event.onCheckFinished();
+                libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
             });
         }
     }
@@ -304,7 +309,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             try {
                 let document = libraryDocumentProvider.parseDocument(event);
                 if (document) {
-                    diagnosticsProvider.checkDocument(event, document);
+                    diagnosticsProvider.checkDocument(document);
                     changeCodeLensesEventEmitter.fire();
                 }
             } catch (error) {

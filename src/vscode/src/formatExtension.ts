@@ -1410,7 +1410,7 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
         if (parseEventEmitter && parsedDocument.file) {
-            parseEventEmitter.fire({document: document, file: parsedDocument.file, diagnostics: diagnostics, onCheckFinished: () => diagnosticCollection.set(document.uri, diagnostics)});
+            parseEventEmitter.fire({document: document, file: parsedDocument.file});
         }
         return parsedDocument;
     } else {
