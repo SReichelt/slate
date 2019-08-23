@@ -10,17 +10,26 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "slate",
-            "aliases": ["Slate", "slate"],
-            "extensions": [".slate"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "slate",
-            "scopeName": "source.slate",
-            "path": "./syntaxes/slate.tmLanguage.json"
-        }],
+        "languages": [
+            {
+                "id": "slate",
+                "aliases": [
+                    "Slate",
+                    "slate"
+                ],
+                "extensions": [
+                    ".slate"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "slate",
+                "scopeName": "source.slate",
+                "path": "./syntaxes/slate.tmLanguage.json"
+            }
+        ],
         "configurationDefaults": {
             "slate": {
                 "files.encoding": "utf-8"
@@ -39,10 +48,10 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.21",
-        "tslint": "^5.8.0",
-        "@types/node": "^8.10.25",
-        "@types/mocha": "^2.2.42"
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.10.52",
+        "@types/vscode": "^1.37.0",
+        "tslint": "^5.19.0",
+        "typescript": "^2.6.1"
     }
 }

@@ -1,9 +1,8 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as util from 'util';
-import { areUrisEqual } from './utils';
+import { TextDecoder } from 'util';
+import { areUrisEqual, toCachedPromise } from './utils';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
@@ -19,13 +18,14 @@ export class WorkspaceFileAccessor implements FileAccessor {
                 return CachedPromise.resolve(contents);
             }
         }
-        let contents = util.promisify(fs.readFile)(vscodeUri.fsPath, 'utf8')
-            .then((text) => {
+        return toCachedPromise(vscode.workspace.fs.readFile(vscodeUri))
+            .then((buffer: Uint8Array) => {
+                let textDecoder = new TextDecoder;
+                let text = textDecoder.decode(buffer);
                 let contents = new WorkspaceFileContents(this.registeredContents, vscodeUri, text);
                 this.registeredContents.push(contents);
                 return contents;
             });
-        return new CachedPromise(contents);
     }
 
     documentChanged(document: vscode.TextDocument): void {

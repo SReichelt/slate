@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'fs';  // TODO replace with vscode.workspace.fs
 import * as Fmt from '../../shared/format/format';
 import * as Ctx from '../../shared/format/context';
 import * as Meta from '../../shared/format/metaModel';
