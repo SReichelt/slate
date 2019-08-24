@@ -339,7 +339,7 @@ class HLMDefinitionChecker {
             if (parameterContext.previousSetTerm) {
               expectedSet = this.utils.substitutePrevious(expectedSet, parameterContext.previousSetTerm);
             }
-            expectedSet = this.utils.substitutePath(expectedSet, parameterContext.targetPath);
+            expectedSet = this.utils.substitutePath(expectedSet, parameterContext.targetPath, false);
             expectedSet = this.utils.substituteAllArguments(expectedSet, parameterLists, argumentLists);
             expectedSet = this.utils.substituteParameters(expectedSet, originalBindingParameters, substitutedBindingParameters);
             if (!this.utils.areExpressionsEqual(bindingParameterSet, expectedSet)) {
@@ -525,13 +525,62 @@ class HLMDefinitionChecker {
   }
 
   private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression) => void, context: HLMCheckerContext): void {
-    // TODO check constructors, parameters, etc.
     this.checkElementTerm(term, context);
-    this.checkSetTerm(construction, context);
+    if (construction instanceof Fmt.DefinitionRefExpression) {
+      this.promise = this.promise
+        .then(() => this.utils.getOuterDefinition(construction))
+        .then((definition: Fmt.Definition) => {
+          if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
+            this.checkDefinitionRefExpression(construction, [definition], [true], context);
+            let index = 0;
+            for (let innerDefinition of definition.innerDefinitions) {
+              if (innerDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
+                if (index < cases.length) {
+                  let structuralCase = cases[index];
+                  if (structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
+                    if (!structuralCase._constructor.path.parentPath.isEquivalentTo(construction.path)) {
+                      this.error(structuralCase._constructor, 'Constructor path must match construction path');
+                    }
+                    if (structuralCase._constructor.path.name === innerDefinition.name) {
+                      if (structuralCase.parameters) {
+                        let expectedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+                        let substitutionFn = (expression: Fmt.Expression) => {
+                          expression = this.utils.substituteImmediatePath(expression, construction.path.parentPath, true);
+                          expression = this.utils.substituteArguments(expression, definition.parameters, construction.path.arguments);
+                          return expression;
+                        };
+                        innerDefinition.parameters.substituteExpression(substitutionFn, expectedParameters);
+                        if (!structuralCase.parameters.isEquivalentTo(expectedParameters)) {
+                          this.error(structuralCase.parameters, 'Case parameters must match constructor parameters');
+                        }
+                      } else if (innerDefinition.parameters.length) {
+                        this.error(structuralCase, 'Parameter list required');
+                      }
+                    } else {
+                      this.error(structuralCase._constructor, `Expected reference to constructor "${innerDefinition.name}"`);
+                    }
+                  } else {
+                    this.error(structuralCase._constructor, 'Constructor reference expected');
+                  }
+                } else {
+                  this.error(term, `Missing case for constructor "${innerDefinition.name}"`);
+                  break;
+                }
+                index++;
+              }
+            }
+            if (index < cases.length) {
+              this.error(cases[index], 'Too many cases');
+            }
+          } else {
+            this.error(term, 'Referenced definition must be a construction');
+          }
+        })
+        .catch((error) => this.error(term, error.message));
+    } else {
+      this.error(construction, 'Construction reference expected');
+    }
     for (let structuralCase of cases) {
-      if (structuralCase.parameters) {
-        this.checkParameterList(structuralCase.parameters, context);
-      }
       checkCase(structuralCase.value);
     }
   }

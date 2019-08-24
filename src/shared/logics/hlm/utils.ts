@@ -73,7 +73,7 @@ export class HLMUtils extends GenericUtils {
         let bindingArgParamType = new Fmt.Type;
         let bindingArgParamTypeExpr = new FmtHLM.MetaRefExpression_Element;
         // TODO type._set may be "previous"
-        bindingArgParamTypeExpr._set = this.substitutePath(type._set, targetPath);
+        bindingArgParamTypeExpr._set = this.substitutePath(type._set, targetPath, true);
         bindingArgParamType.expression = bindingArgParamTypeExpr;
         bindingArgParamType.arrayDimensions = 0;
         bindingArgParam.type = bindingArgParamType;
@@ -138,7 +138,7 @@ export class HLMUtils extends GenericUtils {
       let result: Fmt.Expression;
       if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorDefinitionContents.rewrite) {
         result = constructorDefinitionContents.rewrite.value;
-        result = this.substitutePath(result, constructionPath.parentPath);
+        result = this.substitutePath(result, constructionPath.parentPath, true);
         result = this.substituteArguments(result, constructionDefinition.parameters, constructionPath.arguments);
       } else {
         let resultPath = new Fmt.Path;

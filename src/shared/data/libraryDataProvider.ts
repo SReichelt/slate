@@ -20,6 +20,7 @@ interface PrefetchQueueItem {
 }
 
 export class LibraryDataProvider implements LibraryDataAccessor {
+  private path?: Fmt.NamedPathItem;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
   private definitionCache = new Map<string, CachedPromise<Fmt.Definition>>();
   private prefetchQueue: PrefetchQueueItem[] = [];
@@ -28,7 +29,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }
-    if (!this.parent) {
+    if (this.parent) {
+      let path = new Fmt.NamedPathItem;
+      path.name = this.childName;
+      path.parentPath = this.parent.path;
+      this.path = path;
+    } else {
       this.itemNumber = [];
     }
   }
@@ -71,17 +77,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
-  private getPath(): Fmt.PathItem | undefined {
-    if (this.parent) {
-      let result = new Fmt.NamedPathItem;
-      result.name = this.childName;
-      result.parentPath = this.parent.getPath();
-      return result;
-    } else {
-      return undefined;
-    }
-  }
-
   getAbsolutePath(path: Fmt.Path): Fmt.Path {
     let result = new Fmt.Path;
     result.name = path.name;
@@ -90,7 +85,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       result.parentPath = this.getAbsolutePath(path.parentPath);
     } else {
       let parentProvider = this.getProviderForSection(path.parentPath);
-      result.parentPath = parentProvider.getPath();
+      result.parentPath = parentProvider.path;
     }
     return result;
   }
@@ -126,6 +121,23 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       return path;
     } else {
       return this.getRelativePath(libraryDataProvider.getAbsolutePath(path));
+    }
+  }
+
+  simplifyPath(path: Fmt.Path): Fmt.Path {
+    let hasParentPathItem = false;
+    let hasNamedPathItem = false;
+    for (let pathItem = path.parentPath; pathItem; pathItem = pathItem.parentPath) {
+      if (pathItem instanceof Fmt.ParentPathItem) {
+        hasParentPathItem = true;
+      } else if (pathItem instanceof Fmt.NamedPathItem && !(pathItem instanceof Fmt.Path)) {
+        hasNamedPathItem = true;
+      }
+    }
+    if (hasParentPathItem && hasNamedPathItem) {
+      return this.getRelativePath(this.getAbsolutePath(path));
+    } else {
+      return path;
     }
   }
 

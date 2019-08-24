@@ -65,25 +65,30 @@ export class GenericUtils {
     });
   }
 
-  substitutePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
+  substitutePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined, simplifyPaths: boolean): Fmt.Expression {
     if (targetPath) {
-      return expression.substitute((subExpression: Fmt.Expression) => {
-        if (subExpression instanceof Fmt.DefinitionRefExpression) {
-          let newExpression = new Fmt.DefinitionRefExpression;
-          newExpression.path = this.adjustPath(subExpression.path, targetPath);
-          return newExpression;
-        } else {
-          return subExpression;
-        }
-      });
+      return expression.substitute((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath, simplifyPaths));
     } else {
       return expression;
     }
   }
 
-  private adjustPath<PathItemType extends Fmt.PathItem>(path: PathItemType, targetPath: Fmt.PathItem | undefined): PathItemType {
+  substituteImmediatePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined, simplifyPath: boolean): Fmt.Expression {
+    if (targetPath && expression instanceof Fmt.DefinitionRefExpression) {
+      let newExpression = new Fmt.DefinitionRefExpression;
+      newExpression.path = GenericUtils.adjustPath(expression.path, targetPath);
+      if (simplifyPath) {
+        newExpression.path = this.libraryDataAccessor.simplifyPath(newExpression.path);
+      }
+      return newExpression;
+    } else {
+      return expression;
+    }
+  }
+
+  private static adjustPath<PathItemType extends Fmt.PathItem>(path: PathItemType, targetPath: Fmt.PathItem | undefined): PathItemType {
     let newPath = Object.create(path);
-    newPath.parentPath = path.parentPath ? this.adjustPath(path.parentPath, targetPath) : targetPath;
+    newPath.parentPath = path.parentPath ? GenericUtils.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
   }
 

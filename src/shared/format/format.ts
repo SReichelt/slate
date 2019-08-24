@@ -240,6 +240,9 @@ export class Parameter {
       result.optional = this.optional;
       result.list = this.list;
       result.dependencies = newDependencies;
+      if (this.previousParameter) {
+        result.previousParameter = this.previousParameter.findReplacement(replacedParameters);
+      }
       return result;
     } else {
       return this;
