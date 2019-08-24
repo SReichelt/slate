@@ -132,8 +132,6 @@ We show that ∃ t : S → ℕ_(<(n+1)) : t is injective:
 Choose t := i.
 3⇒5. Assume ∃ y ∈ ℕ : |S| ≤ y. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
 
-|S| ≤ y
-
 ⇒^def ∃ u : S → ℕ_(<y) : u is injective
 
 Let T := u(S).

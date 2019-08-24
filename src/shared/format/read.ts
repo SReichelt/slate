@@ -334,6 +334,7 @@ export class Reader {
     if (this.tryReadChar('=')) {
       parameter.defaultValue = this.readExpression(false, context.metaModel.functions, context);
     }
+    parameter.previousParameter = context.getPreviousParameter();
     this.markEnd(parameterStart, parameter, context, undefined, nameRange);
     return parameter;
   }

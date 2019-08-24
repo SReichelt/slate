@@ -503,6 +503,9 @@ export abstract class GenericEditHandler {
     parameterType.expression = type;
     parameterType.arrayDimensions = 0;
     parameter.type = parameterType;
+    if (context) {
+      parameter.previousParameter = context.getPreviousParameter();
+    }
     return parameter;
   }
 

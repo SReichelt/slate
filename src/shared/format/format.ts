@@ -5,6 +5,10 @@ export import BN = require('bn.js');
 export class File {
   metaModelPath: Path;
   definitions: DefinitionList = Object.create(DefinitionList.prototype);
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeFile(this));
+  }
 }
 
 export type ExpressionTraversalFn = (expression: Expression) => void;
@@ -189,6 +193,7 @@ export class Parameter {
   optional: boolean;
   list: boolean;
   dependencies?: Expression[];
+  previousParameter?: Parameter;
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;

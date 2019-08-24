@@ -72,6 +72,7 @@ export class HLMUtils extends GenericUtils {
         bindingArgParam.name = targetParam ? targetParam.name : param.name;
         let bindingArgParamType = new Fmt.Type;
         let bindingArgParamTypeExpr = new FmtHLM.MetaRefExpression_Element;
+        // TODO type._set may be "previous"
         bindingArgParamTypeExpr._set = this.substitutePath(type._set, targetPath);
         bindingArgParamType.expression = bindingArgParamTypeExpr;
         bindingArgParamType.arrayDimensions = 0;
@@ -174,7 +175,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
-    for (let paramIndex = 0; paramIndex < originalParameters.length; paramIndex++) {
+    for (let paramIndex = 0; paramIndex < originalParameters.length && paramIndex < substitutedParameters.length; paramIndex++) {
       expression = this.substituteParameter(expression, originalParameters[paramIndex], substitutedParameters[paramIndex], markAsDefinition);
     }
     return expression;
@@ -250,7 +251,7 @@ export class HLMUtils extends GenericUtils {
     });
   }
 
-  getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression {
+  getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression | undefined {
     let type = step.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
       let result = new FmtHLM.MetaRefExpression_setEquals;
@@ -268,24 +269,7 @@ export class HLMUtils extends GenericUtils {
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
       if (type.variable instanceof Fmt.VariableRefExpression) {
-        let variable = type.variable.variable;
-        let variableType = variable.type.expression;
-        if (variableType instanceof FmtHLM.MetaRefExpression_Subset) {
-          let result = new FmtHLM.MetaRefExpression_sub;
-          result.subset = type.variable;
-          result.superset = this.substituteIndices(variableType.superset, type.variable);
-          return result;
-        } else if (variableType instanceof FmtHLM.MetaRefExpression_Element) {
-          let result = new FmtHLM.MetaRefExpression_in;
-          result.element = type.variable;
-          result._set = this.substituteIndices(variableType._set, type.variable);
-          return result;
-        } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
-          return variableType.formula;
-        } else {
-          // TODO use previous result of proof step
-          return this.getProofStepResult(type.variable.variable);
-        }
+        return this.getParameterConstraint(type.variable.variable, type.variable);
       } else {
         throw new Error('Variable reference expected');
       }
@@ -296,37 +280,80 @@ export class HLMUtils extends GenericUtils {
                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
       return type.result;
-    } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
-      if (previousResult instanceof FmtHLM.MetaRefExpression_forall) {
-        return this.substituteArguments(previousResult.formula, previousResult.parameters, type.arguments);
-      } else {
-        throw new Error('Previous result is not a universally quantified expression');
-      }
     } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
       let result = new FmtHLM.MetaRefExpression_equals;
       result.left = type.input;
       result.right = type.output;
       return result;
-    } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
-      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
-        let result = new FmtHLM.MetaRefExpression_setEquals;
-        result.left = this.substitutePrevious(type.term, previousResult.left);
-        result.right = this.substitutePrevious(type.term, previousResult.right);
-        return result;
-      } else {
-        throw new Error('Previous result is not an equality expression');
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
+               || type instanceof FmtHLM.MetaRefExpression_UseForAll
+               || type instanceof FmtHLM.MetaRefExpression_SetExtend
+               || type instanceof FmtHLM.MetaRefExpression_Extend) {
+      if (!previousResult && step.previousParameter) {
+        previousResult = this.getParameterConstraint(step.previousParameter);
       }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
-      if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
-        let result = new FmtHLM.MetaRefExpression_equals;
-        result.left = this.substitutePrevious(type.term, previousResult.left);
-        result.right = this.substitutePrevious(type.term, previousResult.right);
-        return result;
+      if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
+        if (previousResult instanceof FmtHLM.MetaRefExpression_exists || previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
+          return previousResult.formula;
+        } else {
+          throw new Error('Previous result is not an existentially quantified expression');
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
+        if (previousResult instanceof FmtHLM.MetaRefExpression_forall) {
+          return this.substituteArguments(previousResult.formula, previousResult.parameters, type.arguments);
+        } else {
+          throw new Error('Previous result is not a universally quantified expression');
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
+        if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+          let result = new FmtHLM.MetaRefExpression_setEquals;
+          result.left = this.substitutePrevious(type.term, previousResult.left);
+          result.right = this.substitutePrevious(type.term, previousResult.right);
+          return result;
+        } else {
+          throw new Error('Previous result is not an equality expression');
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
+        if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+          let result = new FmtHLM.MetaRefExpression_equals;
+          result.left = this.substitutePrevious(type.term, previousResult.left);
+          result.right = this.substitutePrevious(type.term, previousResult.right);
+          return result;
+        } else {
+          throw new Error('Previous result is not an equality expression');
+        }
       } else {
-        throw new Error('Previous result is not an equality expression');
+        throw new Error('Unknown proof step');
       }
     } else {
-      throw new Error('Proof step does not have a result');
+      return undefined;
+    }
+  }
+
+  getParameterConstraint(param: Fmt.Parameter, variableRefExpression?: Fmt.VariableRefExpression): Fmt.Expression | undefined {
+    let variableType = param.type.expression;
+    if (variableType instanceof FmtHLM.MetaRefExpression_Subset) {
+      if (!variableRefExpression) {
+        variableRefExpression = new Fmt.VariableRefExpression;
+        variableRefExpression.variable = param;
+      }
+      let result = new FmtHLM.MetaRefExpression_sub;
+      result.subset = variableRefExpression;
+      result.superset = this.substituteIndices(variableType.superset, variableRefExpression);
+      return result;
+    } else if (variableType instanceof FmtHLM.MetaRefExpression_Element) {
+      if (!variableRefExpression) {
+        variableRefExpression = new Fmt.VariableRefExpression;
+        variableRefExpression.variable = param;
+      }
+      let result = new FmtHLM.MetaRefExpression_in;
+      result.element = variableRefExpression;
+      result._set = this.substituteIndices(variableType._set, variableRefExpression);
+      return result;
+    } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
+      return variableType.formula;
+    } else {
+      return this.getProofStepResult(param);
     }
   }
 }

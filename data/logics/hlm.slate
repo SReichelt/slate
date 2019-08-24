@@ -299,8 +299,9 @@ $UseCases(side?: $EquationSide, caseProofs: $Proof[]): %ParameterType {
 $UseForAll(arguments: %ArgumentList): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseExists(proof: $Proof): %ParameterType {
-  superType = $FinalProofStep
+$UseExists(parameters: %ParameterList): %ParameterType {
+  superType = $IntermediateProofStep,
+  exports = [parameters]
 }
 $Embed(construction: $Construction, input: $ElementTerm, output: $ElementTerm): %ParameterType($Formula) {
   superType = $IntermediateProofStep

@@ -4837,36 +4837,34 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
-  proof: ObjectContents_Proof;
+  parameters: Fmt.ParameterList;
 
   getName(): string {
     return 'UseExists';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    let proofRaw = argumentList.getValue('proof', 0);
-    if (proofRaw instanceof Fmt.CompoundExpression) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromCompoundExpression(proofRaw);
-      this.proof = newItem;
+    let parametersRaw = argumentList.getValue('parameters', 0);
+    if (parametersRaw instanceof Fmt.ParameterExpression) {
+      this.parameters = parametersRaw.parameters;
     } else {
-      throw new Error('proof: Compound expression expected');
+      throw new Error('parameters: Parameter expression expected');
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    let proofExpr = new Fmt.CompoundExpression;
-    this.proof.toCompoundExpression(proofExpr);
-    argumentList.add(proofExpr, undefined, false);
+    let parametersExpr = new Fmt.ParameterExpression;
+    parametersExpr.parameters.push(...this.parameters);
+    argumentList.add(parametersExpr, undefined, false);
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_UseExists;
     let changed = false;
-    if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+    if (this.parameters) {
+      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
     }
@@ -4877,8 +4875,8 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseExists)) {
       return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
+    if (this.parameters || expression.parameters) {
+      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
         return false;
       }
     }
@@ -6153,11 +6151,6 @@ export class MetaModel extends Meta.MetaModel {
           context = new ArgumentTypeContext(ObjectContents_Proof, context);
         }
       }
-      if (parent instanceof MetaRefExpression_UseExists) {
-        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 0)) {
-          context = new ArgumentTypeContext(ObjectContents_Proof, context);
-        }
-      }
       if (parent instanceof MetaRefExpression_ProveDef) {
         if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 1)) {
           context = new ArgumentTypeContext(ObjectContents_Proof, context);
@@ -6203,6 +6196,9 @@ export class MetaModel extends Meta.MetaModel {
   protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     if (expression instanceof MetaRefExpression_Binding) {
+      context = this.getParameterListContext(expression.parameters, context);
+    }
+    if (expression instanceof MetaRefExpression_UseExists) {
       context = this.getParameterListContext(expression.parameters, context);
     }
     return context;

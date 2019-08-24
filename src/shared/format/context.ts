@@ -6,6 +6,8 @@ export abstract class Context {
 
   abstract getVariables(): Fmt.Parameter[];
   abstract getVariable(name: string): Fmt.Parameter;
+
+  abstract getPreviousParameter(): Fmt.Parameter | undefined;
 }
 
 export class EmptyContext extends Context {
@@ -15,6 +17,10 @@ export class EmptyContext extends Context {
 
   getVariable(name: string): Fmt.Parameter {
     throw new Error(`Variable "${name}" not found`);
+  }
+
+  getPreviousParameter(): Fmt.Parameter | undefined {
+    return undefined;
   }
 }
 
@@ -29,6 +35,10 @@ export class DerivedContext extends Context {
 
   getVariable(name: string): Fmt.Parameter {
     return this.parentContext.getVariable(name);
+  }
+
+  getPreviousParameter(): Fmt.Parameter | undefined {
+    return this.parentContext.getPreviousParameter();
   }
 }
 
@@ -54,6 +64,10 @@ export class ParameterContext extends DerivedContext {
     }
     return this.parentContext.getVariable(name);
   }
+
+  getPreviousParameter(): Fmt.Parameter | undefined {
+    return this.parameter;
+  }
 }
 
 export class DummyContext extends Context {
@@ -65,5 +79,9 @@ export class DummyContext extends Context {
     let param = new Fmt.Parameter;
     param.name = name;
     return param;
+  }
+
+  getPreviousParameter(): Fmt.Parameter | undefined {
+    return undefined;
   }
 }

@@ -37,7 +37,7 @@ export class Writer {
       this.write('%');
       this.writeNewLine();
       if (file.definitions.length) {
-        this.writeNewLine();
+        this.writeNewLine(true);
         this.writeDefinitions(file.definitions, indent);
       }
     });
@@ -96,7 +96,7 @@ export class Writer {
       if (first) {
         first = false;
       } else {
-        this.writeNewLine();
+        this.writeNewLine(true);
       }
       this.writeIndent(indent);
       this.writeDefinition(definition, indent);
@@ -104,7 +104,7 @@ export class Writer {
   }
 
   writeDefinition(definition: Fmt.Definition, indent?: IndentInfo): void {
-    if (definition.documentation) {
+    if (definition.documentation && this.newLineStr) {
       this.writeDocumentationComment(definition.documentation, indent);
     }
     this.writeRange(definition, false, false, false, false, () => {
@@ -128,7 +128,7 @@ export class Writer {
         this.writeDefinitions(definition.innerDefinitions, innerIndent);
         if (args && args.length) {
           if (definition.innerDefinitions.length) {
-            this.writeNewLine();
+            this.writeNewLine(true);
           }
           this.writeArguments(args, innerIndent, true, true);
         }
@@ -386,6 +386,9 @@ export class Writer {
   }
 
   writeString(str: string, quoteChar: string, breakLines: boolean): void {
+    if (!this.newLineStr) {
+      breakLines = false;
+    }
     let indentLength = this.lineLength;
     let result = quoteChar;
     let insertLineBreak = false;
@@ -524,10 +527,12 @@ export class Writer {
     this.lineLength += str.length;
   }
 
-  private writeNewLine(): void {
+  private writeNewLine(writeSpaceIfSingleLine: boolean = false): void {
     if (this.newLineStr) {
       this.stream.write(this.newLineStr);
       this.lineLength = 0;
+    } else if (writeSpaceIfSingleLine) {
+      this.write(' ');
     }
   }
 
