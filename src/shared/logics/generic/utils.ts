@@ -86,4 +86,14 @@ export class GenericUtils {
     newPath.parentPath = path.parentPath ? this.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
   }
+
+  areExpressionsEqual(left: Fmt.Expression, right: Fmt.Expression): boolean {
+    let unificationFn = (leftSubExpression: Fmt.Expression, rightSubExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
+      if (leftSubExpression instanceof Fmt.DefinitionRefExpression && rightSubExpression instanceof Fmt.DefinitionRefExpression) {
+        return this.libraryDataAccessor.arePathsEqual(leftSubExpression.path, rightSubExpression.path, unificationFn, replacedParameters);
+      }
+      return false;
+    };
+    return Fmt.Expression.areExpressionsEquivalent(left, right, unificationFn);
+  }
 }

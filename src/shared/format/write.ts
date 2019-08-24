@@ -28,26 +28,22 @@ interface IndentInfo {
 export class Writer {
   private lineLength = 0;
 
-  constructor(private stream: OutputStream) {}
+  constructor(private stream: OutputStream, private newLineStr: string = '\n', private indentStr: string = '  ') {}
 
-  writeFile(file: Fmt.File): void {
+  writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
     this.writeRange(file, false, false, false, false, () => {
-      let indentInfo: IndentInfo = {
-        indent: '',
-        outerIndent: ''
-      };
       this.write('%');
-      this.writePath(file.metaModelPath, indentInfo);
+      this.writePath(file.metaModelPath, indent);
       this.write('%');
       this.writeNewLine();
       if (file.definitions.length) {
         this.writeNewLine();
-        this.writeDefinitions(file.definitions, indentInfo);
+        this.writeDefinitions(file.definitions, indent);
       }
     });
   }
 
-  writePath(path: Fmt.Path, indent: IndentInfo): void {
+  writePath(path: Fmt.Path, indent?: IndentInfo): void {
     let argumentListIndent = indent;
     let lastArgumentListIndent = indent;
     if (path.parentPath instanceof Fmt.Path) {
@@ -57,7 +53,7 @@ export class Writer {
     this.writeFullPath(path, argumentListIndent, lastArgumentListIndent);
   }
 
-  private writeFullPath(path: Fmt.Path, argumentListIndent: IndentInfo, lastArgumentListIndent: IndentInfo): void {
+  private writeFullPath(path: Fmt.Path, argumentListIndent?: IndentInfo, lastArgumentListIndent?: IndentInfo): void {
     this.writeRange(path, false, false, false, false, () => {
       if (path.parentPath instanceof Fmt.Path) {
         this.writeFullPath(path.parentPath, argumentListIndent, argumentListIndent);
@@ -94,7 +90,7 @@ export class Writer {
     });
   }
 
-  writeDefinitions(definitions: Fmt.Definition[], indent: IndentInfo): void {
+  writeDefinitions(definitions: Fmt.Definition[], indent?: IndentInfo): void {
     let first = true;
     for (let definition of definitions) {
       if (first) {
@@ -107,7 +103,7 @@ export class Writer {
     }
   }
 
-  writeDefinition(definition: Fmt.Definition, indent: IndentInfo): void {
+  writeDefinition(definition: Fmt.Definition, indent?: IndentInfo): void {
     if (definition.documentation) {
       this.writeDocumentationComment(definition.documentation, indent);
     }
@@ -143,7 +139,7 @@ export class Writer {
     this.writeNewLine();
   }
 
-  writeParameterList(parameters: Fmt.ParameterList, indent: IndentInfo, multiLine: boolean): void {
+  writeParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
     this.writeRange(parameters, false, false, false, false, () => {
       this.write('(');
       this.writeParameters(parameters, indent, multiLine);
@@ -151,16 +147,16 @@ export class Writer {
     });
   }
 
-  writeOptionalParameterList(parameters: Fmt.ParameterList, indent: IndentInfo, multiLine: boolean): void {
+  writeOptionalParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
     if (parameters.length) {
       this.writeParameterList(parameters, indent, multiLine);
     }
   }
 
-  writeParameters(parameters: Fmt.ParameterList, indent: IndentInfo, multiLine: boolean): void {
+  writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
     let paramIndent = indent;
     let lastParamIndent = indent;
-    if (parameters.length <= 1) {
+    if (parameters.length <= 1 || !this.newLineStr) {
       multiLine = false;
     } else {
       paramIndent = this.indent(paramIndent);
@@ -183,11 +179,13 @@ export class Writer {
     }
     if (multiLine) {
       this.writeNewLine();
-      this.write(indent.outerIndent);
+      if (indent) {
+        this.write(indent.outerIndent);
+      }
     }
   }
 
-  writeParameter(parameter: Fmt.Parameter, indent: IndentInfo): void {
+  writeParameter(parameter: Fmt.Parameter, indent?: IndentInfo): void {
     this.writeRange(parameter, false, false, false, false, () => {
       this.writeIdentifier(parameter.name, parameter, false);
       if (parameter.dependencies) {
@@ -209,7 +207,7 @@ export class Writer {
     });
   }
 
-  writeArgumentList(args: Fmt.ArgumentList, indent: IndentInfo, multiLine: boolean): void {
+  writeArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo, multiLine: boolean = false): void {
     this.writeRange(args, false, false, false, false, () => {
       this.write('(');
       this.writeArguments(args, indent, false, multiLine);
@@ -217,17 +215,20 @@ export class Writer {
     });
   }
 
-  writeOptionalArgumentList(args: Fmt.ArgumentList, indent: IndentInfo, multiLine: boolean): void {
+  writeOptionalArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo, multiLine: boolean = false): void {
     if (args.length) {
       this.writeArgumentList(args, indent, multiLine);
     }
   }
 
-  writeArguments(args: Fmt.ArgumentList, indent: IndentInfo, blockMode: boolean, multiLine: boolean): void {
+  writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false, multiLine: boolean = false): void {
     let argIndent = indent;
     let lastArgIndent = indent;
+    if (!this.newLineStr) {
+      blockMode = false;
+    }
     if (!blockMode) {
-      if (args.length <= 1) {
+      if (args.length <= 1 || !this.newLineStr) {
         multiLine = false;
       } else {
         argIndent = this.indent(argIndent);
@@ -253,13 +254,13 @@ export class Writer {
     }
     if (multiLine) {
       this.writeNewLine();
-      if (!blockMode) {
+      if (indent && !blockMode) {
         this.write(indent.outerIndent);
       }
     }
   }
 
-  writeArgument(arg: Fmt.Argument, indent: IndentInfo): void {
+  writeArgument(arg: Fmt.Argument, indent?: IndentInfo): void {
     this.writeRange(arg, false, false, false, false, () => {
       if (arg.name) {
         this.writeIdentifier(arg.name, arg, true);
@@ -269,7 +270,7 @@ export class Writer {
     });
   }
 
-  writeType(type: Fmt.Type, indent: IndentInfo): void {
+  writeType(type: Fmt.Type, indent?: IndentInfo): void {
     this.write(': ');
     this.writeRange(type, false, false, false, false, () => {
       this.writeExpression(type.expression, indent);
@@ -283,10 +284,10 @@ export class Writer {
     });
   }
 
-  writeExpressions(expressions: Fmt.Expression[], indent: IndentInfo, multiLine: boolean, squeeze: boolean): void {
+  writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, multiLine: boolean = false, squeeze: boolean = false): void {
     let expressionIndent = indent;
     let lastExpressionIndent = indent;
-    if (expressions.length <= 1) {
+    if (expressions.length <= 1 || !this.newLineStr) {
       multiLine = false;
     } else {
       expressionIndent = this.indent(expressionIndent);
@@ -309,11 +310,13 @@ export class Writer {
     }
     if (multiLine) {
       this.writeNewLine();
-      this.write(indent.outerIndent);
+      if (indent) {
+        this.write(indent.outerIndent);
+      }
     }
   }
 
-  writeExpressionList(expressions: Fmt.Expression[], indent: IndentInfo, squeeze: boolean): void {
+  writeExpressionList(expressions: Fmt.Expression[], indent?: IndentInfo, squeeze: boolean = false): void {
     let hasLargeItem = false;
     for (let item of expressions) {
       if (this.isLargeExpression(item)) {
@@ -326,13 +329,13 @@ export class Writer {
     this.write(']');
   }
 
-  writeOptionalExpressionList(expressions: Fmt.Expression[] | undefined, indent: IndentInfo, squeeze: boolean): void {
+  writeOptionalExpressionList(expressions: Fmt.Expression[] | undefined, indent?: IndentInfo, squeeze: boolean = false): void {
     if (expressions && expressions.length) {
       this.writeExpressionList(expressions, indent, squeeze);
     }
   }
 
-  writeExpression(expression: Fmt.Expression, indent: IndentInfo): void {
+  writeExpression(expression: Fmt.Expression, indent?: IndentInfo): void {
     this.writeRange(expression, false, false, false, false, () => {
       if (expression instanceof Fmt.IntegerExpression) {
         this.writeInteger(expression.value);
@@ -442,7 +445,7 @@ export class Writer {
     });
   }
 
-  writeDocumentationComment(documentationComment: Fmt.DocumentationComment, indent: IndentInfo): void {
+  writeDocumentationComment(documentationComment: Fmt.DocumentationComment, indent?: IndentInfo): void {
     this.writeRange(documentationComment, false, false, false, false, () => {
       this.write('/**');
       let first = true;
@@ -522,20 +525,28 @@ export class Writer {
   }
 
   private writeNewLine(): void {
-    this.stream.write('\n');
-    this.lineLength = 0;
+    if (this.newLineStr) {
+      this.stream.write(this.newLineStr);
+      this.lineLength = 0;
+    }
   }
 
-  private writeIndent(indent: IndentInfo): void {
-    this.write(indent.indent);
+  private writeIndent(indent: IndentInfo | undefined): void {
+    if (indent) {
+      this.write(indent.indent);
+    }
   }
 
-  private indent(indent: IndentInfo, keepOuterIndent: boolean = false): IndentInfo {
-    let newIndent = indent.indent + '  ';
-    return {
-      indent: newIndent,
-      outerIndent: keepOuterIndent ? indent.outerIndent : newIndent
-    };
+  private indent(indent: IndentInfo | undefined, keepOuterIndent: boolean = false): IndentInfo | undefined {
+    if (indent) {
+      let newIndent = indent.indent + this.indentStr;
+      return {
+        indent: newIndent,
+        outerIndent: keepOuterIndent ? indent.outerIndent : newIndent
+      };
+    } else {
+      return undefined;
+    }
   }
 
   private writeRange(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean, fn: () => void): void {

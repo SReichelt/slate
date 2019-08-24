@@ -219,6 +219,13 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
+  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], indexVariables?: Fmt.Parameter[]): Fmt.Expression {
+    for (let index = 0; index < parameterLists.length; index++) {
+      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], indexVariables);
+    }
+    return expression;
+  }
+
   substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
     if (variable.indices) {
       for (let index of variable.indices) {

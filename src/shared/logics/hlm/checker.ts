@@ -13,6 +13,7 @@ export class HLMChecker implements Logic.LogicChecker {
 }
 
 interface HLMCheckerContext {
+  targetPath?: Fmt.PathItem;
   previousSetTerm?: Fmt.Expression;
 }
 
@@ -22,38 +23,42 @@ class HLMDefinitionChecker {
   private result: Logic.LogicCheckResult = {diagnostics: []};
   private promise = CachedPromise.resolve();
 
-  constructor(private definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor) {
+  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor) {
     this.utils = new HLMUtils(definition, libraryDataAccessor);
   }
 
   checkDefinition(): CachedPromise<Logic.LogicCheckResult> {
-    let contents = this.definition.contents;
-    if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
-      this.checkMacroOperator(contents);
-    } else {
-      this.checkParameterList(this.definition.parameters, this.rootContext);
-      if (contents instanceof FmtHLM.ObjectContents_Construction) {
-        this.checkConstruction(contents);
+    try {
+      let contents = this.definition.contents;
+      if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
+        this.checkMacroOperator(contents);
       } else {
-        for (let innerDefinition of this.definition.innerDefinitions) {
-          this.error(innerDefinition, 'This type of object does not support inner definitions.');
-        }
-        if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
-          this.checkSetOperator(contents);
-        } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-          this.checkExplicitOperator(contents);
-        } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-          this.checkImplicitOperator(contents);
-        } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
-          this.checkPredicate(contents);
-        } else if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-          this.checkStandardTheorem(contents);
-        } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-          this.checkEquivalenceTheorem(contents);
+        this.checkParameterList(this.definition.parameters, this.rootContext);
+        if (contents instanceof FmtHLM.ObjectContents_Construction) {
+          this.checkConstruction(contents);
         } else {
-          this.error(this.definition.type, 'Invalid object type');
+          for (let innerDefinition of this.definition.innerDefinitions) {
+            this.error(innerDefinition, 'This type of object does not support inner definitions.');
+          }
+          if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
+            this.checkSetOperator(contents);
+          } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+            this.checkExplicitOperator(contents);
+          } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
+            this.checkImplicitOperator(contents);
+          } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
+            this.checkPredicate(contents);
+          } else if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
+            this.checkStandardTheorem(contents);
+          } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+            this.checkEquivalenceTheorem(contents);
+          } else {
+            this.error(this.definition.type, 'Invalid object type');
+          }
         }
       }
+    } catch (error) {
+      this.result.diagnostics.push({object: this.definition, message: error.message, severity: Logic.DiagnosticSeverity.Error});
     }
     return this.promise.then(() => this.result);
   }
@@ -131,7 +136,7 @@ class HLMDefinitionChecker {
   }
 
   private checkEmbedding(embedding: FmtHLM.ObjectContents_Embedding): void {
-    this.checkParameter(embedding.parameter, this.rootContext);
+    this.checkElementParameter(embedding.parameter, this.rootContext);
     if (embedding.target instanceof Fmt.DefinitionRefExpression && embedding.target.path.parentPath instanceof Fmt.Path) {
       if (embedding.target.path.parentPath.parentPath || embedding.target.path.parentPath.name !== this.definition.name) {
         this.error(embedding.target, 'Embedding must refer to constructor of parent construction');
@@ -155,7 +160,7 @@ class HLMDefinitionChecker {
   }
 
   private checkImplicitOperator(contents: FmtHLM.ObjectContents_ImplicitOperator): void {
-    this.checkParameter(contents.parameter, this.rootContext);
+    this.checkElementParameter(contents.parameter, this.rootContext);
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
     this.checkEquivalenceList(contents.definition, contents.equivalenceProofs, checkItem, this.rootContext);
     this.checkProof(contents.wellDefinednessProof, this.rootContext);
@@ -184,18 +189,7 @@ class HLMDefinitionChecker {
     let currentContext = context;
     for (let param of parameterList) {
       this.checkParameter(param, currentContext);
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        if (!(type.superset instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {previousSetTerm: type.superset, ...context};
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {previousSetTerm: type._set, ...context};
-        }
-      } else {
-        currentContext = context;
-      }
+      currentContext = this.getNextParameterContext(param.type.expression, context, currentContext);
     }
   }
 
@@ -239,23 +233,68 @@ class HLMDefinitionChecker {
       this.checkElementTerm(type.element, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       this.checkSetTerm(type._set, context);
-      let innerContext = context;
-      if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-        innerContext = {previousSetTerm: type._set, ...context};
-      }
+      let innerContext = this.getBindingParameterContext(type, context);
       this.checkParameterList(type.parameters, innerContext);
     } else {
       this.error(type, 'Invalid parameter type');
     }
   }
 
-  private checkArgumentList(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, context: HLMCheckerContext): void {
-    for (let param of parameterList) {
-      this.checkArgument(argumentList, param, context);
+  private checkElementParameter(param: Fmt.Parameter, context: HLMCheckerContext): Fmt.Expression | undefined {
+    let type = param.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      this.checkParameter(param, context);
+      return type._set;
+    } else {
+      this.error(type, 'Element parameter expected');
+      return undefined;
     }
   }
 
-  private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext): void {
+  private getNextParameterContext(type: Fmt.Expression, context: HLMCheckerContext, currentContext: HLMCheckerContext): HLMCheckerContext {
+    if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      if (type.superset instanceof FmtHLM.MetaRefExpression_previous) {
+        return currentContext;
+      } else {
+        return {previousSetTerm: type.superset, ...context};
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      if (type._set instanceof FmtHLM.MetaRefExpression_previous) {
+        return currentContext;
+      } else {
+        return {previousSetTerm: type._set, ...context};
+      }
+    } else {
+      return context;
+    }
+  }
+
+  private getBindingParameterContext(type: FmtHLM.MetaRefExpression_Binding, context: HLMCheckerContext): HLMCheckerContext {
+    if (type._set instanceof FmtHLM.MetaRefExpression_previous) {
+      return context;
+    } else {
+      return {previousSetTerm: type._set, ...context};
+    }
+  }
+
+  private checkArgumentLists(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
+    for (let listIndex = 0; listIndex < argumentLists.length; listIndex++) {
+      let currentArgumentLists = argumentLists.slice(0, listIndex + 1);
+      let currentParameterLists = parameterLists.slice(0, listIndex + 1);
+      this.checkLastArgumentList(currentArgumentLists, currentParameterLists, context, parameterContext);
+    }
+  }
+
+  private checkLastArgumentList(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
+    let currentParameterContext = parameterContext;
+    for (let param of parameterLists[parameterLists.length - 1]) {
+      this.checkArgument(argumentLists, parameterLists, param, context, currentParameterContext);
+      currentParameterContext = this.getNextParameterContext(param.type.expression, parameterContext, currentParameterContext);
+    }
+  }
+
+  private checkArgument(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], param: Fmt.Parameter, context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
+    let argumentList = argumentLists[argumentLists.length - 1];
     let type = param.type.expression;
     try {
       if (type instanceof FmtHLM.MetaRefExpression_Prop) {
@@ -294,9 +333,21 @@ class HLMDefinitionChecker {
       } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_BindingArg);
         if (bindingArg) {
-          // TODO check whether parameter is declared correctly
-          this.checkParameter(bindingArg.parameter, context);
-          this.checkArgumentList(bindingArg.arguments, type.parameters, context);
+          let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
+          if (bindingParameterSet) {
+            // TODO substitute indices in case of nested bindings
+            let expectedSet = type._set;
+            if (parameterContext.previousSetTerm) {
+              expectedSet = this.utils.substitutePrevious(expectedSet, parameterContext.previousSetTerm);
+            }
+            expectedSet = this.utils.substitutePath(expectedSet, parameterContext.targetPath);
+            expectedSet = this.utils.substituteAllArguments(expectedSet, parameterLists, argumentLists);
+            if (!this.utils.areExpressionsEqual(bindingParameterSet, expectedSet)) {
+              this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
+            }
+          }
+          let innerParameterContext = this.getBindingParameterContext(type, parameterContext);
+          this.checkLastArgumentList(argumentLists.concat(bindingArg.arguments), parameterLists.concat(type.parameters), context, innerParameterContext);
         } else {
           this.error(argumentList, `Missing argument for parameter ${param.name}`);
         }
@@ -327,7 +378,7 @@ class HLMDefinitionChecker {
         }
       }
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
-      this.checkParameter(term.parameter, context);
+      this.checkElementParameter(term.parameter, context);
       this.checkFormula(term.formula, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
       this.checkParameterList(term.parameters, context);
@@ -434,30 +485,28 @@ class HLMDefinitionChecker {
   }
 
   private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], argumentsExpected: boolean[], context: HLMCheckerContext): void {
+    let parameterLists: Fmt.ParameterList[] = [];
     let argumentLists: Fmt.ArgumentList[] = [];
-    let path: Fmt.Path | undefined = expression.path;
-    for (let _ of definitions) {
-      if (path) {
-        argumentLists.unshift(path.arguments);
-        if (path.parentPath instanceof Fmt.Path) {
-          path = path.parentPath;
-        } else {
-          path = undefined;
+    let path: Fmt.PathItem | undefined = expression.path;
+    for (let index = definitions.length - 1; index >= 0; index--) {
+      if (path instanceof Fmt.Path) {
+        if (argumentsExpected[index]) {
+          parameterLists.unshift(definitions[index].parameters);
+          argumentLists.unshift(path.arguments);
+        } else if (path.arguments.length) {
+          this.error(path.arguments, 'Unexpected argument list');
         }
+        path = path.parentPath;
       } else {
         this.error(expression, 'Reference to inner definition expected');
+        return;
       }
     }
-    if (path && path.parentPath instanceof Fmt.Path) {
+    if (path instanceof Fmt.Path) {
       this.error(expression, 'Unexpected reference to inner definition');
     } else {
-      for (let index = 0; index < definitions.length; index++) {
-        if (argumentsExpected[index]) {
-          this.checkArgumentList(argumentLists[index], definitions[index].parameters, context);
-        } else if (argumentLists[index].length) {
-          this.error(argumentLists[index], 'Unexpected argument list');
-        }
-      }
+      let parameterContext: HLMCheckerContext = {targetPath: path};
+      this.checkArgumentLists(argumentLists, parameterLists, context, parameterContext);
     }
   }
 

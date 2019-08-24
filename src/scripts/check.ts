@@ -6,7 +6,7 @@ import * as FmtLibrary from '../shared/logics/library';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import { PhysicalFileAccessor } from '../fs/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDataAccessor } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider } from '../shared/data/libraryDataProvider';
 import CachedPromise from '../shared/data/cachedPromise';
 
 let fileAccessor = new PhysicalFileAccessor;

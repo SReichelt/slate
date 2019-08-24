@@ -1,3 +1,5 @@
+import * as FmtWriter from './write';
+
 export import BN = require('bn.js');
 
 export class File {
@@ -133,6 +135,10 @@ export class Path extends NamedPathItem {
   protected matches(pathItem: PathItem, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
     return pathItem instanceof Path && this.name === pathItem.name && this.arguments.isEquivalentTo(pathItem.arguments, fn, replacedParameters);
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writePath(this));
+  }
 }
 
 export class Definition {
@@ -158,6 +164,10 @@ export class Definition {
       result.documentation = this.documentation.clone(replacedParameters);
     }
     return result;
+  }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeDefinition(this));
   }
 }
 
@@ -248,6 +258,10 @@ export class Parameter {
     }
     return false;
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeParameter(this));
+  }
 }
 
 export class ParameterList extends Array<Parameter> {
@@ -304,6 +318,10 @@ export class ParameterList extends Array<Parameter> {
     }
     return true;
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeParameters(this));
+  }
 }
 
 export class Argument {
@@ -334,6 +352,10 @@ export class Argument {
     }
     return this.name === arg.name
            && this.value.isEquivalentTo(arg.value, fn, replacedParameters);
+  }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeArgument(this));
   }
 }
 
@@ -442,6 +464,10 @@ export class ArgumentList extends Array<Argument> {
     }
     return true;
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(this));
+  }
 }
 
 export class Type {
@@ -471,6 +497,10 @@ export class Type {
     return this.arrayDimensions === type.arrayDimensions
            && this.expression.isEquivalentTo(type.expression, fn, replacedParameters);
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeType(this));
+  }
 }
 
 export abstract class ObjectContents {
@@ -486,6 +516,12 @@ export abstract class ObjectContents {
   }
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
+
+  toString(): string {
+    let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
+    this.toArgumentList(argumentList);
+    return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
+  }
 }
 
 export class GenericObjectContents extends ObjectContents {
@@ -578,6 +614,10 @@ export abstract class Expression {
       return true;
     }
     return false;
+  }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeExpression(this));
   }
 }
 
@@ -782,6 +822,10 @@ export class DocumentationComment {
     }
     return result;
   }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeDocumentationComment(this));
+  }
 }
 
 export class DocumentationItem {
@@ -835,4 +879,11 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
   allowArbitraryReferences(): boolean {
     return true;
   }
+}
+
+function writeToString(doWrite: (writer: FmtWriter.Writer) => void): string {
+  let stream = new FmtWriter.StringOutputStream;
+  let writer = new FmtWriter.Writer(stream, '', '');
+  doWrite(writer);
+  return stream.str;
 }

@@ -129,6 +129,22 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
+  arePathsEqual(left: Fmt.Path, right: Fmt.Path, unificationFn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (left.name !== right.name) {
+      return false;
+    }
+    if (left.parentPath instanceof Fmt.Path || right.parentPath instanceof Fmt.Path) {
+      if (!(left.parentPath instanceof Fmt.Path && right.parentPath instanceof Fmt.Path && this.arePathsEqual(left.parentPath, right.parentPath, unificationFn))) {
+        return false;
+      }
+    } else {
+      if (this.getProviderForSection(left.parentPath) !== this.getProviderForSection(right.parentPath)) {
+        return false;
+      }
+    }
+    return left.arguments.isEquivalentTo(right.arguments, unificationFn, replacedParameters);
+  }
+
   private fetchDefinition(name: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
     let result = this.definitionCache.get(name);
     if (!result) {
