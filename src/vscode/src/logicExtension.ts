@@ -21,7 +21,7 @@ const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file'
 
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
-    file: Fmt.File;
+    file?: Fmt.File;
 }
 
 export class HoverEvent {
@@ -53,6 +53,19 @@ class LibraryDocumentProvider {
     constructor(private fileAccessor: WorkspaceFileAccessor) {}
 
     parseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
+        let libraryDocument = this.tryParseDocument(event);
+        if (libraryDocument) {
+            this.documents.set(event.document, libraryDocument);
+        } else {
+            this.documents.delete(event.document);
+        }
+        return libraryDocument;
+    }
+
+    private tryParseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
+        if (!event.file) {
+            return undefined;
+        }
         let isSection = (event.file.metaModelPath.name === 'library');
         let rangeList: RangeInfo[] = [];
         let rangeMap = new Map<Object, RangeInfo>();
@@ -74,9 +87,14 @@ class LibraryDocumentProvider {
         }
         let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
         if (!isSection) {
-            event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
+            try {
+                event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
+            } catch (error) {
+                library.diagnosticCollection.set(event.document.uri, []);
+                return undefined;
+            }
         }
-        let libraryDocument: LibraryDocument = {
+        return {
             document: event.document,
             library: library,
             documentLibraryDataProvider: documentLibraryDataProvider,
@@ -85,8 +103,6 @@ class LibraryDocumentProvider {
             rangeList: rangeList,
             rangeMap: rangeMap
         };
-        this.documents.set(event.document, libraryDocument);
-        return libraryDocument;
     }
 
     private getLibrary(event: ParseDocumentEvent, isSection: boolean): Library | undefined {
@@ -134,6 +150,9 @@ class LibraryDocumentProvider {
     }
 
     private getLogicName(event: ParseDocumentEvent, isSection: boolean): string | undefined {
+        if (!event.file) {
+            return undefined;
+        }
         if (isSection) {
             if (event.file.definitions.length) {
                 let contents = event.file.definitions[0].contents;
@@ -163,10 +182,8 @@ class SlateDiagnosticsProvider {
             let definition = libraryDocument.file.definitions[0];
             let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
             checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
-                let diagnostics: vscode.Diagnostic[] = [];
-                for (let diagnostic of checkResult.diagnostics) {
-                    diagnostics.push(new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
-                }
+                let diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
+                    new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
             });
         }
