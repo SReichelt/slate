@@ -281,19 +281,19 @@ class HLMDefinitionChecker {
     for (let listIndex = 0; listIndex < argumentLists.length; listIndex++) {
       let currentArgumentLists = argumentLists.slice(0, listIndex + 1);
       let currentParameterLists = parameterLists.slice(0, listIndex + 1);
-      this.checkLastArgumentList(currentArgumentLists, currentParameterLists, context, parameterContext);
+      this.checkLastArgumentList(currentArgumentLists, currentParameterLists, [], [], context, parameterContext);
     }
   }
 
-  private checkLastArgumentList(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
+  private checkLastArgumentList(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], originalBindingParameters: Fmt.Parameter[], substitutedBindingParameters: Fmt.Parameter[], context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
     let currentParameterContext = parameterContext;
     for (let param of parameterLists[parameterLists.length - 1]) {
-      this.checkArgument(argumentLists, parameterLists, param, context, currentParameterContext);
+      this.checkArgument(argumentLists, parameterLists, param, originalBindingParameters, substitutedBindingParameters, context, currentParameterContext);
       currentParameterContext = this.getNextParameterContext(param.type.expression, parameterContext, currentParameterContext);
     }
   }
 
-  private checkArgument(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], param: Fmt.Parameter, context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
+  private checkArgument(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], param: Fmt.Parameter, originalBindingParameters: Fmt.Parameter[], substitutedBindingParameters: Fmt.Parameter[], context: HLMCheckerContext, parameterContext: HLMCheckerContext): void {
     let argumentList = argumentLists[argumentLists.length - 1];
     let type = param.type.expression;
     try {
@@ -335,19 +335,23 @@ class HLMDefinitionChecker {
         if (bindingArg) {
           let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
           if (bindingParameterSet) {
-            // TODO substitute indices in case of nested bindings
             let expectedSet = type._set;
             if (parameterContext.previousSetTerm) {
               expectedSet = this.utils.substitutePrevious(expectedSet, parameterContext.previousSetTerm);
             }
             expectedSet = this.utils.substitutePath(expectedSet, parameterContext.targetPath);
             expectedSet = this.utils.substituteAllArguments(expectedSet, parameterLists, argumentLists);
+            expectedSet = this.utils.substituteParameters(expectedSet, originalBindingParameters, substitutedBindingParameters);
             if (!this.utils.areExpressionsEqual(bindingParameterSet, expectedSet)) {
               this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
             }
           }
+          let innerArgumentLists = argumentLists.concat(bindingArg.arguments);
+          let innerParameterLists = parameterLists.concat(type.parameters);
+          let innerOriginalBindingParameters = originalBindingParameters.concat(param);
+          let innerSubstitutedBindingParameters = substitutedBindingParameters.concat(bindingArg.parameter);
           let innerParameterContext = this.getBindingParameterContext(type, parameterContext);
-          this.checkLastArgumentList(argumentLists.concat(bindingArg.arguments), parameterLists.concat(type.parameters), context, innerParameterContext);
+          this.checkLastArgumentList(innerArgumentLists, innerParameterLists, innerOriginalBindingParameters, innerSubstitutedBindingParameters, context, innerParameterContext);
         } else {
           this.error(argumentList, `Missing argument for parameter ${param.name}`);
         }

@@ -173,21 +173,24 @@ export class HLMUtils extends GenericUtils {
     return resultRef;
   }
 
-  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.ParameterList, substitutedParameters: Fmt.ParameterList, markAsDefinition: boolean = false): Fmt.Expression {
+  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
     for (let paramIndex = 0; paramIndex < originalParameters.length; paramIndex++) {
-      let originalParam = originalParameters[paramIndex];
-      let substitutedParam = substitutedParameters[paramIndex];
-      expression = this.substituteVariable(expression, originalParam, (indices?: Fmt.Expression[]) => {
-        let substitutedExpression = markAsDefinition ? new DefinitionVariableRefExpression : new Fmt.VariableRefExpression;
-        substitutedExpression.variable = substitutedParam;
-        substitutedExpression.indices = indices;
-        return substitutedExpression;
-      });
-      let originalType = originalParam.type.expression;
-      if (originalType instanceof FmtHLM.MetaRefExpression_Binding) {
-        let substitutedType = substitutedParam.type.expression as FmtHLM.MetaRefExpression_Binding;
-        expression = this.substituteParameters(expression, originalType.parameters, substitutedType.parameters, markAsDefinition);
-      }
+      expression = this.substituteParameter(expression, originalParameters[paramIndex], substitutedParameters[paramIndex], markAsDefinition);
+    }
+    return expression;
+  }
+
+  substituteParameter(expression: Fmt.Expression, originalParam: Fmt.Parameter, substitutedParam: Fmt.Parameter, markAsDefinition: boolean = false): Fmt.Expression {
+    expression = this.substituteVariable(expression, originalParam, (indices?: Fmt.Expression[]) => {
+      let substitutedExpression = markAsDefinition ? new DefinitionVariableRefExpression : new Fmt.VariableRefExpression;
+      substitutedExpression.variable = substitutedParam;
+      substitutedExpression.indices = indices;
+      return substitutedExpression;
+    });
+    let originalType = originalParam.type.expression;
+    let substitutedType = substitutedParam.type.expression;
+    if (originalType instanceof FmtHLM.MetaRefExpression_Binding && substitutedType instanceof FmtHLM.MetaRefExpression_Binding) {
+      expression = this.substituteParameters(expression, originalType.parameters, substitutedType.parameters, markAsDefinition);
     }
     return expression;
   }
