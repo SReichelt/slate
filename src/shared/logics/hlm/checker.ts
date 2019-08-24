@@ -480,11 +480,21 @@ class HLMDefinitionChecker {
   }
 
   private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
-    // TODO check whether number of indices is correct
+    let indexCount = 0;
     if (expression.indices) {
+      indexCount = expression.indices.length;
       for (let index of expression.indices) {
         this.checkElementTerm(index, context);
       }
+    }
+    let expectedIndexCount = 0;
+    if (!(expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
+      for (let bindingParameter = this.utils.getParentBinding(expression.variable); bindingParameter; bindingParameter = this.utils.getParentBinding(bindingParameter)) {
+        expectedIndexCount++;
+      }
+    }
+    if (indexCount !== expectedIndexCount) {
+      this.error(expression, `Expected ${expectedIndexCount} indices instead of ${indexCount}`);
     }
   }
 

@@ -232,10 +232,14 @@ export class HLMUtils extends GenericUtils {
 
   substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
     if (variable.indices) {
-      for (let index of variable.indices) {
-        // TODO
-        //let bindingVariable = (the parent binding of variable.variable that belongs to index);
-        //expression = this.substituteVariable(expression, bindingVariable, () => index);
+      let bindingParameter: Fmt.Parameter | undefined = variable.variable;
+      for (let indexIndex = variable.indices.length - 1; indexIndex >= 0; indexIndex--) {
+        bindingParameter = this.getParentBinding(bindingParameter);
+        if (!bindingParameter) {
+          throw new Error('Too many indices');
+        }
+        let index = variable.indices[indexIndex];
+        expression = this.substituteVariable(expression, bindingParameter, () => index);
       }
     }
     return expression;
@@ -249,6 +253,18 @@ export class HLMUtils extends GenericUtils {
         return subExpression;
       }
     });
+  }
+
+  getParentBinding(param: Fmt.Parameter): Fmt.Parameter | undefined {
+    for (let previousParam = param.previousParameter; previousParam; previousParam = previousParam.previousParameter) {
+      let type = previousParam.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+        if (type.parameters.indexOf(param) >= 0) {
+          return previousParam;
+        }
+      }
+    }
+    return undefined;
   }
 
   getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression | undefined {
