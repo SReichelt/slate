@@ -23,7 +23,7 @@ function tidy(fileName: string): void {
 
 if (process.argv.length < 3) {
   console.error('usage: src/scripts/tidy.sh <file1> [<file2>...]');
-  process.exit(1);
+  process.exit(2);
 }
 
 for (let fileName of process.argv.slice(2)) {

@@ -1215,7 +1215,7 @@ function generate(inFileName: string, outFileName: string, ReferencedMetaModels:
 
 if (process.argv.length < 4) {
   console.error('usage: src/scripts/generateMetaDeclarations.sh <infile> <outfile> [<refinfile> <refoutfile> [...]]');
-  process.exit(1);
+  process.exit(2);
 }
 
 let refs: ReferencedMetaModel[] = [];

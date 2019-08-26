@@ -582,6 +582,7 @@ class HLMDefinitionChecker {
     }
     for (let structuralCase of cases) {
       checkCase(structuralCase.value);
+      this.checkProof(structuralCase.wellDefinednessProof, context);
     }
   }
 

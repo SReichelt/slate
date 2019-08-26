@@ -11,7 +11,7 @@ import CachedPromise from '../shared/data/cachedPromise';
 
 let fileAccessor = new PhysicalFileAccessor;
 
-function checkLibrary(fileName: string): CachedPromise<void> {
+function checkLibrary(fileName: string): CachedPromise<boolean> {
   let fileStr = fs.readFileSync(fileName, 'utf8');
   let file = FmtReader.readString(fileStr, fileName, FmtLibrary.getMetaModel);
   let contents = file.definitions[0].contents as FmtLibrary.ObjectContents_Library;
@@ -23,35 +23,39 @@ function checkLibrary(fileName: string): CachedPromise<void> {
   return libraryDataProvider.fetchLocalSection().then((definition: Fmt.Definition) => checkSection(definition, libraryDataProvider, checker));
 }
 
-function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, checker: Logic.LogicChecker): CachedPromise<void> {
-  let promise = CachedPromise.resolve();
+function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, checker: Logic.LogicChecker): CachedPromise<boolean> {
+  let promise = CachedPromise.resolve(true);
   let contents = definition.contents as FmtLibrary.ObjectContents_Section;
   if (contents.items instanceof Fmt.ArrayExpression) {
     for (let item of contents.items.items) {
       if (item instanceof FmtLibrary.MetaRefExpression_item) {
         let ref = item.ref as Fmt.DefinitionRefExpression;
-        promise = promise
-          .then(() => libraryDataProvider.fetchItem(ref.path))
-          .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path, checker));
+        promise = promise.then((currentResult: boolean) =>
+          libraryDataProvider.fetchItem(ref.path)
+            .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path, checker))
+            .then((itemResult: boolean) => currentResult && itemResult));
       } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
         let ref = item.ref as Fmt.DefinitionRefExpression;
         let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
-        promise = promise
-          .then(() => subsectionDataProvider.fetchLocalSection())
-          .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider, checker));
+        promise = promise.then((currentResult: boolean) =>
+          subsectionDataProvider.fetchLocalSection()
+            .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider, checker))
+            .then((itemResult: boolean) => currentResult && itemResult));
       }
     }
   }
   return promise;
 }
 
-function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path, checker: Logic.LogicChecker): CachedPromise<void> {
+function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path, checker: Logic.LogicChecker): CachedPromise<boolean> {
   return checker.checkDefinition(definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+    let result = true;
     for (let diagnostic of checkResult.diagnostics) {
       let severity = 'Unknown';
       switch (diagnostic.severity) {
       case Logic.DiagnosticSeverity.Error:
         severity = 'Error';
+        result = false;
         break;
       case Logic.DiagnosticSeverity.Warning:
         severity = 'Warning';
@@ -59,13 +63,15 @@ function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataP
       }
       console.error(`${libraryDataProvider.pathToURI(itemPath)}: ${severity}: ${diagnostic.message}`);
     }
+    return result;
   });
 }
 
 if (process.argv.length !== 3) {
   console.error('usage: src/scripts/check.sh <libraryFile>');
-  process.exit(1);
+  process.exit(2);
 }
 
 let libraryFileName = process.argv[2];
-checkLibrary(libraryFileName);
+checkLibrary(libraryFileName)
+  .then((result: boolean) => process.exit(result ? 0 : 1));
