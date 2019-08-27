@@ -1788,7 +1788,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         && definition.contents.definitionDisplay) {
       let path = new Fmt.Path;
       path.name = definition.name;
-      path.arguments = this.utils.getParameterArguments(definition.parameters);
+      this.utils.getParameterArguments(path.arguments, definition.parameters);
       let term = new Fmt.DefinitionRefExpression;
       term.path = path;
       let type = new FmtHLM.MetaRefExpression_Element;
@@ -1826,10 +1826,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             && constructorDefinition.contents.definitionDisplay) {
           let parentPath = new Fmt.Path;
           parentPath.name = definition.name;
-          parentPath.arguments = this.utils.getParameterArguments(definition.parameters);
+          this.utils.getParameterArguments(parentPath.arguments, definition.parameters);
           let path = new Fmt.Path;
           path.name = constructorDefinition.name;
-          path.arguments = this.utils.getParameterArguments(constructorDefinition.parameters);
+          this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters);
           path.parentPath = parentPath;
           let term = new Fmt.DefinitionRefExpression;
           term.path = path;

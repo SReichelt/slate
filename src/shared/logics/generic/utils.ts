@@ -65,21 +65,19 @@ export class GenericUtils {
     });
   }
 
-  substitutePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined, simplifyPaths: boolean): Fmt.Expression {
+  substitutePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
     if (targetPath) {
-      return expression.substitute((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath, simplifyPaths));
+      return expression.substitute((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath));
     } else {
       return expression;
     }
   }
 
-  substituteImmediatePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined, simplifyPath: boolean): Fmt.Expression {
+  substituteImmediatePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
     if (targetPath && expression instanceof Fmt.DefinitionRefExpression) {
+      let newPath = GenericUtils.adjustPath(expression.path, targetPath);
       let newExpression = new Fmt.DefinitionRefExpression;
-      newExpression.path = GenericUtils.adjustPath(expression.path, targetPath);
-      if (simplifyPath) {
-        newExpression.path = this.libraryDataAccessor.simplifyPath(newExpression.path);
-      }
+      newExpression.path = this.libraryDataAccessor.simplifyPath(newPath);
       return newExpression;
     } else {
       return expression;
@@ -90,15 +88,5 @@ export class GenericUtils {
     let newPath = Object.create(path);
     newPath.parentPath = path.parentPath ? GenericUtils.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
-  }
-
-  areExpressionsEqual(left: Fmt.Expression, right: Fmt.Expression): boolean {
-    let unificationFn = (leftSubExpression: Fmt.Expression, rightSubExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
-      if (leftSubExpression instanceof Fmt.DefinitionRefExpression && rightSubExpression instanceof Fmt.DefinitionRefExpression) {
-        return this.libraryDataAccessor.arePathsEqual(leftSubExpression.path, rightSubExpression.path, unificationFn, replacedParameters);
-      }
-      return false;
-    };
-    return Fmt.Expression.areExpressionsEquivalent(left, right, unificationFn);
   }
 }

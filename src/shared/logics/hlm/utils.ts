@@ -5,6 +5,15 @@ import CachedPromise from '../../data/cachedPromise';
 
 export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {}
 
+export interface HLMDefinitionRefContext {
+  targetPath?: Fmt.PathItem;
+  previousSetTerm?: Fmt.Expression;
+  parameterLists?: Fmt.ParameterList[];
+  argumentLists?: Fmt.ArgumentList[];
+  originalBindingParameters?: Fmt.Parameter[];
+  substitutedBindingParameters?: Fmt.Parameter[];
+}
+
 export class HLMUtils extends GenericUtils {
   getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
     for (let argumentList of argumentLists) {
@@ -60,7 +69,22 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArgument(param: Fmt.Parameter, targetParam?: Fmt.Parameter, targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.Argument | undefined {
+  substituteParameterSet(term: Fmt.Expression, context: HLMDefinitionRefContext): Fmt.Expression {
+    if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
+      return context.previousSetTerm;
+    } else {
+      term = this.substitutePath(term, context.targetPath);
+      if (context.parameterLists && context.argumentLists) {
+        term = this.substituteAllArguments(term, context.parameterLists, context.argumentLists);
+      }
+      if (context.originalBindingParameters && context.substitutedBindingParameters) {
+        term = this.substituteParameters(term, context.originalBindingParameters, context.substitutedBindingParameters);
+      }
+      return term;
+    }
+  }
+
+  getParameterArgument(param: Fmt.Parameter, context: HLMDefinitionRefContext, targetParam?: Fmt.Parameter, indices?: Fmt.Expression[]): Fmt.Argument | undefined {
     let type = param.type.expression;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binding) {
       let arg = new Fmt.Argument;
@@ -72,19 +96,25 @@ export class HLMUtils extends GenericUtils {
         bindingArgParam.name = targetParam ? targetParam.name : param.name;
         let bindingArgParamType = new Fmt.Type;
         let bindingArgParamTypeExpr = new FmtHLM.MetaRefExpression_Element;
-        // TODO type._set may be "previous"
-        bindingArgParamTypeExpr._set = this.substitutePath(type._set, targetPath, true);
+        bindingArgParamTypeExpr._set = this.substituteParameterSet(type._set, context);
         bindingArgParamType.expression = bindingArgParamTypeExpr;
         bindingArgParamType.arrayDimensions = 0;
         bindingArgParam.type = bindingArgParamType;
         bindingArgParam.optional = false;
         bindingArgParam.list = false;
         bindingArg.parameter = bindingArgParam;
+        let newContext: HLMDefinitionRefContext = {
+          ...context,
+          previousSetTerm: bindingArgParamTypeExpr._set,
+          originalBindingParameters: context.originalBindingParameters ? [...context.originalBindingParameters, param] : [param],
+          substitutedBindingParameters: context.substitutedBindingParameters ? [...context.substitutedBindingParameters, bindingArgParam] : [bindingArgParam]
+        };
         let targetInnerParameters = targetParam ? (targetParam.type.expression as FmtHLM.MetaRefExpression_Binding).parameters : undefined;
         let indexExpr = new Fmt.VariableRefExpression;
         indexExpr.variable = bindingArgParam;
-        let newIndices = indices ? indices.concat([indexExpr]) : [indexExpr];
-        bindingArg.arguments = this.getParameterArguments(type.parameters, targetInnerParameters, targetPath, newIndices);
+        let newIndices = indices ? [...indices, indexExpr] : [indexExpr];
+        bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
+        this.getParameterArguments(bindingArg.arguments, type.parameters, newContext, targetInnerParameters, newIndices);
         bindingArg.toCompoundExpression(argValue);
       } else {
         let varExpr = new Fmt.VariableRefExpression;
@@ -111,20 +141,20 @@ export class HLMUtils extends GenericUtils {
       arg.value = argValue;
       return arg;
     }
+    // No need to adjust context according to parameter; it is only used for bindings.
+    context.previousSetTerm = undefined;
     return undefined;
   }
 
-  getParameterArguments(parameters: Fmt.Parameter[], targetParameters?: Fmt.Parameter[], targetPath?: Fmt.PathItem, indices?: Fmt.Expression[]): Fmt.ArgumentList {
-    let result = Object.create(Fmt.ArgumentList.prototype);
+  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMDefinitionRefContext = {}, targetParameters?: Fmt.Parameter[], indices?: Fmt.Expression[]): void {
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
       let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
-      let arg = this.getParameterArgument(param, targetParam, targetPath, indices);
+      let arg = this.getParameterArgument(param, context, targetParam, indices);
       if (arg) {
-        result.push(arg);
+        args.push(arg);
       }
     }
-    return result;
   }
 
   getStructuralCaseTerm(construction: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
@@ -138,13 +168,14 @@ export class HLMUtils extends GenericUtils {
       let result: Fmt.Expression;
       if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorDefinitionContents.rewrite) {
         result = constructorDefinitionContents.rewrite.value;
-        result = this.substitutePath(result, constructionPath.parentPath, true);
+        result = this.substitutePath(result, constructionPath.parentPath);
         result = this.substituteArguments(result, constructionDefinition.parameters, constructionPath.arguments);
       } else {
         let resultPath = new Fmt.Path;
         resultPath.parentPath = constructionPath;
         resultPath.name = constructorPath.name;
-        resultPath.arguments = this.getParameterArguments(constructorDefinition.parameters, structuralCase.parameters, constructionPath.parentPath);
+        let context: HLMDefinitionRefContext = {targetPath: constructionPath.parentPath};
+        this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
         let resultRef = new Fmt.DefinitionRefExpression;
         resultRef.path = resultPath;
         result = resultRef;
@@ -164,7 +195,8 @@ export class HLMUtils extends GenericUtils {
     let fullConstructionPath = new Fmt.Path;
     fullConstructionPath.parentPath = constructionPath.parentPath;
     fullConstructionPath.name = constructionPath.name;
-    fullConstructionPath.arguments = this.getParameterArguments(construction.parameters, undefined, constructionPath.parentPath);
+    let context: HLMDefinitionRefContext = {targetPath: constructionPath.parentPath};
+    this.getParameterArguments(fullConstructionPath.arguments, construction.parameters, context);
     let resultPath = new Fmt.Path;
     resultPath.parentPath = fullConstructionPath;
     resultPath.name = constructorPath.name;
@@ -215,7 +247,7 @@ export class HLMUtils extends GenericUtils {
       } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BindingArg);
         if (argValue) {
-          let newIndexVariables = indexVariables ? indexVariables.concat([argValue.parameter]) : [argValue.parameter];
+          let newIndexVariables = indexVariables ? [...indexVariables, argValue.parameter] : [argValue.parameter];
           expression = this.substituteArguments(expression, type.parameters, argValue.arguments, newIndexVariables);
         }
       }
