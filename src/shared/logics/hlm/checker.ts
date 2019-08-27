@@ -387,6 +387,7 @@ class HLMDefinitionChecker {
         for (let item of term.terms) {
           this.checkElementTerm(item, context);
         }
+        this.checkElementCompatibility(term.terms, context);
       }
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       this.checkElementParameter(term.parameter, context);
@@ -396,7 +397,8 @@ class HLMDefinitionChecker {
       this.checkElementTerm(term.term, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       let checkCase = (value: Fmt.Expression) => this.checkSetTerm(value, context);
-      this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, context);
+      let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(values, context);
+      this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
       // Nothing to check.
     } else {
@@ -424,13 +426,17 @@ class HLMDefinitionChecker {
         .catch((error) => this.error(term, error.message));
     } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
       // TODO check that cases form a partition
+      let values: Fmt.Expression[] = [];
       for (let item of term.cases) {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
+        values.push(item.value);
       }
+      this.checkElementCompatibility(values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
       let checkCase = (value: Fmt.Expression) => this.checkElementTerm(value, context);
-      this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, context);
+      let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(values, context);
+      this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else {
       this.error(term, 'Element term expected');
     }
@@ -469,39 +475,52 @@ class HLMDefinitionChecker {
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       this.checkElementTerm(formula.element, context);
       this.checkSetTerm(formula._set, context);
+      this.checkCompatibility([formula._set], [formula.element], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       this.checkSetTerm(formula.subset, context);
       this.checkSetTerm(formula.superset, context);
+      this.checkSetCompatibility([formula.subset, formula.superset], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
       this.checkSetTerm(formula.left, context);
       this.checkSetTerm(formula.right, context);
+      this.checkSetCompatibility([formula.left, formula.right], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
       this.checkElementTerm(formula.left, context);
       this.checkElementTerm(formula.right, context);
+      this.checkElementCompatibility([formula.left, formula.right], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       let checkCase = (value: Fmt.Expression) => this.checkFormula(value, context);
-      this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, context);
+      this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, undefined, context);
     } else {
       this.error(formula, 'Formula expected');
     }
   }
 
   private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
-    let indexCount = 0;
-    if (expression.indices) {
-      indexCount = expression.indices.length;
-      for (let index of expression.indices) {
-        this.checkElementTerm(index, context);
-      }
-    }
-    let expectedIndexCount = 0;
+    let bindingParameters: Fmt.Parameter[] = [];
     if (!(expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
       for (let bindingParameter = this.utils.getParentBinding(expression.variable); bindingParameter; bindingParameter = this.utils.getParentBinding(bindingParameter)) {
-        expectedIndexCount++;
+        bindingParameters.unshift(bindingParameter);
       }
     }
-    if (indexCount !== expectedIndexCount) {
-      this.error(expression, `Expected ${expectedIndexCount} indices instead of ${indexCount}`);
+    if (expression.indices) {
+      let indexIndex = 0;
+      for (let index of expression.indices) {
+        if (indexIndex < bindingParameters.length) {
+          this.checkElementTerm(index, context);
+          let type = bindingParameters[indexIndex].type.expression as FmtHLM.MetaRefExpression_Binding;
+          this.checkCompatibility([type._set], [index], context);
+          indexIndex++;
+        } else {
+          this.error(expression, `Superfluous index`);
+          break;
+        }
+      }
+      if (expression.indices.length < bindingParameters.length) {
+        this.error(expression, `Too few indices`);
+      }
+    } else if (bindingParameters.length) {
+        this.error(expression, `Indices required`);
     }
   }
 
@@ -530,7 +549,8 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression) => void, context: HLMCheckerContext): void {
+  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, context: HLMCheckerContext): void {
+    // TODO check if element term is an element of the construction
     this.checkElementTerm(term, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
       this.promise = this.promise
@@ -586,9 +606,15 @@ class HLMDefinitionChecker {
     } else {
       this.error(construction, 'Construction reference expected');
     }
+
+    let values: Fmt.Expression[] = [];
     for (let structuralCase of cases) {
       checkCase(structuralCase.value);
+      values.push(structuralCase.value);
       this.checkProof(structuralCase.wellDefinednessProof, context);
+    }
+    if (checkCompatibility) {
+      checkCompatibility(values);
     }
   }
 
