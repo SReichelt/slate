@@ -1,7 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
-import { HLMUtils, HLMDefinitionRefContext } from './utils';
+import { HLMUtils, HLMSubstitutionContext } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -276,32 +276,32 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkArgumentLists(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], context: HLMCheckerContext, parameterContext: HLMDefinitionRefContext): void {
-    let currentParameterContext: HLMDefinitionRefContext = {
-      ...parameterContext,
-      parameterLists: parameterContext.parameterLists || [],
-      argumentLists: parameterContext.argumentLists || []
+  private checkArgumentLists(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], targetPath: Fmt.PathItem | undefined, context: HLMCheckerContext): void {
+    let substitutionContext: HLMSubstitutionContext = {
+      targetPath: targetPath,
+      parameterLists: [],
+      argumentLists: []
     };
     for (let listIndex = 0; listIndex < argumentLists.length; listIndex++) {
-      currentParameterContext.parameterLists!.push(parameterLists[listIndex]);
-      currentParameterContext.argumentLists!.push(argumentLists[listIndex]);
-      this.checkLastArgumentList(context, currentParameterContext);
+      substitutionContext.parameterLists!.push(parameterLists[listIndex]);
+      substitutionContext.argumentLists!.push(argumentLists[listIndex]);
+      this.checkLastArgumentList(context, substitutionContext);
     }
   }
 
-  private checkLastArgumentList(context: HLMCheckerContext, parameterContext: HLMDefinitionRefContext): void {
-    let argumentList = parameterContext.argumentLists![parameterContext.argumentLists!.length - 1];
-    let parameterList = parameterContext.parameterLists![parameterContext.parameterLists!.length - 1]; 
+  private checkLastArgumentList(context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    let argumentList = substitutionContext.argumentLists![substitutionContext.argumentLists!.length - 1];
+    let parameterList = substitutionContext.parameterLists![substitutionContext.parameterLists!.length - 1]; 
     for (let param of parameterList) {
-      this.checkArgument(argumentList, param, context, parameterContext);
+      this.checkArgument(argumentList, param, context, substitutionContext);
     }
   }
 
-  private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext, parameterContext: HLMDefinitionRefContext): void {
+  private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let type = param.type.expression;
     try {
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let superset = this.utils.substituteParameterSet(type.superset, parameterContext);
+        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext);
         let subsetArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_SubsetArg);
         if (subsetArg) {
           this.checkSetTerm(subsetArg._set, context);
@@ -311,7 +311,7 @@ class HLMDefinitionChecker {
           this.error(argumentList, `Missing argument for parameter ${param.name}`);
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let set = this.utils.substituteParameterSet(type._set, parameterContext);
+        let set = this.utils.substituteParameterSet(type._set, substitutionContext);
         let elementArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_ElementArg);
         if (elementArg) {
           this.checkElementTerm(elementArg.element, context);
@@ -343,25 +343,25 @@ class HLMDefinitionChecker {
           if (bindingArg) {
             let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
             if (bindingParameterSet) {
-              let expectedSet = this.utils.substituteParameterSet(type._set, parameterContext);
+              let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext);
               if (!bindingParameterSet.isEquivalentTo(expectedSet)) {
                 this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
               }
-              let innerParameterContext: HLMDefinitionRefContext = {
-                ...parameterContext,
+              let innerSubstitutionContext: HLMSubstitutionContext = {
+                ...substitutionContext,
                 previousSetTerm: expectedSet,
-                parameterLists: [...parameterContext.parameterLists!, type.parameters],
-                argumentLists: [...parameterContext.argumentLists!, bindingArg.arguments],
-                originalBindingParameters: parameterContext.originalBindingParameters ? [...parameterContext.originalBindingParameters, param] : [param],
-                substitutedBindingParameters: parameterContext.substitutedBindingParameters ? [...parameterContext.substitutedBindingParameters, bindingArg.parameter] : [bindingArg.parameter]
+                parameterLists: [...substitutionContext.parameterLists!, type.parameters],
+                argumentLists: [...substitutionContext.argumentLists!, bindingArg.arguments],
+                originalBindingParameters: substitutionContext.originalBindingParameters ? [...substitutionContext.originalBindingParameters, param] : [param],
+                substitutedBindingParameters: substitutionContext.substitutedBindingParameters ? [...substitutionContext.substitutedBindingParameters, bindingArg.parameter] : [bindingArg.parameter]
               };
-              this.checkLastArgumentList(context, innerParameterContext);
+              this.checkLastArgumentList(context, innerSubstitutionContext);
             }
           } else {
             this.error(argumentList, `Missing argument for parameter ${param.name}`);
           }
         }
-        parameterContext.previousSetTerm = undefined;
+        substitutionContext.previousSetTerm = undefined;
       }
     } catch (error) {
       this.error(this.utils.getRawArgument([argumentList], param)!, error.message);
@@ -526,8 +526,7 @@ class HLMDefinitionChecker {
     if (path instanceof Fmt.Path) {
       this.error(expression, 'Unexpected reference to inner definition');
     } else {
-      let parameterContext: HLMDefinitionRefContext = {targetPath: path};
-      this.checkArgumentLists(argumentLists, parameterLists, context, parameterContext);
+      this.checkArgumentLists(argumentLists, parameterLists, path, context);
     }
   }
 
