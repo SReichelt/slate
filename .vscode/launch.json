@@ -13,7 +13,8 @@
                 "run-script",
                 "dev"
             ],
-            "port": 9229
+            "port": 9229,
+            "timeout": 20000
         },
         {
             "type": "chrome",

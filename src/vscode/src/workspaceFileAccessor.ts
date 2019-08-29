@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { TextDecoder } from 'util';
-import { areUrisEqual, toCachedPromise } from './utils';
+import { areUrisEqual } from './utils';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
@@ -18,7 +18,7 @@ export class WorkspaceFileAccessor implements FileAccessor {
                 return CachedPromise.resolve(contents);
             }
         }
-        return toCachedPromise(vscode.workspace.fs.readFile(vscodeUri))
+        return new CachedPromise(vscode.workspace.fs.readFile(vscodeUri))
             .then((buffer: Uint8Array) => {
                 let textDecoder = new TextDecoder;
                 let text = textDecoder.decode(buffer);

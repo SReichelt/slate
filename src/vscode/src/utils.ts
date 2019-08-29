@@ -4,15 +4,6 @@ import * as vscode from 'vscode';
 import * as Fmt from '../../shared/format/format';
 import * as Ctx from '../../shared/format/context';
 import * as FmtReader from '../../shared/format/read';
-import CachedPromise from '../../shared/data/cachedPromise';
-
-export function toPromise<T>(thenable: Thenable<T>): Promise<T> {
-    return new Promise((resolve, reject) => thenable.then(resolve, reject));
-}
-
-export function toCachedPromise<T>(thenable: Thenable<T>): CachedPromise<T> {
-    return new CachedPromise(toPromise(thenable));
-}
 
 export interface RangeInfo {
     object: Object;
