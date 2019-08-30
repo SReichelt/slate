@@ -1,10 +1,11 @@
+// Custom promise wrapper which stores the result of the given promise when fulfilled, and then executes all then() calls immediately.
 class CachedPromise<T> implements PromiseLike<T> {
   private promise?: PromiseLike<T>;
   private result?: T;
 
   constructor(source: T | PromiseLike<T>, allowPromise: boolean = true) {
     if (allowPromise && source instanceof Object && 'then' in (source as any)) {
-      this.promise = (source as PromiseLike<T>).then((result) => {
+      this.promise = (source as PromiseLike<T>).then((result: T) => {
         this.result = result;
         this.promise = undefined;
         return result;
@@ -25,38 +26,39 @@ class CachedPromise<T> implements PromiseLike<T> {
     return new CachedPromise<U>(Promise.reject(reason));
   }
 
-  then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): CachedPromise<TResult1 | TResult2> {
+  static construct<U>(source: U | PromiseLike<U>): CachedPromise<U> {
+    if (source instanceof CachedPromise) {
+      return source;
+    } else {
+      return new CachedPromise<U>(source);
+    }
+  }
+
+  then<TResult1 = T, TResult2 = never>(onfulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>): CachedPromise<TResult1 | TResult2> {
     if (this.promise) {
       return new CachedPromise(this.promise.then(onfulfilled, onrejected));
-    } else {
+    } else if (onfulfilled) {
       try {
-        let value = this.result as T;
-        let result = onfulfilled ? onfulfilled(value) : value;
-        if (result instanceof CachedPromise) {
-          return result;
-        } else {
-          return new CachedPromise<TResult1>(result as any);
-        }
+        let result = onfulfilled(this.result as T);
+        return CachedPromise.construct<TResult1>(result);
       } catch (error) {
         if (onrejected) {
           try {
             let result = onrejected(error);
-            if (result instanceof CachedPromise) {
-              return result;
-            } else {
-              return new CachedPromise<TResult2>(result as any);
-            }
+            return CachedPromise.construct<TResult2>(result);
           } catch (rejectionError) {
-            return new CachedPromise<TResult2>(Promise.reject(rejectionError));
+            return CachedPromise.reject<TResult2>(rejectionError);
           }
         } else {
-          return new CachedPromise<TResult2>(Promise.reject(error));
+          return CachedPromise.reject<TResult2>(error);
         }
       }
+    } else {
+      return this as any as CachedPromise<TResult1>;
     }
   }
 
-  catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): CachedPromise<T | TResult> {
+  catch<TResult = never>(onrejected?: (reason: any) => TResult | PromiseLike<TResult>): CachedPromise<T | TResult> {
     if (this.promise) {
       return new CachedPromise(this.promise.then(undefined, onrejected));
     } else {

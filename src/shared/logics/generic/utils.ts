@@ -65,7 +65,7 @@ export class GenericUtils {
     });
   }
 
-  substitutePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
+  substituteTargetPath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
     if (targetPath) {
       return expression.substitute((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath));
     } else {

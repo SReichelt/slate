@@ -60,7 +60,7 @@ $Constructor: %DefinitionType($ElementTerm) {
 $EqualityDefinition: %ExpressionType {
   members = #(
     leftParameters: %ParameterList,
-    rightParameters: %ParameterList,
+    rightParameters[leftParameters]: %ParameterList,
     definition[leftParameters, rightParameters]: $Formula[],
     equivalenceProofs[leftParameters, rightParameters]: $Proof[] = [],
     reflexivityProof?: $Proof,

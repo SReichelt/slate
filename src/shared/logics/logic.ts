@@ -20,6 +20,7 @@ export interface LogicChecker {
 
 export interface LogicCheckResult {
   diagnostics: LogicCheckDiagnostic[];
+  hasErrors: boolean;
 }
 
 export interface LogicCheckDiagnostic {

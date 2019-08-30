@@ -19,7 +19,7 @@ interface HLMCheckerContext {
 class HLMDefinitionChecker {
   private utils: HLMUtils;
   private readonly rootContext: HLMCheckerContext = {};
-  private result: Logic.LogicCheckResult = {diagnostics: []};
+  private result: Logic.LogicCheckResult = {diagnostics: [], hasErrors: false};
   private promise = CachedPromise.resolve();
 
   constructor(private definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor) {
@@ -140,7 +140,7 @@ class HLMDefinitionChecker {
     this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters);
     let constructorExpression = new Fmt.DefinitionRefExpression;
     constructorExpression.path = constructorPath;
-    this.checkElementCompatibility([constructorExpression, rewriteDefinition.value], this.rootContext);
+    this.checkElementCompatibility(rewriteDefinition.value, [constructorExpression, rewriteDefinition.value], this.rootContext);
     // TODO check whether rewrite definition matches referenced theorem
   }
 
@@ -159,13 +159,13 @@ class HLMDefinitionChecker {
   }
 
   private checkSetOperator(contents: FmtHLM.ObjectContents_SetOperator): void {
-    let checkCompatibility = (terms: Fmt.Expression[]) => this.checkSetCompatibility(terms, this.rootContext);
+    let checkCompatibility = (terms: Fmt.Expression[]) => this.checkSetCompatibility(contents.definition, terms, this.rootContext);
     let checkItem = (term: Fmt.Expression) => this.checkSetTerm(term, this.rootContext);
     this.checkEquivalenceList(contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
   }
 
   private checkExplicitOperator(contents: FmtHLM.ObjectContents_ExplicitOperator): void {
-    let checkCompatibility = (terms: Fmt.Expression[]) => this.checkElementCompatibility(terms, this.rootContext);
+    let checkCompatibility = (terms: Fmt.Expression[]) => this.checkElementCompatibility(contents.definition, terms, this.rootContext);
     let checkItem = (term: Fmt.Expression) => this.checkElementTerm(term, this.rootContext);
     this.checkEquivalenceList(contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
   }
@@ -301,21 +301,21 @@ class HLMDefinitionChecker {
     let type = param.type.expression;
     try {
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext);
+        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext, true);
         let subsetArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_SubsetArg);
         if (subsetArg) {
           this.checkSetTerm(subsetArg._set, context);
-          this.checkSetCompatibility([subsetArg._set, superset], context);
+          this.checkSetCompatibility(subsetArg._set, [subsetArg._set, superset], context);
           this.checkProof(subsetArg.subsetProof, context);
         } else {
           this.error(argumentList, `Missing argument for parameter ${param.name}`);
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let set = this.utils.substituteParameterSet(type._set, substitutionContext);
+        let set = this.utils.substituteParameterSet(type._set, substitutionContext, true);
         let elementArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_ElementArg);
         if (elementArg) {
           this.checkElementTerm(elementArg.element, context);
-          this.checkCompatibility([set], [elementArg.element], context);
+          this.checkCompatibility(elementArg.element, [set], [elementArg.element], context);
           this.checkProof(elementArg.elementProof, context);
         } else {
           this.error(argumentList, `Missing argument for parameter ${param.name}`);
@@ -343,7 +343,7 @@ class HLMDefinitionChecker {
           if (bindingArg) {
             let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
             if (bindingParameterSet) {
-              let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext);
+              let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext, false);
               if (!bindingParameterSet.isEquivalentTo(expectedSet)) {
                 this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
               }
@@ -387,7 +387,7 @@ class HLMDefinitionChecker {
         for (let item of term.terms) {
           this.checkElementTerm(item, context);
         }
-        this.checkElementCompatibility(term.terms, context);
+        this.checkElementCompatibility(term, term.terms, context);
       }
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       this.checkElementParameter(term.parameter, context);
@@ -397,7 +397,7 @@ class HLMDefinitionChecker {
       this.checkElementTerm(term.term, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       let checkCase = (value: Fmt.Expression) => this.checkSetTerm(value, context);
-      let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(values, context);
+      let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
       // Nothing to check.
@@ -432,10 +432,10 @@ class HLMDefinitionChecker {
         this.checkElementTerm(item.value, context);
         values.push(item.value);
       }
-      this.checkElementCompatibility(values, context);
+      this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
       let checkCase = (value: Fmt.Expression) => this.checkElementTerm(value, context);
-      let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(values, context);
+      let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else {
       this.error(term, 'Element term expected');
@@ -475,19 +475,19 @@ class HLMDefinitionChecker {
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       this.checkElementTerm(formula.element, context);
       this.checkSetTerm(formula._set, context);
-      this.checkCompatibility([formula._set], [formula.element], context);
+      this.checkCompatibility(formula, [formula._set], [formula.element], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       this.checkSetTerm(formula.subset, context);
       this.checkSetTerm(formula.superset, context);
-      this.checkSetCompatibility([formula.subset, formula.superset], context);
+      this.checkSetCompatibility(formula, [formula.subset, formula.superset], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
       this.checkSetTerm(formula.left, context);
       this.checkSetTerm(formula.right, context);
-      this.checkSetCompatibility([formula.left, formula.right], context);
+      this.checkSetCompatibility(formula, [formula.left, formula.right], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
       this.checkElementTerm(formula.left, context);
       this.checkElementTerm(formula.right, context);
-      this.checkElementCompatibility([formula.left, formula.right], context);
+      this.checkElementCompatibility(formula, [formula.left, formula.right], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       let checkCase = (value: Fmt.Expression) => this.checkFormula(value, context);
       this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, undefined, context);
@@ -509,7 +509,7 @@ class HLMDefinitionChecker {
         if (indexIndex < bindingParameters.length) {
           this.checkElementTerm(index, context);
           let type = bindingParameters[indexIndex].type.expression as FmtHLM.MetaRefExpression_Binding;
-          this.checkCompatibility([type._set], [index], context);
+          this.checkCompatibility(index, [type._set], [index], context);
           indexIndex++;
         } else {
           this.error(expression, `Superfluous index`);
@@ -651,16 +651,72 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkCompatibility(setTerms: Fmt.Expression[], elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    // TODO
+  private checkCompatibility(object: Object, setTerms: Fmt.Expression[], elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    let declaredSetsPromise = CachedPromise.resolve(setTerms);
+    for (let elementTerm of elementTerms) {
+      declaredSetsPromise = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) =>
+        this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet)));
+    }
+    let checkDeclaredSets = declaredSetsPromise
+      .then((declaredSets: Fmt.Expression[]) => this.checkSetCompatibility(object, declaredSets, context))
+      .catch((error) => this.conditionalError(object, error.message));
+    this.promise = this.promise.then(() => checkDeclaredSets);
   }
 
-  private checkSetCompatibility(setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    this.checkCompatibility(setTerms, [], context);
+  private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (setTerms.length > 1) {
+      let firstTerm = setTerms[0];
+      let finalSupersetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+      for (let index = 1; index < setTerms.length; index++) {
+        let term = setTerms[index];
+        if (!firstTerm.isEquivalentTo(term)) {
+          finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) =>
+            this.utils.getFinalSuperset(term).then((finalSuperset: Fmt.Expression) => {
+              if (this.utils.isWildcardFinalSet(finalSuperset)) {
+                return finalSupersets;
+              } else {
+                return finalSupersets.concat(finalSuperset);
+              }
+            }));
+        }
+      }
+      finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) => {
+        if (finalSupersets.length) {
+          return this.utils.getFinalSuperset(firstTerm).then((finalSuperset: Fmt.Expression) => {
+            if (this.utils.isWildcardFinalSet(finalSuperset)) {
+              return finalSupersets;
+            } else {
+              return [finalSuperset, ...finalSupersets];
+            }
+          });
+        } else {
+          return finalSupersets;
+        }
+      });
+      let checkFinalSupersets = finalSupersetsPromise
+        .then((finalSupersets: Fmt.Expression[]) => this.checkFinalSupersetCompatibility(object, finalSupersets, context))
+        .catch((error) => this.conditionalError(object, error.message));
+      this.promise = this.promise.then(() => checkFinalSupersets);
+    }
   }
 
-  private checkElementCompatibility(elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    this.checkCompatibility([], elementTerms, context);
+  private checkFinalSupersetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (setTerms.length > 1) {
+      let firstTerm = setTerms[0];
+      for (let index = 1; index < setTerms.length; index++) {
+        let term = setTerms[index];
+        if (!firstTerm.isEquivalentTo(term)) {
+          this.error(object, 'Type mismatch');
+          return;
+        }
+      }
+    }
+  }
+
+  private checkElementCompatibility(object: Object, elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (elementTerms.length > 1) {
+      this.checkCompatibility(object, [], elementTerms, context);
+    }
   }
 
   private error(object: Object, message: string): void {
@@ -669,5 +725,12 @@ class HLMDefinitionChecker {
       message: message,
       severity: Logic.DiagnosticSeverity.Error
     });
+    this.result.hasErrors = true;
+  }
+
+  private conditionalError(object: Object, message: string): void {
+    if (!this.result.hasErrors) {
+      this.error(object, message);
+    }
   }
 }

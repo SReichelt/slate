@@ -5980,6 +5980,12 @@ export class MetaModel extends Meta.MetaModel {
             }
           }
           if (currentContext.objectContentsClass === ObjectContents_EqualityDefinition) {
+            if (argument.name === 'rightParameters' || (argument.name === undefined && argumentIndex === 1)) {
+              let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
+              if (leftParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(leftParametersValue.parameters, context);
+              }
+            }
             if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 2)) {
               let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
               if (leftParametersValue instanceof Fmt.ParameterExpression) {

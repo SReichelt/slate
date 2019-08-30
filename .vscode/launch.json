@@ -33,7 +33,14 @@
             "type": "node",
             "request": "launch",
             "name": "Run tests",
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js"
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Check HLM library",
+            "runtimeArgs": ["-r", "ts-node/register"],
+            "args": ["${workspaceFolder}/src/scripts/check.ts", "${workspaceFolder}/data/libraries/hlm/Library.slate"]
         }
     ],
     "compounds": [
