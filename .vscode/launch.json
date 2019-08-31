@@ -38,6 +38,13 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Update snapshot",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+            "args": ["--updateSnapshot"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Check HLM library",
             "runtimeArgs": ["-r", "ts-node/register"],
             "args": ["${workspaceFolder}/src/scripts/check.ts", "${workspaceFolder}/data/libraries/hlm/Library.slate"]
