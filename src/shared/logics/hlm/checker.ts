@@ -505,11 +505,15 @@ class HLMDefinitionChecker {
     }
     if (expression.indices) {
       let indexIndex = 0;
+      let currentSet: Fmt.Expression | undefined = undefined;
       for (let index of expression.indices) {
         if (indexIndex < bindingParameters.length) {
           this.checkElementTerm(index, context);
           let type = bindingParameters[indexIndex].type.expression as FmtHLM.MetaRefExpression_Binding;
-          this.checkCompatibility(index, [type._set], [index], context);
+          if (!(currentSet && type._set instanceof FmtHLM.MetaRefExpression_previous)) {
+            currentSet = type._set;
+          }
+          this.checkCompatibility(index, [currentSet], [index], context);
           indexIndex++;
         } else {
           this.error(expression, `Superfluous index`);
@@ -663,7 +667,7 @@ class HLMDefinitionChecker {
     this.promise = this.promise.then(() => checkDeclaredSets);
   }
 
-  private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+  private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext, secondPass: boolean = false): void {
     if (setTerms.length > 1) {
       let firstTerm = setTerms[0];
       let finalSupersetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
@@ -671,7 +675,7 @@ class HLMDefinitionChecker {
         let term = setTerms[index];
         if (!firstTerm.isEquivalentTo(term)) {
           finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) =>
-            this.utils.getFinalSuperset(term).then((finalSuperset: Fmt.Expression) => {
+            this.utils.getFinalSuperset(term, secondPass).then((finalSuperset: Fmt.Expression) => {
               if (this.utils.isWildcardFinalSet(finalSuperset)) {
                 return finalSupersets;
               } else {
@@ -682,7 +686,7 @@ class HLMDefinitionChecker {
       }
       finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) => {
         if (finalSupersets.length) {
-          return this.utils.getFinalSuperset(firstTerm).then((finalSuperset: Fmt.Expression) => {
+          return this.utils.getFinalSuperset(firstTerm, secondPass).then((finalSuperset: Fmt.Expression) => {
             if (this.utils.isWildcardFinalSet(finalSuperset)) {
               return finalSupersets;
             } else {
@@ -694,7 +698,7 @@ class HLMDefinitionChecker {
         }
       });
       let checkFinalSupersets = finalSupersetsPromise
-        .then((finalSupersets: Fmt.Expression[]) => this.checkFinalSupersetCompatibility(object, finalSupersets, context))
+        .then((finalSupersets: Fmt.Expression[]) => secondPass ? this.checkFinalSupersetCompatibility(object, finalSupersets, context) : this.checkSetCompatibility(object, finalSupersets, context, true))
         .catch((error) => this.conditionalError(object, error.message));
       this.promise = this.promise.then(() => checkFinalSupersets);
     }

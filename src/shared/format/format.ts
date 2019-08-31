@@ -211,7 +211,6 @@ export class Parameter {
   }
 
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Parameter {
-    let newType = this.type.expression.substitute(fn, replacedParameters);
     let newDefaultValue = this.defaultValue ? this.defaultValue.substitute(fn, replacedParameters) : undefined;
     let newDependencies: Expression[] | undefined = undefined;
     if (this.dependencies) {
@@ -228,7 +227,17 @@ export class Parameter {
         newDependencies = this.dependencies;
       }
     }
-    if (newType !== this.type.expression || newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || !fn) {
+    let newPreviousParameter = this.previousParameter ? this.previousParameter.findReplacement(replacedParameters) : undefined;
+    let changed = (newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || newPreviousParameter !== this.previousParameter || !fn);
+    if (!changed) {
+      let origReplacedParametersLength = replacedParameters.length;
+      let newType = this.type.expression.substitute(fn, replacedParameters);
+      replacedParameters.length = origReplacedParametersLength;
+      if (newType !== this.type.expression) {
+        changed = true;
+      }
+    }
+    if (changed) {
       let result = new Parameter;
       replacedParameters.push({original: this, replacement: result});
       result.name = this.name;
@@ -240,9 +249,7 @@ export class Parameter {
       result.optional = this.optional;
       result.list = this.list;
       result.dependencies = newDependencies;
-      if (this.previousParameter) {
-        result.previousParameter = this.previousParameter.findReplacement(replacedParameters);
-      }
+      result.previousParameter = newPreviousParameter;
       return result;
     } else {
       return this;

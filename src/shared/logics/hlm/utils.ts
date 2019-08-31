@@ -425,7 +425,8 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getNextSuperset(term: Fmt.Expression): CachedPromise<Fmt.Expression | undefined> {
+  // TODO honor embedSubsets
+  getNextSuperset(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression | undefined> {
     if (term instanceof Fmt.VariableRefExpression) {
       let type = term.variable.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Set) {
@@ -451,9 +452,15 @@ export class HLMUtils extends GenericUtils {
         return CachedPromise.reject(new Error('Set variable expected'));
       }
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      return this.getOuterDefinition(term).then((definition: Fmt.Definition) => {
-        if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator && definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length) {
-          // TODO
+      return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+        if (followEmbeddings && definition.contents instanceof FmtHLM.ObjectContents_Construction && definition.contents.embedding) {
+          let type = definition.contents.embedding.parameter.type.expression;
+          if (type instanceof FmtHLM.MetaRefExpression_Element) {
+            return this.substitutePath(type._set, term.path, [definition]);
+          } else {
+            return CachedPromise.reject(new Error('Element parameter expected'));
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator && definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length) {
           let item = definition.contents.definition.items[0];
           return this.substitutePath(item, term.path, [definition]);
         } else {
@@ -462,7 +469,6 @@ export class HLMUtils extends GenericUtils {
       });
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms && term.terms.length) {
-        // TODO
         return this.getDeclaredSet(term.terms[0]);
       } else {
         return CachedPromise.resolve(undefined);
@@ -478,7 +484,6 @@ export class HLMUtils extends GenericUtils {
       return this.getDeclaredSet(term.term);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       if (term.cases.length) {
-        // TODO
         return CachedPromise.resolve(term.cases[0].value);
       } else {
         return this.getWildcardFinalSet();
@@ -488,25 +493,33 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getFinalSuperset(term: Fmt.Expression, visitedDefinitions: Fmt.DefinitionRefExpression[] = []): CachedPromise<Fmt.Expression> {
+  getFinalSuperset(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression> {
+    return this.getFinalSupersetInternal(term, followEmbeddings, []);
+  }
+
+  private getFinalSupersetInternal(term: Fmt.Expression, followEmbeddings: boolean, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
     if (term instanceof Fmt.DefinitionRefExpression) {
       for (let visitedDefinition of visitedDefinitions) {
         if (term.isEquivalentTo(visitedDefinition)) {
-          return this.getWildcardFinalSet();
+          return CachedPromise.reject(new Error('Invalid circular reference'));
         }
       }
       visitedDefinitions.push(term);
     }
-    return this.getNextSuperset(term).then((next: Fmt.Expression | undefined) => {
+    return this.getNextSuperset(term, followEmbeddings).then((next: Fmt.Expression | undefined) => {
       if (next) {
-        return this.getFinalSuperset(next, visitedDefinitions);
+        return this.getFinalSupersetInternal(next, followEmbeddings, visitedDefinitions);
       } else {
         return term;
       }
     });
   }
 
-  getDeclaredSet(term: Fmt.Expression, visitedDefinitions: Fmt.DefinitionRefExpression[] = []): CachedPromise<Fmt.Expression> {
+  getDeclaredSet(term: Fmt.Expression): CachedPromise<Fmt.Expression> {
+    return this.getDeclaredSetInternal(term, []);
+  }
+
+  private getDeclaredSetInternal(term: Fmt.Expression, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
     for (;;) {
       if (term instanceof Fmt.VariableRefExpression) {
         let type = term.variable.type.expression;
@@ -538,7 +551,7 @@ export class HLMUtils extends GenericUtils {
         } else {
           for (let visitedDefinition of visitedDefinitions) {
             if (term.isEquivalentTo(visitedDefinition)) {
-              return this.getWildcardFinalSet();
+              return CachedPromise.reject(new Error('Invalid circular reference'));
             }
           }
           visitedDefinitions.push(term);
@@ -546,9 +559,8 @@ export class HLMUtils extends GenericUtils {
           return this.getOuterDefinition(term).then((definition: Fmt.Definition) => {
             if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
               if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length) {
-                // TODO
                 let item = definition.contents.definition.items[0];
-                return this.getDeclaredSet(this.substitutePath(item, path, [definition]), visitedDefinitions);
+                return this.getDeclaredSetInternal(this.substitutePath(item, path, [definition]), visitedDefinitions);
               } else {
                 return this.getWildcardFinalSet();
               }
@@ -569,7 +581,6 @@ export class HLMUtils extends GenericUtils {
         }
       } else if (term instanceof FmtHLM.MetaRefExpression_cases || term instanceof FmtHLM.MetaRefExpression_structuralCases) {
         if (term.cases.length) {
-          // TODO
           term = term.cases[0].value;
         } else {
           return this.getWildcardFinalSet();
@@ -580,8 +591,8 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getFinalSet(term: Fmt.Expression): CachedPromise<Fmt.Expression> {
-    return this.getDeclaredSet(term).then((set: Fmt.Expression) => this.getFinalSuperset(set));
+  getFinalSet(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression> {
+    return this.getDeclaredSet(term).then((set: Fmt.Expression) => this.getFinalSuperset(set, followEmbeddings));
   }
 
   getWildcardFinalSet(): CachedPromise<Fmt.Expression> {
