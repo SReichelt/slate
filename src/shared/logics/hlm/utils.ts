@@ -307,6 +307,32 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
+  parameterListContainsParameter(parameterList: Fmt.ParameterList, param: Fmt.Parameter): boolean {
+    for (let currentParam of parameterList) {
+      if (currentParam === param) {
+        return true;
+      }
+      let type = currentParam.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binding && this.parameterListContainsParameter(type.parameters, param)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private referencesCaseParameter(structuralCase: FmtHLM.ObjectContents_StructuralCase): boolean {
+    let referencesCaseParameter = false;
+    if (structuralCase.parameters) {
+      let parameters = structuralCase.parameters;
+      structuralCase.value.traverse((subExpression: Fmt.Expression) => {
+        if (subExpression instanceof Fmt.VariableRefExpression && this.parameterListContainsParameter(parameters, subExpression.variable)) {
+          referencesCaseParameter = true;
+        }
+      });
+    }
+    return referencesCaseParameter;
+  }
+
   getParentBinding(param: Fmt.Parameter): Fmt.Parameter | undefined {
     for (let previousParam = param.previousParameter; previousParam; previousParam = previousParam.previousParameter) {
       let type = previousParam.type.expression;
@@ -484,7 +510,18 @@ export class HLMUtils extends GenericUtils {
       return this.getDeclaredSet(term.term);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       if (term.cases.length) {
-        return CachedPromise.resolve(term.cases[0].value);
+        let structuralCase = term.cases[0];
+        if (this.referencesCaseParameter(structuralCase)) {
+          return this.getNextSuperset(structuralCase.value, followEmbeddings).then((superset: Fmt.Expression | undefined) => {
+            if (superset || term.cases.length > 1 || structuralCase.rewrite) {
+              return this.buildSingleStructuralCaseSetTerm(term.term, term.construction, structuralCase._constructor, structuralCase.parameters, superset || structuralCase.value);
+            } else {
+              return undefined;
+            }
+          });
+        } else {
+          return CachedPromise.resolve(structuralCase.value);
+        }
       } else {
         return this.getWildcardFinalSet();
       }
@@ -579,9 +616,23 @@ export class HLMUtils extends GenericUtils {
             }
           });
         }
-      } else if (term instanceof FmtHLM.MetaRefExpression_cases || term instanceof FmtHLM.MetaRefExpression_structuralCases) {
+      } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
         if (term.cases.length) {
           term = term.cases[0].value;
+        } else {
+          return this.getWildcardFinalSet();
+        }
+      } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
+        if (term.cases.length) {
+          let structuralCase = term.cases[0];
+          if (this.referencesCaseParameter(structuralCase)) {
+            let structuralCasesTerm = term;
+            return this.getDeclaredSet(structuralCase.value).then((declaredSet: Fmt.Expression) => {
+              return this.buildSingleStructuralCaseSetTerm(structuralCasesTerm.term, structuralCasesTerm.construction, structuralCase._constructor, structuralCase.parameters, declaredSet);
+            });
+          } else {
+            term = structuralCase.value;
+          }
         } else {
           return this.getWildcardFinalSet();
         }
@@ -601,5 +652,17 @@ export class HLMUtils extends GenericUtils {
 
   isWildcardFinalSet(term: Fmt.Expression): boolean {
     return term instanceof FmtHLM.MetaRefExpression_enumeration && !term.terms;
+  }
+
+  buildSingleStructuralCaseSetTerm(term: Fmt.Expression, construction: Fmt.Expression, constructor: Fmt.Expression, parameters: Fmt.ParameterList | undefined, value: Fmt.Expression): FmtHLM.MetaRefExpression_setStructuralCases {
+    let structuralCase = new FmtHLM.ObjectContents_StructuralCase;
+    structuralCase._constructor = constructor;
+    structuralCase.parameters = parameters;
+    structuralCase.value = value;
+    let result = new FmtHLM.MetaRefExpression_setStructuralCases;
+    result.term = term;
+    result.construction = construction;
+    result.cases = [structuralCase];
+    return result;
   }
 }

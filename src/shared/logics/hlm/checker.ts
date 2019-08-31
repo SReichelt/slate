@@ -12,13 +12,29 @@ export class HLMChecker implements Logic.LogicChecker {
   }
 }
 
+interface HLMCheckerStructuralCaseRef {
+  term: Fmt.Expression;
+  construction: Fmt.Expression;
+  _constructor: Fmt.Expression;
+  parameters: Fmt.ParameterList | undefined;
+}
+
 interface HLMCheckerContext {
   previousSetTerm?: Fmt.Expression;
+  parentStructuralCases: HLMCheckerStructuralCaseRef[];
+}
+
+interface HLMCheckerCompatibilityStatus {
+  directEquivalenceUnlikely: boolean;
+  checkedForDirectEquivalence: boolean;
+  obtainedFinalSets: boolean;
+  followedEmbeddings: boolean;
+  addedStructuralCases: boolean;
 }
 
 class HLMDefinitionChecker {
   private utils: HLMUtils;
-  private readonly rootContext: HLMCheckerContext = {};
+  private readonly rootContext: HLMCheckerContext = {parentStructuralCases: []};
   private result: Logic.LogicCheckResult = {diagnostics: [], hasErrors: false};
   private promise = CachedPromise.resolve();
 
@@ -145,7 +161,17 @@ class HLMDefinitionChecker {
   }
 
   private checkEmbedding(embedding: FmtHLM.ObjectContents_Embedding): void {
-    this.checkElementParameter(embedding.parameter, this.rootContext);
+    let subset = this.checkElementParameter(embedding.parameter, this.rootContext);
+    if (subset) {
+      let checkSubset = this.utils.getFinalSuperset(subset, true)
+        .then((superset: Fmt.Expression) => {
+          if (this.utils.isWildcardFinalSet(superset)) {
+            this.error(subset!, 'The given set cannot be embedded');
+          }
+        })
+        .catch((error) => this.conditionalError(subset!, error.message));
+      this.promise = this.promise.then(() => checkSubset);
+    }
     if (embedding.target instanceof Fmt.DefinitionRefExpression && embedding.target.path.parentPath instanceof Fmt.Path) {
       if (embedding.target.path.parentPath.parentPath || embedding.target.path.parentPath.name !== this.definition.name) {
         this.error(embedding.target, 'Embedding must refer to constructor of parent construction');
@@ -396,7 +422,7 @@ class HLMDefinitionChecker {
       this.checkParameterList(term.parameters, context);
       this.checkElementTerm(term.term, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
-      let checkCase = (value: Fmt.Expression) => this.checkSetTerm(value, context);
+      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkSetTerm(value, caseContext);
       let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
@@ -434,7 +460,7 @@ class HLMDefinitionChecker {
       }
       this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
-      let checkCase = (value: Fmt.Expression) => this.checkElementTerm(value, context);
+      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkElementTerm(value, caseContext);
       let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
     } else {
@@ -489,7 +515,7 @@ class HLMDefinitionChecker {
       this.checkElementTerm(formula.right, context);
       this.checkElementCompatibility(formula, [formula.left, formula.right], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
-      let checkCase = (value: Fmt.Expression) => this.checkFormula(value, context);
+      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkFormula(value, caseContext);
       this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, undefined, context);
     } else {
       this.error(formula, 'Formula expected');
@@ -553,10 +579,17 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, context: HLMCheckerContext): void {
-    // TODO check if element term is an element of the construction
+  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, context: HLMCheckerContext): void {
     this.checkElementTerm(term, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
+      let checkConstructionRef = this.utils.getFinalSet(term, false)
+        .then((finalSet: Fmt.Expression) => {
+          if (!finalSet.isEquivalentTo(construction)) {
+            this.error(term, 'Term must be an element of the specified construction');
+          }
+        })
+        .catch((error) => this.conditionalError(term, error.message));
+      this.promise = this.promise.then(() => checkConstructionRef);
       this.promise = this.promise
         .then(() => this.utils.getOuterDefinition(construction))
         .then((definition: Fmt.Definition) => {
@@ -613,7 +646,16 @@ class HLMDefinitionChecker {
 
     let values: Fmt.Expression[] = [];
     for (let structuralCase of cases) {
-      checkCase(structuralCase.value);
+      let caseContext: HLMCheckerContext = {
+        ...context,
+        parentStructuralCases: context.parentStructuralCases.concat({
+          term: term,
+          construction: construction,
+          _constructor: structuralCase._constructor,
+          parameters: structuralCase.parameters
+        })
+      };
+      checkCase(structuralCase.value, caseContext);
       values.push(structuralCase.value);
       this.checkProof(structuralCase.wellDefinednessProof, context);
     }
@@ -662,64 +704,96 @@ class HLMDefinitionChecker {
         this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet)));
     }
     let checkDeclaredSets = declaredSetsPromise
-      .then((declaredSets: Fmt.Expression[]) => this.checkSetCompatibility(object, declaredSets, context))
+      .then((declaredSets: Fmt.Expression[]) => this.checkSetCompatibilityInternal(object, declaredSets, context, {
+        directEquivalenceUnlikely: false,
+        checkedForDirectEquivalence: false,
+        obtainedFinalSets: false,
+        followedEmbeddings: false,
+        addedStructuralCases: false
+      }))
       .catch((error) => this.conditionalError(object, error.message));
     this.promise = this.promise.then(() => checkDeclaredSets);
   }
 
-  private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext, secondPass: boolean = false): void {
-    if (setTerms.length > 1) {
-      let firstTerm = setTerms[0];
-      let finalSupersetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-      for (let index = 1; index < setTerms.length; index++) {
-        let term = setTerms[index];
-        if (!firstTerm.isEquivalentTo(term)) {
-          finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) =>
-            this.utils.getFinalSuperset(term, secondPass).then((finalSuperset: Fmt.Expression) => {
-              if (this.utils.isWildcardFinalSet(finalSuperset)) {
-                return finalSupersets;
-              } else {
-                return finalSupersets.concat(finalSuperset);
-              }
-            }));
-        }
-      }
-      finalSupersetsPromise = finalSupersetsPromise.then((finalSupersets: Fmt.Expression[]) => {
-        if (finalSupersets.length) {
-          return this.utils.getFinalSuperset(firstTerm, secondPass).then((finalSuperset: Fmt.Expression) => {
-            if (this.utils.isWildcardFinalSet(finalSuperset)) {
-              return finalSupersets;
-            } else {
-              return [finalSuperset, ...finalSupersets];
-            }
-          });
-        } else {
-          return finalSupersets;
-        }
-      });
-      let checkFinalSupersets = finalSupersetsPromise
-        .then((finalSupersets: Fmt.Expression[]) => secondPass ? this.checkFinalSupersetCompatibility(object, finalSupersets, context) : this.checkSetCompatibility(object, finalSupersets, context, true))
-        .catch((error) => this.conditionalError(object, error.message));
-      this.promise = this.promise.then(() => checkFinalSupersets);
-    }
-  }
-
-  private checkFinalSupersetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    if (setTerms.length > 1) {
-      let firstTerm = setTerms[0];
-      for (let index = 1; index < setTerms.length; index++) {
-        let term = setTerms[index];
-        if (!firstTerm.isEquivalentTo(term)) {
-          this.error(object, 'Type mismatch');
-          return;
-        }
-      }
-    }
+  private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    this.checkSetCompatibilityInternal(object, setTerms, context, {
+      directEquivalenceUnlikely: true,
+      checkedForDirectEquivalence: false,
+      obtainedFinalSets: false,
+      followedEmbeddings: false,
+      addedStructuralCases: false
+    });
   }
 
   private checkElementCompatibility(object: Object, elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
     if (elementTerms.length > 1) {
       this.checkCompatibility(object, [], elementTerms, context);
+    }
+  }
+
+  private checkSetCompatibilityInternal(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext, status: HLMCheckerCompatibilityStatus): void {
+    if (setTerms.length > 1) {
+      if (status.obtainedFinalSets && status.followedEmbeddings && status.addedStructuralCases) {
+        let firstTerm = setTerms[0];
+        for (let index = 1; index < setTerms.length; index++) {
+          let term = setTerms[index];
+          if (status.checkedForDirectEquivalence || !firstTerm.isEquivalentTo(term)) {
+            this.error(object, 'Type mismatch');
+            return;
+          }
+        }
+      } else {
+        let localPromise = CachedPromise.resolve();
+        let nextSetTerms: Fmt.Expression[] = [];
+        let nextStatus: HLMCheckerCompatibilityStatus = {
+          directEquivalenceUnlikely: false,
+          checkedForDirectEquivalence: !status.directEquivalenceUnlikely,
+          obtainedFinalSets: true,
+          followedEmbeddings: status.obtainedFinalSets,
+          addedStructuralCases: status.followedEmbeddings || !context.parentStructuralCases.length
+        };
+        if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
+          for (let index = 0; index < setTerms.length; index++) {
+            let term = setTerms[index];
+            for (let structuralCaseRef of context.parentStructuralCases) {
+              term = this.utils.buildSingleStructuralCaseSetTerm(structuralCaseRef.term, structuralCaseRef.construction, structuralCaseRef._constructor, structuralCaseRef.parameters, term);
+            }
+            setTerms[index] = term;
+          }
+        }
+        let firstTerm = setTerms[0];
+        for (let index = 1; index < setTerms.length; index++) {
+          let term = setTerms[index];
+          if (status.directEquivalenceUnlikely || status.checkedForDirectEquivalence || !firstTerm.isEquivalentTo(term)) {
+            localPromise = localPromise.then(() =>
+              this.utils.getFinalSuperset(term, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
+                if (!this.utils.isWildcardFinalSet(finalSuperset)) {
+                  nextSetTerms.push(finalSuperset);
+                  if (finalSuperset !== term) {
+                    nextStatus.checkedForDirectEquivalence = false;
+                  }
+                }
+              })
+            );
+          }
+        }
+        localPromise = localPromise.then((): CachedPromise<void> | void => {
+          if (nextSetTerms.length) {
+            return this.utils.getFinalSuperset(firstTerm, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
+              if (!this.utils.isWildcardFinalSet(finalSuperset)) {
+                nextSetTerms.unshift(finalSuperset);
+                if (finalSuperset !== firstTerm) {
+                  nextStatus.checkedForDirectEquivalence = false;
+                }
+              }
+            });
+          }
+        });
+        localPromise = localPromise
+          .then(() => this.checkSetCompatibilityInternal(object, nextSetTerms, context, nextStatus))
+          .catch((error) => this.conditionalError(object, error.message));
+        this.promise = this.promise.then(() => localPromise);
+      }
     }
   }
 
