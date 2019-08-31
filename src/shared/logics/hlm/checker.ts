@@ -135,6 +135,7 @@ class HLMDefinitionChecker {
         }
       }
     }
+    // TODO somehow this doesn't catch missing substitutions
     if (!rightParameters.isEquivalentTo(leftParameters, unificationFn)) {
       this.error(rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
@@ -463,6 +464,10 @@ class HLMDefinitionChecker {
       let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkElementTerm(value, caseContext);
       let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
+    } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+      this.checkElementTerm(term.term, context);
+      this.checkSetTerm(term._set, context);
+      this.checkCompatibility(term, [term._set], [term.term], context);
     } else {
       this.error(term, 'Element term expected');
     }
@@ -538,19 +543,21 @@ class HLMDefinitionChecker {
           let type = bindingParameters[indexIndex].type.expression as FmtHLM.MetaRefExpression_Binding;
           if (!(currentSet && type._set instanceof FmtHLM.MetaRefExpression_previous)) {
             currentSet = type._set;
+            for (let substitutionIndex = 0; substitutionIndex < indexIndex; substitutionIndex++) {
+              currentSet = this.utils.substituteVariable(currentSet, bindingParameters[substitutionIndex], () => expression.indices![substitutionIndex]);
+            }
           }
           this.checkCompatibility(index, [currentSet], [index], context);
           indexIndex++;
         } else {
-          this.error(expression, `Superfluous index`);
-          break;
+          this.error(index, `Superfluous index`);
         }
       }
-      if (expression.indices.length < bindingParameters.length) {
+      if (indexIndex < bindingParameters.length) {
         this.error(expression, `Too few indices`);
       }
     } else if (bindingParameters.length) {
-        this.error(expression, `Indices required`);
+      this.error(expression, `Indices required`);
     }
   }
 
@@ -701,7 +708,8 @@ class HLMDefinitionChecker {
     let declaredSetsPromise = CachedPromise.resolve(setTerms);
     for (let elementTerm of elementTerms) {
       declaredSetsPromise = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) =>
-        this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet)));
+        this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet))
+      );
     }
     let checkDeclaredSets = declaredSetsPromise
       .then((declaredSets: Fmt.Expression[]) => this.checkSetCompatibilityInternal(object, declaredSets, context, {
@@ -743,8 +751,7 @@ class HLMDefinitionChecker {
           }
         }
       } else {
-        let localPromise = CachedPromise.resolve();
-        let nextSetTerms: Fmt.Expression[] = [];
+        let nextSetTermsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         let nextStatus: HLMCheckerCompatibilityStatus = {
           directEquivalenceUnlikely: false,
           checkedForDirectEquivalence: !status.directEquivalenceUnlikely,
@@ -765,34 +772,40 @@ class HLMDefinitionChecker {
         for (let index = 1; index < setTerms.length; index++) {
           let term = setTerms[index];
           if (status.directEquivalenceUnlikely || status.checkedForDirectEquivalence || !firstTerm.isEquivalentTo(term)) {
-            localPromise = localPromise.then(() =>
+            nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) =>
               this.utils.getFinalSuperset(term, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
-                if (!this.utils.isWildcardFinalSet(finalSuperset)) {
-                  nextSetTerms.push(finalSuperset);
+                if (this.utils.isWildcardFinalSet(finalSuperset)) {
+                  return nextSetTerms;
+                } else {
                   if (finalSuperset !== term) {
                     nextStatus.checkedForDirectEquivalence = false;
                   }
+                  return nextSetTerms.concat(finalSuperset);
                 }
               })
             );
           }
         }
-        localPromise = localPromise.then((): CachedPromise<void> | void => {
+        nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) => {
           if (nextSetTerms.length) {
             return this.utils.getFinalSuperset(firstTerm, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
-              if (!this.utils.isWildcardFinalSet(finalSuperset)) {
-                nextSetTerms.unshift(finalSuperset);
+              if (this.utils.isWildcardFinalSet(finalSuperset)) {
+                return nextSetTerms;
+              } else {
                 if (finalSuperset !== firstTerm) {
                   nextStatus.checkedForDirectEquivalence = false;
                 }
+                return [finalSuperset, ...nextSetTerms];
               }
             });
+          } else {
+            return nextSetTerms;
           }
         });
-        localPromise = localPromise
-          .then(() => this.checkSetCompatibilityInternal(object, nextSetTerms, context, nextStatus))
+        let checkNextSetTerms = nextSetTermsPromise
+          .then((nextSetTerms: Fmt.Expression[]) => this.checkSetCompatibilityInternal(object, nextSetTerms, context, nextStatus))
           .catch((error) => this.conditionalError(object, error.message));
-        this.promise = this.promise.then(() => localPromise);
+        this.promise = this.promise.then(() => checkNextSetTerms);
       }
     }
   }

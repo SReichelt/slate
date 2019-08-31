@@ -43,6 +43,7 @@ export class HLMUtils extends GenericUtils {
     return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element);
   }
 
+  // OPT omit proofs during argument conversion, as they are not used
   private getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
     let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
@@ -451,7 +452,6 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  // TODO honor embedSubsets
   getNextSuperset(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression | undefined> {
     if (term instanceof Fmt.VariableRefExpression) {
       let type = term.variable.type.expression;
@@ -479,19 +479,57 @@ export class HLMUtils extends GenericUtils {
       }
     } else if (term instanceof Fmt.DefinitionRefExpression) {
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
-        if (followEmbeddings && definition.contents instanceof FmtHLM.ObjectContents_Construction && definition.contents.embedding) {
-          let type = definition.contents.embedding.parameter.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_Element) {
-            return this.substitutePath(type._set, term.path, [definition]);
+        if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
+          if (followEmbeddings && definition.contents.embedding) {
+            let type = definition.contents.embedding.parameter.type.expression;
+            if (type instanceof FmtHLM.MetaRefExpression_Element) {
+              return this.substitutePath(type._set, term.path, [definition]);
+            } else {
+              return CachedPromise.reject(new Error('Element parameter expected'));
+            }
           } else {
-            return CachedPromise.reject(new Error('Element parameter expected'));
+            let supersetResult: CachedPromise<Fmt.Expression | undefined> = CachedPromise.resolve(undefined);
+            for (let param of definition.parameters) {
+              let type = param.type.expression;
+              if ((type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true) {
+                supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+                  if (currentResult) {
+                    return currentResult;
+                  } else {
+                    let argValue = this.getArgValue(term.path.arguments, param);
+                    if (argValue) {
+                      return this.getNextSuperset(argValue, followEmbeddings).then((superset: Fmt.Expression | undefined) => {
+                        if (superset) {
+                          let result = term.clone() as Fmt.DefinitionRefExpression;
+                          if (type instanceof FmtHLM.MetaRefExpression_Set) {
+                            let resultArg = this.getArgument([result.path.arguments], param, FmtHLM.ObjectContents_SetArg)!;
+                            resultArg._set = superset;
+                          } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+                            let resultArg = this.getArgument([result.path.arguments], param, FmtHLM.ObjectContents_SubsetArg)!;
+                            resultArg._set = superset;
+                          }
+                          return result;
+                        } else {
+                          return undefined;
+                        }
+                      });
+                    } else {
+                      return undefined;
+                    }
+                  }
+                });
+              }
+            }
+            return supersetResult;
           }
-        } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator && definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length) {
-          let item = definition.contents.definition.items[0];
-          return this.substitutePath(item, term.path, [definition]);
-        } else {
-          return undefined;
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
+          let definitionList = definition.contents.definition;
+          if (definitionList instanceof Fmt.ArrayExpression && definitionList.items.length) {
+            let item = definitionList.items[0];
+            return this.substitutePath(item, term.path, [definition]);
+          }
         }
+        return undefined;
       });
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms && term.terms.length) {
@@ -636,6 +674,8 @@ export class HLMUtils extends GenericUtils {
         } else {
           return this.getWildcardFinalSet();
         }
+      } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+        return CachedPromise.resolve(term._set);
       } else {
         return CachedPromise.reject(new Error('Element term expected'));
       }

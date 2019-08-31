@@ -913,6 +913,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       };
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
+    } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+      return this.renderElementTermInternal(term.term);
     } else {
       return this.renderGenericExpression(term);
     }
