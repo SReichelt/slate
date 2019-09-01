@@ -303,8 +303,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private prefetch = (): boolean => {
-    if (this.prefetchQueue.length) {
-      let prefetchQueueItem = this.prefetchQueue.shift()!;
+    let prefetchQueueItem = this.prefetchQueue.shift();
+    if (prefetchQueueItem) {
       if (prefetchQueueItem.isSubsection) {
         this.fetchSubsection(prefetchQueueItem.path, prefetchQueueItem.itemNumber, false)
           .then(this.prefetch)

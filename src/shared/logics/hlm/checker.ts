@@ -22,6 +22,7 @@ interface HLMCheckerStructuralCaseRef {
 interface HLMCheckerContext {
   previousSetTerm?: Fmt.Expression;
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
+  inTypeCast: boolean;
 }
 
 interface HLMCheckerCompatibilityStatus {
@@ -34,7 +35,7 @@ interface HLMCheckerCompatibilityStatus {
 
 class HLMDefinitionChecker {
   private utils: HLMUtils;
-  private readonly rootContext: HLMCheckerContext = {parentStructuralCases: []};
+  private readonly rootContext: HLMCheckerContext = {parentStructuralCases: [], inTypeCast: false};
   private result: Logic.LogicCheckResult = {diagnostics: [], hasErrors: false};
   private promise = CachedPromise.resolve();
 
@@ -467,7 +468,12 @@ class HLMDefinitionChecker {
     } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
       this.checkElementTerm(term.term, context);
       this.checkSetTerm(term._set, context);
-      this.checkCompatibility(term, [term._set], [term.term], context);
+      let typeCastContext: HLMCheckerContext = {
+        ...context,
+        inTypeCast: true
+      };
+      this.checkCompatibility(term, [term._set], [term.term], typeCastContext);
+      this.checkProof(term.proof, context);
     } else {
       this.error(term, 'Element term expected');
     }
@@ -773,7 +779,7 @@ class HLMDefinitionChecker {
           let term = setTerms[index];
           if (status.directEquivalenceUnlikely || status.checkedForDirectEquivalence || !firstTerm.isEquivalentTo(term)) {
             nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) =>
-              this.utils.getFinalSuperset(term, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
+              this.utils.getFinalSuperset(term, nextStatus.followedEmbeddings, context.inTypeCast).then((finalSuperset: Fmt.Expression) => {
                 if (this.utils.isWildcardFinalSet(finalSuperset)) {
                   return nextSetTerms;
                 } else {
@@ -788,7 +794,7 @@ class HLMDefinitionChecker {
         }
         nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) => {
           if (nextSetTerms.length) {
-            return this.utils.getFinalSuperset(firstTerm, nextStatus.followedEmbeddings).then((finalSuperset: Fmt.Expression) => {
+            return this.utils.getFinalSuperset(firstTerm, nextStatus.followedEmbeddings, context.inTypeCast).then((finalSuperset: Fmt.Expression) => {
               if (this.utils.isWildcardFinalSet(finalSuperset)) {
                 return nextSetTerms;
               } else {
