@@ -106,12 +106,11 @@ class LibraryDocumentProvider {
     }
 
     private getLibrary(event: ParseDocumentEvent, isSection: boolean): Library | undefined {
-        let libraryBaseUri = this.getLibraryBaseUri(event);
-        let libraryName = this.getLibraryName(event, libraryBaseUri);
-        if (!libraryName) {
+        let libraryUri = this.getLibraryUri(event);
+        if (!libraryUri) {
             return undefined;
         }
-        let library = this.libraries.get(libraryName);
+        let library = this.libraries.get(libraryUri);
         if (!library) {
             let logicName = this.getLogicName(event, isSection);
             if (!logicName) {
@@ -121,32 +120,32 @@ class LibraryDocumentProvider {
             if (!logic) {
                 return undefined;
             }
-            let libraryUri = libraryBaseUri + libraryName;
             library = {
                 libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, 'Library'),
-                diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + libraryName)
+                diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
-            this.libraries.set(libraryName, library);
+            this.libraries.set(libraryUri, library);
         }
         return library;
     }
 
-    private getLibraryBaseUri(event: ParseDocumentEvent): string | undefined {
+    private getLibraryUri(event: ParseDocumentEvent): string | undefined {
         let workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
         if (!workspaceFolder) {
             return undefined;
         }
-        return workspaceFolder.uri.toString() + '/data/libraries/';
-    }
-
-    private getLibraryName(event: ParseDocumentEvent, libraryBaseUri: string | undefined): string | undefined {
         let documentUri = event.document.uri.toString();
-        if (!libraryBaseUri || !documentUri.startsWith(libraryBaseUri)) {
-            return undefined;
+        let libraryBaseUri = workspaceFolder.uri.toString() + '/data/libraries/';
+        if (documentUri.startsWith(libraryBaseUri)) {
+            let slashPos = documentUri.indexOf('/', libraryBaseUri.length);
+            return slashPos >= 0 ? documentUri.substring(0, slashPos) : documentUri;
         }
-        let relativeUri = documentUri.substring(libraryBaseUri.length);
-        let slashPos = relativeUri.indexOf('/');
-        return slashPos >= 0 ? relativeUri.substring(0, slashPos) : relativeUri;
+        let testDataUriPart = '/__tests__/data/';
+        let testDataPos = documentUri.indexOf(testDataUriPart);
+        if (testDataPos >= 0) {
+            return documentUri.substring(0, testDataPos + testDataUriPart.length);
+        }
+        return undefined;
     }
 
     private getLogicName(event: ParseDocumentEvent, isSection: boolean): string | undefined {

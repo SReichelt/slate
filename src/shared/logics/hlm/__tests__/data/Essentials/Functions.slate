@@ -1,0 +1,27 @@
+%../../../../../../../data/logics/hlm%
+
+$Functions(
+  X: %Set,
+  Y: %Set
+): %Construction {
+  $function(x: %Binding(
+    X,
+    #(y: %Element(Y))
+  )): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(x: %Binding(
+        X,
+        #(y: %Element(Y))
+      )),
+      rightParameters = #(x: %Binding(
+        X,
+        #("y'": %Element(Y))
+      )),
+      definition = [%forall(
+        #(x: %Element(X)),
+        %equals(y[x], "y'"[x])
+      )],
+      isomorphic = %true
+    }
+  }
+}

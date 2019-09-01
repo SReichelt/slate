@@ -39,7 +39,7 @@ interface ParsedMetaModel {
 let lastReadFileName: string | undefined = undefined;
 let lastReadFileContents: string | undefined = undefined;
 
-function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vscode.TextDocument): string | undefined {
+function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vscode.TextDocument): string {
     if (sourceDocument && areUrisEqual(uri, sourceDocument.uri)) {
         return sourceDocument.getText(range);
     }
@@ -48,18 +48,26 @@ function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vs
             return document.getText(range);
         }
     }
-    try {
-        let fileName = uri.fsPath;
-        if (lastReadFileName !== fileName) {
-            lastReadFileName = undefined;
-            lastReadFileContents = fs.readFileSync(fileName, 'utf8');
-            lastReadFileName = fileName;
+    let fileName = uri.fsPath;
+    if (lastReadFileName !== fileName) {
+        lastReadFileName = undefined;
+        lastReadFileContents = fs.readFileSync(fileName, 'utf8');
+        lastReadFileName = fileName;
+    }
+    let contents = lastReadFileContents!;
+    if (range) {
+        let position = 0;
+        let line = 0;
+        for (; line < range.start.line; line++) {
+            position = contents.indexOf('\n', position);
+            if (position < 0) {
+                break;
+            }
+            position++;
         }
-        let contents = lastReadFileContents!;
-        if (range) {
-            let position = 0;
-            let line = 0;
-            for (; line < range.start.line; line++) {
+        if (position >= 0) {
+            let start = position + range.start.character;
+            for (; line < range.end.line; line++) {
                 position = contents.indexOf('\n', position);
                 if (position < 0) {
                     break;
@@ -67,69 +75,60 @@ function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocument?: vs
                 position++;
             }
             if (position >= 0) {
-                let start = position + range.start.character;
-                for (; line < range.end.line; line++) {
-                    position = contents.indexOf('\n', position);
-                    if (position < 0) {
-                        break;
-                    }
-                    position++;
-                }
-                if (position >= 0) {
-                    let end = position + range.end.character;
-                    return contents.substring(start, end);
-                }
+                let end = position + range.end.character;
+                return contents.substring(start, end);
             }
-        } else {
-            return contents;
         }
-    } catch (error) {
+        return '';
+    } else {
+        return contents;
     }
-    return undefined;
 }
 
 function readRange(uri: vscode.Uri, range?: vscode.Range, singleLine: boolean = false, sourceDocument?: vscode.TextDocument): string | undefined {
-    let raw = readRangeRaw(uri, range, sourceDocument);
-    if (raw !== undefined) {
-        if (singleLine) {
-            let result = '';
-            let carry = '';
-            for (let c of raw) {
-                if (c === '\r' || c === '\n' || c === '\t') {
-                    c = ' ';
-                }
-                if (c === ' ' && (carry === ' ' || carry === '(' || carry === '[' || carry === '{')) {
-                    continue;
-                }
-                if (!(carry === ' ' && (c === ')' || c === ']' || c === '}' || c === ','))) {
-                    result += carry;
-                }
-                carry = c;
-            }
-            result += carry;
-            return result;
-        } else if (range) {
-            let result = '';
-            let spacesToSkip = 0;
-            for (let c of raw) {
-                if (c === '\n') {
-                    spacesToSkip = range.start.character;
-                } else if (spacesToSkip) {
-                    if (c === ' ' || c === '\t') {
-                        spacesToSkip--;
-                        continue;
-                    } else {
-                        spacesToSkip = 0;
-                    }
-                }
-                result += c;
-            }
-            return result;
-        } else {
-            return raw;
-        }
+    let raw: string;
+    try {
+        raw = readRangeRaw(uri, range, sourceDocument);
+    } catch (error) {
+        return undefined;
     }
-    return undefined;
+    if (singleLine) {
+        let result = '';
+        let carry = '';
+        for (let c of raw) {
+            if (c === '\r' || c === '\n' || c === '\t') {
+                c = ' ';
+            }
+            if (c === ' ' && (carry === ' ' || carry === '(' || carry === '[' || carry === '{')) {
+                continue;
+            }
+            if (!(carry === ' ' && (c === ')' || c === ']' || c === '}' || c === ','))) {
+                result += carry;
+            }
+            carry = c;
+        }
+        result += carry;
+        return result;
+    } else if (range) {
+        let result = '';
+        let spacesToSkip = 0;
+        for (let c of raw) {
+            if (c === '\n') {
+                spacesToSkip = range.start.character;
+            } else if (spacesToSkip) {
+                if (c === ' ' || c === '\t') {
+                    spacesToSkip--;
+                    continue;
+                } else {
+                    spacesToSkip = 0;
+                }
+            }
+            result += c;
+        }
+        return result;
+    } else {
+        return raw;
+    }
 }
 
 function findDefinition(definitions: Fmt.DefinitionList, path: Fmt.Path): Fmt.Definition | undefined {
@@ -312,10 +311,13 @@ function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, 
                         if (readSignatureCode) {
                             let definitionRangeInfo = metaModelDocument.rangeMap.get(metaContents.members);
                             if (definitionRangeInfo) {
-                                if (signatureCode) {
-                                    signatureCode = ', ' + signatureCode;
+                                let text = readRange(metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument);
+                                if (text) {
+                                    if (signatureCode) {
+                                        signatureCode = ', ' + signatureCode;
+                                    }
+                                    signatureCode = '#' + text + signatureCode;
                                 }
-                                signatureCode = '#' + readRange(metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument) + signatureCode;
                             }
                         }
                     }
@@ -1356,7 +1358,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
             rangeList: [],
             rangeMap: new Map<Object, RangeInfo>()
         };
-        let metaModelFileContents = readRange(parsedMetaModelDocument.uri)!;
+        let metaModelFileContents = readRangeRaw(parsedMetaModelDocument.uri);
         let reportMetaModelRange = (info: FmtReader.ObjectRangeInfo) => {
             let rangeInfo = convertRangeInfo(info);
             parsedMetaModelDocument.rangeList.push(rangeInfo);

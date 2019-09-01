@@ -1,0 +1,10 @@
+%../../../../../../../data/logics/library%
+
+$Essentials: %Section {
+  logic = 'hlm',
+  items = [
+    %item($Functions),
+    %item($value),
+    %item($composition)
+  ]
+}

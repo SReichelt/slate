@@ -19,11 +19,10 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
   let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), undefined, libraryName);
-  let checker = logic.getChecker();
-  return libraryDataProvider.fetchLocalSection().then((definition: Fmt.Definition) => checkSection(definition, libraryDataProvider, checker));
+  return libraryDataProvider.fetchLocalSection().then((definition: Fmt.Definition) => checkSection(definition, libraryDataProvider));
 }
 
-function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, checker: Logic.LogicChecker): CachedPromise<boolean> {
+function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
   let promise = CachedPromise.resolve(true);
   let contents = definition.contents as FmtLibrary.ObjectContents_Section;
   if (contents.items instanceof Fmt.ArrayExpression) {
@@ -32,14 +31,14 @@ function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDa
         let ref = item.ref as Fmt.DefinitionRefExpression;
         promise = promise.then((currentResult: boolean) =>
           libraryDataProvider.fetchItem(ref.path)
-            .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path, checker))
+            .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
             .then((itemResult: boolean) => currentResult && itemResult));
       } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
         let ref = item.ref as Fmt.DefinitionRefExpression;
         let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
         promise = promise.then((currentResult: boolean) =>
           subsectionDataProvider.fetchLocalSection()
-            .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider, checker))
+            .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider))
             .then((itemResult: boolean) => currentResult && itemResult));
       }
     }
@@ -47,7 +46,8 @@ function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDa
   return promise;
 }
 
-function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path, checker: Logic.LogicChecker): CachedPromise<boolean> {
+function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path): CachedPromise<boolean> {
+  let checker = libraryDataProvider.logic.getChecker();
   return checker.checkDefinition(definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
     let result = true;
     for (let diagnostic of checkResult.diagnostics) {

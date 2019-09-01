@@ -916,186 +916,186 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     for (let next = iterator.next(); !next.done; next = iterator.next()) {
       let c = next.value;
       switch (c) {
-        case '\r':
-          break;
-        case '\n':
-          flush();
-          result.push(<br key={childIndex++}/>);
-          break;
-        case ' ':
-          if (curText) {
-            if (curText.endsWith(' ')) {
-              curText = curText.substring(0, curText.length - 1);
-              flush();
-              result.push(<span key={childIndex++}>&nbsp;</span>);
-            }
-            curText += c;
-          } else {
-            result.push(<span key={childIndex++}>{'\u2008'}</span>);
+      case '\r':
+        break;
+      case '\n':
+        flush();
+        result.push(<br key={childIndex++}/>);
+        break;
+      case ' ':
+        if (curText) {
+          if (curText.endsWith(' ')) {
+            curText = curText.substring(0, curText.length - 1);
+            flush();
+            result.push(<span key={childIndex++}>&nbsp;</span>);
           }
-          break;
-        case '\'':
-          flush();
-          result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
-          break;
-        default:
-          let cp = c.codePointAt(0)!;
-          if (cp >= 0x1d400 && cp < 0x1d434) {
-            setStyle('bold');
-            curText += this.convertLatinMathToRegular(cp - 0x1d400);
-          } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
-            setStyle('bold');
-            curText += this.convertGreekMathToRegular(cp - 0x1d6a8);
-          } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
-            setStyle('bold');
-            curText += this.convertDigitMathToRegular(cp - 0x1d7ce);
-          } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
-            setStyle('italic');
-            switch (cp) {
-              case 0x210e:
-                curText += 'h';
-                break;
-              default:
-                curText += this.convertLatinMathToRegular(cp - 0x1d434);
-            }
-          } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
-            setStyle('italic');
-            curText += this.convertGreekMathToRegular(cp - 0x1d6e2);
-          } else if (cp >= 0x1d468 && cp < 0x1d49c) {
-            setStyle('bold italic');
-            curText += this.convertLatinMathToRegular(cp - 0x1d468);
-          } else if (cp >= 0x1d71c && cp < 0x1d756) {
-            setStyle('bold italic');
-            curText += this.convertGreekMathToRegular(cp - 0x1d71c);
-          } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
-            setStyle('sans');
-            curText += this.convertLatinMathToRegular(cp - 0x1d5a0);
-          } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
-            setStyle('sans');
-            curText += this.convertDigitMathToRegular(cp - 0x1d7e2);
-          } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
-            setStyle('sans bold');
-            curText += this.convertLatinMathToRegular(cp - 0x1d5d4);
-          } else if (cp >= 0x1d756 && cp < 0x1d790) {
-            setStyle('sans bold');
-            curText += this.convertGreekMathToRegular(cp - 0x1d756);
-          } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
-            setStyle('sans bold');
-            curText += this.convertDigitMathToRegular(cp - 0x1d7ec);
-          } else if (cp >= 0x1d608 && cp < 0x1d63c) {
-            setStyle('sans italic');
-            curText += this.convertLatinMathToRegular(cp - 0x1d608);
-          } else if (cp >= 0x1d63c && cp < 0x1d670) {
-            setStyle('sans bold italic');
-            curText += this.convertLatinMathToRegular(cp - 0x1d63c);
-          } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
-            setStyle('sans bold italic');
-            curText += this.convertGreekMathToRegular(cp - 0x1d790);
-          } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
-            setStyle('calligraphic');
-            switch (cp) {
-              case 0x212c:
-                curText += 'B';
-                break;
-              case 0x2130:
-                curText += 'E';
-                break;
-              case 0x2131:
-                curText += 'F';
-                break;
-              case 0x210b:
-                curText += 'H';
-                break;
-              case 0x2110:
-                curText += 'I';
-                break;
-              case 0x2112:
-                curText += 'L';
-                break;
-              case 0x2133:
-                curText += 'M';
-                break;
-              case 0x211b:
-                curText += 'R';
-                break;
-              case 0x212f:
-                curText += 'e';
-                break;
-              case 0x210a:
-                curText += 'g';
-                break;
-              case 0x2134:
-                curText += 'o';
-                break;
-              default:
-                curText += this.convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
-            }
-          } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
-            setStyle('fraktur');
-            switch (cp) {
-              case 0x212d:
-                curText += 'C';
-                break;
-              case 0x210c:
-                curText += 'H';
-                break;
-              case 0x2111:
-                curText += 'I';
-                break;
-              case 0x211c:
-                curText += 'R';
-                break;
-              case 0x2128:
-                curText += 'Z';
-                break;
-              default:
-                curText += this.convertLatinMathToRegular(cp < 0x1d56c ? cp - 0x1d504 : cp - 0x1d56c);
-            }
-          } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
-            setStyle('double-struck');
-            switch (cp) {
-              case 0x2102:
-                curText += 'C';
-                break;
-              case 0x210d:
-                curText += 'H';
-                break;
-              case 0x2115:
-                curText += 'N';
-                break;
-              case 0x2119:
-                curText += 'P';
-                break;
-              case 0x211a:
-                curText += 'Q';
-                break;
-              case 0x211d:
-                curText += 'R';
-                break;
-              case 0x2124:
-                curText += 'Z';
-                break;
-              default:
-                curText += this.convertLatinMathToRegular(cp - 0x1d538);
-            }
-          } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
-            setStyle('double-struck');
-            curText += this.convertDigitMathToRegular(cp - 0x1d7d8);
-          } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
-            setStyle('monospace');
-            curText += this.convertLatinMathToRegular(cp - 0x1d670);
-          } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
-            setStyle('monospace');
-            curText += this.convertDigitMathToRegular(cp - 0x1d7f6);
-          } else {
-            if (curStyle) {
-              flush();
-            }
-            if (this.shrinkMathSpaces) {
-              c = shrinkMathSpace(c);
-            }
-            curText += c;
+          curText += c;
+        } else {
+          result.push(<span key={childIndex++}>{'\u2008'}</span>);
+        }
+        break;
+      case '\'':
+        flush();
+        result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
+        break;
+      default:
+        let cp = c.codePointAt(0)!;
+        if (cp >= 0x1d400 && cp < 0x1d434) {
+          setStyle('bold');
+          curText += this.convertLatinMathToRegular(cp - 0x1d400);
+        } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
+          setStyle('bold');
+          curText += this.convertGreekMathToRegular(cp - 0x1d6a8);
+        } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
+          setStyle('bold');
+          curText += this.convertDigitMathToRegular(cp - 0x1d7ce);
+        } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
+          setStyle('italic');
+          switch (cp) {
+          case 0x210e:
+            curText += 'h';
+            break;
+          default:
+            curText += this.convertLatinMathToRegular(cp - 0x1d434);
           }
+        } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
+          setStyle('italic');
+          curText += this.convertGreekMathToRegular(cp - 0x1d6e2);
+        } else if (cp >= 0x1d468 && cp < 0x1d49c) {
+          setStyle('bold italic');
+          curText += this.convertLatinMathToRegular(cp - 0x1d468);
+        } else if (cp >= 0x1d71c && cp < 0x1d756) {
+          setStyle('bold italic');
+          curText += this.convertGreekMathToRegular(cp - 0x1d71c);
+        } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
+          setStyle('sans');
+          curText += this.convertLatinMathToRegular(cp - 0x1d5a0);
+        } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
+          setStyle('sans');
+          curText += this.convertDigitMathToRegular(cp - 0x1d7e2);
+        } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
+          setStyle('sans bold');
+          curText += this.convertLatinMathToRegular(cp - 0x1d5d4);
+        } else if (cp >= 0x1d756 && cp < 0x1d790) {
+          setStyle('sans bold');
+          curText += this.convertGreekMathToRegular(cp - 0x1d756);
+        } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
+          setStyle('sans bold');
+          curText += this.convertDigitMathToRegular(cp - 0x1d7ec);
+        } else if (cp >= 0x1d608 && cp < 0x1d63c) {
+          setStyle('sans italic');
+          curText += this.convertLatinMathToRegular(cp - 0x1d608);
+        } else if (cp >= 0x1d63c && cp < 0x1d670) {
+          setStyle('sans bold italic');
+          curText += this.convertLatinMathToRegular(cp - 0x1d63c);
+        } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
+          setStyle('sans bold italic');
+          curText += this.convertGreekMathToRegular(cp - 0x1d790);
+        } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
+          setStyle('calligraphic');
+          switch (cp) {
+          case 0x212c:
+            curText += 'B';
+            break;
+          case 0x2130:
+            curText += 'E';
+            break;
+          case 0x2131:
+            curText += 'F';
+            break;
+          case 0x210b:
+            curText += 'H';
+            break;
+          case 0x2110:
+            curText += 'I';
+            break;
+          case 0x2112:
+            curText += 'L';
+            break;
+          case 0x2133:
+            curText += 'M';
+            break;
+          case 0x211b:
+            curText += 'R';
+            break;
+          case 0x212f:
+            curText += 'e';
+            break;
+          case 0x210a:
+            curText += 'g';
+            break;
+          case 0x2134:
+            curText += 'o';
+            break;
+          default:
+            curText += this.convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
+          }
+        } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
+          setStyle('fraktur');
+          switch (cp) {
+          case 0x212d:
+            curText += 'C';
+            break;
+          case 0x210c:
+            curText += 'H';
+            break;
+          case 0x2111:
+            curText += 'I';
+            break;
+          case 0x211c:
+            curText += 'R';
+            break;
+          case 0x2128:
+            curText += 'Z';
+            break;
+          default:
+            curText += this.convertLatinMathToRegular(cp < 0x1d56c ? cp - 0x1d504 : cp - 0x1d56c);
+          }
+        } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
+          setStyle('double-struck');
+          switch (cp) {
+          case 0x2102:
+            curText += 'C';
+            break;
+          case 0x210d:
+            curText += 'H';
+            break;
+          case 0x2115:
+            curText += 'N';
+            break;
+          case 0x2119:
+            curText += 'P';
+            break;
+          case 0x211a:
+            curText += 'Q';
+            break;
+          case 0x211d:
+            curText += 'R';
+            break;
+          case 0x2124:
+            curText += 'Z';
+            break;
+          default:
+            curText += this.convertLatinMathToRegular(cp - 0x1d538);
+          }
+        } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
+          setStyle('double-struck');
+          curText += this.convertDigitMathToRegular(cp - 0x1d7d8);
+        } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
+          setStyle('monospace');
+          curText += this.convertLatinMathToRegular(cp - 0x1d670);
+        } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
+          setStyle('monospace');
+          curText += this.convertDigitMathToRegular(cp - 0x1d7f6);
+        } else {
+          if (curStyle) {
+            flush();
+          }
+          if (this.shrinkMathSpaces) {
+            c = shrinkMathSpace(c);
+          }
+          curText += c;
+        }
       }
     }
     flush();

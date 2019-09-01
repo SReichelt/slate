@@ -53,21 +53,21 @@ export function isNumericalCharacter(c: string): boolean {
 
 export function shrinkMathSpace(c: string): string {
   switch (c) {
-    case '\u2002':
-      return '\u2005';
-    case '\u2003':
-      return '\u2002';
-    case '\u2004':
-      return '\u2006';
-    case '\u2005':
-      return '\u200a';
-    case '\u2006':
-    case '\u2009':
-    case '\u200a':
-    case '\u205f':
-      return '';
-    default:
-      return c;
+  case '\u2002':
+    return '\u2005';
+  case '\u2003':
+    return '\u2002';
+  case '\u2004':
+    return '\u2006';
+  case '\u2005':
+    return '\u200a';
+  case '\u2006':
+  case '\u2009':
+  case '\u200a':
+  case '\u205f':
+    return '';
+  default:
+    return c;
   }
 }
 

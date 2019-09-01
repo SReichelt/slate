@@ -183,9 +183,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         let icon: React.ReactNode = undefined;
         if (typeof row.iconType === 'string') {
           switch (row.iconType) {
-            case 'remove':
-              icon = getButtonIcon(ButtonType.Remove);
-              break;
+          case 'remove':
+            icon = getButtonIcon(ButtonType.Remove);
+            break;
           }
         } else {
           icon = getDefinitionIcon(row.iconType);

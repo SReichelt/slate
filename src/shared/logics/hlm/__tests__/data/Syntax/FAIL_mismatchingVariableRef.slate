@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Element term expected
+ */
+$FAIL_mismatchingVariableRef(V: %Set): %ExplicitOperator {
+  definition = [V]
+}

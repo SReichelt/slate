@@ -1,6 +1,5 @@
 import { PhysicalFileAccessor } from '../../../fs/data/physicalFileAccessor';
-import { LibraryDataProvider } from '../../data/libraryDataProvider';
-import { LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
+import { LibraryDataProvider, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataProvider';
 import * as Fmt from '../../format/format';
 import * as FmtReader from '../../format/read';
 import * as FmtLibrary from '../library';
@@ -24,12 +23,8 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
         if (item instanceof FmtLibrary.MetaRefExpression_item) {
           let ref = item.ref as Fmt.DefinitionRefExpression;
           let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
-          let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
-          let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), true, true, true);
-          if (renderedDefinition) {
-            let renderedText = renderAsText(renderedDefinition, false, false);
-            expect(renderedText).resolves.toMatchSnapshot(formatItemNumber(itemInfo.itemNumber) + ' ' + libraryDataProvider.pathToURI(ref.path));
-          }
+          let uri = libraryDataProvider.pathToURI(ref.path);
+          await checkItem(libraryDataProvider, templates, itemInfo, definition, uri);
         } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
           let ref = item.ref as Fmt.DefinitionRefExpression;
           let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
@@ -38,6 +33,15 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
       }
       index++;
     }
+  }
+}
+
+async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, itemInfo: LibraryItemInfo, definition: Fmt.Definition, uri: string) {
+  let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
+  let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), true, true, true);
+  if (renderedDefinition) {
+    let renderedText = renderAsText(renderedDefinition, false, false);
+    expect(renderedText).resolves.toMatchSnapshot(formatItemNumber(itemInfo.itemNumber) + ' ' + uri);
   }
 }
 

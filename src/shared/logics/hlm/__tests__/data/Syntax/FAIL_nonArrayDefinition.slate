@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Array expression expected
+ */
+$FAIL_nonArrayDefinition: %ExplicitOperator {
+  definition = 42
+}

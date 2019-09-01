@@ -1,4 +1,4 @@
-import { LibraryDataAccessor, LibraryItemInfo } from './libraryDataAccessor';
+import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
 import { FileAccessor, FileContents, WriteFileResult } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
@@ -8,7 +8,7 @@ import * as FmtWriter from '../format/write';
 import * as FmtLibrary from '../logics/library';
 import * as Logic from '../logics/logic';
 
-export { LibraryDataAccessor, LibraryItemInfo };
+export { LibraryDataAccessor, LibraryItemInfo, formatItemNumber };
 
 
 const fileExtension = '.slate';
@@ -152,26 +152,33 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return left.arguments.isEquivalentTo(right.arguments, unificationFn, replacedParameters);
   }
 
-  private fetchDefinition(name: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
-    let result = this.definitionCache.get(name);
+  private fetchDefinition(fileName: string, definitionName: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
+    let result = this.definitionCache.get(fileName);
     if (!result) {
-      let uri = this.uri + encodeURI(name) + fileExtension;
+      let uri = this.uri + encodeURI(fileName) + fileExtension;
       result = this.fileAccessor.readFile(uri)
         .then((contents: FileContents) => {
           contents.onChange = () => {
-            this.definitionCache.delete(name);
+            this.definitionCache.delete(fileName);
             contents.close();
           };
           let file = FmtReader.readString(contents.text, uri, getMetaModel);
-          return file.definitions[0];
+          if (file.definitions.length !== 1) {
+            throw new Error('File is expected to contain exactly one definition');
+          }
+          let definition = file.definitions[0];
+          if (definition.name !== definitionName) {
+            throw new Error(`Expected name "${definitionName}" but found "${definition.name}" instead`);
+          }
+          return definition;
         });
-      this.definitionCache.set(name, result);
+      this.definitionCache.set(fileName, result);
     }
     return result;
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
-    let result = this.fetchDefinition(name, FmtLibrary.getMetaModel);
+    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel);
     if (prefetchContents) {
       result.then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
@@ -211,7 +218,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
-    return this.fetchDefinition(name, this.logic.getMetaModel);
+    return this.fetchDefinition(name, name, this.logic.getMetaModel);
   }
 
   fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {

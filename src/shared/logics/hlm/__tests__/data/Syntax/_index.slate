@@ -1,0 +1,12 @@
+%../../../../../../../data/logics/library%
+
+$Syntax: %Section {
+  logic = 'hlm',
+  items = [
+    %item($FAIL_nonArrayDefinition),
+    %item($FAIL_nonTerm),
+    %item($FAIL_mismatchingTerm),
+    %item($FAIL_mismatchingVariableRef),
+    %item($FAIL_unexpectedPrevious)
+  ]
+}

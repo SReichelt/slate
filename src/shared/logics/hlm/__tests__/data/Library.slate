@@ -1,0 +1,15 @@
+%../../../../../../data/logics/library%
+
+$Library: %Library {
+  logic = 'hlm',
+  items = [
+    %subsection(
+      $Essentials,
+      'Essentials'
+    ),
+    %subsection(
+      $Syntax,
+      'Syntax'
+    )
+  ]
+}
