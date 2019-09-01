@@ -182,9 +182,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (prefetchContents) {
       result.then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
-          let items = definition.contents.items as Fmt.ArrayExpression;
           let index = 0;
-          for (let item of items.items) {
+          for (let item of definition.contents.items) {
             if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
               if (!path.parentPath && !this.definitionCache.get(path.name)) {
@@ -264,11 +263,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fetchLocalSection(false)
       .then((definition: Fmt.Definition) => {
         let contents = definition.contents as FmtLibrary.ObjectContents_Section;
-        let items = contents.items as Fmt.ArrayExpression;
         let type: string | undefined = undefined;
         let title: string | undefined = undefined;
         let index = 0;
-        for (let item of items.items) {
+        for (let item of contents.items) {
           if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
             if ((item.ref as Fmt.DefinitionRefExpression).path.name === name) {
               if (item instanceof FmtLibrary.MetaRefExpression_item) {

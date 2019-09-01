@@ -106,9 +106,9 @@ export class HLMRenderUtils {
       if (constraint instanceof Fmt.DefinitionRefExpression
           && definition
           && definition.contents instanceof FmtHLM.ObjectContents_Definition
-          && definition.contents.display instanceof Fmt.ArrayExpression
-          && definition.contents.display.items.length) {
-        let display = definition.contents.display.items[0];
+          && definition.contents.display
+          && definition.contents.display.length) {
+        let display = definition.contents.display[0];
         if (display instanceof Fmt.DefinitionRefExpression) {
           if (display.path.name === 'Property'
               || display.path.name === 'NounProperty'
@@ -164,9 +164,8 @@ export class HLMRenderUtils {
     return result;
   }
 
-  extractStructuralCases(definitions: Fmt.Expression): ExtractedStructuralCase[] {
-    let items = (definitions as Fmt.ArrayExpression).items;
-    return this.doExtractStructuralCases(this.definition.parameters, items, true);
+  extractStructuralCases(definitions: Fmt.Expression[]): ExtractedStructuralCase[] {
+    return this.doExtractStructuralCases(this.definition.parameters, definitions, true);
   }
 
   doExtractStructuralCases(parameters: Fmt.Parameter[], expressions: Fmt.Expression[], allowMultipleCases: boolean): ExtractedStructuralCase[] {

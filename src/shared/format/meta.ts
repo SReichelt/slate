@@ -7,26 +7,60 @@ import * as Ctx from './context';
 import * as Meta from './metaModel';
 
 export class ObjectContents_MetaModel extends Fmt.ObjectContents {
-  definitionTypes: Fmt.Expression;
-  expressionTypes?: Fmt.Expression;
-  functions?: Fmt.Expression;
+  definitionTypes: Fmt.Expression[];
+  expressionTypes?: Fmt.Expression[];
+  functions?: Fmt.Expression[];
   lookup?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.definitionTypes = argumentList.getValue('definitionTypes', 0);
-    this.expressionTypes = argumentList.getOptionalValue('expressionTypes', 1);
-    this.functions = argumentList.getOptionalValue('functions', 2);
+    let definitionTypesRaw = argumentList.getValue('definitionTypes', 0);
+    if (definitionTypesRaw instanceof Fmt.ArrayExpression) {
+      this.definitionTypes = definitionTypesRaw.items;
+    } else {
+      throw new Error('definitionTypes: Array expression expected');
+    }
+    let expressionTypesRaw = argumentList.getOptionalValue('expressionTypes', 1);
+    if (expressionTypesRaw !== undefined) {
+      if (expressionTypesRaw instanceof Fmt.ArrayExpression) {
+        this.expressionTypes = expressionTypesRaw.items;
+      } else {
+        throw new Error('expressionTypes: Array expression expected');
+      }
+    }
+    let functionsRaw = argumentList.getOptionalValue('functions', 2);
+    if (functionsRaw !== undefined) {
+      if (functionsRaw instanceof Fmt.ArrayExpression) {
+        this.functions = functionsRaw.items;
+      } else {
+        throw new Error('functions: Array expression expected');
+      }
+    }
     this.lookup = argumentList.getOptionalValue('lookup', 3);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.definitionTypes, 'definitionTypes', false);
+    let definitionTypesExpr = new Fmt.ArrayExpression;
+    definitionTypesExpr.items = [];
+    for (let item of this.definitionTypes) {
+      definitionTypesExpr.items.push(item);
+    }
+    argumentList.add(definitionTypesExpr, 'definitionTypes', false);
     if (this.expressionTypes !== undefined) {
-      argumentList.add(this.expressionTypes, 'expressionTypes', true);
+      let expressionTypesExpr = new Fmt.ArrayExpression;
+      expressionTypesExpr.items = [];
+      for (let item of this.expressionTypes) {
+        expressionTypesExpr.items.push(item);
+      }
+      argumentList.add(expressionTypesExpr, 'expressionTypes', true);
     }
     if (this.functions !== undefined) {
-      argumentList.add(this.functions, 'functions', true);
+      let functionsExpr = new Fmt.ArrayExpression;
+      functionsExpr.items = [];
+      for (let item of this.functions) {
+        functionsExpr.items.push(item);
+      }
+      argumentList.add(functionsExpr, 'functions', true);
     }
     if (this.lookup !== undefined) {
       argumentList.add(this.lookup, 'lookup', true);
@@ -42,21 +76,33 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.definitionTypes) {
-      result.definitionTypes = this.definitionTypes.substitute(fn, replacedParameters);
-      if (result.definitionTypes !== this.definitionTypes) {
-        changed = true;
+      result.definitionTypes = [];
+      for (let item of this.definitionTypes) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definitionTypes.push(newItem);
       }
     }
     if (this.expressionTypes) {
-      result.expressionTypes = this.expressionTypes.substitute(fn, replacedParameters);
-      if (result.expressionTypes !== this.expressionTypes) {
-        changed = true;
+      result.expressionTypes = [];
+      for (let item of this.expressionTypes) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.expressionTypes.push(newItem);
       }
     }
     if (this.functions) {
-      result.functions = this.functions.substitute(fn, replacedParameters);
-      if (result.functions !== this.functions) {
-        changed = true;
+      result.functions = [];
+      for (let item of this.functions) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.functions.push(newItem);
       }
     }
     if (this.lookup) {
@@ -73,18 +119,45 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       return true;
     }
     if (this.definitionTypes || objectContents.definitionTypes) {
-      if (!this.definitionTypes || !objectContents.definitionTypes || !this.definitionTypes.isEquivalentTo(objectContents.definitionTypes, fn, replacedParameters)) {
+      if (!this.definitionTypes || !objectContents.definitionTypes || this.definitionTypes.length !== objectContents.definitionTypes.length) {
         return false;
+      }
+      for (let i = 0; i < this.definitionTypes.length; i++) {
+        let leftItem = this.definitionTypes[i];
+        let rightItem = objectContents.definitionTypes[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.expressionTypes || objectContents.expressionTypes) {
-      if (!this.expressionTypes || !objectContents.expressionTypes || !this.expressionTypes.isEquivalentTo(objectContents.expressionTypes, fn, replacedParameters)) {
+      if (!this.expressionTypes || !objectContents.expressionTypes || this.expressionTypes.length !== objectContents.expressionTypes.length) {
         return false;
+      }
+      for (let i = 0; i < this.expressionTypes.length; i++) {
+        let leftItem = this.expressionTypes[i];
+        let rightItem = objectContents.expressionTypes[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.functions || objectContents.functions) {
-      if (!this.functions || !objectContents.functions || !this.functions.isEquivalentTo(objectContents.functions, fn, replacedParameters)) {
+      if (!this.functions || !objectContents.functions || this.functions.length !== objectContents.functions.length) {
         return false;
+      }
+      for (let i = 0; i < this.functions.length; i++) {
+        let leftItem = this.functions[i];
+        let rightItem = objectContents.functions[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.lookup || objectContents.lookup) {
@@ -131,7 +204,7 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
 export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   superType?: Fmt.Expression;
   members?: Fmt.ParameterList;
-  exports?: Fmt.Expression;
+  exports?: Fmt.Expression[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.superType = argumentList.getOptionalValue('superType', 0);
@@ -143,7 +216,14 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         throw new Error('members: Parameter expression expected');
       }
     }
-    this.exports = argumentList.getOptionalValue('exports', 2);
+    let exportsRaw = argumentList.getOptionalValue('exports', 2);
+    if (exportsRaw !== undefined) {
+      if (exportsRaw instanceof Fmt.ArrayExpression) {
+        this.exports = exportsRaw.items;
+      } else {
+        throw new Error('exports: Array expression expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -157,7 +237,12 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       argumentList.add(membersExpr, 'members', true);
     }
     if (this.exports !== undefined) {
-      argumentList.add(this.exports, 'exports', true);
+      let exportsExpr = new Fmt.ArrayExpression;
+      exportsExpr.items = [];
+      for (let item of this.exports) {
+        exportsExpr.items.push(item);
+      }
+      argumentList.add(exportsExpr, 'exports', true);
     }
   }
 
@@ -182,9 +267,13 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       }
     }
     if (this.exports) {
-      result.exports = this.exports.substitute(fn, replacedParameters);
-      if (result.exports !== this.exports) {
-        changed = true;
+      result.exports = [];
+      for (let item of this.exports) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.exports.push(newItem);
       }
     }
     return changed;
@@ -205,8 +294,17 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       }
     }
     if (this.exports || objectContents.exports) {
-      if (!this.exports || !objectContents.exports || !this.exports.isEquivalentTo(objectContents.exports, fn, replacedParameters)) {
+      if (!this.exports || !objectContents.exports || this.exports.length !== objectContents.exports.length) {
         return false;
+      }
+      for (let i = 0; i < this.exports.length; i++) {
+        let leftItem = this.exports[i];
+        let rightItem = objectContents.exports[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     return true;
@@ -214,17 +312,29 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
-  innerDefinitionTypes?: Fmt.Expression;
+  innerDefinitionTypes?: Fmt.Expression[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.innerDefinitionTypes = argumentList.getOptionalValue('innerDefinitionTypes', 3);
+    let innerDefinitionTypesRaw = argumentList.getOptionalValue('innerDefinitionTypes', 3);
+    if (innerDefinitionTypesRaw !== undefined) {
+      if (innerDefinitionTypesRaw instanceof Fmt.ArrayExpression) {
+        this.innerDefinitionTypes = innerDefinitionTypesRaw.items;
+      } else {
+        throw new Error('innerDefinitionTypes: Array expression expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
     if (this.innerDefinitionTypes !== undefined) {
-      argumentList.add(this.innerDefinitionTypes, 'innerDefinitionTypes', true);
+      let innerDefinitionTypesExpr = new Fmt.ArrayExpression;
+      innerDefinitionTypesExpr.items = [];
+      for (let item of this.innerDefinitionTypes) {
+        innerDefinitionTypesExpr.items.push(item);
+      }
+      argumentList.add(innerDefinitionTypesExpr, 'innerDefinitionTypes', true);
     }
   }
 
@@ -237,9 +347,13 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.innerDefinitionTypes) {
-      result.innerDefinitionTypes = this.innerDefinitionTypes.substitute(fn, replacedParameters);
-      if (result.innerDefinitionTypes !== this.innerDefinitionTypes) {
-        changed = true;
+      result.innerDefinitionTypes = [];
+      for (let item of this.innerDefinitionTypes) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.innerDefinitionTypes.push(newItem);
       }
     }
     return changed;
@@ -250,8 +364,17 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
       return true;
     }
     if (this.innerDefinitionTypes || objectContents.innerDefinitionTypes) {
-      if (!this.innerDefinitionTypes || !objectContents.innerDefinitionTypes || !this.innerDefinitionTypes.isEquivalentTo(objectContents.innerDefinitionTypes, fn, replacedParameters)) {
+      if (!this.innerDefinitionTypes || !objectContents.innerDefinitionTypes || this.innerDefinitionTypes.length !== objectContents.innerDefinitionTypes.length) {
         return false;
+      }
+      for (let i = 0; i < this.innerDefinitionTypes.length; i++) {
+        let leftItem = this.innerDefinitionTypes[i];
+        let rightItem = objectContents.innerDefinitionTypes[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);

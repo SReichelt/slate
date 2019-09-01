@@ -9,7 +9,7 @@ import * as FmtDisplay from '../../display/meta';
 
 export class ObjectContents_Definition extends Fmt.ObjectContents {
   properties?: ObjectContents_Property[];
-  display?: Fmt.Expression;
+  display?: Fmt.Expression[];
   definitionDisplay?: ObjectContents_DefinitionDisplay;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -30,7 +30,14 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
         throw new Error('properties: Array expression expected');
       }
     }
-    this.display = argumentList.getOptionalValue('display', 1);
+    let displayRaw = argumentList.getOptionalValue('display', 1);
+    if (displayRaw !== undefined) {
+      if (displayRaw instanceof Fmt.ArrayExpression) {
+        this.display = displayRaw.items;
+      } else {
+        throw new Error('display: Array expression expected');
+      }
+    }
     let definitionDisplayRaw = argumentList.getOptionalValue('definitionDisplay', 2);
     if (definitionDisplayRaw !== undefined) {
       if (definitionDisplayRaw instanceof Fmt.CompoundExpression) {
@@ -56,7 +63,12 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       argumentList.add(propertiesExpr, 'properties', true);
     }
     if (this.display !== undefined) {
-      argumentList.add(this.display, 'display', true);
+      let displayExpr = new Fmt.ArrayExpression;
+      displayExpr.items = [];
+      for (let item of this.display) {
+        displayExpr.items.push(item);
+      }
+      argumentList.add(displayExpr, 'display', true);
     }
     if (this.definitionDisplay !== undefined) {
       let definitionDisplayExpr = new Fmt.CompoundExpression;
@@ -84,9 +96,13 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       }
     }
     if (this.display) {
-      result.display = this.display.substitute(fn, replacedParameters);
-      if (result.display !== this.display) {
-        changed = true;
+      result.display = [];
+      for (let item of this.display) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.display.push(newItem);
       }
     }
     if (this.definitionDisplay) {
@@ -117,8 +133,17 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       }
     }
     if (this.display || objectContents.display) {
-      if (!this.display || !objectContents.display || !this.display.isEquivalentTo(objectContents.display, fn, replacedParameters)) {
+      if (!this.display || !objectContents.display || this.display.length !== objectContents.display.length) {
         return false;
+      }
+      for (let i = 0; i < this.display.length; i++) {
+        let leftItem = this.display[i];
+        let rightItem = objectContents.display[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.definitionDisplay || objectContents.definitionDisplay) {
@@ -132,7 +157,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 
 export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
   parameter: Fmt.Parameter;
-  display?: Fmt.Expression;
+  display?: Fmt.Expression[];
   singularName?: Fmt.Expression;
   pluralName?: Fmt.Expression;
   nameOptional?: Fmt.Expression;
@@ -144,7 +169,14 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
     } else {
       throw new Error('parameter: Parameter expression with single parameter expected');
     }
-    this.display = argumentList.getOptionalValue('display', 1);
+    let displayRaw = argumentList.getOptionalValue('display', 1);
+    if (displayRaw !== undefined) {
+      if (displayRaw instanceof Fmt.ArrayExpression) {
+        this.display = displayRaw.items;
+      } else {
+        throw new Error('display: Array expression expected');
+      }
+    }
     this.singularName = argumentList.getOptionalValue('singularName', 2);
     this.pluralName = argumentList.getOptionalValue('pluralName', 3);
     this.nameOptional = argumentList.getOptionalValue('nameOptional', 4);
@@ -156,7 +188,12 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
     parameterExpr.parameters.push(this.parameter);
     argumentList.add(parameterExpr, 'parameter', false);
     if (this.display !== undefined) {
-      argumentList.add(this.display, 'display', true);
+      let displayExpr = new Fmt.ArrayExpression;
+      displayExpr.items = [];
+      for (let item of this.display) {
+        displayExpr.items.push(item);
+      }
+      argumentList.add(displayExpr, 'display', true);
     }
     if (this.singularName !== undefined) {
       argumentList.add(this.singularName, 'singularName', true);
@@ -184,9 +221,13 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
       }
     }
     if (this.display) {
-      result.display = this.display.substitute(fn, replacedParameters);
-      if (result.display !== this.display) {
-        changed = true;
+      result.display = [];
+      for (let item of this.display) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.display.push(newItem);
       }
     }
     if (this.singularName) {
@@ -220,8 +261,17 @@ export class ObjectContents_DefinitionDisplay extends Fmt.ObjectContents {
       }
     }
     if (this.display || objectContents.display) {
-      if (!this.display || !objectContents.display || !this.display.isEquivalentTo(objectContents.display, fn, replacedParameters)) {
+      if (!this.display || !objectContents.display || this.display.length !== objectContents.display.length) {
         return false;
+      }
+      for (let i = 0; i < this.display.length; i++) {
+        let leftItem = this.display[i];
+        let rightItem = objectContents.display[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.singularName || objectContents.singularName) {
@@ -544,7 +594,7 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
 export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   leftParameters: Fmt.ParameterList;
   rightParameters: Fmt.ParameterList;
-  definition: Fmt.Expression;
+  definition: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
   reflexivityProof?: ObjectContents_Proof;
   symmetryProof?: ObjectContents_Proof;
@@ -564,7 +614,12 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     } else {
       throw new Error('rightParameters: Parameter expression expected');
     }
-    this.definition = argumentList.getValue('definition', 2);
+    let definitionRaw = argumentList.getValue('definition', 2);
+    if (definitionRaw instanceof Fmt.ArrayExpression) {
+      this.definition = definitionRaw.items;
+    } else {
+      throw new Error('definition: Array expression expected');
+    }
     let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 3);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
@@ -623,7 +678,12 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     let rightParametersExpr = new Fmt.ParameterExpression;
     rightParametersExpr.parameters.push(...this.rightParameters);
     argumentList.add(rightParametersExpr, 'rightParameters', false);
-    argumentList.add(this.definition, 'definition', false);
+    let definitionExpr = new Fmt.ArrayExpression;
+    definitionExpr.items = [];
+    for (let item of this.definition) {
+      definitionExpr.items.push(item);
+    }
+    argumentList.add(definitionExpr, 'definition', false);
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
@@ -675,9 +735,13 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       }
     }
     if (this.definition) {
-      result.definition = this.definition.substitute(fn, replacedParameters);
-      if (result.definition !== this.definition) {
-        changed = true;
+      result.definition = [];
+      for (let item of this.definition) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definition.push(newItem);
       }
     }
     if (this.equivalenceProofs) {
@@ -732,8 +796,17 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       }
     }
     if (this.definition || objectContents.definition) {
-      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+      if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
         return false;
+      }
+      for (let i = 0; i < this.definition.length; i++) {
+        let leftItem = this.definition[i];
+        let rightItem = objectContents.definition[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equivalenceProofs || objectContents.equivalenceProofs) {
@@ -833,14 +906,19 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_SetOperator extends ObjectContents_Definition {
-  definition: Fmt.Expression;
+  definition: Fmt.Expression[];
   equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.definition = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 3);
+    if (definitionRaw instanceof Fmt.ArrayExpression) {
+      this.definition = definitionRaw.items;
+    } else {
+      throw new Error('definition: Array expression expected');
+    }
     let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 4);
     if (equalityProofsRaw !== undefined) {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
@@ -873,7 +951,12 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
-    argumentList.add(this.definition, 'definition', false);
+    let definitionExpr = new Fmt.ArrayExpression;
+    definitionExpr.items = [];
+    for (let item of this.definition) {
+      definitionExpr.items.push(item);
+    }
+    argumentList.add(definitionExpr, 'definition', false);
     if (this.equalityProofs !== undefined) {
       let equalityProofsExpr = new Fmt.ArrayExpression;
       equalityProofsExpr.items = [];
@@ -903,9 +986,13 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SetOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.definition) {
-      result.definition = this.definition.substitute(fn, replacedParameters);
-      if (result.definition !== this.definition) {
-        changed = true;
+      result.definition = [];
+      for (let item of this.definition) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definition.push(newItem);
       }
     }
     if (this.equalityProofs) {
@@ -938,8 +1025,17 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       return true;
     }
     if (this.definition || objectContents.definition) {
-      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+      if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
         return false;
+      }
+      for (let i = 0; i < this.definition.length; i++) {
+        let leftItem = this.definition[i];
+        let rightItem = objectContents.definition[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equalityProofs || objectContents.equalityProofs) {
@@ -1031,14 +1127,19 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
 }
 
 export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
-  definition: Fmt.Expression;
+  definition: Fmt.Expression[];
   equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.definition = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 3);
+    if (definitionRaw instanceof Fmt.ArrayExpression) {
+      this.definition = definitionRaw.items;
+    } else {
+      throw new Error('definition: Array expression expected');
+    }
     let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 4);
     if (equalityProofsRaw !== undefined) {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
@@ -1071,7 +1172,12 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
-    argumentList.add(this.definition, 'definition', false);
+    let definitionExpr = new Fmt.ArrayExpression;
+    definitionExpr.items = [];
+    for (let item of this.definition) {
+      definitionExpr.items.push(item);
+    }
+    argumentList.add(definitionExpr, 'definition', false);
     if (this.equalityProofs !== undefined) {
       let equalityProofsExpr = new Fmt.ArrayExpression;
       equalityProofsExpr.items = [];
@@ -1101,9 +1207,13 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ExplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.definition) {
-      result.definition = this.definition.substitute(fn, replacedParameters);
-      if (result.definition !== this.definition) {
-        changed = true;
+      result.definition = [];
+      for (let item of this.definition) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definition.push(newItem);
       }
     }
     if (this.equalityProofs) {
@@ -1136,8 +1246,17 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       return true;
     }
     if (this.definition || objectContents.definition) {
-      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+      if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
         return false;
+      }
+      for (let i = 0; i < this.definition.length; i++) {
+        let leftItem = this.definition[i];
+        let rightItem = objectContents.definition[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equalityProofs || objectContents.equalityProofs) {
@@ -1202,7 +1321,7 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
 
 export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
   parameter: Fmt.Parameter;
-  definition: Fmt.Expression;
+  definition: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
   wellDefinednessProof?: ObjectContents_Proof;
 
@@ -1214,7 +1333,12 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     } else {
       throw new Error('parameter: Parameter expression with single parameter expected');
     }
-    this.definition = argumentList.getValue('definition', 4);
+    let definitionRaw = argumentList.getValue('definition', 4);
+    if (definitionRaw instanceof Fmt.ArrayExpression) {
+      this.definition = definitionRaw.items;
+    } else {
+      throw new Error('definition: Array expression expected');
+    }
     let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 5);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
@@ -1249,7 +1373,12 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     let parameterExpr = new Fmt.ParameterExpression;
     parameterExpr.parameters.push(this.parameter);
     argumentList.add(parameterExpr, 'parameter', false);
-    argumentList.add(this.definition, 'definition', false);
+    let definitionExpr = new Fmt.ArrayExpression;
+    definitionExpr.items = [];
+    for (let item of this.definition) {
+      definitionExpr.items.push(item);
+    }
+    argumentList.add(definitionExpr, 'definition', false);
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
@@ -1282,9 +1411,13 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       }
     }
     if (this.definition) {
-      result.definition = this.definition.substitute(fn, replacedParameters);
-      if (result.definition !== this.definition) {
-        changed = true;
+      result.definition = [];
+      for (let item of this.definition) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definition.push(newItem);
       }
     }
     if (this.equivalenceProofs) {
@@ -1316,8 +1449,17 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       }
     }
     if (this.definition || objectContents.definition) {
-      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+      if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
         return false;
+      }
+      for (let i = 0; i < this.definition.length; i++) {
+        let leftItem = this.definition[i];
+        let rightItem = objectContents.definition[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equivalenceProofs || objectContents.equivalenceProofs) {
@@ -1436,12 +1578,17 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Predicate extends ObjectContents_Definition {
-  definition: Fmt.Expression;
+  definition: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    this.definition = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 3);
+    if (definitionRaw instanceof Fmt.ArrayExpression) {
+      this.definition = definitionRaw.items;
+    } else {
+      throw new Error('definition: Array expression expected');
+    }
     let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 4);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
@@ -1463,7 +1610,12 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
-    argumentList.add(this.definition, 'definition', false);
+    let definitionExpr = new Fmt.ArrayExpression;
+    definitionExpr.items = [];
+    for (let item of this.definition) {
+      definitionExpr.items.push(item);
+    }
+    argumentList.add(definitionExpr, 'definition', false);
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
@@ -1485,9 +1637,13 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Predicate, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.definition) {
-      result.definition = this.definition.substitute(fn, replacedParameters);
-      if (result.definition !== this.definition) {
-        changed = true;
+      result.definition = [];
+      for (let item of this.definition) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.definition.push(newItem);
       }
     }
     if (this.equivalenceProofs) {
@@ -1508,8 +1664,17 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       return true;
     }
     if (this.definition || objectContents.definition) {
-      if (!this.definition || !objectContents.definition || !this.definition.isEquivalentTo(objectContents.definition, fn, replacedParameters)) {
+      if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
         return false;
+      }
+      for (let i = 0; i < this.definition.length; i++) {
+        let leftItem = this.definition[i];
+        let rightItem = objectContents.definition[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equivalenceProofs || objectContents.equivalenceProofs) {
@@ -1689,11 +1854,16 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
-  conditions: Fmt.Expression;
+  conditions: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.conditions = argumentList.getValue('conditions', 0);
+    let conditionsRaw = argumentList.getValue('conditions', 0);
+    if (conditionsRaw instanceof Fmt.ArrayExpression) {
+      this.conditions = conditionsRaw.items;
+    } else {
+      throw new Error('conditions: Array expression expected');
+    }
     let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 1);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
@@ -1715,7 +1885,12 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    argumentList.add(this.conditions, 'conditions', false);
+    let conditionsExpr = new Fmt.ArrayExpression;
+    conditionsExpr.items = [];
+    for (let item of this.conditions) {
+      conditionsExpr.items.push(item);
+    }
+    argumentList.add(conditionsExpr, 'conditions', false);
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
@@ -1737,9 +1912,13 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.conditions) {
-      result.conditions = this.conditions.substitute(fn, replacedParameters);
-      if (result.conditions !== this.conditions) {
-        changed = true;
+      result.conditions = [];
+      for (let item of this.conditions) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.conditions.push(newItem);
       }
     }
     if (this.equivalenceProofs) {
@@ -1760,8 +1939,17 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       return true;
     }
     if (this.conditions || objectContents.conditions) {
-      if (!this.conditions || !objectContents.conditions || !this.conditions.isEquivalentTo(objectContents.conditions, fn, replacedParameters)) {
+      if (!this.conditions || !objectContents.conditions || this.conditions.length !== objectContents.conditions.length) {
         return false;
+      }
+      for (let i = 0; i < this.conditions.length; i++) {
+        let leftItem = this.conditions[i];
+        let rightItem = objectContents.conditions[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     if (this.equivalenceProofs || objectContents.equivalenceProofs) {

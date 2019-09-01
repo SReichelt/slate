@@ -8,7 +8,7 @@ import * as Meta from '../format/metaModel';
 
 export class ObjectContents_Section extends Fmt.ObjectContents {
   logic: string;
-  items?: Fmt.Expression;
+  items: Fmt.Expression[];
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     let logicRaw = argumentList.getValue('logic', 0);
@@ -17,7 +17,12 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     } else {
       throw new Error('logic: String expected');
     }
-    this.items = argumentList.getOptionalValue('items', 1);
+    let itemsRaw = argumentList.getValue('items', 1);
+    if (itemsRaw instanceof Fmt.ArrayExpression) {
+      this.items = itemsRaw.items;
+    } else {
+      throw new Error('items: Array expression expected');
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -25,9 +30,12 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     let logicExpr = new Fmt.StringExpression;
     logicExpr.value = this.logic;
     argumentList.add(logicExpr, 'logic', false);
-    if (this.items !== undefined) {
-      argumentList.add(this.items, 'items', true);
+    let itemsExpr = new Fmt.ArrayExpression;
+    itemsExpr.items = [];
+    for (let item of this.items) {
+      itemsExpr.items.push(item);
     }
+    argumentList.add(itemsExpr, 'items', false);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
@@ -40,9 +48,13 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     let changed = false;
     result.logic = this.logic;
     if (this.items) {
-      result.items = this.items.substitute(fn, replacedParameters);
-      if (result.items !== this.items) {
-        changed = true;
+      result.items = [];
+      for (let item of this.items) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.items.push(newItem);
       }
     }
     return changed;
@@ -56,8 +68,17 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
       return false;
     }
     if (this.items || objectContents.items) {
-      if (!this.items || !objectContents.items || !this.items.isEquivalentTo(objectContents.items, fn, replacedParameters)) {
+      if (!this.items || !objectContents.items || this.items.length !== objectContents.items.length) {
         return false;
+      }
+      for (let i = 0; i < this.items.length; i++) {
+        let leftItem = this.items[i];
+        let rightItem = objectContents.items[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
       }
     }
     return true;

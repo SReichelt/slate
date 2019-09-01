@@ -147,13 +147,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         claim = this.renderFormula(contents.claim, formulaSelection);
       } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-        let conditions = contents.conditions as Fmt.ArrayExpression;
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
-        let items = conditions.items.map((formula) => this.renderFormula(formula, formulaSelection));
+        let items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
         claim = this.renderTemplate('MultiEquivalenceRelation', {
                                       'operands': items
                                     });
@@ -553,10 +552,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (definitionDisplay) {
             let args = this.getRenderedTemplateArguments(definitions, argumentLists);
             args[definitionDisplay.parameter.name] = variableDefinitions;
-            if (definitionDisplay.display
-                && definitionDisplay.display instanceof Fmt.ArrayExpression
-                && definitionDisplay.display.items.length) {
-              let display = findBestMatch(definitionDisplay.display.items, argumentLists)!;
+            if (definitionDisplay.display && definitionDisplay.display.length) {
+              let display = findBestMatch(definitionDisplay.display, argumentLists)!;
               variableDisplay = this.renderDisplayExpression(display, args);
               this.addSemanticLink(variableDisplay, definitionRef);
             }
@@ -799,7 +796,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let innerDefinition = definitions[definitions.length - 1];
     let contents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
     let definitionRef = this.renderDefinitionRef(definitions);
-    let onSetDisplay = (display: Fmt.ArrayExpression | undefined) => (contents.display = display);
+    let onSetDisplay = (display: Fmt.Expression[] | undefined) => (contents.display = display);
     let onGetDefault = () => this.renderDefaultDefinitionRef(definitions);
     let onGetVariables = () => {
       let variables: RenderedVariable[] = [];
@@ -1227,10 +1224,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  private renderDefinitionDisplayExpression(displayExpression: Fmt.Expression | undefined, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression | undefined {
-    if (displayExpression instanceof Fmt.ArrayExpression
-        && displayExpression.items.length) {
-      let display = findBestMatch(displayExpression.items, argumentLists)!;
+  private renderDefinitionDisplayExpression(displayExpression: Fmt.Expression[] | undefined, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression | undefined {
+    if (displayExpression && displayExpression.length) {
+      let display = findBestMatch(displayExpression, argumentLists)!;
       if (omitArguments && display instanceof Fmt.DefinitionRefExpression) {
         let abbr: Fmt.Expression | undefined = undefined;
         if (display.path.name === 'Operator'
@@ -1499,13 +1495,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       return this.renderFormula(contents.claim, formulaSelection);
     } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-      let conditions = contents.conditions as Fmt.ArrayExpression;
       let formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
       };
-      let items = conditions.items.map((formula) => this.renderFormula(formula, formulaSelection));
+      let items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
       return new Display.ListExpression(items, '1.');
     } else if (contents instanceof FmtHLM.ObjectContents_Definition) {
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
@@ -1631,10 +1626,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   let parameterOverrides: ParameterOverrides = {elementParameterOverrides: elementParameterOverrides};
                   let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides);
                   args[definitionDisplay.parameter.name] = renderLeftSide(elementParameterOverrides);
-                  if (definitionDisplay.display
-                      && definitionDisplay.display instanceof Fmt.ArrayExpression
-                      && definitionDisplay.display.items.length) {
-                    let display = findBestMatch(definitionDisplay.display.items, argumentLists)!;
+                  if (definitionDisplay.display && definitionDisplay.display.length) {
+                    let display = findBestMatch(definitionDisplay.display, argumentLists)!;
                     let result = this.renderDisplayExpression(display, args);
                     this.addSemanticLink(result, definitionRef);
                     return result;
@@ -1658,19 +1651,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
       this.addEquivalenceProofs(contents.equivalenceProofs, 'Proof', '⇒', paragraphs);
     } else if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
-      if (contents.definition instanceof Fmt.ArrayExpression && contents.definition.items.length > 1) {
+      if (contents.definition.length > 1) {
         this.addEquivalenceProofs(contents.equalityProofs, 'Equality', '⊆', paragraphs);
       }
     } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-      if (contents.definition instanceof Fmt.ArrayExpression && contents.definition.items.length > 1) {
+      if (contents.definition.length > 1) {
         this.addEquivalenceProofs(contents.equalityProofs, 'Equality', '=', paragraphs);
       }
     } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
-      if (contents.definition instanceof Fmt.ArrayExpression && contents.definition.items.length > 1) {
+      if (contents.definition.length > 1) {
         this.addEquivalenceProofs(contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
       }
     } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-      if (contents.definition instanceof Fmt.ArrayExpression && contents.definition.items.length > 1) {
+      if (contents.definition.length > 1) {
         this.addEquivalenceProofs(contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
       }
       this.addProof(contents.wellDefinednessProof, 'Well-definedness', undefined, paragraphs);
@@ -1762,9 +1755,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.addSubsetEmbeddings(paragraphs);
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate
-               && definition.contents.display instanceof Fmt.ArrayExpression
-               && definition.contents.display.items.length) {
-      let display = definition.contents.display.items[0];
+               && definition.contents.display
+               && definition.contents.display.length) {
+      let display = definition.contents.display[0];
       if (display instanceof Fmt.DefinitionRefExpression) {
         if (display.path.name === 'Property'
             || display.path.name === 'MultiProperty') {
@@ -1896,13 +1889,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           });
           this.addSemanticLink(equality, equalityDefinition);
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, fullFormulaSelection);
-          let definitions = equalityDefinition.definition as Fmt.ArrayExpression;
           let parameters: Fmt.Parameter[] = [];
           parameters.push(...equalityDefinition.leftParameters);
           parameters.push(...equalityDefinition.rightParameters);
           let singleCase: ExtractedStructuralCase = {
             caseParameters: parameters,
-            definitions: definitions.items
+            definitions: equalityDefinition.definition
           };
           let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3);
           paragraphs.push(equivalenceDef);
@@ -2344,10 +2336,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let equalityDefinition = contents.equalityDefinition;
             this.addParameterListParts(equalityDefinition.leftParameters, undefined, result);
             this.addParameterListParts(equalityDefinition.rightParameters, undefined, result);
-            if (equalityDefinition.definition instanceof Fmt.ArrayExpression) {
-              for (let item of equalityDefinition.definition.items) {
-                this.addFormulaParts(item, result);
-              }
+            for (let item of equalityDefinition.definition) {
+              this.addFormulaParts(item, result);
             }
             if (equalityDefinition.equivalenceProofs) {
               this.addProofListParts(equalityDefinition.equivalenceProofs, result);
@@ -2369,23 +2359,23 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               this.addGenericExpressionParts(rewrite.theorem, result);
             }
           }
-        } else if (contents instanceof FmtHLM.ObjectContents_SetOperator && contents.definition instanceof Fmt.ArrayExpression) {
-          for (let item of contents.definition.items) {
+        } else if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
+          for (let item of contents.definition) {
             this.addSetTermParts(item, result);
           }
           if (contents.equalityProofs) {
             this.addProofListParts(contents.equalityProofs, result);
           }
-        } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator && contents.definition instanceof Fmt.ArrayExpression) {
-          for (let item of contents.definition.items) {
+        } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+          for (let item of contents.definition) {
             this.addElementTermParts(item, result);
           }
           if (contents.equalityProofs) {
             this.addProofListParts(contents.equalityProofs, result);
           }
-        } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator && contents.definition instanceof Fmt.ArrayExpression) {
+        } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           this.addParameterParts(contents.parameter, result);
-          for (let item of contents.definition.items) {
+          for (let item of contents.definition) {
             this.addFormulaParts(item, result);
           }
           if (contents.wellDefinednessProof) {
@@ -2394,8 +2384,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (contents.equivalenceProofs) {
             this.addProofListParts(contents.equivalenceProofs, result);
           }
-        } else if (contents instanceof FmtHLM.ObjectContents_Predicate && contents.definition instanceof Fmt.ArrayExpression) {
-          for (let item of contents.definition.items) {
+        } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
+          for (let item of contents.definition) {
             this.addFormulaParts(item, result);
           }
           if (contents.equivalenceProofs) {
@@ -2408,8 +2398,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (contents.proofs) {
             this.addProofListParts(contents.proofs, result);
           }
-        } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem && contents.conditions instanceof Fmt.ArrayExpression) {
-          for (let item of contents.conditions.items) {
+        } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+          for (let item of contents.conditions) {
             this.addFormulaParts(item, result);
           }
           if (contents.equivalenceProofs) {

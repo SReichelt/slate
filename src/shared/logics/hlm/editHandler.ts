@@ -578,9 +578,9 @@ export class HLMEditHandler extends GenericEditHandler {
     let displayExpressions: (Fmt.Expression | undefined)[] = [undefined];
     if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
       let display = definition.contents.display;
-      if (display instanceof Fmt.ArrayExpression && display.items.length > 1) {
-        displayItems = display.items;
-        displayExpressions = display.items;
+      if (display && display.length > 1) {
+        displayItems = display;
+        displayExpressions = display;
       }
     }
     let result: Fmt.Path[] = [];

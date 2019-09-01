@@ -9,7 +9,7 @@ $library: %MetaModel {
 $Section: %DefinitionType {
   members = #(
     logic: %String,
-    items: $Item[] = []
+    items: $Item[]
   )
 }
 

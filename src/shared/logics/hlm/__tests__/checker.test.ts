@@ -8,17 +8,15 @@ import * as Logics from '../../logics';
 async function checkSection(libraryDataProvider: LibraryDataProvider) {
   let section = await libraryDataProvider.fetchLocalSection();
   let contents = section.contents as FmtLibrary.ObjectContents_Section;
-  if (contents.items instanceof Fmt.ArrayExpression) {
-    for (let item of contents.items.items) {
-      if (item instanceof FmtLibrary.MetaRefExpression_item) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
-        let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
-        await checkItem(libraryDataProvider, definition);
-      } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
-        let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
-        await checkSection(childProvider);
-      }
+  for (let item of contents.items) {
+    if (item instanceof FmtLibrary.MetaRefExpression_item) {
+      let ref = item.ref as Fmt.DefinitionRefExpression;
+      let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
+      await checkItem(libraryDataProvider, definition);
+    } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
+      let ref = item.ref as Fmt.DefinitionRefExpression;
+      let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
+      await checkSection(childProvider);
     }
   }
 }

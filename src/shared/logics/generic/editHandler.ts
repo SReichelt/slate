@@ -27,7 +27,7 @@ export class PlaceholderExpression extends Fmt.Expression {
   }
 }
 
-export type SetDisplayFn = (display: Fmt.Expression | undefined) => void;
+export type SetDisplayFn = (display: Fmt.Expression[] | undefined) => void;
 export type SetDisplayItemFn = (displayItem: Fmt.Expression | undefined) => void;
 
 export type RenderParameterFn = (parameter: Fmt.Parameter) => Display.RenderedExpression;
@@ -48,13 +48,11 @@ export abstract class GenericEditHandler {
     this.editAnalysis.analyzeDefinition(definition, libraryDataProvider.logic.getRootContext());
   }
 
-  addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
-    let displayItem = display instanceof Fmt.ArrayExpression && display.items.length === 1 ? display.items[0] : undefined;
+  addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
+    let displayItem = display && display.length === 1 ? display[0] : undefined;
     let onSetDisplayItem = (newDisplayItem: Fmt.Expression | undefined) => {
       if (newDisplayItem) {
-        let newDisplay = new Fmt.ArrayExpression;
-        newDisplay.items = [newDisplayItem];
-        onSetDisplay(newDisplay);
+        onSetDisplay([newDisplayItem]);
       } else {
         onSetDisplay(undefined);
       }
@@ -427,32 +425,36 @@ export abstract class GenericEditHandler {
     return dialog;
   }
 
-  private getDisplayMenuAlternativesRow(display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getDisplayMenuAlternativesRow(display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let alternativesRow = new Menu.StandardExpressionMenuRow;
     alternativesRow.title = 'Multiple alternatives';
     let alternativesAction = new Menu.DialogExpressionMenuAction;
     alternativesAction.onOpen = () => this.getAlternativesDialog(display, onSetDisplay, variables, isTopLevel, isPredicate, renderer);
     alternativesRow.titleAction = alternativesAction;
-    alternativesRow.selected = display instanceof Fmt.ArrayExpression && display.items.length > 1;
+    alternativesRow.selected = display !== undefined && display.length > 1;
     return alternativesRow;
   }
 
-  private getAlternativesDialog(display: Fmt.Expression | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getAlternativesDialog(display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [];
-    let newDisplay: Fmt.ArrayExpression;
-    if (display instanceof Fmt.ArrayExpression) {
-      newDisplay = display.clone() as Fmt.ArrayExpression;
-    } else {
-      newDisplay = new Fmt.ArrayExpression;
-      newDisplay.items = [];
+    let newDisplay: Fmt.Expression[] = [];
+    if (display) {
+      newDisplay = display.slice();
     }
     let paramItem = new Dialog.ExpressionDialogParameterItem;
     paramItem.title = 'Alternatives';
     paramItem.onGetValue = () => {
+      let newDisplayExpression = new Fmt.ArrayExpression;
+      newDisplayExpression.items = newDisplay;
       let type = new FmtDisplay.MetaRefExpression_Expr;
-      return this.renderArgumentValue(newDisplay, type, 1, undefined, onSetDisplay, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
+      let onSetDisplayExpression = (displayExpression: Fmt.Expression) => {
+        if (displayExpression instanceof Fmt.ArrayExpression) {
+          onSetDisplay(displayExpression.items);
+        }
+      };
+      return this.renderArgumentValue(newDisplayExpression, type, 1, undefined, onSetDisplayExpression, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
     };
     dialog.items.push(paramItem);
     dialog.onOK = () => onSetDisplay(newDisplay);

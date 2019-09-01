@@ -580,8 +580,8 @@ export class HLMUtils extends GenericUtils {
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           let definitionList = definition.contents.definition;
-          if (definitionList instanceof Fmt.ArrayExpression && definitionList.items.length) {
-            let item = definitionList.items[0];
+          if (definitionList.length) {
+            let item = definitionList[0];
             return this.substitutePath(item, term.path, [definition]);
           }
         }
@@ -710,8 +710,8 @@ export class HLMUtils extends GenericUtils {
           let path = term.path;
           return this.getOuterDefinition(term).then((definition: Fmt.Definition) => {
             if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-              if (definition.contents.definition instanceof Fmt.ArrayExpression && definition.contents.definition.items.length) {
-                let item = definition.contents.definition.items[0];
+              if (definition.contents.definition.length) {
+                let item = definition.contents.definition[0];
                 return this.getDeclaredSetInternal(this.substitutePath(item, path, [definition]), visitedDefinitions);
               } else {
                 return this.getWildcardFinalSet();

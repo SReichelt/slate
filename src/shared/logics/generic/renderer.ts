@@ -96,7 +96,7 @@ export abstract class GenericRenderer {
     return semanticLink;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression | undefined, onSetDisplay: (display: Fmt.Expression | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression[] | undefined, onSetDisplay: (display: Fmt.Expression[] | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
     let semanticLink = new Display.SemanticLink(linkedObject, true);
     if (this.editHandler) {
       this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, isPredicate, this);

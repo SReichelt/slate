@@ -25,8 +25,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
     let resultPromise = CachedPromise.resolve(false);
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
-      let items = definition.contents.items as Fmt.ArrayExpression;
-      for (let item of items.items) {
+      for (let item of definition.contents.items) {
         resultPromise = resultPromise.then((currentResult: boolean) => {
           if (currentResult) {
             return true;
@@ -509,8 +508,7 @@ function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
   if (props.section) {
     let render = props.section.then((section: Fmt.Definition) => {
       if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
-        let items = section.contents.items as Fmt.ArrayExpression;
-        return renderLibraryTreeItems(props, items.items);
+        return renderLibraryTreeItems(props, section.contents.items);
       } else {
         return <div className={'tree-item error'}>Error: Invalid section content type</div>;
       }

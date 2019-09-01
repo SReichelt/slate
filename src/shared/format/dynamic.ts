@@ -144,8 +144,8 @@ export class DynamicMetaModel extends Meta.MetaModel {
     let context = parentContext;
     if (expression instanceof DynamicMetaRefExpression) {
       let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
-      if (metaContents.exports instanceof Fmt.ArrayExpression) {
-        for (let metaExport of metaContents.exports.items) {
+      if (metaContents.exports) {
+        for (let metaExport of metaContents.exports) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
             context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport.variable, context);
           }
@@ -218,8 +218,8 @@ export class DynamicMetaModel extends Meta.MetaModel {
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
-      if (metaContents.exports instanceof Fmt.ArrayExpression) {
-        for (let metaExport of metaContents.exports.items) {
+      if (metaContents.exports) {
+        for (let metaExport of metaContents.exports) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
             let index = metaContents.members.indexOf(metaExport.variable);
             if (index >= 0) {
@@ -329,15 +329,15 @@ export class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
   metaDefinitions = new Map<string, Fmt.Definition>();
   includesAny = false;
 
-  constructor(definitions: Fmt.DefinitionList, list: Fmt.Expression | undefined, secondaryList?: Fmt.Expression) {
-    if (list instanceof Fmt.ArrayExpression) {
-      for (let item of list.items) {
+  constructor(definitions: Fmt.DefinitionList, list: Fmt.Expression[] | undefined, secondaryList?: Fmt.Expression[]) {
+    if (list) {
+      for (let item of list) {
         if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
           this.metaDefinitions.set(item.path.name, definitions.getDefinition(item.path.name));
         } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
           this.includesAny = true;
-          if (secondaryList instanceof Fmt.ArrayExpression) {
-            for (let secondaryItem of secondaryList.items) {
+          if (secondaryList) {
+            for (let secondaryItem of secondaryList) {
               if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
                 this.metaDefinitions.set(secondaryItem.path.name, definitions.getDefinition(secondaryItem.path.name));
               }

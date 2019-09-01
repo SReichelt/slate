@@ -25,22 +25,20 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
 function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
   let promise = CachedPromise.resolve(true);
   let contents = definition.contents as FmtLibrary.ObjectContents_Section;
-  if (contents.items instanceof Fmt.ArrayExpression) {
-    for (let item of contents.items.items) {
-      if (item instanceof FmtLibrary.MetaRefExpression_item) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
-        promise = promise.then((currentResult: boolean) =>
-          libraryDataProvider.fetchItem(ref.path)
-            .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
-            .then((itemResult: boolean) => currentResult && itemResult));
-      } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
-        let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
-        promise = promise.then((currentResult: boolean) =>
-          subsectionDataProvider.fetchLocalSection()
-            .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider))
-            .then((itemResult: boolean) => currentResult && itemResult));
-      }
+  for (let item of contents.items) {
+    if (item instanceof FmtLibrary.MetaRefExpression_item) {
+      let ref = item.ref as Fmt.DefinitionRefExpression;
+      promise = promise.then((currentResult: boolean) =>
+        libraryDataProvider.fetchItem(ref.path)
+          .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
+          .then((itemResult: boolean) => currentResult && itemResult));
+    } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
+      let ref = item.ref as Fmt.DefinitionRefExpression;
+      let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
+      promise = promise.then((currentResult: boolean) =>
+        subsectionDataProvider.fetchLocalSection()
+          .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider))
+          .then((itemResult: boolean) => currentResult && itemResult));
     }
   }
   return promise;
