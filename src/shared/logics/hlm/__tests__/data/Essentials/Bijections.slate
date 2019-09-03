@@ -1,0 +1,18 @@
+%../../../../../../../data/logics/hlm%
+
+$Bijections(
+  X: %Set,
+  Y: %Set
+): %SetOperator {
+  definition = [%subset(
+    #(f: %Element($Functions(
+      X = {X},
+      Y = {Y}
+    ))),
+    $bijective(
+      X = {X},
+      Y = {Y},
+      f = {f}
+    )
+  )]
+}

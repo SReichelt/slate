@@ -10,6 +10,10 @@ $Library: %Library {
     %subsection(
       $Syntax,
       'Syntax'
+    ),
+    %subsection(
+      $Types,
+      'Types'
     )
   ]
 }

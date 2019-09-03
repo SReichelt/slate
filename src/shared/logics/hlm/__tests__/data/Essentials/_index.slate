@@ -3,8 +3,13 @@
 $Essentials: %Section {
   logic = 'hlm',
   items = [
+    %item($"Natural numbers"),
     %item($Functions),
     %item($value),
-    %item($composition)
+    %item($composition),
+    %item($bijective),
+    %item($Bijections),
+    %item($"Cardinal numbers"),
+    %item($"Inhabited sets")
   ]
 }

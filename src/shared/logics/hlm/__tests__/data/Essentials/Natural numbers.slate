@@ -1,0 +1,14 @@
+%../../../../../../../data/logics/hlm%
+
+$"Natural numbers": %Construction {
+  $zero: %Constructor {}
+
+  $successor(n: %Element($"Natural numbers")): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(m: %Element($"Natural numbers")),
+      rightParameters = #(n: %Element(%previous)),
+      definition = [%equals(m, n)],
+      isomorphic = %true
+    }
+  }
+}

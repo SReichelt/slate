@@ -2,8 +2,7 @@ import * as Fmt from '../format/format';
 import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 import * as Display from '../display/display';
-import { LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataAccessor';
-import { LibraryDataProvider } from '../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataProvider';
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {

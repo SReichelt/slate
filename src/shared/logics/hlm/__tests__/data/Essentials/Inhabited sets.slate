@@ -1,0 +1,35 @@
+%../../../../../../../data/logics/hlm%
+
+$"Inhabited sets": %Construction {
+  $instance(
+    S: %Set,
+    s: %Element(S)
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        S: %Set,
+        s: %Element(S)
+      ),
+      rightParameters = #(
+        T: %Set,
+        t: %Element(T)
+      ),
+      definition = [%exists(
+        #(f: %Element($Bijections(
+          X = {S},
+          Y = {T}
+        ))),
+        formula = %equals(
+          $value(
+            X = {S},
+            Y = {T},
+            f = {f},
+            x = {s}
+          ),
+          t
+        )
+      )],
+      isomorphic = %true
+    }
+  }
+}

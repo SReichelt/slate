@@ -141,7 +141,7 @@ class HLMDefinitionChecker {
       this.error(rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
-    this.checkEquivalenceList(equalityDefinition, equalityDefinition.definition, equalityDefinition.equivalenceProofs, checkItem, undefined, this.rootContext);
+    this.checkEquivalenceList(innerDefinition, equalityDefinition.definition, equalityDefinition.equivalenceProofs, checkItem, undefined, this.rootContext);
     this.checkProof(equalityDefinition.reflexivityProof, this.rootContext);
     this.checkProof(equalityDefinition.symmetryProof, this.rootContext);
     this.checkProof(equalityDefinition.transitivityProof, this.rootContext);
@@ -189,25 +189,25 @@ class HLMDefinitionChecker {
   private checkSetOperator(contents: FmtHLM.ObjectContents_SetOperator): void {
     let checkCompatibility = (terms: Fmt.Expression[]) => this.checkSetCompatibility(contents.definition, terms, this.rootContext);
     let checkItem = (term: Fmt.Expression) => this.checkSetTerm(term, this.rootContext);
-    this.checkEquivalenceList(contents, contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
+    this.checkEquivalenceList(this.definition, contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
   }
 
   private checkExplicitOperator(contents: FmtHLM.ObjectContents_ExplicitOperator): void {
     let checkCompatibility = (terms: Fmt.Expression[]) => this.checkElementCompatibility(contents.definition, terms, this.rootContext);
     let checkItem = (term: Fmt.Expression) => this.checkElementTerm(term, this.rootContext);
-    this.checkEquivalenceList(contents, contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
+    this.checkEquivalenceList(this.definition, contents.definition, contents.equalityProofs, checkItem, checkCompatibility, this.rootContext);
   }
 
   private checkImplicitOperator(contents: FmtHLM.ObjectContents_ImplicitOperator): void {
     this.checkElementParameter(contents.parameter, this.rootContext);
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
-    this.checkEquivalenceList(contents, contents.definition, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
+    this.checkEquivalenceList(this.definition, contents.definition, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
     this.checkProof(contents.wellDefinednessProof, this.rootContext);
   }
 
   private checkPredicate(contents: FmtHLM.ObjectContents_Predicate): void {
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
-    this.checkEquivalenceList(contents, contents.definition, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
+    this.checkEquivalenceList(this.definition, contents.definition, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
   }
 
   private checkStandardTheorem(contents: FmtHLM.ObjectContents_StandardTheorem): void {
@@ -217,7 +217,7 @@ class HLMDefinitionChecker {
 
   private checkEquivalenceTheorem(contents: FmtHLM.ObjectContents_EquivalenceTheorem): void {
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);
-    this.checkEquivalenceList(contents, contents.conditions, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
+    this.checkEquivalenceList(this.definition, contents.conditions, contents.equivalenceProofs, checkItem, undefined, this.rootContext);
   }
 
   private checkMacroOperator(contents: FmtHLM.ObjectContents_MacroOperator): void {

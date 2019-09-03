@@ -1,0 +1,22 @@
+%../../../../../../../data/logics/hlm%
+
+$extractFromStructural: %Predicate {
+  definition = [%equals(
+    %structuralCases(
+      $../Essentials/"Inhabited sets".instance(
+          S = {$../Essentials/"Natural numbers"},
+          s = {$../Essentials/"Natural numbers".zero}
+      ),
+      $../Essentials/"Inhabited sets",
+      [{
+        constructor = $../Essentials/"Inhabited sets".instance,
+        parameters = #(
+          S: %Set,
+          s: %Element(S)
+        ),
+        value = s
+      }]
+    ),
+    $../Essentials/"Natural numbers".zero
+  )]
+}

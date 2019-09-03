@@ -1,0 +1,15 @@
+%../../../../../../../data/logics/hlm%
+
+$"Cardinal numbers": %Construction {
+  $cardinality(S: %Set): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(S: %Set),
+      rightParameters = #(T: %Set),
+      definition = [%exists(#(f: %Element($Bijections(
+        X = {S},
+        Y = {T}
+      ))))],
+      isomorphic = %true
+    }
+  }
+}

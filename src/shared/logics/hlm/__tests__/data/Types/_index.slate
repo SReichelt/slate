@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/library%
+
+$Types: %Section {
+  logic = 'hlm',
+  items = [
+    %item($extractFromStructural)
+  ]
+}

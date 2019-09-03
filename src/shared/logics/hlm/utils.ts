@@ -452,6 +452,50 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
+  resolveSetTerm(term: Fmt.Expression): CachedPromise<Fmt.Expression | undefined> {
+    if (term instanceof Fmt.VariableRefExpression) {
+      let type = term.variable.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+        return CachedPromise.resolve(this.substituteIndices(type._set, term));
+      }
+    } else if (term instanceof Fmt.DefinitionRefExpression) {
+      return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+        if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
+          let definitionList = definition.contents.definition;
+          if (definitionList.length) {
+            let item = definitionList[0];
+            return this.substitutePath(item, term.path, [definition]);
+          }
+        }
+        return undefined;
+      });
+    }
+    return CachedPromise.resolve(undefined);
+  }
+
+  resolveElementTerm(term: Fmt.Expression): CachedPromise<Fmt.Expression | undefined> {
+    if (term instanceof Fmt.VariableRefExpression) {
+      let type = term.variable.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Def) {
+        return CachedPromise.resolve(this.substituteIndices(type.element, term));
+      }
+    } else if (term instanceof Fmt.DefinitionRefExpression) {
+      return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+        if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+          let definitionList = definition.contents.definition;
+          if (definitionList.length) {
+            let item = definitionList[0];
+            return this.substitutePath(item, term.path, [definition]);
+          }
+        } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
+          // TODO
+        }
+        return undefined;
+      });
+    }
+    return CachedPromise.resolve(undefined);
+  }
+
   getNextSuperset(term: Fmt.Expression, followEmbeddings: boolean, inTypeCast: boolean = false): CachedPromise<Fmt.Expression | undefined> {
     if (term instanceof Fmt.VariableRefExpression) {
       let type = term.variable.type.expression;
@@ -604,13 +648,30 @@ export class HLMUtils extends GenericUtils {
       return this.getDeclaredSet(term.term);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
       if (term.cases.length) {
+        // TODO select the first non-wildcard case
         let structuralCase = term.cases[0];
         if (this.referencesCaseParameter(structuralCase)) {
-          return this.getNextSuperset(structuralCase.value, followEmbeddings, inTypeCast).then((superset: Fmt.Expression | undefined) => {
-            if (superset || term.cases.length > 1 || structuralCase.rewrite) {
-              return this.buildSingleStructuralCaseSetTerm(term.term, term.construction, structuralCase._constructor, structuralCase.parameters, superset || structuralCase.value);
+          if (term.term instanceof Fmt.DefinitionRefExpression && term.term.path.parentPath instanceof Fmt.Path && structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
+            if (term.term.path.parentPath.isEquivalentTo(structuralCase._constructor.path.parentPath) && term.term.path.name === structuralCase._constructor.path.name) {
+              let constructorPath = term.term.path;
+              return this.getOuterDefinition(structuralCase._constructor).then((definition: Fmt.Definition) => {
+                let innerDefinition = definition.innerDefinitions.getDefinition(constructorPath.name);
+                let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters);
+                return this.substitutePath(substituted, constructorPath, [definition, innerDefinition]);
+              });
+            }
+          }
+          return this.resolveElementTerm(term.term).then((resolvedTerm: Fmt.Expression | undefined) => {
+            if (resolvedTerm) {
+              return this.buildSingleStructuralCaseSetTerm(resolvedTerm, term.construction, structuralCase._constructor, structuralCase.parameters, structuralCase.value);
             } else {
-              return undefined;
+              return this.getNextSuperset(structuralCase.value, followEmbeddings, inTypeCast).then((superset: Fmt.Expression | undefined) => {
+                if (superset || term.cases.length > 1 || structuralCase.rewrite) {
+                  return this.buildSingleStructuralCaseSetTerm(term.term, term.construction, structuralCase._constructor, structuralCase.parameters, superset || structuralCase.value);
+                } else {
+                  return undefined;
+                }
+              });
             }
           });
         } else {
