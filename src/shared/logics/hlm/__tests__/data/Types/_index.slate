@@ -3,6 +3,7 @@
 $Types: %Section {
   logic = 'hlm',
   items = [
-    %item($extractFromStructural)
+    %item($extractFromStructural),
+    %item($FAIL_extractFromStructural)
   ]
 }

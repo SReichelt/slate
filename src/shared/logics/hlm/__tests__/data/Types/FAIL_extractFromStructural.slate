@@ -1,11 +1,14 @@
 %../../../../../../../data/logics/hlm%
 
-$extractFromStructural: %Predicate {
+/**
+ * @expectedError Type mismatch
+ */
+$FAIL_extractFromStructural(S: %Set, s: %Element(S)): %Predicate {
   definition = [%equals(
     $../Essentials/"Inhabited set element"(i = {$../Essentials/"Inhabited sets".instance(
         S = {$../Essentials/"Natural numbers"},
         s = {$../Essentials/"Natural numbers".zero}
     )}),
-    $../Essentials/"Natural numbers".zero
+    s
   )]
 }

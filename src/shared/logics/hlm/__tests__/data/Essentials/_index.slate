@@ -10,6 +10,8 @@ $Essentials: %Section {
     %item($bijective),
     %item($Bijections),
     %item($"Cardinal numbers"),
-    %item($"Inhabited sets")
+    %item($"Inhabited sets"),
+    %item($"Inhabited set carrier"),
+    %item($"Inhabited set element")
   ]
 }
