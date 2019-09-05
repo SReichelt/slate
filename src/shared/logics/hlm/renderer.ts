@@ -751,7 +751,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getSingularArticle(nextWord?: string): string {
-    if (nextWord) {
+    if (nextWord && nextWord.length > 1) {
       let firstChar = nextWord.charAt(0);
       if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
         // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
@@ -2316,8 +2316,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addDefinitionParts(definitions.concat(innerDefinition), result);
       }
       if (contents instanceof FmtHLM.ObjectContents_Definition) {
-        if (contents.display) {
-          result.set(contents.display, () => this.renderDefinitionRef(definitions));
+        if (contents.display && contents.display.length) {
+          result.set(contents.display[0], () => this.renderDefinitionRef(definitions));
         }
         if (contents instanceof FmtHLM.ObjectContents_Construction) {
           if (contents.embedding) {

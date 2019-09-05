@@ -1381,6 +1381,12 @@ exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Op
   ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x"
 `;
 
+exports[`render hlm library: 1.4.27.7 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
+"Definition 1.4.27.7.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
+
+  ∗∣_A := ∗∣_(A×A)^A"
+`;
+
 exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Sequences/Finite%20sequences 1`] = `
 "Definition 1.5.1.  Let S be a set. We define:
 
@@ -4198,7 +4204,11 @@ exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Magmas/Equality%20
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
 
-No proof."
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of magmas."
 `;
 
 exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Magmas/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
@@ -4209,8 +4219,29 @@ exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Magmas/Inverse%20
 No proof."
 `;
 
-exports[`render hlm library: 2.2.11.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
-"Definition 2.2.11.1.  Let S be a set. We define:
+exports[`render hlm library: 2.2.11 data/libraries/hlm/Algebra/Magmas/submagma%20set 1`] = `
+"Definition 2.2.11.  Let 𝐌 be a magma, U ⊆ Carrier(𝐌). We define:
+
+  U is a submagma of 𝐌  :⇔  ∀ a, b ∈ U : a • b ∈ U"
+`;
+
+exports[`render hlm library: 2.2.12 data/libraries/hlm/Algebra/Magmas/subset%20magma 1`] = `
+"Definition 2.2.12.  Let 𝐌 be a magma, U ⊆ Carrier(𝐌) such that U is a submagma of 𝐌. We define:
+
+  [U] := {[U, ∗∣_U] if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)"
+`;
+
+exports[`render hlm library: 2.2.13 data/libraries/hlm/Algebra/Magmas/submagma 1`] = `
+"Definition 2.2.13.  Let 𝐌, 𝐍 be magmas. We define:
+
+  𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
+    ⇔  ∃ U ⊆ Carrier(𝐍) : [U is a submagma of 𝐍 and 𝐌 = [U]]
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.2.14.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
+"Definition 2.2.14.1.  Let S be a set. We define:
 
   𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) :=: {(s) | s ∈ S, a^b | a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S)}
 
@@ -4230,14 +4261,14 @@ Remarks.
 This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma."
 `;
 
-exports[`render hlm library: 2.2.11.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
-"Definition 2.2.11.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
+exports[`render hlm library: 2.2.14.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
+"Definition 2.2.14.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
 
   free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]"
 `;
 
-exports[`render hlm library: 2.2.11.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
-"Definition 2.2.11.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.2.14.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
+"Definition 2.2.14.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   𝐌 is free on S  :⇔  𝐌 = free_𝓜𝓰𝓶(S)
     ⇔  ∀ magmas 𝐍, f : S → Carrier(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
@@ -4245,8 +4276,8 @@ exports[`render hlm library: 2.2.11.3 data/libraries/hlm/Algebra/Magmas/Free%20m
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.2.11.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
-"Definition 2.2.11.4.  Let 𝐌 be a magma. We define:
+exports[`render hlm library: 2.2.14.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
+"Definition 2.2.14.4.  Let 𝐌 be a magma. We define:
 
   𝐌 is free  :⇔  ∃ S ⊆ Carrier(𝐌) : 𝐌 is free on S"
 `;
@@ -4274,7 +4305,7 @@ exports[`render hlm library: 4.1 data/libraries/hlm/Category%20theory/Categories
 
   [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ[𝐀],φ[𝐁] f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : ψ_𝐂,𝐂[i_𝐂] = j_(φ[𝐂])] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : (ψ_𝐄,𝐅, ψ_𝐃,𝐄, ψ_𝐃,𝐅)[∘_𝐃,𝐄,𝐅] = ∙_φ[𝐃],φ[𝐄],φ[𝐅]]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
 
-We write “let 𝓒 be an u-small category” for “let 𝓒 ∈ 𝓒𝓪𝓽_u.”
+We write “let 𝓒 be a u-small category” for “let 𝓒 ∈ 𝓒𝓪𝓽_u.”
 
 Remarks.
 
@@ -4293,7 +4324,7 @@ References.
 `;
 
 exports[`render hlm library: 4.2 data/libraries/hlm/Category%20theory/Objects 1`] = `
-"Definition 4.2.  Let u ∈ ℕ, 𝓒 be an u-small category. We define
+"Definition 4.2.  Let u ∈ ℕ, 𝓒 be a u-small category. We define
 
   Ob(𝓒)
 
@@ -4309,7 +4340,7 @@ This definition retrieves a representative set of objects from a category (which
 `;
 
 exports[`render hlm library: 4.3 data/libraries/hlm/Category%20theory/Morphisms 1`] = `
-"Definition 4.3.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
+"Definition 4.3.  Let u ∈ ℕ, 𝓒 be a u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
 
   (𝐗 → 𝐘) := {M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
@@ -4324,7 +4355,7 @@ References.
 `;
 
 exports[`render hlm library: 4.4 data/libraries/hlm/Category%20theory/identity 1`] = `
-"Definition 4.4.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗 ∈ 𝓒. We define:
+"Definition 4.4.  Let u ∈ ℕ, 𝓒 be a u-small category, 𝐗 ∈ 𝓒. We define:
 
   id_𝐗 := {i_𝐗 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
@@ -4334,7 +4365,7 @@ References.
 `;
 
 exports[`render hlm library: 4.5 data/libraries/hlm/Category%20theory/composition 1`] = `
-"Definition 4.5.  Let u ∈ ℕ, 𝓒 be an u-small category, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
+"Definition 4.5.  Let u ∈ ℕ, 𝓒 be a u-small category, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
 
   g ∘ f := {g ∘_𝐗,𝐘,𝐙 f if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
@@ -4387,7 +4418,7 @@ by:
 `;
 
 exports[`render hlm library: 4.6.4 data/libraries/hlm/Category%20theory/Functors/identity 1`] = `
-"Definition 4.6.4.  Let u ∈ ℕ, 𝓒 be an u-small category. We define:
+"Definition 4.6.4.  Let u ∈ ℕ, 𝓒 be a u-small category. We define:
 
   id_𝓒 :  𝓒 → 𝓒, 𝐗 ↦ 𝐗, (f : 𝐘 → 𝐙) ↦ f"
 `;
