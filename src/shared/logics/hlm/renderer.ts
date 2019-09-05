@@ -1227,53 +1227,57 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderDefinitionDisplayExpression(displayExpression: Fmt.Expression[] | undefined, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression | undefined {
     if (displayExpression && displayExpression.length) {
       let display = findBestMatch(displayExpression, argumentLists)!;
-      if (omitArguments && display instanceof Fmt.DefinitionRefExpression) {
-        let abbr: Fmt.Expression | undefined = undefined;
-        if (display.path.name === 'Operator'
-            || display.path.name === 'AssociativeOperator'
-            || display.path.name === 'Relation'
-            || display.path.name === 'TextualRelation'
-            || display.path.name === 'BooleanOperator') {
-          abbr = display.path.arguments.getValue('symbol');
-        } else if (display.path.name === 'FunctionOperator') {
-          abbr = display.path.arguments.getOptionalValue('symbol');
-          if (abbr === undefined) {
-            let symbol = new Fmt.StringExpression;
-            symbol.value = '→';
-            abbr = symbol;
-          }
-        } else if (display.path.name === 'Function') {
-          abbr = display.path.arguments.getValue('function');
-        } else if (display.path.name === 'Property'
-                   || display.path.name === 'MultiProperty') {
-          abbr = display.path.arguments.getValue('property');
-          if (abbr instanceof FmtDisplay.MetaRefExpression_neg) {
-            let negationList = new Fmt.ArrayExpression;
-            negationList.items = [];
-            let comma = new Fmt.StringExpression;
-            comma.value = ', ';
-            for (let item of abbr.items) {
-              if (negationList.items.length) {
-                negationList.items.push(comma);
-              }
-              negationList.items.push(item);
-            }
-            abbr = negationList;
-          }
-        } else if (display.path.name === 'NounProperty'
-                   || display.path.name === 'NounRelation'
-                   || display.path.name === 'Feature') {
-          abbr = display.path.arguments.getValue('singular');
-        }
-        if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {
-          display = abbr;
-        }
-      }
-      let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, omitArguments);
-      return this.renderDisplayExpression(display, args, negationCount);
+      return this.renderSpecificDisplayExpression(display, definitions, argumentLists, omitArguments, negationCount, parameterOverrides);
     } else {
       return undefined;
     }
+  }
+
+  private renderSpecificDisplayExpression(display: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: boolean = false, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression {
+    if (omitArguments && display instanceof Fmt.DefinitionRefExpression) {
+      let abbr: Fmt.Expression | undefined = undefined;
+      if (display.path.name === 'Operator'
+          || display.path.name === 'AssociativeOperator'
+          || display.path.name === 'Relation'
+          || display.path.name === 'TextualRelation'
+          || display.path.name === 'BooleanOperator') {
+        abbr = display.path.arguments.getValue('symbol');
+      } else if (display.path.name === 'FunctionOperator') {
+        abbr = display.path.arguments.getOptionalValue('symbol');
+        if (abbr === undefined) {
+          let symbol = new Fmt.StringExpression;
+          symbol.value = '→';
+          abbr = symbol;
+        }
+      } else if (display.path.name === 'Function') {
+        abbr = display.path.arguments.getValue('function');
+      } else if (display.path.name === 'Property'
+                  || display.path.name === 'MultiProperty') {
+        abbr = display.path.arguments.getValue('property');
+        if (abbr instanceof FmtDisplay.MetaRefExpression_neg) {
+          let negationList = new Fmt.ArrayExpression;
+          negationList.items = [];
+          let comma = new Fmt.StringExpression;
+          comma.value = ', ';
+          for (let item of abbr.items) {
+            if (negationList.items.length) {
+              negationList.items.push(comma);
+            }
+            negationList.items.push(item);
+          }
+          abbr = negationList;
+        }
+      } else if (display.path.name === 'NounProperty'
+                  || display.path.name === 'NounRelation'
+                  || display.path.name === 'Feature') {
+        abbr = display.path.arguments.getValue('singular');
+      }
+      if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {
+        display = abbr;
+      }
+    }
+    let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, omitArguments);
+    return this.renderDisplayExpression(display, args, negationCount);
   }
 
   private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], parameterOverrides?: ParameterOverrides, markAsDummy: boolean = false): Display.RenderedTemplateArguments {
@@ -2316,8 +2320,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addDefinitionParts(definitions.concat(innerDefinition), result);
       }
       if (contents instanceof FmtHLM.ObjectContents_Definition) {
-        if (contents.display && contents.display.length) {
-          result.set(contents.display[0], () => this.renderDefinitionRef(definitions));
+        if (contents.display) {
+          for (let display of contents.display) {
+            result.set(display, () => this.renderSpecificDisplayExpression(display, definitions));
+          }
         }
         if (contents instanceof FmtHLM.ObjectContents_Construction) {
           if (contents.embedding) {
