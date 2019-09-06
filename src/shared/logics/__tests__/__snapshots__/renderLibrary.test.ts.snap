@@ -2590,6 +2590,9 @@ exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardi
 "Definition 1.6.2.7.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
 
   𝐱 ≤ 𝐲  :⇔  ∃ φ : 𝐱 → 𝐲 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐲) : |S| = 𝐱
+
+Equivalence.  No proof.
 
 References.
 
@@ -2764,28 +2767,47 @@ exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordin
   id_𝐱 := id_(Carrier(𝐱))"
 `;
 
-exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
-"Definition 1.6.3.7.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/ordered%20subset 1`] = `
+"Definition 1.6.3.7.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱). We define
 
-  𝐱 ≤ 𝐲  :⇔  ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective"
+  S is an ordered subset of 𝐱
+
+by:
+
+  S is an ordered subset of [X, ⪯]  :⇔  ⪯∣_S is a well-order  (X is a set, ⪯ is a relation on X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
-"Definition 1.6.3.8.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/subset%20ordinal 1`] = `
+"Definition 1.6.3.8.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱) such that S is an ordered subset of 𝐱. We define:
+
+  [S] := {[S, ⪯∣_S] if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
+"Definition 1.6.3.9.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+  𝐱 ≤ 𝐲  :⇔  ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐲) : [S is an ordered subset of 𝐲 and 𝐱 = [S]]
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
+"Definition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
 
   𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲"
 `;
 
-exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
-"Proposition 1.6.3.9.
+exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
+"Proposition 1.6.3.11.
 
   ≤ is a well-order
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
-"Proposition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
+"Proposition 1.6.3.12.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
 
   1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
   2. Iso(𝐱, 𝐲) is nonempty
@@ -2794,8 +2816,8 @@ exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordi
 No proof."
 `;
 
-exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
-"Definition 1.6.3.11.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.13 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
+"Definition 1.6.3.13.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
 
   𝐱 + 𝐲
 
@@ -2804,8 +2826,8 @@ by:
   [X, ⪯] + [Y, ⊑] := [X ⊎ Y, ⪯ ≪ ⊑]  (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
-"Definition 1.6.3.12.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.14 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
+"Definition 1.6.3.14.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
 
   𝐱 ⋅ 𝐲
 
@@ -4220,22 +4242,22 @@ No proof."
 `;
 
 exports[`render hlm library: 2.2.11 data/libraries/hlm/Algebra/Magmas/submagma%20set 1`] = `
-"Definition 2.2.11.  Let 𝐌 be a magma, U ⊆ Carrier(𝐌). We define:
+"Definition 2.2.11.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
-  U is a submagma of 𝐌  :⇔  ∀ a, b ∈ U : a • b ∈ U"
+  S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S"
 `;
 
 exports[`render hlm library: 2.2.12 data/libraries/hlm/Algebra/Magmas/subset%20magma 1`] = `
-"Definition 2.2.12.  Let 𝐌 be a magma, U ⊆ Carrier(𝐌) such that U is a submagma of 𝐌. We define:
+"Definition 2.2.12.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌) such that S is a submagma of 𝐌. We define:
 
-  [U] := {[U, ∗∣_U] if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)"
+  [S] := {[S, ∗∣_S] if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
 exports[`render hlm library: 2.2.13 data/libraries/hlm/Algebra/Magmas/submagma 1`] = `
 "Definition 2.2.13.  Let 𝐌, 𝐍 be magmas. We define:
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
-    ⇔  ∃ U ⊆ Carrier(𝐍) : [U is a submagma of 𝐍 and 𝐌 = [U]]
+    ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submagma of 𝐍 and 𝐌 = [S]]
 
 Equivalence.  No proof."
 `;

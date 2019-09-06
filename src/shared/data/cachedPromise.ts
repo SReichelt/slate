@@ -4,7 +4,7 @@ class CachedPromise<T> implements PromiseLike<T> {
   private result?: T;
 
   constructor(source: T | PromiseLike<T>, allowPromise: boolean = true) {
-    if (allowPromise && typeof(source) === 'object' && 'then' in (source as any)) {
+    if (allowPromise && source && typeof(source) === 'object' && 'then' in (source as any)) {
       this.promise = (source as PromiseLike<T>).then((result: T) => {
         this.result = result;
         this.promise = undefined;
