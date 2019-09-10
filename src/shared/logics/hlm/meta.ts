@@ -8,26 +8,17 @@ import * as Meta from '../../format/metaModel';
 import * as FmtDisplay from '../../display/meta';
 
 export class ObjectContents_Definition extends Fmt.ObjectContents {
-  properties?: ObjectContents_Property[];
+  properties?: Fmt.ArgumentList;
   display?: Fmt.Expression[];
   definitionDisplay?: ObjectContents_DefinitionDisplay;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     let propertiesRaw = argumentList.getOptionalValue('properties', 0);
     if (propertiesRaw !== undefined) {
-      if (propertiesRaw instanceof Fmt.ArrayExpression) {
-        this.properties = [];
-        for (let item of propertiesRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Property;
-            newItem.fromCompoundExpression(item);
-            this.properties.push(newItem);
-          } else {
-            throw new Error('properties: Compound expression expected');
-          }
-        }
+      if (propertiesRaw instanceof Fmt.CompoundExpression) {
+        this.properties = propertiesRaw.arguments;
       } else {
-        throw new Error('properties: Array expression expected');
+        throw new Error('properties: Compound expression expected');
       }
     }
     let displayRaw = argumentList.getOptionalValue('display', 1);
@@ -53,13 +44,8 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     if (this.properties !== undefined) {
-      let propertiesExpr = new Fmt.ArrayExpression;
-      propertiesExpr.items = [];
-      for (let item of this.properties) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem);
-        propertiesExpr.items.push(newItem);
-      }
+      let propertiesExpr = new Fmt.CompoundExpression;
+      propertiesExpr.arguments = this.properties;
       argumentList.add(propertiesExpr, 'properties', true);
     }
     if (this.display !== undefined) {
@@ -86,13 +72,9 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.properties) {
-      result.properties = [];
-      for (let item of this.properties) {
-        let newItem = new ObjectContents_Property;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.properties.push(newItem);
+      result.properties = Object.create(Fmt.ArgumentList.prototype);
+      if (this.properties.substituteExpression(fn, result.properties!, replacedParameters)) {
+        changed = true;
       }
     }
     if (this.display) {
@@ -119,17 +101,8 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       return true;
     }
     if (this.properties || objectContents.properties) {
-      if (!this.properties || !objectContents.properties || this.properties.length !== objectContents.properties.length) {
+      if (!this.properties || !objectContents.properties || !this.properties.isEquivalentTo(objectContents.properties, fn, replacedParameters)) {
         return false;
-      }
-      for (let i = 0; i < this.properties.length; i++) {
-        let leftItem = this.properties[i];
-        let rightItem = objectContents.properties[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
-        }
       }
     }
     if (this.display || objectContents.display) {
@@ -1518,12 +1491,27 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_MacroOperator extends ObjectContents_Operator {
+  references?: Fmt.ArgumentList;
+
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
+    let referencesRaw = argumentList.getOptionalValue('references', 3);
+    if (referencesRaw !== undefined) {
+      if (referencesRaw instanceof Fmt.CompoundExpression) {
+        this.references = referencesRaw.arguments;
+      } else {
+        throw new Error('references: Compound expression expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     super.toArgumentList(argumentList);
+    if (this.references !== undefined) {
+      let referencesExpr = new Fmt.CompoundExpression;
+      referencesExpr.arguments = this.references;
+      argumentList.add(referencesExpr, 'references', true);
+    }
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MacroOperator {
@@ -1534,12 +1522,23 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
+    if (this.references) {
+      result.references = Object.create(Fmt.ArgumentList.prototype);
+      if (this.references.substituteExpression(fn, result.references!, replacedParameters)) {
+        changed = true;
+      }
+    }
     return changed;
   }
 
   isEquivalentTo(objectContents: ObjectContents_MacroOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
+    }
+    if (this.references || objectContents.references) {
+      if (!this.references || !objectContents.references || !this.references.isEquivalentTo(objectContents.references, fn, replacedParameters)) {
+        return false;
+      }
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -1999,64 +1998,6 @@ export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression 
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_EquivalenceTheorem;
-  }
-}
-
-export class ObjectContents_Property extends Fmt.ObjectContents {
-  property: string;
-  theorem?: Fmt.Expression;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    let propertyRaw = argumentList.getValue('property', 0);
-    if (propertyRaw instanceof Fmt.StringExpression) {
-      this.property = propertyRaw.value;
-    } else {
-      throw new Error('property: String expected');
-    }
-    this.theorem = argumentList.getOptionalValue('theorem', 1);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    let propertyExpr = new Fmt.StringExpression;
-    propertyExpr.value = this.property;
-    argumentList.add(propertyExpr, 'property', false);
-    if (this.theorem !== undefined) {
-      argumentList.add(this.theorem, 'theorem', true);
-    }
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Property {
-    let result = new ObjectContents_Property;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Property, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    result.property = this.property;
-    if (this.theorem) {
-      result.theorem = this.theorem.substitute(fn, replacedParameters);
-      if (result.theorem !== this.theorem) {
-        changed = true;
-      }
-    }
-    return changed;
-  }
-
-  isEquivalentTo(objectContents: ObjectContents_Property, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    if (this === objectContents && !replacedParameters.length) {
-      return true;
-    }
-    if (this.property !== objectContents.property) {
-      return false;
-    }
-    if (this.theorem || objectContents.theorem) {
-      if (!this.theorem || !objectContents.theorem || !this.theorem.isEquivalentTo(objectContents.theorem, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
   }
 }
 
@@ -6070,9 +6011,6 @@ export class MetaModel extends Meta.MetaModel {
       let type = parent.type.expression;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Construction) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6085,9 +6023,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_Constructor) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6111,9 +6046,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_SetOperator) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6129,9 +6061,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_ExplicitOperator) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6147,9 +6076,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_ImplicitOperator) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6175,9 +6101,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_MacroOperator) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;
@@ -6187,9 +6110,6 @@ export class MetaModel extends Meta.MetaModel {
           }
         }
         if (type instanceof MetaRefExpression_Predicate) {
-          if (argument.name === 'properties' || (argument.name === undefined && argumentIndex === 0)) {
-            context = new ArgumentTypeContext(ObjectContents_Property, context);
-          }
           if (argument.name === 'display' || (argument.name === undefined && argumentIndex === 1)) {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtDisplay.metaModel;

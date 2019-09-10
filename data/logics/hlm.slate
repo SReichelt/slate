@@ -17,7 +17,7 @@ $hlm: %MetaModel {
 
 $Definition: %DefinitionType {
   members = #(
-    properties: $Property[] = [],
+    properties: %ArgumentList = {},
     display?: $../display/display/Expr[],
     definitionDisplay?: $DefinitionDisplay
   )
@@ -112,7 +112,10 @@ $ImplicitOperator: %DefinitionType($ElementTerm) {
 }
 
 $MacroOperator: %DefinitionType($ElementTerm) {
-  superType = $Operator
+  superType = $Operator,
+  members = #(
+    references: %ArgumentList = {}
+  )
 }
 
 $Predicate: %DefinitionType($Formula) {
@@ -139,13 +142,6 @@ $EquivalenceTheorem: %DefinitionType {
   members = #(
     conditions: $Formula[],
     equivalenceProofs: $Proof[] = []
-  )
-}
-
-$Property: %ExpressionType {
-  members = #(
-    property: %String,
-    theorem?: $Theorem
   )
 }
 

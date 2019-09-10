@@ -1,6 +1,8 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
+import * as HLMMacro from './macro';
+import * as HLMMacros from './macros/macros';
 import { HLMUtils, HLMSubstitutionContext } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
@@ -39,7 +41,7 @@ class HLMDefinitionChecker {
   private result: Logic.LogicCheckResult = {diagnostics: [], hasErrors: false};
   private promise = CachedPromise.resolve();
 
-  constructor(private definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor) {
+  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor) {
     this.utils = new HLMUtils(definition, libraryDataAccessor);
   }
 
@@ -221,7 +223,11 @@ class HLMDefinitionChecker {
   }
 
   private checkMacroOperator(contents: FmtHLM.ObjectContents_MacroOperator): void {
-    // TODO
+    let checkMacro = HLMMacros.instantiateMacro(this.libraryDataAccessor, this.definition)
+      .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.check())
+      .then((diagnostics: Logic.LogicCheckDiagnostic[]) => { this.result.diagnostics.push(...diagnostics); })
+      .catch((error) => this.error(this.definition, error.message));
+    this.promise = this.promise.then(() => checkMacro);
   }
 
   private checkParameterList(parameterList: Fmt.ParameterList, context: HLMCheckerContext): void {
@@ -400,8 +406,7 @@ class HLMDefinitionChecker {
     if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Set || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Subset || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_SetDef)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise
-        .then(() => this.utils.getOuterDefinition(term))
+      let checkDefinitionRef = this.utils.getOuterDefinition(term)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
             this.checkDefinitionRefExpression(term, [definition], [true], context);
@@ -410,6 +415,7 @@ class HLMDefinitionChecker {
           }
         })
         .catch((error) => this.error(term, error.message));
+      this.promise = this.promise.then(() => checkDefinitionRef);
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms) {
         for (let item of term.terms) {
@@ -439,8 +445,7 @@ class HLMDefinitionChecker {
     if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise
-        .then(() => this.utils.getOuterDefinition(term))
+      let checkDefinitionRef = this.utils.getOuterDefinition(term)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction && term.path.parentPath instanceof Fmt.Path && !(term.path.parentPath.parentPath instanceof Fmt.Path)) {
             let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
@@ -452,6 +457,7 @@ class HLMDefinitionChecker {
           }
         })
         .catch((error) => this.error(term, error.message));
+      this.promise = this.promise.then(() => checkDefinitionRef);
     } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
       // TODO check that cases form a partition
       let values: Fmt.Expression[] = [];
@@ -483,8 +489,7 @@ class HLMDefinitionChecker {
     if (formula instanceof Fmt.VariableRefExpression && formula.variable.type.expression instanceof FmtHLM.MetaRefExpression_Prop) {
       this.checkVariableRefExpression(formula, context);
     } else if (formula instanceof Fmt.DefinitionRefExpression) {
-      this.promise = this.promise
-        .then(() => this.utils.getOuterDefinition(formula))
+      let checkDefinitionRef = this.utils.getOuterDefinition(formula)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
             this.checkDefinitionRefExpression(formula, [definition], [true], context);
@@ -493,6 +498,7 @@ class HLMDefinitionChecker {
           }
         })
         .catch((error) => this.error(formula, error.message));
+      this.promise = this.promise.then(() => checkDefinitionRef);
     } else if (formula instanceof FmtHLM.MetaRefExpression_not) {
       this.checkFormula(formula.formula, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
@@ -603,8 +609,7 @@ class HLMDefinitionChecker {
         })
         .catch((error) => this.conditionalError(term, error.message));
       this.promise = this.promise.then(() => checkConstructionRef);
-      this.promise = this.promise
-        .then(() => this.utils.getOuterDefinition(construction))
+      let checkCases = this.utils.getOuterDefinition(construction)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
             this.checkDefinitionRefExpression(construction, [definition], [true], context);
@@ -653,6 +658,7 @@ class HLMDefinitionChecker {
           }
         })
         .catch((error) => this.error(term, error.message));
+      this.promise = this.promise.then(() => checkCases);
     } else {
       this.error(construction, 'Construction reference expected');
     }

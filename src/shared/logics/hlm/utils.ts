@@ -1,6 +1,8 @@
 import { GenericUtils } from '../generic/utils';
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
+import * as HLMMacro from './macro';
+import * as HLMMacros from './macros/macros';
 import CachedPromise from '../../data/cachedPromise';
 
 export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {}
@@ -785,8 +787,10 @@ export class HLMUtils extends GenericUtils {
                 return CachedPromise.reject(new Error('Element parameter expected'));
               }
             } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
-              // TODO
-              return this.getWildcardFinalSet();
+              let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(path.parentPath);
+              return HLMMacros.instantiateMacro(libraryDataAccessor, definition)
+                .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.invoke(this.libraryDataAccessor, path.arguments))
+                .then((macroInvocation: HLMMacro.HLMMacroInvocation) => macroInvocation.getDeclaredSet());
             } else {
               return CachedPromise.reject(new Error('Referenced definition must be a constructor or operator'));
             }

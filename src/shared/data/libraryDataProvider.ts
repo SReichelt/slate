@@ -47,6 +47,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
+  getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor {
+    return this.getProviderForSection(path);
+  }
+
   getProviderForSection(path?: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
     if (!path) {
       return this;
