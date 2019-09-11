@@ -27,13 +27,14 @@ export class NumberMacroInstance implements HLMMacro.HLMMacroInstance {
   }
 
   invoke(libraryDataAccessor: LibraryDataAccessor, args: Fmt.ArgumentList): CachedPromise<NumberMacroInvocation> {
-    let naturalNumbersRelativePath = libraryDataAccessor.getRelativePath(this.naturalNumbersAbsolutePath);
-    return CachedPromise.resolve(new NumberMacroInvocation(naturalNumbersRelativePath));
+    let naturalNumbersRef = new Fmt.DefinitionRefExpression;
+    naturalNumbersRef.path = libraryDataAccessor.getRelativePath(this.naturalNumbersAbsolutePath);
+    return CachedPromise.resolve(new NumberMacroInvocation(naturalNumbersRef));
   }
 }
 
 export class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
-  constructor(private naturalNumbersRelativePath: Fmt.Path) {}
+  constructor(private naturalNumbersRef: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -42,8 +43,6 @@ export class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
   }
 
   getDeclaredSet(): CachedPromise<Fmt.Expression> {
-    let result = new Fmt.DefinitionRefExpression;
-    result.path = this.naturalNumbersRelativePath;
-    return CachedPromise.resolve(result);
+    return CachedPromise.resolve(this.naturalNumbersRef);
   }
 }
