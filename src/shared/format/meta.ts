@@ -38,14 +38,14 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     this.lookup = argumentList.getOptionalValue('lookup', 3);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     let definitionTypesExpr = new Fmt.ArrayExpression;
     definitionTypesExpr.items = [];
     for (let item of this.definitionTypes) {
       definitionTypesExpr.items.push(item);
     }
-    argumentList.add(definitionTypesExpr, 'definitionTypes', false);
+    argumentList.add(definitionTypesExpr, outputAllNames ? 'definitionTypes' : undefined, false);
     if (this.expressionTypes !== undefined) {
       let expressionTypesExpr = new Fmt.ArrayExpression;
       expressionTypesExpr.items = [];
@@ -226,7 +226,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     if (this.superType !== undefined) {
       argumentList.add(this.superType, 'superType', true);
@@ -326,8 +326,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.toArgumentList(argumentList);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    super.toArgumentList(argumentList, outputAllNames);
     if (this.innerDefinitionTypes !== undefined) {
       let innerDefinitionTypesExpr = new Fmt.ArrayExpression;
       innerDefinitionTypesExpr.items = [];
@@ -433,8 +433,8 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
     super.fromArgumentList(argumentList);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.toArgumentList(argumentList);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    super.toArgumentList(argumentList, outputAllNames);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
@@ -498,8 +498,8 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     this.argumentType = argumentList.getOptionalValue('argumentType', 4);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.toArgumentList(argumentList);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    super.toArgumentList(argumentList, outputAllNames);
     if (this.optional !== undefined) {
       argumentList.add(this.optional, 'optional', true);
     }

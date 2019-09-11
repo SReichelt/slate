@@ -103,7 +103,7 @@ export class HLMUtils extends GenericUtils {
         let newIndices = indices ? [...indices, indexExpr] : [indexExpr];
         bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
         this.getParameterArguments(bindingArg.arguments, type.parameters, newContext, targetInnerParameters, newIndices);
-        bindingArg.toCompoundExpression(argValue);
+        bindingArg.toCompoundExpression(argValue, false);
       } else {
         let varExpr = new Fmt.VariableRefExpression;
         varExpr.variable = param;
@@ -111,19 +111,19 @@ export class HLMUtils extends GenericUtils {
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
           propArg.formula = varExpr;
-          propArg.toCompoundExpression(argValue);
+          propArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = new FmtHLM.ObjectContents_SetArg;
           setArg._set = varExpr;
-          setArg.toCompoundExpression(argValue);
+          setArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
           let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
           subsetArg._set = varExpr;
-          subsetArg.toCompoundExpression(argValue);
+          subsetArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           let elementArg = new FmtHLM.ObjectContents_ElementArg;
           elementArg.element = varExpr;
-          elementArg.toCompoundExpression(argValue);
+          elementArg.toCompoundExpression(argValue, false);
         }
       }
       arg.value = argValue;
@@ -568,7 +568,7 @@ export class HLMUtils extends GenericUtils {
             for (let param of definition.parameters) {
               let type = param.type.expression;
               if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) {
-                if (inTypeCast || type.embedSubsets instanceof FmtHLM.MetaRefExpression_true) {
+                if (inTypeCast || (followEmbeddings && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true)) {
                   supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
                     if (currentResult) {
                       return currentResult;
@@ -579,11 +579,15 @@ export class HLMUtils extends GenericUtils {
                           if (superset) {
                             let result = term.clone() as Fmt.DefinitionRefExpression;
                             if (type instanceof FmtHLM.MetaRefExpression_Set) {
-                              let resultArg = this.getArgument([result.path.arguments], param, FmtHLM.ObjectContents_SetArg)!;
-                              resultArg._set = superset;
+                              let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
+                              let newArg = new FmtHLM.ObjectContents_SetArg;
+                              newArg._set = superset;
+                              newArg.toCompoundExpression(resultArg, false);
                             } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-                              let resultArg = this.getArgument([result.path.arguments], param, FmtHLM.ObjectContents_SubsetArg)!;
-                              resultArg._set = superset;
+                              let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
+                              let newArg = new FmtHLM.ObjectContents_SubsetArg;
+                              newArg._set = superset;
+                              newArg.toCompoundExpression(resultArg, false);
                             }
                             return result;
                           } else {

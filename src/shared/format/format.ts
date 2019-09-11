@@ -520,21 +520,21 @@ export class Type {
 
 export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList): void;
-  abstract toArgumentList(argumentList: ArgumentList): void;
+  abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean): void;
 
   fromCompoundExpression(expression: CompoundExpression): void {
     this.fromArgumentList(expression.arguments);
   }
 
-  toCompoundExpression(expression: CompoundExpression): void {
-    this.toArgumentList(expression.arguments);
+  toCompoundExpression(expression: CompoundExpression, outputAllNames: boolean): void {
+    this.toArgumentList(expression.arguments, outputAllNames);
   }
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
 
   toString(): string {
     let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
-    this.toArgumentList(argumentList);
+    this.toArgumentList(argumentList, false);
     return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
   }
 }
@@ -547,7 +547,7 @@ export class GenericObjectContents extends ObjectContents {
     this.arguments.push(...argumentList);
   }
 
-  toArgumentList(argumentList: ArgumentList): void {
+  toArgumentList(argumentList: ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     argumentList.push(...this.arguments);
   }

@@ -101,7 +101,7 @@ export class EditAnalysis {
       this.analyzeArgumentList(contents.arguments, undefined, context);
     } else {
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      contents.toArgumentList(args);
+      contents.toArgumentList(args, false);
       let onApply = () => contents.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }

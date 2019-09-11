@@ -646,7 +646,7 @@ export class HLMEditHandler extends GenericEditHandler {
       }
       if (arg) {
         let argValue = new Fmt.CompoundExpression;
-        arg.toCompoundExpression(argValue);
+        arg.toCompoundExpression(argValue, false);
         let argument = new Fmt.Argument;
         argument.name = param.name;
         argument.value = argValue;

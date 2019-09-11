@@ -25,17 +25,17 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     let logicExpr = new Fmt.StringExpression;
     logicExpr.value = this.logic;
-    argumentList.add(logicExpr, 'logic', false);
+    argumentList.add(logicExpr, outputAllNames ? 'logic' : undefined, false);
     let itemsExpr = new Fmt.ArrayExpression;
     itemsExpr.items = [];
     for (let item of this.items) {
       itemsExpr.items.push(item);
     }
-    argumentList.add(itemsExpr, 'items', false);
+    argumentList.add(itemsExpr, outputAllNames ? 'items' : undefined, false);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
@@ -122,8 +122,8 @@ export class ObjectContents_Library extends ObjectContents_Section {
     super.fromArgumentList(argumentList);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.toArgumentList(argumentList);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    super.toArgumentList(argumentList, outputAllNames);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {

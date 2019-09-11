@@ -13,7 +13,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     this.display = argumentList.getOptionalValue('display', 0);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     if (this.display !== undefined) {
       argumentList.add(this.display, 'display', true);

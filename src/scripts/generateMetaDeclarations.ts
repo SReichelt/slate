@@ -250,16 +250,16 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
   return outFileStr;
 }
 
-function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, optional: boolean, list: boolean, named: boolean, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, optional: boolean, list: boolean, named: number, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   if (list) {
     let item = argName + 'Arg';
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, true, false, false, targetIsList, remainingArrayDimensions, `${indent}  `);
+    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, true, false, 0, targetIsList, remainingArrayDimensions, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     let outputBegin = targetIsList ? `${target}.push(` : `${target}.add(`;
-    let outputEnd = targetIsList ? `)` : named ? `, '${argName}', ${optional})` : `, undefined, ${optional})`;
+    let outputEnd = targetIsList ? `)` : named > 1 ? `, '${argName}', ${optional})` : named > 0 ? `, outputAllNames ? '${argName}' : undefined, ${optional})` : `, undefined, ${optional})`;
     let variableName = argName + 'Expr';
     if (targetIsList) {
       variableName = 'newItem';
@@ -276,7 +276,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
         item += remainingArrayDimensions - 1;
       }
       outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-      outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type, true, false, false, true, remainingArrayDimensions - 1, `${indent}  `);
+      outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type, true, false, 0, true, remainingArrayDimensions - 1, `${indent}  `);
       outFileStr += `${indent}}\n`;
       outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
     } else {
@@ -308,7 +308,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
           let definition = inFile.definitions.getDefinition(path.name);
           if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
             outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-            outFileStr += `${indent}${source}.toCompoundExpression(${variableName});\n`;
+            outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true);\n`;
             outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
           }
         }
@@ -321,7 +321,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
   return outFileStr;
 }
 
-function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type: Fmt.Type, optional: boolean, list: boolean, named: boolean, indent: string): string {
+function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type: Fmt.Type, optional: boolean, list: boolean, named: number, indent: string): string {
   let outFileStr = '';
   if (optional) {
     outFileStr += `${indent}if (${source} !== undefined) {\n`;
@@ -516,17 +516,21 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
-      outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
+      outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {\n`;
       if (superDefinition) {
-        outFileStr += `    super.toArgumentList(argumentList);\n`;
+        outFileStr += `    super.toArgumentList(argumentList, outputAllNames);\n`;
       } else {
         outFileStr += `    argumentList.length = 0;\n`;
       }
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+        let named = 1;
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
           let optional = member.optional || member.defaultValue !== undefined;
-          outFileStr += outputWriteCode(inFile, member.name, `this.${memberName}`, member.type, optional, false, true, `    `);
+          if (optional) {
+            named = 2;
+          }
+          outFileStr += outputWriteCode(inFile, member.name, `this.${memberName}`, member.type, optional, false, named, `    `);
         }
       }
       outFileStr += `  }\n`;
@@ -609,12 +613,12 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `\n`;
       outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
       outFileStr += `    argumentList.length = 0;\n`;
-      let named = false;
+      let named = 0;
       for (let parameter of definition.parameters) {
         let memberName = translateMemberName(parameter.name);
         let optional = parameter.optional || parameter.defaultValue !== undefined;
         if (optional && !parameter.list) {
-          named = true;
+          named = 2;
         }
         outFileStr += outputWriteCode(inFile, parameter.name, `this.${memberName}`, parameter.type, optional, parameter.list, named, `    `);
       }

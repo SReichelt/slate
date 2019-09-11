@@ -120,7 +120,7 @@ export class Writer {
       let args: Fmt.ArgumentList | undefined = undefined;
       if (definition.contents) {
         args = Object.create(Fmt.ArgumentList.prototype);
-        definition.contents.toArgumentList(args!);
+        definition.contents.toArgumentList(args!, true);
       }
       if (definition.innerDefinitions.length || (args && args.length)) {
         this.writeNewLine();
