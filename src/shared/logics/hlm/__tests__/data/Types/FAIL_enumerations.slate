@@ -1,0 +1,21 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ */
+$FAIL_enumerations(
+  S: %Set,
+  s1: %Element(S),
+  s2: %Element(S),
+  T: %Set,
+  t: %Element(T)
+): %SetOperator {
+  definition = [
+    %enumeration(s1),
+    %enumeration(s1, s2),
+    %enumeration(s1, t),
+    %enumeration(s1, s2, t)
+  ]
+}

@@ -12,6 +12,10 @@ $Library: %Library {
       'Syntax'
     ),
     %subsection(
+      $Restrictions,
+      'Restrictions'
+    ),
+    %subsection(
       $Types,
       'Types'
     )

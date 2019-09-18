@@ -108,38 +108,38 @@ class HLMDefinitionChecker {
   }
 
   private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_EqualityDefinition): void {
+    let constructorParameters = innerDefinition.parameters;
     let leftParameters = equalityDefinition.leftParameters;
-    if (!leftParameters.isEquivalentTo(innerDefinition.parameters)) {
+    if (!leftParameters.isEquivalentTo(constructorParameters)) {
       this.error(leftParameters, 'Parameters of equality definition must match constructor parameters');
     }
     let rightParameters = equalityDefinition.rightParameters;
     let unificationFn = undefined;
-    if (leftParameters.length && rightParameters.length) {
-      let leftFirstType = leftParameters[0].type.expression;
+    if (constructorParameters.length && rightParameters.length) {
+      let constructorFirstType = constructorParameters[0].type.expression;
       let rightFirstType = rightParameters[0].type.expression;
-      if (leftFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType.superset instanceof FmtHLM.MetaRefExpression_previous) {
-        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === leftFirstType && actual === rightFirstType;
-        for (let leftParam of leftParameters.slice(1)) {
-          let leftParamType = leftParam.type.expression;
-          if (!(leftParamType instanceof FmtHLM.MetaRefExpression_Subset && leftParamType.superset instanceof FmtHLM.MetaRefExpression_previous)) {
+      if (constructorFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType.superset instanceof FmtHLM.MetaRefExpression_previous) {
+        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === constructorFirstType && actual === rightFirstType;
+        for (let constructorParam of constructorParameters.slice(1)) {
+          let constructorParamType = constructorParam.type.expression;
+          if (!(constructorParamType instanceof FmtHLM.MetaRefExpression_Subset && constructorParamType.superset instanceof FmtHLM.MetaRefExpression_previous)) {
             unificationFn = undefined;
             break;
           }
         }
       }
-      if (leftFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType._set instanceof FmtHLM.MetaRefExpression_previous) {
-        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === leftFirstType && actual === rightFirstType;
-        for (let leftParam of leftParameters.slice(1)) {
-          let leftParamType = leftParam.type.expression;
-          if (!(leftParamType instanceof FmtHLM.MetaRefExpression_Element && leftParamType._set instanceof FmtHLM.MetaRefExpression_previous)) {
+      if (constructorFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType._set instanceof FmtHLM.MetaRefExpression_previous) {
+        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === constructorFirstType && actual === rightFirstType;
+        for (let constructorParam of constructorParameters.slice(1)) {
+          let constructorParamType = constructorParam.type.expression;
+          if (!(constructorParamType instanceof FmtHLM.MetaRefExpression_Element && constructorParamType._set instanceof FmtHLM.MetaRefExpression_previous)) {
             unificationFn = undefined;
             break;
           }
         }
       }
     }
-    // TODO somehow this doesn't catch missing substitutions
-    if (!rightParameters.isEquivalentTo(leftParameters, unificationFn)) {
+    if (!rightParameters.isEquivalentTo(constructorParameters, unificationFn)) {
       this.error(rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
     let checkItem = (formula: Fmt.Expression) => this.checkFormula(formula, this.rootContext);

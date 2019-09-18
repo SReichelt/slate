@@ -1,0 +1,25 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ */
+$FAIL_invalidFunctionCall(f: %Element($../Essentials/Functions(
+  X = {$../Essentials/"Natural numbers"},
+  Y = {$../Essentials/"Inhabited sets"}
+))): %Predicate {
+  definition = [%equals(
+    $../Essentials/value(
+      X = {$../Essentials/"Natural numbers"},
+      Y = {$../Essentials/"Inhabited sets"},
+      f = {f},
+      x = {$../Essentials/"Inhabited sets".instance(
+          S = {$../Essentials/"Natural numbers"},
+          s = {$../Essentials/"Natural numbers".zero}
+      )}
+    ),
+    $../Essentials/"Inhabited sets".instance(
+        S = {$../Essentials/"Natural numbers"},
+        s = {$../Essentials/"Natural numbers".zero}
+    )
+  )]
+}

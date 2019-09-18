@@ -1,0 +1,19 @@
+%../../../../../../../data/logics/hlm%
+
+$validFunctionCall(f: %Element($../Essentials/Functions(
+  X = {$../Essentials/"Natural numbers"},
+  Y = {$../Essentials/"Inhabited sets"}
+))): %Predicate {
+  definition = [%equals(
+    $../Essentials/value(
+      X = {$../Essentials/"Natural numbers"},
+      Y = {$../Essentials/"Inhabited sets"},
+      f = {f},
+      x = {$../Essentials/"Natural numbers".zero}
+    ),
+    $../Essentials/"Inhabited sets".instance(
+        S = {$../Essentials/"Natural numbers"},
+        s = {$../Essentials/"Natural numbers".zero}
+    )
+  )]
+}

@@ -1,0 +1,26 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Parameters of equality definition must match constructor parameters
+ */
+$FAIL_EqualityDefinitionParameters: %Construction {
+  $ctor(
+    S: %Set,
+    s: %Element(S)
+  ): %Constructor {
+    equalityDefinition = {
+      leftParameters = #(
+        S: %Set,
+        s: %Element(S)
+      ),
+      rightParameters = #(
+        T: %Set,
+        t: %Element(S)
+      ),
+      definition = [%exists(#(f: %Element($../Essentials/Bijections(
+        X = {S},
+        Y = {T}
+      ))))]
+    }
+  }
+}

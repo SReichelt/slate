@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/library%
+
+$Restrictions: %Section {
+  logic = 'hlm',
+  items = [
+    %item($FAIL_EqualityDefinitionParameters)
+  ]
+}

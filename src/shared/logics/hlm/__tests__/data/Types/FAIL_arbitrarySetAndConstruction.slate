@@ -1,0 +1,23 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ */
+$FAIL_arbitrarySetAndConstruction(
+  S: %Set,
+  s: %Element(S),
+  t: %Element($../Essentials/"Natural numbers")
+): %Predicate {
+  definition = [
+    %in(s, $../Essentials/"Natural numbers"),
+    %sub(S, $../Essentials/"Natural numbers"),
+    %setEquals(S, $../Essentials/"Natural numbers"),
+    %equals(s, t)
+  ]
+}

@@ -1,0 +1,14 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ */
+$FAIL_constructor(S: %Set): %Predicate {
+  definition = [%in(
+    $../Essentials/"Inhabited sets".instance(
+        S = {$../Essentials/"Natural numbers"},
+        s = {$../Essentials/"Natural numbers".zero}
+    ),
+    S
+  )]
+}

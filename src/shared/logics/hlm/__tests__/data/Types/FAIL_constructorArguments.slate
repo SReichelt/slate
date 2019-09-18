@@ -1,0 +1,14 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ */
+$FAIL_constructorArguments(
+  S: %Set,
+  s: %Element(S)
+): %ExplicitOperator {
+  definition = [$../Essentials/"Inhabited sets".instance(
+      S = {$../Essentials/"Natural numbers"},
+      s = {s}
+  )]
+}

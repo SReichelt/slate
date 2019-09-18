@@ -1,0 +1,24 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ */
+$FAIL_arbitrarySets(
+  S: %Set,
+  T: %Set,
+  s: %Element(S),
+  t: %Element(T)
+): %Predicate {
+  definition = [
+    %in(s, T),
+    %sub(S, T),
+    %setEquals(S, T),
+    %equals(s, t)
+  ]
+}

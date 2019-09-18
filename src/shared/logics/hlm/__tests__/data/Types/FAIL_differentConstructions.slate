@@ -1,0 +1,22 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ */
+$FAIL_differentConstructions(
+  s: %Element($../Essentials/"Inhabited sets"),
+  t: %Element($../Essentials/"Natural numbers")
+): %Predicate {
+  definition = [
+    %in(s, $../Essentials/"Natural numbers"),
+    %sub($../Essentials/"Inhabited sets", $../Essentials/"Natural numbers"),
+    %setEquals($../Essentials/"Inhabited sets", $../Essentials/"Natural numbers"),
+    %equals(s, t)
+  ]
+}
