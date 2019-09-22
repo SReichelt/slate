@@ -1,0 +1,24 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Constructor path must match construction path
+ *
+ * @expectedError Expected reference to constructor "zero"
+ */
+$FAIL_invalidStructuralCase(x: %Element($../Essentials/"Natural numbers")): %Predicate {
+  definition = [%structural(
+    x,
+    $../Essentials/"Natural numbers",
+    [
+      {
+        constructor = $../Essentials/"Inhabited sets".instance,
+        value = %and
+      },
+      {
+        constructor = $../Essentials/"Natural numbers".successor,
+        parameters = #(n: %Element($../Essentials/"Natural numbers")),
+        value = %and
+      }
+    ]
+  )]
+}

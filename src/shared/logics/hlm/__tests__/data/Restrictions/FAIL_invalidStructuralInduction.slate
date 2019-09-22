@@ -1,0 +1,22 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Term must be an element of the specified construction
+ */
+$FAIL_invalidStructuralInduction(x: %Element($../Essentials/"Inhabited sets")): %Predicate {
+  definition = [%structural(
+    x,
+    $../Essentials/"Natural numbers",
+    [
+      {
+        constructor = $../Essentials/"Natural numbers".zero,
+        value = %and
+      },
+      {
+        constructor = $../Essentials/"Natural numbers".successor,
+        parameters = #(n: %Element($../Essentials/"Natural numbers")),
+        value = %and
+      }
+    ]
+  )]
+}

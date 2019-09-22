@@ -1,0 +1,22 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ *
+ * @expectedError Type mismatch
+ */
+$FAIL_indices(i: %Binding(
+  $../Essentials/"Inhabited sets",
+  #(j: %Binding(
+    $../Essentials/"Natural numbers",
+    #(a: %Element($../Essentials/"Inhabited sets"))
+  ))
+)): %ExplicitOperator {
+  definition = [a[
+    $../Essentials/"Natural numbers".zero,
+    $../Essentials/"Inhabited sets".instance(
+        S = {$../Essentials/"Natural numbers"},
+        s = {$../Essentials/"Natural numbers".zero}
+    )
+  ]]
+}

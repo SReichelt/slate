@@ -1,0 +1,14 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Superfluous index
+ */
+$FAIL_tooManyIndices(i: %Binding(
+  $../Essentials/"Natural numbers",
+  #(a: %Element($../Essentials/"Inhabited sets"))
+)): %ExplicitOperator {
+  definition = [a[
+    $../Essentials/"Natural numbers".zero,
+    $../Essentials/"Natural numbers".zero
+  ]]
+}

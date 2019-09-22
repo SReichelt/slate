@@ -1,0 +1,11 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Indices required
+ */
+$FAIL_missingIndex(i: %Binding(
+  $../Essentials/"Natural numbers",
+  #(a: %Element($../Essentials/"Inhabited sets"))
+)): %ExplicitOperator {
+  definition = [a]
+}

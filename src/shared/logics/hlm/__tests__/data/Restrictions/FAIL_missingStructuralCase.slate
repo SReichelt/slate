@@ -1,0 +1,15 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Missing case for constructor "successor"
+ */
+$FAIL_missingStructuralCase(x: %Element($../Essentials/"Natural numbers")): %Predicate {
+  definition = [%structural(
+    x,
+    $../Essentials/"Natural numbers",
+    [{
+      constructor = $../Essentials/"Natural numbers".zero,
+      value = %and
+    }]
+  )]
+}

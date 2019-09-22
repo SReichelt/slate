@@ -23,6 +23,7 @@ interface HLMCheckerStructuralCaseRef {
 
 interface HLMCheckerContext {
   previousSetTerm?: Fmt.Expression;
+  parentBindingParameters: Fmt.Parameter[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
   inTypeCast: boolean;
 }
@@ -37,7 +38,7 @@ interface HLMCheckerCompatibilityStatus {
 
 class HLMDefinitionChecker {
   private utils: HLMUtils;
-  private readonly rootContext: HLMCheckerContext = {parentStructuralCases: [], inTypeCast: false};
+  private readonly rootContext: HLMCheckerContext = {parentBindingParameters: [], parentStructuralCases: [], inTypeCast: false};
   private result: Logic.LogicCheckResult = {diagnostics: [], hasErrors: false};
   private promise = CachedPromise.resolve();
 
@@ -265,10 +266,11 @@ class HLMDefinitionChecker {
     if (param.type.arrayDimensions) {
       this.error(param, 'Array parameters are not supported in HLM');
     }
-    this.checkParameterType(param.type.expression, context);
+    this.checkParameterType(param, context);
   }
 
-  private checkParameterType(type: Fmt.Expression, context: HLMCheckerContext): void {
+  private checkParameterType(param: Fmt.Parameter, context: HLMCheckerContext): void {
+    let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       this.checkBoolConstant(type.auto);
     } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
@@ -289,9 +291,9 @@ class HLMDefinitionChecker {
       this.checkElementTerm(type.element, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       this.checkSetTerm(type._set, context);
-      let innerContext = context;
+      let innerContext: HLMCheckerContext = {...context, parentBindingParameters: context.parentBindingParameters.concat(param)};
       if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-        innerContext = {...context, previousSetTerm: type._set};
+        innerContext.previousSetTerm = type._set;
       }
       this.checkParameterList(type.parameters, innerContext);
     } else {
@@ -441,7 +443,6 @@ class HLMDefinitionChecker {
   }
 
   private checkElementTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
-    // TODO restrict access to binding?
     if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
@@ -541,7 +542,11 @@ class HLMDefinitionChecker {
 
   private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
     let bindingParameters: Fmt.Parameter[] = [];
-    if (!(expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
+    if (expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
+      if (context.parentBindingParameters.indexOf(expression.variable) < 0) {
+        this.error(expression, 'Invalid reference to binding parameter');
+      }
+    } else {
       for (let bindingParameter = this.utils.getParentBinding(expression.variable); bindingParameter; bindingParameter = this.utils.getParentBinding(bindingParameter)) {
         bindingParameters.unshift(bindingParameter);
       }
@@ -651,7 +656,7 @@ class HLMDefinitionChecker {
               }
             }
             if (index < cases.length) {
-              this.error(cases[index], 'Too many cases');
+              this.error(term, 'Too many cases');
             }
           } else {
             this.error(term, 'Referenced definition must be a construction');

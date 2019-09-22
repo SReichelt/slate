@@ -1,0 +1,11 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Invalid reference to binding parameter
+ */
+$FAIL_invalidBindingReference(i: %Binding(
+  $../Essentials/"Natural numbers",
+  #(a: %Element($../Essentials/"Inhabited sets"))
+)): %ExplicitOperator {
+  definition = [i]
+}

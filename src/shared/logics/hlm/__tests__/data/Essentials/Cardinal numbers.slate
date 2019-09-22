@@ -12,4 +12,9 @@ $"Cardinal numbers": %Construction {
       isomorphic = %true
     }
   }
+
+  embedding = {
+    parameter = #(n: %Element($"Natural numbers")),
+    target = $"Cardinal numbers".cardinality(S = {$"Inhabited sets"})
+  }
 }

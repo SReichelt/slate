@@ -6,6 +6,7 @@ $Types: %Section {
     %item($FAIL_arbitrarySets),
     %item($FAIL_arbitrarySetAndConstruction),
     %item($FAIL_differentConstructions),
+    %item($FAIL_differentConstructionArguments),
     %item($FAIL_constructor),
     %item($FAIL_constructorArguments),
     %item($FAIL_enumerations),
@@ -13,6 +14,7 @@ $Types: %Section {
     %item($FAIL_invalidFunctionCall),
     %item($FAIL_functionCallResultMismatch),
     %item($extractFromStructural),
-    %item($FAIL_extractFromStructural)
+    %item($FAIL_extractFromStructural),
+    %item($FAIL_indices)
   ]
 }

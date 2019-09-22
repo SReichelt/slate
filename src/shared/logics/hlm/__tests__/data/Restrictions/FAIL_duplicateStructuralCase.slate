@@ -1,0 +1,27 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Too many cases
+ */
+$FAIL_duplicateStructuralCase(x: %Element($../Essentials/"Natural numbers")): %Predicate {
+  definition = [%structural(
+    x,
+    $../Essentials/"Natural numbers",
+    [
+      {
+        constructor = $../Essentials/"Natural numbers".zero,
+        value = %and
+      },
+      {
+        constructor = $../Essentials/"Natural numbers".successor,
+        parameters = #(n: %Element($../Essentials/"Natural numbers")),
+        value = %and
+      },
+      {
+        constructor = $../Essentials/"Natural numbers".successor,
+        parameters = #(n: %Element($../Essentials/"Natural numbers")),
+        value = %and
+      }
+    ]
+  )]
+}

@@ -3,6 +3,16 @@
 $Restrictions: %Section {
   logic = 'hlm',
   items = [
-    %item($FAIL_EqualityDefinitionParameters)
+    %item($FAIL_invalidBindingReference),
+    %item($FAIL_missingIndex),
+    %item($FAIL_tooFewIndices),
+    %item($FAIL_tooManyIndices),
+    %item($FAIL_EqualityDefinitionParameters),
+    %item($FAIL_InvalidEmbedding),
+    %item($FAIL_invalidStructuralInduction),
+    %item($FAIL_invalidStructuralCase),
+    %item($FAIL_invalidStructuralCaseParameters),
+    %item($FAIL_missingStructuralCase),
+    %item($FAIL_duplicateStructuralCase)
   ]
 }

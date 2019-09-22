@@ -1,0 +1,22 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Case parameters must match constructor parameters
+ */
+$FAIL_invalidStructuralCaseParameters(x: %Element($../Essentials/"Natural numbers")): %Predicate {
+  definition = [%structural(
+    x,
+    $../Essentials/"Natural numbers",
+    [
+      {
+        constructor = $../Essentials/"Natural numbers".zero,
+        value = %and
+      },
+      {
+        constructor = $../Essentials/"Natural numbers".successor,
+        parameters = #(n: %Element($../Essentials/"Inhabited sets")),
+        value = %and
+      }
+    ]
+  )]
+}
