@@ -266,7 +266,7 @@ interface SignatureInfo {
 function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, readSignatureCode: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): SignatureInfo | undefined {
     let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument, restrictToUri);
     if (referencedDefinition) {
-        if (position && rangeInfo.linkRange && rangeInfo.linkRange.contains(position)) {
+        if (position && rangeInfo.linkRange && rangeInfo.linkRange.end.isAfterOrEqual(position)) {
             return {
                 parsedDocument: referencedDefinition.parsedDocument,
                 isMetaModel: referencedDefinition.isMetaModel,
