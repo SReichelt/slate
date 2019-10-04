@@ -1,0 +1,11 @@
+%../../../../../../../../data/logics/library%
+
+$Restrictions: %Section {
+  logic = 'hlm',
+  items = [
+    %item($twoCases),
+    %item($threeCasesWithNegation),
+    %item($threeCasesSimplified),
+    %item($FAIL_incompleteCases)
+  ]
+}

@@ -1,0 +1,24 @@
+%../../../../../../../data/logics/hlm%
+
+$less(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %Predicate {
+  properties = {negation = $"less or equal"(
+    n = {m},
+    m = {n}
+  )},
+  definition = [
+    %not($"less or equal"(
+      n = {m},
+      m = {n}
+    )),
+    %and(
+      $"less or equal"(
+        m = {m},
+        n = {n}
+      ),
+      %not(%equals(m, n))
+    )
+  ]
+}

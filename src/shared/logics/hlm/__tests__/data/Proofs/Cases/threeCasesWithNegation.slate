@@ -1,0 +1,42 @@
+%../../../../../../../../data/logics/hlm%
+
+$threeCasesWithNegation(
+  m: %Element($../../Essentials/"Natural numbers"),
+  n: %Element(%previous)
+): %ExplicitOperator {
+  definition = [%cases([
+    {
+      formula = $../../Essentials/less(
+        m = {m},
+        n = {n}
+      ),
+      value = $../../Essentials/"Natural numbers".zero
+    },
+    {
+      formula = %and(
+        $../../Essentials/"less or equal"(
+          n = {m},
+          m = {n}
+        ),
+        %equals(m, n)
+      ),
+      value = $../../Essentials/"Natural numbers".successor(n = {$../../Essentials/"Natural numbers".zero})
+    },
+    {
+      formula = %and(
+        %or(
+          $../../Essentials/less(
+            m = {m},
+            n = {n}
+          ),
+          %not(%equals(m, n))
+        ),
+        $../../Essentials/less(
+          n = {m},
+          m = {n}
+        )
+      ),
+      value = $../../Essentials/"Natural numbers".successor(n = {$../../Essentials/"Natural numbers".successor(n = {$../../Essentials/"Natural numbers".zero})})
+    }
+  ])]
+}

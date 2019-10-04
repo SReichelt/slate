@@ -1,0 +1,25 @@
+%../../../../../../../data/logics/hlm%
+
+$sum(
+  m: %Element($"Natural numbers"),
+  n: %Element(%previous)
+): %ExplicitOperator {
+  definition = [%structuralCases(
+    n,
+    $"Natural numbers",
+    [
+      {
+        constructor = $"Natural numbers".zero,
+        value = m
+      },
+      {
+        constructor = $"Natural numbers".successor,
+        parameters = #(x: %Element($"Natural numbers")),
+        value = $"Natural numbers".successor(n = {$sum(
+            m = {m},
+            n = {x}
+        )})
+      }
+    ]
+  )]
+}

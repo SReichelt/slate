@@ -472,7 +472,22 @@ export class ArgumentList extends Array<Argument> {
     }
     let origReplacedParametersLength = replacedParameters.length;
     for (let i = 0; i < this.length; i++) {
-      if (!this[i].isEquivalentTo(args[i], fn, replacedParameters)) {
+      let arg = this[i];
+      let argMatches = arg.isEquivalentTo(args[i], fn, replacedParameters);
+      if (!argMatches && arg.name !== undefined) {
+        let found = false;
+        for (let otherArg of args) {
+          if (otherArg.name === arg.name) {
+            if (found) {
+              argMatches = false;
+              break;
+            }
+            found = true;
+            argMatches = arg.isEquivalentTo(otherArg, fn, replacedParameters);
+          }
+        }
+      }
+      if (!argMatches) {
         replacedParameters.length = origReplacedParametersLength;
         return false;
       }

@@ -59,6 +59,7 @@ class HLMDefinitionChecker {
           for (let innerDefinition of this.definition.innerDefinitions) {
             this.error(innerDefinition, 'This type of object does not support inner definitions.');
           }
+          // TODO check properties (currently: negation)
           if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
             this.checkSetOperator(contents);
           } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
@@ -460,13 +461,14 @@ class HLMDefinitionChecker {
         .catch((error) => this.error(term, error.message));
       this.promise = this.promise.then(() => checkDefinitionRef);
     } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
-      // TODO check that cases form a partition
       let values: Fmt.Expression[] = [];
       for (let item of term.cases) {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
+        this.checkProof(item.exclusivityProof, context);
         values.push(item.value);
       }
+      this.checkProof(term.totalityProof, context);
       this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
       let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkElementTerm(value, caseContext);

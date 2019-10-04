@@ -4,6 +4,9 @@ $Essentials: %Section {
   logic = 'hlm',
   items = [
     %item($"Natural numbers"),
+    %item($sum),
+    %item($"less or equal"),
+    %item($less),
     %item($Functions),
     %item($value),
     %item($composition),

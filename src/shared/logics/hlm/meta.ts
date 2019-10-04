@@ -3374,6 +3374,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
 
 export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
   cases: ObjectContents_Case[];
+  totalityProof?: ObjectContents_Proof;
 
   getName(): string {
     return 'cases';
@@ -3395,6 +3396,16 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     } else {
       throw new Error('cases: Array expression expected');
     }
+    let totalityProofRaw = argumentList.getOptionalValue('totalityProof', 1);
+    if (totalityProofRaw !== undefined) {
+      if (totalityProofRaw instanceof Fmt.CompoundExpression) {
+        let newItem = new ObjectContents_Proof;
+        newItem.fromCompoundExpression(totalityProofRaw);
+        this.totalityProof = newItem;
+      } else {
+        throw new Error('totalityProof: Compound expression expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -3407,6 +3418,11 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
       casesExpr.items.push(newItem);
     }
     argumentList.add(casesExpr, undefined, false);
+    if (this.totalityProof !== undefined) {
+      let totalityProofExpr = new Fmt.CompoundExpression;
+      this.totalityProof.toCompoundExpression(totalityProofExpr, true);
+      argumentList.add(totalityProofExpr, 'totalityProof', true);
+    }
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3420,6 +3436,12 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
           changed = true;
         }
         result.cases.push(newItem);
+      }
+    }
+    if (this.totalityProof) {
+      result.totalityProof = new ObjectContents_Proof;
+      if (this.totalityProof.substituteExpression(fn, result.totalityProof!, replacedParameters)) {
+        changed = true;
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
@@ -3441,6 +3463,11 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
             return false;
           }
         }
+      }
+    }
+    if (this.totalityProof || expression.totalityProof) {
+      if (!this.totalityProof || !expression.totalityProof || !this.totalityProof.isEquivalentTo(expression.totalityProof, fn, replacedParameters)) {
+        return false;
       }
     }
     return true;
@@ -4388,19 +4415,19 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
 export class ObjectContents_Case extends Fmt.ObjectContents {
   formula: Fmt.Expression;
   value: Fmt.Expression;
-  wellDefinednessProof?: ObjectContents_Proof;
+  exclusivityProof?: ObjectContents_Proof;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.formula = argumentList.getValue('formula', 0);
     this.value = argumentList.getValue('value', 1);
-    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 2);
-    if (wellDefinednessProofRaw !== undefined) {
-      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
+    let exclusivityProofRaw = argumentList.getOptionalValue('exclusivityProof', 2);
+    if (exclusivityProofRaw !== undefined) {
+      if (exclusivityProofRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(wellDefinednessProofRaw);
-        this.wellDefinednessProof = newItem;
+        newItem.fromCompoundExpression(exclusivityProofRaw);
+        this.exclusivityProof = newItem;
       } else {
-        throw new Error('wellDefinednessProof: Compound expression expected');
+        throw new Error('exclusivityProof: Compound expression expected');
       }
     }
   }
@@ -4409,10 +4436,10 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     argumentList.length = 0;
     argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
     argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
-    if (this.wellDefinednessProof !== undefined) {
-      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
-      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true);
-      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
+    if (this.exclusivityProof !== undefined) {
+      let exclusivityProofExpr = new Fmt.CompoundExpression;
+      this.exclusivityProof.toCompoundExpression(exclusivityProofExpr, true);
+      argumentList.add(exclusivityProofExpr, 'exclusivityProof', true);
     }
   }
 
@@ -4436,9 +4463,9 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
         changed = true;
       }
     }
-    if (this.wellDefinednessProof) {
-      result.wellDefinednessProof = new ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
+    if (this.exclusivityProof) {
+      result.exclusivityProof = new ObjectContents_Proof;
+      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof!, replacedParameters)) {
         changed = true;
       }
     }
@@ -4459,8 +4486,8 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
         return false;
       }
     }
-    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
-      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+    if (this.exclusivityProof || objectContents.exclusivityProof) {
+      if (!this.exclusivityProof || !objectContents.exclusivityProof || !this.exclusivityProof.isEquivalentTo(objectContents.exclusivityProof, fn, replacedParameters)) {
         return false;
       }
     }
@@ -6231,7 +6258,7 @@ export class MetaModel extends Meta.MetaModel {
             }
           }
           if (currentContext.objectContentsClass === ObjectContents_Case) {
-            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 2)) {
+            if (argument.name === 'exclusivityProof' || (argument.name === undefined && argumentIndex === 2)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
             }
           }
@@ -6301,6 +6328,9 @@ export class MetaModel extends Meta.MetaModel {
       if (parent instanceof MetaRefExpression_cases) {
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 0)) {
           context = new ArgumentTypeContext(ObjectContents_Case, context);
+        }
+        if (argument.name === 'totalityProof' || (argument.name === undefined && argumentIndex === 1)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
         }
       }
       if (parent instanceof MetaRefExpression_structuralCases) {

@@ -851,4 +851,287 @@ export class HLMUtils extends GenericUtils {
     result.cases = [structuralCase];
     return result;
   }
+
+  negateFormula(formula: Fmt.Expression): CachedPromise<Fmt.Expression> {
+    if (formula instanceof FmtHLM.MetaRefExpression_not) {
+      return CachedPromise.resolve(formula.formula);
+    } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
+      return this.negateFormulae(formula.formulae).then((negatedFormulae: Fmt.Expression[] | undefined) => {
+        let result = new FmtHLM.MetaRefExpression_or;
+        result.formulae = negatedFormulae;
+        return result;
+      });
+    } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
+      return this.negateFormulae(formula.formulae).then((negatedFormulae: Fmt.Expression[] | undefined) => {
+        let result = new FmtHLM.MetaRefExpression_and;
+        result.formulae = negatedFormulae;
+        return result;
+      });
+    } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
+      return this.negateFormula(formula.formula).then((negatedFormula: Fmt.Expression) => {
+        let result = new FmtHLM.MetaRefExpression_exists;
+        result.parameters = formula.parameters;
+        result.formula = negatedFormula;
+        return result;
+      });
+    } else if (formula instanceof FmtHLM.MetaRefExpression_exists && formula.formula) {
+      return this.negateFormula(formula.formula).then((negatedFormula: Fmt.Expression) => {
+        let result = new FmtHLM.MetaRefExpression_forall;
+        result.parameters = formula.parameters;
+        result.formula = negatedFormula;
+        return result;
+      });
+    } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
+      let resultCases: CachedPromise<FmtHLM.ObjectContents_StructuralCase[]> = CachedPromise.resolve([]);
+      for (let structuralCase of formula.cases) {
+        resultCases = resultCases.then((negatedCases: FmtHLM.ObjectContents_StructuralCase[]) =>
+          this.negateFormula(structuralCase.value).then((negatedFormula: Fmt.Expression) => {
+            let resultCase = new FmtHLM.ObjectContents_StructuralCase;
+            resultCase._constructor = structuralCase._constructor;
+            resultCase.parameters = structuralCase.parameters;
+            resultCase.value = negatedFormula;
+            resultCase.rewrite = structuralCase.rewrite;
+            return negatedCases.concat(resultCase);
+          })
+        );
+      }
+      return resultCases.then((cases: FmtHLM.ObjectContents_StructuralCase[]) => {
+        let result = new FmtHLM.MetaRefExpression_structural;
+        result.term = formula.term;
+        result.construction = formula.construction;
+        result.cases = cases;
+        return CachedPromise.resolve(result);
+      });
+    } else if (formula instanceof Fmt.DefinitionRefExpression && !formula.path.parentPath) {
+      return this.getDefinition(formula.path).then((definition: Fmt.Definition) => {
+        if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.properties) {
+          let negationArg = definition.contents.properties.getOptionalValue('negation');
+          if (negationArg) {
+            return negationArg;
+          }
+        }
+        let result = new FmtHLM.MetaRefExpression_not;
+        result.formula = formula;
+        return result;
+      });
+    } else {
+      let result = new FmtHLM.MetaRefExpression_not;
+      result.formula = formula;
+      return CachedPromise.resolve(result);
+    }
+  }
+
+  negateFormulae(formulae: Fmt.Expression[] | undefined): CachedPromise<Fmt.Expression[] | undefined> {
+    if (formulae) {
+      let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+      for (let formula of formulae) {
+        result = result.then((negatedFormulae: Fmt.Expression[]) =>
+          this.negateFormula(formula).then((negatedFormula: Fmt.Expression) =>
+            negatedFormulae.concat(negatedFormula)
+          )
+        );
+      }
+      return result;
+    } else {
+      return CachedPromise.resolve(undefined);
+    }
+  }
+
+  isTrivialTautology(formula: Fmt.Expression): CachedPromise<boolean> {
+    if (formula instanceof FmtHLM.MetaRefExpression_and) {
+      let resultPromise = CachedPromise.resolve(true);
+      if (formula.formulae) {
+        for (let item of formula.formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (!currentResult) {
+              return false;
+            } else {
+              return this.isTrivialTautology(item);
+            }
+          });
+        }
+      }
+      return resultPromise;
+    } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
+      let resultPromise = CachedPromise.resolve(false);
+      if (formula.formulae) {
+        let formulae = formula.formulae;
+        for (let item of formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (currentResult) {
+              return true;
+            } else {
+              return this.isTrivialTautology(item);
+            }
+          });
+          if (item !== formulae[0]) {
+            resultPromise = resultPromise.then((currentResult: boolean) => {
+              if (currentResult) {
+                return true;
+              } else {
+                return this.negateFormula(item).then((negatedItem: Fmt.Expression) => {
+                  for (let previousItem of formulae) {
+                    if (previousItem === item) {
+                      break;
+                    }
+                    if (this.areFormulaeSyntacticallyEquivalent(negatedItem, previousItem)) {
+                      return true;
+                    }
+                    if (previousItem instanceof FmtHLM.MetaRefExpression_not && this.areFormulaeSyntacticallyEquivalent(item, formula)) {
+                      return true;
+                    }
+                  }
+                  return false;
+                });
+              }
+            });
+          }
+        }
+      }
+      return resultPromise;
+    } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
+      return this.isTrivialTautology(formula.formula);
+    } else if (formula instanceof FmtHLM.MetaRefExpression_equals || formula instanceof FmtHLM.MetaRefExpression_setEquals) {
+      if (formula.left.isEquivalentTo(formula.right)) {
+        return CachedPromise.resolve(true);
+      }
+    } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
+      if (formula.subset.isEquivalentTo(formula.superset)) {
+        return CachedPromise.resolve(true);
+      }
+    }
+    return CachedPromise.resolve(false);
+  }
+
+  isTrivialContradiction(formula: Fmt.Expression): CachedPromise<boolean> {
+    return this.negateFormula(formula).then((negatedFormula: Fmt.Expression) => this.isTrivialTautology(negatedFormula));
+  }
+
+  triviallyImplies(sourceFormula: Fmt.Expression, targetFormula: Fmt.Expression, followDefinitions: boolean): CachedPromise<boolean> {
+    if (this.areFormulaeSyntacticallyEquivalent(sourceFormula, targetFormula)) {
+      return CachedPromise.resolve(true);
+    }
+    if (sourceFormula instanceof FmtHLM.MetaRefExpression_and) {
+      let resultPromise = this.isTrivialTautology(targetFormula);
+      if (sourceFormula.formulae) {
+        for (let item of sourceFormula.formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (currentResult) {
+              return true;
+            } else {
+              return this.triviallyImplies(item, targetFormula, followDefinitions);
+            }
+          });
+        }
+      }
+      return resultPromise;
+    } else if (sourceFormula instanceof FmtHLM.MetaRefExpression_or) {
+      let resultPromise = CachedPromise.resolve(true);
+      if (sourceFormula.formulae) {
+        for (let item of sourceFormula.formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (!currentResult) {
+              return false;
+            } else {
+              return this.triviallyImplies(item, targetFormula, followDefinitions);
+            }
+          });
+        }
+      }
+      return resultPromise;
+    }
+    if (targetFormula instanceof FmtHLM.MetaRefExpression_and) {
+      let resultPromise = CachedPromise.resolve(true);
+      if (targetFormula.formulae) {
+        for (let item of targetFormula.formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (!currentResult) {
+              return false;
+            } else {
+              return this.triviallyImplies(sourceFormula, item, followDefinitions);
+            }
+          });
+        }
+      }
+      return resultPromise;
+    } else if (targetFormula instanceof FmtHLM.MetaRefExpression_or) {
+      let resultPromise = this.isTrivialContradiction(sourceFormula);
+      if (targetFormula.formulae) {
+        for (let item of targetFormula.formulae) {
+          resultPromise = resultPromise.then((currentResult: boolean) => {
+            if (currentResult) {
+              return true;
+            } else {
+              return this.triviallyImplies(sourceFormula, item, followDefinitions);
+            }
+          });
+        }
+      }
+      return resultPromise;
+    }
+    let finalResultPromise = CachedPromise.resolve(false);
+    if (followDefinitions) {
+      if (sourceFormula instanceof Fmt.DefinitionRefExpression && !sourceFormula.path.parentPath) {
+        finalResultPromise = finalResultPromise.then((currentFinalResult: boolean) => {
+          if (currentFinalResult) {
+            return true;
+          } else {
+            return this.getDefinition(sourceFormula.path).then((definition: Fmt.Definition) => {
+              let resultPromise = CachedPromise.resolve(false);
+              if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+                for (let definitionFormula of definition.contents.definition) {
+                  resultPromise = resultPromise.then((currentResult: boolean) => {
+                    if (currentResult) {
+                      return true;
+                    } else {
+                      let substitutedDefinitionFormula = this.substitutePath(definitionFormula, sourceFormula.path, [definition]);
+                      return this.triviallyImplies(substitutedDefinitionFormula, targetFormula, false);
+                    }
+                  });
+                }
+              }
+              return resultPromise;
+            });
+          }
+        });
+      }
+      if (targetFormula instanceof Fmt.DefinitionRefExpression && !targetFormula.path.parentPath) {
+        finalResultPromise = finalResultPromise.then((currentFinalResult: boolean) => {
+          if (currentFinalResult) {
+            return true;
+          } else {
+            return this.getDefinition(targetFormula.path).then((definition: Fmt.Definition) => {
+              let resultPromise = CachedPromise.resolve(false);
+              if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+                for (let definitionFormula of definition.contents.definition) {
+                  resultPromise = resultPromise.then((currentResult: boolean) => {
+                    if (currentResult) {
+                      return true;
+                    } else {
+                      let substitutedDefinitionFormula = this.substitutePath(definitionFormula, targetFormula.path, [definition]);
+                      return this.triviallyImplies(sourceFormula, substitutedDefinitionFormula, false);
+                    }
+                  });
+                }
+              }
+              return resultPromise;
+            });
+          }
+        });
+      }
+    }
+    return finalResultPromise;
+  }
+
+  private areFormulaeSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
+    let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
+      if ((leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals)
+          || (leftPart instanceof FmtHLM.MetaRefExpression_setEquals && rightPart instanceof FmtHLM.MetaRefExpression_setEquals)) {
+        return ((leftPart.left.isEquivalentTo(rightPart.left) && leftPart.right.isEquivalentTo(rightPart.right))
+                || (leftPart.left.isEquivalentTo(rightPart.right) && leftPart.right.isEquivalentTo(rightPart.left)));
+      }
+      return false;
+    };
+    return left.isEquivalentTo(right, fn);
+  }
 }
