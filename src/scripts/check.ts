@@ -72,4 +72,8 @@ if (process.argv.length !== 3) {
 
 let libraryFileName = process.argv[2];
 checkLibrary(libraryFileName)
-  .then((result: boolean) => process.exit(result ? 0 : 1));
+  .then((result: boolean) => process.exit(result ? 0 : 1))
+  .catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });

@@ -859,6 +859,8 @@ export class Reader {
   }
 
   private readChar(c: string): void {
+    this.markedStart = undefined;
+    this.markedEnd = undefined;
     this.skipWhitespace(c !== '/');
     if (!this.tryReadChar(c)) {
       let expected = '';
