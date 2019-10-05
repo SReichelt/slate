@@ -14,7 +14,7 @@ $FAIL_invalidStructuralCaseParameters(x: %Element($../Essentials/"Natural number
       },
       {
         constructor = $../Essentials/"Natural numbers".successor,
-        parameters = #(n: %Element($../Essentials/"Inhabited sets")),
+        parameters = #(n: %Element($../Essentials/"Pointed sets")),
         value = %and
       }
     ]

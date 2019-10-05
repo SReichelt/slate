@@ -22,7 +22,7 @@ $FAIL_differentConstructionArguments(
   )),
   u: %Element($../Essentials/Functions(
     X = {$../Essentials/"Natural numbers"},
-    Y = {$../Essentials/"Inhabited sets"}
+    Y = {$../Essentials/"Pointed sets"}
   ))
 ): %Predicate {
   definition = [
@@ -69,7 +69,7 @@ $FAIL_differentConstructionArguments(
         s,
         $../Essentials/Functions(
           X = {$../Essentials/"Natural numbers"},
-          Y = {$../Essentials/"Inhabited sets"}
+          Y = {$../Essentials/"Pointed sets"}
         )
       ),
       u

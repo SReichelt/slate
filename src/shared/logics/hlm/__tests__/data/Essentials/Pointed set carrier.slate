@@ -1,11 +1,11 @@
 %../../../../../../../data/logics/hlm%
 
-$"Inhabited set carrier"(i: %Element($"Inhabited sets")): %SetOperator {
+$"Pointed set carrier"(i: %Element($"Pointed sets")): %SetOperator {
   definition = [%setStructuralCases(
     i,
-    $"Inhabited sets",
+    $"Pointed sets",
     [{
-      constructor = $"Inhabited sets".instance,
+      constructor = $"Pointed sets"."pointed set",
       parameters = #(
         S: %Set,
         s: %Element(S)

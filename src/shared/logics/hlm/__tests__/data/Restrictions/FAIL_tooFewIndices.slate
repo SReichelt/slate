@@ -7,7 +7,7 @@ $FAIL_tooFewIndices(i: %Binding(
   $../Essentials/"Natural numbers",
   #(j: %Binding(
     $../Essentials/"Natural numbers",
-    #(a: %Element($../Essentials/"Inhabited sets"))
+    #(a: %Element($../Essentials/"Pointed sets"))
   ))
 )): %ExplicitOperator {
   definition = [a[$../Essentials/"Natural numbers".zero]]

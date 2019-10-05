@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
-$"Inhabited sets": %Construction {
-  $instance(
+$"Pointed sets": %Construction {
+  $"pointed set"(
     S: %Set,
     s: %Element(S)
   ): %Constructor {

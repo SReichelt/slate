@@ -5,7 +5,7 @@
  */
 $FAIL_constructor(S: %Set): %Predicate {
   definition = [%in(
-    $../Essentials/"Inhabited sets".instance(
+    $../Essentials/"Pointed sets"."pointed set"(
         S = {$../Essentials/"Natural numbers"},
         s = {$../Essentials/"Natural numbers".zero}
     ),

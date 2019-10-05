@@ -5,7 +5,7 @@
  */
 $FAIL_invalidBindingReference(i: %Binding(
   $../Essentials/"Natural numbers",
-  #(a: %Element($../Essentials/"Inhabited sets"))
+  #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
   definition = [i]
 }

@@ -15,6 +15,6 @@ $"Cardinal numbers": %Construction {
 
   embedding = {
     parameter = #(n: %Element($"Natural numbers")),
-    target = $"Cardinal numbers".cardinality(S = {$"Inhabited sets"})
+    target = $"Cardinal numbers".cardinality(S = {$"Pointed sets"})
   }
 }

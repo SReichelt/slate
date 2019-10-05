@@ -5,12 +5,12 @@
  */
 $FAIL_functionCallResultMismatch(f: %Element($../Essentials/Functions(
   X = {$../Essentials/"Natural numbers"},
-  Y = {$../Essentials/"Inhabited sets"}
+  Y = {$../Essentials/"Pointed sets"}
 ))): %Predicate {
   definition = [%equals(
     $../Essentials/value(
       X = {$../Essentials/"Natural numbers"},
-      Y = {$../Essentials/"Inhabited sets"},
+      Y = {$../Essentials/"Pointed sets"},
       f = {f},
       x = {$../Essentials/"Natural numbers".zero}
     ),

@@ -11,7 +11,7 @@ $FAIL_invalidStructuralCase(x: %Element($../Essentials/"Natural numbers")): %Pre
     $../Essentials/"Natural numbers",
     [
       {
-        constructor = $../Essentials/"Inhabited sets".instance,
+        constructor = $../Essentials/"Pointed sets"."pointed set",
         value = %and
       },
       {

@@ -6,15 +6,15 @@
  * @expectedError Type mismatch
  */
 $FAIL_indices(i: %Binding(
-  $../Essentials/"Inhabited sets",
+  $../Essentials/"Pointed sets",
   #(j: %Binding(
     $../Essentials/"Natural numbers",
-    #(a: %Element($../Essentials/"Inhabited sets"))
+    #(a: %Element($../Essentials/"Pointed sets"))
   ))
 )): %ExplicitOperator {
   definition = [a[
     $../Essentials/"Natural numbers".zero,
-    $../Essentials/"Inhabited sets".instance(
+    $../Essentials/"Pointed sets"."pointed set"(
         S = {$../Essentials/"Natural numbers"},
         s = {$../Essentials/"Natural numbers".zero}
     )

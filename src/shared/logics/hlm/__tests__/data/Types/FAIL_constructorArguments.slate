@@ -7,7 +7,7 @@ $FAIL_constructorArguments(
   S: %Set,
   s: %Element(S)
 ): %ExplicitOperator {
-  definition = [$../Essentials/"Inhabited sets".instance(
+  definition = [$../Essentials/"Pointed sets"."pointed set"(
       S = {$../Essentials/"Natural numbers"},
       s = {s}
   )]

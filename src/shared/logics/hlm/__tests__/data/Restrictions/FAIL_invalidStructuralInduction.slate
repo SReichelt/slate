@@ -3,7 +3,7 @@
 /**
  * @expectedError Term must be an element of the specified construction
  */
-$FAIL_invalidStructuralInduction(x: %Element($../Essentials/"Inhabited sets")): %Predicate {
+$FAIL_invalidStructuralInduction(x: %Element($../Essentials/"Pointed sets")): %Predicate {
   definition = [%structural(
     x,
     $../Essentials/"Natural numbers",

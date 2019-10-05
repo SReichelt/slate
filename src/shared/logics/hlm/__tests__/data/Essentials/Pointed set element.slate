@@ -1,11 +1,11 @@
 %../../../../../../../data/logics/hlm%
 
-$"Inhabited set element"(i: %Element($"Inhabited sets")): %ExplicitOperator {
+$"Pointed set element"(i: %Element($"Pointed sets")): %ExplicitOperator {
   definition = [%structuralCases(
     i,
-    $"Inhabited sets",
+    $"Pointed sets",
     [{
-      constructor = $"Inhabited sets".instance,
+      constructor = $"Pointed sets"."pointed set",
       parameters = #(
         S: %Set,
         s: %Element(S)

@@ -38,7 +38,7 @@ $FAIL_InvalidEmbedding: %Construction {
 
   embedding = {
     parameter = #(s: %Element($../Essentials/"Natural numbers")),
-    target = $../Essentials/"Inhabited sets".instance(
+    target = $../Essentials/"Pointed sets"."pointed set"(
         S = {$../Essentials/"Natural numbers"},
         s = {s}
     )
