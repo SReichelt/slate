@@ -1,6 +1,6 @@
 %../../../../../../../data/logics/hlm%
 
-$"Pointed set element"(i: %Element($"Pointed sets")): %ExplicitOperator {
+$"Pointed set base point"(i: %Element($"Pointed sets")): %ExplicitOperator {
   definition = [%structuralCases(
     i,
     $"Pointed sets",

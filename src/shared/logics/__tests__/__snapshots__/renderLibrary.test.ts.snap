@@ -4131,8 +4131,119 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.2.1 data/libraries/hlm/Algebra/Magmas/Magmas 1`] = `
+exports[`render hlm library: 2.2.1 data/libraries/hlm/Algebra/Pointed%20sets/Pointed%20sets 1`] = `
 "Definition 2.2.1.  We define:
+
+  𝓟𝓽𝓢𝓮𝓽 :=: {[S, s] | S is a set, s ∈ S}
+
+  [S, s] = [T, t]  :⇔  ∃ φ : S ↔ T : φ[s] = t  (S is a set, s ∈ S, T is a set, t ∈ T)
+
+We write “let 𝐒 be a pointed set” for “let 𝐒 ∈ 𝓟𝓽𝓢𝓮𝓽.”
+
+Remarks.
+
+Strictly speaking, the elements of this set are not pointed sets but isomorphism classes of pointed sets, which are similar to [cardinal numbers](../../Essentials/Numbers/Cardinal/Cardinal%20numbers). Due to the rules of HLM, it is not even possible to define pointed sets (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
+
+References.
+
+* https://en.wikipedia.org/wiki/Pointed_set"
+`;
+
+exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Pointed%20sets/Carrier 1`] = `
+"Definition 2.2.2.  Let 𝐒 be a pointed set. We define
+
+  Carrier(𝐒)
+
+by:
+
+  Carrier([S, s]) := S  (S is a set, s ∈ S)
+
+We write “let x ∈ 𝐒” for “let x ∈ Carrier(𝐒).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a pointed set (which is actually an equivalence class of pointed sets), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.2.3 data/libraries/hlm/Algebra/Pointed%20sets/base%20point 1`] = `
+"Definition 2.2.3.  Let 𝐒 be a pointed set. We define
+
+  base(𝐒)
+
+by:
+
+  base([S, s]) := s  (S is a set, s ∈ S)"
+`;
+
+exports[`render hlm library: 2.2.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms 1`] = `
+"Definition 2.2.4.  Let 𝐒, 𝐓 be pointed sets. We define:
+
+  Hom(𝐒, 𝐓) := {f : Carrier(𝐒) → Carrier(𝐓) : f(base(𝐒)) = base(𝐓)}
+
+We write “let φ : 𝐒 → 𝐓 be a homomorphism” for “let φ ∈ Hom(𝐒, 𝐓).”"
+`;
+
+exports[`render hlm library: 2.2.5 data/libraries/hlm/Algebra/Pointed%20sets/Isomorphisms 1`] = `
+"Definition 2.2.5.  Let 𝐒, 𝐓 be pointed sets. We define:
+
+  Iso(𝐒, 𝐓) := {homomorphisms φ : 𝐒 → 𝐓 : φ is bijective}
+   = {f : Carrier(𝐒) ↔ Carrier(𝐓) : f(base(𝐒)) = base(𝐓)}
+
+We write “let φ : 𝐒 ↔ 𝐓 be an isomorphism” for “let φ ∈ Iso(𝐒, 𝐓).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.2.6 data/libraries/hlm/Algebra/Pointed%20sets/identity 1`] = `
+"Definition 2.2.6.  Let 𝐒 be a pointed set. We define:
+
+  id_𝐒 := id_(Carrier(𝐒))"
+`;
+
+exports[`render hlm library: 2.2.7 data/libraries/hlm/Algebra/Pointed%20sets/Equality%20criterion 1`] = `
+"Proposition 2.2.7.  Let 𝐒, 𝐓 be pointed sets. Then the following are equivalent:
+
+  1. Iso(𝐒, 𝐓) is nonempty
+  2. 𝐒 = 𝐓
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of pointed sets."
+`;
+
+exports[`render hlm library: 2.2.8 data/libraries/hlm/Algebra/Pointed%20sets/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.2.8.  Let 𝐒, 𝐓 be pointed sets, φ : 𝐒 ↔ 𝐓 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐓, 𝐒)
+
+No proof."
+`;
+
+exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Pointed%20sets/subset%20of%20pointed%20set 1`] = `
+"Definition 2.2.9.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒). We define:
+
+  S is a pointed subset of 𝐒  :⇔  base(𝐒) ∈ S"
+`;
+
+exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Pointed%20sets/subset%20as%20pointed%20set 1`] = `
+"Definition 2.2.10.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒) such that S is a pointed subset of 𝐒. We define:
+
+  [S] := [S, base(𝐒)]"
+`;
+
+exports[`render hlm library: 2.2.11 data/libraries/hlm/Algebra/Pointed%20sets/pointed%20subset 1`] = `
+"Definition 2.2.11.  Let 𝐒, 𝐓 be pointed sets. We define:
+
+  𝐒 ≤ 𝐓  :⇔  ∃ homomorphism φ : 𝐒 → 𝐓 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐓) : [S is a pointed subset of 𝐓 and 𝐒 = [S]]
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.3.1 data/libraries/hlm/Algebra/Magmas/Magmas 1`] = `
+"Definition 2.3.1.  We define:
 
   𝓜𝓪𝓰 :=: {[S, ∗] | S is a set, ∗ : S × S → S is an operation on S}
 
@@ -4149,8 +4260,8 @@ References.
 * https://en.wikipedia.org/wiki/Magma_(algebra)"
 `;
 
-exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Magmas/Carrier 1`] = `
-"Definition 2.2.2.  Let 𝐌 be a magma. We define
+exports[`render hlm library: 2.3.2 data/libraries/hlm/Algebra/Magmas/Carrier 1`] = `
+"Definition 2.3.2.  Let 𝐌 be a magma. We define
 
   Carrier(𝐌)
 
@@ -4165,8 +4276,8 @@ Remarks.
 This definition retrieves a representative carrier set from a magma (which is actually an equivalence class of magmas), and enables typical abuse of notation."
 `;
 
-exports[`render hlm library: 2.2.3 data/libraries/hlm/Algebra/Magmas/operation 1`] = `
-"Definition 2.2.3.  Let 𝐌 be a magma, a, b ∈ 𝐌. We define:
+exports[`render hlm library: 2.3.3 data/libraries/hlm/Algebra/Magmas/operation 1`] = `
+"Definition 2.3.3.  Let 𝐌 be a magma, a, b ∈ 𝐌. We define:
 
   a • b := {a ∗ b if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)
 
@@ -4175,8 +4286,8 @@ Remarks.
 This definition lets us multiply elements without decomposing the magma."
 `;
 
-exports[`render hlm library: 2.2.4 data/libraries/hlm/Algebra/Magmas/associative 1`] = `
-"Definition 2.2.4.  Let 𝐌 be a magma. We define
+exports[`render hlm library: 2.3.4 data/libraries/hlm/Algebra/Magmas/associative 1`] = `
+"Definition 2.3.4.  Let 𝐌 be a magma. We define
 
   𝐌 is associative
 
@@ -4185,8 +4296,8 @@ by:
   [M, ∗] is associative  :⇔  ∗ is associative  (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
-exports[`render hlm library: 2.2.5 data/libraries/hlm/Algebra/Magmas/commutative 1`] = `
-"Definition 2.2.5.  Let 𝐌 be a magma. We define
+exports[`render hlm library: 2.3.5 data/libraries/hlm/Algebra/Magmas/commutative 1`] = `
+"Definition 2.3.5.  Let 𝐌 be a magma. We define
 
   𝐌 is commutative
 
@@ -4195,16 +4306,16 @@ by:
   [M, ∗] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
-exports[`render hlm library: 2.2.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms 1`] = `
-"Definition 2.2.6.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms 1`] = `
+"Definition 2.3.6.  Let 𝐌, 𝐍 be magmas. We define:
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
 
-exports[`render hlm library: 2.2.7 data/libraries/hlm/Algebra/Magmas/Isomorphisms 1`] = `
-"Definition 2.2.7.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.7 data/libraries/hlm/Algebra/Magmas/Isomorphisms 1`] = `
+"Definition 2.3.7.  Let 𝐌, 𝐍 be magmas. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
    = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
@@ -4214,14 +4325,14 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.2.8 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
-"Definition 2.2.8.  Let 𝐌 be a magma. We define:
+exports[`render hlm library: 2.3.8 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
+"Definition 2.3.8.  Let 𝐌 be a magma. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Magmas/Equality%20criterion 1`] = `
-"Proposition 2.2.9.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
+exports[`render hlm library: 2.3.9 data/libraries/hlm/Algebra/Magmas/Equality%20criterion 1`] = `
+"Proposition 2.3.9.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -4233,28 +4344,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of magmas."
 `;
 
-exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Magmas/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.2.10.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.3.10 data/libraries/hlm/Algebra/Magmas/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.3.10.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.2.11 data/libraries/hlm/Algebra/Magmas/submagma%20set 1`] = `
-"Definition 2.2.11.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.3.11 data/libraries/hlm/Algebra/Magmas/submagma%20set 1`] = `
+"Definition 2.3.11.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S"
 `;
 
-exports[`render hlm library: 2.2.12 data/libraries/hlm/Algebra/Magmas/subset%20magma 1`] = `
-"Definition 2.2.12.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌) such that S is a submagma of 𝐌. We define:
+exports[`render hlm library: 2.3.12 data/libraries/hlm/Algebra/Magmas/subset%20magma 1`] = `
+"Definition 2.3.12.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌) such that S is a submagma of 𝐌. We define:
 
   [S] := {[S, ∗∣_S] if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
-exports[`render hlm library: 2.2.13 data/libraries/hlm/Algebra/Magmas/submagma 1`] = `
-"Definition 2.2.13.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.13 data/libraries/hlm/Algebra/Magmas/submagma 1`] = `
+"Definition 2.3.13.  Let 𝐌, 𝐍 be magmas. We define:
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submagma of 𝐍 and 𝐌 = [S]]
@@ -4262,8 +4373,8 @@ exports[`render hlm library: 2.2.13 data/libraries/hlm/Algebra/Magmas/submagma 1
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.2.14.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
-"Definition 2.2.14.1.  Let S be a set. We define:
+exports[`render hlm library: 2.3.14.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
+"Definition 2.3.14.1.  Let S be a set. We define:
 
   𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) :=: {(s) | s ∈ S, a^b | a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S)}
 
@@ -4283,14 +4394,14 @@ Remarks.
 This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma."
 `;
 
-exports[`render hlm library: 2.2.14.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
-"Definition 2.2.14.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
+exports[`render hlm library: 2.3.14.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
+"Definition 2.3.14.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
 
   free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]"
 `;
 
-exports[`render hlm library: 2.2.14.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
-"Definition 2.2.14.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.3.14.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
+"Definition 2.3.14.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   𝐌 is free on S  :⇔  𝐌 = free_𝓜𝓰𝓶(S)
     ⇔  ∀ magmas 𝐍, f : S → Carrier(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
@@ -4298,10 +4409,149 @@ exports[`render hlm library: 2.2.14.3 data/libraries/hlm/Algebra/Magmas/Free%20m
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.2.14.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
-"Definition 2.2.14.4.  Let 𝐌 be a magma. We define:
+exports[`render hlm library: 2.3.14.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
+"Definition 2.3.14.4.  Let 𝐌 be a magma. We define:
 
   𝐌 is free  :⇔  ∃ S ⊆ Carrier(𝐌) : 𝐌 is free on S"
+`;
+
+exports[`render hlm library: 2.4.1 data/libraries/hlm/Algebra/Semigroups/Semigroups 1`] = `
+"Definition 2.4.1.  We define:
+
+  𝓢𝓮𝓶𝓲𝓖𝓻𝓹 := {magmas 𝐒 : 𝐒 is associative}
+
+We write “let 𝐒 be a semigroup” for “let 𝐒 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Semigroup"
+`;
+
+exports[`render hlm library: 2.5.1 data/libraries/hlm/Algebra/Monoids/Monoids 1`] = `
+"Definition 2.5.1.  We define:
+
+  𝓜𝓸𝓷 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = e and e ∗ a = e]]}
+
+  [S, ∗, e] = [T, ⋆, f]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T with suitable conditions)
+
+We write “let 𝐌 be a monoid” for “let 𝐌 ∈ 𝓜𝓸𝓷.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Monoid"
+`;
+
+exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/Carrier 1`] = `
+"Definition 2.5.2.  Let 𝐌 be a monoid. We define
+
+  Carrier(𝐌)
+
+by:
+
+  Carrier([M, ∗, e]) := M  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
+
+We write “let a ∈ 𝐌” for “let a ∈ Carrier(𝐌).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a monoid (which is actually an equivalence class of monoids), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.5.3 data/libraries/hlm/Algebra/Monoids/operation 1`] = `
+"Definition 2.5.3.  Let 𝐌 be a monoid, a, b ∈ 𝐌. We define:
+
+  a • b := {a ∗ b if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the monoid."
+`;
+
+exports[`render hlm library: 2.5.4 data/libraries/hlm/Algebra/Monoids/identity%20element 1`] = `
+"Definition 2.5.4.  Let 𝐌 be a monoid. We define
+
+  1_𝐌
+
+by:
+
+  1_[M,∗,e] := e  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.5.5 data/libraries/hlm/Algebra/Monoids/commutative 1`] = `
+"Definition 2.5.5.  Let 𝐌 be a monoid. We define
+
+  𝐌 is commutative
+
+by:
+
+  [M, ∗, e] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.5.6 data/libraries/hlm/Algebra/Monoids/Homomorphisms 1`] = `
+"Definition 2.5.6.  Let 𝐌, 𝐍 be monoids. We define:
+
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
+
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
+`;
+
+exports[`render hlm library: 2.5.7 data/libraries/hlm/Algebra/Monoids/Isomorphisms 1`] = `
+"Definition 2.5.7.  Let 𝐌, 𝐍 be monoids. We define:
+
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
+
+We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.5.8 data/libraries/hlm/Algebra/Monoids/identity 1`] = `
+"Definition 2.5.8.  Let 𝐌 be a monoid. We define:
+
+  id_𝐌 := id_(Carrier(𝐌))"
+`;
+
+exports[`render hlm library: 2.5.9 data/libraries/hlm/Algebra/Monoids/Equality%20criterion 1`] = `
+"Proposition 2.5.9.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
+
+  1. Iso(𝐌, 𝐍) is nonempty
+  2. 𝐌 = 𝐍
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of monoids."
+`;
+
+exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.5.10.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐍, 𝐌)
+
+No proof."
+`;
+
+exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/submonoid%20set 1`] = `
+"Definition 2.5.11.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
+
+  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐌 ∈ S"
+`;
+
+exports[`render hlm library: 2.5.12 data/libraries/hlm/Algebra/Monoids/subset%20monoid 1`] = `
+"Definition 2.5.12.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌) such that S is a submonoid of 𝐌. We define:
+
+  [S] := {[S, ∗∣_S, e] if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/submonoid 1`] = `
+"Definition 2.5.13.  Let 𝐌, 𝐍 be monoids. We define:
+
+  𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submonoid of 𝐍 and 𝐌 = [S]]
+
+Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `

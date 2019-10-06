@@ -5,7 +5,7 @@
  */
 $FAIL_extractFromStructural(S: %Set, s: %Element(S)): %Predicate {
   definition = [%equals(
-    $../Essentials/"Pointed set element"(i = {$../Essentials/"Pointed sets"."pointed set"(
+    $../Essentials/"Pointed set base point"(i = {$../Essentials/"Pointed sets"."pointed set"(
         S = {$../Essentials/"Natural numbers"},
         s = {$../Essentials/"Natural numbers".zero}
     )}),

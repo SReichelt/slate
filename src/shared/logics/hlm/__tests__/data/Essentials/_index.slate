@@ -15,6 +15,6 @@ $Essentials: %Section {
     %item($"Cardinal numbers"),
     %item($"Pointed sets"),
     %item($"Pointed set carrier"),
-    %item($"Pointed set element")
+    %item($"Pointed set base point")
   ]
 }
