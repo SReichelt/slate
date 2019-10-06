@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/hlm%
+
+$"pointed natural numbers": %ExplicitOperator {
+  definition = [$"Pointed sets"."pointed set"(
+      S = {$"Natural numbers"},
+      s = {$"Natural numbers".zero}
+  )]
+}

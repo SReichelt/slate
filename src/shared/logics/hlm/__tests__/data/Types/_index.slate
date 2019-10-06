@@ -15,6 +15,8 @@ $Types: %Section {
     %item($FAIL_functionCallResultMismatch),
     %item($extractFromStructural),
     %item($FAIL_extractFromStructural),
-    %item($FAIL_indices)
+    %item($FAIL_indices),
+    %item($extractFromPointedNaturalNumbers),
+    %item($FAIL_extractFromPointedNaturalNumbersWithAlternative)
   ]
 }

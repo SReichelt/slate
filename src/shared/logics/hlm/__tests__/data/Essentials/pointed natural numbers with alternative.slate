@@ -1,0 +1,14 @@
+%../../../../../../../data/logics/hlm%
+
+$"pointed natural numbers with alternative": %ExplicitOperator {
+  definition = [
+    $"Pointed sets"."pointed set"(
+        S = {$"Natural numbers"},
+        s = {$"Natural numbers".zero}
+    ),
+    $"Pointed sets"."pointed set"(
+        S = {$"Natural numbers"},
+        s = {$"Natural numbers".successor(n = {$"Natural numbers".zero})}
+    )
+  ]
+}

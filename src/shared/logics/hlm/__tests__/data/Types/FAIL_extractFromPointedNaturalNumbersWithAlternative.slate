@@ -1,0 +1,11 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Type mismatch
+ */
+$FAIL_extractFromPointedNaturalNumbersWithAlternative: %StandardTheorem {
+  claim = %equals(
+    $../Essentials/"Pointed set base point"(i = {$../Essentials/"pointed natural numbers with alternative"}),
+    $../Essentials/"Natural numbers".zero
+  )
+}
