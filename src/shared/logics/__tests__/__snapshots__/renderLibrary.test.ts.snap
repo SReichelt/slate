@@ -4430,7 +4430,7 @@ References.
 exports[`render hlm library: 2.5.1 data/libraries/hlm/Algebra/Monoids/Monoids 1`] = `
 "Definition 2.5.1.  We define:
 
-  𝓜𝓸𝓷 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = e and e ∗ a = e]]}
+  𝓜𝓸𝓷 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]]}
 
   [S, ∗, e] = [T, ⋆, f]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T with suitable conditions)
 
@@ -4550,6 +4550,154 @@ exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/submonoid
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submonoid of 𝐍 and 𝐌 = [S]]
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.5.14.1 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20addition 1`] = `
+"Definition 2.5.14.1.  We define:
+
+  (ℕ, +) := [ℕ, +, 0]"
+`;
+
+exports[`render hlm library: 2.5.14.2 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20multiplication 1`] = `
+"Definition 2.5.14.2.  We define:
+
+  (ℕ, ⋅) := [ℕ, ⋅, 1]"
+`;
+
+exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
+"Definition 2.6.1.  We define:
+
+  𝓖𝓻𝓹 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]], i : S → S is a function such that [∀ a ∈ S : [a ∗ i(a) = e and i(a) ∗ a = e]]}
+
+  [S, ∗, e] = [T, ⋆, f]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, i : S → S is a function, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T, j : T → T is a function with suitable conditions)
+
+We write “let 𝐆 be a group” for “let 𝐆 ∈ 𝓖𝓻𝓹.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Group_(mathematics)"
+`;
+
+exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/Carrier 1`] = `
+"Definition 2.6.2.  Let 𝐆 be a group. We define
+
+  Carrier(𝐆)
+
+by:
+
+  Carrier([G, ∗, e]) := G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+
+We write “let a ∈ 𝐆” for “let a ∈ Carrier(𝐆).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a group (which is actually an equivalence class of groups), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/operation 1`] = `
+"Definition 2.6.3.  Let 𝐆 be a group, a, b ∈ 𝐆. We define:
+
+  a • b := {a ∗ b if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the group."
+`;
+
+exports[`render hlm library: 2.6.4 data/libraries/hlm/Algebra/Groups/identity%20element 1`] = `
+"Definition 2.6.4.  Let 𝐆 be a group. We define
+
+  1_𝐆
+
+by:
+
+  1_[G,∗,e] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.6.5 data/libraries/hlm/Algebra/Groups/inverse%20element 1`] = `
+"Definition 2.6.5.  Let 𝐆 be a group, a ∈ 𝐆. We define:
+
+  a^-1 := {i(a) if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/abelian 1`] = `
+"Definition 2.6.6.  Let 𝐆 be a group. We define
+
+  𝐆 is abelian
+
+by:
+
+  [G, ∗, e] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.6.7 data/libraries/hlm/Algebra/Groups/Homomorphisms 1`] = `
+"Definition 2.6.7.  Let 𝐆, 𝐇 be groups. We define:
+
+  Hom(𝐆, 𝐇) := {f : Carrier(𝐆) → Carrier(𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(1_𝐆) = 1_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
+   = {f : Carrier(𝐆) → Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+
+We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ ∈ Hom(𝐆, 𝐇).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.6.8 data/libraries/hlm/Algebra/Groups/Isomorphisms 1`] = `
+"Definition 2.6.8.  Let 𝐆, 𝐇 be groups. We define:
+
+  Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
+   = {f : Carrier(𝐆) ↔ Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+
+We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ ∈ Iso(𝐆, 𝐇).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/identity 1`] = `
+"Definition 2.6.9.  Let 𝐆 be a group. We define:
+
+  id_𝐆 := id_(Carrier(𝐆))"
+`;
+
+exports[`render hlm library: 2.6.10 data/libraries/hlm/Algebra/Groups/Equality%20criterion 1`] = `
+"Proposition 2.6.10.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
+
+  1. Iso(𝐆, 𝐇) is nonempty
+  2. 𝐆 = 𝐇
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of groups."
+`;
+
+exports[`render hlm library: 2.6.11 data/libraries/hlm/Algebra/Groups/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.6.11.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐇, 𝐆)
+
+No proof."
+`;
+
+exports[`render hlm library: 2.6.12 data/libraries/hlm/Algebra/Groups/subgroup%20set 1`] = `
+"Definition 2.6.12.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+
+  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
+`;
+
+exports[`render hlm library: 2.6.13 data/libraries/hlm/Algebra/Groups/subset%20group 1`] = `
+"Definition 2.6.13.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
+
+  [S] := {[S, ∗∣_S, e] if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.6.14 data/libraries/hlm/Algebra/Groups/subgroup 1`] = `
+"Definition 2.6.14.  Let 𝐆, 𝐇 be groups. We define:
+
+  𝐆 ≤ 𝐇  :⇔  ∃ homomorphism φ : 𝐆 → 𝐇 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐇) : [S is a subgroup of 𝐇 and 𝐆 = [S]]
 
 Equivalence.  No proof."
 `;
@@ -4813,8 +4961,28 @@ References.
 * https://en.wikipedia.org/wiki/Category_of_magmas"
 `;
 
-exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/monoids 1`] = `
 "Definition 4.8.5.  Let u ∈ ℕ. We define:
+
+  𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of monoids."
+`;
+
+exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/groups 1`] = `
+"Definition 4.8.6.  Let u ∈ ℕ. We define:
+
+  𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of groups."
+`;
+
+exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+"Definition 4.8.7.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
@@ -4828,8 +4996,8 @@ References.
 * https://ncatlab.org/nlab/show/Cat"
 `;
 
-exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.6.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+"Definition 4.8.8.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
   𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
 
