@@ -4726,7 +4726,7 @@ exports[`render hlm library: 2.6.17 data/libraries/hlm/Algebra/Groups/normal%20s
 exports[`render hlm library: 2.6.18 data/libraries/hlm/Algebra/Groups/quotient%20group 1`] = `
 "Definition 2.6.18.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
 
-  𝐆∕S := [T, (T × T → T, x ↦ {{{[g • h]_∼ if u = [h]_∼ (h ∈ 𝐆) if t = [g]_∼ (g ∈ 𝐆) if x = (t, u) (t ∈ T, u ∈ T)), [1_𝐆]_∼, (T → T, t ↦ {[g^-1]_∼ if t = [g]_∼ (g ∈ 𝐆))]"
+  𝐆∕S := [T, (T × T → T, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [1_𝐆]_∼, (T → T, [g]_∼ ↦ [g^-1]_∼)]"
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `
