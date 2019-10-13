@@ -4569,9 +4569,9 @@ exports[`render hlm library: 2.5.14.2 data/libraries/hlm/Algebra/Monoids/Example
 exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
 "Definition 2.6.1.  We define:
 
-  𝓖𝓻𝓹 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]], i : S → S is a function such that [∀ a ∈ S : [a ∗ i(a) = e and i(a) ∗ a = e]]}
+  𝓖𝓻𝓹 :=: {[S, ∗, e, i] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]], i : S → S is a function such that [∀ a ∈ S : [a ∗ i(a) = e and i(a) ∗ a = e]]}
 
-  [S, ∗, e] = [T, ⋆, f]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, i : S → S is a function, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T, j : T → T is a function with suitable conditions)
+  [S, ∗, e, i] = [T, ⋆, f, j]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, i : S → S is a function, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T, j : T → T is a function with suitable conditions)
 
 We write “let 𝐆 be a group” for “let 𝐆 ∈ 𝓖𝓻𝓹.”
 
@@ -4587,7 +4587,7 @@ exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/Carrier 1`]
 
 by:
 
-  Carrier([G, ∗, e]) := G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+  Carrier([G, ∗, e, i]) := G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
 
 We write “let a ∈ 𝐆” for “let a ∈ Carrier(𝐆).”
 
@@ -4599,7 +4599,7 @@ This definition retrieves a representative carrier set from a group (which is ac
 exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/operation 1`] = `
 "Definition 2.6.3.  Let 𝐆 be a group, a, b ∈ 𝐆. We define:
 
-  a • b := {a ∗ b if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+  a • b := {a ∗ b if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
 
 Remarks.
 
@@ -4613,13 +4613,13 @@ exports[`render hlm library: 2.6.4 data/libraries/hlm/Algebra/Groups/identity%20
 
 by:
 
-  1_[G,∗,e] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  1_[G,∗,e,i] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.6.5 data/libraries/hlm/Algebra/Groups/inverse%20element 1`] = `
 "Definition 2.6.5.  Let 𝐆 be a group, a ∈ 𝐆. We define:
 
-  a^-1 := {i(a) if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  a^-1 := {i(a) if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/abelian 1`] = `
@@ -4629,7 +4629,7 @@ exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/abelian 1`]
 
 by:
 
-  [G, ∗, e] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  [G, ∗, e, i] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.6.7 data/libraries/hlm/Algebra/Groups/Homomorphisms 1`] = `
@@ -4654,14 +4654,20 @@ We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/identity 1`] = `
-"Definition 2.6.9.  Let 𝐆 be a group. We define:
+exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/Kernel 1`] = `
+"Definition 2.6.9.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
+
+  Ker(φ) := {g ∈ 𝐆 : φ(g) = 1_𝐇}"
+`;
+
+exports[`render hlm library: 2.6.10 data/libraries/hlm/Algebra/Groups/identity 1`] = `
+"Definition 2.6.10.  Let 𝐆 be a group. We define:
 
   id_𝐆 := id_(Carrier(𝐆))"
 `;
 
-exports[`render hlm library: 2.6.10 data/libraries/hlm/Algebra/Groups/Equality%20criterion 1`] = `
-"Proposition 2.6.10.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
+exports[`render hlm library: 2.6.11 data/libraries/hlm/Algebra/Groups/Equality%20criterion 1`] = `
+"Proposition 2.6.11.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
 
   1. Iso(𝐆, 𝐇) is nonempty
   2. 𝐆 = 𝐇
@@ -4673,33 +4679,54 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of groups."
 `;
 
-exports[`render hlm library: 2.6.11 data/libraries/hlm/Algebra/Groups/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.6.11.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
+exports[`render hlm library: 2.6.12 data/libraries/hlm/Algebra/Groups/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.6.12.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐇, 𝐆)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.6.12 data/libraries/hlm/Algebra/Groups/subgroup%20set 1`] = `
-"Definition 2.6.12.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+exports[`render hlm library: 2.6.13 data/libraries/hlm/Algebra/Groups/subgroup%20set 1`] = `
+"Definition 2.6.13.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
   S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
 `;
 
-exports[`render hlm library: 2.6.13 data/libraries/hlm/Algebra/Groups/subset%20group 1`] = `
-"Definition 2.6.13.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
+exports[`render hlm library: 2.6.14 data/libraries/hlm/Algebra/Groups/subset%20group 1`] = `
+"Definition 2.6.14.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
 
-  [S] := {[S, ∗∣_S, e] if 𝐆 = [G, ∗, e] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  [S] := {[S, ∗∣_S, e, i∣_S^S] if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.14 data/libraries/hlm/Algebra/Groups/subgroup 1`] = `
-"Definition 2.6.14.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.15 data/libraries/hlm/Algebra/Groups/subgroup 1`] = `
+"Definition 2.6.15.  Let 𝐆, 𝐇 be groups. We define:
 
   𝐆 ≤ 𝐇  :⇔  ∃ homomorphism φ : 𝐆 → 𝐇 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐇) : [S is a subgroup of 𝐇 and 𝐆 = [S]]
 
 Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/normal%20subgroup%20set 1`] = `
+"Definition 2.6.16.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+
+  S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : (g • s) • g^-1 ∈ S
+    ⇔  ∃ group 𝐇, homomorphism φ : 𝐆 → 𝐇 : S = Ker(φ)
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 2.6.17 data/libraries/hlm/Algebra/Groups/normal%20subgroup 1`] = `
+"Definition 2.6.17.  Let 𝐆, 𝐇 be groups. We define:
+
+  𝐆 ⊴ 𝐇  :⇔  ∃ S ⊆ Carrier(𝐇) : [S is a normal subgroup of 𝐇 and 𝐆 = [S]]"
+`;
+
+exports[`render hlm library: 2.6.18 data/libraries/hlm/Algebra/Groups/quotient%20group 1`] = `
+"Definition 2.6.18.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
+
+  𝐆∕S := [T, (T × T → T, x ↦ {{{[g • h]_∼ if u = [h]_∼ (h ∈ 𝐆) if t = [g]_∼ (g ∈ 𝐆) if x = (t, u) (t ∈ T, u ∈ T)), [1_𝐆]_∼, (T → T, t ↦ {[g^-1]_∼ if t = [g]_∼ (g ∈ 𝐆))]"
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `
