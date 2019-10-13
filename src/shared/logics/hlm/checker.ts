@@ -335,6 +335,7 @@ class HLMDefinitionChecker {
   }
 
   private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    let missingArgument = false;
     let type = param.type.expression;
     try {
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
@@ -345,7 +346,7 @@ class HLMDefinitionChecker {
           this.checkSetCompatibility(subsetArg._set, [subsetArg._set, superset], context);
           this.checkProof(subsetArg.subsetProof, context);
         } else {
-          this.error(argumentList, `Missing argument for parameter ${param.name}`);
+          missingArgument = true;
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
         let set = this.utils.substituteParameterSet(type._set, substitutionContext, true);
@@ -355,7 +356,7 @@ class HLMDefinitionChecker {
           this.checkCompatibility(elementArg.element, [set], [elementArg.element], context);
           this.checkProof(elementArg.elementProof, context);
         } else {
-          this.error(argumentList, `Missing argument for parameter ${param.name}`);
+          missingArgument = true;
         }
       } else {
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
@@ -363,14 +364,14 @@ class HLMDefinitionChecker {
           if (propArg) {
             this.checkFormula(propArg.formula, context);
           } else {
-            this.error(argumentList, `Missing argument for parameter ${param.name}`);
+          missingArgument = true;
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_SetArg);
           if (setArg) {
             this.checkSetTerm(setArg._set, context);
           } else {
-            this.error(argumentList, `Missing argument for parameter ${param.name}`);
+          missingArgument = true;
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
           let constraintArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_ConstraintArg);
@@ -395,13 +396,16 @@ class HLMDefinitionChecker {
               this.checkLastArgumentList(context, innerSubstitutionContext);
             }
           } else {
-            this.error(argumentList, `Missing argument for parameter ${param.name}`);
+            missingArgument = true;
           }
         }
         substitutionContext.previousSetTerm = undefined;
       }
     } catch (error) {
       this.error(this.utils.getRawArgument([argumentList], param)!, error.message);
+    }
+    if (missingArgument) {
+      this.error(argumentList, `Missing argument for parameter "${param.name}"`);
     }
   }
 

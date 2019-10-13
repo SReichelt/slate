@@ -22,6 +22,7 @@ const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file'
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
     file?: Fmt.File;
+    hasErrors: boolean;
 }
 
 export class HoverEvent {
@@ -63,7 +64,7 @@ class LibraryDocumentProvider {
     }
 
     private tryParseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
-        if (!event.file) {
+        if (!event.file || event.hasErrors) {
             return undefined;
         }
         let isSection = (event.file.metaModelPath.name === 'library');
