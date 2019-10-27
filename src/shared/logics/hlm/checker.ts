@@ -36,6 +36,8 @@ interface HLMCheckerCompatibilityStatus {
   addedStructuralCases: boolean;
 }
 
+// TODO definitions of individual categories are not fully checked
+
 class HLMDefinitionChecker {
   private utils: HLMUtils;
   private readonly rootContext: HLMCheckerContext = {parentBindingParameters: [], parentStructuralCases: [], inTypeCast: false};

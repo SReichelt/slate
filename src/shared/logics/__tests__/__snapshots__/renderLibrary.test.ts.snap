@@ -2555,8 +2555,8 @@ Remarks.
 This definition retrieves a representative set from a cardinal number, and enables typical abuse of notation."
 `;
 
-exports[`render hlm library: 1.6.2.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms 1`] = `
-"Definition 1.6.2.4.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+exports[`render hlm library: 1.6.2.4.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Homomorphisms 1`] = `
+"Definition 1.6.2.4.1.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
 
   Hom(𝐱, 𝐲) := (Carrier(𝐱) → Carrier(𝐲))
 
@@ -2569,8 +2569,8 @@ The definition of cardinal numbers in HLM is very similar to the definition of a
 Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal."
 `;
 
-exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/Isomorphisms 1`] = `
-"Definition 1.6.2.5.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+exports[`render hlm library: 1.6.2.4.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Isomorphisms 1`] = `
+"Definition 1.6.2.4.2.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
 
   Iso(𝐱, 𝐲) := {φ : 𝐱 → 𝐲 : φ is bijective}
    = (Carrier(𝐱) ↔ Carrier(𝐲))
@@ -2580,58 +2580,14 @@ We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/identity 1`] = `
-"Definition 1.6.2.6.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
+exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/identity 1`] = `
+"Definition 1.6.2.4.3.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
 
   id_𝐱 := id_(Carrier(𝐱))"
 `;
 
-exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
-"Definition 1.6.2.7.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
-
-  𝐱 ≤ 𝐲  :⇔  ∃ φ : 𝐱 → 𝐲 : φ is injective
-    ⇔  ∃ S ⊆ Carrier(𝐲) : |S| = 𝐱
-
-Equivalence.  No proof.
-
-References.
-
-* https://en.wikipedia.org/wiki/Cardinal_number"
-`;
-
-exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
-"Definition 1.6.2.8.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
-
-  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲
-
-Remarks.
-
-Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”."
-`;
-
-exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
-"Proposition 1.6.2.9.
-
-  ≤ is a partial order
-
-No proof."
-`;
-
-exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
-"Proposition 1.6.2.10.  The following are equivalent:
-
-  1. AC
-  2. ≤ is a total order
-
-No proof.
-
-Remarks.
-
-The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total."
-`;
-
-exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
-"Proposition 1.6.2.11.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+exports[`render hlm library: 1.6.2.4.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 1.6.2.4.4.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. Then the following are equivalent:
 
   1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
   2. Iso(𝐱, 𝐲) is nonempty
@@ -2646,8 +2602,52 @@ References.
 * [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)"
 `;
 
-exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
-"Definition 1.6.2.12.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
+"Definition 1.6.2.5.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+  𝐱 ≤ 𝐲  :⇔  ∃ φ : 𝐱 → 𝐲 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐲) : |S| = 𝐱
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinal_number"
+`;
+
+exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
+"Definition 1.6.2.6.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+
+  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲
+
+Remarks.
+
+Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”."
+`;
+
+exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
+"Proposition 1.6.2.7.
+
+  ≤ is a partial order
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
+"Proposition 1.6.2.8.  The following are equivalent:
+
+  1. AC
+  2. ≤ is a total order
+
+No proof.
+
+Remarks.
+
+The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total."
+`;
+
+exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
+"Definition 1.6.2.9.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
 
   𝐱 + 𝐲
 
@@ -2662,8 +2662,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Sum_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
-"Definition 1.6.2.13.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
+"Definition 1.6.2.10.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
 
   𝐱 ⋅ 𝐲
 
@@ -2678,8 +2678,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
-"Definition 1.6.2.14.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
+"Definition 1.6.2.11.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
 
   𝐱^𝐲
 
@@ -2694,8 +2694,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.15 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
-"Proposition 1.6.2.15.  Let S be a set. Then:
+exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.6.2.12.  Let S be a set. Then:
 
   |𝒫(S)| = 2^|S|
 
@@ -2742,16 +2742,16 @@ exports[`render hlm library: 1.6.3.3 data/libraries/hlm/Essentials/Numbers/Ordin
   a ≤ b  :⇔  {a ⪯ b if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms 1`] = `
-"Definition 1.6.3.4.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.4.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Homomorphisms 1`] = `
+"Definition 1.6.3.4.1.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
 
   Hom(𝐱, 𝐲) := {f : Carrier(𝐱) → Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
 
 We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”"
 `;
 
-exports[`render hlm library: 1.6.3.5 data/libraries/hlm/Essentials/Numbers/Ordinal/Isomorphisms 1`] = `
-"Definition 1.6.3.5.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.4.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
+"Definition 1.6.3.4.2.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
 
   Iso(𝐱, 𝐲) := {homomorphisms φ : 𝐱 → 𝐲 : φ is bijective}
    = {f : Carrier(𝐱) ↔ Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
@@ -2761,53 +2761,14 @@ We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/identity 1`] = `
-"Definition 1.6.3.6.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/identity 1`] = `
+"Definition 1.6.3.4.3.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define:
 
   id_𝐱 := id_(Carrier(𝐱))"
 `;
 
-exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/ordered%20subset 1`] = `
-"Definition 1.6.3.7.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱). We define
-
-  S is an ordered subset of 𝐱
-
-by:
-
-  S is an ordered subset of [X, ⪯]  :⇔  ⪯∣_S is a well-order  (X is a set, ⪯ is a relation on X with suitable conditions)"
-`;
-
-exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/subset%20ordinal 1`] = `
-"Definition 1.6.3.8.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱) such that S is an ordered subset of 𝐱. We define:
-
-  [S] := {[S, ⪯∣_S] if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
-`;
-
-exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
-"Definition 1.6.3.9.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
-
-  𝐱 ≤ 𝐲  :⇔  ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective
-    ⇔  ∃ S ⊆ Carrier(𝐲) : [S is an ordered subset of 𝐲 and 𝐱 = [S]]
-
-Equivalence.  No proof."
-`;
-
-exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
-"Definition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
-
-  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲"
-`;
-
-exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
-"Proposition 1.6.3.11.
-
-  ≤ is a well-order
-
-No proof."
-`;
-
-exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
-"Proposition 1.6.3.12.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+exports[`render hlm library: 1.6.3.4.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 1.6.3.4.4.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
 
   1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
   2. Iso(𝐱, 𝐲) is nonempty
@@ -2816,8 +2777,47 @@ exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordi
 No proof."
 `;
 
-exports[`render hlm library: 1.6.3.13 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
-"Definition 1.6.3.13.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.5.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/ordered%20subset 1`] = `
+"Definition 1.6.3.5.1.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱). We define
+
+  S is an ordered subset of 𝐱
+
+by:
+
+  S is an ordered subset of [X, ⪯]  :⇔  ⪯∣_S is a well-order  (X is a set, ⪯ is a relation on X with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.3.5.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/subset%20ordinal 1`] = `
+"Definition 1.6.3.5.2.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱) such that S is an ordered subset of 𝐱. We define:
+
+  [S] := {[S, ⪯∣_S] if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
+`;
+
+exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
+"Definition 1.6.3.6.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+  𝐱 ≤ 𝐲  :⇔  ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective
+    ⇔  ∃ S ⊆ Carrier(𝐲) : [S is an ordered subset of 𝐲 and 𝐱 = [S]]
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
+"Definition 1.6.3.7.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+
+  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲"
+`;
+
+exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
+"Proposition 1.6.3.8.
+
+  ≤ is a well-order
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
+"Definition 1.6.3.9.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
 
   𝐱 + 𝐲
 
@@ -2826,8 +2826,8 @@ by:
   [X, ⪯] + [Y, ⊑] := [X ⊎ Y, ⪯ ≪ ⊑]  (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.14 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
-"Definition 1.6.3.14.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
+"Definition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
 
   𝐱 ⋅ 𝐲
 
@@ -4175,16 +4175,16 @@ by:
   base([S, s]) := s  (S is a set, s ∈ S)"
 `;
 
-exports[`render hlm library: 2.2.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms 1`] = `
-"Definition 2.2.4.  Let 𝐒, 𝐓 be pointed sets. We define:
+exports[`render hlm library: 2.2.4.1 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.2.4.1.  Let 𝐒, 𝐓 be pointed sets. We define:
 
   Hom(𝐒, 𝐓) := {f : Carrier(𝐒) → Carrier(𝐓) : f(base(𝐒)) = base(𝐓)}
 
 We write “let φ : 𝐒 → 𝐓 be a homomorphism” for “let φ ∈ Hom(𝐒, 𝐓).”"
 `;
 
-exports[`render hlm library: 2.2.5 data/libraries/hlm/Algebra/Pointed%20sets/Isomorphisms 1`] = `
-"Definition 2.2.5.  Let 𝐒, 𝐓 be pointed sets. We define:
+exports[`render hlm library: 2.2.4.2 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.2.4.2.  Let 𝐒, 𝐓 be pointed sets. We define:
 
   Iso(𝐒, 𝐓) := {homomorphisms φ : 𝐒 → 𝐓 : φ is bijective}
    = {f : Carrier(𝐒) ↔ Carrier(𝐓) : f(base(𝐒)) = base(𝐓)}
@@ -4194,14 +4194,14 @@ We write “let φ : 𝐒 ↔ 𝐓 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.2.6 data/libraries/hlm/Algebra/Pointed%20sets/identity 1`] = `
-"Definition 2.2.6.  Let 𝐒 be a pointed set. We define:
+exports[`render hlm library: 2.2.4.3 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/identity 1`] = `
+"Definition 2.2.4.3.  Let 𝐒 be a pointed set. We define:
 
   id_𝐒 := id_(Carrier(𝐒))"
 `;
 
-exports[`render hlm library: 2.2.7 data/libraries/hlm/Algebra/Pointed%20sets/Equality%20criterion 1`] = `
-"Proposition 2.2.7.  Let 𝐒, 𝐓 be pointed sets. Then the following are equivalent:
+exports[`render hlm library: 2.2.4.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.2.4.4.  Let 𝐒, 𝐓 be pointed sets. Then the following are equivalent:
 
   1. Iso(𝐒, 𝐓) is nonempty
   2. 𝐒 = 𝐓
@@ -4213,28 +4213,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of pointed sets."
 `;
 
-exports[`render hlm library: 2.2.8 data/libraries/hlm/Algebra/Pointed%20sets/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.2.8.  Let 𝐒, 𝐓 be pointed sets, φ : 𝐒 ↔ 𝐓 be an isomorphism. Then:
+exports[`render hlm library: 2.2.4.5 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.2.4.5.  Let 𝐒, 𝐓 be pointed sets, φ : 𝐒 ↔ 𝐓 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐓, 𝐒)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.2.9 data/libraries/hlm/Algebra/Pointed%20sets/subset%20of%20pointed%20set 1`] = `
-"Definition 2.2.9.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒). We define:
+exports[`render hlm library: 2.2.5.1 data/libraries/hlm/Algebra/Pointed%20sets/Subsets/subset%20of%20pointed%20set 1`] = `
+"Definition 2.2.5.1.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒). We define:
 
   S is a pointed subset of 𝐒  :⇔  base(𝐒) ∈ S"
 `;
 
-exports[`render hlm library: 2.2.10 data/libraries/hlm/Algebra/Pointed%20sets/subset%20as%20pointed%20set 1`] = `
-"Definition 2.2.10.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒) such that S is a pointed subset of 𝐒. We define:
+exports[`render hlm library: 2.2.5.2 data/libraries/hlm/Algebra/Pointed%20sets/Subsets/subset%20as%20pointed%20set 1`] = `
+"Definition 2.2.5.2.  Let 𝐒 be a pointed set, S ⊆ Carrier(𝐒) such that S is a pointed subset of 𝐒. We define:
 
   [S] := [S, base(𝐒)]"
 `;
 
-exports[`render hlm library: 2.2.11 data/libraries/hlm/Algebra/Pointed%20sets/pointed%20subset 1`] = `
-"Definition 2.2.11.  Let 𝐒, 𝐓 be pointed sets. We define:
+exports[`render hlm library: 2.2.5.3 data/libraries/hlm/Algebra/Pointed%20sets/Subsets/pointed%20subset 1`] = `
+"Definition 2.2.5.3.  Let 𝐒, 𝐓 be pointed sets. We define:
 
   𝐒 ≤ 𝐓  :⇔  ∃ homomorphism φ : 𝐒 → 𝐓 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐓) : [S is a pointed subset of 𝐓 and 𝐒 = [S]]
@@ -4245,9 +4245,9 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.3.1 data/libraries/hlm/Algebra/Magmas/Magmas 1`] = `
 "Definition 2.3.1.  We define:
 
-  𝓜𝓪𝓰 :=: {[S, ∗] | S is a set, ∗ : S × S → S is an operation on S}
+  𝓜𝓪𝓰 :=: {[M, ∗] | M is a set, ∗ : M × M → M is an operation on M}
 
-  [S, ∗] = [T, ⋆]  :⇔  ∃ φ : S ↔ T : φ[∗] = ⋆  (S is a set, ∗ : S × S → S is an operation on S, T is a set, ⋆ : T × T → T is an operation on T)
+  [M, ∗] = [N, ⋆]  :⇔  ∃ φ : M ↔ N : φ[∗] = ⋆  (M is a set, ∗ : M × M → M is an operation on M, N is a set, ⋆ : N × N → N is an operation on N)
 
 We write “let 𝐌 be a magma” for “let 𝐌 ∈ 𝓜𝓪𝓰.”
 
@@ -4306,16 +4306,16 @@ by:
   [M, ∗] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
-exports[`render hlm library: 2.3.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms 1`] = `
-"Definition 2.3.6.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.6.1 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.3.6.1.  Let 𝐌, 𝐍 be magmas. We define:
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
 
-exports[`render hlm library: 2.3.7 data/libraries/hlm/Algebra/Magmas/Isomorphisms 1`] = `
-"Definition 2.3.7.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.6.2 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.3.6.2.  Let 𝐌, 𝐍 be magmas. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
    = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
@@ -4325,14 +4325,14 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.3.8 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
-"Definition 2.3.8.  Let 𝐌 be a magma. We define:
+exports[`render hlm library: 2.3.6.3 data/libraries/hlm/Algebra/Magmas/Homomorphisms/identity 1`] = `
+"Definition 2.3.6.3.  Let 𝐌 be a magma. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.3.9 data/libraries/hlm/Algebra/Magmas/Equality%20criterion 1`] = `
-"Proposition 2.3.9.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
+exports[`render hlm library: 2.3.6.4 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.3.6.4.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -4344,28 +4344,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of magmas."
 `;
 
-exports[`render hlm library: 2.3.10 data/libraries/hlm/Algebra/Magmas/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.3.10.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.3.6.5 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.3.6.5.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.3.11 data/libraries/hlm/Algebra/Magmas/submagma%20set 1`] = `
-"Definition 2.3.11.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.3.7.1 data/libraries/hlm/Algebra/Magmas/Submagmas/submagma%20set 1`] = `
+"Definition 2.3.7.1.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S"
 `;
 
-exports[`render hlm library: 2.3.12 data/libraries/hlm/Algebra/Magmas/subset%20magma 1`] = `
-"Definition 2.3.12.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌) such that S is a submagma of 𝐌. We define:
+exports[`render hlm library: 2.3.7.2 data/libraries/hlm/Algebra/Magmas/Submagmas/subset%20magma 1`] = `
+"Definition 2.3.7.2.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌) such that S is a submagma of 𝐌. We define:
 
   [S] := {[S, ∗∣_S] if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
-exports[`render hlm library: 2.3.13 data/libraries/hlm/Algebra/Magmas/submagma 1`] = `
-"Definition 2.3.13.  Let 𝐌, 𝐍 be magmas. We define:
+exports[`render hlm library: 2.3.7.3 data/libraries/hlm/Algebra/Magmas/Submagmas/submagma 1`] = `
+"Definition 2.3.7.3.  Let 𝐌, 𝐍 be magmas. We define:
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submagma of 𝐍 and 𝐌 = [S]]
@@ -4373,8 +4373,8 @@ exports[`render hlm library: 2.3.13 data/libraries/hlm/Algebra/Magmas/submagma 1
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.3.14.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
-"Definition 2.3.14.1.  Let S be a set. We define:
+exports[`render hlm library: 2.3.8.1 data/libraries/hlm/Algebra/Magmas/Free%20magma/Binary%20trees 1`] = `
+"Definition 2.3.8.1.  Let S be a set. We define:
 
   𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) :=: {(s) | s ∈ S, a^b | a, b ∈ 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S)}
 
@@ -4394,14 +4394,14 @@ Remarks.
 This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma."
 `;
 
-exports[`render hlm library: 2.3.14.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
-"Definition 2.3.14.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
+exports[`render hlm library: 2.3.8.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
+"Definition 2.3.8.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
 
   free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]"
 `;
 
-exports[`render hlm library: 2.3.14.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
-"Definition 2.3.14.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.3.8.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
+"Definition 2.3.8.3.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
   𝐌 is free on S  :⇔  𝐌 = free_𝓜𝓰𝓶(S)
     ⇔  ∀ magmas 𝐍, f : S → Carrier(𝐍) : ∃! homomorphism φ : 𝐌 → 𝐍 : φ∣_S = f
@@ -4409,8 +4409,8 @@ exports[`render hlm library: 2.3.14.3 data/libraries/hlm/Algebra/Magmas/Free%20m
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.3.14.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
-"Definition 2.3.14.4.  Let 𝐌 be a magma. We define:
+exports[`render hlm library: 2.3.8.4 data/libraries/hlm/Algebra/Magmas/Free%20magma/free 1`] = `
+"Definition 2.3.8.4.  Let 𝐌 be a magma. We define:
 
   𝐌 is free  :⇔  ∃ S ⊆ Carrier(𝐌) : 𝐌 is free on S"
 `;
@@ -4430,9 +4430,9 @@ References.
 exports[`render hlm library: 2.5.1 data/libraries/hlm/Algebra/Monoids/Monoids 1`] = `
 "Definition 2.5.1.  We define:
 
-  𝓜𝓸𝓷 :=: {[S, ∗, e] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]]}
+  𝓜𝓸𝓷 :=: {[M, ∗, e] | M is a set, ∗ : M × M → M is an associative operation on M, e ∈ M such that [∀ a ∈ M : [a ∗ e = a and e ∗ a = a]]}
 
-  [S, ∗, e] = [T, ⋆, f]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T with suitable conditions)
+  [M, ∗, e] = [N, ⋆, f]  :⇔  ∃ φ : M ↔ N : [φ[∗] = ⋆ and φ[e] = f]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M, N is a set, ⋆ : N × N → N is an operation on N, f ∈ N with suitable conditions)
 
 We write “let 𝐌 be a monoid” for “let 𝐌 ∈ 𝓜𝓸𝓷.”
 
@@ -4487,16 +4487,16 @@ by:
   [M, ∗, e] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.5.6 data/libraries/hlm/Algebra/Monoids/Homomorphisms 1`] = `
-"Definition 2.5.6.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.6.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.5.6.1.  Let 𝐌, 𝐍 be monoids. We define:
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
 
-exports[`render hlm library: 2.5.7 data/libraries/hlm/Algebra/Monoids/Isomorphisms 1`] = `
-"Definition 2.5.7.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.6.2 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.5.6.2.  Let 𝐌, 𝐍 be monoids. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
    = {f : Carrier(𝐌) ↔ Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
@@ -4506,14 +4506,14 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.5.8 data/libraries/hlm/Algebra/Monoids/identity 1`] = `
-"Definition 2.5.8.  Let 𝐌 be a monoid. We define:
+exports[`render hlm library: 2.5.6.3 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
+"Definition 2.5.6.3.  Let 𝐌 be a monoid. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.5.9 data/libraries/hlm/Algebra/Monoids/Equality%20criterion 1`] = `
-"Proposition 2.5.9.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
+exports[`render hlm library: 2.5.6.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.5.6.4.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -4525,28 +4525,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of monoids."
 `;
 
-exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.5.10.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.5.6.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.5.6.5.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/submonoid%20set 1`] = `
-"Definition 2.5.11.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
+"Definition 2.5.7.1.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
 
   S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐌 ∈ S"
 `;
 
-exports[`render hlm library: 2.5.12 data/libraries/hlm/Algebra/Monoids/subset%20monoid 1`] = `
-"Definition 2.5.12.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌) such that S is a submonoid of 𝐌. We define:
+exports[`render hlm library: 2.5.7.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
+"Definition 2.5.7.2.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌) such that S is a submonoid of 𝐌. We define:
 
   [S] := {[S, ∗∣_S, e] if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/submonoid 1`] = `
-"Definition 2.5.13.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid 1`] = `
+"Definition 2.5.7.3.  Let 𝐌, 𝐍 be monoids. We define:
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submonoid of 𝐍 and 𝐌 = [S]]
@@ -4554,14 +4554,14 @@ exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/submonoid
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.5.14.1 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20addition 1`] = `
-"Definition 2.5.14.1.  We define:
+exports[`render hlm library: 2.5.8.1 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20addition 1`] = `
+"Definition 2.5.8.1.  We define:
 
   (ℕ, +) := [ℕ, +, 0]"
 `;
 
-exports[`render hlm library: 2.5.14.2 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20multiplication 1`] = `
-"Definition 2.5.14.2.  We define:
+exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20multiplication 1`] = `
+"Definition 2.5.8.2.  We define:
 
   (ℕ, ⋅) := [ℕ, ⋅, 1]"
 `;
@@ -4569,9 +4569,9 @@ exports[`render hlm library: 2.5.14.2 data/libraries/hlm/Algebra/Monoids/Example
 exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
 "Definition 2.6.1.  We define:
 
-  𝓖𝓻𝓹 :=: {[S, ∗, e, i] | S is a set, ∗ : S × S → S is an associative operation on S, e ∈ S such that [∀ a ∈ S : [a ∗ e = a and e ∗ a = a]], i : S → S is a function such that [∀ a ∈ S : [a ∗ i(a) = e and i(a) ∗ a = e]]}
+  𝓖𝓻𝓹 :=: {[G, ∗, e, i] | G is a set, ∗ : G × G → G is an associative operation on G, e ∈ G such that [∀ a ∈ G : [a ∗ e = a and e ∗ a = a]], i : G → G is a function such that [∀ a ∈ G : [a ∗ i(a) = e and i(a) ∗ a = e]]}
 
-  [S, ∗, e, i] = [T, ⋆, f, j]  :⇔  ∃ φ : S ↔ T : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (S is a set, ∗ : S × S → S is an operation on S, e ∈ S, i : S → S is a function, T is a set, ⋆ : T × T → T is an operation on T, f ∈ T, j : T → T is a function with suitable conditions)
+  [G, ∗, e, i] = [H, ⋆, f, j]  :⇔  ∃ φ : G ↔ H : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function, H is a set, ⋆ : H × H → H is an operation on H, f ∈ H, j : H → H is a function with suitable conditions)
 
 We write “let 𝐆 be a group” for “let 𝐆 ∈ 𝓖𝓻𝓹.”
 
@@ -4632,8 +4632,8 @@ by:
   [G, ∗, e, i] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.7 data/libraries/hlm/Algebra/Groups/Homomorphisms 1`] = `
-"Definition 2.6.7.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.7.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.6.7.1.  Let 𝐆, 𝐇 be groups. We define:
 
   Hom(𝐆, 𝐇) := {f : Carrier(𝐆) → Carrier(𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(1_𝐆) = 1_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
    = {f : Carrier(𝐆) → Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
@@ -4643,8 +4643,8 @@ We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.8 data/libraries/hlm/Algebra/Groups/Isomorphisms 1`] = `
-"Definition 2.6.8.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.7.2 data/libraries/hlm/Algebra/Groups/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.6.7.2.  Let 𝐆, 𝐇 be groups. We define:
 
   Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
    = {f : Carrier(𝐆) ↔ Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
@@ -4654,20 +4654,20 @@ We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/Kernel 1`] = `
-"Definition 2.6.9.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
+exports[`render hlm library: 2.6.7.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
+"Definition 2.6.7.3.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐆 : φ(g) = 1_𝐇}"
 `;
 
-exports[`render hlm library: 2.6.10 data/libraries/hlm/Algebra/Groups/identity 1`] = `
-"Definition 2.6.10.  Let 𝐆 be a group. We define:
+exports[`render hlm library: 2.6.7.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
+"Definition 2.6.7.4.  Let 𝐆 be a group. We define:
 
   id_𝐆 := id_(Carrier(𝐆))"
 `;
 
-exports[`render hlm library: 2.6.11 data/libraries/hlm/Algebra/Groups/Equality%20criterion 1`] = `
-"Proposition 2.6.11.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
+exports[`render hlm library: 2.6.7.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.6.7.5.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
 
   1. Iso(𝐆, 𝐇) is nonempty
   2. 𝐆 = 𝐇
@@ -4679,28 +4679,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of groups."
 `;
 
-exports[`render hlm library: 2.6.12 data/libraries/hlm/Algebra/Groups/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.6.12.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
+exports[`render hlm library: 2.6.7.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.6.7.6.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐇, 𝐆)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.6.13 data/libraries/hlm/Algebra/Groups/subgroup%20set 1`] = `
-"Definition 2.6.13.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+exports[`render hlm library: 2.6.8.1 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup%20set 1`] = `
+"Definition 2.6.8.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
   S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
 `;
 
-exports[`render hlm library: 2.6.14 data/libraries/hlm/Algebra/Groups/subset%20group 1`] = `
-"Definition 2.6.14.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
+exports[`render hlm library: 2.6.8.2 data/libraries/hlm/Algebra/Groups/Subgroups/subset%20group 1`] = `
+"Definition 2.6.8.2.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
 
   [S] := {[S, ∗∣_S, e, i∣_S^S] if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.15 data/libraries/hlm/Algebra/Groups/subgroup 1`] = `
-"Definition 2.6.15.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.8.3 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup 1`] = `
+"Definition 2.6.8.3.  Let 𝐆, 𝐇 be groups. We define:
 
   𝐆 ≤ 𝐇  :⇔  ∃ homomorphism φ : 𝐆 → 𝐇 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐇) : [S is a subgroup of 𝐇 and 𝐆 = [S]]
@@ -4708,8 +4708,8 @@ exports[`render hlm library: 2.6.15 data/libraries/hlm/Algebra/Groups/subgroup 1
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/normal%20subgroup%20set 1`] = `
-"Definition 2.6.16.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+exports[`render hlm library: 2.6.8.4 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup%20set 1`] = `
+"Definition 2.6.8.4.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
   S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : (g • s) • g^-1 ∈ S
     ⇔  ∃ group 𝐇, homomorphism φ : 𝐆 → 𝐇 : S = Ker(φ)
@@ -4717,14 +4717,14 @@ exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/normal%20s
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.6.17 data/libraries/hlm/Algebra/Groups/normal%20subgroup 1`] = `
-"Definition 2.6.17.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.8.5 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup 1`] = `
+"Definition 2.6.8.5.  Let 𝐆, 𝐇 be groups. We define:
 
   𝐆 ⊴ 𝐇  :⇔  ∃ S ⊆ Carrier(𝐇) : [S is a normal subgroup of 𝐇 and 𝐆 = [S]]"
 `;
 
-exports[`render hlm library: 2.6.18 data/libraries/hlm/Algebra/Groups/quotient%20group 1`] = `
-"Definition 2.6.18.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
+exports[`render hlm library: 2.6.9.1 data/libraries/hlm/Algebra/Groups/Quotient/quotient%20group 1`] = `
+"Definition 2.6.9.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
 
   𝐆∕S := [T, (T × T → T, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [1_𝐆]_∼, (T → T, [g]_∼ ↦ [g^-1]_∼)]"
 `;
@@ -4974,8 +4974,18 @@ Remarks.
 The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers."
 `;
 
-exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Individual%20categories/magmas 1`] = `
+exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Individual%20categories/pointed%20sets 1`] = `
 "Definition 4.8.4.  Let u ∈ ℕ. We define:
+
+  𝐏𝐭𝐒𝐞𝐭_u := [𝓟𝓽𝓢𝓮𝓽, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓟𝓽𝓢𝓮𝓽), (id_𝐂)_(𝐂 ∈ 𝓟𝓽𝓢𝓮𝓽), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓟𝓽𝓢𝓮𝓽)]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of pointed sets."
+`;
+
+exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/magmas 1`] = `
+"Definition 4.8.5.  Let u ∈ ℕ. We define:
 
   𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u
 
@@ -4988,8 +4998,18 @@ References.
 * https://en.wikipedia.org/wiki/Category_of_magmas"
 `;
 
-exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/monoids 1`] = `
-"Definition 4.8.5.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/semigroups 1`] = `
+"Definition 4.8.6.  Let u ∈ ℕ. We define:
+
+  𝐒𝐞𝐦𝐢𝐆𝐫𝐩_u := [𝓢𝓮𝓶𝓲𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹)]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of semigroups."
+`;
+
+exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Individual%20categories/monoids 1`] = `
+"Definition 4.8.7.  Let u ∈ ℕ. We define:
 
   𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u
 
@@ -4998,8 +5018,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of monoids."
 `;
 
-exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/groups 1`] = `
-"Definition 4.8.6.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Individual%20categories/groups 1`] = `
+"Definition 4.8.8.  Let u ∈ ℕ. We define:
 
   𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u
 
@@ -5008,8 +5028,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of groups."
 `;
 
-exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
-"Definition 4.8.7.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+"Definition 4.8.9.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
@@ -5023,8 +5043,8 @@ References.
 * https://ncatlab.org/nlab/show/Cat"
 `;
 
-exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.8.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+"Definition 4.8.10.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
   𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
 
