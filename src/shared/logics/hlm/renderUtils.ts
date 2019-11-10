@@ -178,7 +178,7 @@ export class HLMRenderUtils {
         changed = false;
         for (let currentCase of cases) {
           let currentCaseDefinition = currentCase.definitions[0];
-          while (currentCaseDefinition instanceof FmtHLM.MetaRefExpression_asElementOf) {
+          while (currentCaseDefinition instanceof FmtHLM.MetaRefExpression_asElementOf || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_setAssociative || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_associative) {
             currentCaseDefinition = currentCaseDefinition.term;
           }
           if ((currentCaseDefinition instanceof FmtHLM.MetaRefExpression_setStructuralCases || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_structuralCases || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_structural)

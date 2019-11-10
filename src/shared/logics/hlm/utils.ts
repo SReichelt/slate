@@ -682,6 +682,8 @@ export class HLMUtils extends GenericUtils {
         });
       }
       return resultPromise;
+    } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+      return CachedPromise.resolve(term.term);
     } else {
       return CachedPromise.reject(new Error('Set term expected'));
     }
@@ -818,6 +820,8 @@ export class HLMUtils extends GenericUtils {
         }
       } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
         return CachedPromise.resolve(term._set);
+      } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+        term = term.term;
       } else {
         return CachedPromise.reject(new Error('Element term expected'));
       }

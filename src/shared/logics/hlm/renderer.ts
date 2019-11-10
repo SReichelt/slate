@@ -871,6 +871,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       };
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
+    } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+      let result = this.renderSetTermInternal(term.term, markParametersAsDummy);
+      return new Display.DecoratedExpression(result);
     } else {
       return this.renderGenericExpression(term);
     }
@@ -912,6 +915,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
     } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
       return this.renderElementTermInternal(term.term);
+    } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+      let result = this.renderElementTermInternal(term.term);
+      return new Display.DecoratedExpression(result);
     } else {
       return this.renderGenericExpression(term);
     }

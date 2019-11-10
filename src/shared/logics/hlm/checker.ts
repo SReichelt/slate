@@ -442,6 +442,9 @@ class HLMDefinitionChecker {
       let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkSetTerm(value, caseContext);
       let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(term, values, context);
       this.checkStructuralCases(term.term, term.construction, term.cases, checkCase, checkCompatibility, context);
+    } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+      this.checkSetTerm(term.term, context);
+      // TODO check whether inner and outer operations are the same and are really declared as associative
     } else if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
       // Nothing to check.
     } else {
@@ -489,6 +492,9 @@ class HLMDefinitionChecker {
       };
       this.checkCompatibility(term, [term._set], [term.term], typeCastContext);
       this.checkProof(term.proof, context);
+    } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+      this.checkElementTerm(term.term, context);
+      // TODO check whether inner and outer operations are the same and are really declared as associative
     } else {
       this.error(term, 'Element term expected');
     }

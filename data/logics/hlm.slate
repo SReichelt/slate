@@ -8,8 +8,8 @@ $hlm: %MetaModel {
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false, $left, $right,
                $empty, $previous,
-               $enumeration, $subset, $extendedSubset, $setStructuralCases,
-               $cases, $structuralCases, $asElementOf,
+               $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
+               $cases, $structuralCases, $asElementOf, $associative,
                $not, $and, $or, $equiv, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
                %Any],
   lookup = %Any
@@ -232,10 +232,12 @@ $enumeration(terms...?: $ElementTerm): $SetTerm {}
 $subset(parameter: %SingleParameter($Element), formula[parameter]: $Formula): $SetTerm {}
 $extendedSubset(parameters: %ParameterList, term[parameters]: $ElementTerm): $SetTerm {}
 $setStructuralCases(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($SetTerm)[]): $SetTerm {}
+$setAssociative(term: $SetTerm): $SetTerm {}
 
 $cases(cases: $Case($ElementTerm)[], totalityProof?: $Proof): $ElementTerm {}
 $structuralCases(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($ElementTerm)[]): $ElementTerm {}
 $asElementOf(term: $ElementTerm, set: $SetTerm, proof?: $Proof): $ElementTerm {}
+$associative(term: $ElementTerm): $ElementTerm {}
 
 $not(formula: $Formula): $Formula {}
 $and(formulae...?: $Formula): $Formula {}
