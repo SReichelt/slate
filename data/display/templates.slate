@@ -242,6 +242,13 @@ $Property(operand: %Expr, property: %Expr, article?: %String): %Template {
   )
 }
 
+$RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, preposition: %String): %Template {
+  display = $TextualRelation(
+    symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property, ' ', preposition],
+    operands = operands
+  )
+}
+
 $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   display = $Property(
     operand = operand,
@@ -251,9 +258,11 @@ $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String =
 }
 
 $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
-  display = $TextualRelation(
-    symbol = [%neg('is', 'is not'), ' ', article, ' ', singular, ' of'],
-    operands = operands
+  display = $RelationalProperty(
+    operands = operands,
+    property = singular,
+    article = article,
+    preposition = 'of'
   )
 }
 

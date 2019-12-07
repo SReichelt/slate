@@ -1372,17 +1372,47 @@ References.
 exports[`render hlm library: 1.4.27.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
 "Definition 1.4.27.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
 
-  ∗ is associative  :⇔  ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)"
+  ∗ is associative  :⇔  ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)
+
+References.
+
+* https://en.wikipedia.org/wiki/Associative_property"
 `;
 
 exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
 "Definition 1.4.27.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
 
-  ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x"
+  ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x
+
+References.
+
+* https://en.wikipedia.org/wiki/Commutative_property"
 `;
 
-exports[`render hlm library: 1.4.27.7 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
-"Definition 1.4.27.7.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.27.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
+"Definition 1.4.27.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+
+  ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)"
+`;
+
+exports[`render hlm library: 1.4.27.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
+"Definition 1.4.27.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+
+  ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)"
+`;
+
+exports[`render hlm library: 1.4.27.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
+"Definition 1.4.27.9.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
+
+  ∗ is distributive over ⋆  :⇔  ∗ is left-distributive over ⋆ and ∗ is right-distributive over ⋆
+
+References.
+
+* https://en.wikipedia.org/wiki/Distributive_property"
+`;
+
+exports[`render hlm library: 1.4.27.10 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
+"Definition 1.4.27.10.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_A := ∗∣_(A×A)^A"
 `;
@@ -1921,8 +1951,16 @@ exports[`render hlm library: 1.6.1.26 data/libraries/hlm/Essentials/Numbers/Natu
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.27 data/libraries/hlm/Essentials/Numbers/Natural/divisible 1`] = `
-"Definition 1.6.1.27.  Let m ∈ ℕ_+, n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.1.27 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20distributive%20over%20sum 1`] = `
+"Proposition 1.6.1.27.
+
+  ⋅ is distributive over +
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.28 data/libraries/hlm/Essentials/Numbers/Natural/divisible 1`] = `
+"Definition 1.6.1.28.  Let m ∈ ℕ_+, n ∈ ℕ. We define:
 
   m ∣ n  :⇔  ∃ x ∈ ℕ : m ⋅ x = n
 
@@ -1937,8 +1975,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers"
 `;
 
-exports[`render hlm library: 1.6.1.28 data/libraries/hlm/Essentials/Numbers/Natural/Divisors 1`] = `
-"Definition 1.6.1.28.  Let n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natural/Divisors 1`] = `
+"Definition 1.6.1.29.  Let n ∈ ℕ. We define:
 
   Div_ℕ(n) := {m ∈ ℕ_+ : m ∣ n}
 
@@ -1951,16 +1989,16 @@ References.
 * http://oeis.org/A027750"
 `;
 
-exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natural/Divisors%20are%20less%20or%20equal 1`] = `
-"Proposition 1.6.1.29.  Let m, n ∈ ℕ_+ such that m ∣ n. Then:
+exports[`render hlm library: 1.6.1.30 data/libraries/hlm/Essentials/Numbers/Natural/Divisors%20are%20less%20or%20equal 1`] = `
+"Proposition 1.6.1.30.  Let m, n ∈ ℕ_+ such that m ∣ n. Then:
 
   m ≤ n
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.30 data/libraries/hlm/Essentials/Numbers/Natural/Divisibility%20criterion 1`] = `
-"Proposition 1.6.1.30.  Let a ∈ ℕ_+, b ∈ ℕ such that a ∣ b, c ∈ ℕ. Then the following are equivalent:
+exports[`render hlm library: 1.6.1.31 data/libraries/hlm/Essentials/Numbers/Natural/Divisibility%20criterion 1`] = `
+"Proposition 1.6.1.31.  Let a ∈ ℕ_+, b ∈ ℕ such that a ∣ b, c ∈ ℕ. Then the following are equivalent:
 
   1. a ∣ c
   2. a ∣ (b + c)
@@ -1968,8 +2006,8 @@ exports[`render hlm library: 1.6.1.30 data/libraries/hlm/Essentials/Numbers/Natu
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.31 data/libraries/hlm/Essentials/Numbers/Natural/even 1`] = `
-"Definition 1.6.1.31.  Let n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.1.32 data/libraries/hlm/Essentials/Numbers/Natural/even 1`] = `
+"Definition 1.6.1.32.  Let n ∈ ℕ. We define:
 
   n is even  :⇔  {true if n = 0, x is odd if n = x + 1 (x ∈ ℕ)
     ⇔  2 ∣ n
@@ -1987,8 +2025,8 @@ References.
 * http://oeis.org/A005843"
 `;
 
-exports[`render hlm library: 1.6.1.32 data/libraries/hlm/Essentials/Numbers/Natural/quotient 1`] = `
-"Definition 1.6.1.32.  Let n ∈ ℕ, m ∈ Div_ℕ(n). For x ∈ ℕ, we define:
+exports[`render hlm library: 1.6.1.33 data/libraries/hlm/Essentials/Numbers/Natural/quotient 1`] = `
+"Definition 1.6.1.33.  Let n ∈ ℕ, m ∈ Div_ℕ(n). For x ∈ ℕ, we define:
 
   n/m = x  :⇔  n = x ⋅ m
 
@@ -2001,8 +2039,8 @@ References.
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)"
 `;
 
-exports[`render hlm library: 1.6.1.33 data/libraries/hlm/Essentials/Numbers/Natural/power 1`] = `
-"Definition 1.6.1.33.  Let m, n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.34 data/libraries/hlm/Essentials/Numbers/Natural/power 1`] = `
+"Definition 1.6.1.34.  Let m, n ∈ ℕ. We define
 
   m^n
 
@@ -2019,8 +2057,8 @@ References.
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow"
 `;
 
-exports[`render hlm library: 1.6.1.34 data/libraries/hlm/Essentials/Numbers/Natural/inductive 1`] = `
-"Definition 1.6.1.34.  Let M ⊆ ℕ. We define:
+exports[`render hlm library: 1.6.1.35 data/libraries/hlm/Essentials/Numbers/Natural/inductive 1`] = `
+"Definition 1.6.1.35.  Let M ⊆ ℕ. We define:
 
   M is inductive  :⇔  0 ∈ M and ∀ m ∈ M : m + 1 ∈ M
 
@@ -2035,8 +2073,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Inductive_Set (also uses a 1-based definition)"
 `;
 
-exports[`render hlm library: 1.6.1.35 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20lemma 1`] = `
-"Lemma 1.6.1.35.  Let M ⊆ ℕ such that M is inductive, n ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.36 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20lemma 1`] = `
+"Lemma 1.6.1.36.  Let M ⊆ ℕ such that M is inductive, n ∈ ℕ. Then:
 
   n ∈ M
 
@@ -2049,7 +2087,7 @@ M is inductive
 ⇒^def 0 ∈ M
 2. Let x ∈ ℕ. Then x + 1 ∈ M:
 
-1.6.1.35 ⇒ x ∈ M
+1.6.1.36 ⇒ x ∈ M
 
 M is inductive
 
@@ -2058,8 +2096,8 @@ M is inductive
 ⇒ x + 1 ∈ M"
 `;
 
-exports[`render hlm library: 1.6.1.36 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
-"Theorem 1.6.1.36 (Induction principle).  Let M ⊆ ℕ. Then the following are equivalent:
+exports[`render hlm library: 1.6.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
+"Theorem 1.6.1.37 (Induction principle).  Let M ⊆ ℕ. Then the following are equivalent:
 
   1. M is inductive
   2. M = ℕ
@@ -2069,7 +2107,7 @@ Proof.
 1⇒2. ⊆. Trivial.
 ⊇. Let n ∈ ℕ. Then n ∈ M:
 
-1.6.1.35 ⇒ n ∈ M
+1.6.1.36 ⇒ n ∈ M
 
 Remarks.
 
@@ -2080,8 +2118,8 @@ References.
 * https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Set"
 `;
 
-exports[`render hlm library: 1.6.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
-"Corollary 1.6.1.37 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and ∀ m ∈ ℕ s.t. m is p : m + 1 is p. Then:
+exports[`render hlm library: 1.6.1.38 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
+"Corollary 1.6.1.38 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and ∀ m ∈ ℕ s.t. m is p : m + 1 is p. Then:
 
   ∀ n ∈ ℕ : n is p
 
@@ -2098,8 +2136,8 @@ References.
 * https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Predicate"
 `;
 
-exports[`render hlm library: 1.6.1.38 data/libraries/hlm/Essentials/Numbers/Natural/Well-ordering%20principle 1`] = `
-"Theorem 1.6.1.38 (Well-ordering principle).
+exports[`render hlm library: 1.6.1.39 data/libraries/hlm/Essentials/Numbers/Natural/Well-ordering%20principle 1`] = `
+"Theorem 1.6.1.39 (Well-ordering principle).
 
   ≤ is a well-order
 
@@ -2112,8 +2150,8 @@ References.
 * https://proofwiki.org/wiki/Well-Ordering_Principle"
 `;
 
-exports[`render hlm library: 1.6.1.39 data/libraries/hlm/Essentials/Numbers/Natural/minimum 1`] = `
-"Definition 1.6.1.39.  Let M ⊆ ℕ such that M is nonempty. For m ∈ M, we define:
+exports[`render hlm library: 1.6.1.40 data/libraries/hlm/Essentials/Numbers/Natural/minimum 1`] = `
+"Definition 1.6.1.40.  Let M ⊆ ℕ such that M is nonempty. For m ∈ M, we define:
 
   min(M) = m  :⇔  ∀ n ∈ M : m ≤ n
     ⇔  ∀ l ∈ M s.t. l ≤ m : l = m
@@ -2124,8 +2162,8 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.6.1.40 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
-"Definition 1.6.1.40.  Let n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
+"Definition 1.6.1.41.  Let n ∈ ℕ. We define
 
   n!
 
@@ -2142,8 +2180,8 @@ References.
 * https://coq.inria.fr/library/Coq.Arith.Factorial.html#fact"
 `;
 
-exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
-"Definition 1.6.1.41.  Let n, k ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.42 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
+"Definition 1.6.1.42.  Let n, k ∈ ℕ. We define
 
   (n, k)
 
@@ -2162,8 +2200,8 @@ References.
 * https://en.wikipedia.org/wiki/Pascal%27s_rule"
 `;
 
-exports[`render hlm library: 1.6.1.42 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
-"Proposition 1.6.1.42.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.43 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
+"Proposition 1.6.1.43.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
 
   (n, k) = (n!)/(k! ⋅ (n − k)!)
 
@@ -2177,8 +2215,8 @@ References.
 * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C"
 `;
 
-exports[`render hlm library: 1.6.1.43.1 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20sum%20(exclusive) 1`] = `
-"Definition 1.6.1.43.1.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.6.1.44.1 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20sum%20(exclusive) 1`] = `
+"Definition 1.6.1.44.1.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
 
   ∑_(i < n) a_i
 
@@ -2194,48 +2232,48 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.1.43.2 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20distributive%20over%20sum 1`] = `
-"Proposition 1.6.1.43.2.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.44.2 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20distributive%20over%20sum 1`] = `
+"Proposition 1.6.1.44.2.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
 
   ∑_(j < n) (a_j + b_j) = (∑_(k < n) a_k) + (∑_(l < n) b_l)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.3 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20grows 1`] = `
-"Proposition 1.6.1.43.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.44.3 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20grows 1`] = `
+"Proposition 1.6.1.44.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∑_(j < m) a_j ≤ ∑_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.4 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.6.1.43.4.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.44.4 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.44.4.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∑_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.5 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20constant 1`] = `
-"Proposition 1.6.1.43.5.  Let n, a ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.44.5 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20constant 1`] = `
+"Proposition 1.6.1.44.5.  Let n, a ∈ ℕ. Then:
 
   ∑_(i < n) a = n ⋅ a
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.6 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20variable 1`] = `
-"Proposition 1.6.1.43.6.  Let n ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.44.6 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Sum%20over%20variable 1`] = `
+"Proposition 1.6.1.44.6.  Let n ∈ ℕ. Then:
 
   ∑_(i < n) i = (n, 2)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.7 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20product%20(exclusive) 1`] = `
-"Definition 1.6.1.43.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.6.1.44.7 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/inductive%20product%20(exclusive) 1`] = `
+"Definition 1.6.1.44.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n). We define
 
   ∏_(i < n) a_i
 
@@ -2251,48 +2289,48 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.6.1.43.8 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20distributive%20over%20product 1`] = `
-"Proposition 1.6.1.43.8.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.44.8 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20distributive%20over%20product 1`] = `
+"Proposition 1.6.1.44.8.  Let n ∈ ℕ, let a_i, b_i ∈ ℕ for each i ∈ ℕ_(<n). Then:
 
   ∏_(j < n) (a_j ⋅ b_j) = (∏_(k < n) a_k) ⋅ (∏_(l < n) b_l)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.9 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20multiplies 1`] = `
-"Proposition 1.6.1.43.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.44.9 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20multiplies 1`] = `
+"Proposition 1.6.1.44.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∏_(j < m) a_j ∣ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.10 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20grows 1`] = `
-"Proposition 1.6.1.43.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.44.10 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20grows 1`] = `
+"Proposition 1.6.1.44.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∏_(j < m) a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.11 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
-"Proposition 1.6.1.43.11.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.44.11 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
+"Proposition 1.6.1.44.11.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ∣ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.43.12 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.6.1.43.12.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.44.12 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20sums%20and%20products/Inductive%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.44.12.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.44.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
-"Definition 1.6.1.44.1.  Let n ∈ ℕ_(>1). We define:
+exports[`render hlm library: 1.6.1.45.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
+"Definition 1.6.1.45.1.  Let n ∈ ℕ_(>1). We define:
 
   n is prime  :⇔  ∀ m ∈ ℕ_+ s.t. m ∣ n : [m = 1 or m = n]
     ⇔  ∀ l ∈ ℕ_(>1) s.t. l ∣ n : l = n
@@ -2323,8 +2361,8 @@ References.
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime"
 `;
 
-exports[`render hlm library: 1.6.1.44.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
-"Example 1.6.1.44.2.
+exports[`render hlm library: 1.6.1.45.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
+"Example 1.6.1.45.2.
 
   2 is prime
 
@@ -2335,8 +2373,8 @@ References.
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime_2"
 `;
 
-exports[`render hlm library: 1.6.1.44.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
-"Definition 1.6.1.44.3.  We define:
+exports[`render hlm library: 1.6.1.45.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
+"Definition 1.6.1.45.3.  We define:
 
   ℙ := {n ∈ ℕ_(>1) : n is prime}
 
@@ -2348,16 +2386,16 @@ References.
 * http://oeis.org/A000040"
 `;
 
-exports[`render hlm library: 1.6.1.44.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
-"Proposition 1.6.1.44.4.  Let n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.6.1.45.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
+"Proposition 1.6.1.45.4.  Let n ∈ ℕ_(>1). Then:
 
   ∃ p ∈ ℙ : p ∣ n
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.44.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
-"Theorem 1.6.1.44.5 (Euclid's theorem).
+exports[`render hlm library: 1.6.1.45.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
+"Theorem 1.6.1.45.5 (Euclid's theorem).
 
   ℙ is infinite
 
@@ -2367,7 +2405,7 @@ Proof.  Assume ℙ is finite.
 
 Let a := ∏_(i < n) f(i).
 
-1.6.1.43.10 ⇒ 1 ≤ a
+1.6.1.44.10 ⇒ 1 ≤ a
 
 Let b := a + 1.
 
@@ -2375,17 +2413,17 @@ Let b := a + 1.
 
 ⇒^1.6.1.13 b > 1
 
-⇒^1.6.1.44.4 ∃ p ∈ ℙ : p ∣ b
+⇒^1.6.1.45.4 ∃ p ∈ ℙ : p ∣ b
 
 ⇒^def p ∣ (a + 1)
 
-⇒^1.6.1.43.11 f(f^-1(p)) ∣ a
+⇒^1.6.1.44.11 f(f^-1(p)) ∣ a
 
 ⇒^1.4.26 p ∣ a
 
-⇒^1.6.1.30 p ∣ 1
+⇒^1.6.1.31 p ∣ 1
 
-⇒^1.6.1.29 p ≤ 1
+⇒^1.6.1.30 p ≤ 1
 
 p ∈ ℙ
 
@@ -2398,8 +2436,8 @@ References.
 * https://proofwiki.org/wiki/Euclid%27s_Theorem"
 `;
 
-exports[`render hlm library: 1.6.1.44.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.6.1.44.6.  Let p ∈ ℙ, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
+exports[`render hlm library: 1.6.1.45.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.6.1.45.6.  Let p ∈ ℙ, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ m
   2. p ∣ m^n
@@ -2408,8 +2446,8 @@ exports[`render hlm library: 1.6.1.44.6 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
-"Definition 1.6.1.45.  Let m, n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.1.46 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
+"Definition 1.6.1.46.  Let m, n ∈ ℕ. We define:
 
   m and n are coprime  :⇔  ∀ a ∈ ℕ_+ s.t. a ∣ m and a ∣ n : a = 1
     ⇔  ∄ b ∈ ℕ_(>1) : [b ∣ m and b ∣ n]
@@ -2431,16 +2469,16 @@ References.
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)"
 `;
 
-exports[`render hlm library: 1.6.1.46 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
-"Proposition 1.6.1.46.  Let m, n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.6.1.47 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
+"Proposition 1.6.1.47.  Let m, n ∈ ℕ_(>1). Then:
 
   m and m ⋅ n are not coprime
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.47.1 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/indexed%20element 1`] = `
-"Definition 1.6.1.47.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
+exports[`render hlm library: 1.6.1.48.1 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/indexed%20element 1`] = `
+"Definition 1.6.1.48.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
 
   M[n]
 
@@ -2454,8 +2492,8 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite), and to provide a [way](../Sequences/finite%20sequence) of obtaining a sequence from a finite set of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.47.2 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/bounded%20cardinality 1`] = `
-"Definition 1.6.1.47.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.48.2 data/libraries/hlm/Essentials/Numbers/Natural/Technical%20definitions/bounded%20cardinality 1`] = `
+"Definition 1.6.1.48.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
 
   |M|_≤n
 
@@ -2469,8 +2507,8 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.48.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/finite%20sequence 1`] = `
-"Definition 1.6.1.48.1.  Let M ⊆ ℕ such that M is finite. We define:
+exports[`render hlm library: 1.6.1.49.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/finite%20sequence 1`] = `
+"Definition 1.6.1.49.1.  Let M ⊆ ℕ such that M is finite. We define:
 
   seq_fin(M) := (M[n])_(n < |M|)
 
@@ -2479,8 +2517,8 @@ Remarks.
 This definition produces a sorted finite sequence from a finite subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.48.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence 1`] = `
-"Definition 1.6.1.48.2.  Let M ⊆ ℕ such that M is infinite. We define:
+exports[`render hlm library: 1.6.1.49.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence 1`] = `
+"Definition 1.6.1.49.2.  Let M ⊆ ℕ such that M is infinite. We define:
 
   seq_inf(M) := (M[n])_(n ∈ ℕ)
 
@@ -3898,17 +3936,17 @@ p ⋅ a^n = b^n
 
 ⇒^def b^m ⋅ b = a^n ⋅ p
 
-⇒^def (b^l ⋅ b) ⋅ b = a^n ⋅ p
+⇒^def b^l ⋅ b ⋅ b = a^n ⋅ p
 
-⇒^[p⋅y = b] (b^l ⋅ (p ⋅ y)) ⋅ (p ⋅ y) = a^n ⋅ p
+⇒^[p⋅y = b] b^l ⋅ p ⋅ y ⋅ p ⋅ y = a^n ⋅ p
 
-⇒^1.6.4.20 (b^l ⋅ (p ⋅ y)) ⋅ y = a^n
+⇒^1.6.4.20 b^l ⋅ p ⋅ y ⋅ y = a^n
 
 We have p ∣ a^n:
 
 We show that ∃ z ∈ ℤ : p ⋅ z = a^n:
 
-Choose z := (b^l ⋅ y) ⋅ y.
+Choose z := b^l ⋅ y ⋅ y.
 
 ⇒^1.6.4.22.1 p ∣ a
 
@@ -3933,7 +3971,7 @@ exports[`render hlm library: 1.6.6.18 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.
 
-1.6.1.44.2 ⇒ 2 is prime
+1.6.1.45.2 ⇒ 2 is prime
 
 ⇒^1.6.6.17 2√2 is irrational"
 `;
@@ -4103,7 +4141,7 @@ exports[`render hlm library: 2.1.3 data/libraries/hlm/Algebra/Isomorphisms/inner
 by:
 
   φ[(X × X → X, x ↦ z_x)] := (Y × Y → Y, (y_1, y_2) ↦ φ(z_(φ^-1(y_1),φ^-1(y_2))))  (z_x ∈ X for each x ∈ X × X)
-   = φ ∘ (∗ ∘ (φ × φ)^-1)
+   = φ ∘ ∗ ∘ (φ × φ)^-1
 
 Equality.  No proof."
 `;
@@ -4126,7 +4164,7 @@ exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/morph
 by:
 
   (φ_1, φ_2, φ_3)[(X_1 × X_2 → X_3, x ↦ z_x)] := (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ φ_3(z_((φ_1)^-1(y_1),(φ_2)^-1(y_2))))  (z_x ∈ X_3 for each x ∈ X_1 × X_2)
-   = φ_3 ∘ (∙ ∘ (φ_1 × φ_2)^-1)
+   = φ_3 ∘ ∙ ∘ (φ_1 × φ_2)^-1
 
 Equality.  No proof."
 `;
@@ -4415,6 +4453,20 @@ exports[`render hlm library: 2.3.8.4 data/libraries/hlm/Algebra/Magmas/Free%20ma
   𝐌 is free  :⇔  ∃ S ⊆ Carrier(𝐌) : 𝐌 is free on S"
 `;
 
+exports[`render hlm library: 2.3.9 data/libraries/hlm/Algebra/Magmas/identity%20element 1`] = `
+"Definition 2.3.9.  Let 𝐌 be a magma, e ∈ 𝐌. We define:
+
+  e is an identity element of 𝐌  :⇔  ∀ a ∈ 𝐌 : [e • a = e and a • e = e]"
+`;
+
+exports[`render hlm library: 2.3.10 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
+"Definition 2.3.10.  Let 𝐌 be a magma such that ∃ e ∈ 𝐌 : e is an identity element of 𝐌. For m ∈ 𝐌, we define:
+
+  1_𝐌 = m  :⇔  m is an identity element of 𝐌
+
+Well-definedness.  No proof."
+`;
+
 exports[`render hlm library: 2.4.1 data/libraries/hlm/Algebra/Semigroups/Semigroups 1`] = `
 "Definition 2.4.1.  We define:
 
@@ -4441,8 +4493,18 @@ References.
 * https://en.wikipedia.org/wiki/Monoid"
 `;
 
-exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/Carrier 1`] = `
-"Definition 2.5.2.  Let 𝐌 be a monoid. We define
+exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/semigroup%20with%20identity 1`] = `
+"Definition 2.5.2.  Let 𝐌 be a semigroup such that ∃ e ∈ 𝐌 : e is an identity element of 𝐌. We define
+
+  𝐌_𝓜𝓸𝓷
+
+by:
+
+  [M, ∗]_𝓜𝓸𝓷 := [M, ∗, 1_𝐌]  (M is a set, ∗ : M × M → M is an operation on M)"
+`;
+
+exports[`render hlm library: 2.5.3 data/libraries/hlm/Algebra/Monoids/Carrier 1`] = `
+"Definition 2.5.3.  Let 𝐌 be a monoid. We define
 
   Carrier(𝐌)
 
@@ -4457,8 +4519,8 @@ Remarks.
 This definition retrieves a representative carrier set from a monoid (which is actually an equivalence class of monoids), and enables typical abuse of notation."
 `;
 
-exports[`render hlm library: 2.5.3 data/libraries/hlm/Algebra/Monoids/operation 1`] = `
-"Definition 2.5.3.  Let 𝐌 be a monoid, a, b ∈ 𝐌. We define:
+exports[`render hlm library: 2.5.4 data/libraries/hlm/Algebra/Monoids/operation 1`] = `
+"Definition 2.5.4.  Let 𝐌 be a monoid, a, b ∈ 𝐌. We define:
 
   a • b := {a ∗ b if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
 
@@ -4467,8 +4529,8 @@ Remarks.
 This definition lets us multiply elements without decomposing the monoid."
 `;
 
-exports[`render hlm library: 2.5.4 data/libraries/hlm/Algebra/Monoids/identity%20element 1`] = `
-"Definition 2.5.4.  Let 𝐌 be a monoid. We define
+exports[`render hlm library: 2.5.5 data/libraries/hlm/Algebra/Monoids/identity 1`] = `
+"Definition 2.5.5.  Let 𝐌 be a monoid. We define
 
   1_𝐌
 
@@ -4477,8 +4539,8 @@ by:
   1_[M,∗,e] := e  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.5.5 data/libraries/hlm/Algebra/Monoids/commutative 1`] = `
-"Definition 2.5.5.  Let 𝐌 be a monoid. We define
+exports[`render hlm library: 2.5.6 data/libraries/hlm/Algebra/Monoids/commutative 1`] = `
+"Definition 2.5.6.  Let 𝐌 be a monoid. We define
 
   𝐌 is commutative
 
@@ -4487,16 +4549,16 @@ by:
   [M, ∗, e] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.5.6.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
-"Definition 2.5.6.1.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.5.7.1.  Let 𝐌, 𝐍 be monoids. We define:
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
 
-exports[`render hlm library: 2.5.6.2 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Isomorphisms 1`] = `
-"Definition 2.5.6.2.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.7.2 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.5.7.2.  Let 𝐌, 𝐍 be monoids. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
    = {f : Carrier(𝐌) ↔ Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
@@ -4506,14 +4568,14 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.5.6.3 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
-"Definition 2.5.6.3.  Let 𝐌 be a monoid. We define:
+exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
+"Definition 2.5.7.3.  Let 𝐌 be a monoid. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.5.6.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.5.6.4.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
+exports[`render hlm library: 2.5.7.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.5.7.4.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -4525,28 +4587,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of monoids."
 `;
 
-exports[`render hlm library: 2.5.6.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.5.6.5.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.5.7.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.5.7.5.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
-"Definition 2.5.7.1.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
+exports[`render hlm library: 2.5.8.1 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
+"Definition 2.5.8.1.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
 
   S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐌 ∈ S"
 `;
 
-exports[`render hlm library: 2.5.7.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
-"Definition 2.5.7.2.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌) such that S is a submonoid of 𝐌. We define:
+exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
+"Definition 2.5.8.2.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌) such that S is a submonoid of 𝐌. We define:
 
   [S] := {[S, ∗∣_S, e] if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid 1`] = `
-"Definition 2.5.7.3.  Let 𝐌, 𝐍 be monoids. We define:
+exports[`render hlm library: 2.5.8.3 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid 1`] = `
+"Definition 2.5.8.3.  Let 𝐌, 𝐍 be monoids. We define:
 
   𝐌 ≤ 𝐍  :⇔  ∃ homomorphism φ : 𝐌 → 𝐍 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐍) : [S is a submonoid of 𝐍 and 𝐌 = [S]]
@@ -4554,16 +4616,30 @@ exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Submonoi
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.5.8.1 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20addition 1`] = `
-"Definition 2.5.8.1.  We define:
+exports[`render hlm library: 2.5.9.1 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20addition 1`] = `
+"Definition 2.5.9.1.  We define:
 
   (ℕ, +) := [ℕ, +, 0]"
 `;
 
-exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Examples/Natural%20numbers%20with%20multiplication 1`] = `
-"Definition 2.5.8.2.  We define:
+exports[`render hlm library: 2.5.9.2 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20multiplication 1`] = `
+"Definition 2.5.9.2.  We define:
 
   (ℕ, ⋅) := [ℕ, ⋅, 1]"
+`;
+
+exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/invertible 1`] = `
+"Definition 2.5.10.  Let 𝐌 be a monoid, a ∈ 𝐌. We define:
+
+  a is invertible in 𝐌  :⇔  ∃ b ∈ 𝐌 : [a • b = 1_𝐌 and b • a = 1_𝐌]"
+`;
+
+exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/inverse 1`] = `
+"Definition 2.5.11.  Let 𝐌 be a monoid, a ∈ 𝐌 such that a is invertible in 𝐌. For m ∈ 𝐌, we define:
+
+  a^-1 = m  :⇔  a • m = 1_𝐌
+
+Well-definedness.  No proof."
 `;
 
 exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
@@ -4580,8 +4656,18 @@ References.
 * https://en.wikipedia.org/wiki/Group_(mathematics)"
 `;
 
-exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/Carrier 1`] = `
-"Definition 2.6.2.  Let 𝐆 be a group. We define
+exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/monoid%20with%20inverses 1`] = `
+"Definition 2.6.2.  Let 𝐌 be a monoid such that ∀ a ∈ 𝐌 : a is invertible in 𝐌. We define
+
+  𝐌_𝓖𝓻𝓹
+
+by:
+
+  [M, ∗, e]_𝓖𝓻𝓹 := [M, ∗, e, (M → M, a ↦ a^-1)]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/Carrier 1`] = `
+"Definition 2.6.3.  Let 𝐆 be a group. We define
 
   Carrier(𝐆)
 
@@ -4596,8 +4682,8 @@ Remarks.
 This definition retrieves a representative carrier set from a group (which is actually an equivalence class of groups), and enables typical abuse of notation."
 `;
 
-exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/operation 1`] = `
-"Definition 2.6.3.  Let 𝐆 be a group, a, b ∈ 𝐆. We define:
+exports[`render hlm library: 2.6.4 data/libraries/hlm/Algebra/Groups/operation 1`] = `
+"Definition 2.6.4.  Let 𝐆 be a group, a, b ∈ 𝐆. We define:
 
   a • b := {a ∗ b if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
 
@@ -4606,8 +4692,8 @@ Remarks.
 This definition lets us multiply elements without decomposing the group."
 `;
 
-exports[`render hlm library: 2.6.4 data/libraries/hlm/Algebra/Groups/identity%20element 1`] = `
-"Definition 2.6.4.  Let 𝐆 be a group. We define
+exports[`render hlm library: 2.6.5 data/libraries/hlm/Algebra/Groups/identity 1`] = `
+"Definition 2.6.5.  Let 𝐆 be a group. We define
 
   1_𝐆
 
@@ -4616,14 +4702,14 @@ by:
   1_[G,∗,e,i] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.5 data/libraries/hlm/Algebra/Groups/inverse%20element 1`] = `
-"Definition 2.6.5.  Let 𝐆 be a group, a ∈ 𝐆. We define:
+exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/inverse 1`] = `
+"Definition 2.6.6.  Let 𝐆 be a group, a ∈ 𝐆. We define:
 
   a^-1 := {i(a) if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/abelian 1`] = `
-"Definition 2.6.6.  Let 𝐆 be a group. We define
+exports[`render hlm library: 2.6.7 data/libraries/hlm/Algebra/Groups/abelian 1`] = `
+"Definition 2.6.7.  Let 𝐆 be a group. We define
 
   𝐆 is abelian
 
@@ -4632,8 +4718,8 @@ by:
   [G, ∗, e, i] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.7.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
-"Definition 2.6.7.1.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.8.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.6.8.1.  Let 𝐆, 𝐇 be groups. We define:
 
   Hom(𝐆, 𝐇) := {f : Carrier(𝐆) → Carrier(𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(1_𝐆) = 1_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
    = {f : Carrier(𝐆) → Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
@@ -4643,8 +4729,8 @@ We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.7.2 data/libraries/hlm/Algebra/Groups/Homomorphisms/Isomorphisms 1`] = `
-"Definition 2.6.7.2.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.8.2 data/libraries/hlm/Algebra/Groups/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.6.8.2.  Let 𝐆, 𝐇 be groups. We define:
 
   Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
    = {f : Carrier(𝐆) ↔ Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
@@ -4654,20 +4740,20 @@ We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.7.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
-"Definition 2.6.7.3.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
+exports[`render hlm library: 2.6.8.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
+"Definition 2.6.8.3.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐆 : φ(g) = 1_𝐇}"
 `;
 
-exports[`render hlm library: 2.6.7.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
-"Definition 2.6.7.4.  Let 𝐆 be a group. We define:
+exports[`render hlm library: 2.6.8.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
+"Definition 2.6.8.4.  Let 𝐆 be a group. We define:
 
   id_𝐆 := id_(Carrier(𝐆))"
 `;
 
-exports[`render hlm library: 2.6.7.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.6.7.5.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
+exports[`render hlm library: 2.6.8.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.6.8.5.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
 
   1. Iso(𝐆, 𝐇) is nonempty
   2. 𝐆 = 𝐇
@@ -4679,28 +4765,28 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of groups."
 `;
 
-exports[`render hlm library: 2.6.7.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.6.7.6.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
+exports[`render hlm library: 2.6.8.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.6.8.6.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐇, 𝐆)
 
 No proof."
 `;
 
-exports[`render hlm library: 2.6.8.1 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup%20set 1`] = `
-"Definition 2.6.8.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+exports[`render hlm library: 2.6.9.1 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup%20set 1`] = `
+"Definition 2.6.9.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
   S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
 `;
 
-exports[`render hlm library: 2.6.8.2 data/libraries/hlm/Algebra/Groups/Subgroups/subset%20group 1`] = `
-"Definition 2.6.8.2.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
+exports[`render hlm library: 2.6.9.2 data/libraries/hlm/Algebra/Groups/Subgroups/subset%20group 1`] = `
+"Definition 2.6.9.2.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a subgroup of 𝐆. We define:
 
   [S] := {[S, ∗∣_S, e, i∣_S^S] if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.6.8.3 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup 1`] = `
-"Definition 2.6.8.3.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.9.3 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup 1`] = `
+"Definition 2.6.9.3.  Let 𝐆, 𝐇 be groups. We define:
 
   𝐆 ≤ 𝐇  :⇔  ∃ homomorphism φ : 𝐆 → 𝐇 : φ is injective
     ⇔  ∃ S ⊆ Carrier(𝐇) : [S is a subgroup of 𝐇 and 𝐆 = [S]]
@@ -4708,41 +4794,284 @@ exports[`render hlm library: 2.6.8.3 data/libraries/hlm/Algebra/Groups/Subgroups
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.6.8.4 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup%20set 1`] = `
-"Definition 2.6.8.4.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
+exports[`render hlm library: 2.6.9.4 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup%20set 1`] = `
+"Definition 2.6.9.4.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
-  S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : (g • s) • g^-1 ∈ S
+  S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : g • s • g^-1 ∈ S
     ⇔  ∃ group 𝐇, homomorphism φ : 𝐆 → 𝐇 : S = Ker(φ)
 
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.6.8.5 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup 1`] = `
-"Definition 2.6.8.5.  Let 𝐆, 𝐇 be groups. We define:
+exports[`render hlm library: 2.6.9.5 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup 1`] = `
+"Definition 2.6.9.5.  Let 𝐆, 𝐇 be groups. We define:
 
   𝐆 ⊴ 𝐇  :⇔  ∃ S ⊆ Carrier(𝐇) : [S is a normal subgroup of 𝐇 and 𝐆 = [S]]"
 `;
 
-exports[`render hlm library: 2.6.9.1 data/libraries/hlm/Algebra/Groups/Quotient/quotient%20group 1`] = `
-"Definition 2.6.9.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
+exports[`render hlm library: 2.6.10.1 data/libraries/hlm/Algebra/Groups/Quotient/quotient%20group 1`] = `
+"Definition 2.6.10.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), T := Carrier(𝐆)∕∼. We define:
 
   𝐆∕S := [T, (T × T → T, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [1_𝐆]_∼, (T → T, [g]_∼ ↦ [g^-1]_∼)]"
 `;
 
-exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Essentials/Matrices 1`] = `
-"Definition 3.1.1.  Let S be a set, m, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.1 data/libraries/hlm/Algebra/Rings/Rings 1`] = `
+"Definition 2.7.1.  We define:
 
-  S^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
+  𝓡𝓲𝓷𝓰 :=: {[R, ⊕, 0, ⊖, ⊙, 1] | R is a set, ⊕ : R × R → R is a commutative associative operation on R, 0 ∈ R such that [∀ a ∈ R : a ⊕ 0 = a], ⊖ : R → R is a function such that [∀ a ∈ R : a ⊕ ⊖(a) = 0], ⊙ : R × R → R is an associative operation on R, 1 ∈ R such that [∀ a ∈ R : [a ⊙ 1 = a and 1 ⊙ a = a]] and ⊙ is distributive over ⊕}
 
-  (a_i,j)_i < m,j < n = (b_i,j)_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ S for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
+  [R, ⊕, 0, ⊖, ⊙, 1] = [S, ⋆, 𝟢, ∼, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗ and φ[1] = 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∼ : S → S is a function, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
 
-For S' ⊆ S, we canonically treat elements of S'^(m×n) as elements of S^(m×n)."
+We write “let 𝐑 be a ring” for “let 𝐑 ∈ 𝓡𝓲𝓷𝓰.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Ring_(mathematics)"
 `;
 
-exports[`render hlm library: 3.1.2 data/libraries/hlm/Linear%20algebra/Essentials/Vectors 1`] = `
-"Definition 3.1.2.  Let S be a set, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.2 data/libraries/hlm/Algebra/Rings/Carrier 1`] = `
+"Definition 2.7.2.  Let 𝐑 be a ring. We define
 
-  S^n := S^(1×n)"
+  Carrier(𝐑)
+
+by:
+
+  Carrier([R, ⊕, 0, ⊖, ⊙, 1]) := R  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)
+
+We write “let a ∈ 𝐑” for “let a ∈ Carrier(𝐑).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a ring (which is actually an equivalence class of rings), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.7.3 data/libraries/hlm/Algebra/Rings/sum 1`] = `
+"Definition 2.7.3.  Let 𝐑 be a ring, a, b ∈ 𝐑. We define:
+
+  a + b := {a ⊕ b if 𝐑 = [R, ⊕, 0, ⊖, ⊙, 1] (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)
+
+Remarks.
+
+This definition lets us add elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.4 data/libraries/hlm/Algebra/Rings/zero 1`] = `
+"Definition 2.7.4.  Let 𝐑 be a ring. We define
+
+  0_𝐑
+
+by:
+
+  0_[R,⊕,0,⊖,⊙,1] := 0  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.5 data/libraries/hlm/Algebra/Rings/additive%20inverse 1`] = `
+"Definition 2.7.5.  Let 𝐑 be a ring, a ∈ 𝐑. We define:
+
+  −a := {⊖(a) if 𝐑 = [R, ⊕, 0, ⊖, ⊙, 1] (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.6 data/libraries/hlm/Algebra/Rings/difference 1`] = `
+"Definition 2.7.6.  Let 𝐑 be a ring, a, b ∈ 𝐑. We define:
+
+  a − b := a + (−b)"
+`;
+
+exports[`render hlm library: 2.7.7 data/libraries/hlm/Algebra/Rings/product 1`] = `
+"Definition 2.7.7.  Let 𝐑 be a ring, a, b ∈ 𝐑. We define:
+
+  a ⋅ b := {a ⊙ b if 𝐑 = [R, ⊕, 0, ⊖, ⊙, 1] (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.8 data/libraries/hlm/Algebra/Rings/one 1`] = `
+"Definition 2.7.8.  Let 𝐑 be a ring. We define
+
+  1_𝐑
+
+by:
+
+  1_[R,⊕,0,⊖,⊙,1] := 1  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.9.1 data/libraries/hlm/Algebra/Rings/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.7.9.1.  Let 𝐑, 𝐒 be rings. We define:
+
+  Hom(𝐑, 𝐒) := {f : Carrier(𝐑) → Carrier(𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c ∈ 𝐑 : f(−c) = −f(c)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+   = {f : Carrier(𝐑) → Carrier(𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+
+We write “let φ : 𝐑 → 𝐒 be a homomorphism” for “let φ ∈ Hom(𝐑, 𝐒).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.9.2 data/libraries/hlm/Algebra/Rings/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.7.9.2.  Let 𝐑, 𝐒 be rings. We define:
+
+  Iso(𝐑, 𝐒) := {homomorphisms φ : 𝐑 → 𝐒 : φ is bijective}
+   = {f : Carrier(𝐑) ↔ Carrier(𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+
+We write “let φ : 𝐑 ↔ 𝐒 be an isomorphism” for “let φ ∈ Iso(𝐑, 𝐒).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.9.3 data/libraries/hlm/Algebra/Rings/Homomorphisms/Kernel 1`] = `
+"Definition 2.7.9.3.  Let 𝐑, 𝐒 be rings, φ : 𝐑 → 𝐒 be a homomorphism. We define:
+
+  Ker(φ) := {g ∈ 𝐑 : φ(g) = 0_𝐒}"
+`;
+
+exports[`render hlm library: 2.7.9.4 data/libraries/hlm/Algebra/Rings/Homomorphisms/identity 1`] = `
+"Definition 2.7.9.4.  Let 𝐑 be a ring. We define:
+
+  id_𝐑 := id_(Carrier(𝐑))"
+`;
+
+exports[`render hlm library: 2.7.9.5 data/libraries/hlm/Algebra/Rings/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.7.9.5.  Let 𝐑, 𝐒 be rings. Then the following are equivalent:
+
+  1. Iso(𝐑, 𝐒) is nonempty
+  2. 𝐑 = 𝐒
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of rings."
+`;
+
+exports[`render hlm library: 2.7.9.6 data/libraries/hlm/Algebra/Rings/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.7.9.6.  Let 𝐑, 𝐒 be rings, φ : 𝐑 ↔ 𝐒 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐒, 𝐑)
+
+No proof."
+`;
+
+exports[`render hlm library: 2.7.10 data/libraries/hlm/Algebra/Rings/unit 1`] = `
+"Definition 2.7.10.  Let 𝐑 be a ring, r ∈ 𝐑. We define:
+
+  r is a unit  :⇔  ∃ s ∈ 𝐑 : [r ⋅ s = 1_𝐑 and s ⋅ r = 1_𝐑]"
+`;
+
+exports[`render hlm library: 2.7.11 data/libraries/hlm/Algebra/Rings/units 1`] = `
+"Definition 2.7.11.  Let 𝐑 be a ring, U := {r ∈ 𝐑 : r is a unit}. We define
+
+  𝐑^×
+
+by:
+
+  [R, ⊕, 0, ⊖, ⊙, 1]^× := [U, ⊙∣_U, 1]_𝓖𝓻𝓹  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.12.1 data/libraries/hlm/Algebra/Rings/Examples/integers 1`] = `
+"Definition 2.7.12.1.  We define:
+
+  ℤ := [ℤ, +, 0, −, ⋅, 1]"
+`;
+
+exports[`render hlm library: 2.7.13 data/libraries/hlm/Algebra/Rings/kronecker%20delta 1`] = `
+"Definition 2.7.13.  Let 𝐑 be a ring, S be a set, i, j ∈ S. We define:
+
+  δ_𝐑,i,j := {1_𝐑 if i = j, 0_𝐑 if i ≠ j"
+`;
+
+exports[`render hlm library: 2.7.14.1 data/libraries/hlm/Algebra/Rings/Generalized%20sums%20and%20products/inductive%20sum%20(exclusive) 1`] = `
+"Definition 2.7.14.1.  Let 𝐑 be a ring, n ∈ ℕ, let a_i ∈ 𝐑 for each i ∈ ℕ_(<n). We define
+
+  ∑_(i < n) a_i
+
+by:
+
+  ∑_(i < 0) a_i := 0_𝐑
+  ∑_(i < m+1) a_i := (∑_(j < m) a_j) + a_m  (m ∈ ℕ)"
+`;
+
+exports[`render hlm library: 2.7.14.2 data/libraries/hlm/Algebra/Rings/Generalized%20sums%20and%20products/inductive%20product%20(exclusive) 1`] = `
+"Definition 2.7.14.2.  Let 𝐑 be a ring, n ∈ ℕ, let a_i ∈ 𝐑 for each i ∈ ℕ_(<n). We define
+
+  ∏_(i < n) a_i
+
+by:
+
+  ∏_(i < 0) a_i := 1_𝐑
+  ∏_(i < m+1) a_i := (∏_(j < m) a_j) ⋅ a_m  (m ∈ ℕ)"
+`;
+
+exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Rings/Matrices/Matrices 1`] = `
+"Definition 2.7.15.1.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+
+  𝐑^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
+
+  (a_i,j)_i < m,j < n = (b_i,j)_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 2.7.15.2 data/libraries/hlm/Algebra/Rings/Matrices/Vectors 1`] = `
+"Definition 2.7.15.2.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+
+  𝐑^n := 𝐑^(1×n)"
+`;
+
+exports[`render hlm library: 2.7.15.3 data/libraries/hlm/Algebra/Rings/Matrices/sum 1`] = `
+"Definition 2.7.15.3.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+
+  A + B
+
+by:
+
+  (a_i,j)_i < m,j < n + (b_i,j)_i < m,j < n := (a_i,j + b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 2.7.15.4 data/libraries/hlm/Algebra/Rings/Matrices/zero 1`] = `
+"Definition 2.7.15.4.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+
+  0_(𝐑^(m×n)) := (0_𝐑)_i < m,j < n"
+`;
+
+exports[`render hlm library: 2.7.15.5 data/libraries/hlm/Algebra/Rings/Matrices/additive%20inverse 1`] = `
+"Definition 2.7.15.5.  Let 𝐑 be a ring, m, n ∈ ℕ, A ∈ 𝐑^(m×n). We define
+
+  −A
+
+by:
+
+  −(a_i,j)_i < m,j < n := (−a_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 2.7.15.6 data/libraries/hlm/Algebra/Rings/Matrices/difference 1`] = `
+"Definition 2.7.15.6.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+
+  A − B
+
+by:
+
+  (a_i,j)_i < m,j < n − (b_i,j)_i < m,j < n := (a_i,j − b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 2.7.15.7 data/libraries/hlm/Algebra/Rings/Matrices/product 1`] = `
+"Definition 2.7.15.7.  Let 𝐑 be a ring, l, m, n ∈ ℕ, A ∈ 𝐑^(l×m), B ∈ 𝐑^(m×n). We define
+
+  A ⋅ B
+
+by:
+
+  (a_i,j)_i < l,j < m ⋅ (b_j,k)_j < m,k < n := (∑_(j < m) a_i,j ⋅ b_j,k)_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 2.7.15.8 data/libraries/hlm/Algebra/Rings/Matrices/identity 1`] = `
+"Definition 2.7.15.8.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+
+  I_(𝐑^(n×n)) := (δ_𝐑,i,j)_i < n,j < n"
+`;
+
+exports[`render hlm library: 2.7.15.9 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
+"Definition 2.7.15.9.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+
+  𝐑^(n×n) := [𝐑^(n×n), +, 0_(𝐑^(n×n)), −, ⋅, I_(𝐑^(n×n))]"
 `;
 
 exports[`render hlm library: 4.1 data/libraries/hlm/Category%20theory/Categories 1`] = `
@@ -5028,8 +5357,18 @@ Remarks.
 The objects of this category are actually isomorphism classes of groups."
 `;
 
-exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Individual%20categories/rings 1`] = `
 "Definition 4.8.9.  Let u ∈ ℕ. We define:
+
+  𝐑𝐢𝐧𝐠_u := [𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓲𝓷𝓰)]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of rings."
+`;
+
+exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+"Definition 4.8.10.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
@@ -5043,8 +5382,8 @@ References.
 * https://ncatlab.org/nlab/show/Cat"
 `;
 
-exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.10.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+"Definition 4.8.11.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
   𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
 
