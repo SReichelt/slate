@@ -1283,7 +1283,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                  || display.path.name === 'Feature') {
         abbr = display.path.arguments.getValue('singular');
       }
-      if (abbr instanceof Fmt.StringExpression || abbr instanceof Fmt.ArrayExpression || abbr instanceof Fmt.MetaRefExpression) {
+      if ((abbr instanceof Fmt.StringExpression && abbr.value)
+          || (abbr instanceof Fmt.ArrayExpression && abbr.items.length)
+          || abbr instanceof Fmt.MetaRefExpression) {
         display = abbr;
       }
     }

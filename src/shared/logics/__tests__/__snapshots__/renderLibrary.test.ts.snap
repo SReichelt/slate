@@ -4028,7 +4028,7 @@ exports[`render hlm library: 1.6.7.3 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+i_a𝒊) + (r_b+i_b𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+  (r_a+(i_a)𝒊) + (r_b+(i_b)𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
 `;
 
 exports[`render hlm library: 1.6.7.4 data/libraries/hlm/Essentials/Numbers/Complex/Sum%20is%20associative 1`] = `
@@ -4054,7 +4054,7 @@ exports[`render hlm library: 1.6.7.6 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  −(r_a+i_a𝒊) := ((−r_a)+(−i_a)𝒊)  (r_a, i_a ∈ ℝ)"
+  −(r_a+(i_a)𝒊) := ((−r_a)+(−i_a)𝒊)  (r_a, i_a ∈ ℝ)"
 `;
 
 exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Complex/difference 1`] = `
@@ -4064,7 +4064,7 @@ exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_b+i_b𝒊) − (r_a+i_a𝒊) := ((r_b − r_a)+(i_b − i_a)𝒊)  (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
+  (r_b+(i_b)𝒊) − (r_a+(i_a)𝒊) := ((r_b − r_a)+(i_b − i_a)𝒊)  (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
    = b + (−a)
 
 Equality.  No proof."
@@ -4077,7 +4077,7 @@ exports[`render hlm library: 1.6.7.8 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+i_a𝒊) ⋅ (r_b+i_b𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+  (r_a+(i_a)𝒊) ⋅ (r_b+(i_b)𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
 `;
 
 exports[`render hlm library: 1.6.7.9 data/libraries/hlm/Essentials/Numbers/Complex/Product%20is%20associative 1`] = `
@@ -5002,22 +5002,131 @@ by:
   ∏_(i < m+1) a_i := (∏_(j < m) a_j) ⋅ a_m  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Rings/Matrices/Matrices 1`] = `
-"Definition 2.7.15.1.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Rings/Polynomials/Polynomials 1`] = `
+"Definition 2.7.15.1.  Let 𝐑 be a ring, X be a variable. We define:
+
+  𝐑[X] :=: {(0)_(𝐑[X]), (pX+a) | p ∈ 𝐑[X], a ∈ 𝐑 such that [p ≠ (0)_(𝐑[X]) or a ≠ 0_𝐑]}
+
+  (pX+a) = (qX+b)  :⇔  p = q and a = b  (p ∈ 𝐑[X], a ∈ 𝐑, q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.2 data/libraries/hlm/Algebra/Rings/Polynomials/normalized 1`] = `
+"Definition 2.7.15.2.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑. We define:
+
+  [pX+a] := {(pX+a) if p ≠ (0)_(𝐑[X]) or a ≠ 0_𝐑, (0)_(𝐑[X]) if p = (0)_(𝐑[X]) and a = 0_𝐑"
+`;
+
+exports[`render hlm library: 2.7.15.3 data/libraries/hlm/Algebra/Rings/Polynomials/term 1`] = `
+"Definition 2.7.15.3.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, n ∈ ℕ. We define:
+
+  aX^n := {{((0)_(𝐑[X])X+a) if n = 0, (aX^mX+0_𝐑) if n = m + 1 (m ∈ ℕ) if a ≠ 0_𝐑, (0)_(𝐑[X]) if a = 0_𝐑"
+`;
+
+exports[`render hlm library: 2.7.15.4 data/libraries/hlm/Algebra/Rings/Polynomials/constant 1`] = `
+"Definition 2.7.15.4.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑. We define:
+
+  [a]_(𝐑[X]) := [(0)_(𝐑[X])X+a]
+   = aX^0
+   = {((0)_(𝐑[X])X+a) if a ≠ 0_𝐑, (0)_(𝐑[X]) if a = 0_𝐑
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.15.5 data/libraries/hlm/Algebra/Rings/Polynomials/sum 1`] = `
+"Definition 2.7.15.5.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
+
+  p + q
+
+by:
+
+  p + (0)_(𝐑[X]) := p
+  (0)_(𝐑[X]) + (sX+b) := (sX+b)  (s ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)
+  (rX+a) + (sX+b) := [(r + s)X+(a + b)]  (r ∈ 𝐑[X], a ∈ 𝐑, s ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.6 data/libraries/hlm/Algebra/Rings/Polynomials/additive%20inverse 1`] = `
+"Definition 2.7.15.6.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
+
+  −p
+
+by:
+
+  −(0)_(𝐑[X]) := (0)_(𝐑[X])
+  −(qX+a) := ((−q)X+(−a))  (q ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.7 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20scalar 1`] = `
+"Definition 2.7.15.7.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, p ∈ 𝐑[X]. We define
+
+  a ⋅ p
+
+by:
+
+  a ⋅ (0)_(𝐑[X]) := (0)_(𝐑[X])
+  a ⋅ (qX+b) := [(a ⋅ q)X+(a ⋅ b)]  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.8 data/libraries/hlm/Algebra/Rings/Polynomials/product 1`] = `
+"Definition 2.7.15.8.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
+
+  p ⋅ q
+
+by:
+
+  (0)_(𝐑[X]) ⋅ q := (0)_(𝐑[X])
+  (rX+a) ⋅ q := [(r ⋅ q)X+0_𝐑] + a ⋅ q  (r ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.9 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
+"Definition 2.7.15.9.  Let 𝐑 be a ring, X be a variable. We define:
+
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, [1_𝐑]_(𝐑[X])]"
+`;
+
+exports[`render hlm library: 2.7.15.10 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
+"Definition 2.7.15.10.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑. We define
+
+  p(a)
+
+by:
+
+  (0)_(𝐑[X])(a) := 0_𝐑
+  (qX+b)(a) := q(a) ⋅ a + b  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.11 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
+"Definition 2.7.15.11.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
+
+  dim(p)
+
+by:
+
+  dim((0)_(𝐑[X])) := 0
+  dim(qX+a) := dim(q) + 1  (q ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.15.12 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
+"Definition 2.7.15.12.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X] ∖ {(0)_(𝐑[X])}. We define:
+
+  deg(p) := dim(p) − 1"
+`;
+
+exports[`render hlm library: 2.7.16.1 data/libraries/hlm/Algebra/Rings/Matrices/Matrices 1`] = `
+"Definition 2.7.16.1.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
   𝐑^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
 
   (a_i,j)_i < m,j < n = (b_i,j)_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.15.2 data/libraries/hlm/Algebra/Rings/Matrices/Vectors 1`] = `
-"Definition 2.7.15.2.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.16.2 data/libraries/hlm/Algebra/Rings/Matrices/Vectors 1`] = `
+"Definition 2.7.16.2.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
   𝐑^n := 𝐑^(1×n)"
 `;
 
-exports[`render hlm library: 2.7.15.3 data/libraries/hlm/Algebra/Rings/Matrices/sum 1`] = `
-"Definition 2.7.15.3.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.16.3 data/libraries/hlm/Algebra/Rings/Matrices/sum 1`] = `
+"Definition 2.7.16.3.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
 
   A + B
 
@@ -5026,14 +5135,14 @@ by:
   (a_i,j)_i < m,j < n + (b_i,j)_i < m,j < n := (a_i,j + b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.15.4 data/libraries/hlm/Algebra/Rings/Matrices/zero 1`] = `
-"Definition 2.7.15.4.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.16.4 data/libraries/hlm/Algebra/Rings/Matrices/zero 1`] = `
+"Definition 2.7.16.4.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
   0_(𝐑^(m×n)) := (0_𝐑)_i < m,j < n"
 `;
 
-exports[`render hlm library: 2.7.15.5 data/libraries/hlm/Algebra/Rings/Matrices/additive%20inverse 1`] = `
-"Definition 2.7.15.5.  Let 𝐑 be a ring, m, n ∈ ℕ, A ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.16.5 data/libraries/hlm/Algebra/Rings/Matrices/additive%20inverse 1`] = `
+"Definition 2.7.16.5.  Let 𝐑 be a ring, m, n ∈ ℕ, A ∈ 𝐑^(m×n). We define
 
   −A
 
@@ -5042,8 +5151,8 @@ by:
   −(a_i,j)_i < m,j < n := (−a_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.15.6 data/libraries/hlm/Algebra/Rings/Matrices/difference 1`] = `
-"Definition 2.7.15.6.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.16.6 data/libraries/hlm/Algebra/Rings/Matrices/difference 1`] = `
+"Definition 2.7.16.6.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
 
   A − B
 
@@ -5052,8 +5161,8 @@ by:
   (a_i,j)_i < m,j < n − (b_i,j)_i < m,j < n := (a_i,j − b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.15.7 data/libraries/hlm/Algebra/Rings/Matrices/product 1`] = `
-"Definition 2.7.15.7.  Let 𝐑 be a ring, l, m, n ∈ ℕ, A ∈ 𝐑^(l×m), B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.16.7 data/libraries/hlm/Algebra/Rings/Matrices/product 1`] = `
+"Definition 2.7.16.7.  Let 𝐑 be a ring, l, m, n ∈ ℕ, A ∈ 𝐑^(l×m), B ∈ 𝐑^(m×n). We define
 
   A ⋅ B
 
@@ -5062,14 +5171,14 @@ by:
   (a_i,j)_i < l,j < m ⋅ (b_j,k)_j < m,k < n := (∑_(j < m) a_i,j ⋅ b_j,k)_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.15.8 data/libraries/hlm/Algebra/Rings/Matrices/identity 1`] = `
-"Definition 2.7.15.8.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.16.8 data/libraries/hlm/Algebra/Rings/Matrices/identity 1`] = `
+"Definition 2.7.16.8.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
   I_(𝐑^(n×n)) := (δ_𝐑,i,j)_i < n,j < n"
 `;
 
-exports[`render hlm library: 2.7.15.9 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
-"Definition 2.7.15.9.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.16.9 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
+"Definition 2.7.16.9.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
   𝐑^(n×n) := [𝐑^(n×n), +, 0_(𝐑^(n×n)), −, ⋅, I_(𝐑^(n×n))]"
 `;
@@ -5399,6 +5508,8 @@ exports[`render hlm library: 5.1 data/libraries/hlm/Formal%20systems/Variables 1
   𝓥𝓪𝓻 :=: {(n) | n ∈ ℕ}
 
   (m) = (n)  :⇔  m = n  (m, n ∈ ℕ)
+
+We write “let v be a variable” for “let v ∈ 𝓥𝓪𝓻.”
 
 Remarks.
 
