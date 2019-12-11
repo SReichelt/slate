@@ -3136,6 +3136,12 @@ exports[`render hlm library: 1.6.4.10.10 data/libraries/hlm/Essentials/Numbers/I
 Equality.  No proof."
 `;
 
+exports[`render hlm library: 1.6.4.10.11 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
+"Definition 1.6.4.10.11.  Let n ∈ ℕ. We define:
+
+  nℤ := {n ⋅ z : z ∈ ℤ}"
+`;
+
 exports[`render hlm library: 1.6.4.11 data/libraries/hlm/Essentials/Numbers/Integer/absolute 1`] = `
 "Definition 1.6.4.11.  Let a ∈ ℤ. We define:
 
@@ -4838,6 +4844,38 @@ exports[`render hlm library: 2.6.10.1 data/libraries/hlm/Algebra/Groups/Quotient
   𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [1_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]"
 `;
 
+exports[`render hlm library: 2.6.11.1 data/libraries/hlm/Algebra/Groups/Examples/integers 1`] = `
+"Definition 2.6.11.1.  We define:
+
+  ℤ := [ℤ, +, 0, −]"
+`;
+
+exports[`render hlm library: 2.6.11.2 data/libraries/hlm/Algebra/Groups/Examples/Multiples%20are%20a%20normal%20subgroup%20of%20integers 1`] = `
+"Proposition 2.6.11.2.  Let n ∈ ℕ. Then:
+
+  nℤ is a normal subgroup of ℤ
+
+No proof."
+`;
+
+exports[`render hlm library: 2.6.11.3 data/libraries/hlm/Algebra/Groups/Examples/cyclic%20group 1`] = `
+"Definition 2.6.11.3.  Let n ∈ ℕ. We define:
+
+  𝐶_n := ℤ∕nℤ"
+`;
+
+exports[`render hlm library: 2.6.11.4 data/libraries/hlm/Algebra/Groups/Examples/symmetric%20group 1`] = `
+"Definition 2.6.11.4.  Let X be a set. We define:
+
+  𝑆_X := [X ↔ X, ∘, id_X, ((X ↔ X) → (X ↔ X), f ↦ f^-1)]"
+`;
+
+exports[`render hlm library: 2.6.11.5 data/libraries/hlm/Algebra/Groups/Examples/finite%20symmetric%20group 1`] = `
+"Definition 2.6.11.5.  Let n ∈ ℕ. We define:
+
+  𝑆_n := 𝑆_(ℕ_(<n))"
+`;
+
 exports[`render hlm library: 2.7.1 data/libraries/hlm/Algebra/Rings/Rings 1`] = `
 "Definition 2.7.1.  We define:
 
@@ -5015,26 +5053,20 @@ by:
   [[R, ⊕, 0, ⊖, ⊙, 1]^×] := [𝐑^×, ⊙∣_(𝐑^×), 1, (𝐑^× → 𝐑^×, a ↦ a^-1)]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Rings/Examples/integers 1`] = `
-"Definition 2.7.15.1.  We define:
-
-  ℤ := [ℤ, +, 0, −, ⋅, 1]"
-`;
-
-exports[`render hlm library: 2.7.16.1 data/libraries/hlm/Algebra/Rings/Ideals/left%20ideal 1`] = `
-"Definition 2.7.16.1.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
+exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Rings/Ideals/left%20ideal 1`] = `
+"Definition 2.7.15.1.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
 
   I is a left ideal of 𝐑  :⇔  I is a subgroup of [𝐑, +] and ∀ i ∈ I, r ∈ 𝐑 : r ⋅ i ∈ I"
 `;
 
-exports[`render hlm library: 2.7.16.2 data/libraries/hlm/Algebra/Rings/Ideals/right%20ideal 1`] = `
-"Definition 2.7.16.2.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
+exports[`render hlm library: 2.7.15.2 data/libraries/hlm/Algebra/Rings/Ideals/right%20ideal 1`] = `
+"Definition 2.7.15.2.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
 
   I is a right ideal of 𝐑  :⇔  I is a subgroup of [𝐑, +] and ∀ i ∈ I, r ∈ 𝐑 : i ⋅ r ∈ I"
 `;
 
-exports[`render hlm library: 2.7.16.3 data/libraries/hlm/Algebra/Rings/Ideals/ideal 1`] = `
-"Definition 2.7.16.3.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
+exports[`render hlm library: 2.7.15.3 data/libraries/hlm/Algebra/Rings/Ideals/ideal 1`] = `
+"Definition 2.7.15.3.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑). We define:
 
   I is an ideal of 𝐑  :⇔  I is a left ideal of 𝐑 and I is a right ideal of 𝐑
     ⇔  ∃ ring 𝐒, homomorphism φ : 𝐑 → 𝐒 : I = Ker(φ)
@@ -5042,10 +5074,24 @@ exports[`render hlm library: 2.7.16.3 data/libraries/hlm/Algebra/Rings/Ideals/id
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.7.17.1 data/libraries/hlm/Algebra/Rings/Quotients/quotient%20ring 1`] = `
-"Definition 2.7.17.1.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑) such that I is an ideal of 𝐑, ∼ := [∃ s ∈ I : g + s = h]_(g,h ∈ Carrier(𝐑)), Q := Carrier(𝐑)∕∼. We define:
+exports[`render hlm library: 2.7.16.1 data/libraries/hlm/Algebra/Rings/Quotients/quotient%20ring 1`] = `
+"Definition 2.7.16.1.  Let 𝐑 be a ring, I ⊆ Carrier(𝐑) such that I is an ideal of 𝐑, ∼ := [∃ s ∈ I : g + s = h]_(g,h ∈ Carrier(𝐑)), Q := Carrier(𝐑)∕∼. We define:
 
   𝐑∕I := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g + h]_∼), [0_𝐑]_∼, (Q → Q, [g]_∼ ↦ [−g]_∼), (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g ⋅ h]_∼), [1_𝐑]_∼]"
+`;
+
+exports[`render hlm library: 2.7.17.1 data/libraries/hlm/Algebra/Rings/Examples/integers 1`] = `
+"Definition 2.7.17.1.  We define:
+
+  ℤ := [ℤ, +, 0, −, ⋅, 1]"
+`;
+
+exports[`render hlm library: 2.7.17.2 data/libraries/hlm/Algebra/Rings/Examples/Multiples%20are%20an%20ideal%20of%20integers 1`] = `
+"Proposition 2.7.17.2.  Let n ∈ ℕ. Then:
+
+  nℤ is an ideal of ℤ
+
+No proof."
 `;
 
 exports[`render hlm library: 2.7.18 data/libraries/hlm/Algebra/Rings/kronecker%20delta 1`] = `
