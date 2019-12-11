@@ -1030,7 +1030,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           default:
             curText += this.convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
           }
-        } else if ((cp >= 0x1d504 && cp < 0x1d5a0) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
+        } else if ((cp >= 0x1d504 && cp < 0x1d538) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
           setStyle('fraktur');
           switch (cp) {
           case 0x212d:
@@ -1049,7 +1049,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             curText += 'Z';
             break;
           default:
-            curText += this.convertLatinMathToRegular(cp < 0x1d56c ? cp - 0x1d504 : cp - 0x1d56c);
+            curText += this.convertLatinMathToRegular(cp < 0x1d51e ? cp - 0x1d504 : cp - 0x1d56c);
           }
         } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
           setStyle('double-struck');

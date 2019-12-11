@@ -661,6 +661,11 @@ export class HLMUtils extends GenericUtils {
                     return this.substitutePath(substituted, constructorPath, [definition, innerDefinition]);
                   });
                 }
+              } else if (term.term instanceof FmtHLM.MetaRefExpression_structuralCases && term.term.cases.length === 1) {
+                let innerTerm = term.term;
+                let innerStructuralCase = innerTerm.cases[0];
+                let innerResultTerm = this.buildSingleStructuralCaseSetTerm(innerStructuralCase.value, term.construction, structuralCase._constructor, structuralCase.parameters, structuralCase.value);
+                return this.buildSingleStructuralCaseSetTerm(innerTerm.term, innerTerm.construction, innerStructuralCase._constructor, innerStructuralCase.parameters, innerResultTerm);
               }
               return this.resolveElementTerm(term.term).then((resolvedTerms: Fmt.Expression[] | undefined) => {
                 if (resolvedTerms && resolvedTerms.length === 1) {
