@@ -4561,11 +4561,11 @@ This definition lets us multiply elements without decomposing the monoid."
 exports[`render hlm library: 2.5.5 data/libraries/hlm/Algebra/Monoids/identity 1`] = `
 "Definition 2.5.5.  Let 𝐌 be a monoid. We define
 
-  1_𝐌
+  e_𝐌
 
 by:
 
-  1_[M,∗,e] := e  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+  e_[M,∗,e] := e  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.5.6 data/libraries/hlm/Algebra/Monoids/commutative 1`] = `
@@ -4581,7 +4581,7 @@ by:
 exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.5.7.1.  Let 𝐌, 𝐍 be monoids. We define:
 
-  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
 `;
@@ -4590,7 +4590,7 @@ exports[`render hlm library: 2.5.7.2 data/libraries/hlm/Algebra/Monoids/Homomorp
 "Definition 2.5.7.2.  Let 𝐌, 𝐍 be monoids. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(1_𝐌) = 1_𝐍}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -4627,7 +4627,7 @@ No proof."
 exports[`render hlm library: 2.5.8.1 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
 "Definition 2.5.8.1.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
 
-  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐌 ∈ S"
+  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐌 ∈ S"
 `;
 
 exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
@@ -4660,13 +4660,13 @@ exports[`render hlm library: 2.5.9.2 data/libraries/hlm/Algebra/Monoids/Examples
 exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/invertible 1`] = `
 "Definition 2.5.10.  Let 𝐌 be a monoid, a ∈ 𝐌. We define:
 
-  a is invertible  :⇔  ∃ b ∈ 𝐌 : [a • b = 1_𝐌 and b • a = 1_𝐌]"
+  a is invertible  :⇔  ∃ b ∈ 𝐌 : [a • b = e_𝐌 and b • a = e_𝐌]"
 `;
 
 exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/inverse 1`] = `
 "Definition 2.5.11.  Let 𝐌 be a monoid, a ∈ 𝐌 such that a is invertible. For m ∈ 𝐌, we define:
 
-  a^-1 = m  :⇔  a • m = 1_𝐌
+  a^-1 = m  :⇔  a • m = e_𝐌
 
 Well-definedness.  No proof."
 `;
@@ -4724,11 +4724,11 @@ This definition lets us multiply elements without decomposing the group."
 exports[`render hlm library: 2.6.5 data/libraries/hlm/Algebra/Groups/identity 1`] = `
 "Definition 2.6.5.  Let 𝐆 be a group. We define
 
-  1_𝐆
+  e_𝐆
 
 by:
 
-  1_[G,∗,e,i] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  e_[G,∗,e,i] := e  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.6.6 data/libraries/hlm/Algebra/Groups/inverse 1`] = `
@@ -4750,7 +4750,7 @@ by:
 exports[`render hlm library: 2.6.8.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.6.8.1.  Let 𝐆, 𝐇 be groups. We define:
 
-  Hom(𝐆, 𝐇) := {f : Carrier(𝐆) → Carrier(𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(1_𝐆) = 1_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
+  Hom(𝐆, 𝐇) := {f : Carrier(𝐆) → Carrier(𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(e_𝐆) = e_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
    = {f : Carrier(𝐆) → Carrier(𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ ∈ Hom(𝐆, 𝐇).”
@@ -4772,7 +4772,7 @@ Equality.  No proof."
 exports[`render hlm library: 2.6.8.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
 "Definition 2.6.8.3.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
 
-  Ker(φ) := {g ∈ 𝐆 : φ(g) = 1_𝐇}"
+  Ker(φ) := {g ∈ 𝐆 : φ(g) = e_𝐇}"
 `;
 
 exports[`render hlm library: 2.6.8.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
@@ -4805,7 +4805,7 @@ No proof."
 exports[`render hlm library: 2.6.9.1 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup%20set 1`] = `
 "Definition 2.6.9.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
-  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and 1_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
+  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
 `;
 
 exports[`render hlm library: 2.6.9.2 data/libraries/hlm/Algebra/Groups/Subgroups/subset%20group 1`] = `
@@ -4841,7 +4841,7 @@ exports[`render hlm library: 2.6.9.5 data/libraries/hlm/Algebra/Groups/Subgroups
 exports[`render hlm library: 2.6.10.1 data/libraries/hlm/Algebra/Groups/Quotients/quotient%20group 1`] = `
 "Definition 2.6.10.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), Q := Carrier(𝐆)∕∼. We define:
 
-  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [1_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]"
+  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]"
 `;
 
 exports[`render hlm library: 2.6.11.1 data/libraries/hlm/Algebra/Groups/Examples/integers 1`] = `
