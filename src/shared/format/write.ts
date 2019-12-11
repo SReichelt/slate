@@ -46,11 +46,22 @@ export class Writer {
   writePath(path: Fmt.Path, indent?: IndentInfo): void {
     let argumentListIndent = indent;
     let lastArgumentListIndent = indent;
-    if (path.parentPath instanceof Fmt.Path) {
+    if (this.hasArguments(path.parentPath)) {
       argumentListIndent = this.indent(indent);
       lastArgumentListIndent = this.indent(indent, true);
     }
     this.writeFullPath(path, argumentListIndent, lastArgumentListIndent);
+  }
+
+  private hasArguments(pathItem: Fmt.PathItem | undefined): boolean {
+    if (pathItem instanceof Fmt.Path) {
+      if (pathItem.arguments.length) {
+        return true;
+      }
+      return this.hasArguments(pathItem.parentPath);
+    } else {
+      return false;
+    }
   }
 
   private writeFullPath(path: Fmt.Path, argumentListIndent?: IndentInfo, lastArgumentListIndent?: IndentInfo): void {
