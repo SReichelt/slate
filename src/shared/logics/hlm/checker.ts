@@ -337,77 +337,96 @@ class HLMDefinitionChecker {
   }
 
   private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
-    let missingArgument = false;
-    let type = param.type.expression;
-    try {
-      if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext, true);
-        let subsetArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_SubsetArg);
-        if (subsetArg) {
-          this.checkSetTerm(subsetArg._set, context);
-          this.checkSetCompatibility(subsetArg._set, [subsetArg._set, superset], context);
-          this.checkProof(subsetArg.subsetProof, context);
-        } else {
-          missingArgument = true;
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let set = this.utils.substituteParameterSet(type._set, substitutionContext, true);
-        let elementArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_ElementArg);
-        if (elementArg) {
-          this.checkElementTerm(elementArg.element, context);
-          this.checkCompatibility(elementArg.element, [set], [elementArg.element], context);
-          this.checkProof(elementArg.elementProof, context);
-        } else {
-          missingArgument = true;
+    let rawArg = this.utils.getRawArgument([argumentList], param);
+    this.checkRawArgument(argumentList, param, rawArg, param.type.arrayDimensions, context, substitutionContext);
+  }
+
+  private checkRawArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, remainingArrayDimensions: number, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    if (remainingArrayDimensions && rawArg) {
+      if (rawArg instanceof Fmt.ArrayExpression) {
+        for (let item of rawArg.items) {
+          this.checkRawArgument(argumentList, param, item, remainingArrayDimensions - 1, context, substitutionContext);
         }
       } else {
-        if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-          let propArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_PropArg);
-          if (propArg) {
-            this.checkFormula(propArg.formula, context);
-          } else {
-          missingArgument = true;
-          }
-        } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-          let setArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_SetArg);
-          if (setArg) {
-            this.checkSetTerm(setArg._set, context);
-          } else {
-          missingArgument = true;
-          }
-        } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-          let constraintArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_ConstraintArg);
-          this.checkProof(constraintArg ? constraintArg.proof : undefined, context);
-        } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-          let bindingArg = this.utils.getArgument([argumentList], param, FmtHLM.ObjectContents_BindingArg);
-          if (bindingArg) {
-            let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
-            if (bindingParameterSet) {
-              let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext, false);
-              if (!bindingParameterSet.isEquivalentTo(expectedSet)) {
-                this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
-              }
-              let innerSubstitutionContext: HLMSubstitutionContext = {
-                ...substitutionContext,
-                previousSetTerm: expectedSet,
-                parameterLists: [...substitutionContext.parameterLists!, type.parameters],
-                argumentLists: [...substitutionContext.argumentLists!, bindingArg.arguments],
-                originalBindingParameters: substitutionContext.originalBindingParameters ? [...substitutionContext.originalBindingParameters, param] : [param],
-                substitutedBindingParameters: substitutionContext.substitutedBindingParameters ? [...substitutionContext.substitutedBindingParameters, bindingArg.parameter] : [bindingArg.parameter]
-              };
-              this.checkLastArgumentList(context, innerSubstitutionContext);
-            }
-          } else {
-            missingArgument = true;
-          }
-        }
-        substitutionContext.previousSetTerm = undefined;
+        this.error(rawArg, 'Array expression expected');
       }
-    } catch (error) {
-      this.error(this.utils.getRawArgument([argumentList], param)!, error.message);
+    } else {
+      try {
+        this.checkArgumentValue(param, rawArg, context, substitutionContext);
+      } catch (error) {
+        this.error(rawArg ? rawArg : argumentList, error.message);
+      }
+    }
+  }
+
+  private checkArgumentValue(param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    let missingArgument = false;
+    let type = param.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      if (rawArg) {
+        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext, true);
+        let subsetArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
+        this.checkSetTerm(subsetArg._set, context);
+        this.checkSetCompatibility(subsetArg._set, [subsetArg._set, superset], context);
+        this.checkProof(subsetArg.subsetProof, context);
+      } else {
+        missingArgument = true;
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      if (rawArg) {
+        let set = this.utils.substituteParameterSet(type._set, substitutionContext, true);
+        let elementArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
+        this.checkElementTerm(elementArg.element, context);
+        this.checkCompatibility(elementArg.element, [set], [elementArg.element], context);
+        this.checkProof(elementArg.elementProof, context);
+      } else {
+        missingArgument = true;
+      }
+    } else {
+      if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+        if (rawArg) {
+          let propArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_PropArg);
+          this.checkFormula(propArg.formula, context);
+        } else {
+          missingArgument = true;
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
+        if (rawArg) {
+          let setArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SetArg);
+          this.checkSetTerm(setArg._set, context);
+        } else {
+          missingArgument = true;
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
+        let constraintArg = rawArg ? this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ConstraintArg) : undefined;
+        this.checkProof(constraintArg ? constraintArg.proof : undefined, context);
+      } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+        if (rawArg) {
+          let bindingArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BindingArg);
+          let bindingParameterSet = this.checkElementParameter(bindingArg.parameter, context);
+          if (bindingParameterSet) {
+            let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext, false);
+            if (!bindingParameterSet.isEquivalentTo(expectedSet)) {
+              this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
+            }
+            let innerSubstitutionContext: HLMSubstitutionContext = {
+              ...substitutionContext,
+              previousSetTerm: expectedSet,
+              parameterLists: [...substitutionContext.parameterLists!, type.parameters],
+              argumentLists: [...substitutionContext.argumentLists!, bindingArg.arguments],
+              originalBindingParameters: substitutionContext.originalBindingParameters ? [...substitutionContext.originalBindingParameters, param] : [param],
+              substitutedBindingParameters: substitutionContext.substitutedBindingParameters ? [...substitutionContext.substitutedBindingParameters, bindingArg.parameter] : [bindingArg.parameter]
+            };
+            this.checkLastArgumentList(context, innerSubstitutionContext);
+          }
+        } else {
+          missingArgument = true;
+        }
+      }
+      substitutionContext.previousSetTerm = undefined;
     }
     if (missingArgument) {
-      this.error(argumentList, `Missing argument for parameter "${param.name}"`);
+      throw Error(`Missing argument for parameter "${param.name}"`);
     }
   }
 

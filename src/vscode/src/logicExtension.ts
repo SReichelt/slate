@@ -64,7 +64,7 @@ class LibraryDocumentProvider {
     }
 
     private tryParseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
-        if (!event.file || event.hasErrors) {
+        if (!event.file) {
             return undefined;
         }
         let isSection = (event.file.metaModelPath.name === 'library');
@@ -83,7 +83,8 @@ class LibraryDocumentProvider {
             return undefined;
         }
         let path = library.libraryDataProvider.uriToPath(event.document.uri.toString());
-        if (!path) {
+        if (!path || event.hasErrors) {
+            library.diagnosticCollection.set(event.document.uri, []);
             return undefined;
         }
         let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);

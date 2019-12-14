@@ -6,20 +6,19 @@ import { HLMUtils } from '../utils';
 import * as HLMMacro from '../macro';
 import CachedPromise from '../../../data/cachedPromise';
 
-export class OperatorMacro implements HLMMacro.HLMMacro {
-  name = 'operator';
+export class MatrixMacro implements HLMMacro.HLMMacro {
+  name = 'matrix';
 
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): CachedPromise<OperatorMacroInstance> {
-    let functionParameters = definition.parameters.filter((param: Fmt.Parameter) => param.type.expression instanceof FmtHLM.MetaRefExpression_Set);
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
     let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
-    let functions = references.getValue(functionParameters.length > 2 ? 'Operations' : 'Functions');
-    return CachedPromise.resolve(new OperatorMacroInstance(definition, functions));
+    let matrices = references.getValue('Matrices');
+    return CachedPromise.resolve(new OperatorMacroInstance(definition, matrices));
   }
 }
 
 export class OperatorMacroInstance implements HLMMacro.HLMMacroInstance {
-  constructor(private definition: Fmt.Definition, private functions: Fmt.Expression) {}
+  constructor(private definition: Fmt.Definition, private matrices: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -28,13 +27,13 @@ export class OperatorMacroInstance implements HLMMacro.HLMMacroInstance {
   }
 
   invoke(utils: HLMUtils, path: Fmt.Path): CachedPromise<OperatorMacroInvocation> {
-    let functionsRef = utils.substitutePath(this.functions, path, [this.definition]);
-    return CachedPromise.resolve(new OperatorMacroInvocation(functionsRef));
+    let matricesRef = utils.substitutePath(this.matrices, path, [this.definition]);
+    return CachedPromise.resolve(new OperatorMacroInvocation(matricesRef));
   }
 }
 
 export class OperatorMacroInvocation implements HLMMacro.HLMMacroInvocation {
-  constructor(private functionsRef: Fmt.Expression) {}
+  constructor(private matricesRef: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -43,6 +42,6 @@ export class OperatorMacroInvocation implements HLMMacro.HLMMacroInvocation {
   }
 
   getDeclaredSet(): CachedPromise<Fmt.Expression> {
-    return CachedPromise.resolve(this.functionsRef);
+    return CachedPromise.resolve(this.matricesRef);
   }
 }

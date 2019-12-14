@@ -284,9 +284,12 @@ export class MarkdownExpression extends RenderedExpression {
   }
 }
 
+export type ExpressionValue = any; // depending on type: constant or RenderedExpression or RenderedExpression[] or RenderedExpression[][] or ...
+
 export interface RenderedTemplateArguments {
-  [name: string]: any;  // depending on parameter: constant or RenderedExpression or RenderedExpression[] or RenderedExpression[][] or ...
+  [name: string]: ExpressionValue;
 }
+
 
 export class RenderedTemplateConfig {
   public args: RenderedTemplateArguments = {};
@@ -323,31 +326,31 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
 
   protected abstract doResolveExpressionWithArgs(): RenderedExpression;
 
-  protected toRenderedExpression(expression: any): RenderedExpression {
-    if (expression instanceof RenderedExpression) {
-      return expression;
-    } else if (expression instanceof Array) {
-      return new RowExpression(this.toRenderedExpressionList(expression));
-    } else if (expression === undefined) {
+  protected toRenderedExpression(value: ExpressionValue): RenderedExpression {
+    if (value instanceof RenderedExpression) {
+      return value;
+    } else if (value instanceof Array) {
+      return new RowExpression(this.toRenderedExpressionList(value));
+    } else if (value === undefined) {
       return new EmptyExpression();
     } else {
-      return new TextExpression(expression.toString());
+      return new TextExpression(value.toString());
     }
   }
 
-  protected toRenderedExpressionList(expressions: any[]): RenderedExpression[] {
-    return expressions.map(this.toRenderedExpression, this);
+  protected toRenderedExpressionList(value: ExpressionValue[]): RenderedExpression[] {
+    return value.map(this.toRenderedExpression, this);
   }
 
-  protected toRenderedExpressionListList(expressions: any[][]): RenderedExpression[][] {
-    return expressions.map(this.toRenderedExpressionList, this);
+  protected toRenderedExpressionListList(value: ExpressionValue[][]): RenderedExpression[][] {
+    return value.map(this.toRenderedExpressionList, this);
   }
 
-  protected getOptionalArg(name: string): any {
+  protected getOptionalArg(name: string): ExpressionValue | undefined {
     return this.config.args[name];
   }
 
-  protected getArg(name: string): any {
+  protected getArg(name: string): ExpressionValue {
     let arg = this.getOptionalArg(name);
     if (arg === undefined) {
       throw new Error(`Missing argument for "${name}"`);
@@ -391,7 +394,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
   }
 
   protected doResolveExpressionWithArgs(): RenderedExpression {
-    let result: any[] = [];
+    let result: ExpressionValue[] = [];
     this.translateExpression(this.display, undefined, result);
     let row = this.toRenderedExpressionList(result);
     if (row.length === 1) {
@@ -401,7 +404,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     }
   }
 
-  private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: any[]): void {
+  private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: ExpressionValue[]): void {
     if (expression instanceof Fmt.StringExpression) {
       result.push(expression.value);
     } else if (expression instanceof Fmt.IntegerExpression) {
@@ -431,7 +434,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       let config = new RenderedTemplateConfig;
       for (let argument of expression.path.arguments) {
         if (argument.name) {
-          let arg: any[] = [];
+          let arg: ExpressionValue[] = [];
           this.translateExpression(argument.value, loopData, arg);
           if (arg.length === 1) {
             config.args[argument.name] = arg[0];
@@ -454,7 +457,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       } else if (expression instanceof FmtDisplay.MetaRefExpression_false) {
         result.push(false);
       } else if (expression instanceof FmtDisplay.MetaRefExpression_not) {
-        let arg: any[] = [];
+        let arg: ExpressionValue[] = [];
         this.translateExpression(expression.condition, loopData, arg);
         result.push(!arg.some((value) => value));
       } else if (expression instanceof FmtDisplay.MetaRefExpression_opt) {
@@ -475,7 +478,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       } else if (expression instanceof FmtDisplay.MetaRefExpression_add) {
         let value = 0;
         for (let argument of expression.items) {
-          let arg: any[] = [];
+          let arg: ExpressionValue[] = [];
           this.translateExpression(argument, undefined, arg);
           for (let item of arg) {
             value += item;
@@ -483,7 +486,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         }
         result.push(value);
       } else if (expression instanceof FmtDisplay.MetaRefExpression_for) {
-        let part: any[] = loopData ? result : [];
+        let part: ExpressionValue[] = loopData ? result : [];
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
         let arg = this.getOptionalArg(param);
@@ -551,7 +554,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         throw new Error('Undefined meta reference');
       }
     } else if (expression instanceof Fmt.ArrayExpression) {
-      let part: any[] = [];
+      let part: ExpressionValue[] = [];
       this.translateExpressionList(expression.items, loopData, part);
       result.push(part);
     } else {

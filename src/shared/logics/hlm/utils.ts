@@ -19,26 +19,31 @@ export interface HLMSubstitutionContext {
 export class HLMUtils extends GenericUtils {
   getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
     for (let argumentList of argumentLists) {
-      let value = argumentList.getOptionalValue(param.name);
-      if (value) {
-        return value;
+      let rawArg = argumentList.getOptionalValue(param.name);
+      if (rawArg) {
+        return rawArg;
       }
     }
     return undefined;
   }
 
-  getArgument<ContentClass extends Fmt.ObjectContents>(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter, contentClass: {new(): ContentClass}): ContentClass | undefined {
-    let arg = this.getRawArgument(argumentLists, param);
-    if (arg) {
-      if (arg instanceof Fmt.CompoundExpression) {
-        let contents = new contentClass;
-        contents.fromCompoundExpression(arg);
-        return contents;
-      } else {
-        throw new Error('Compound expression expected');
-      }
+  convertArgument<ContentClass extends Fmt.ObjectContents>(rawArg: Fmt.Expression, contentClass: {new(): ContentClass}): ContentClass {
+    if (rawArg instanceof Fmt.CompoundExpression) {
+      let contents = new contentClass;
+      contents.fromCompoundExpression(rawArg);
+      return contents;
+    } else {
+      throw new Error('Compound expression expected');
     }
-    return undefined;
+  }
+
+  getArgument<ContentClass extends Fmt.ObjectContents>(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter, contentClass: {new(): ContentClass}): ContentClass | undefined {
+    let rawArg = this.getRawArgument(argumentLists, param);
+    if (rawArg) {
+      return this.convertArgument(rawArg, contentClass);
+    } else {
+      return undefined;
+    }
   }
 
   isValueParamType(type: Fmt.Expression): boolean {
@@ -47,25 +52,20 @@ export class HLMUtils extends GenericUtils {
 
   // OPT omit proofs during argument conversion, as they are not used
   private getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
-    let type = param.type.expression;
-    if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-      let propArg = this.getArgument([argumentList], param, FmtHLM.ObjectContents_PropArg);
-      if (propArg) {
+    let arg = this.getRawArgument([argumentList], param);
+    if (arg) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+        let propArg = this.convertArgument(arg, FmtHLM.ObjectContents_PropArg);
         return propArg.formula;
-      }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-      let setArg = this.getArgument([argumentList], param, FmtHLM.ObjectContents_SetArg);
-      if (setArg) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
+        let setArg = this.convertArgument(arg, FmtHLM.ObjectContents_SetArg);
         return setArg._set;
-      }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let subsetArg = this.getArgument([argumentList], param, FmtHLM.ObjectContents_SubsetArg);
-      if (subsetArg) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+        let subsetArg = this.convertArgument(arg, FmtHLM.ObjectContents_SubsetArg);
         return subsetArg._set;
-      }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let elementArg = this.getArgument([argumentList], param, FmtHLM.ObjectContents_ElementArg);
-      if (elementArg) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+        let elementArg = this.convertArgument(arg, FmtHLM.ObjectContents_ElementArg);
         return elementArg.element;
       }
     }
@@ -219,24 +219,31 @@ export class HLMUtils extends GenericUtils {
   substituteArguments(expression: Fmt.Expression, parameters: Fmt.ParameterList, args: Fmt.ArgumentList, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
     for (let param of parameters) {
       let type = param.type.expression;
-      if (this.isValueParamType(type)) {
-        let argValue = this.getArgValue(args, param);
+      if (type instanceof FmtHLM.MetaRefExpression_Expr || type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat || type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
+        let argValue = this.getRawArgument([args], param);
         if (argValue) {
-          expression = this.substituteVariable(expression, param, (indices?: Fmt.Expression[]) => {
-            let substitutedArg = argValue!;
-            if (indexVariables) {
-              for (let index = 0; index < indexVariables.length; index++) {
-                substitutedArg = this.substituteVariable(substitutedArg, indexVariables[index], () => indices![index]);
-              }
-            }
-            return substitutedArg;
-          });
+          expression = this.substituteVariable(expression, param, () => argValue!);
         }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-        let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BindingArg);
-        if (argValue) {
-          let newIndexVariables = indexVariables ? [...indexVariables, argValue.parameter] : [argValue.parameter];
-          expression = this.substituteArguments(expression, type.parameters, argValue.arguments, newIndexVariables);
+      } else if (!param.type.arrayDimensions) {
+        if (this.isValueParamType(type)) {
+          let argValue = this.getArgValue(args, param);
+          if (argValue) {
+            expression = this.substituteVariable(expression, param, (indices?: Fmt.Expression[]) => {
+              let substitutedArg = argValue!;
+              if (indexVariables) {
+                for (let index = 0; index < indexVariables.length; index++) {
+                  substitutedArg = this.substituteVariable(substitutedArg, indexVariables[index], () => indices![index]);
+                }
+              }
+              return substitutedArg;
+            });
+          }
+        } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+          let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BindingArg);
+          if (argValue) {
+            let newIndexVariables = indexVariables ? [...indexVariables, argValue.parameter] : [argValue.parameter];
+            expression = this.substituteArguments(expression, type.parameters, argValue.arguments, newIndexVariables);
+          }
         }
       }
     }
@@ -796,7 +803,7 @@ export class HLMUtils extends GenericUtils {
             } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
               let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(path.parentPath);
               return HLMMacros.instantiateMacro(libraryDataAccessor, definition)
-                .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.invoke(this.libraryDataAccessor, path.arguments))
+                .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.invoke(this, path))
                 .then((macroInvocation: HLMMacro.HLMMacroInvocation) => macroInvocation.getDeclaredSet());
             } else {
               return CachedPromise.reject(new Error('Referenced definition must be a constructor or operator'));

@@ -5245,8 +5245,10 @@ exports[`render hlm library: 2.7.21.2 data/libraries/hlm/Algebra/Rings/Matrices/
   𝐑^n := 𝐑^(1×n)"
 `;
 
-exports[`render hlm library: 2.7.21.3 data/libraries/hlm/Algebra/Rings/Matrices/sum 1`] = `
-"Definition 2.7.21.3.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.21.3 data/libraries/hlm/Algebra/Rings/Matrices/matrix 1`] = `"Definition 2.7.21.3 (Matrix notation)."`;
+
+exports[`render hlm library: 2.7.21.4 data/libraries/hlm/Algebra/Rings/Matrices/sum 1`] = `
+"Definition 2.7.21.4.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
 
   A + B
 
@@ -5255,14 +5257,14 @@ by:
   (a_i,j)_i < m,j < n + (b_i,j)_i < m,j < n := (a_i,j + b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.21.4 data/libraries/hlm/Algebra/Rings/Matrices/zero 1`] = `
-"Definition 2.7.21.4.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.21.5 data/libraries/hlm/Algebra/Rings/Matrices/zero 1`] = `
+"Definition 2.7.21.5.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
   0_(𝐑^(m×n)) := (0_𝐑)_i < m,j < n"
 `;
 
-exports[`render hlm library: 2.7.21.5 data/libraries/hlm/Algebra/Rings/Matrices/additive%20inverse 1`] = `
-"Definition 2.7.21.5.  Let 𝐑 be a ring, m, n ∈ ℕ, A ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.21.6 data/libraries/hlm/Algebra/Rings/Matrices/additive%20inverse 1`] = `
+"Definition 2.7.21.6.  Let 𝐑 be a ring, m, n ∈ ℕ, A ∈ 𝐑^(m×n). We define
 
   −A
 
@@ -5271,8 +5273,8 @@ by:
   −(a_i,j)_i < m,j < n := (−a_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.21.6 data/libraries/hlm/Algebra/Rings/Matrices/difference 1`] = `
-"Definition 2.7.21.6.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.21.7 data/libraries/hlm/Algebra/Rings/Matrices/difference 1`] = `
+"Definition 2.7.21.7.  Let 𝐑 be a ring, m, n ∈ ℕ, A, B ∈ 𝐑^(m×n). We define
 
   A − B
 
@@ -5281,8 +5283,8 @@ by:
   (a_i,j)_i < m,j < n − (b_i,j)_i < m,j < n := (a_i,j − b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.21.7 data/libraries/hlm/Algebra/Rings/Matrices/product 1`] = `
-"Definition 2.7.21.7.  Let 𝐑 be a ring, l, m, n ∈ ℕ, A ∈ 𝐑^(l×m), B ∈ 𝐑^(m×n). We define
+exports[`render hlm library: 2.7.21.8 data/libraries/hlm/Algebra/Rings/Matrices/product 1`] = `
+"Definition 2.7.21.8.  Let 𝐑 be a ring, l, m, n ∈ ℕ, A ∈ 𝐑^(l×m), B ∈ 𝐑^(m×n). We define
 
   A ⋅ B
 
@@ -5291,14 +5293,14 @@ by:
   (a_i,j)_i < l,j < m ⋅ (b_j,k)_j < m,k < n := (∑_(j < m) a_i,j ⋅ b_j,k)_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))"
 `;
 
-exports[`render hlm library: 2.7.21.8 data/libraries/hlm/Algebra/Rings/Matrices/identity 1`] = `
-"Definition 2.7.21.8.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.21.9 data/libraries/hlm/Algebra/Rings/Matrices/identity 1`] = `
+"Definition 2.7.21.9.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
   I_(𝐑^(n×n)) := (δ_𝐑,i,j)_i < n,j < n"
 `;
 
-exports[`render hlm library: 2.7.21.9 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
-"Definition 2.7.21.9.  Let 𝐑 be a ring, n ∈ ℕ. We define:
+exports[`render hlm library: 2.7.21.10 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
+"Definition 2.7.21.10.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
   𝐑^(n×n) := [𝐑^(n×n), +, 0_(𝐑^(n×n)), −, ⋅, I_(𝐑^(n×n))]"
 `;
