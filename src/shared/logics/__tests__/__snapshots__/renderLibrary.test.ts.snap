@@ -5640,9 +5640,9 @@ by:
 `;
 
 exports[`render hlm library: 2.7.22.2.8 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/product 1`] = `
-"Definition 2.7.22.2.8.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, a ∈ 𝐑, x ∈ 𝐌. We define:
+"Definition 2.7.22.2.8.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌, a ∈ 𝐑. We define:
 
-  a ⋅ x := {x ⊙ a if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)
+  x ⋅ a := {x ⊙ a if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)
 
 Remarks.
 
@@ -5652,8 +5652,8 @@ This definition lets us multiply elements without decomposing the ring."
 exports[`render hlm library: 2.7.22.2.9.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.7.22.2.9.1.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
 
-  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(a ⋅ w) = a ⋅ f(w)}
-   = {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(w ⋅ a) = f(w) ⋅ a}
+   = {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -5664,7 +5664,7 @@ exports[`render hlm library: 2.7.22.2.9.2 data/libraries/hlm/Algebra/Rings/Modul
 "Definition 2.7.22.2.9.2.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
