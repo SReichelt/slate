@@ -364,7 +364,7 @@ $EquivalenceDefinition(left: %Expr, right: %Expr): %Template {
 
 $ImplicationRelation(left: %Expr, right: %Expr): %Template {
   display = $Relation(
-    symbol = '⇒',
+    symbol = %neg('⇒', '⇏'),
     operands = [left, right],
     space = '  ',
     parenLevel = -3

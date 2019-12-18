@@ -454,8 +454,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getRelationRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let equalsExpression = new FmtHLM.MetaRefExpression_equals;
-    equalsExpression.left = new PlaceholderExpression(HLMTermType.ElementTerm);
-    equalsExpression.right = new PlaceholderExpression(HLMTermType.ElementTerm);
+    equalsExpression.terms = [new PlaceholderExpression(HLMTermType.ElementTerm), new PlaceholderExpression(HLMTermType.ElementTerm)];
     let inExpression = new FmtHLM.MetaRefExpression_in;
     inExpression.element = new PlaceholderExpression(HLMTermType.ElementTerm);
     inExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
@@ -463,8 +462,7 @@ export class HLMEditHandler extends GenericEditHandler {
     subExpression.subset = new PlaceholderExpression(HLMTermType.SetTerm);
     subExpression.superset = new PlaceholderExpression(HLMTermType.SetTerm);
     let setEqualsExpression = new FmtHLM.MetaRefExpression_setEquals;
-    setEqualsExpression.left = new PlaceholderExpression(HLMTermType.SetTerm);
-    setEqualsExpression.right = new PlaceholderExpression(HLMTermType.SetTerm);
+    setEqualsExpression.terms = [new PlaceholderExpression(HLMTermType.SetTerm), new PlaceholderExpression(HLMTermType.SetTerm)];
     let negatedEqualsExpression = new FmtHLM.MetaRefExpression_not;
     negatedEqualsExpression.formula = equalsExpression;
     let negatedInExpression = new FmtHLM.MetaRefExpression_not;

@@ -4214,8 +4214,34 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/relation%20transform 1`] = `
-"Definition 2.1.4.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
+exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/left%20operation%20transform 1`] = `
+"Definition 2.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X be an operation. We define
+
+  φ[∗]
+
+by:
+
+  φ[(S × X → X, x ↦ z_x)] := (S × Y → Y, (s, y) ↦ φ(z_(s,φ^-1(y))))  (z_x ∈ X for each x ∈ S × X)
+   = φ ∘ ∗ ∘ (id_S × φ)^-1
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/right%20operation%20transform 1`] = `
+"Definition 2.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X be an operation. We define
+
+  φ[∗]
+
+by:
+
+  φ[(X × S → X, x ↦ z_x)] := (Y × S → Y, (y, s) ↦ φ(z_(φ^-1(y),s)))  (z_x ∈ X for each x ∈ X × S)
+   = φ ∘ ∗ ∘ (φ × id_S)^-1
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.1.6 data/libraries/hlm/Algebra/Isomorphisms/relation%20transform 1`] = `
+"Definition 2.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
 
   φ[≺]
 
@@ -4224,8 +4250,8 @@ by:
   φ[[p_x_1,x_2]_(x_1,x_2 ∈ X)] := [p_φ^-1(y_1),φ^-1(y_2)]_(y_1,y_2 ∈ Y)  (p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)"
 `;
 
-exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transform 1`] = `
-"Definition 2.1.5.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
+exports[`render hlm library: 2.1.7 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transform 1`] = `
+"Definition 2.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
 
   (φ_1, φ_2, φ_3)[∙]
 
@@ -5394,6 +5420,178 @@ exports[`render hlm library: 2.7.21.11.2 data/libraries/hlm/Algebra/Rings/Matric
   I_(𝐑^(2×2)) = (1_𝐑 0_𝐑, 0_𝐑 1_𝐑)
 
 No proof."
+`;
+
+exports[`render hlm library: 2.7.22.1.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Left%20modules 1`] = `
+"Definition 2.7.22.1.1.  Let 𝐑 be a ring. We define:
+
+  𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = 0], ⊙ : Carrier(𝐑) × M → M is an operation such that ⊙ is left-distributive over ⊕ and [∀ a, b ∈ 𝐑, x ∈ M : (a + b) ⊙ x = (a ⊙ x) ⊕ (b ⊙ x)] and [∀ a, b ∈ 𝐑, x ∈ M : (a ⋅ b) ⊙ x = a ⊙ (b ⊙ x)] and [∀ x ∈ M : 1_𝐑 ⊙ x = x]}
+
+  [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : Carrier(𝐑) × N → N is an operation with suitable conditions)
+
+We write “let 𝐌 be a left 𝐑-module” for “let 𝐌 ∈ 𝓛𝓜𝓸𝓭(𝐑).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)"
+`;
+
+exports[`render hlm library: 2.7.22.1.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Carrier 1`] = `
+"Definition 2.7.22.1.2.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define
+
+  Carrier(𝐌)
+
+by:
+
+  Carrier([M, ⊕, 0, ⊖, ⊙]) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)
+
+We write “let x ∈ 𝐌” for “let x ∈ Carrier(𝐌).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a module (which is actually an equivalence class of modules), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.7.22.1.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/sum 1`] = `
+"Definition 2.7.22.1.3.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x, y ∈ 𝐌. We define:
+
+  x + y := {x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)
+
+Remarks.
+
+This definition lets us add elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.22.1.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/zero 1`] = `
+"Definition 2.7.22.1.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define
+
+  0_𝐌
+
+by:
+
+  0_[M,⊕,0,⊖,⊙] := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.1.5 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/additive%20inverse 1`] = `
+"Definition 2.7.22.1.5.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x ∈ 𝐌. We define
+
+  −x
+
+by:
+
+  −x := ⊖(x)  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.1.6 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/difference 1`] = `
+"Definition 2.7.22.1.6.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x, y ∈ 𝐌. We define:
+
+  x − y := x + (−y)"
+`;
+
+exports[`render hlm library: 2.7.22.1.7 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/additive%20group 1`] = `
+"Definition 2.7.22.1.7.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define
+
+  [𝐌, +]
+
+by:
+
+  [[M, ⊕, 0, ⊖, ⊙], +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.1.8 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/product 1`] = `
+"Definition 2.7.22.1.8.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, a ∈ 𝐑, x ∈ 𝐌. We define:
+
+  a ⋅ x := {a ⊙ x if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation with suitable conditions)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.22.2.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Right%20modules 1`] = `
+"Definition 2.7.22.2.1.  Let 𝐑 be a ring. We define:
+
+  𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = 0], ⊙ : M × Carrier(𝐑) → M is an operation such that ⊙ is right-distributive over ⊕ and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a + b) = (x ⊙ a) ⊕ (x ⊙ b)] and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a ⋅ b) = (x ⊙ a) ⊙ b] and [∀ x ∈ M : x ⊙ 1_𝐑 = x]}
+
+  [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × Carrier(𝐑) → N is an operation with suitable conditions)
+
+We write “let 𝐌 be a right 𝐑-module” for “let 𝐌 ∈ 𝓡𝓜𝓸𝓭(𝐑).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)"
+`;
+
+exports[`render hlm library: 2.7.22.2.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Carrier 1`] = `
+"Definition 2.7.22.2.2.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define
+
+  Carrier(𝐌)
+
+by:
+
+  Carrier([M, ⊕, 0, ⊖, ⊙]) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)
+
+We write “let x ∈ 𝐌” for “let x ∈ Carrier(𝐌).”
+
+Remarks.
+
+This definition retrieves a representative carrier set from a module (which is actually an equivalence class of modules), and enables typical abuse of notation."
+`;
+
+exports[`render hlm library: 2.7.22.2.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/sum 1`] = `
+"Definition 2.7.22.2.3.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x, y ∈ 𝐌. We define:
+
+  x + y := {x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)
+
+Remarks.
+
+This definition lets us add elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.22.2.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/zero 1`] = `
+"Definition 2.7.22.2.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define
+
+  0_𝐌
+
+by:
+
+  0_[M,⊕,0,⊖,⊙] := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.2.5 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/additive%20inverse 1`] = `
+"Definition 2.7.22.2.5.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌. We define
+
+  −x
+
+by:
+
+  −x := ⊖(x)  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.2.6 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/difference 1`] = `
+"Definition 2.7.22.2.6.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x, y ∈ 𝐌. We define:
+
+  x − y := x + (−y)"
+`;
+
+exports[`render hlm library: 2.7.22.2.7 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/additive%20group 1`] = `
+"Definition 2.7.22.2.7.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define
+
+  [𝐌, +]
+
+by:
+
+  [[M, ⊕, 0, ⊖, ⊙], +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.7.22.2.8 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/product 1`] = `
+"Definition 2.7.22.2.8.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, a ∈ 𝐑, x ∈ 𝐌. We define:
+
+  a ⋅ x := {x ⊙ a if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation with suitable conditions)
+
+Remarks.
+
+This definition lets us multiply elements without decomposing the ring."
 `;
 
 exports[`render hlm library: 2.8.1 data/libraries/hlm/Algebra/Fields/Fields 1`] = `

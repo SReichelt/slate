@@ -6,7 +6,7 @@ $hlm: %MetaModel {
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
-  functions = [$true, $false, $left, $right,
+  functions = [$true, $false,
                $empty, $previous,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
@@ -160,10 +160,6 @@ $Expr: %ExpressionType {}
 $ParameterList: %ExpressionType {}
 $DefinitionRef: %ExpressionType {}
 
-$EquationSide: %ExpressionType {}
-$left: $EquationSide {}
-$right: $EquationSide {}
-
 $Prop(auto: $Bool = $false): %ParameterType($Formula) {
   argumentType = $PropArg
 }
@@ -248,8 +244,8 @@ $exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $existsUnique(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $in(element: $ElementTerm, set: $SetTerm): $Formula {}
 $sub(subset: $SetTerm, superset: $SetTerm): $Formula {}
-$setEquals(left: $SetTerm, right: $SetTerm): $Formula {}
-$equals(left: $ElementTerm, right: $ElementTerm): $Formula {}
+$setEquals(terms...: $SetTerm): $Formula {}
+$equals(terms...: $ElementTerm): $Formula {}
 $structural(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Formula)[]): $Formula {}
 
 $Case(type: %Type): %ExpressionType {
@@ -289,10 +285,10 @@ $Consider(variable: %Any, index?: %Int): %ParameterType($Formula) {
 $State(statement: $Formula, proof?: $Proof): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseDef(side?: $EquationSide, result: $Formula): %ParameterType($Formula) {
+$UseDef(side?: %Int, result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseCases(side?: $EquationSide, caseProofs: $Proof[]): %ParameterType {
+$UseCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
   superType = $FinalProofStep
 }
 $UseForAll(arguments: %ArgumentList): %ParameterType($Formula) {
@@ -311,7 +307,7 @@ $SetExtend(term: $SetTerm): %ParameterType($Formula) {
 $Extend(term: $ElementTerm): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: $EquationSide, result: $Formula): %ParameterType($Formula) {
+$Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $ResolveDef(result: $Formula): %ParameterType($Formula) {
@@ -320,7 +316,7 @@ $ResolveDef(result: $Formula): %ParameterType($Formula) {
 $UseTheorem(theorem: $Theorem, result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$ProveDef(side?: $EquationSide, proof: $Proof): %ParameterType {
+$ProveDef(side?: %Int, proof: $Proof): %ParameterType {
   superType = $FinalProofStep
 }
 $ProveNeg(proof: $Proof): %ParameterType {
@@ -335,7 +331,7 @@ $ProveExists(arguments: %ArgumentList, proof?: $Proof): %ParameterType {
 $ProveSetEquals(subsetProof?: $Proof, supersetProof?: $Proof): %ParameterType {
   superType = $FinalProofStep
 }
-$ProveCases(side?: $EquationSide, caseProofs: $Proof[]): %ParameterType {
+$ProveCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
   superType = $FinalProofStep
 }
 $ProveByInduction(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Proof)[]): %ParameterType {

@@ -361,15 +361,13 @@ export class HLMUtils extends GenericUtils {
       let result = new FmtHLM.MetaRefExpression_setEquals;
       let left = new Fmt.VariableRefExpression;
       left.variable = step;
-      result.left = left;
-      result.right = type._set;
+      result.terms = [left, type._set];
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       let result = new FmtHLM.MetaRefExpression_equals;
       let left = new Fmt.VariableRefExpression;
       left.variable = step;
-      result.left = left;
-      result.right = type.element;
+      result.terms = [left, type.element];
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
       if (type.variable instanceof Fmt.VariableRefExpression) {
@@ -386,8 +384,7 @@ export class HLMUtils extends GenericUtils {
       return type.result;
     } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
       let result = new FmtHLM.MetaRefExpression_equals;
-      result.left = type.input;
-      result.right = type.output;
+      result.terms = [type.input, type.output];
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
                || type instanceof FmtHLM.MetaRefExpression_UseForAll
@@ -410,18 +407,18 @@ export class HLMUtils extends GenericUtils {
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
         if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+          let term = type.term;
           let result = new FmtHLM.MetaRefExpression_setEquals;
-          result.left = this.substitutePrevious(type.term, previousResult.left);
-          result.right = this.substitutePrevious(type.term, previousResult.right);
+          result.terms = previousResult.terms.map((item) => this.substitutePrevious(term, item));
           return result;
         } else {
           throw new Error('Previous result is not an equality expression');
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
         if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
+          let term = type.term;
           let result = new FmtHLM.MetaRefExpression_equals;
-          result.left = this.substitutePrevious(type.term, previousResult.left);
-          result.right = this.substitutePrevious(type.term, previousResult.right);
+          result.terms = previousResult.terms.map((item) => this.substitutePrevious(term, item));
           return result;
         } else {
           throw new Error('Previous result is not an equality expression');
@@ -1004,9 +1001,12 @@ export class HLMUtils extends GenericUtils {
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       return this.isTrivialTautology(formula.formula);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals || formula instanceof FmtHLM.MetaRefExpression_setEquals) {
-      if (formula.left.isEquivalentTo(formula.right)) {
-        return CachedPromise.resolve(true);
+      for (let index = 0; index + 1 < formula.terms.length; index++) {
+        if (!formula.terms[index].isEquivalentTo(formula.terms[formula.terms.length - 1])) {
+          return CachedPromise.resolve(false);
+        }
       }
+      return CachedPromise.resolve(true);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       if (formula.subset.isEquivalentTo(formula.superset)) {
         return CachedPromise.resolve(true);
@@ -1137,10 +1137,25 @@ export class HLMUtils extends GenericUtils {
 
   private areFormulaeSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
     let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
-      if ((leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals)
-          || (leftPart instanceof FmtHLM.MetaRefExpression_setEquals && rightPart instanceof FmtHLM.MetaRefExpression_setEquals)) {
-        return ((leftPart.left.isEquivalentTo(rightPart.left) && leftPart.right.isEquivalentTo(rightPart.right))
-                || (leftPart.left.isEquivalentTo(rightPart.right) && leftPart.right.isEquivalentTo(rightPart.left)));
+      if (((leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals)
+           || (leftPart instanceof FmtHLM.MetaRefExpression_setEquals && rightPart instanceof FmtHLM.MetaRefExpression_setEquals))
+          && leftPart.terms.length === rightPart.terms.length) {
+        let leftTerms = [...leftPart.terms];
+        let rightTerms = [...rightPart.terms];
+        for (let leftTerm of leftTerms) {
+          let found = false;
+          for (let rightIndex = 0; rightIndex < rightTerms.length; rightIndex++) {
+            if (leftTerm.isEquivalentTo(rightTerms[rightIndex])) {
+              found = true;
+              rightTerms.splice(rightIndex, 1);
+              break;
+            }
+          }
+          if (!found) {
+            return false;
+          }
+        }
+        return true;
       }
       return false;
     };

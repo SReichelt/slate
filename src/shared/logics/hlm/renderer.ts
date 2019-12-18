@@ -936,18 +936,32 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderFormulaInternal(formula: Fmt.Expression): [Display.RenderedExpression, Fmt.Expression] {
     let negationCount = 0;
-    let innerFormula = formula;
-    while (innerFormula instanceof FmtHLM.MetaRefExpression_not) {
+    while (formula instanceof FmtHLM.MetaRefExpression_not) {
+      let innerFormula = formula.formula;
+      if ((innerFormula instanceof FmtHLM.MetaRefExpression_setEquals || innerFormula instanceof FmtHLM.MetaRefExpression_equals)
+          && innerFormula.terms.length !== 2) {
+        break;
+      }
       negationCount++;
-      innerFormula = innerFormula.formula;
+      formula = innerFormula;
     }
-    let result = this.renderFormulaWithNegationCount(innerFormula, negationCount);
+    let result = this.renderFormulaWithNegationCount(formula, negationCount);
     result.optionalParenStyle = '[]';
-    return [result, innerFormula];
+    return [result, formula];
   }
 
   private renderFormulaWithNegationCount(formula: Fmt.Expression, negationCount: number): Display.RenderedExpression {
-    if (formula instanceof FmtHLM.MetaRefExpression_and) {
+    if (formula instanceof FmtHLM.MetaRefExpression_not) {
+      let formulaSelection: FormulaSelection = {
+        allowTruthValue: false,
+        allowEquiv: false,
+        allowCases: true
+      };
+      return this.renderTemplate('Negation', {
+                                   'operand': this.renderFormula(formula.formula, formulaSelection)
+                                 },
+                                 negationCount);
+    } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
       if (formula.formulae) {
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
@@ -1064,15 +1078,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                  },
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
-      return this.renderTemplate('EqualityRelation', {
-                                   'left': this.renderSetTerm(formula.left, fullSetTermSelection),
-                                   'right': this.renderSetTerm(formula.right, fullSetTermSelection)
+      return this.renderTemplate('MultiEqualityRelation', {
+                                   'operands': formula.terms.map((item) => this.renderSetTerm(item, fullSetTermSelection))
                                  },
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
-      return this.renderTemplate('EqualityRelation', {
-                                   'left': this.renderElementTerm(formula.left, fullElementTermSelection),
-                                   'right': this.renderElementTerm(formula.right, fullElementTermSelection)
+      return this.renderTemplate('MultiEqualityRelation', {
+                                   'operands': formula.terms.map((item) => this.renderElementTerm(item, fullElementTermSelection))
                                  },
                                  negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {

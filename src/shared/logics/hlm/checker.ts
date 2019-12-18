@@ -446,10 +446,7 @@ class HLMDefinitionChecker {
       this.promise = this.promise.then(() => checkDefinitionRef);
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms) {
-        for (let item of term.terms) {
-          this.checkElementTerm(item, context);
-        }
-        this.checkElementCompatibility(term, term.terms, context);
+        this.checkElementTerms(term, term.terms, context);
       }
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       this.checkElementParameter(term.parameter, context);
@@ -469,6 +466,13 @@ class HLMDefinitionChecker {
     } else {
       this.error(term, 'Set term expected');
     }
+  }
+
+  private checkSetTerms(object: Object, terms: Fmt.Expression[], context: HLMCheckerContext): void {
+    for (let item of terms) {
+      this.checkSetTerm(item, context);
+    }
+    this.checkSetCompatibility(object, terms, context);
   }
 
   private checkElementTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
@@ -519,6 +523,13 @@ class HLMDefinitionChecker {
     }
   }
 
+  private checkElementTerms(object: Object, terms: Fmt.Expression[], context: HLMCheckerContext): void {
+    for (let item of terms) {
+      this.checkElementTerm(item, context);
+    }
+    this.checkElementCompatibility(object, terms, context);
+  }
+
   private checkFormula(formula: Fmt.Expression, context: HLMCheckerContext): void {
     if (formula instanceof Fmt.VariableRefExpression && formula.variable.type.expression instanceof FmtHLM.MetaRefExpression_Prop) {
       this.checkVariableRefExpression(formula, context);
@@ -558,13 +569,9 @@ class HLMDefinitionChecker {
       this.checkSetTerm(formula.superset, context);
       this.checkSetCompatibility(formula, [formula.subset, formula.superset], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
-      this.checkSetTerm(formula.left, context);
-      this.checkSetTerm(formula.right, context);
-      this.checkSetCompatibility(formula, [formula.left, formula.right], context);
+      this.checkSetTerms(formula, formula.terms, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
-      this.checkElementTerm(formula.left, context);
-      this.checkElementTerm(formula.right, context);
-      this.checkElementCompatibility(formula, [formula.left, formula.right], context);
+      this.checkElementTerms(formula, formula.terms, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkFormula(value, caseContext);
       this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, undefined, context);
