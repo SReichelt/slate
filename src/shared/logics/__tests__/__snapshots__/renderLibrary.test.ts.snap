@@ -4980,7 +4980,7 @@ References.
 exports[`render hlm library: 2.7.1 data/libraries/hlm/Algebra/Rings/Rings 1`] = `
 "Definition 2.7.1.  We define:
 
-  𝓡𝓲𝓷𝓰 :=: {[R, ⊕, 0, ⊖, ⊙, 1] | R is a set, ⊕ : R × R → R is a commutative associative operation on R, 0 ∈ R such that [∀ a ∈ R : a ⊕ 0 = a], ⊖ : R → R is a function such that [∀ a ∈ R : a ⊕ ⊖(a) = 0], ⊙ : R × R → R is an associative operation on R, 1 ∈ R such that [∀ a ∈ R : [a ⊙ 1 = a and 1 ⊙ a = a]] and ⊙ is distributive over ⊕}
+  𝓡𝓲𝓷𝓰 :=: {[R, ⊕, 0, ⊖, ⊙, 1] | R is a set, ⊕ : R × R → R is a commutative associative operation on R, 0 ∈ R such that [∀ a ∈ R : a ⊕ 0 = 0 ⊕ a = a], ⊖ : R → R is a function such that [∀ a ∈ R : a ⊕ ⊖(a) = ⊖(a) ⊕ a = 0], ⊙ : R × R → R is an associative operation on R such that [∀ a ∈ R : a ⊙ 0 = 0 ⊙ a = 0] and [∀ a, b ∈ R : a ⊙ ⊖(b) = ⊖(a) ⊙ b = ⊖(a ⊙ b)], 1 ∈ R such that [∀ a ∈ R : a ⊙ 1 = 1 ⊙ a = a] and ⊙ is distributive over ⊕}
 
   [R, ⊕, 0, ⊖, ⊙, 1] = [S, ⋆, 𝟢, ∼, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗ and φ[1] = 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∼ : S → S is a function, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
 
@@ -5425,7 +5425,7 @@ No proof."
 exports[`render hlm library: 2.7.22.1.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Left%20modules 1`] = `
 "Definition 2.7.22.1.1.  Let 𝐑 be a ring. We define:
 
-  𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = 0], ⊙ : Carrier(𝐑) × M → M is an operation such that ⊙ is left-distributive over ⊕ and [∀ a, b ∈ 𝐑, x ∈ M : (a + b) ⊙ x = (a ⊙ x) ⊕ (b ⊙ x)] and [∀ a, b ∈ 𝐑, x ∈ M : (a ⋅ b) ⊙ x = a ⊙ (b ⊙ x)] and [∀ x ∈ M : 1_𝐑 ⊙ x = x]}
+  𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : Carrier(𝐑) × M → M is an operation such that ⊙ is left-distributive over ⊕ and [∀ a, b ∈ 𝐑, x ∈ M : (a + b) ⊙ x = (a ⊙ x) ⊕ (b ⊙ x)] and [∀ x ∈ M : 0_𝐑 ⊙ x = 0] and [∀ a ∈ 𝐑 : a ⊙ 0 = 0] and [∀ a ∈ 𝐑, x ∈ M : (−a) ⊙ x = a ⊙ ⊖(x) = ⊖(a ⊙ x)] and [∀ a, b ∈ 𝐑, x ∈ M : (a ⋅ b) ⊙ x = a ⊙ (b ⊙ x)] and [∀ x ∈ M : 1_𝐑 ⊙ x = x]}
 
   [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : Carrier(𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : Carrier(𝐑) × N → N is an operation with suitable conditions)
 
@@ -5508,10 +5508,65 @@ Remarks.
 This definition lets us multiply elements without decomposing the ring."
 `;
 
+exports[`render hlm library: 2.7.22.1.9.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.7.22.1.9.1.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. We define:
+
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(a ⋅ w) = a ⋅ f(w)}
+   = {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.22.1.9.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.7.22.1.9.2.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. We define:
+
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+
+We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.22.1.9.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Kernel 1`] = `
+"Definition 2.7.22.1.9.3.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
+
+  Ker(φ) := {g ∈ 𝐌 : φ(g) = 0_𝐍}"
+`;
+
+exports[`render hlm library: 2.7.22.1.9.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/identity 1`] = `
+"Definition 2.7.22.1.9.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
+
+  id_𝐌 := id_(Carrier(𝐌))"
+`;
+
+exports[`render hlm library: 2.7.22.1.9.5 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.7.22.1.9.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. Then the following are equivalent:
+
+  1. Iso(𝐌, 𝐍) is nonempty
+  2. 𝐌 = 𝐍
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of modules."
+`;
+
+exports[`render hlm library: 2.7.22.1.9.6 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.7.22.1.9.6.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐍, 𝐌)
+
+No proof."
+`;
+
 exports[`render hlm library: 2.7.22.2.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Right%20modules 1`] = `
 "Definition 2.7.22.2.1.  Let 𝐑 be a ring. We define:
 
-  𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = 0], ⊙ : M × Carrier(𝐑) → M is an operation such that ⊙ is right-distributive over ⊕ and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a + b) = (x ⊙ a) ⊕ (x ⊙ b)] and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a ⋅ b) = (x ⊙ a) ⊙ b] and [∀ x ∈ M : x ⊙ 1_𝐑 = x]}
+  𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : M × Carrier(𝐑) → M is an operation such that ⊙ is right-distributive over ⊕ and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a + b) = (x ⊙ a) ⊕ (x ⊙ b)] and [∀ x ∈ M : x ⊙ 0_𝐑 = 0] and [∀ a ∈ 𝐑 : 0 ⊙ a = 0] and [∀ a ∈ 𝐑, x ∈ M : x ⊙ (−a) = ⊖(x) ⊙ a = ⊖(x ⊙ a)] and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a ⋅ b) = (x ⊙ a) ⊙ b] and [∀ x ∈ M : x ⊙ 1_𝐑 = x]}
 
   [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × Carrier(𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × Carrier(𝐑) → N is an operation with suitable conditions)
 
@@ -5592,6 +5647,61 @@ exports[`render hlm library: 2.7.22.2.8 data/libraries/hlm/Algebra/Rings/Modules
 Remarks.
 
 This definition lets us multiply elements without decomposing the ring."
+`;
+
+exports[`render hlm library: 2.7.22.2.9.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Homomorphisms 1`] = `
+"Definition 2.7.22.2.9.1.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
+
+  Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(a ⋅ w) = a ⋅ f(w)}
+   = {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.22.2.9.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Isomorphisms 1`] = `
+"Definition 2.7.22.2.9.2.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
+
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : Carrier(𝐌) ↔ Carrier(𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+
+We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
+
+Equality.  No proof."
+`;
+
+exports[`render hlm library: 2.7.22.2.9.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Kernel 1`] = `
+"Definition 2.7.22.2.9.3.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
+
+  Ker(φ) := {g ∈ 𝐌 : φ(g) = 0_𝐍}"
+`;
+
+exports[`render hlm library: 2.7.22.2.9.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/identity 1`] = `
+"Definition 2.7.22.2.9.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
+
+  id_𝐌 := id_(Carrier(𝐌))"
+`;
+
+exports[`render hlm library: 2.7.22.2.9.5 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.7.22.2.9.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. Then the following are equivalent:
+
+  1. Iso(𝐌, 𝐍) is nonempty
+  2. 𝐌 = 𝐍
+
+No proof.
+
+Remarks.
+
+This follows immediately from the HLM-specific definition of equality of modules."
+`;
+
+exports[`render hlm library: 2.7.22.2.9.6 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.7.22.2.9.6.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+
+  φ^-1 ∈ Iso(𝐍, 𝐌)
+
+No proof."
 `;
 
 exports[`render hlm library: 2.8.1 data/libraries/hlm/Algebra/Fields/Fields 1`] = `
@@ -5931,8 +6041,28 @@ Remarks.
 The objects of this category are actually isomorphism classes of rings."
 `;
 
-exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/fields 1`] = `
-"Definition 4.8.10.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/left%20modules 1`] = `
+"Definition 4.8.10.  Let u ∈ ℕ, 𝐑 be a ring. We define:
+
+  (𝐋𝐌𝐨𝐝(𝐑))_u := [𝓛𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓛𝓜𝓸𝓭(𝐑))]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of modules."
+`;
+
+exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Individual%20categories/right%20modules 1`] = `
+"Definition 4.8.11.  Let u ∈ ℕ, 𝐑 be a ring. We define:
+
+  (𝐑𝐌𝐨𝐝(𝐑))_u := [𝓡𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓜𝓸𝓭(𝐑))]_u
+
+Remarks.
+
+The objects of this category are actually isomorphism classes of modules."
+`;
+
+exports[`render hlm library: 4.8.12 data/libraries/hlm/Category%20theory/Individual%20categories/fields 1`] = `
+"Definition 4.8.12.  Let u ∈ ℕ. We define:
 
   𝐅𝐥𝐝_u := [𝓕𝓵𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓕𝓵𝓭), (id_𝐂)_(𝐂 ∈ 𝓕𝓵𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓕𝓵𝓭)]_u
 
@@ -5941,8 +6071,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of fields."
 `;
 
-exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
-"Definition 4.8.11.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.8.13 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+"Definition 4.8.13.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
@@ -5956,8 +6086,8 @@ References.
 * https://ncatlab.org/nlab/show/Cat"
 `;
 
-exports[`render hlm library: 4.8.12 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.12.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+"Definition 4.8.14.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
   𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
 
