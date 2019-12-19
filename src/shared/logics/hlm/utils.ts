@@ -145,12 +145,11 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getStructuralCaseTerm(construction: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
-    let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(construction);
+  getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
+    let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(constructionPath);
     let resultPromise = constructionDefinitionPromise.then((constructionDefinition: Fmt.Definition) => {
       let constructorExpr = structuralCase._constructor as Fmt.DefinitionRefExpression;
       let constructorPath = constructorExpr.path;
-      let constructionPath = constructorPath.parentPath as Fmt.Path;
       let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(constructorExpr.path.name);
       let constructorDefinitionContents = constructorDefinition.contents as FmtHLM.ObjectContents_Constructor;
       let result: Fmt.Expression;

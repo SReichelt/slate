@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Constructor path must match construction path
+ * @expectedError Constructor path must match construction path (without arguments)
  *
  * @expectedError Expected reference to constructor "zero"
  */

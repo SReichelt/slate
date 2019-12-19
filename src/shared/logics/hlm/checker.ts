@@ -184,6 +184,9 @@ class HLMDefinitionChecker {
       if (embedding.target.path.parentPath.parentPath || embedding.target.path.parentPath.name !== this.definition.name) {
         this.error(embedding.target, 'Embedding must refer to constructor of parent construction');
       } else {
+        if (embedding.target.path.parentPath.arguments.length) {
+          this.error(embedding.target, 'Embedding target construction must be referenced without arguments');
+        }
         let innerDefinition = this.definition.innerDefinitions.getDefinition(embedding.target.path.name);
         this.checkDefinitionRefExpression(embedding.target, [this.definition, innerDefinition], [false, true], this.rootContext);
       }
@@ -654,6 +657,9 @@ class HLMDefinitionChecker {
         })
         .catch((error) => this.conditionalError(term, error.message));
       this.promise = this.promise.then(() => checkConstructionRef);
+      let constructionPathWithoutArguments = new Fmt.Path;
+      constructionPathWithoutArguments.name = construction.path.name;
+      constructionPathWithoutArguments.parentPath = construction.path.parentPath;
       let checkCases = this.utils.getOuterDefinition(construction)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
@@ -664,8 +670,8 @@ class HLMDefinitionChecker {
                 if (index < cases.length) {
                   let structuralCase = cases[index];
                   if (structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
-                    if (!structuralCase._constructor.path.parentPath.isEquivalentTo(construction.path)) {
-                      this.error(structuralCase._constructor, 'Constructor path must match construction path');
+                    if (!structuralCase._constructor.path.parentPath.isEquivalentTo(constructionPathWithoutArguments)) {
+                      this.error(structuralCase._constructor, 'Constructor path must match construction path (without arguments)');
                     }
                     if (structuralCase._constructor.path.name === innerDefinition.name) {
                       if (structuralCase.parameters) {
