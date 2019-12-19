@@ -1424,7 +1424,7 @@ exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Sequences/Finit
 
   (a_k)_(k < n) = (a'_k)_(k < n')  :⇔  n = n' and ∀ k ∈ ℕ_(<n) : a_k = a'_k  (n ∈ ℕ, a_k ∈ S for each k ∈ ℕ_(<n), n' ∈ ℕ, a'_k ∈ S for each k ∈ ℕ_(<n'))
 
-We write “let a be a finite sequence on S” for “let a ∈ S^∗.”
+We write “let 𝐚 be a finite sequence on S” for “let 𝐚 ∈ S^∗.”
 
 Remarks.
 
@@ -1441,14 +1441,24 @@ References.
 
 exports[`render hlm library: 1.5.2 data/libraries/hlm/Essentials/Sequences/finite%20sequence 1`] = `"Definition 1.5.2 (Tuple)."`;
 
-exports[`render hlm library: 1.5.3 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
-"Definition 1.5.3.  Let S be a set. We define:
+exports[`render hlm library: 1.5.3 data/libraries/hlm/Essentials/Sequences/finite%20sequence%20length 1`] = `
+"Definition 1.5.3.  Let S be a set, 𝐚 be a finite sequence on S. We define
+
+  |𝐚|
+
+by:
+
+  |(a_k)_(k < n)| := n  (n ∈ ℕ, a_k ∈ S for each k ∈ ℕ_(<n))"
+`;
+
+exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
+"Definition 1.5.4.  Let S be a set. We define:
 
   S^ω :=: {(a_n)_(n ∈ ℕ) | a_n ∈ S for each n ∈ ℕ}
 
   (a_n)_(n ∈ ℕ) = (a'_n)_(n ∈ ℕ)  :⇔  ∀ n ∈ ℕ : a_n = a'_n  (a_n ∈ S for each n ∈ ℕ, a'_n ∈ S for each n ∈ ℕ)
 
-We write “let a be a sequence on S” for “let a ∈ S^ω.”
+We write “let 𝐚 be a sequence on S” for “let 𝐚 ∈ S^ω.”
 
 Remarks.
 
@@ -1466,8 +1476,37 @@ References.
 * https://ncatlab.org/nlab/show/sequence"
 `;
 
-exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/starts%20with 1`] = `
-"Definition 1.5.4.  Let S be a set, 𝐚 be a sequence on S, 𝐛 be a finite sequence on S. We define
+exports[`render hlm library: 1.5.5 data/libraries/hlm/Essentials/Sequences/Ordinal-indexed%20sequences 1`] = `
+"Definition 1.5.5.  Let S be a set. We define:
+
+  S^⋆ :=: {(a_k)_(k < α) | α ∈ 𝓞𝓻𝓭, a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α)}
+
+  (a_k)_(k < α) = (a'_k)_(k < α')  :⇔    α = α' and ∀ k ∈ 𝓞𝓻𝓭_(<α) : a_k = a'_k  (α ∈ 𝓞𝓻𝓭, a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α), α' ∈ 𝓞𝓻𝓭, a'_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α'))
+
+S^∗ ⊆: S^⋆ via
+𝐚 = ({a_k if 𝐚 = (a_j)_(j < n) (n ∈ ℕ, a_j ∈ S for each j ∈ ℕ_(<n)))_(k < |𝐚|)
+
+Well-definedness.  No proof.
+
+We write “let 𝐚 be an ordinal-indexed sequence on S” for “let 𝐚 ∈ S^⋆.”
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_number#Transfinite_sequence (but we use arbitrary ordinals, not only limit ordinals)"
+`;
+
+exports[`render hlm library: 1.5.6 data/libraries/hlm/Essentials/Sequences/ordinal-indexed%20sequence%20length 1`] = `
+"Definition 1.5.6.  Let S be a set, 𝐚 be an ordinal-indexed sequence on S. We define
+
+  |𝐚|
+
+by:
+
+  |(a_k)_(k < α)| := α  (α ∈ 𝓞𝓻𝓭, a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α))"
+`;
+
+exports[`render hlm library: 1.5.7 data/libraries/hlm/Essentials/Sequences/starts%20with 1`] = `
+"Definition 1.5.7.  Let S be a set, 𝐚 be a sequence on S, 𝐛 be a finite sequence on S. We define
 
   𝐚 starts with 𝐛
 
@@ -2617,15 +2656,15 @@ References.
 `;
 
 exports[`render hlm library: 1.6.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Carrier 1`] = `
-"Definition 1.6.2.3.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define
+"Definition 1.6.2.3.  Let κ ∈ 𝓒𝓻𝓭. We define
 
-  Carrier(𝐱)
+  Carrier(κ)
 
 by:
 
-  Carrier(|S|) := S  (S is a set)
+  Carrier(|K|) := K  (K is a set)
 
-We write “let a ∈ 𝐱” for “let a ∈ Carrier(𝐱).”
+We write “let a ∈ κ” for “let a ∈ Carrier(κ).”
 
 Remarks.
 
@@ -2633,11 +2672,11 @@ This definition retrieves a representative set from a cardinal number, and enabl
 `;
 
 exports[`render hlm library: 1.6.2.4.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Homomorphisms 1`] = `
-"Definition 1.6.2.4.1.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.6.2.4.1.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
-  Hom(𝐱, 𝐲) := (Carrier(𝐱) → Carrier(𝐲))
+  Hom(κ, μ) := (Carrier(κ) → Carrier(μ))
 
-We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”
+We write “let φ : κ → μ be a homomorphism” for “let φ ∈ Hom(κ, μ).”
 
 Remarks.
 
@@ -2647,28 +2686,28 @@ Although these sets are not unique, the type system prevents the ambiguities tha
 `;
 
 exports[`render hlm library: 1.6.2.4.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Isomorphisms 1`] = `
-"Definition 1.6.2.4.2.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.6.2.4.2.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
-  Iso(𝐱, 𝐲) := {φ : 𝐱 → 𝐲 : φ is bijective}
-   = (Carrier(𝐱) ↔ Carrier(𝐲))
+  Iso(κ, μ) := {φ : κ → μ : φ is bijective}
+   = (Carrier(κ) ↔ Carrier(μ))
 
-We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
+We write “let φ : κ ↔ μ be an isomorphism” for “let φ ∈ Iso(κ, μ).”
 
 Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/identity 1`] = `
-"Definition 1.6.2.4.3.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.6.2.4.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  id_𝐱 := id_(Carrier(𝐱))"
+  id_κ := id_(Carrier(κ))"
 `;
 
 exports[`render hlm library: 1.6.2.4.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.2.4.4.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+"Proposition 1.6.2.4.4.  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
 
-  1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
-  2. Iso(𝐱, 𝐲) is nonempty
-  3. 𝐱 = 𝐲
+  1. κ ≤ μ and μ ≤ κ
+  2. Iso(κ, μ) is nonempty
+  3. κ = μ
 
 No proof.
 
@@ -2680,10 +2719,10 @@ References.
 `;
 
 exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
-"Definition 1.6.2.5.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.6.2.5.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
-  𝐱 ≤ 𝐲  :⇔  ∃ φ : 𝐱 → 𝐲 : φ is injective
-    ⇔  ∃ S ⊆ Carrier(𝐲) : |S| = 𝐱
+  κ ≤ μ  :⇔  ∃ φ : κ → μ : φ is injective
+    ⇔  ∃ S ⊆ Carrier(μ) : |S| = κ
 
 Equivalence.  No proof.
 
@@ -2693,25 +2732,49 @@ References.
 `;
 
 exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
-"Definition 1.6.2.6.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.6.2.6.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
-  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲
+  κ < μ  :⇔  κ ≤ μ and κ ≠ μ
 
 Remarks.
 
 Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”."
 `;
 
-exports[`render hlm library: 1.6.2.7 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
-"Proposition 1.6.2.7.
+exports[`render hlm library: 1.6.2.7.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.2.7.1.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  𝓒𝓻𝓭_(<κ) := {μ ∈ 𝓒𝓻𝓭 : μ < κ}"
+`;
+
+exports[`render hlm library: 1.6.2.7.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.2.7.2.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  𝓒𝓻𝓭_(≤κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≤ κ}"
+`;
+
+exports[`render hlm library: 1.6.2.7.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.2.7.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  𝓒𝓻𝓭_(≥κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≥ κ}"
+`;
+
+exports[`render hlm library: 1.6.2.7.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.2.7.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
+`;
+
+exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
+"Proposition 1.6.2.8.
 
   ≤ is a partial order
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
-"Proposition 1.6.2.8.  The following are equivalent:
+exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
+"Proposition 1.6.2.9.  The following are equivalent:
 
   1. AC
   2. ≤ is a total order
@@ -2723,14 +2786,14 @@ Remarks.
 The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total."
 `;
 
-exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
-"Definition 1.6.2.9.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
+"Definition 1.6.2.10.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
-  𝐱 + 𝐲
+  κ + μ
 
 by:
 
-  |X| + |Y| := |X ⊎ Y|  (X, Y are sets)
+  |K| + |J| := |K ⊎ J|  (K, J are sets)
 
 References.
 
@@ -2739,14 +2802,14 @@ References.
 * https://proofwiki.org/wiki/Definition:Sum_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
-"Definition 1.6.2.10.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
+"Definition 1.6.2.11.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
-  𝐱 ⋅ 𝐲
+  κ ⋅ μ
 
 by:
 
-  |X| ⋅ |Y| := |X × Y|  (X, Y are sets)
+  |K| ⋅ |J| := |K × J|  (K, J are sets)
 
 References.
 
@@ -2755,14 +2818,14 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
-"Definition 1.6.2.11.  Let 𝐱, 𝐲 ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
+"Definition 1.6.2.12.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
-  𝐱^𝐲
+  κ^μ
 
 by:
 
-  |X|^|Y| := |Y → X|  (X, Y are sets)
+  |K|^|J| := |J → K|  (K, J are sets)
 
 References.
 
@@ -2771,8 +2834,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals"
 `;
 
-exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
-"Proposition 1.6.2.12.  Let S be a set. Then:
+exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.6.2.13.  Let S be a set. Then:
 
   |𝒫(S)| = 2^|S|
 
@@ -2798,15 +2861,15 @@ Well-definedness.  No proof."
 `;
 
 exports[`render hlm library: 1.6.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Carrier 1`] = `
-"Definition 1.6.3.2.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define
+"Definition 1.6.3.2.  Let α ∈ 𝓞𝓻𝓭. We define
 
-  Carrier(𝐱)
+  Carrier(α)
 
 by:
 
-  Carrier([S, ⪯]) := S  (S is a set, ⪯ is a relation on S with suitable conditions)
+  Carrier([A, ⪯]) := A  (A is a set, ⪯ is a relation on A with suitable conditions)
 
-We write “let a ∈ 𝐱” for “let a ∈ Carrier(𝐱).”
+We write “let a ∈ α” for “let a ∈ Carrier(α).”
 
 Remarks.
 
@@ -2814,103 +2877,127 @@ This definition retrieves a representative set from an ordinal number, and enabl
 `;
 
 exports[`render hlm library: 1.6.3.3 data/libraries/hlm/Essentials/Numbers/Ordinal/before 1`] = `
-"Definition 1.6.3.3.  Let 𝐱 ∈ 𝓞𝓻𝓭, a, b ∈ 𝐱. We define:
+"Definition 1.6.3.3.  Let α ∈ 𝓞𝓻𝓭, a, b ∈ α. We define:
 
-  a ≤ b  :⇔  {a ⪯ b if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
+  a ≤ b  :⇔  {a ⪯ b if α = [A, ⪯] (A is a set, ⪯ is a relation on A with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.6.3.4.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Homomorphisms 1`] = `
-"Definition 1.6.3.4.1.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.3.4.1.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  Hom(𝐱, 𝐲) := {f : Carrier(𝐱) → Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+  Hom(α, β) := {f : Carrier(α) → Carrier(β) : ∀ a, b ∈ α s.t. a ≤ b : f(a) ≤ f(b)}
 
-We write “let φ : 𝐱 → 𝐲 be a homomorphism” for “let φ ∈ Hom(𝐱, 𝐲).”"
+We write “let φ : α → β be a homomorphism” for “let φ ∈ Hom(α, β).”"
 `;
 
 exports[`render hlm library: 1.6.3.4.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
-"Definition 1.6.3.4.2.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.3.4.2.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  Iso(𝐱, 𝐲) := {homomorphisms φ : 𝐱 → 𝐲 : φ is bijective}
-   = {f : Carrier(𝐱) ↔ Carrier(𝐲) : ∀ a, b ∈ 𝐱 s.t. a ≤ b : f(a) ≤ f(b)}
+  Iso(α, β) := {homomorphisms φ : α → β : φ is bijective}
+   = {f : Carrier(α) ↔ Carrier(β) : ∀ a, b ∈ α s.t. a ≤ b : f(a) ≤ f(b)}
 
-We write “let φ : 𝐱 ↔ 𝐲 be an isomorphism” for “let φ ∈ Iso(𝐱, 𝐲).”
+We write “let φ : α ↔ β be an isomorphism” for “let φ ∈ Iso(α, β).”
 
 Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/identity 1`] = `
-"Definition 1.6.3.4.3.  Let 𝐱 ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.3.4.3.  Let α ∈ 𝓞𝓻𝓭. We define:
 
-  id_𝐱 := id_(Carrier(𝐱))"
+  id_α := id_(Carrier(α))"
 `;
 
 exports[`render hlm library: 1.6.3.4.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.3.4.4.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+"Proposition 1.6.3.4.4.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
 
-  1. 𝐱 ≤ 𝐲 and 𝐲 ≤ 𝐱
-  2. Iso(𝐱, 𝐲) is nonempty
-  3. 𝐱 = 𝐲
+  1. α ≤ β and β ≤ α
+  2. Iso(α, β) is nonempty
+  3. α = β
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.3.5.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/ordered%20subset 1`] = `
-"Definition 1.6.3.5.1.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱). We define
+exports[`render hlm library: 1.6.3.5.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordered%20subsets/ordered%20subset 1`] = `
+"Definition 1.6.3.5.1.  Let α ∈ 𝓞𝓻𝓭, S ⊆ Carrier(α). We define
 
-  S is an ordered subset of 𝐱
+  S is an ordered subset of α
 
 by:
 
-  S is an ordered subset of [X, ⪯]  :⇔  ⪯∣_S is a well-order  (X is a set, ⪯ is a relation on X with suitable conditions)"
+  S is an ordered subset of [A, ⪯]  :⇔  ⪯∣_S is a well-order  (A is a set, ⪯ is a relation on A with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.5.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/subset%20ordinal 1`] = `
-"Definition 1.6.3.5.2.  Let 𝐱 ∈ 𝓞𝓻𝓭, S ⊆ Carrier(𝐱) such that S is an ordered subset of 𝐱. We define:
+exports[`render hlm library: 1.6.3.5.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordered%20subsets/subset%20ordinal 1`] = `
+"Definition 1.6.3.5.2.  Let α ∈ 𝓞𝓻𝓭, S ⊆ Carrier(α) such that S is an ordered subset of α. We define:
 
-  [S] := {[S, ⪯∣_S] if 𝐱 = [X, ⪯] (X is a set, ⪯ is a relation on X with suitable conditions)"
+  [S] := {[S, ⪯∣_S] if α = [A, ⪯] (A is a set, ⪯ is a relation on A with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
-"Definition 1.6.3.6.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.3.6.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  𝐱 ≤ 𝐲  :⇔  ∃ homomorphism φ : 𝐱 → 𝐲 : φ is injective
-    ⇔  ∃ S ⊆ Carrier(𝐲) : [S is an ordered subset of 𝐲 and 𝐱 = [S]]
+  α ≤ β  :⇔  ∃ homomorphism φ : α → β : φ is injective
+    ⇔  ∃ S ⊆ Carrier(β) : [S is an ordered subset of β and α = [S]]
 
 Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
-"Definition 1.6.3.7.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.3.7.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  𝐱 < 𝐲  :⇔  𝐱 ≤ 𝐲 and 𝐱 ≠ 𝐲"
+  α < β  :⇔  α ≤ β and α ≠ β"
 `;
 
-exports[`render hlm library: 1.6.3.8 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
-"Proposition 1.6.3.8.
+exports[`render hlm library: 1.6.3.8.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less) 1`] = `
+"Definition 1.6.3.8.1.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  𝓞𝓻𝓭_(<α) := {β ∈ 𝓞𝓻𝓭 : β < α}"
+`;
+
+exports[`render hlm library: 1.6.3.8.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.6.3.8.2.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  𝓞𝓻𝓭_(≤α) := {β ∈ 𝓞𝓻𝓭 : β ≤ α}"
+`;
+
+exports[`render hlm library: 1.6.3.8.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.6.3.8.3.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  𝓞𝓻𝓭_(≥α) := {β ∈ 𝓞𝓻𝓭 : β ≥ α}"
+`;
+
+exports[`render hlm library: 1.6.3.8.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.6.3.8.4.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  𝓞𝓻𝓭_(>α) := {β ∈ 𝓞𝓻𝓭 : β > α}"
+`;
+
+exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
+"Proposition 1.6.3.9.
 
   ≤ is a well-order
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
-"Definition 1.6.3.9.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
+"Definition 1.6.3.10.  Let α, β ∈ 𝓞𝓻𝓭. We define
 
-  𝐱 + 𝐲
+  α + β
 
 by:
 
-  [X, ⪯] + [Y, ⊑] := [X ⊎ Y, ⪯ ≪ ⊑]  (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
+  [A, ⪯] + [B, ⊑] := [A ⊎ B, ⪯ ≪ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
-"Definition 1.6.3.10.  Let 𝐱, 𝐲 ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
+"Definition 1.6.3.11.  Let α, β ∈ 𝓞𝓻𝓭. We define
 
-  𝐱 ⋅ 𝐲
+  α ⋅ β
 
 by:
 
-  [X, ⪯] ⋅ [Y, ⊑] := [X × Y, ⪯ ∠ ⊑]  (X is a set, ⪯ is a relation on X, Y is a set, ⊑ is a relation on Y with suitable conditions)"
+  [A, ⪯] ⋅ [B, ⊑] := [A × B, ⪯ ∠ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.6.4.1 data/libraries/hlm/Essentials/Numbers/Integer/Integers 1`] = `
@@ -4948,11 +5035,11 @@ exports[`render hlm library: 2.6.12.1 data/libraries/hlm/Algebra/Groups/Order/gr
 `;
 
 exports[`render hlm library: 2.6.12.2 data/libraries/hlm/Algebra/Groups/Order/Groups%20with%20order 1`] = `
-"Definition 2.6.12.2.  Let 𝐱 ∈ 𝓒𝓻𝓭. We define:
+"Definition 2.6.12.2.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓖𝓻𝓹_𝐱 := {groups 𝐆 : |𝐆| = 𝐱}
+  𝓖𝓻𝓹_κ := {groups 𝐆 : |𝐆| = κ}
 
-We write “let 𝐆 be a group of order 𝐱” for “let 𝐆 ∈ 𝓖𝓻𝓹_𝐱.”"
+We write “let 𝐆 be a group of order κ” for “let 𝐆 ∈ 𝓖𝓻𝓹_κ.”"
 `;
 
 exports[`render hlm library: 2.6.12.3 data/libraries/hlm/Algebra/Groups/Order/number%20of%20groups%20with%20order 1`] = `
