@@ -21,7 +21,7 @@
         font-size: 300%;
       }
       .loading-screen-loading {
-        margin-top: 2em;
+        margin-bottom: 2em;
       }
       @font-face {
         font-family: 'TeX';
@@ -63,6 +63,13 @@
       }
       @font-face {
         font-family: 'TeX-Var';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Var';
         src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
              url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
              url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
@@ -75,6 +82,14 @@
              url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'),
              url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype'),
              url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Var';
+        font-style: italic;
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
@@ -148,6 +163,29 @@
       }
       @font-face {
         font-family: 'TeX-Large';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Large';
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Large';
+        font-style: italic;
+        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Large';
+        font-style: italic;
         src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
              url('/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
              url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
@@ -183,8 +221,8 @@
     <div id="app">
       <div class="loading-screen">
         <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> web-based interactive theorem prover.</p>
-        <p>This website requires a modern web browser with JavaScript.</p>
         <p class="loading-screen-loading">Loading...</p>
+        <p>This website requires a modern web browser with JavaScript.</p>
         <p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>
       </div>
     </div>

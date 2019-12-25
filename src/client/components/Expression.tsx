@@ -486,8 +486,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               }
               break;
             case '<>':
-              openParen = '〈';
-              closeParen = '〉';
+              openParen = '⟨';
+              closeParen = '⟩';
               if (lineHeight) {
                 parenClassName = 'paren-angle-text';
               } else {

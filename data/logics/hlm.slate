@@ -114,7 +114,8 @@ $ImplicitOperator: %DefinitionType($ElementTerm) {
 $MacroOperator: %DefinitionType($ElementTerm) {
   superType = $Operator,
   members = #(
-    references: %ArgumentList = {}
+    variables: %ParameterList = #(),
+    references[variables]: %ArgumentList = {}
   )
 }
 

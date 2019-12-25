@@ -9,18 +9,19 @@ import CachedPromise from '../../../data/cachedPromise';
 export class NumberSequenceMacro implements HLMMacro.HLMMacro {
   name = 'finite sequence of numbers';
 
-  instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): CachedPromise<OperatorMacroInstance> {
+  instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): CachedPromise<NumberSequenceMacroInstance> {
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
+    let variables: Fmt.ParameterList = contents.variables || Object.create(Fmt.ParameterList.prototype);
+    let length = variables.getParameter('length');
     let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
-    let finiteSequences = references.getValue('Finite sequences');
+    let fixedLengthSequences = references.getValue('Fixed-length sequences');
     let finiteSequence = references.getValue('finite sequence');
-    let numberMacro = references.getValue('number');
-    return CachedPromise.resolve(new OperatorMacroInstance(definition, finiteSequences, finiteSequence, numberMacro));
+    return CachedPromise.resolve(new NumberSequenceMacroInstance(definition, length, fixedLengthSequences, finiteSequence));
   }
 }
 
-export class OperatorMacroInstance implements HLMMacro.HLMMacroInstance {
-  constructor(private definition: Fmt.Definition, private finiteSequences: Fmt.Expression, private finiteSequence: Fmt.Expression, private numberMacro: Fmt.Expression) {}
+export class NumberSequenceMacroInstance implements HLMMacro.HLMMacroInstance {
+  constructor(private definition: Fmt.Definition, private length: Fmt.Parameter, private fixedLengthSequences: Fmt.Expression, private finiteSequence: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -28,14 +29,18 @@ export class OperatorMacroInstance implements HLMMacro.HLMMacroInstance {
     return result;
   }
 
-  invoke(utils: HLMUtils, path: Fmt.Path): CachedPromise<OperatorMacroInvocation> {
-    let finiteSequencesRef = utils.substitutePath(this.finiteSequences, path, [this.definition]);
-    return CachedPromise.resolve(new OperatorMacroInvocation(finiteSequencesRef));
+  invoke(utils: HLMUtils, path: Fmt.Path): CachedPromise<NumberSequenceMacroInvocation> {
+    let items = path.arguments.getValue('items') as Fmt.ArrayExpression;
+    let fixedLengthSequencesRef = utils.substitutePath(this.fixedLengthSequences, path, [this.definition]);
+    let length = new Fmt.IntegerExpression;
+    length.value = new Fmt.BN(items.items.length);
+    fixedLengthSequencesRef = utils.substituteVariable(fixedLengthSequencesRef, this.length, () => length);
+    return CachedPromise.resolve(new NumberSequenceMacroInvocation(fixedLengthSequencesRef));
   }
 }
 
-export class OperatorMacroInvocation implements HLMMacro.HLMMacroInvocation {
-  constructor(private finiteSequencesRef: Fmt.Expression) {}
+export class NumberSequenceMacroInvocation implements HLMMacro.HLMMacroInvocation {
+  constructor(private fixedLengthSequencesRef: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -44,6 +49,6 @@ export class OperatorMacroInvocation implements HLMMacro.HLMMacroInvocation {
   }
 
   getDeclaredSet(): CachedPromise<Fmt.Expression> {
-    return CachedPromise.resolve(this.finiteSequencesRef);
+    return CachedPromise.resolve(this.fixedLengthSequencesRef);
   }
 }

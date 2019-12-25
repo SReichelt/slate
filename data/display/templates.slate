@@ -170,19 +170,22 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', paren
 
 $OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
   display = $OuterParens(
-    body = [
-      $OverUnder(
-        body = symbol,
-        over = over,
-        under = under,
-        style = style
-      ),
-      space,
-      $InnerParens(
-        body = operand,
-        maxLevel = maxParenLevel
-      )
-    ],
+    body = $Style(
+      body = [
+        $OverUnder(
+          body = symbol,
+          over = over,
+          under = under,
+          style = style
+        ),
+        space,
+        $InnerParens(
+          body = operand,
+          maxLevel = maxParenLevel
+        )
+      ],
+      styleClass = 'nowrap'
+    ),
     minLevel = minParenLevel
   )
 }

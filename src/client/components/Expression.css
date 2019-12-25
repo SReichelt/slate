@@ -555,12 +555,15 @@ div.display-math {
 }
 
 .largesym {
-  font-family: 'TeX-Large', serif;
   font-size: 110%;
   line-height: 150%;
 }
 
-.source-code {
+.largesym, .largesym .expr {
+  font-family: 'TeX-Large', serif;
+}
+
+.source-code, .nowrap {
   white-space: nowrap;
 }
 

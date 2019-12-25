@@ -155,8 +155,7 @@ export class HLMUtils extends GenericUtils {
       let result: Fmt.Expression;
       if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorDefinitionContents.rewrite) {
         result = constructorDefinitionContents.rewrite.value;
-        result = this.substituteTargetPath(result, constructionPath.parentPath);
-        result = this.substituteArguments(result, constructionDefinition.parameters, constructionPath.arguments);
+        result = this.substitutePath(result, constructionPath, [constructionDefinition]);
       } else {
         let resultPath = new Fmt.Path;
         resultPath.parentPath = constructionPath;
@@ -215,7 +214,8 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
-  substituteArguments(expression: Fmt.Expression, parameters: Fmt.ParameterList, args: Fmt.ArgumentList, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
+  substituteArguments(expression: Fmt.Expression, parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath?: Fmt.PathItem, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
+    let previousParameters: Fmt.Parameter[] = [];
     for (let param of parameters) {
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Expr || type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat || type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
@@ -227,34 +227,35 @@ export class HLMUtils extends GenericUtils {
         if (this.isValueParamType(type)) {
           let argValue = this.getArgValue(args, param);
           if (argValue) {
-            expression = this.substituteVariable(expression, param, (indices?: Fmt.Expression[]) => {
-              let substitutedArg = argValue!;
-              if (indexVariables) {
-                for (let index = 0; index < indexVariables.length; index++) {
-                  substitutedArg = this.substituteVariable(substitutedArg, indexVariables[index], () => indices![index]);
-                }
-              }
-              return substitutedArg;
-            });
+            expression = this.substituteVariableWithIndices(expression, param, argValue, indexVariables);
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
           let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BindingArg);
           if (argValue) {
             let newIndexVariables = indexVariables ? [...indexVariables, argValue.parameter] : [argValue.parameter];
-            expression = this.substituteArguments(expression, type.parameters, argValue.arguments, newIndexVariables);
+            expression = this.substituteArguments(expression, type.parameters, argValue.arguments, targetPath, newIndexVariables);
           }
+        } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+          let value = this.substituteTargetPath(type._set, targetPath);
+          value = this.substituteArguments(value, previousParameters, args, targetPath, indexVariables);
+          expression = this.substituteVariableWithIndices(expression, param, value, indexVariables);
+        } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
+          let value = this.substituteTargetPath(type.element, targetPath);
+          value = this.substituteArguments(value, previousParameters, args, targetPath, indexVariables);
+          expression = this.substituteVariableWithIndices(expression, param, value, indexVariables);
         }
       }
+      previousParameters.push(param);
     }
     return expression;
   }
 
-  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], indexVariables?: Fmt.Parameter[]): Fmt.Expression {
+  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], targetPath?: Fmt.PathItem, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
     if (parameterLists.length !== argumentLists.length) {
       throw new Error('Number of parameter and argument lists do not match');
     }
     for (let index = 0; index < parameterLists.length; index++) {
-      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], indexVariables);
+      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], targetPath, indexVariables);
     }
     return expression;
   }
@@ -274,6 +275,18 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
+  substituteVariableWithIndices(expression: Fmt.Expression, variable: Fmt.Parameter, value: Fmt.Expression, indexVariables?: Fmt.Parameter[]): Fmt.Expression {
+    return this.substituteVariable(expression, variable, (indices?: Fmt.Expression[]) => {
+      let substitutedArg = value;
+      if (indexVariables) {
+        for (let index = 0; index < indexVariables.length; index++) {
+          substitutedArg = this.substituteVariable(substitutedArg, indexVariables[index], () => indices![index]);
+        }
+      }
+      return substitutedArg;
+    });
+  }
+
   substitutePrevious(expression: Fmt.Expression, previous: Fmt.Expression): Fmt.Expression {
     return expression.substitute((subExpression: Fmt.Expression) => {
       if (subExpression instanceof FmtHLM.MetaRefExpression_previous) {
@@ -285,7 +298,11 @@ export class HLMUtils extends GenericUtils {
   }
 
   substitutePath(expression: Fmt.Expression, path: Fmt.Path, definitions: Fmt.Definition[]): Fmt.Expression {
-    expression = this.substituteTargetPath(expression, path.parentPath);
+    let parentPath = path.parentPath;
+    while (parentPath instanceof Fmt.Path) {
+      parentPath = parentPath.parentPath;
+    }
+    expression = this.substituteTargetPath(expression, parentPath);
     let parameterLists: Fmt.ParameterList[] = [];
     for (let definition of definitions) {
       parameterLists.push(definition.parameters);
@@ -294,7 +311,7 @@ export class HLMUtils extends GenericUtils {
     for (let pathItem: Fmt.PathItem | undefined = path; pathItem instanceof Fmt.Path; pathItem = pathItem.parentPath) {
       argumentLists.unshift(pathItem.arguments);
     }
-    expression = this.substituteAllArguments(expression, parameterLists, argumentLists);
+    expression = this.substituteAllArguments(expression, parameterLists, argumentLists, parentPath);
     return expression;
   }
 
@@ -304,7 +321,7 @@ export class HLMUtils extends GenericUtils {
     } else {
       term = this.substituteTargetPath(term, context.targetPath);
       if (context.parameterLists && context.argumentLists) {
-        term = this.substituteAllArguments(term, context.parameterLists, context.argumentLists);
+        term = this.substituteAllArguments(term, context.parameterLists, context.argumentLists, context.targetPath);
       }
       if (context.originalBindingParameters && context.substitutedBindingParameters) {
         term = this.substituteParameters(term, context.originalBindingParameters, context.substitutedBindingParameters);
@@ -558,70 +575,9 @@ export class HLMUtils extends GenericUtils {
             } else {
               return CachedPromise.reject(new Error('Element parameter expected'));
             }
-          } else {
-            let supersetResult: CachedPromise<Fmt.Expression | undefined> = CachedPromise.resolve(undefined);
-            for (let param of definition.parameters) {
-              let type = param.type.expression;
-              if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) {
-                if (inTypeCast || (followEmbeddings && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true)) {
-                  supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
-                    if (currentResult) {
-                      return currentResult;
-                    } else {
-                      let argValue = this.getArgValue(term.path.arguments, param);
-                      if (argValue) {
-                        return this.getNextSuperset(argValue, followEmbeddings, inTypeCast).then((superset: Fmt.Expression | undefined) => {
-                          if (superset) {
-                            let result = term.clone() as Fmt.DefinitionRefExpression;
-                            if (type instanceof FmtHLM.MetaRefExpression_Set) {
-                              let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
-                              let newArg = new FmtHLM.ObjectContents_SetArg;
-                              newArg._set = superset;
-                              newArg.toCompoundExpression(resultArg, false);
-                            } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-                              let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
-                              let newArg = new FmtHLM.ObjectContents_SubsetArg;
-                              newArg._set = superset;
-                              newArg.toCompoundExpression(resultArg, false);
-                            }
-                            return result;
-                          } else {
-                            return undefined;
-                          }
-                        });
-                      } else {
-                        return undefined;
-                      }
-                    }
-                  });
-                }
-              } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-                if (inTypeCast) {
-                  supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
-                    if (currentResult) {
-                      return currentResult;
-                    } else {
-                      let argValue = this.getArgValue(term.path.arguments, param);
-                      if (argValue) {
-                        return this.getNextTypeCastTerm(argValue, followEmbeddings).then((newTerm: Fmt.Expression | undefined) => {
-                          if (newTerm) {
-                            let result = term.clone() as Fmt.DefinitionRefExpression;
-                            let resultArg = this.getArgument([result.path.arguments], param, FmtHLM.ObjectContents_ElementArg)!;
-                            resultArg.element = newTerm;
-                            return result;
-                          } else {
-                            return undefined;
-                          }
-                        });
-                      } else {
-                        return undefined;
-                      }
-                    }
-                  });
-                }
-              }
-            }
-            return supersetResult;
+          } else if (followEmbeddings || inTypeCast) {
+            // We slightly misuse followEmbeddings here to also mean "follow definitions in construction arguments".
+            return this.resolveConstructionArguments(term, definition, followEmbeddings, inTypeCast);
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           let definitionList = definition.contents.definition;
@@ -660,8 +616,8 @@ export class HLMUtils extends GenericUtils {
                   let constructorPath = term.term.path;
                   return this.getOuterDefinition(structuralCase._constructor).then((definition: Fmt.Definition) => {
                     let innerDefinition = definition.innerDefinitions.getDefinition(constructorPath.name);
-                    let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters);
-                    return this.substitutePath(substituted, constructorPath, [definition, innerDefinition]);
+                    let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters, false);
+                    return this.substituteArguments(substituted, innerDefinition.parameters, constructorPath.arguments);
                   });
                 }
               } else if (term.term instanceof FmtHLM.MetaRefExpression_structuralCases && term.term.cases.length === 1) {
@@ -695,6 +651,115 @@ export class HLMUtils extends GenericUtils {
     } else {
       return CachedPromise.reject(new Error('Set term expected'));
     }
+  }
+
+  private resolveConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, followEmbeddings: boolean, inTypeCast: boolean): CachedPromise<Fmt.Expression | undefined> {
+    let supersetResult: CachedPromise<Fmt.Expression | undefined> = CachedPromise.resolve(undefined);
+    for (let param of definition.parameters) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) {
+        let embedSubsets = (followEmbeddings && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true);
+        supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+          if (currentResult) {
+            return currentResult;
+          } else {
+            let argValue = this.getArgValue(term.path.arguments, param);
+            if (argValue) {
+              if (inTypeCast || embedSubsets) {
+                return this.getNextSuperset(argValue, followEmbeddings, inTypeCast).then((newArgValue: Fmt.Expression | undefined) => {
+                  if (newArgValue) {
+                    return this.replaceSetArgValue(term, param, newArgValue);
+                  } else {
+                    return undefined;
+                  }
+                });
+              } else {
+                if (argValue instanceof FmtHLM.MetaRefExpression_setStructuralCases && argValue.cases.length === 1) {
+                  let structuralCase = argValue.cases[0];
+                  let replacedTerm = this.replaceSetArgValue(term, param, structuralCase.value);
+                  return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
+                } else {
+                  return this.resolveSetTerm(argValue).then((resolvedSetTerms: Fmt.Expression[] | undefined) => {
+                    if (resolvedSetTerms && resolvedSetTerms.length) {
+                      return this.replaceSetArgValue(term, param, resolvedSetTerms[0]);
+                    } else {
+                      return undefined;
+                    }
+                  });
+                }
+              }
+            } else {
+              return undefined;
+            }
+          }
+        });
+      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+        supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
+          if (currentResult) {
+            return currentResult;
+          } else {
+            let argValue = this.getArgValue(term.path.arguments, param);
+            if (argValue) {
+              if (inTypeCast) {
+                return this.getNextTypeCastTerm(argValue, followEmbeddings).then((newArgValue: Fmt.Expression | undefined) => {
+                  if (newArgValue) {
+                    return this.replaceElementArgValue(term, param, newArgValue);
+                  } else {
+                    return undefined;
+                  }
+                });
+              } else {
+                if (argValue instanceof FmtHLM.MetaRefExpression_structuralCases && argValue.cases.length === 1) {
+                  let structuralCase = argValue.cases[0];
+                  let replacedTerm = this.replaceElementArgValue(term, param, structuralCase.value);
+                  return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
+                } else {
+                  return this.resolveElementTerm(argValue).then((resolvedElementTerms: Fmt.Expression[] | undefined) => {
+                    if (resolvedElementTerms && resolvedElementTerms.length) {
+                      return this.replaceElementArgValue(term, param, resolvedElementTerms[0]);
+                    } else {
+                      return undefined;
+                    }
+                  });
+                }
+              }
+            } else {
+              return undefined;
+            }
+          }
+        });
+      }
+    }
+    return supersetResult;
+  }
+
+  private replaceSetArgValue(term: Fmt.DefinitionRefExpression, param: Fmt.Parameter, newValue: Fmt.Expression): Fmt.DefinitionRefExpression {
+    let result = term.clone() as Fmt.DefinitionRefExpression;
+    let type = param.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_Set) {
+      let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
+      let newArg = new FmtHLM.ObjectContents_SetArg;
+      newArg._set = newValue;
+      newArg.toCompoundExpression(resultArg, false);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
+      let newArg = new FmtHLM.ObjectContents_SubsetArg;
+      newArg._set = newValue;
+      newArg.toCompoundExpression(resultArg, false);
+    }
+    return result;
+  }
+
+  private replaceElementArgValue(term: Fmt.DefinitionRefExpression, param: Fmt.Parameter, newValue: Fmt.Expression): Fmt.DefinitionRefExpression {
+    let result = term.clone() as Fmt.DefinitionRefExpression;
+    let type = param.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      let resultArg = this.getRawArgument([result.path.arguments], param) as Fmt.CompoundExpression;
+      let newArg = new FmtHLM.ObjectContents_ElementArg;
+      newArg.element = newValue;
+      newArg.toCompoundExpression(resultArg, false);
+    }
+    return result;
   }
 
   private getNextTypeCastTerm(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression | undefined> {

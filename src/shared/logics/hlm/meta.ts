@@ -1491,11 +1491,20 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_MacroOperator extends ObjectContents_Operator {
+  variables?: Fmt.ParameterList;
   references?: Fmt.ArgumentList;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let referencesRaw = argumentList.getOptionalValue('references', 3);
+    let variablesRaw = argumentList.getOptionalValue('variables', 3);
+    if (variablesRaw !== undefined) {
+      if (variablesRaw instanceof Fmt.ParameterExpression) {
+        this.variables = variablesRaw.parameters;
+      } else {
+        throw new Error('variables: Parameter expression expected');
+      }
+    }
+    let referencesRaw = argumentList.getOptionalValue('references', 4);
     if (referencesRaw !== undefined) {
       if (referencesRaw instanceof Fmt.CompoundExpression) {
         this.references = referencesRaw.arguments;
@@ -1507,6 +1516,11 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     super.toArgumentList(argumentList, outputAllNames);
+    if (this.variables !== undefined) {
+      let variablesExpr = new Fmt.ParameterExpression;
+      variablesExpr.parameters.push(...this.variables);
+      argumentList.add(variablesExpr, 'variables', true);
+    }
     if (this.references !== undefined) {
       let referencesExpr = new Fmt.CompoundExpression;
       referencesExpr.arguments = this.references;
@@ -1522,6 +1536,12 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
+    if (this.variables) {
+      result.variables = Object.create(Fmt.ParameterList.prototype);
+      if (this.variables.substituteExpression(fn, result.variables!, replacedParameters)) {
+        changed = true;
+      }
+    }
     if (this.references) {
       result.references = Object.create(Fmt.ArgumentList.prototype);
       if (this.references.substituteExpression(fn, result.references!, replacedParameters)) {
@@ -1534,6 +1554,11 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
   isEquivalentTo(objectContents: ObjectContents_MacroOperator, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
+    }
+    if (this.variables || objectContents.variables) {
+      if (!this.variables || !objectContents.variables || !this.variables.isEquivalentTo(objectContents.variables, fn, replacedParameters)) {
+        return false;
+      }
     }
     if (this.references || objectContents.references) {
       if (!this.references || !objectContents.references || !this.references.isEquivalentTo(objectContents.references, fn, replacedParameters)) {
@@ -6198,6 +6223,12 @@ export class MetaModel extends Meta.MetaModel {
           }
           if (argument.name === 'definitionDisplay' || (argument.name === undefined && argumentIndex === 2)) {
             context = new ArgumentTypeContext(ObjectContents_DefinitionDisplay, context);
+          }
+          if (argument.name === 'references' || (argument.name === undefined && argumentIndex === 4)) {
+            let variablesValue = previousArguments.getOptionalValue('variables', 0);
+            if (variablesValue instanceof Fmt.ParameterExpression) {
+              context = this.getParameterListContext(variablesValue.parameters, context);
+            }
           }
         }
         if (type instanceof MetaRefExpression_Predicate) {
