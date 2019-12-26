@@ -16,6 +16,13 @@ export interface HLMSubstitutionContext {
   substitutedBindingParameters?: Fmt.Parameter[];
 }
 
+export interface HLMTypeSearchParameters {
+  followEmbeddings: boolean;
+  resolveConstructionArguments: boolean;
+  extractStructuralCasesFromConstructionArguments: boolean;
+  inTypeCast: boolean;
+}
+
 export class HLMUtils extends GenericUtils {
   getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
     for (let argumentList of argumentLists) {
@@ -510,11 +517,11 @@ export class HLMUtils extends GenericUtils {
     return CachedPromise.resolve(undefined);
   }
 
-  getNextSuperset(term: Fmt.Expression, followEmbeddings: boolean, inTypeCast: boolean = false): CachedPromise<Fmt.Expression | undefined> {
+  getNextSuperset(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression | undefined> {
     if (term instanceof Fmt.VariableRefExpression) {
       let type = term.variable.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        if (inTypeCast && term.indices) {
+        if (typeSearchParameters.inTypeCast && term.indices) {
           let newIndicesPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
           let indicesChanged = false;
           for (let index of term.indices) {
@@ -522,7 +529,7 @@ export class HLMUtils extends GenericUtils {
               if (indicesChanged) {
                 return newIndices.concat(index);
               } else {
-                return this.getNextTypeCastTerm(index, followEmbeddings).then((newIndex: Fmt.Expression | undefined) => {
+                return this.getNextTypeCastTerm(index, typeSearchParameters).then((newIndex: Fmt.Expression | undefined) => {
                   if (newIndex) {
                     indicesChanged = true;
                     return newIndices.concat(newIndex);
@@ -568,16 +575,15 @@ export class HLMUtils extends GenericUtils {
     } else if (term instanceof Fmt.DefinitionRefExpression) {
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
-          if (followEmbeddings && definition.contents.embedding) {
+          if (typeSearchParameters.followEmbeddings && definition.contents.embedding) {
             let type = definition.contents.embedding.parameter.type.expression;
             if (type instanceof FmtHLM.MetaRefExpression_Element) {
               return this.substitutePath(type._set, term.path, [definition]);
             } else {
               return CachedPromise.reject(new Error('Element parameter expected'));
             }
-          } else if (followEmbeddings || inTypeCast) {
-            // We slightly misuse followEmbeddings here to also mean "follow definitions in construction arguments".
-            return this.resolveConstructionArguments(term, definition, followEmbeddings, inTypeCast);
+          } else if (typeSearchParameters.resolveConstructionArguments || typeSearchParameters.extractStructuralCasesFromConstructionArguments) {
+            return this.resolveConstructionArguments(term, definition, typeSearchParameters);
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           let definitionList = definition.contents.definition;
@@ -630,7 +636,7 @@ export class HLMUtils extends GenericUtils {
                 if (resolvedTerms && resolvedTerms.length === 1) {
                   return this.buildSingleStructuralCaseSetTerm(resolvedTerms[0], term.construction, structuralCase._constructor, structuralCase.parameters, structuralCase.value);
                 } else {
-                  return this.getNextSuperset(structuralCase.value, followEmbeddings, inTypeCast).then((superset: Fmt.Expression | undefined) => {
+                  return this.getNextSuperset(structuralCase.value, typeSearchParameters).then((superset: Fmt.Expression | undefined) => {
                     if (superset || term.cases.length > 1 || structuralCase.rewrite) {
                       return this.buildSingleStructuralCaseSetTerm(term.term, term.construction, structuralCase._constructor, structuralCase.parameters, superset || structuralCase.value);
                     } else {
@@ -653,20 +659,24 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  private resolveConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, followEmbeddings: boolean, inTypeCast: boolean): CachedPromise<Fmt.Expression | undefined> {
+  private resolveConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression | undefined> {
     let supersetResult: CachedPromise<Fmt.Expression | undefined> = CachedPromise.resolve(undefined);
     for (let param of definition.parameters) {
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let embedSubsets = (followEmbeddings && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true);
+        let embedSubsets = (typeSearchParameters.followEmbeddings && type.embedSubsets instanceof FmtHLM.MetaRefExpression_true);
         supersetResult = supersetResult.then((currentResult: Fmt.Expression | undefined): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
           if (currentResult) {
             return currentResult;
           } else {
             let argValue = this.getArgValue(term.path.arguments, param);
             if (argValue) {
-              if (inTypeCast || embedSubsets) {
-                return this.getNextSuperset(argValue, followEmbeddings, inTypeCast).then((newArgValue: Fmt.Expression | undefined) => {
+              if (typeSearchParameters.extractStructuralCasesFromConstructionArguments && argValue instanceof FmtHLM.MetaRefExpression_setStructuralCases && argValue.cases.length === 1) {
+                let structuralCase = argValue.cases[0];
+                let replacedTerm = this.replaceSetArgValue(term, param, structuralCase.value);
+                return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
+              } else if (typeSearchParameters.inTypeCast || embedSubsets) {
+                return this.getNextSuperset(argValue, typeSearchParameters).then((newArgValue: Fmt.Expression | undefined) => {
                   if (newArgValue) {
                     return this.replaceSetArgValue(term, param, newArgValue);
                   } else {
@@ -674,19 +684,13 @@ export class HLMUtils extends GenericUtils {
                   }
                 });
               } else {
-                if (argValue instanceof FmtHLM.MetaRefExpression_setStructuralCases && argValue.cases.length === 1) {
-                  let structuralCase = argValue.cases[0];
-                  let replacedTerm = this.replaceSetArgValue(term, param, structuralCase.value);
-                  return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
-                } else {
-                  return this.resolveSetTerm(argValue).then((resolvedSetTerms: Fmt.Expression[] | undefined) => {
-                    if (resolvedSetTerms && resolvedSetTerms.length) {
-                      return this.replaceSetArgValue(term, param, resolvedSetTerms[0]);
-                    } else {
-                      return undefined;
-                    }
-                  });
-                }
+                return this.resolveSetTerm(argValue).then((resolvedSetTerms: Fmt.Expression[] | undefined) => {
+                  if (resolvedSetTerms && resolvedSetTerms.length) {
+                    return this.replaceSetArgValue(term, param, resolvedSetTerms[0]);
+                  } else {
+                    return undefined;
+                  }
+                });
               }
             } else {
               return undefined;
@@ -700,8 +704,12 @@ export class HLMUtils extends GenericUtils {
           } else {
             let argValue = this.getArgValue(term.path.arguments, param);
             if (argValue) {
-              if (inTypeCast) {
-                return this.getNextTypeCastTerm(argValue, followEmbeddings).then((newArgValue: Fmt.Expression | undefined) => {
+              if (typeSearchParameters.extractStructuralCasesFromConstructionArguments && argValue instanceof FmtHLM.MetaRefExpression_structuralCases && argValue.cases.length === 1) {
+                let structuralCase = argValue.cases[0];
+                let replacedTerm = this.replaceElementArgValue(term, param, structuralCase.value);
+                return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
+              } else if (typeSearchParameters.inTypeCast) {
+                return this.getNextTypeCastTerm(argValue, typeSearchParameters).then((newArgValue: Fmt.Expression | undefined) => {
                   if (newArgValue) {
                     return this.replaceElementArgValue(term, param, newArgValue);
                   } else {
@@ -709,19 +717,13 @@ export class HLMUtils extends GenericUtils {
                   }
                 });
               } else {
-                if (argValue instanceof FmtHLM.MetaRefExpression_structuralCases && argValue.cases.length === 1) {
-                  let structuralCase = argValue.cases[0];
-                  let replacedTerm = this.replaceElementArgValue(term, param, structuralCase.value);
-                  return this.buildSingleStructuralCaseSetTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, replacedTerm);
-                } else {
-                  return this.resolveElementTerm(argValue).then((resolvedElementTerms: Fmt.Expression[] | undefined) => {
-                    if (resolvedElementTerms && resolvedElementTerms.length) {
-                      return this.replaceElementArgValue(term, param, resolvedElementTerms[0]);
-                    } else {
-                      return undefined;
-                    }
-                  });
-                }
+                return this.resolveElementTerm(argValue).then((resolvedElementTerms: Fmt.Expression[] | undefined) => {
+                  if (resolvedElementTerms && resolvedElementTerms.length) {
+                    return this.replaceElementArgValue(term, param, resolvedElementTerms[0]);
+                  } else {
+                    return undefined;
+                  }
+                });
               }
             } else {
               return undefined;
@@ -762,9 +764,9 @@ export class HLMUtils extends GenericUtils {
     return result;
   }
 
-  private getNextTypeCastTerm(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression | undefined> {
+  private getNextTypeCastTerm(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression | undefined> {
     if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
-      return this.getNextSuperset(term._set, followEmbeddings, true).then((superset: Fmt.Expression | undefined) => {
+      return this.getNextSuperset(term._set, typeSearchParameters).then((superset: Fmt.Expression | undefined) => {
         if (superset) {
           return this.getTypeCastTerm(superset);
         } else {
@@ -783,11 +785,11 @@ export class HLMUtils extends GenericUtils {
     return newTerm;
   }
 
-  getFinalSuperset(term: Fmt.Expression, followEmbeddings: boolean, inTypeCast: boolean = false): CachedPromise<Fmt.Expression> {
-    return this.getFinalSupersetInternal(term, followEmbeddings, inTypeCast, []);
+  getFinalSuperset(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression> {
+    return this.getFinalSupersetInternal(term, typeSearchParameters, []);
   }
 
-  private getFinalSupersetInternal(term: Fmt.Expression, followEmbeddings: boolean, inTypeCast: boolean, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
+  private getFinalSupersetInternal(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
     if (term instanceof Fmt.DefinitionRefExpression) {
       for (let visitedDefinition of visitedDefinitions) {
         if (term.isEquivalentTo(visitedDefinition)) {
@@ -796,9 +798,9 @@ export class HLMUtils extends GenericUtils {
       }
       visitedDefinitions.push(term);
     }
-    return this.getNextSuperset(term, followEmbeddings, inTypeCast).then((next: Fmt.Expression | undefined) => {
+    return this.getNextSuperset(term, typeSearchParameters).then((next: Fmt.Expression | undefined) => {
       if (next) {
-        return this.getFinalSupersetInternal(next, followEmbeddings, inTypeCast, visitedDefinitions);
+        return this.getFinalSupersetInternal(next, typeSearchParameters, visitedDefinitions);
       } else {
         return term;
       }
@@ -901,8 +903,8 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getFinalSet(term: Fmt.Expression, followEmbeddings: boolean): CachedPromise<Fmt.Expression> {
-    return this.getDeclaredSet(term).then((set: Fmt.Expression) => this.getFinalSuperset(set, followEmbeddings));
+  getFinalSet(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression> {
+    return this.getDeclaredSet(term).then((set: Fmt.Expression) => this.getFinalSuperset(set, typeSearchParameters));
   }
 
   getWildcardFinalSet(): Fmt.Expression {

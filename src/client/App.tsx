@@ -13,7 +13,6 @@ import renderPromise from './components/PromiseHelper';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
-import * as FmtLibrary from '../shared/logics/library';
 import * as FmtDisplay from '../shared/display/meta';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/fileAccessor';
