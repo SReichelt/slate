@@ -1049,7 +1049,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             curText += 'Z';
             break;
           default:
-            curText += this.convertLatinMathToRegular(cp < 0x1d51e ? cp - 0x1d504 : cp - 0x1d56c);
+            curText += this.convertLatinMathToRegular(cp - 0x1d504);
           }
         } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
           setStyle('double-struck');
@@ -1078,6 +1078,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           default:
             curText += this.convertLatinMathToRegular(cp - 0x1d538);
           }
+        } else if (cp >= 0x1d56c && cp < 0x1d5a0) {
+          setStyle('fraktur bold');
+          curText += this.convertLatinMathToRegular(cp - 0x1d56c);
         } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
           setStyle('double-struck');
           curText += this.convertDigitMathToRegular(cp - 0x1d7d8);

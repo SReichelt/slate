@@ -519,13 +519,26 @@ $PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
   )
 }
 
-$Cases(cases: %Expr[,]): %Template {
-  display = $Parens(
+$SingleCase(case: %Expr[]): %Template {
+  display = $OuterParens(
     body = $Table(
-      items = cases,
-      style = 'cases'
+      items = [case],
+      style = 'single-case'
     ),
-    style = '{'
+    minLevel = 0
+  )
+}
+
+$Cases(cases: %Expr[,]): %Template {
+  display = $OuterParens(
+    body = $Parens(
+      body = $Table(
+        items = cases,
+        style = 'cases'
+      ),
+      style = '{'
+    ),
+    minLevel = 0
   )
 }
 

@@ -92,9 +92,9 @@ function StartPage(props: StartPageProps) {
     let renderer = new HLMRenderer(dummyDefinition, false, props.libraryDataProvider, props.templates);
     let examples = [
       renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer, ['multiple definitions', 'of finiteness']),
-      renderTheoremExample(['Essentials', 'Numbers', 'Natural', 'Generalized operators', 'Generalized sum over variable'], props),
       renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer, ['definition']),
-      renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props)
+      renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props),
+      renderTheoremExample(['Algebra', 'Semirings', 'Formulas', 'Binomial theorem'], props)
     ];
     exampleContainer = (
       <div className="examples">

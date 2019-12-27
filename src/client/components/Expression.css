@@ -350,12 +350,24 @@ div.display-math {
   white-space: nowrap;
 }
 
-.table.cases>.table-row>.table-cell:not(:first-child) {
+.table.aligned>.table-row:not(:first-child)>.table-cell {
+  padding-top: 2pt;
+}
+
+.table.cases>.table-row>.table-cell:not(:first-child), .table.single-case>.table-row>.table-cell:not(:first-child) {
   padding-left: 1ex;
+}
+
+.table.cases>.table-row>.table-cell:not(:last-child), .table.single-case>.table-row>.table-cell:not(:last-child) {
+  white-space: nowrap;
 }
 
 .table.definitions>.table-row>.table-cell:nth-child(3) {
   padding-left: 1em;
+}
+
+.table.definitions>.table-row>.table-cell:not(:last-child) {
+  white-space: nowrap;
 }
 
 .table.construction>.table-row>.table-cell {
@@ -556,11 +568,23 @@ div.display-math {
 
 .largesym {
   font-size: 110%;
-  line-height: 150%;
+  line-height: 140%;
 }
 
 .largesym, .largesym .expr {
   font-family: 'TeX-Large', serif;
+}
+
+.largesym>sub {
+  line-height: 100%;
+  position: relative;
+  bottom: -0.25em;
+}
+
+.largesym>sup {
+  line-height: 100%;
+  position: relative;
+  top: 0.25em;
 }
 
 .source-code, .nowrap {

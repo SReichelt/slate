@@ -185,7 +185,8 @@ export class HLMRenderUtils {
               && currentCaseDefinition.construction instanceof Fmt.DefinitionRefExpression
               && currentCaseDefinition.cases.length
               && (currentCaseDefinition.cases.length === 1 || (expressions.length === 1 && allowMultipleCases))
-              && currentCaseDefinition.term instanceof Fmt.VariableRefExpression) {
+              && currentCaseDefinition.term instanceof Fmt.VariableRefExpression
+              && !currentCaseDefinition.term.indices) {
             let currentParameter = currentCaseDefinition.term.variable;
             let currentParameterIndex = parameters.indexOf(currentParameter);
             let currentParameterStructuralCase: FmtHLM.ObjectContents_StructuralCase | undefined = undefined;

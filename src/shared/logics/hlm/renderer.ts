@@ -1136,9 +1136,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return row;
       });
     }
-    return this.renderTemplate('Cases', {
-      'cases': rows,
-    });
+    if (rows.length === 1) {
+      return this.renderTemplate('SingleCase', {
+        'case': rows[0],
+      });
+    } else {
+      return this.renderTemplate('Cases', {
+        'cases': rows,
+      });
+    }
   }
 
   private addCaseParameters(parameters: Fmt.Parameter[], elementParameterOverrides: ElementParameterOverrides | undefined, row: Display.RenderedExpression[]): void {
