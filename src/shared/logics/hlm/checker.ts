@@ -637,6 +637,7 @@ class HLMDefinitionChecker {
   }
 
   private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], argumentsExpected: boolean[], context: HLMCheckerContext): void {
+    this.checkPath(expression.path);
     let parameterLists: Fmt.ParameterList[] = [];
     let argumentLists: Fmt.ArgumentList[] = [];
     let path: Fmt.PathItem | undefined = expression.path;
@@ -658,6 +659,13 @@ class HLMDefinitionChecker {
       this.error(expression, 'Unexpected reference to inner definition');
     } else {
       this.checkArgumentLists(argumentLists, parameterLists, path, context);
+    }
+  }
+
+  private checkPath(path: Fmt.Path): void {
+    let simplifiedPath = this.libraryDataAccessor.simplifyPath(path);
+    if (simplifiedPath !== path) {
+      this.message(path, `Path can be simplified to ${simplifiedPath.toString()}`, Logic.DiagnosticSeverity.Hint);
     }
   }
 
@@ -900,12 +908,16 @@ class HLMDefinitionChecker {
     this.pendingChecks.push(check);
   }
 
-  private error(object: Object, message: string): void {
+  private message(object: Object, message: string, severity: Logic.DiagnosticSeverity): void {
     this.result.diagnostics.push({
       object: object,
       message: message,
-      severity: Logic.DiagnosticSeverity.Error
+      severity: severity
     });
+  }
+
+  private error(object: Object, message: string): void {
+    this.message(object, message, Logic.DiagnosticSeverity.Error);
     this.result.hasErrors = true;
   }
 

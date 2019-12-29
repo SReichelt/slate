@@ -30,7 +30,9 @@ export interface LogicCheckDiagnostic {
 
 export enum DiagnosticSeverity {
   Error,
-  Warning
+  Warning,
+  Information,
+  Hint
 }
 
 export enum LogicDefinitionType {

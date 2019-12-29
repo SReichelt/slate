@@ -19,6 +19,11 @@ interface PrefetchQueueItem {
   itemNumber?: number[];
 }
 
+interface CanonicalPathInfo {
+  parentPathCount: number;
+  names: string[];
+}
+
 export class LibraryDataProvider implements LibraryDataAccessor {
   private path?: Fmt.NamedPathItem;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
@@ -124,20 +129,74 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   simplifyPath(path: Fmt.Path): Fmt.Path {
-    let hasParentPathItem = false;
-    let hasNamedPathItem = false;
-    for (let pathItem = path.parentPath; pathItem; pathItem = pathItem.parentPath) {
-      if (pathItem instanceof Fmt.ParentPathItem) {
-        hasParentPathItem = true;
-      } else if (pathItem instanceof Fmt.NamedPathItem && !(pathItem instanceof Fmt.Path)) {
-        hasNamedPathItem = true;
+    let parentPath = path.parentPath;
+    let simplifiedParentPath = parentPath instanceof Fmt.Path ? this.simplifyPath(parentPath) : this.getSimplifiedParentPath(parentPath);
+    if (simplifiedParentPath !== path.parentPath) {
+      let newPath = path.clone() as Fmt.Path;
+      newPath.parentPath = simplifiedParentPath;
+      return newPath;
+    }
+    return path;
+  }
+
+  private getSimplifiedParentPath(parentPath: Fmt.PathItem | undefined): Fmt.PathItem | undefined {
+    let canonicalPathInfo: CanonicalPathInfo = {
+      parentPathCount: 0,
+      names: []
+    };
+    let modified = LibraryDataProvider.getCanonicalPathInfo(parentPath, canonicalPathInfo);
+    if (this.simplifyCanonicalPath(canonicalPathInfo, 0)) {
+      modified = true;
+    }
+    if (modified) {
+      let result: Fmt.PathItem | undefined = undefined;
+      for (let i = 0; i < canonicalPathInfo.parentPathCount; i++) {
+        let parentPathItem = new Fmt.ParentPathItem;
+        parentPathItem.parentPath = result;
+        result = parentPathItem;
+      }
+      for (let name of canonicalPathInfo.names) {
+        let namedPathItem = new Fmt.NamedPathItem;
+        namedPathItem.name = name;
+        namedPathItem.parentPath = result;
+        result = namedPathItem;
+      }
+      return result;
+    }
+    return parentPath;
+  }
+
+  private simplifyCanonicalPath(canonicalPathInfo: CanonicalPathInfo, depth: number): boolean {
+    let modified = false;
+    if (depth < canonicalPathInfo.parentPathCount && this.parent) {
+      modified = this.parent.simplifyCanonicalPath(canonicalPathInfo, depth + 1);
+      if (depth === canonicalPathInfo.parentPathCount - 1 && canonicalPathInfo.names.length && canonicalPathInfo.names[0] === this.childName) {
+        canonicalPathInfo.parentPathCount--;
+        canonicalPathInfo.names.shift();
+        modified = true;
       }
     }
-    if (hasParentPathItem && hasNamedPathItem) {
-      return this.getRelativePath(this.getAbsolutePath(path));
-    } else {
-      return path;
+    return modified;
+  }
+
+  private static getCanonicalPathInfo(pathItem: Fmt.PathItem | undefined, result: CanonicalPathInfo): boolean {
+    if (!pathItem) {
+      return false;
     }
+    let modified = LibraryDataProvider.getCanonicalPathInfo(pathItem.parentPath, result);
+    if (pathItem instanceof Fmt.IdentityPathItem) {
+      return true;
+    } else if (pathItem instanceof Fmt.ParentPathItem) {
+      if (result.names.length) {
+        result.names.pop();
+        return true;
+      } else {
+        result.parentPathCount++;
+      }
+    } else if (pathItem instanceof Fmt.NamedPathItem) {
+      result.names.push(pathItem.name);
+    }
+    return modified;
   }
 
   arePathsEqual(left: Fmt.Path, right: Fmt.Path, unificationFn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

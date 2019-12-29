@@ -58,6 +58,12 @@ function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataP
       case Logic.DiagnosticSeverity.Warning:
         severity = 'Warning';
         break;
+      case Logic.DiagnosticSeverity.Information:
+        severity = 'Information';
+        break;
+      case Logic.DiagnosticSeverity.Hint:
+        severity = 'Hint';
+        break;
       }
       console.error(`${libraryDataProvider.pathToURI(itemPath)}: ${severity}: ${diagnostic.message}`);
     }

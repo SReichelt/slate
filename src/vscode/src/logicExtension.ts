@@ -206,6 +206,10 @@ class SlateDiagnosticsProvider {
             return vscode.DiagnosticSeverity.Error;
         case Logic.DiagnosticSeverity.Warning:
             return vscode.DiagnosticSeverity.Warning;
+        case Logic.DiagnosticSeverity.Information:
+            return vscode.DiagnosticSeverity.Information;
+        case Logic.DiagnosticSeverity.Hint:
+            return vscode.DiagnosticSeverity.Hint;
         }
     }
 }
