@@ -3,8 +3,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import { HLMRenderer } from './renderer';
 import { HLMEditHandler } from './editHandler';
-import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
-import { LibraryDataProvider } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDataAccessor } from '../../data/libraryDataProvider';
 
 export class HLMDisplay implements Logic.LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): Logic.LogicDefinitionType {

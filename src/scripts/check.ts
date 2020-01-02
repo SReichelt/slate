@@ -6,7 +6,7 @@ import * as FmtLibrary from '../shared/logics/library';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import { PhysicalFileAccessor } from '../fs/data/physicalFileAccessor';
-import { LibraryDataProvider } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition } from '../shared/data/libraryDataProvider';
 import CachedPromise from '../shared/data/cachedPromise';
 
 let fileAccessor = new PhysicalFileAccessor;
@@ -19,34 +19,34 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
   let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), undefined, libraryName);
-  return libraryDataProvider.fetchLocalSection().then((definition: Fmt.Definition) => checkSection(definition, libraryDataProvider));
+  return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 
-function checkSection(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
+function checkSection(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
   let promise = CachedPromise.resolve(true);
-  let contents = definition.contents as FmtLibrary.ObjectContents_Section;
+  let contents = definition.definition.contents as FmtLibrary.ObjectContents_Section;
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
       promise = promise.then((currentResult: boolean) =>
         libraryDataProvider.fetchItem(ref.path)
-          .then((itemDefinition: Fmt.Definition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
+          .then((itemDefinition: LibraryDefinition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
           .then((itemResult: boolean) => currentResult && itemResult));
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
       let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
       promise = promise.then((currentResult: boolean) =>
         subsectionDataProvider.fetchLocalSection()
-          .then((subsectionDefinition: Fmt.Definition) => checkSection(subsectionDefinition, subsectionDataProvider))
+          .then((subsectionDefinition: LibraryDefinition) => checkSection(subsectionDefinition, subsectionDataProvider))
           .then((itemResult: boolean) => currentResult && itemResult));
     }
   }
   return promise;
 }
 
-function checkItem(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path): CachedPromise<boolean> {
+function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path): CachedPromise<boolean> {
   let checker = libraryDataProvider.logic.getChecker();
-  return checker.checkDefinition(definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+  return checker.checkDefinition(definition.definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
     let result = true;
     for (let diagnostic of checkResult.diagnostics) {
       let severity = 'Unknown';

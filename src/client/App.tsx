@@ -19,7 +19,7 @@ import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/file
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
-import { LibraryDataProvider, LibraryItemInfo } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import Message from './components/Message';
@@ -38,11 +38,9 @@ interface SelectionState {
   selectedItemRepository?: GitHub.Repository;
   selectedItemPath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
-  selectedItemDefinition?: CachedPromise<Fmt.Definition>;
+  selectedItemDefinition?: CachedPromise<LibraryDefinition>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
   interactionHandler?: LibraryItemInteractionHandler;
-  editedDefinition?: Fmt.Definition;
-  submitting: boolean;
 }
 
 interface GitHubState {
@@ -75,7 +73,6 @@ class App extends React.Component<AppProps, AppState> {
 
     let state: AppState = {
       verticalLayout: window.innerHeight > window.innerWidth,
-      submitting: false,
       extraContentsVisible: false,
     };
 
@@ -194,7 +191,6 @@ class App extends React.Component<AppProps, AppState> {
         selectedItemDefinition: undefined,
         selectedItemInfo: undefined,
         interactionHandler: undefined,
-        submitting: false
       };
       this.updateSelectionState(state, window.location.pathname);
       this.setState(state);
@@ -266,10 +262,11 @@ class App extends React.Component<AppProps, AppState> {
     let extraContents: React.ReactNode = undefined;
     if (this.state.selectedItemDefinition) {
       if (this.state.templates && this.state.selectedItemProvider) {
-        let definition = this.state.editedDefinition ? CachedPromise.resolve(this.state.editedDefinition) : this.state.selectedItemDefinition;
-        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} editing={this.state.editedDefinition !== undefined} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
-        extraContents = <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
-        if (this.state.editedDefinition) {
+        let definitionPromise = this.state.selectedItemDefinition;
+        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definitionPromise} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+        extraContents = <SourceCodeView definition={definitionPromise} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+        let definition = definitionPromise.getImmediateResult();
+        if (definition && definition.state === LibraryDefinitionState.Editing) {
           if (!this.state.gitHubUserInfo && !this.runningLocally) {
             mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
           } else if (this.state.selectedItemRepository) {
@@ -334,10 +331,11 @@ class App extends React.Component<AppProps, AppState> {
 
     let rightButtons: React.ReactNode[] = [];
     if (this.state.selectedItemDefinition) {
-      if (this.state.submitting) {
+      let definition = this.state.selectedItemDefinition.getImmediateResult();
+      if (definition && definition.state === LibraryDefinitionState.Submitting) {
         rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
         rightButtons.push(' ');
-      } else if (this.state.editedDefinition) {
+      } else if (definition && definition.state === LibraryDefinitionState.Editing) {
         let willSubmit: boolean | undefined;
         let repository = this.state.selectedItemRepository;
         if (repository) {
@@ -351,17 +349,18 @@ class App extends React.Component<AppProps, AppState> {
           </Button>
         );
         rightButtons.push(
-          <Button toolTipText={'Cancel'} onClick={() => this.setState({editedDefinition: undefined})} key={'Cancel'}>
+          <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key={'Cancel'}>
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
         );
         rightButtons.push(' ');
       } else {
-        rightButtons.push(
+        let editButtonPromise = this.state.selectedItemDefinition.then(() => (
           <Button toolTipText={'Edit'} onClick={this.edit} key={'Edit'}>
             {getButtonIcon(ButtonType.Edit)}
           </Button>
-        );
+        ));
+        rightButtons.push(renderPromise(editButtonPromise));
         if (this.runningLocally) {
           rightButtons.push(
             <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
@@ -432,23 +431,18 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo): void => {
+  private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
     this.navigate({
       selectedItemPath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
       selectedItemDefinition: definitionPromise,
       selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined,
-      interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined,
-      editedDefinition: undefined,
-      submitting: false
+      interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined
     });
   }
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
-    let state: SelectionState = {
-      editedDefinition: undefined,
-      submitting: false
-    };
+    let state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
     this.navigate(state);
   }
@@ -487,41 +481,56 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private edit = (): void => {
-    if (this.state.selectedItemDefinition) {
-      this.state.selectedItemDefinition.then((definition: Fmt.Definition) => this.setState({
-        editedDefinition: definition.clone()
-      }));
+    let libraryDataProvider = this.state.selectedItemProvider;
+    let definitionPromise = this.state.selectedItemDefinition;
+    if (libraryDataProvider && definitionPromise) {
+      definitionPromise.then((definition: LibraryDefinition) => {
+        let clonedDefinition = libraryDataProvider!.editLocalItem(definition);
+        this.setState({
+          selectedItemDefinition: CachedPromise.resolve(clonedDefinition)
+        });
+      });
     }
   }
 
   private submit = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
-    let path = this.state.selectedItemPath;
-    if (this.state.editedDefinition && libraryDataProvider && path) {
-      this.setState({
-        selectedItemDefinition: CachedPromise.resolve(this.state.editedDefinition),
-        editedDefinition: undefined,
-        submitting: true
-      });
-      libraryDataProvider.submitLocalItem(path.name, this.state.editedDefinition)
-        .then((writeFileResult: WriteFileResult) => {
-          this.setState({submitting: false});
-          if (writeFileResult instanceof GitHubWriteFileResult) {
-            if (writeFileResult.pullRequestState !== undefined) {
-              let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
-              this.props.alert.info(`GitHub pull request ${action} successfully.`);
+    let definitionPromise = this.state.selectedItemDefinition;
+    if (libraryDataProvider && definitionPromise) {
+      let definition = definitionPromise.getImmediateResult();
+      if (definition) {
+        libraryDataProvider.submitLocalItem(definition)
+          .then((writeFileResult: WriteFileResult) => {
+            if (writeFileResult instanceof GitHubWriteFileResult) {
+              if (writeFileResult.pullRequestState !== undefined) {
+                let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
+                this.props.alert.info(`GitHub pull request ${action} successfully.`);
+              }
+            } else if (writeFileResult instanceof WebWriteFileResult) {
+              if (!writeFileResult.writtenDirectly) {
+                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+              }
             }
-          } else if (writeFileResult instanceof WebWriteFileResult) {
-            if (!writeFileResult.writtenDirectly) {
-              this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
-            }
-          }
-        })
-        .catch((error) => {
-          this.setState({submitting: false});
-          this.props.alert.error('Error submitting changes: ' + error.message);
-        });
-      this.forceUpdate();
+            this.forceUpdate();
+          })
+          .catch((error) => {
+            this.props.alert.error('Error submitting changes: ' + error.message);
+            this.forceUpdate();
+          });
+        this.forceUpdate();
+      }
+    }
+  }
+
+  private cancelEditing = (): void => {
+    let libraryDataProvider = this.state.selectedItemProvider;
+    let definitionPromise = this.state.selectedItemDefinition;
+    if (libraryDataProvider && definitionPromise) {
+      let definition = definitionPromise.getImmediateResult();
+      if (definition) {
+        libraryDataProvider.cancelEditing(definition);
+        this.setState({selectedItemDefinition: libraryDataProvider.fetchLocalItem(definition.definition.name)});
+      }
     }
   }
 

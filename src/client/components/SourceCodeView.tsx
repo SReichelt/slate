@@ -1,13 +1,13 @@
 import * as React from 'react';
-import * as Fmt from '../../shared/format/format';
 import * as FmtWriter from '../../shared/format/write';
 import * as SourceCodeDisplay from '../../shared/display/sourceCodeDisplay';
+import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
 
 interface SourceCodeViewProps {
-  definition: CachedPromise<Fmt.Definition>;
+  definition: CachedPromise<LibraryDefinition>;
   interactionHandler?: ExpressionInteractionHandler;
 }
 
@@ -42,14 +42,14 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
   }
 
   render(): React.ReactNode {
-    let render = this.props.definition.then((definition: Fmt.Definition) => {
+    let render = this.props.definition.then((definition: LibraryDefinition) => {
       let stream = new SourceCodeDisplay.SourceCodeStream;
       let writer = new FmtWriter.Writer(stream);
       let indent = {
         indent: '',
         outerIndent: ''
       };
-      writer.writeDefinition(definition, indent);
+      writer.writeDefinition(definition.definition, indent);
       return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} tooltipPosition="top"/>;
     });
 

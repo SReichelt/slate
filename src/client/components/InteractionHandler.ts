@@ -1,6 +1,6 @@
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
-import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
@@ -79,7 +79,7 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 }
 
 export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerImpl {
-  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<Fmt.Definition>, private onLinkClicked?: OnLinkClicked) {
+  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<LibraryDefinition>, private onLinkClicked?: OnLinkClicked) {
     super();
   }
 
@@ -118,8 +118,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
         includeLabel: false,
         includeExtras: true,
         includeProofs: false,
-        includeRemarks: false,
-        editing: false
+        includeRemarks: false
       };
       return renderLibraryItem(props);
     } else {
@@ -135,7 +134,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
       }
       if (!path.parentPath && this.definition) {
         let ownDefinition = this.definition.getImmediateResult();
-        if (ownDefinition && path.name === ownDefinition.name) {
+        if (ownDefinition && path.name === ownDefinition.definition.name) {
           return undefined;
         }
       }

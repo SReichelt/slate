@@ -49,6 +49,7 @@
 .tree-item-display {
   display: table-cell;
   padding: 2pt;
+  position: relative;
 }
 
 .tree-item-content-display {
@@ -59,9 +60,4 @@
 .tree-item-minor {
   font-size: smaller;
   color: gray;
-}
-
-.filtering {
-  float: right;
-  vertical-align: middle;
 }

@@ -11,7 +11,7 @@ import * as Logic from '../../shared/logics/logic';
 import * as Logics from '../../shared/logics/logics';
 import { FileContents } from '../../shared/data/fileAccessor';
 import { WorkspaceFileAccessor } from './workspaceFileAccessor';
-import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import { fileExtension } from '../../fs/format/dynamic';
 import { RangeInfo, convertRangeInfo } from './utils';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -240,8 +240,8 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
                         let ref = range.object.ref;
                         result.push(new SlateCodeLens(range.range, () => {
                             let item = libraryDataProvider.fetchItem(ref.path);
-                            let expression = item.then((definition) => {
-                                let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, false, libraryDataProvider, templates);
+                            let expression = item.then((definition: LibraryDefinition) => {
+                                let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, false, libraryDataProvider, templates);
                                 try {
                                     return renderer.renderDefinitionSummary() || new Display.EmptyExpression;
                                 } catch (error) {
@@ -301,8 +301,8 @@ class SlateLogicHoverProvider {
             let targetDataProvider = libraryDocument.documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
             let templates = this.templates;
-            let textPromise = definitionPromise.then((definition: Fmt.Definition) => {
-                let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition, false, targetDataProvider, templates);
+            let textPromise = definitionPromise.then((definition: LibraryDefinition) => {
+                let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, false, targetDataProvider, templates);
                 let renderedDefinition = renderer.renderDefinition(undefined, false, true, false);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
             });

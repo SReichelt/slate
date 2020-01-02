@@ -1,4 +1,4 @@
-import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
+import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
 import { FileAccessor, FileContents, WriteFileResult } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
@@ -8,7 +8,7 @@ import * as FmtWriter from '../format/write';
 import * as FmtLibrary from '../logics/library';
 import * as Logic from '../logics/logic';
 
-export { LibraryDataAccessor, LibraryItemInfo, formatItemNumber };
+export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber };
 
 
 const fileExtension = '.slate';
@@ -27,7 +27,8 @@ interface CanonicalPathInfo {
 export class LibraryDataProvider implements LibraryDataAccessor {
   private path?: Fmt.NamedPathItem;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
-  private definitionCache = new Map<string, CachedPromise<Fmt.Definition>>();
+  private definitionCache = new Map<string, CachedPromise<LibraryDefinition>>();
+  private editedItems = new Map<string, LibraryDefinition>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
@@ -215,14 +216,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return left.arguments.isEquivalentTo(right.arguments, unificationFn, replacedParameters);
   }
 
-  private fetchDefinition(fileName: string, definitionName: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.Definition> {
-    let result = this.definitionCache.get(fileName);
+  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<LibraryDefinition> {
+    let result = this.definitionCache.get(name);
     if (!result) {
-      let uri = this.uri + encodeURI(fileName) + fileExtension;
+      let uri = this.uri + encodeURI(name) + fileExtension;
       result = this.fileAccessor.readFile(uri)
         .then((contents: FileContents) => {
           contents.onChange = () => {
-            this.definitionCache.delete(fileName);
+            this.definitionCache.delete(name);
             contents.close();
           };
           let file = FmtReader.readString(contents.text, uri, getMetaModel);
@@ -233,20 +234,25 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           if (definition.name !== definitionName) {
             throw new Error(`Expected name "${definitionName}" but found "${definition.name}" instead`);
           }
-          return definition;
+          return {
+            file: file,
+            definition: definition,
+            state: LibraryDefinitionState.Loaded
+          };
         });
-      this.definitionCache.set(fileName, result);
+      this.definitionCache.set(name, result);
     }
     return result;
   }
 
-  private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
+  private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel);
     if (prefetchContents) {
-      result.then((definition: Fmt.Definition) => {
-        if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
+      result.then((libraryDefinition: LibraryDefinition) => {
+        let contents = libraryDefinition.definition.contents;
+        if (contents instanceof FmtLibrary.ObjectContents_Section) {
           let index = 0;
-          for (let item of definition.contents.items) {
+          for (let item of contents.items) {
             if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
               if (!path.parentPath && !this.definitionCache.get(path.name)) {
@@ -270,43 +276,73 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return result;
   }
 
-  fetchLocalSection(prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
+  fetchLocalSection(prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     return this.fetchSection(this.parent ? '_index' : this.childName, prefetchContents);
   }
 
-  fetchSubsection(path: Fmt.Path, itemNumber?: number[], prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
+  fetchSubsection(path: Fmt.Path, itemNumber?: number[], prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     let provider = this.getProviderForSection(path, itemNumber);
     return provider.fetchLocalSection(prefetchContents);
   }
 
-  fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
+  fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
+    let editedItem = this.editedItems.get(name);
+    if (editedItem) {
+      return CachedPromise.resolve(editedItem);
+    }
     return this.fetchDefinition(name, name, this.logic.getMetaModel);
   }
 
-  fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<Fmt.Definition> {
+  fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     let parentProvider = this.getProviderForSection(path.parentPath);
     return parentProvider.fetchLocalItem(path.name, prefetchContents);
   }
 
-  isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<Fmt.Definition>): boolean {
+  isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
+    if (this.editedItems.has(name)) {
+      return false;
+    }
     return definitionPromise === this.definitionCache.get(name);
   }
 
-  isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<Fmt.Definition>): boolean {
+  isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
     let parentProvider = this.getProviderForSection(path.parentPath);
     return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
   }
 
-  submitLocalItem(name: string, definition: Fmt.Definition): CachedPromise<WriteFileResult> {
+  editLocalItem(libraryDefinition: LibraryDefinition): LibraryDefinition {
+    let clonedFile = libraryDefinition.file.clone();
+    let clonedLibraryDefinition: LibraryDefinition = {
+      file: clonedFile,
+      definition: clonedFile.definitions[0],
+      state: LibraryDefinitionState.Editing
+    };
+    this.editedItems.set(libraryDefinition.definition.name, clonedLibraryDefinition);
+    return clonedLibraryDefinition;
+  }
+
+  cancelEditing(editedLibraryDefinition: LibraryDefinition): void {
+    let name = editedLibraryDefinition.definition.name;
+    if (editedLibraryDefinition === this.editedItems.get(name)) {
+      this.editedItems.delete(name);
+    }
+  }
+
+  submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
+    let name = editedLibraryDefinition.definition.name;
+    if (editedLibraryDefinition !== this.editedItems.get(name)) {
+      throw new Error('Trying to submit definition that is not being edited');
+    }
     try {
-      this.definitionCache.set(name, CachedPromise.resolve(definition));
+      editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
       let uri = this.uri + encodeURI(name) + fileExtension;
-      let file = new Fmt.File;
-      file.metaModelPath = this.getLogicMetaModelPath();
-      file.definitions = new Fmt.DefinitionList;
-      file.definitions.push(definition);
-      let contents = FmtWriter.writeString(file);
-      return this.fileAccessor.writeFile!(uri, contents);
+      let contents = FmtWriter.writeString(editedLibraryDefinition.file);
+      return this.fileAccessor.writeFile!(uri, contents).then((result: WriteFileResult) => {
+        editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
+        this.definitionCache.set(name, CachedPromise.resolve(editedLibraryDefinition));
+        this.editedItems.delete(name);
+        return result;
+      });
     } catch (error) {
       return CachedPromise.reject(error);
     }
@@ -324,8 +360,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   getLocalItemInfo(name: string): CachedPromise<LibraryItemInfo> {
     return this.fetchLocalSection(false)
-      .then((definition: Fmt.Definition) => {
-        let contents = definition.contents as FmtLibrary.ObjectContents_Section;
+      .then((libraryDefinition: LibraryDefinition) => {
+        let contents = libraryDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
         let type: string | undefined = undefined;
         let title: string | undefined = undefined;
         let index = 0;

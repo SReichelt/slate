@@ -6,6 +6,15 @@ export class File {
   metaModelPath: Path;
   definitions: DefinitionList = Object.create(DefinitionList.prototype);
 
+  clone(): File {
+    let result = new File;
+    result.metaModelPath = this.metaModelPath;
+    for (let definition of this.definitions) {
+      result.definitions.push(definition.clone());
+    }
+    return result;
+  }
+
   toString(): string {
     return writeToString((writer: FmtWriter.Writer) => writer.writeFile(this));
   }

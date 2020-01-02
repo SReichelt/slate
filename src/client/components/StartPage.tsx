@@ -2,7 +2,7 @@ import * as React from 'react';
 import './StartPage.css';
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
-import { LibraryDataProvider } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { OnLinkClicked } from './InteractionHandler';
@@ -74,8 +74,8 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
   let examplePath = buildExamplePath(names);
   let libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
   let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
-  let expressionPromise = definitionPromise.then((definition) => {
-    let definitionRenderer = new HLMRenderer(definition, false, libraryDataProvider, props.templates!);
+  let expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
+    let definitionRenderer = new HLMRenderer(definition.definition, false, libraryDataProvider, props.templates!);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
   let expression = new Display.PromiseExpression(expressionPromise);

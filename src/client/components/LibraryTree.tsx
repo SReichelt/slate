@@ -3,7 +3,7 @@ import './LibraryTree.css';
 import * as Fmt from '../../shared/format/format';
 import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
-import { LibraryDataProvider, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
 import Expression from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
@@ -12,15 +12,15 @@ import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
 const Loading = require('react-loading-animation');
 const ToolTip = require('react-portal-tooltip').default;
 
-export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<boolean>;
-export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinitionPromise: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo) => void;
+export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;
+export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
 
 interface VisibilityResult {
   visible: CachedPromise<boolean>;
   selectable: CachedPromise<boolean>;
 }
 
-function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, outerDefinition: Fmt.Definition, definition: Fmt.Definition, onFilter: OnFilter): VisibilityResult {
+function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, libraryDefinition: LibraryDefinition, definition: Fmt.Definition, onFilter: OnFilter): VisibilityResult {
   if (isSubsection) {
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
     let resultPromise = CachedPromise.resolve(false);
@@ -33,13 +33,13 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
             if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
               let itemIsSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
               let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
-              let itemDefinitionPromise: CachedPromise<Fmt.Definition>;
+              let itemDefinitionPromise: CachedPromise<LibraryDefinition>;
               if (itemIsSubsection) {
                 itemDefinitionPromise = innerLibraryDataProvider.fetchSubsection(itemPath, undefined, false);
               } else {
                 itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false);
               }
-              return itemDefinitionPromise.then((itemDefinition: Fmt.Definition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, itemDefinition, onFilter).visible);
+              return itemDefinitionPromise.then((itemDefinition: LibraryDefinition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, itemDefinition.definition, onFilter).visible);
             } else {
               return false;
             }
@@ -52,7 +52,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
       selectable: CachedPromise.resolve(false)
     };
   } else {
-    let ownResultPromise = onFilter(libraryDataProvider, path, outerDefinition, definition);
+    let ownResultPromise = onFilter(libraryDataProvider, path, libraryDefinition, definition);
     let resultPromise = ownResultPromise;
     for (let innerDefinition of definition.innerDefinitions) {
       resultPromise = resultPromise.then((currentResult: boolean) => {
@@ -62,7 +62,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
           let innerPath = new Fmt.Path;
           innerPath.name = innerDefinition.name;
           innerPath.parentPath = path;
-          return checkVisibility(libraryDataProvider, innerPath, false, outerDefinition, innerDefinition, onFilter).visible;
+          return checkVisibility(libraryDataProvider, innerPath, false, libraryDefinition, innerDefinition, onFilter).visible;
         }
       });
     }
@@ -77,7 +77,7 @@ let previewContents: React.ReactNode = null;
 
 interface LibraryTreeItemProps {
   libraryDataProvider: LibraryDataProvider;
-  outerDefinition?: Fmt.Definition;
+  libraryDefinition?: LibraryDefinition;
   isSubsection: boolean;
   path: Fmt.Path;
   itemInfo: LibraryItemInfo;
@@ -101,7 +101,7 @@ interface LibraryTreeItemState {
 }
 
 class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeItemState> {
-  private outerDefinitionPromise?: CachedPromise<Fmt.Definition>;
+  private libraryDefinitionPromise?: CachedPromise<LibraryDefinition>;
   private htmlNode: HTMLElement | null = null;
   private clicked: boolean = false;
   private hovered: boolean = false;
@@ -137,8 +137,8 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       }
     }
     if (props.isSubsection !== this.props.isSubsection
-        || props.outerDefinition !== this.props.outerDefinition
-        || (!props.isSubsection && this.outerDefinitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.outerDefinitionPromise))) {
+        || props.libraryDefinition !== this.props.libraryDefinition
+        || (!props.isSubsection && this.libraryDefinitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.libraryDefinitionPromise))) {
       this.updateItem(props);
     }
     if (props.selected !== this.props.selected
@@ -155,12 +155,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       opened: false
     });
 
-    if (props.outerDefinition) {
-      this.outerDefinitionPromise = CachedPromise.resolve(props.outerDefinition);
-      let definition = props.outerDefinition.innerDefinitions.getDefinition(props.path.name);
+    if (props.libraryDefinition) {
+      this.libraryDefinitionPromise = CachedPromise.resolve(props.libraryDefinition);
+      let definition = props.libraryDefinition.definition.innerDefinitions.getDefinition(props.path.name);
       this.setState({definition: definition});
       if (props.onFilter) {
-        let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, props.outerDefinition, definition, props.onFilter);
+        let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, props.libraryDefinition, definition, props.onFilter);
         visibilityResult.visible.then((visible: boolean) => {
           this.setState({
             filtering: false,
@@ -174,23 +174,23 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         });
       }
     } else {
-      let definitionPromise: CachedPromise<Fmt.Definition> | undefined = undefined;
+      let libraryDefinitionPromise: CachedPromise<LibraryDefinition> | undefined = undefined;
       if (props.isSubsection) {
-        definitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
+        libraryDefinitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
       } else {
-        definitionPromise = props.libraryDataProvider.fetchItem(props.path);
+        libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path);
       }
-      this.outerDefinitionPromise = definitionPromise;
+      this.libraryDefinitionPromise = libraryDefinitionPromise;
 
-      if (definitionPromise) {
-        definitionPromise
-          .then((definition: Fmt.Definition) => {
-            if (this.outerDefinitionPromise === definitionPromise) {
-              this.setState({definition: definition});
+      if (libraryDefinitionPromise) {
+        libraryDefinitionPromise
+          .then((libraryDefinition: LibraryDefinition) => {
+            if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
+              this.setState({definition: libraryDefinition.definition});
               if (props.onFilter) {
-                let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, definition, definition, props.onFilter);
+                let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, libraryDefinition, libraryDefinition.definition, props.onFilter);
                 visibilityResult.visible.then((visible: boolean) => {
-                  if (this.outerDefinitionPromise === definitionPromise) {
+                  if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
                     this.setState({
                       filtering: false,
                       filtered: !visible
@@ -199,7 +199,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
                 });
                 if (!props.isSubsection) {
                   visibilityResult.selectable.then((selectable: boolean) => {
-                    if (this.outerDefinitionPromise === definitionPromise) {
+                    if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
                       this.setState({
                         clickable: selectable
                       });
@@ -232,7 +232,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.parentScrollPane) {
       this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
     }
-    this.outerDefinitionPromise = undefined;
+    this.libraryDefinitionPromise = undefined;
   }
 
   render(): React.ReactNode {
@@ -246,17 +246,17 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.isSubsection) {
       if (this.state.opened) {
         icon = getButtonIcon(ButtonType.DownArrow);
-        if (this.outerDefinitionPromise) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} section={this.outerDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+        if (this.libraryDefinitionPromise) {
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       } else {
         icon = getButtonIcon(ButtonType.RightArrow);
       }
     } else {
       let definition = this.state.definition;
-      if (definition && this.props.onFilter) {
+      if (definition && this.props.onFilter && this.libraryDefinitionPromise) {
         if (definition.innerDefinitions.length) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} outerDefinition={definition} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       }
       if (definition) {
@@ -266,7 +266,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         let definitionIcon = getDefinitionIcon(definitionType, this.props.itemInfo);
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
-          let outerDefinition = this.props.outerDefinition || definition;
+          let outerDefinition = this.props.libraryDefinition ? this.props.libraryDefinition.definition : definition;
           let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, false, this.props.libraryDataProvider, this.props.templates);
           let summary = renderer.renderDefinitionSummary(definition);
           if (summary) {
@@ -311,15 +311,31 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.itemInfo && this.props.itemInfo.type === 'lemma') {
       display = <span className={'tree-item-minor'} key="minor">{display}</span>;
     }
+    let specialIcon = undefined;
     if (this.state.filtering) {
-      display = [display, <div className={'filtering'} key="filtering"><Loading width={'1em'} height={'1em'}/></div>];
+      specialIcon = <Loading width={'1em'} height={'1em'}/>;
+    } else if (this.libraryDefinitionPromise) {
+      let libraryDefinition = this.libraryDefinitionPromise.getImmediateResult();
+      if (libraryDefinition) {
+        switch (libraryDefinition.state) {
+        case LibraryDefinitionState.Editing:
+          specialIcon = getButtonIcon(ButtonType.Edit);
+          break;
+        case LibraryDefinitionState.Submitting:
+          specialIcon = <Loading width={'1em'} height={'1em'}/>;
+          break;
+        }
+      }
+    }
+    if (specialIcon && !this.props.indent) {
+      icon = specialIcon;
     }
     let columns: React.ReactNodeArray = [
       <div className={'tree-item-icon'} key="icon">{icon}</div>,
       <div className={'tree-item-display'} key="display">{display}</div>
     ];
-    for (let i = this.props.indent; i > 0; i--) {
-      columns.unshift(<div className={'tree-item-indent'} key={i}/>);
+    for (let i = this.props.indent - 1; i >= 0; i--) {
+      columns.unshift(<div className={'tree-item-indent'} key={i}>{i === 0 ? specialIcon : undefined}</div>);
     }
     let treeItemContents = (
       <div className={'tree-item-contents'}>
@@ -359,8 +375,8 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
           setTimeout(this.scrollIntoView, 100);
         }
         this.setState((prevState) => ({opened: !prevState.opened}));
-      } else if (this.props.onItemClicked && this.outerDefinitionPromise) {
-        this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.outerDefinitionPromise, this.props.itemInfo);
+      } else if (this.props.onItemClicked && this.libraryDefinitionPromise) {
+        this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.libraryDefinitionPromise, this.props.itemInfo);
       }
     }
   }
@@ -432,8 +448,8 @@ interface LibraryTreeProps {
 }
 
 interface InnerLibraryTreeProps extends LibraryTreeProps {
-  section?: CachedPromise<Fmt.Definition>;
-  outerDefinition?: Fmt.Definition;
+  sectionPromise?: CachedPromise<LibraryDefinition>;
+  libraryDefinition?: LibraryDefinition;
   innerDefinitions?: Fmt.Definition[];
   itemNumber: number[];
   indent: number;
@@ -442,9 +458,9 @@ interface InnerLibraryTreeProps extends LibraryTreeProps {
 
 function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
   let parentPath: Fmt.Path | undefined = undefined;
-  if (props.outerDefinition) {
+  if (props.libraryDefinition) {
     parentPath = new Fmt.Path;
-    parentPath.name = props.outerDefinition.name;
+    parentPath.name = props.libraryDefinition.definition.name;
   }
 
   let selectedItemPathHead: Fmt.NamedPathItem | undefined = undefined;
@@ -496,7 +512,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} outerDefinition={props.outerDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
     }
     index++;
   }
@@ -505,10 +521,10 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
 }
 
 function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
-  if (props.section) {
-    let render = props.section.then((section: Fmt.Definition) => {
-      if (section.contents instanceof FmtLibrary.ObjectContents_Section) {
-        return renderLibraryTreeItems(props, section.contents.items);
+  if (props.sectionPromise) {
+    let render = props.sectionPromise.then((section: LibraryDefinition) => {
+      if (section.definition.contents instanceof FmtLibrary.ObjectContents_Section) {
+        return renderLibraryTreeItems(props, section.definition.contents.items);
       } else {
         return <div className={'tree-item error'}>Error: Invalid section content type</div>;
       }
@@ -524,7 +540,7 @@ function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
 function LibraryTree(props: LibraryTreeProps) {
   let innerProps: InnerLibraryTreeProps = {
     ...props,
-    section: props.libraryDataProvider.fetchLocalSection(),
+    sectionPromise: props.libraryDataProvider.fetchLocalSection(),
     itemNumber: [],
     indent: 0,
     isLast: true

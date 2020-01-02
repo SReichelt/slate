@@ -7,7 +7,7 @@ import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
 import { getNextDefaultName } from '../../format/common';
 import CachedPromise from '../../data/cachedPromise';
@@ -37,7 +37,7 @@ export type RenderExpressionFn = (expression: Fmt.Expression) => Display.Rendere
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
-export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
+export type GetExpressionsFn = (path: Fmt.Path, libraryDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   protected editAnalysis = new Edit.EditAnalysis;
@@ -550,9 +550,9 @@ export abstract class GenericEditHandler {
       let treeItem = new Dialog.ExpressionDialogTreeItem;
       treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
       treeItem.templates = this.templates;
-      treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+      treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => {
         let relativePath = this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
-        let expressionsPromise = onGetExpressions(relativePath, outerDefinition, definition);
+        let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition);
         if (expressionsPromise) {
           return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
         } else {
@@ -562,17 +562,17 @@ export abstract class GenericEditHandler {
       let selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>();
       selectionItem.items = [];
       selectionItem.onRenderItem = onRenderExpression;
-      treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, outerDefinitionPromise?: CachedPromise<Fmt.Definition>, itemInfo?: LibraryItemInfo) => {
+      treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise?: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => {
         let absolutePath = libraryDataProvider.getAbsolutePath(path);
         let relativePath = this.libraryDataProvider.getRelativePath(absolutePath);
         treeItem.selectedItemPath = absolutePath;
         treeItem.changed();
-        if (!outerDefinitionPromise) {
-          outerDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path));
+        if (!libraryDefinitionPromise) {
+          libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path));
         }
-        outerDefinitionPromise.then((outerDefinition: Fmt.Definition) => {
-          let definition = FmtUtils.getInnerDefinition(outerDefinition, path);
-          let expressionsPromise = onGetExpressions(relativePath, outerDefinition, definition);
+        libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
+          let definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);
+          let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition);
           if (expressionsPromise) {
             expressionsPromise.then((expressions: Fmt.Expression[]) => {
               selectionItem.items = expressions;

@@ -3,6 +3,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';
+import { LibraryDefinition } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
 export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {}
@@ -154,7 +155,8 @@ export class HLMUtils extends GenericUtils {
 
   getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
     let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(constructionPath);
-    let resultPromise = constructionDefinitionPromise.then((constructionDefinition: Fmt.Definition) => {
+    let resultPromise = constructionDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
+      let constructionDefinition = libraryDefinition.definition;
       let constructorExpr = structuralCase._constructor as Fmt.DefinitionRefExpression;
       let constructorPath = constructorExpr.path;
       let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(constructorExpr.path.name);

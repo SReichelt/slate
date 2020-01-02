@@ -1,5 +1,5 @@
 import { PhysicalFileAccessor } from '../../../../fs/data/physicalFileAccessor';
-import { LibraryDataProvider } from '../../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition } from '../../../data/libraryDataProvider';
 import * as Fmt from '../../../format/format';
 import * as FmtLibrary from '../../library';
 import * as Logic from '../../logic';
@@ -7,7 +7,7 @@ import * as Logics from '../../logics';
 
 async function checkSection(libraryDataProvider: LibraryDataProvider) {
   let section = await libraryDataProvider.fetchLocalSection();
-  let contents = section.contents as FmtLibrary.ObjectContents_Section;
+  let contents = section.definition.contents as FmtLibrary.ObjectContents_Section;
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
@@ -21,12 +21,12 @@ async function checkSection(libraryDataProvider: LibraryDataProvider) {
   }
 }
 
-async function checkItem(libraryDataProvider: LibraryDataProvider, definition: Fmt.Definition) {
+async function checkItem(libraryDataProvider: LibraryDataProvider, definition: LibraryDefinition) {
   let checker = libraryDataProvider.logic.getChecker();
-  let checkResult: Logic.LogicCheckResult = await checker.checkDefinition(definition, libraryDataProvider);
+  let checkResult: Logic.LogicCheckResult = await checker.checkDefinition(definition.definition, libraryDataProvider);
   let expectedDiagnostics: Logic.LogicCheckDiagnostic[] = [];
-  if (definition.documentation) {
-    for (let item of definition.documentation.items) {
+  if (definition.definition.documentation) {
+    for (let item of definition.definition.documentation.items) {
       let severity: Logic.DiagnosticSeverity;
       switch (item.kind) {
       case 'expectedError':
