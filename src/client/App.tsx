@@ -54,6 +54,7 @@ interface AppState extends SelectionState, GitHubState {
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
   extraContentsVisible: boolean;
+  editedDefinitions: LibraryDefinition[];
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -74,6 +75,7 @@ class App extends React.Component<AppProps, AppState> {
     let state: AppState = {
       verticalLayout: window.innerHeight > window.innerWidth,
       extraContentsVisible: false,
+      editedDefinitions: []
     };
 
     let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
@@ -207,6 +209,14 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({verticalLayout: false});
           }
         }
+      }
+    };
+
+    window.onbeforeunload = () => {
+      if (this.state.editedDefinitions.length) {
+        return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
+      } else {
+        return null;
       }
     };
 
@@ -486,9 +496,10 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryDataProvider && definitionPromise) {
       definitionPromise.then((definition: LibraryDefinition) => {
         let clonedDefinition = libraryDataProvider!.editLocalItem(definition);
-        this.setState({
-          selectedItemDefinition: CachedPromise.resolve(clonedDefinition)
-        });
+        this.setState((prevState) => ({
+          selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
+          editedDefinitions: prevState.editedDefinitions.concat(clonedDefinition)
+        }));
       });
     }
   }
@@ -501,6 +512,12 @@ class App extends React.Component<AppProps, AppState> {
       if (definition) {
         libraryDataProvider.submitLocalItem(definition)
           .then((writeFileResult: WriteFileResult) => {
+            this.setState((prevState) => {
+              let index = prevState.editedDefinitions.indexOf(definition!);
+              return {
+                editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
+              };
+            });
             if (writeFileResult instanceof GitHubWriteFileResult) {
               if (writeFileResult.pullRequestState !== undefined) {
                 let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
@@ -511,7 +528,6 @@ class App extends React.Component<AppProps, AppState> {
                 this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
               }
             }
-            this.forceUpdate();
           })
           .catch((error) => {
             this.props.alert.error('Error submitting changes: ' + error.message);
@@ -529,7 +545,13 @@ class App extends React.Component<AppProps, AppState> {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
         libraryDataProvider.cancelEditing(definition);
-        this.setState({selectedItemDefinition: libraryDataProvider.fetchLocalItem(definition.definition.name)});
+        this.setState((prevState) => {
+          let index = prevState.editedDefinitions.indexOf(definition!);
+          return {
+            selectedItemDefinition: libraryDataProvider!.fetchLocalItem(definition!.definition.name),
+            editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
+          };
+        });
       }
     }
   }
