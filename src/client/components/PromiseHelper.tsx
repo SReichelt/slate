@@ -26,9 +26,9 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
     this.updatePromise(this.props);
   }
 
-  componentWillReceiveProps(props: PromiseHelperProps): void {
-    if (props.promise !== this.props.promise) {
-      this.updatePromise(props);
+  componentDidUpdate(prevProps: PromiseHelperProps): void {
+    if (this.props.promise !== prevProps.promise) {
+      this.updatePromise(this.props);
     }
   }
 
@@ -36,10 +36,12 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
     let promise = props.promise;
 
     this.currentPromise = promise;
-    this.setState({
-      promiseResult: undefined,
-      errorMessage: undefined
-    });
+    if (this.state.promiseResult !== undefined || this.state.errorMessage !== undefined) {
+      this.setState({
+        promiseResult: undefined,
+        errorMessage: undefined
+      });
+    }
 
     promise
       .then((result) => {

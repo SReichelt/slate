@@ -91,17 +91,17 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     this.props.item.unregisterChangeListener(this.onItemChanged);
   }
 
-  componentWillReceiveProps(props: ExpressionDialogItemProps): void {
-    if (props.item !== this.props.item) {
-      this.props.item.unregisterChangeListener(this.onItemChanged);
-      props.item.registerChangeListener(this.onItemChanged);
+  componentDidUpdate(prevProps: ExpressionDialogItemProps): void {
+    if (this.props.item !== prevProps.item) {
+      prevProps.item.unregisterChangeListener(this.onItemChanged);
+      this.props.item.registerChangeListener(this.onItemChanged);
     }
-    if (props.interactionHandler !== this.props.interactionHandler) {
-      if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
+    if (this.props.interactionHandler !== prevProps.interactionHandler) {
+      if (prevProps.interactionHandler) {
+        prevProps.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
       }
-      if (props.interactionHandler) {
-        props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
   }

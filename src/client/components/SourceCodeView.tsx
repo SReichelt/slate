@@ -30,13 +30,13 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
     }
   }
 
-  componentWillReceiveProps(props: SourceCodeViewProps): void {
-    if (props.interactionHandler !== this.props.interactionHandler) {
-      if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
+  componentDidUpdate(prevProps: SourceCodeViewProps): void {
+    if (this.props.interactionHandler !== prevProps.interactionHandler) {
+      if (prevProps.interactionHandler) {
+        prevProps.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
       }
-      if (props.interactionHandler) {
-        props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
   }

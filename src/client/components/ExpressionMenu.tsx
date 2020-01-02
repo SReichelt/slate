@@ -345,9 +345,9 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
     };
   }
 
-  componentWillReceiveProps(props: ExpressionMenuTextInputProps) {
-    if (props.item !== this.props.item) {
-      this.setState({text: props.item.text});
+  componentDidUpdate(prevProps: ExpressionMenuTextInputProps) {
+    if (this.props.item !== prevProps.item) {
+      this.setState({text: this.props.item.text});
     }
   }
 

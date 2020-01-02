@@ -370,7 +370,7 @@ class App extends React.Component<AppProps, AppState> {
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         ));
-        rightButtons.push(renderPromise(editButtonPromise));
+        rightButtons.push(renderPromise(editButtonPromise, 'EditButton'));
         if (this.runningLocally) {
           rightButtons.push(
             <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>

@@ -299,10 +299,22 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
-    if (this.editedItems.has(name)) {
+    let editedItem = this.editedItems.get(name);
+    if (editedItem) {
+      return definitionPromise.getImmediateResult() === editedItem;
+    }
+    let cachedPromise = this.definitionCache.get(name);
+    if (!cachedPromise) {
       return false;
     }
-    return definitionPromise === this.definitionCache.get(name);
+    if (definitionPromise === cachedPromise) {
+      return true;
+    }
+    let cachedResult = cachedPromise.getImmediateResult();
+    if (!cachedResult) {
+      return false;
+    }
+    return definitionPromise.getImmediateResult() === cachedResult;
   }
 
   isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>): boolean {

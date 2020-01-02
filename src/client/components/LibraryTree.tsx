@@ -127,23 +127,23 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     this.updateSelection(this.props);
   }
 
-  componentWillReceiveProps(props: LibraryTreeItemProps): void {
-    if (props.parentScrollPane !== this.props.parentScrollPane) {
+  componentDidUpdate(prevProps: LibraryTreeItemProps): void {
+    if (this.props.parentScrollPane !== prevProps.parentScrollPane) {
+      if (prevProps.parentScrollPane) {
+        prevProps.parentScrollPane.removeEventListener('scroll', this.onScroll);
+      }
       if (this.props.parentScrollPane) {
-        this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
-      }
-      if (props.parentScrollPane) {
-        props.parentScrollPane.addEventListener('scroll', this.onScroll);
+        this.props.parentScrollPane.addEventListener('scroll', this.onScroll);
       }
     }
-    if (props.isSubsection !== this.props.isSubsection
-        || props.libraryDefinition !== this.props.libraryDefinition
-        || (!props.isSubsection && this.libraryDefinitionPromise && !props.libraryDataProvider.isItemUpToDate(props.path, this.libraryDefinitionPromise))) {
-      this.updateItem(props);
+    if (this.props.isSubsection !== prevProps.isSubsection
+        || this.props.libraryDefinition !== prevProps.libraryDefinition
+        || (!this.props.isSubsection && this.libraryDefinitionPromise && !this.props.libraryDataProvider.isItemUpToDate(this.props.path, this.libraryDefinitionPromise))) {
+      this.updateItem(this.props);
     }
-    if (props.selected !== this.props.selected
-        || !FmtUtils.arePathsEqual(props.selectedChildPath, this.props.selectedChildPath)) {
-      this.updateSelection(props);
+    if (this.props.selected !== prevProps.selected
+        || !FmtUtils.arePathsEqual(this.props.selectedChildPath, prevProps.selectedChildPath)) {
+      this.updateSelection(this.props);
     }
   }
 

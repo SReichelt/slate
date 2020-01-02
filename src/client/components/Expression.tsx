@@ -87,19 +87,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  componentWillReceiveProps(props: ExpressionProps): void {
-    if (props.parent !== this.props.parent || props.expression !== this.props.expression || props.interactionHandler !== this.props.interactionHandler) {
+  componentDidUpdate(prevProps: ExpressionProps): void {
+    if (this.props.parent !== prevProps.parent || this.props.expression !== prevProps.expression || this.props.interactionHandler !== prevProps.interactionHandler) {
       this.cleanupDependentState();
     }
-    if (props.interactionHandler !== this.props.interactionHandler) {
-      if (this.props.interactionHandler) {
-        this.props.interactionHandler.unregisterHoverChangeListener(this.onHoverChanged);
+    if (this.props.interactionHandler !== prevProps.interactionHandler) {
+      if (prevProps.interactionHandler) {
+        prevProps.interactionHandler.unregisterHoverChangeListener(this.onHoverChanged);
       }
-      if (props.interactionHandler) {
-        props.interactionHandler.registerHoverChangeListener(this.onHoverChanged);
+      if (this.props.interactionHandler) {
+        this.props.interactionHandler.registerHoverChangeListener(this.onHoverChanged);
       }
     }
-    this.updateOptionalProps(props);
+    this.updateOptionalProps(this.props);
   }
 
   private updateOptionalProps(props: ExpressionProps): void {
@@ -107,12 +107,18 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
   }
 
+  private clearOpenMenu(): void {
+    if (this.state.openMenu || this.state.openDialog) {
+      this.setState({
+        openMenu: undefined,
+        openDialog: undefined
+      });
+    }
+  }
+
   private clearHoverAndMenu(): void {
     this.permanentlyHighlighted = false;
-    this.setState({
-      openMenu: undefined,
-      openDialog: undefined
-    });
+    this.clearOpenMenu();
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
         this.props.parent.removeFromHoveredChildren(expression);
@@ -1223,10 +1229,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       this.permanentlyHighlighted = false;
       this.removeFromHoveredChildren();
     }
-    this.setState({
-      openMenu: undefined,
-      openDialog: undefined
-    });
+    this.clearOpenMenu();
     this.disableWindowClickListener();
     this.disableInteractionBlocker();
   }
