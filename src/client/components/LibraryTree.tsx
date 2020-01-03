@@ -157,7 +157,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
 
     if (props.libraryDefinition) {
       this.libraryDefinitionPromise = CachedPromise.resolve(props.libraryDefinition);
-      let definition = props.libraryDefinition.definition.innerDefinitions.getDefinition(props.path.name);
+      let definition = props.path.parentPath instanceof Fmt.Path ? props.libraryDefinition.definition.innerDefinitions.getDefinition(props.path.name) : props.libraryDefinition.definition;
       this.setState({definition: definition});
       if (props.onFilter) {
         let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, props.libraryDefinition, definition, props.onFilter);
@@ -410,24 +410,27 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.parentScrollPane && this.htmlNode) {
       let parentRect = this.props.parentScrollPane.getBoundingClientRect();
       let itemRect = this.htmlNode.getBoundingClientRect();
-      return {
-        left: parentRect.left,
-        right: parentRect.right,
-        width: parentRect.width,
-        top: itemRect.top,
-        bottom: itemRect.bottom,
-        height: itemRect.height
-      };
-    } else {
-      return {
-        left: 0,
-        right: 0,
-        width: 0,
-        top: 0,
-        bottom: 0,
-        height: 0
-      };
+      if (parentRect.width > 0) {
+        return {
+          left: parentRect.left,
+          right: parentRect.right,
+          width: parentRect.width,
+          top: itemRect.top,
+          bottom: itemRect.bottom,
+          height: itemRect.height
+        };
+      } else if (itemRect.width > 0) {
+        return itemRect;
+      }
     }
+    return {
+      left: 0,
+      right: 0,
+      width: 0,
+      top: 0,
+      bottom: 0,
+      height: 0
+    };
   }
 
   private onScroll = () => {
@@ -454,6 +457,18 @@ interface InnerLibraryTreeProps extends LibraryTreeProps {
   itemNumber: number[];
   indent: number;
   isLast: boolean;
+}
+
+export interface LibraryItemListEntry {
+  libraryDataProvider: LibraryDataProvider;
+  libraryDefinition: LibraryDefinition;
+  absolutePath: Fmt.Path;
+  localPath: Fmt.Path;
+  itemInfo: LibraryItemInfo;
+}
+
+interface LibraryItemListProps extends LibraryTreeProps {
+  items: LibraryItemListEntry[];
 }
 
 function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
@@ -545,10 +560,18 @@ function LibraryTree(props: LibraryTreeProps) {
     indent: 0,
     isLast: true
   };
-  let treeItems = InnerLibraryTreeItems(innerProps);
   return (
     <div className={'tree'}>
-      {treeItems}
+      {InnerLibraryTreeItems(innerProps)}
+    </div>
+  );
+}
+
+export function LibraryItemList(props: LibraryItemListProps) {
+  return (
+    <div className={'tree'}>
+      {props.items.map((entry: LibraryItemListEntry, index: number) =>
+        <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={index === props.items.length - 1} onFilter={props.onFilter} selected={FmtUtils.arePathsEqual(entry.absolutePath, props.selectedItemPath)} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>)}
     </div>
   );
 }

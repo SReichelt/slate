@@ -93,7 +93,11 @@ body {
   overflow: auto;
 }
 
-.app-tree {
+.app-pane-placeholder {
+  height: 0;
+}
+
+.app-tree, .app-edit-list {
   padding: 2pt;
 }
 

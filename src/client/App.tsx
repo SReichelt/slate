@@ -3,7 +3,7 @@ import './App.css';
 import SplitPane from 'react-split-pane';
 import { withAlert, InjectedAlertProp } from 'react-alert';
 import StartPage from './components/StartPage';
-import LibraryTree from './components/LibraryTree';
+import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import Button from './components/Button';
@@ -36,8 +36,9 @@ interface AppProps {
 
 interface SelectionState {
   selectedItemRepository?: GitHub.Repository;
-  selectedItemPath?: Fmt.Path;
+  selectedItemAbsolutePath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
+  selectedItemLocalPath?: Fmt.Path;
   selectedItemDefinition?: CachedPromise<LibraryDefinition>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
   interactionHandler?: LibraryItemInteractionHandler;
@@ -54,7 +55,7 @@ interface AppState extends SelectionState, GitHubState {
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
   extraContentsVisible: boolean;
-  editedDefinitions: LibraryDefinition[];
+  editedDefinitions: LibraryItemListEntry[];
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -64,6 +65,7 @@ class App extends React.Component<AppProps, AppState> {
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
   private treePaneNode: HTMLElement | null = null;
+  private editListPaneNode: HTMLElement | null = null;
   private mainContentsPaneNode: HTMLElement | null = null;
   private extraContentsPaneNode: HTMLElement | null = null;
 
@@ -168,15 +170,22 @@ class App extends React.Component<AppProps, AppState> {
   private updateSelectionState(state: SelectionState, uri: string): boolean {
     let path = this.libraryDataProvider.uriToPath(uri);
     if (path) {
-      this.fillSelectionState(state, path);
+      this.fillSelectionState(state, this.libraryDataProvider, path);
       return true;
     }
     return false;
   }
 
-  private fillSelectionState(state: SelectionState, path: Fmt.Path): void {
-    state.selectedItemPath = path;
-    state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
+  private fillSelectionState(state: SelectionState, libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void {
+    state.selectedItemAbsolutePath = libraryDataProvider.getAbsolutePath(path);
+    if (path.parentPath) {
+      state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(state.selectedItemAbsolutePath.parentPath);
+      state.selectedItemLocalPath = state.selectedItemProvider.getRelativePath(state.selectedItemAbsolutePath);
+    } else {
+      // Optimization: path is already local.
+      state.selectedItemProvider = libraryDataProvider;
+      state.selectedItemLocalPath = path;
+    }
     state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name);
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
     if (this.state && this.state.templates) {
@@ -188,8 +197,9 @@ class App extends React.Component<AppProps, AppState> {
     window.onpopstate = () => {
       // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
       let state: SelectionState = {
-        selectedItemPath: undefined,
+        selectedItemAbsolutePath: undefined,
         selectedItemProvider: undefined,
+        selectedItemLocalPath: undefined,
         selectedItemDefinition: undefined,
         selectedItemInfo: undefined,
         interactionHandler: undefined,
@@ -268,6 +278,30 @@ class App extends React.Component<AppProps, AppState> {
       return <div className={'error'}>Error: {this.state.error}</div>;
     }
 
+    let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
+    let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
+
+    let editListPane = <div className={'app-pane-placeholder'} key={'EditList'} ref={(htmlNode) => (this.editListPaneNode = htmlNode)}/>;
+    if (this.state.editedDefinitions.length) {
+      editListPane = (
+        <div className={'app-pane'} key={'EditList'} ref={(htmlNode) => (this.editListPaneNode = htmlNode)}>
+          <div className={'app-edit-list'}>
+            <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} parentScrollPane={this.editListPaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} onItemClicked={this.treeItemClicked}/>
+          </div>
+        </div>
+      );
+    }
+    let navigationPane = (
+      <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}}>
+        {editListPane}
+        <div className={'app-pane'} key={'Tree'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
+          <div className={'app-tree'}>
+            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} onItemClicked={this.treeItemClicked}/>
+          </div>
+        </div>
+      </SplitPane>
+    );
+
     let mainContents: React.ReactNode = undefined;
     let extraContents: React.ReactNode = undefined;
     if (this.state.selectedItemDefinition) {
@@ -300,9 +334,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-
-    let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
-    let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let leftButtons: React.ReactNode[] = [];
     if (this.state.gitHubUserInfo) {
@@ -430,11 +461,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div className={'app'}>
         <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
-          <div className={'app-pane'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
-            <div className={'app-tree'}>
-              <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemPath} onItemClicked={this.treeItemClicked}/>
-            </div>
-          </div>
+          {navigationPane}
           {contentsPane}
         </SplitPane>
       </div>
@@ -443,8 +470,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
     this.navigate({
-      selectedItemPath: libraryDataProvider.getAbsolutePath(path),
+      selectedItemAbsolutePath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
+      selectedItemLocalPath: path,
       selectedItemDefinition: definitionPromise,
       selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined,
       interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined
@@ -453,15 +481,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
     let state: SelectionState = {};
-    this.fillSelectionState(state, libraryDataProvider.getAbsolutePath(path));
+    this.fillSelectionState(state, libraryDataProvider, path);
     this.navigate(state);
   }
 
   private navigate(state: SelectionState): void {
     this.setState(state);
     let uri = '/';
-    if (state.selectedItemPath) {
-      uri = this.libraryDataProvider.pathToURI(state.selectedItemPath);
+    if (state.selectedItemAbsolutePath) {
+      uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
     let title = this.updateTitle(state);
     window.history.pushState(null, title, uri);
@@ -476,8 +504,8 @@ class App extends React.Component<AppProps, AppState> {
   private updateTitle(state: SelectionState): string {
     let appName = 'Slate';
     let title = appName;
-    if (state.selectedItemPath) {
-      title = `${appName}: ${state.selectedItemPath.name}`;
+    if (state.selectedItemAbsolutePath) {
+      title = `${appName}: ${state.selectedItemAbsolutePath.name}`;
     }
     document.title = title;
     if (state.selectedItemInfo) {
@@ -493,13 +521,24 @@ class App extends React.Component<AppProps, AppState> {
   private edit = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
     let definitionPromise = this.state.selectedItemDefinition;
-    if (libraryDataProvider && definitionPromise) {
+    let absolutePath = this.state.selectedItemAbsolutePath;
+    let localPath = this.state.selectedItemLocalPath;
+    let itemInfoPromise = this.state.selectedItemInfo;
+    if (libraryDataProvider && definitionPromise && absolutePath && localPath && itemInfoPromise) {
       definitionPromise.then((definition: LibraryDefinition) => {
-        let clonedDefinition = libraryDataProvider!.editLocalItem(definition);
-        this.setState((prevState) => ({
-          selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
-          editedDefinitions: prevState.editedDefinitions.concat(clonedDefinition)
-        }));
+        itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
+          let clonedDefinition = libraryDataProvider!.editLocalItem(definition);
+          this.setState((prevState) => ({
+            selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
+            editedDefinitions: prevState.editedDefinitions.concat({
+              libraryDataProvider: libraryDataProvider!,
+              libraryDefinition: clonedDefinition,
+              absolutePath: absolutePath!,
+              localPath: localPath!,
+              itemInfo: itemInfo
+            })
+          }));
+        });
       });
     }
   }
@@ -513,7 +552,7 @@ class App extends React.Component<AppProps, AppState> {
         libraryDataProvider.submitLocalItem(definition)
           .then((writeFileResult: WriteFileResult) => {
             this.setState((prevState) => {
-              let index = prevState.editedDefinitions.indexOf(definition!);
+              let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
               return {
                 editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
               };
@@ -546,7 +585,7 @@ class App extends React.Component<AppProps, AppState> {
       if (definition) {
         libraryDataProvider.cancelEditing(definition);
         this.setState((prevState) => {
-          let index = prevState.editedDefinitions.indexOf(definition!);
+          let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
           return {
             selectedItemDefinition: libraryDataProvider!.fetchLocalItem(definition!.definition.name),
             editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
@@ -566,7 +605,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private openFile(openLocally: boolean): void {
     let libraryDataProvider = this.state.selectedItemProvider;
-    let path = this.state.selectedItemPath;
+    let path = this.state.selectedItemLocalPath;
     if (libraryDataProvider && path) {
       libraryDataProvider.openLocalItem(path.name, openLocally)
         .catch((error) => {
