@@ -286,7 +286,7 @@ class App extends React.Component<AppProps, AppState> {
       editListPane = (
         <div className={'app-pane'} key={'EditList'} ref={(htmlNode) => (this.editListPaneNode = htmlNode)}>
           <div className={'app-edit-list'}>
-            <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} parentScrollPane={this.editListPaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} onItemClicked={this.treeItemClicked}/>
+            <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} parentScrollPane={this.editListPaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
           </div>
         </div>
       );
@@ -296,7 +296,7 @@ class App extends React.Component<AppProps, AppState> {
         {editListPane}
         <div className={'app-pane'} key={'Tree'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
           <div className={'app-tree'}>
-            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} onItemClicked={this.treeItemClicked}/>
+            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
           </div>
         </div>
       </SplitPane>
@@ -564,7 +564,7 @@ class App extends React.Component<AppProps, AppState> {
               }
             } else if (writeFileResult instanceof WebWriteFileResult) {
               if (!writeFileResult.writtenDirectly) {
-                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version until the page is reloaded.');
+                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version as long as the application remains open.');
               }
             }
           })
@@ -630,7 +630,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private logOutOfGitHub = (): void => {
     this.discardGitHubLogin();
-    location.reload();
+    window.location.reload();
   }
 }
 

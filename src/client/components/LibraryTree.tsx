@@ -4,7 +4,7 @@ import * as Fmt from '../../shared/format/format';
 import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
-import Expression from './Expression';
+import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
 import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
@@ -87,6 +87,7 @@ interface LibraryTreeItemProps {
   onFilter?: OnFilter;
   selected: boolean;
   selectedChildPath?: Fmt.Path;
+  interactionHandler?: ExpressionInteractionHandler;
   onItemClicked?: OnItemClicked;
   indent: number;
 }
@@ -106,6 +107,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   private clicked: boolean = false;
   private hovered: boolean = false;
   private refreshTooltip: boolean = false;
+  private updateTimer: any;
 
   constructor(props: LibraryTreeItemProps) {
     super(props);
@@ -125,6 +127,23 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     }
     this.updateItem(this.props);
     this.updateSelection(this.props);
+    if (this.props.interactionHandler && this.props.selected) {
+      this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.props.parentScrollPane) {
+      this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
+    }
+    this.libraryDefinitionPromise = undefined;
+    if (this.updateTimer) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = undefined;
+    }
+    if (this.props.interactionHandler && this.props.selected) {
+      this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
+    }
   }
 
   componentDidUpdate(prevProps: LibraryTreeItemProps): void {
@@ -144,6 +163,14 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.selected !== prevProps.selected
         || !FmtUtils.arePathsEqual(this.props.selectedChildPath, prevProps.selectedChildPath)) {
       this.updateSelection(this.props);
+    }
+    if (this.props.interactionHandler !== prevProps.interactionHandler || this.props.selected !== prevProps.selected) {
+      if (prevProps.interactionHandler && prevProps.selected) {
+        prevProps.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
+      }
+      if (this.props.interactionHandler && this.props.selected) {
+        this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
+      }
     }
   }
 
@@ -228,13 +255,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     }
   }
 
-  componentWillUnmount(): void {
-    if (this.props.parentScrollPane) {
-      this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
-    }
-    this.libraryDefinitionPromise = undefined;
-  }
-
   render(): React.ReactNode {
     if (this.state.filtered) {
       return null;
@@ -247,7 +267,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (this.state.opened) {
         icon = getButtonIcon(ButtonType.DownArrow);
         if (this.libraryDefinitionPromise) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       } else {
         icon = getButtonIcon(ButtonType.RightArrow);
@@ -256,7 +276,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       let definition = this.state.definition;
       if (definition && this.props.onFilter && this.libraryDefinitionPromise) {
         if (definition.innerDefinitions.length) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       }
       if (definition) {
@@ -439,6 +459,13 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       this.setState({showPreview: false});
     }
   }
+
+  private onExpressionChanged = () => {
+    if (this.updateTimer) {
+      clearTimeout(this.updateTimer);
+    }
+    this.updateTimer = setTimeout(() => this.forceUpdate(), 200);
+  }
 }
 
 interface LibraryTreeProps {
@@ -447,6 +474,7 @@ interface LibraryTreeProps {
   parentScrollPane: HTMLElement | null;
   onFilter?: OnFilter;
   selectedItemPath?: Fmt.Path;
+  interactionHandler?: ExpressionInteractionHandler;
   onItemClicked?: OnItemClicked;
 }
 
@@ -527,7 +555,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
     }
     index++;
   }
@@ -570,8 +598,10 @@ function LibraryTree(props: LibraryTreeProps) {
 export function LibraryItemList(props: LibraryItemListProps) {
   return (
     <div className={'tree'}>
-      {props.items.map((entry: LibraryItemListEntry, index: number) =>
-        <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={index === props.items.length - 1} onFilter={props.onFilter} selected={FmtUtils.arePathsEqual(entry.absolutePath, props.selectedItemPath)} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>)}
+      {props.items.map((entry: LibraryItemListEntry, index: number) => {
+        let selected = FmtUtils.arePathsEqual(entry.absolutePath, props.selectedItemPath);
+        return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={index === props.items.length - 1} onFilter={props.onFilter} selected={selected} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
+      })}
     </div>
   );
 }
