@@ -3,6 +3,7 @@ import './StartPage.css';
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
+import * as Logic from '../../shared/logics/logic';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { OnLinkClicked } from './InteractionHandler';
@@ -75,7 +76,11 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
   let libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
   let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
   let expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
-    let definitionRenderer = new HLMRenderer(definition.definition, false, libraryDataProvider, props.templates!);
+    let rendererOptions: Logic.LogicRendererOptions = {
+      includeProofs: false,
+      abbreviateLongLists: true
+    };
+    let definitionRenderer = new HLMRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
   let expression = new Display.PromiseExpression(expressionPromise);
@@ -89,7 +94,11 @@ function StartPage(props: StartPageProps) {
   if (props.libraryDataProvider && props.templates) {
     let dummyDefinition = new Fmt.Definition;
     dummyDefinition.name = '';
-    let renderer = new HLMRenderer(dummyDefinition, false, props.libraryDataProvider, props.templates);
+    let rendererOptions: Logic.LogicRendererOptions = {
+      includeProofs: false,
+      abbreviateLongLists: true
+    };
+    let renderer = new HLMRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
     let examples = [
       renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer, ['multiple definitions', 'of finiteness']),
       renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer, ['definition']),

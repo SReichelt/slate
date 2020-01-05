@@ -1,5 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
+import * as Logic from '../logic';
 import { GenericEditHandler } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
@@ -12,7 +13,7 @@ export interface RenderedVariable {
 export abstract class GenericRenderer {
   private variableNameEditHandler?: GenericEditHandler;
 
-  constructor(protected definition: Fmt.Definition, protected includeProofs: boolean, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected editHandler?: GenericEditHandler) {
+  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected options: Logic.LogicRendererOptions, protected editHandler?: GenericEditHandler) {
     // Variable names can be edited even in some cases where the rest is read-only.
     // Derived classes can reset editHandler but not variableNameEditHandler.
     this.variableNameEditHandler = editHandler;
@@ -35,12 +36,12 @@ export abstract class GenericRenderer {
   }
 
   private getRenderedTemplateConfig(args: Display.RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Display.RenderedTemplateConfig {
-    let config = new Display.RenderedTemplateConfig;
-    config.args = args;
-    config.negationCount = negationCount;
-    config.forceInnerNegations = forceInnerNegations;
-    config.negationFallbackFn = this.renderNegation.bind(this);
-    return config;
+    return {
+      args: args,
+      negationCount: negationCount,
+      forceInnerNegations: forceInnerNegations,
+      negationFallbackFn: this.renderNegation.bind(this)
+    };
   }
 
   renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList): Display.RenderedExpression {
@@ -84,6 +85,12 @@ export abstract class GenericRenderer {
 
   protected renderNegation(expression: Display.RenderedExpression): Display.RenderedExpression {
     return this.renderTemplate('Negation', {'operand': expression});
+  }
+
+  protected renderInteger(value: Fmt.BN): Display.RenderedExpression {
+    let result = new Display.TextExpression(value.toString());
+    result.styleClasses = ['integer'];
+    return result;
   }
 
   protected addSemanticLink(expression: Display.RenderedExpression, linkedObject: Object): Display.SemanticLink {

@@ -178,6 +178,7 @@ class HLMDefinitionChecker {
   }
 
   private checkEmbedding(embedding: FmtHLM.ObjectContents_Embedding): void {
+    // TODO make sure that embedding does not implicitly reference itself (e.g. in the well-definedness proof)
     let subset = this.checkElementParameter(embedding.parameter, this.rootContext);
     if (subset) {
       let typeSearchParameters: HLMTypeSearchParameters = {
@@ -195,19 +196,14 @@ class HLMDefinitionChecker {
         .catch((error) => this.conditionalError(subset!, error.message));
       this.addPendingCheck(checkSubset);
     }
-    if (embedding.target instanceof Fmt.DefinitionRefExpression && embedding.target.path.parentPath instanceof Fmt.Path) {
-      if (embedding.target.path.parentPath.parentPath || embedding.target.path.parentPath.name !== this.definition.name) {
-        this.error(embedding.target, 'Embedding must refer to constructor of parent construction');
-      } else {
-        if (embedding.target.path.parentPath.arguments.length) {
-          this.error(embedding.target, 'Embedding target construction must be referenced without arguments');
-        }
-        let innerDefinition = this.definition.innerDefinitions.getDefinition(embedding.target.path.name);
-        this.checkDefinitionRefExpression(embedding.target, [this.definition, innerDefinition], [false, true], this.rootContext);
-      }
-    } else {
-      this.error(embedding.target, 'Constructor reference expected');
-    }
+    this.checkElementTerm(embedding.target, this.rootContext);
+    let constructionPath = new Fmt.Path;
+    constructionPath.name = this.definition.name;
+    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters);
+    let constructionExpression = new Fmt.DefinitionRefExpression;
+    constructionExpression.path = constructionPath;
+    this.checkCompatibility(embedding.target, [constructionExpression], [embedding.target], this.rootContext);
+    this.checkProof(embedding.wellDefinednessProof, this.rootContext);
   }
 
   private checkSetOperator(contents: FmtHLM.ObjectContents_SetOperator): void {
@@ -455,7 +451,7 @@ class HLMDefinitionChecker {
       let checkDefinitionRef = this.utils.getOuterDefinition(term)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
-            this.checkDefinitionRefExpression(term, [definition], [true], context);
+            this.checkDefinitionRefExpression(term, [definition], context);
           } else {
             this.error(term, 'Referenced definition must be a construction or set operator');
           }
@@ -501,9 +497,9 @@ class HLMDefinitionChecker {
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction && term.path.parentPath instanceof Fmt.Path && !(term.path.parentPath.parentPath instanceof Fmt.Path)) {
             let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
-            this.checkDefinitionRefExpression(term, [definition, innerDefinition], [true, true], context);
+            this.checkDefinitionRefExpression(term, [definition, innerDefinition], context);
           } else if (definition.contents instanceof FmtHLM.ObjectContents_Operator) {
-            this.checkDefinitionRefExpression(term, [definition], [true], context);
+            this.checkDefinitionRefExpression(term, [definition], context);
           } else {
             this.error(term, 'Referenced definition must be a constructor or operator');
           }
@@ -555,7 +551,7 @@ class HLMDefinitionChecker {
       let checkDefinitionRef = this.utils.getOuterDefinition(formula)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
-            this.checkDefinitionRefExpression(formula, [definition], [true], context);
+            this.checkDefinitionRefExpression(formula, [definition], context);
           } else {
             this.error(formula, 'Referenced definition must be a predicate');
           }
@@ -636,19 +632,15 @@ class HLMDefinitionChecker {
     }
   }
 
-  private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], argumentsExpected: boolean[], context: HLMCheckerContext): void {
+  private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], context: HLMCheckerContext): void {
     this.checkPath(expression.path);
     let parameterLists: Fmt.ParameterList[] = [];
     let argumentLists: Fmt.ArgumentList[] = [];
     let path: Fmt.PathItem | undefined = expression.path;
     for (let index = definitions.length - 1; index >= 0; index--) {
       if (path instanceof Fmt.Path) {
-        if (argumentsExpected[index]) {
-          parameterLists.unshift(definitions[index].parameters);
-          argumentLists.unshift(path.arguments);
-        } else if (path.arguments.length) {
-          this.error(path.arguments, 'Unexpected argument list');
-        }
+        parameterLists.unshift(definitions[index].parameters);
+        argumentLists.unshift(path.arguments);
         path = path.parentPath;
       } else {
         this.error(expression, 'Reference to inner definition expected');
@@ -692,7 +684,7 @@ class HLMDefinitionChecker {
       let checkCases = this.utils.getOuterDefinition(construction)
         .then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
-            this.checkDefinitionRefExpression(construction, [definition], [true], context);
+            this.checkDefinitionRefExpression(construction, [definition], context);
             let index = 0;
             for (let innerDefinition of definition.innerDefinitions) {
               if (innerDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {

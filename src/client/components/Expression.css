@@ -497,6 +497,10 @@ div.display-math {
   content: '';
 }
 
+.thousands-separator {
+  padding-left: 1px;
+}
+
 .var .prime {
   position: relative;
   visibility: hidden;
@@ -524,6 +528,9 @@ div.display-math {
 
 .dummy {
   color: #606060;
+}
+
+.var.dummy {
   border: 1px dotted #e0e0a0;
   margin: -1px;
 }

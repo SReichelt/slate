@@ -291,11 +291,11 @@ export interface RenderedTemplateArguments {
 }
 
 
-export class RenderedTemplateConfig {
-  public args: RenderedTemplateArguments = {};
-  public negationCount: number = 0;
-  public forceInnerNegations: number = 0;
-  public negationFallbackFn?: (expression: RenderedExpression) => RenderedExpression;
+export interface RenderedTemplateConfig {
+  args: RenderedTemplateArguments;
+  negationCount: number;
+  forceInnerNegations: number;
+  negationFallbackFn?: (expression: RenderedExpression) => RenderedExpression;
 }
 
 export abstract class ExpressionWithArgs extends IndirectExpression {
@@ -431,7 +431,11 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       result.push(arg);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       let referencedTemplate = this.allTemplates.definitions.getDefinition(expression.path.name);
-      let config = new RenderedTemplateConfig;
+      let config: RenderedTemplateConfig = {
+        args: {},
+        negationCount: 0,
+        forceInnerNegations: 0
+      };
       for (let argument of expression.path.arguments) {
         if (argument.name) {
           let arg: ExpressionValue[] = [];

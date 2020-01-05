@@ -242,21 +242,36 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         let text = expression.text;
         if (text) {
-          let firstChar = text.charAt(0);
-          let lastChar = text.charAt(text.length - 1);
-          if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
-            className += ' space-start';
-          }
-          if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
-            className += ' charcorner-tr';
-            if (lastChar === 'T' || lastChar === 'Y') {
-              className += ' charcorner-large';
+          if (expression.styleClasses && expression.styleClasses.indexOf('integer') >= 0) {
+            let resultArray = [];
+            for (let endIndex = text.length; endIndex > 0; endIndex -= 3) {
+              let startIndex = endIndex - 3;
+              if (startIndex < 0) {
+                startIndex = 0;
+              }
+              resultArray.unshift(text.substring(startIndex, endIndex));
+              if (startIndex > 0) {
+                resultArray.unshift(<span className={'thousands-separator'} key={startIndex}/>);
+              }
             }
+            result = resultArray;
+          } else {
+            let firstChar = text.charAt(0);
+            let lastChar = text.charAt(text.length - 1);
+            if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
+              className += ' space-start';
+            }
+            if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
+              className += ' charcorner-tr';
+              if (lastChar === 'T' || lastChar === 'Y') {
+                className += ' charcorner-large';
+              }
+            }
+            if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
+              className += ' charcorner-bl';
+            }
+            result = this.convertText(text);
           }
-          if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
-            className += ' charcorner-bl';
-          }
-          result = this.convertText(text);
         } else {
           result = '\u200b';
         }

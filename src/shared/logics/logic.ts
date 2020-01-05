@@ -6,11 +6,27 @@ import { LibraryDataProvider, LibraryDataAccessor, LibraryItemInfo } from '../da
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
-  name: string;
-  getMetaModel: Meta.MetaModelGetter;
+  readonly name: string;
+  readonly topLevelDefinitionTypes: LogicDefinitionTypeDescription[];
+  readonly getMetaModel: Meta.MetaModelGetter;
   getRootContext(): Ctx.Context;
   getChecker(): LogicChecker;
   getDisplay(): LogicDisplay;
+}
+
+export enum LogicDefinitionType {
+  Unknown,
+  Construction,
+  Constructor,
+  SetOperator,
+  Operator,
+  Predicate,
+  Theorem
+}
+
+export interface LogicDefinitionTypeDescription {
+  readonly definitionType: LogicDefinitionType;
+  readonly name: string;
 }
 
 export interface LogicChecker {
@@ -35,27 +51,30 @@ export enum DiagnosticSeverity {
   Hint
 }
 
-export enum LogicDefinitionType {
-  Unknown,
-  Construction,
-  Constructor,
-  SetOperator,
-  Operator,
-  Predicate,
-  Theorem
+export interface LogicRendererOptions {
+  includeProofs: boolean;
+  abbreviateLongLists: boolean;
 }
 
 export interface LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
-  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): LogicRenderer;
-  getDefinitionEditor(definition: Fmt.Definition, includeProofs: boolean, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, editing: boolean): LogicRenderer;
+  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: LogicRendererOptions): LogicRenderer;
+  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: LogicRendererOptions, editing: boolean): LogicRenderer;
 }
+
+export interface RenderedDefinitionOptions {
+  includeLabel: boolean;
+  includeExtras: boolean;
+  includeRemarks: boolean;
+}
+
+export interface FullRenderedDefinitionOptions extends LogicRendererOptions, RenderedDefinitionOptions {}
 
 export type RenderFn = () => Display.RenderedExpression;
 export type ObjectRenderFns = Map<Object, RenderFn>;
 
 export interface LogicRenderer {
-  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined;
+  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: RenderedDefinitionOptions): Display.RenderedExpression | undefined;
   renderDefinitionSummary(innerDefinition?: Fmt.Definition): Display.RenderedExpression | undefined;
   getDefinitionParts(): ObjectRenderFns;
 }

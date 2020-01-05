@@ -1,6 +1,7 @@
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
+import * as Logic from '../../shared/logics/logic';
 import { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
@@ -110,15 +111,19 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
       let definition = parentProvider.fetchLocalItem(path.name);
+      let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+        includeProofs: false,
+        abbreviateLongLists: true,
+        includeLabel: false,
+        includeExtras: true,
+        includeRemarks: false
+      };
       // Call function directly instead of creating a component, so that tooltip is not even displayed if it returns null.
       let props: LibraryItemProps = {
         libraryDataProvider: parentProvider,
         definition: definition,
         templates: this.templates,
-        includeLabel: false,
-        includeExtras: true,
-        includeProofs: false,
-        includeRemarks: false
+        options: renderedDefinitionOptions
       };
       return renderLibraryItem(props);
     } else {

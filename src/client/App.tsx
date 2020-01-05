@@ -296,7 +296,7 @@ class App extends React.Component<AppProps, AppState> {
         {editListPane}
         <div className={'app-pane'} key={'Tree'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
           <div className={'app-tree'}>
-            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
+            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
           </div>
         </div>
       </SplitPane>
@@ -307,7 +307,14 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedItemDefinition) {
       if (this.state.templates && this.state.selectedItemProvider) {
         let definitionPromise = this.state.selectedItemDefinition;
-        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definitionPromise} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} includeLabel={true} includeExtras={true} includeProofs={true} includeRemarks={true} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+        let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+          includeProofs: true,
+          abbreviateLongLists: false,
+          includeLabel: true,
+          includeExtras: true,
+          includeRemarks: true
+        };
+        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definitionPromise} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
         extraContents = <SourceCodeView definition={definitionPromise} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
         let definition = definitionPromise.getImmediateResult();
         if (definition && definition.state === LibraryDefinitionState.Editing) {
@@ -516,6 +523,9 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
     return title;
+  }
+
+  private insert = (libraryDataProvider: LibraryDataProvider, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
   }
 
   private edit = (): void => {

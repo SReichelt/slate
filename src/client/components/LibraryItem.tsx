@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Fmt from '../../shared/format/format';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
+import * as Logic from '../../shared/logics/logic';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
@@ -10,10 +11,7 @@ export interface LibraryItemProps {
   definition: CachedPromise<LibraryDefinition>;
   templates: Fmt.File;
   itemInfo?: CachedPromise<LibraryItemInfo>;
-  includeLabel: boolean;
-  includeExtras: boolean;
-  includeProofs: boolean;
-  includeRemarks: boolean;
+  options: Logic.FullRenderedDefinitionOptions;
   interactionHandler?: ExpressionInteractionHandler;
 }
 
@@ -22,8 +20,8 @@ export function renderLibraryItem(props: LibraryItemProps): React.ReactNode {
   let logicDisplay = logic.getDisplay();
 
   let render = props.definition.then((definition: LibraryDefinition) => {
-    let renderer = logicDisplay.getDefinitionEditor(definition.definition, props.includeProofs, props.libraryDataProvider, props.templates, definition.state === LibraryDefinitionState.Editing);
-    let expression = renderer.renderDefinition(props.itemInfo, props.includeLabel, props.includeExtras, props.includeRemarks);
+    let renderer = logicDisplay.getDefinitionEditor(definition.definition, props.libraryDataProvider, props.templates, props.options, definition.state === LibraryDefinitionState.Editing);
+    let expression = renderer.renderDefinition(props.itemInfo, props.options);
     if (expression) {
       return <Expression expression={expression} interactionHandler={props.interactionHandler}/>;
     } else {

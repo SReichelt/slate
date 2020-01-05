@@ -36,33 +36,60 @@ function getGitHubLogo(enabled: boolean = true): React.ReactNode {
   );
 }
 
+export function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true): React.ReactNodeArray {
+  switch (buttonType) {
+  case ButtonType.Submit:
+    return [
+      <path d="M -5 0 L -7 5 L 7 0 L -7 -5 z" fill={'none'} stroke={enabled ? 'green' : 'gray'} strokeWidth="1" key="border"/>,
+      <path d="M -5 0 L 7 0" fill={'none'} stroke={enabled ? 'green' : 'gray'} strokeWidth="0.75" key="middle"/>
+    ];
+  case ButtonType.Edit:
+    return [
+      <path d="M -7 7 L -6 4 L 5 -7 L 7 -5 L -4 6 z" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="shaft"/>,
+      <path d="M -6 4 L -4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="tip"/>
+    ];
+  case ButtonType.ViewSource:
+    return [
+      <path d="M -4 -6 Q -6 -6 -6 -4 L -6 -2 Q -6 0 -8 0 Q -6 0 -6 2 L -6 4 Q -6 6 -4 6" fill={'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="left"/>,
+      <circle cx="-3" cy="0" r="0.75" fill={enabled ? 'black' : 'gray'} stroke="none" key="dot1"/>,
+      <circle cx="0" cy="0" r="0.75" fill={enabled ? 'black' : 'gray'} stroke="none" key="dot2"/>,
+      <circle cx="3" cy="0" r="0.75" fill={enabled ? 'black' : 'gray'} stroke="none" key="dot3"/>,
+      <path d="M 4 -6 Q 6 -6 6 -4 L 6 -2 Q 6 0 8 0 Q 6 0 6 2 L 6 4 Q 6 6 4 6" fill={'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="right"/>
+    ];
+  case ButtonType.RightArrow:
+    return [
+      <path d="M -4 -6 L 4 0 L -4 6 z" fill={'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow"/>
+    ];
+  case ButtonType.DownArrow:
+    return [
+      <path d="M -6 -4 L 0 4 L 6 -4 z" fill={'gray'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow"/>
+    ];
+  case ButtonType.Insert:
+    return [
+      <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={enabled ? 'lime' : 'none'} stroke={enabled ? 'darkgreen' : 'gray'} strokeWidth="0.5" key="cross"/>
+    ];
+  case ButtonType.Remove:
+    return [
+      <rect x="-7" y="-7" width="14" height="14" rx="2" ry="2" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'maroon' : 'gray'} strokeWidth="0.5" key="frame"/>,
+      <line x1="-4" y1="-4" x2="4" y2="4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2" key="cross1"/>,
+      <line x1="-4" y1="4" x2="4" y2="-4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2" key="cross2"/>
+    ];
+  default:
+    return [];
+  }
+}
+
 export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): React.ReactNode {
   switch (buttonType) {
   case ButtonType.OK:
   case ButtonType.Save:
     return <span className="ok">✓</span>;
-  case ButtonType.Submit:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <path d="M -5 0 L -7 5 L 7 0 L -7 -5 z" fill={'none'} stroke={enabled ? 'green' : 'gray'} strokeWidth="1"/>
-        <path d="M -5 0 L 7 0" fill={'none'} stroke={enabled ? 'green' : 'gray'} strokeWidth="0.75"/>
-      </svg>
-    );
   case ButtonType.Cancel:
     return <span className="cancel">✗</span>;
-  case ButtonType.Edit:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <path d="M -7 7 L -6 4 L 5 -7 L 7 -5 L -4 6 z" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
-        <path d="M -6 4 L -4 6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
-      </svg>
-    );
   case ButtonType.OpenInVSCode:
     return getVSCodeLogo(enabled);
   case ButtonType.ViewInGitHub:
     return getGitHubLogo(enabled);
-  case ButtonType.ViewSource:
-    return '{⋯}';
   case ButtonType.LogIn:
     return [
       getGitHubLogo(enabled),
@@ -75,85 +102,79 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
       ' ',
       'Log out'
     ];
-  case ButtonType.RightArrow:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <path d="M -5 -6 L 5 0 L -5 6 z" fill={enabled ? 'black' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
-      </svg>
-    );
-  case ButtonType.DownArrow:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <path d="M -6 -5 L 0 5 L 6 -5 z" fill={enabled ? 'black' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1"/>
-      </svg>
-    );
-  case ButtonType.Insert:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={enabled ? 'lime' : 'none'} stroke={enabled ? 'darkgreen' : 'gray'} strokeWidth="0.5"/>
-      </svg>
-    );
-  case ButtonType.Remove:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <rect x="-7" y="-7" width="14" height="14" rx="2" ry="2" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'maroon' : 'gray'} strokeWidth="0.5"/>
-        <line x1="-4" y1="-4" x2="4" y2="4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2"/>
-        <line x1="-4" y1="4" x2="4" y2="-4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2"/>
-      </svg>
-    );
   default:
-    return null;
+    return (
+      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+        {getButtonIconContents(buttonType, enabled)}
+      </svg>
+    );
+  }
+}
+
+export function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNodeArray {
+  switch (definitionType) {
+  case Logic.LogicDefinitionType.Construction:
+    return [
+      <circle cx="0" cy="0" r="7" fill="green" stroke="black" strokeWidth="0.5" key="circle"/>,
+      <rect x="-3" y="-3" width="6" height="6" fill="red" stroke="white" strokeWidth="0.5" key="rect"/>
+    ];
+  case Logic.LogicDefinitionType.SetOperator:
+    return [
+      <circle cx="0" cy="0" r="7" fill="green" stroke="black" strokeWidth="0.5" key="circle"/>
+    ];
+  case Logic.LogicDefinitionType.Operator:
+  case Logic.LogicDefinitionType.Constructor:
+    return [
+      <rect x="-4" y="-4" width="8" height="8" fill="red" stroke="black" strokeWidth="0.5" key="rect"/>
+    ];
+  case Logic.LogicDefinitionType.Predicate:
+    return [
+      <rect x="-5" y="-5" width="10" height="10" fill="blue" stroke="black" strokeWidth="0.5" transform="rotate(45)" key="rect"/>
+    ];
+  case Logic.LogicDefinitionType.Theorem:
+    let result: React.ReactNodeArray;
+    if (itemInfo && (itemInfo.type === 'lemma' || itemInfo.type === 'corollary' || itemInfo.type === 'example')) {
+      result = [
+        <circle cx="0" cy="-1.5" r="3.5" fill="yellow" stroke="black" strokeWidth="0.5" key="circle"/>,
+        <rect x="-1.25" y="2" width="2.5" height="2.5" fill="gray" stroke="black" strokeWidth="0.5" key="rect"/>
+      ];
+    } else {
+      result = [
+        <circle cx="0" cy="-2" r="5" fill="yellow" stroke="black" strokeWidth="0.5" key="circle"/>,
+        <rect x="-1.7" y="2.7" width="3.4" height="4" fill="gray" stroke="black" strokeWidth="0.5" key="rect"/>
+      ];
+      if (itemInfo && itemInfo.type === 'theorem') {
+        result.unshift(<line x1="-7" y1="-6" x2="7" y2="2" stroke="gray" strokeWidth="0.5" key="line1"/>);
+        result.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="0.5" key="line2"/>);
+        result.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="0.5" key="line3"/>);
+      }
+    }
+    return result;
+  default:
+    return [];
   }
 }
 
 export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNode {
-  switch (definitionType) {
-  case Logic.LogicDefinitionType.Construction:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <circle cx="0" cy="0" r="7" fill="green" stroke="black" strokeWidth="0.5"/>
-        <rect x="-3" y="-3" width="6" height="6" fill="red" stroke="white" strokeWidth="0.5"/>
-      </svg>
-    );
-  case Logic.LogicDefinitionType.SetOperator:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <circle cx="0" cy="0" r="7" fill="green" stroke="black" strokeWidth="0.5"/>
-      </svg>
-    );
-  case Logic.LogicDefinitionType.Operator:
-  case Logic.LogicDefinitionType.Constructor:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <rect x="-4" y="-4" width="8" height="8" fill="red" stroke="black" strokeWidth="0.5"/>
-      </svg>
-    );
-  case Logic.LogicDefinitionType.Predicate:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        <rect x="-5" y="-5" width="10" height="10" fill="blue" stroke="black" strokeWidth="0.5" transform="rotate(45)"/>
-      </svg>
-    );
-  case Logic.LogicDefinitionType.Theorem:
-    let viewBox = '-8 -8 16 16';
-    if (itemInfo && (itemInfo.type === 'lemma' || itemInfo.type === 'corollary' || itemInfo.type === 'example')) {
-      viewBox = '-10 -10 20 20';
-    }
-    let contents = [
-      <circle cx="0" cy="-2" r="5" fill="yellow" stroke="black" strokeWidth="0.5" key="circle"/>,
-      <rect x="-1.7" y="2.7" width="3.4" height="4" fill="gray" stroke="black" strokeWidth="0.5" key="rect"/>
-    ];
-    if (itemInfo && itemInfo.type === 'theorem') {
-      contents.unshift(<line x1="-7" y1="-6" x2="7" y2="2" stroke="gray" strokeWidth="0.5" key="line1"/>);
-      contents.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="0.5" key="line2"/>);
-      contents.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="0.5" key="line3"/>);
-    }
-    return (
-      <svg height="1em" width="1em" viewBox={viewBox}>
-        {contents}
-      </svg>
-    );
-  default:
-    return null;
-  }
+  return (
+    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+      {getDefinitionIconContents(definitionType, itemInfo)}
+    </svg>
+  );
+}
+
+export function getInsertIcon(originalIconContents: React.ReactNodeArray, enabled: boolean = true): React.ReactNode {
+  return (
+    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+      {originalIconContents}
+      <line x1="1" y1="-4" x2="7" y2="-4" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background1"/>
+      <line x1="4" y1="-1" x2="4" y2="-7" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background2"/>
+      <line x1="2" y1="-2" x2="6" y2="-6" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background3"/>
+      <line x1="2" y1="-6" x2="6" y2="-2" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background4"/>
+      <line x1="1" y1="-4" x2="7" y2="-4" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line1"/>
+      <line x1="4" y1="-1" x2="4" y2="-7" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line2"/>
+      <line x1="2" y1="-2" x2="6" y2="-6" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line3"/>
+      <line x1="2" y1="-6" x2="6" y2="-2" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line4"/>
+    </svg>
+  );
 }

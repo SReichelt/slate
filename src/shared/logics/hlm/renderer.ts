@@ -46,8 +46,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   protected renderUtils: HLMRenderUtils;
   protected readOnlyRenderer: HLMRenderer;
 
-  constructor(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, protected editHandler?: HLMEditHandler) {
-    super(definition, includeProofs, libraryDataAccessor, templates, editHandler);
+  constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
+    super(definition, libraryDataAccessor, templates, options, editHandler);
     this.utils = new HLMUtils(definition, libraryDataAccessor);
     this.renderUtils = new HLMRenderUtils(definition, this.utils);
     if (editHandler) {
@@ -58,10 +58,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, includeLabel: boolean, includeExtras: boolean, includeRemarks: boolean): Display.RenderedExpression | undefined {
+  renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: Logic.RenderedDefinitionOptions): Display.RenderedExpression | undefined {
     let space: string | undefined = undefined;
     let row: Display.RenderedExpression[] = [];
-    if (includeLabel && itemInfo !== undefined) {
+    if (options.includeLabel && itemInfo !== undefined) {
       row.push(this.renderDefinitionLabel(itemInfo));
       space = '  ';
     }
@@ -123,8 +123,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       paragraphs.push(definitionRow);
       paragraphs.push(new Display.TextExpression('by:'));
     }
-    this.addDefinitionContents(paragraphs, definitionRef, cases, includeExtras);
-    if (includeRemarks) {
+    this.addDefinitionContents(paragraphs, definitionRef, cases, options.includeExtras);
+    if (options.includeRemarks) {
       this.addDefinitionRemarks(paragraphs);
     }
     if (paragraphs.length) {
@@ -1461,6 +1461,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (rawArg instanceof Fmt.ArrayExpression) {
         let result: Display.ExpressionValue[] = [];
         for (let item of rawArg.items) {
+          if (this.options.abbreviateLongLists && result.length >= 10) {
+            let ellipsis = new Display.TextExpression('...');
+            ellipsis.styleClasses = ['dummy'];
+            result.push(ellipsis);
+            break;
+          }
           result.push(this.renderRegularArgument(item, type, remainingArrayDimensions - 1));
         }
         return result;
@@ -1487,7 +1493,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderElementTerm(arg.element, fullElementTermSelection);
       } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
         let arg = rawArg as Fmt.IntegerExpression;
-        return new Display.TextExpression(arg.value.toString());
+        return this.renderInteger(arg.value);
       } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
         let arg = rawArg as Fmt.DefinitionRefExpression;
         let definitionRef = this.renderGenericExpression(arg, 2);
@@ -1772,8 +1778,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         });
         let supersetWithText = new Display.RowExpression([supersetDefinition, new Display.TextExpression(' via')]);
         rows.push([subset, supersetWithText]);
-        let subsetElement = this.renderVariable(embedding.parameter, undefined, true);
-        let targetTerm = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
+        let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+        let targetTerm = this.renderUtils.convertStructuralCaseToOverride([embedding.parameter], embedding.target, elementParameterOverrides);
+        let subsetElement = this.renderVariable(embedding.parameter, undefined, true, false, undefined, elementParameterOverrides);
         let target = this.renderElementTerm(targetTerm, fullElementTermSelection);
         let supersetElement = this.renderTemplate('EqualityRelation', {
           'left': new Display.EmptyExpression,
@@ -2005,7 +2012,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofsInternal(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, startRow: Display.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Display.RenderedExpression[]): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       if (proofs && proofs.length) {
         let proofNumber = 1;
         for (let proof of proofs) {
@@ -2110,7 +2117,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       let subParagraphs: Display.RenderedExpression[] = [];
       let proofs = proof ? [proof] : undefined;
       this.addProofsInternal(proofs, heading, externalGoal, undefined, undefined, subParagraphs);
@@ -2121,7 +2128,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Display.RenderedExpression[]): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       if (proofs.every((proof) => proof === undefined)) {
         this.addProof(undefined, heading, externalGoal, paragraphs);
       } else {
@@ -2140,7 +2147,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, symbol: string, paragraphs: Display.RenderedExpression[]): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       if (proofs && proofs.length) {
         let labels: string[] = [];
         for (let proof of proofs) {
@@ -2361,10 +2368,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (contents.embedding) {
             let embedding = contents.embedding;
             result.set(embedding.parameter, () => this.renderParameter(embedding.parameter, false, false, false));
-            result.set(embedding.target, () => {
-              let target = this.utils.getEmbeddingTargetTerm(definition, embedding.target);
-              return this.renderElementTerm(target, fullElementTermSelection);
-            });
+            result.set(embedding.target, () => this.renderElementTerm(embedding.target, fullElementTermSelection));
             if (embedding.wellDefinednessProof) {
               this.addProofParts(embedding.wellDefinednessProof, result);
             }
@@ -2534,7 +2538,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofListParts(proofs: FmtHLM.ObjectContents_Proof[], result: Logic.ObjectRenderFns): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       for (let proof of proofs) {
         this.addProofParts(proof, result);
       }
@@ -2542,7 +2546,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofParts(proof: FmtHLM.ObjectContents_Proof, result: Logic.ObjectRenderFns): void {
-    if (this.includeProofs) {
+    if (this.options.includeProofs) {
       if (proof.parameters) {
         this.addParameterListParts(proof.parameters, undefined, result);
       }

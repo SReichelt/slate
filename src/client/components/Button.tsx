@@ -2,6 +2,7 @@ import * as React from 'react';
 import './Button.css';
 
 interface ButtonProps {
+  className?: string;
   toolTipText?: string;
   enabled?: boolean;
   selected?: boolean;
@@ -22,6 +23,9 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   
   render(): React.ReactNode {
     let className = 'button';
+    if (this.props.className) {
+      className += ' ' + this.props.className;
+    }
     let onClick = undefined;
     let onMouseDown = undefined;
     let onMouseUp = undefined;

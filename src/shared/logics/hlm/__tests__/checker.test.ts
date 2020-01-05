@@ -39,14 +39,14 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, definition: L
         continue;
       }
       expectedDiagnostics.push({
-        object: {},
+        object: definition.definition.name,
         severity: severity,
         message: item.text
       });
     }
   }
   for (let diagnostic of checkResult.diagnostics) {
-    diagnostic.object = {};
+    diagnostic.object = definition.definition.name;
   }
   expect(checkResult.diagnostics).toEqual(expectedDiagnostics);
 }

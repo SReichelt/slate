@@ -13,8 +13,26 @@
   user-select: none;
 }
 
+.button.standalone {
+  border: solid 1px #d0d0d0;
+  border-radius: 2px;
+  min-width: 1em;
+  padding: 0.125em;
+  margin: 0.125em;
+  position: relative;
+}
+
 .button svg {
   vertical-align: middle;
+}
+
+.button.button.standalone svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 }
 
 .button img {

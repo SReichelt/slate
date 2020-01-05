@@ -183,24 +183,6 @@ export class HLMUtils extends GenericUtils {
     return resultPromise;
   }
 
-  getEmbeddingTargetTerm(construction: Fmt.Definition, target: Fmt.Expression): Fmt.Expression {
-    let constructorExpr = target as Fmt.DefinitionRefExpression;
-    let constructorPath = constructorExpr.path;
-    let constructionPath = constructorPath.parentPath as Fmt.Path;
-    let fullConstructionPath = new Fmt.Path;
-    fullConstructionPath.parentPath = constructionPath.parentPath;
-    fullConstructionPath.name = constructionPath.name;
-    let context: HLMSubstitutionContext = {targetPath: constructionPath.parentPath};
-    this.getParameterArguments(fullConstructionPath.arguments, construction.parameters, context);
-    let resultPath = new Fmt.Path;
-    resultPath.parentPath = fullConstructionPath;
-    resultPath.name = constructorPath.name;
-    resultPath.arguments = constructorPath.arguments;
-    let resultRef = new Fmt.DefinitionRefExpression;
-    resultRef.path = resultPath;
-    return resultRef;
-  }
-
   substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
     for (let paramIndex = 0; paramIndex < originalParameters.length && paramIndex < substitutedParameters.length; paramIndex++) {
       expression = this.substituteParameter(expression, originalParameters[paramIndex], substitutedParameters[paramIndex], markAsDefinition);

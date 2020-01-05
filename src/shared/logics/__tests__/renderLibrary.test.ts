@@ -4,6 +4,7 @@ import * as Fmt from '../../format/format';
 import * as FmtReader from '../../format/read';
 import * as FmtLibrary from '../library';
 import * as FmtDisplay from '../../display/meta';
+import * as Logic from '../logic';
 import * as Logics from '../logics';
 import { renderAsText } from '../../display/textOutput';
 import CachedPromise from '../../data/cachedPromise';
@@ -35,8 +36,17 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
 }
 
 async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, itemInfo: LibraryItemInfo, definition: LibraryDefinition, uri: string) {
-  let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, true, libraryDataProvider, templates);
-  let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), true, true, true);
+  let rendererOptions: Logic.LogicRendererOptions = {
+    includeProofs: true,
+    abbreviateLongLists: false
+  };
+  let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
+  let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+    includeLabel: true,
+    includeExtras: true,
+    includeRemarks: true
+  };
+  let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
   if (renderedDefinition) {
     let renderedText = renderAsText(renderedDefinition, false, false);
     expect(renderedText).resolves.toMatchSnapshot(formatItemNumber(itemInfo.itemNumber) + ' ' + uri);

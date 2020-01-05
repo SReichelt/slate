@@ -107,6 +107,7 @@ body {
 
 .bottom-toolbar-container>.app-pane {
   bottom: 1.5em;
+  margin-bottom: -0.5px;
 }
 
 .bottom-toolbar {
@@ -118,6 +119,7 @@ body {
   border: solid 1px gray;
   background-color: #f0f0f0;
   z-index: 1;
+  padding-top: 0.5px;
 }
 
 .bottom-toolbar>.left {

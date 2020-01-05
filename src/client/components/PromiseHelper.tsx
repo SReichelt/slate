@@ -70,7 +70,7 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
   }
 }
 
-function renderPromise<T>(promise: CachedPromise<T>, key?: string) {
+function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string): React.ReactElement | T {
   let immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
     return <PromiseHelper promise={promise} key={key}/>;

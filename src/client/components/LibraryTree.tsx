@@ -4,16 +4,19 @@ import * as Fmt from '../../shared/format/format';
 import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
+import * as Logic from '../../shared/logics/logic';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
-import { ButtonType, getButtonIcon, getDefinitionIcon } from '../utils/icons';
+import { ButtonType, getButtonIcon, getButtonIconContents, getDefinitionIcon, getDefinitionIconContents, getInsertIcon } from '../utils/icons';
+import Button from './Button';
 
 const Loading = require('react-loading-animation');
 const ToolTip = require('react-portal-tooltip').default;
 
 export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
+export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, definitionType: Logic.LogicDefinitionTypeDescription | undefined) => void;
 
 interface VisibilityResult {
   visible: CachedPromise<boolean>;
@@ -75,21 +78,24 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
 
 let previewContents: React.ReactNode = null;
 
-interface LibraryTreeItemProps {
+interface LibraryTreeItemBaseProps {
   libraryDataProvider: LibraryDataProvider;
+  parentScrollPane: HTMLElement | null;
+  indent: number;
+}
+
+interface LibraryTreeItemProps extends LibraryTreeItemBaseProps {
   libraryDefinition?: LibraryDefinition;
   isSubsection: boolean;
   path: Fmt.Path;
   itemInfo: LibraryItemInfo;
   templates?: Fmt.File;
-  parentScrollPane: HTMLElement | null;
-  isLast: boolean;
   onFilter?: OnFilter;
   selected: boolean;
   selectedChildPath?: Fmt.Path;
   interactionHandler?: ExpressionInteractionHandler;
   onItemClicked?: OnItemClicked;
-  indent: number;
+  onInsertButtonClicked?: OnInsertButtonClicked;
 }
 
 interface LibraryTreeItemState {
@@ -101,9 +107,71 @@ interface LibraryTreeItemState {
   showPreview: boolean;
 }
 
-class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeItemState> {
+abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, StateType> extends React.Component<PropType, StateType> {
+  protected htmlNode: HTMLElement | null = null;
+
+  protected scrollIntoView = (): void => {
+    if (this.htmlNode) {
+      this.htmlNode.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
+  }
+
+  protected getTreeItemContents(icon: React.ReactNode, specialIcon: React.ReactNode, display: React.ReactNode): React.ReactNode {
+    let columns: React.ReactNodeArray = [
+      <div className={'tree-item-display'} key="display">{display}</div>
+    ];
+    if (specialIcon && !this.props.indent) {
+      icon = specialIcon;
+    }
+    if (icon) {
+      columns.unshift(<div className={'tree-item-icon'} key="icon">{icon}</div>);
+    }
+    for (let i = this.props.indent - 1; i >= 0; i--) {
+      columns.unshift(<div className={'tree-item-indent'} key={i}>{i === 0 ? specialIcon : undefined}</div>);
+    }
+    return (
+      <div className={'tree-item-contents'}>
+        <div className={'tree-item-contents-row'}>
+          {columns}
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate visible dimensions for tooltip.
+  getBoundingClientRect(): ClientRect {
+    if (this.props.parentScrollPane && this.htmlNode) {
+      let parentRect = this.props.parentScrollPane.getBoundingClientRect();
+      let itemRect = this.htmlNode.getBoundingClientRect();
+      if (parentRect.width > 0) {
+        return {
+          left: parentRect.left,
+          right: parentRect.right,
+          width: parentRect.width,
+          top: itemRect.top,
+          bottom: itemRect.bottom,
+          height: itemRect.height
+        };
+      } else if (itemRect.width > 0) {
+        return itemRect;
+      }
+    }
+    return {
+      left: 0,
+      right: 0,
+      width: 0,
+      top: 0,
+      bottom: 0,
+      height: 0
+    };
+  }
+}
+
+class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryTreeItemState> {
   private libraryDefinitionPromise?: CachedPromise<LibraryDefinition>;
-  private htmlNode: HTMLElement | null = null;
   private clicked: boolean = false;
   private hovered: boolean = false;
   private refreshTooltip: boolean = false;
@@ -267,7 +335,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       if (this.state.opened) {
         icon = getButtonIcon(ButtonType.DownArrow);
         if (this.libraryDefinitionPromise) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       } else {
         icon = getButtonIcon(ButtonType.RightArrow);
@@ -276,7 +344,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       let definition = this.state.definition;
       if (definition && this.props.onFilter && this.libraryDefinitionPromise) {
         if (definition.innerDefinitions.length) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} isLast={this.props.isLast} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
+          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       }
       if (definition) {
@@ -287,7 +355,11 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         icon = <span>{definitionIcon}{icon}</span>;
         if (this.props.templates) {
           let outerDefinition = this.props.libraryDefinition ? this.props.libraryDefinition.definition : definition;
-          let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, false, this.props.libraryDataProvider, this.props.templates);
+          let rendererOptions: Logic.LogicRendererOptions = {
+            includeProofs: false,
+            abbreviateLongLists: true
+          };
+          let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, this.props.libraryDataProvider, this.props.templates, rendererOptions);
           let summary = renderer.renderDefinitionSummary(definition);
           if (summary) {
             let summaryExpression = <Expression expression={summary} key="summary"/>;
@@ -302,7 +374,12 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
           } else if (display !== undefined && this.props.parentScrollPane && !this.props.selected) {
             let showPreview = false;
             if (this.state.showPreview) {
-              let renderedDefinition = renderer.renderDefinition(undefined, false, true, false);
+              let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+                includeLabel: false,
+                includeExtras: true,
+                includeRemarks: false
+              };
+              let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
               if (renderedDefinition) {
                 previewContents = <Expression expression={renderedDefinition}/>;
                 showPreview = true;
@@ -331,7 +408,7 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     if (this.props.itemInfo && this.props.itemInfo.type === 'lemma') {
       display = <span className={'tree-item-minor'} key="minor">{display}</span>;
     }
-    let specialIcon = undefined;
+    let specialIcon: React.ReactNode | undefined = undefined;
     if (this.state.filtering) {
       specialIcon = <Loading width={'1em'} height={'1em'}/>;
     } else if (this.libraryDefinitionPromise) {
@@ -347,34 +424,18 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
         }
       }
     }
-    if (specialIcon && !this.props.indent) {
-      icon = specialIcon;
-    }
-    let columns: React.ReactNodeArray = [
-      <div className={'tree-item-icon'} key="icon">{icon}</div>,
-      <div className={'tree-item-display'} key="display">{display}</div>
-    ];
-    for (let i = this.props.indent - 1; i >= 0; i--) {
-      columns.unshift(<div className={'tree-item-indent'} key={i}>{i === 0 ? specialIcon : undefined}</div>);
-    }
-    let treeItemContents = (
-      <div className={'tree-item-contents'}>
-        <div className={'tree-item-contents-row'}>
-          {columns}
-        </div>
-      </div>
-    );
+    let treeItemContents = this.getTreeItemContents(icon, specialIcon, display);
     let treeItem: React.ReactNode;
     if (this.state.clickable) {
       let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
       treeItem = (
-        <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+        <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           {treeItemContents}
         </a>
       );
     } else {
       treeItem = (
-        <div className={className} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} key="display" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+        <div className={className} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           {treeItemContents}
         </div>
       );
@@ -391,9 +452,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
       event.preventDefault();
       this.clicked = true;
       if (this.props.isSubsection) {
-        if (this.props.isLast && !this.state.opened) {
-          setTimeout(this.scrollIntoView, 100);
-        }
         this.setState((prevState) => ({opened: !prevState.opened}));
       } else if (this.props.onItemClicked && this.libraryDefinitionPromise) {
         this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.libraryDefinitionPromise, this.props.itemInfo);
@@ -416,43 +474,6 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
     this.setState({showPreview: false});
   }
 
-  private scrollIntoView = (): void => {
-    if (this.htmlNode) {
-      this.htmlNode.scrollIntoView({
-        block: 'nearest',
-        inline: 'nearest'
-      });
-    }
-  }
-
-  // Calculate visible dimensions for tooltip.
-  getBoundingClientRect(): ClientRect {
-    if (this.props.parentScrollPane && this.htmlNode) {
-      let parentRect = this.props.parentScrollPane.getBoundingClientRect();
-      let itemRect = this.htmlNode.getBoundingClientRect();
-      if (parentRect.width > 0) {
-        return {
-          left: parentRect.left,
-          right: parentRect.right,
-          width: parentRect.width,
-          top: itemRect.top,
-          bottom: itemRect.bottom,
-          height: itemRect.height
-        };
-      } else if (itemRect.width > 0) {
-        return itemRect;
-      }
-    }
-    return {
-      left: 0,
-      right: 0,
-      width: 0,
-      top: 0,
-      bottom: 0,
-      height: 0
-    };
-  }
-
   private onScroll = () => {
     if (this.state.showPreview) {
       this.refreshTooltip = true;
@@ -468,6 +489,49 @@ class LibraryTreeItem extends React.Component<LibraryTreeItemProps, LibraryTreeI
   }
 }
 
+interface LibraryTreeInsertionItemProps extends LibraryTreeItemBaseProps {
+  onInsertButtonClicked: OnInsertButtonClicked;
+}
+
+interface LibraryTreeInsertionItemState {
+}
+
+class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps, LibraryTreeInsertionItemState> {
+  constructor(props: LibraryTreeInsertionItemProps) {
+    super(props);
+
+    this.state = {};
+  }
+
+  render(): React.ReactNode {
+    let definitionButtons: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
+      let toolTipText = `Create new ${definitionType.name.toLowerCase()}`;
+      let onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, definitionType);
+      return (
+        <Button className={'standalone'} toolTipText={toolTipText} onClick={onClick} key={definitionType.definitionType}>
+          {getInsertIcon(getDefinitionIconContents(definitionType.definitionType))}
+        </Button>
+      );
+    });
+    let buttonRow = (
+      <div className={'tree-item-insert-buttons'}>
+        <Button className={'standalone'} toolTipText={'Create new section'} onClick={() => this.props.onInsertButtonClicked(this.props.libraryDataProvider, undefined)} key={'section'}>
+          {getInsertIcon(getButtonIconContents(ButtonType.RightArrow))}
+        </Button>
+        {definitionButtons}
+      </div>
+    );
+    let treeItemContents = this.getTreeItemContents(undefined, undefined, buttonRow);
+    return (
+      <div className={'tree-item-row'} key="item">
+        <div className={'tree-item'} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          {treeItemContents}
+        </div>
+      </div>
+    );
+  }
+}
+
 interface LibraryTreeProps {
   libraryDataProvider: LibraryDataProvider;
   templates?: Fmt.File;
@@ -476,6 +540,7 @@ interface LibraryTreeProps {
   selectedItemPath?: Fmt.Path;
   interactionHandler?: ExpressionInteractionHandler;
   onItemClicked?: OnItemClicked;
+  onInsertButtonClicked?: OnInsertButtonClicked;
 }
 
 interface InnerLibraryTreeProps extends LibraryTreeProps {
@@ -484,7 +549,6 @@ interface InnerLibraryTreeProps extends LibraryTreeProps {
   innerDefinitions?: Fmt.Definition[];
   itemNumber: number[];
   indent: number;
-  isLast: boolean;
 }
 
 export interface LibraryItemListEntry {
@@ -499,7 +563,7 @@ interface LibraryItemListProps extends LibraryTreeProps {
   items: LibraryItemListEntry[];
 }
 
-function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]) {
+function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[]): React.ReactElement {
   let parentPath: Fmt.Path | undefined = undefined;
   if (props.libraryDefinition) {
     parentPath = new Fmt.Path;
@@ -549,21 +613,24 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
           selected = true;
         }
       }
-      let last = index === items.length - 1;
       let itemInfo: LibraryItemInfo = {
         itemNumber: [...props.itemNumber, index + 1],
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={props.isLast && last} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={path.name} indent={props.indent}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} onInsertButtonClicked={props.onInsertButtonClicked} key={path.name} indent={props.indent}/>);
     }
     index++;
+  }
+
+  if (props.onInsertButtonClicked) {
+    treeItems.push(<LibraryTreeInsertionItem libraryDataProvider={props.libraryDataProvider} parentScrollPane={props.parentScrollPane} onInsertButtonClicked={props.onInsertButtonClicked} key={'<insert>'} indent={props.indent}/>);
   }
 
   return <>{treeItems}</>;
 }
 
-function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
+function InnerLibraryTreeItems(props: InnerLibraryTreeProps): React.ReactElement | null {
   if (props.sectionPromise) {
     let render = props.sectionPromise.then((section: LibraryDefinition) => {
       if (section.definition.contents instanceof FmtLibrary.ObjectContents_Section) {
@@ -580,13 +647,12 @@ function InnerLibraryTreeItems(props: InnerLibraryTreeProps) {
   }
 }
 
-function LibraryTree(props: LibraryTreeProps) {
+function LibraryTree(props: LibraryTreeProps): React.ReactElement {
   let innerProps: InnerLibraryTreeProps = {
     ...props,
     sectionPromise: props.libraryDataProvider.fetchLocalSection(),
     itemNumber: [],
     indent: 0,
-    isLast: true
   };
   return (
     <div className={'tree'}>
@@ -595,12 +661,12 @@ function LibraryTree(props: LibraryTreeProps) {
   );
 }
 
-export function LibraryItemList(props: LibraryItemListProps) {
+export function LibraryItemList(props: LibraryItemListProps): React.ReactElement {
   return (
     <div className={'tree'}>
       {props.items.map((entry: LibraryItemListEntry, index: number) => {
         let selected = FmtUtils.arePathsEqual(entry.absolutePath, props.selectedItemPath);
-        return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} isLast={index === props.items.length - 1} onFilter={props.onFilter} selected={selected} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
+        return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} onFilter={props.onFilter} selected={selected} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
       })}
     </div>
   );

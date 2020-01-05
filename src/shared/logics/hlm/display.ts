@@ -25,12 +25,12 @@ export class HLMDisplay implements Logic.LogicDisplay {
     }
   }
 
-  getDefinitionRenderer(definition: Fmt.Definition, includeProofs: boolean, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File): Logic.LogicRenderer {
-    return new HLMRenderer(definition, includeProofs, libraryDataAccessor, templates);
+  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions): Logic.LogicRenderer {
+    return new HLMRenderer(definition, libraryDataAccessor, templates, options);
   }
 
-  getDefinitionEditor(definition: Fmt.Definition, includeProofs: boolean, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, editing: boolean): Logic.LogicRenderer {
+  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean): Logic.LogicRenderer {
     let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, templates) : undefined;
-    return new HLMRenderer(definition, includeProofs, libraryDataProvider, templates, editHandler);
+    return new HLMRenderer(definition, libraryDataProvider, templates, options, editHandler);
   }
 }

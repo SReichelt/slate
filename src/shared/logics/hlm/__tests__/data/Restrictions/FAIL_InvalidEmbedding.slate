@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Embedding must refer to constructor of parent construction
+ * @expectedError Type mismatch
  */
 $FAIL_InvalidEmbedding: %Construction {
   $instance(

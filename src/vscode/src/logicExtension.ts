@@ -231,6 +231,10 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
             let libraryDataProvider = libraryDocument.documentLibraryDataProvider;
             let templates = this.templates;
             let result: vscode.CodeLens[] = [];
+            let rendererOptions: Logic.LogicRendererOptions = {
+                includeProofs: true,
+                abbreviateLongLists: true
+            };
             if (libraryDocument.isSection) {
                 for (let range of libraryDocument.rangeList) {
                     if (token.isCancellationRequested) {
@@ -241,7 +245,7 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
                         result.push(new SlateCodeLens(range.range, () => {
                             let item = libraryDataProvider.fetchItem(ref.path);
                             let expression = item.then((definition: LibraryDefinition) => {
-                                let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, false, libraryDataProvider, templates);
+                                let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
                                 try {
                                     return renderer.renderDefinitionSummary() || new Display.EmptyExpression;
                                 } catch (error) {
@@ -255,7 +259,7 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
             } else {
                 if (libraryDocument.file.definitions.length) {
                     let definition = libraryDocument.file.definitions[0];
-                    let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, true, libraryDataProvider, templates);
+                    let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition, libraryDataProvider, templates, rendererOptions);
                     try {
                         let parts = renderer.getDefinitionParts();
                         for (let range of libraryDocument.rangeList) {
@@ -302,8 +306,17 @@ class SlateLogicHoverProvider {
             let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
             let templates = this.templates;
             let textPromise = definitionPromise.then((definition: LibraryDefinition) => {
-                let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, false, targetDataProvider, templates);
-                let renderedDefinition = renderer.renderDefinition(undefined, false, true, false);
+                let rendererOptions: Logic.LogicRendererOptions = {
+                    includeProofs: false,
+                    abbreviateLongLists: true
+                };
+                let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, targetDataProvider, templates, rendererOptions);
+                let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+                    includeLabel: false,
+                    includeExtras: true,
+                    includeRemarks: false
+                };
+                let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
             });
             event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {

@@ -1552,7 +1552,7 @@ exports[`render hlm library: 1.5.5 data/libraries/hlm/Essentials/Sequences/Infin
   (a_n)_(n ∈ ℕ) = (b_n)_(n ∈ ℕ)  :⇔  ∀ n ∈ ℕ : a_n = b_n  (a_n ∈ S for each n ∈ ℕ, b_n ∈ S for each n ∈ ℕ)
 
 S^ω ⊆: S^ω via
-𝐚 = (a_k if 𝐚 = (a_j)_(j < ω) (a_j ∈ S for each j ∈ 𝓞𝓻𝓭_(<ω)))_(k ∈ ℕ)
+(a_j)_(j < ω) = (a_k)_(k ∈ ℕ)
 
 Well-definedness.  No proof.
 
@@ -1592,7 +1592,7 @@ exports[`render hlm library: 1.5.7 data/libraries/hlm/Essentials/Sequences/Ordin
   (α, 𝐚) = (β, 𝐛)  :⇔  α = β and 𝐚 = 𝐛  (α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α, β ∈ 𝓞𝓻𝓭, 𝐛 is a sequence on S with length β)
 
 S^∗ ⊆: S^⋆ via
-𝒂 = (|𝒂|, 𝐚 if 𝒂 = (n, 𝐚) (n ∈ ℕ, 𝐚 is a sequence on S with length n))
+(n, 𝐚) = (n, 𝐚)
 
 Well-definedness.  No proof.
 
@@ -5932,7 +5932,12 @@ exports[`render hlm library: 2.8.25.1 data/libraries/hlm/Algebra/Rings/Polynomia
 
   𝐑[X] :=: {(0)_(𝐑[X]), (pX+a) | p ∈ 𝐑[X], a ∈ 𝐑 such that [p ≠ (0)_(𝐑[X]) or a ≠ 0_𝐑]}
 
-  (pX+a) = (qX+b)  :⇔  p = q and a = b  (p ∈ 𝐑[X], a ∈ 𝐑, q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+  (pX+a) = (qX+b)  :⇔  p = q and a = b  (p ∈ 𝐑[X], a ∈ 𝐑, q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)
+
+Carrier(𝐑) ⊆: 𝐑[X] via
+a = {(0)_(𝐑[X]) if a = 0_𝐑, ((0)_(𝐑[X])X+a) if a ≠ 0_𝐑
+
+Well-definedness.  No proof."
 `;
 
 exports[`render hlm library: 2.8.25.2 data/libraries/hlm/Algebra/Rings/Polynomials/normalized 1`] = `
@@ -5942,23 +5947,18 @@ exports[`render hlm library: 2.8.25.2 data/libraries/hlm/Algebra/Rings/Polynomia
 `;
 
 exports[`render hlm library: 2.8.25.3 data/libraries/hlm/Algebra/Rings/Polynomials/term 1`] = `
-"Definition 2.8.25.3.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, n ∈ ℕ. We define:
+"Definition 2.8.25.3.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, n ∈ ℕ. We define
 
-  aX^n := {{((0)_(𝐑[X])X+a) if n = 0, (aX^mX+0_𝐑) if n = m + 1 (m ∈ ℕ) if a ≠ 0_𝐑, (0)_(𝐑[X]) if a = 0_𝐑"
+  aX^n
+
+by:
+
+  aX^0 := a
+  aX^(m+1) := [aX^mX+0_𝐑]  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 2.8.25.4 data/libraries/hlm/Algebra/Rings/Polynomials/constant 1`] = `
-"Definition 2.8.25.4.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑. We define:
-
-  [a]_(𝐑[X]) := [(0)_(𝐑[X])X+a]
-   = aX^0
-   = {((0)_(𝐑[X])X+a) if a ≠ 0_𝐑, (0)_(𝐑[X]) if a = 0_𝐑
-
-Equality.  No proof."
-`;
-
-exports[`render hlm library: 2.8.25.5 data/libraries/hlm/Algebra/Rings/Polynomials/sum 1`] = `
-"Definition 2.8.25.5.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.4 data/libraries/hlm/Algebra/Rings/Polynomials/sum 1`] = `
+"Definition 2.8.25.4.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
 
   p + q
 
@@ -5969,8 +5969,8 @@ by:
   (rX+a) + (sX+b) := [(r + s)X+(a + b)]  (r ∈ 𝐑[X], a ∈ 𝐑, s ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.6 data/libraries/hlm/Algebra/Rings/Polynomials/additive%20inverse 1`] = `
-"Definition 2.8.25.6.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.5 data/libraries/hlm/Algebra/Rings/Polynomials/additive%20inverse 1`] = `
+"Definition 2.8.25.5.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
 
   −p
 
@@ -5980,8 +5980,8 @@ by:
   −(qX+a) := ((−q)X+(−a))  (q ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.7 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20scalar 1`] = `
-"Definition 2.8.25.7.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, p ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.6 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20scalar 1`] = `
+"Definition 2.8.25.6.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, p ∈ 𝐑[X]. We define
 
   a ⋅ p
 
@@ -5991,8 +5991,8 @@ by:
   a ⋅ (qX+b) := [(a ⋅ q)X+(a ⋅ b)]  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.8 data/libraries/hlm/Algebra/Rings/Polynomials/product 1`] = `
-"Definition 2.8.25.8.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.7 data/libraries/hlm/Algebra/Rings/Polynomials/product 1`] = `
+"Definition 2.8.25.7.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
 
   p ⋅ q
 
@@ -6002,14 +6002,14 @@ by:
   (rX+a) ⋅ q := [(r ⋅ q)X+0_𝐑] + a ⋅ q  (r ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.9 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
-"Definition 2.8.25.9.  Let 𝐑 be a ring, X be a variable. We define:
+exports[`render hlm library: 2.8.25.8 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
+"Definition 2.8.25.8.  Let 𝐑 be a ring, X be a variable. We define:
 
-  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, [1_𝐑]_(𝐑[X])]"
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, 1_𝐑]"
 `;
 
-exports[`render hlm library: 2.8.25.10 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
-"Definition 2.8.25.10.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑. We define
+exports[`render hlm library: 2.8.25.9 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
+"Definition 2.8.25.9.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑. We define
 
   p(a)
 
@@ -6019,8 +6019,8 @@ by:
   (qX+b)(a) := q(a) ⋅ a + b  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.11 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
-"Definition 2.8.25.11.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.10 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
+"Definition 2.8.25.10.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
 
   dim(p)
 
@@ -6030,8 +6030,8 @@ by:
   dim(qX+a) := dim(q) + 1  (q ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.12 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
-"Definition 2.8.25.12.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X] ∖ {(0)_(𝐑[X])}. We define:
+exports[`render hlm library: 2.8.25.11 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
+"Definition 2.8.25.11.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X] ∖ {(0)_(𝐑[X])}. We define:
 
   deg(p) := dim(p) − 1"
 `;
