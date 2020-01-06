@@ -486,14 +486,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let sectionDefinition = this.editedDefinitions.get(localSectionFileName);
       if (sectionDefinition) {
         return this.submitLocalSection(localSectionFileName, sectionDefinition)
-          .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, true))
+          .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, true, false))
           .catch((error) => {
             editedLibraryDefinition.state = prevState;
             return CachedPromise.reject(error);
           });
       }
     }
-    return this.submitLocalDefinition(name, editedLibraryDefinition, false)
+    return this.submitLocalDefinition(name, editedLibraryDefinition, false, false)
       .catch((error) => {
         editedLibraryDefinition.state = prevState;
         return CachedPromise.reject(error);
@@ -508,25 +508,25 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let parentSectionDefinition = this.parent.editedDefinitions.get(parentSectionFileName);
       if (parentSectionDefinition) {
         return this.parent.submitLocalSection(parentSectionFileName, parentSectionDefinition)
-          .then(() => this.submitLocalDefinition(localSectionFileName, sectionDefinition, true))
+          .then(() => this.submitLocalDefinition(localSectionFileName, sectionDefinition, true, true))
           .catch((error) => {
             sectionDefinition.state = prevState;
             return CachedPromise.reject(error);
           });
       }
     }
-    return this.submitLocalDefinition(localSectionFileName, sectionDefinition, false)
+    return this.submitLocalDefinition(localSectionFileName, sectionDefinition, false, true)
       .catch((error) => {
         sectionDefinition.state = prevState;
         return CachedPromise.reject(error);
       });
   }
 
-  private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isNew: boolean): CachedPromise<WriteFileResult> {
+  private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     try {
       let uri = this.uri + encodeURI(name) + fileExtension;
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
-      return this.fileAccessor.writeFile!(uri, contents, isNew)
+      return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
         .then((result: WriteFileResult) => {
           editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
           this.definitionCache.set(name, CachedPromise.resolve(editedLibraryDefinition));

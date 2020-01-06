@@ -184,7 +184,7 @@ export class APIAccess {
     return utf8.decode(atob(result.content));
   }
 
-  async writeFile(repository: Repository, path: string, text: string, createNew: boolean): Promise<PullRequestState | undefined> {
+  async writeFile(repository: Repository, path: string, text: string, createNew: boolean, isPartOfGroup: boolean): Promise<PullRequestState | undefined> {
     await this.ensureWriteAccess(repository);
 
     let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
@@ -223,7 +223,11 @@ export class APIAccess {
       }
     }
 
-    return await this.createPullRequest(repository, putParameters.message);
+    if (isPartOfGroup) {
+      return undefined;
+    } else {
+      return await this.createPullRequest(repository, putParameters.message);
+    }
   }
 
   async ensureWriteAccess(repository: Repository): Promise<void> {

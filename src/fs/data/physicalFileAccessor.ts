@@ -11,7 +11,7 @@ export class PhysicalFileAccessor implements FileAccessor {
     return new CachedPromise(contents);
   }
 
-  writeFile(uri: string, text: string, createNew: boolean): CachedPromise<WriteFileResult> {
+  writeFile(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     let fileName = decodeURI(uri);
     if (createNew) {
       this.makeDirectories(fileName);
