@@ -56,7 +56,8 @@
 namespace hlm
 
 -- Conjunction and disjunction are dependend in HLM.
-def and_dep {left : Prop} (right : left → Prop) := left ∧ (∀ l : left, right l)
+-- This is equivalent to a sigma type; can it be simplified?
+def and_dep {left : Prop} (right : left → Prop) := left ∧ (Π l : left, right l)
 def and_dep_left {left : Prop} {right : left → Prop} (h : and_dep (λ l : left, right l)) := and.left h
 def and_dep_right {left : Prop} {right : left → Prop} (h : and_dep (λ l : left, right l)) := and.right h (and_dep_left h)
 
@@ -98,13 +99,16 @@ def lean_set_to_base_set {α : Type u} (lean_set : set α) := make_base_set (lea
   exact h2
 end)
 
+structure BaseElement {base_type : BaseType} (base_set: BaseSet base_type) := (element : base_type.α) (is_element : element ∈ base_set.lean_set)
+def make_base_element {base_type : BaseType} (base_set: BaseSet base_type) (element : base_type.α) (is_element : element ∈ base_set.lean_set) : BaseElement base_set := @BaseElement.mk base_type base_set element is_element
+
 class has_base_type (H : Sort v) := (base_type : H → BaseType)
 class has_base_set (H : Sort v) extends has_base_type H := (base_set : Π S : H, BaseSet (has_base_type.base_type S))
 
 def lean_type_of {H : Sort v} [has_base_type H] (S : H) := (has_base_type.base_type S).α
 def lean_set_of {H : Sort v} [has_base_set H] (S : H) := (has_base_set.base_set S).lean_set
 
--- The coercions do not seem to have any effect within definitions. Need to figure out why.
+-- The coercions do not seem to work within definitions, even with ↑. Need to figure out why.
 -- However, they seem to be used implicitly in proofs, as can be seen by commenting them out.
 
 structure Set := (base_type : BaseType) (base_set : BaseSet base_type)
@@ -121,16 +125,17 @@ instance Subset_has_base_set {H : Sort v} [has_base_set H] {S : H} : has_base_se
 def make_subset {H : Sort v} [h : has_base_set H] (S : H) (lean_set : set (lean_type_of S)) (is_subset : lean_set ⊆ lean_set_of S) (respects_equality : lean_set_respects_equality (has_base_type.base_type S) lean_set) : Subset S := @Subset.mk H h S (BaseSet.mk lean_set respects_equality) is_subset
 def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := Set.mk (has_base_type.base_type S) T.base_set
 instance Subset_to_Set {H : Sort v} [has_base_set H] {S : H} : has_coe (Subset S) Set := ⟨subset_to_set⟩
+def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S'): Subset S := Subset.mk T.base_set (begin
+  intro x,
+  assume h1,
+  let h2 := T.is_subset h1,
+  exact S'.is_subset h2
+end)
+instance Subset_to_Superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} : has_coe (Subset S') (Subset S) := ⟨subset_to_superset⟩
 
--- We should be able to coerce from Subset S to (type of S) instead of just Set.
--- Unfortunately, I haven't figured out a way to specify that the Lean type of the result will be the same.
--- That makes these definitions rather useless.
---def subset_to_superset {H : Sort v} [is_set H] {S : H} (T : Subset S) := is_set.construct S T.base_set
---instance Subset_to_Superset {H : Sort v} [is_set H] {S : H} : has_coe (Subset S) H := ⟨subset_to_superset⟩
-
-structure Element {H : Sort v} [has_base_set H] (S : H) := (element : lean_type_of S) (is_element : element ∈ lean_set_of S)
+def Element {H : Sort v} [has_base_set H] (S : H) := BaseElement (has_base_set.base_set S)
 instance Element_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Element S) := ⟨λ _, has_base_type.base_type S⟩
-def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := @Element.mk H h S element is_element
+def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := make_base_element (has_base_set.base_set S) element is_element
 
 def class_of {H : Sort v} [has_base_set H] {S : H} (x : Element S) :=
 base_class_of x.element
