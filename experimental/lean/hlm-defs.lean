@@ -31,6 +31,10 @@
 --   The Element structure simply bundles an element of the required type with a proof that it
 --   is indeed an element of the given set.
 --
+-- These definitions translate the type system of HLM, in the sense that a translated
+-- expression is well-typed in Lean if and only if the original expression is well-typed in
+-- HLM.
+--
 -- These definitions would be sufficient to translate simple definitions, but not HLM
 -- constructions that contain sets: Their custom equality definition in HLM necessarily
 -- identifies isomorphic elements, but it is still possible to obtain "arbitrary
@@ -51,15 +55,10 @@
 
 namespace hlm
 
--- Dependend "and" as used by HLM maps to ∃ in Lean.
-def and_dep_left {P : Prop} {e : P → Prop} (h : ∃ p : P, e p) : P := (begin
-  apply exists.elim h, intro p, assume h1,
-  exact p
-end)
-def and_dep_right {P : Prop} {e : P → Prop} (h : ∃ p : P, e p) : e (and_dep_left h) := (begin
-  apply exists.elim h, intro p, assume h1,
-  exact h1
-end)
+-- Conjunction and disjunction are dependend in HLM.
+def and_dep {left : Prop} (right : left → Prop) := left ∧ (∀ l : left, right l)
+def and_dep_left {left : Prop} {right : left → Prop} (h : and_dep (λ l : left, right l)) := and.left h
+def and_dep_right {left : Prop} {right : left → Prop} (h : and_dep (λ l : left, right l)) := and.right h (and_dep_left h)
 
 universes u v
 
@@ -124,7 +123,7 @@ def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := Set.mk
 instance Subset_to_Set {H : Sort v} [has_base_set H] {S : H} : has_coe (Subset S) Set := ⟨subset_to_set⟩
 
 -- We should be able to coerce from Subset S to (type of S) instead of just Set.
--- Unfortunately, I haven't figured out a way to specify that the lean type of the result will be the same.
+-- Unfortunately, I haven't figured out a way to specify that the Lean type of the result will be the same.
 -- That makes these definitions rather useless.
 --def subset_to_superset {H : Sort v} [is_set H] {S : H} (T : Subset S) := is_set.construct S T.base_set
 --instance Subset_to_Superset {H : Sort v} [is_set H] {S : H} : has_coe (Subset S) H := ⟨subset_to_superset⟩
@@ -241,20 +240,25 @@ X ⊆ Y1 → X ⊆ Y2 := begin
 end
 
 def subset {H : Sort v} [has_base_set H] {S : H} (s : set (Element S)) (s_respects_equality : ∀ x y : Element S, x ≈ y → x ∈ s → y ∈ s) : Subset S :=
-let lean_set := {x : lean_type_of S | ∃ p : x ∈ lean_set_of S, (make_element S x p) ∈ s} in
+let lean_set := {x : lean_type_of S | and_dep (λ p : x ∈ lean_set_of S, (make_element S x p) ∈ s)} in
 make_subset S lean_set (begin
   intros a h1,
   exact and_dep_left h1
 end) (begin
   intros x_base y_base,
   assume h1 h2,
-  split,
   let h3 := and_dep_left h2,
-  let h4 := (has_base_set.base_set S).respects_equality x_base y_base h1 h3,
-  let x := make_element S x_base h3,
-  let y := make_element S y_base h4,
-  apply s_respects_equality x y h1,
-  apply and_dep_right h2
+  split,
+  {
+    exact (has_base_set.base_set S).respects_equality x_base y_base h1 h3
+  },
+  {
+    assume h4,
+    let x := make_element S x_base h3,
+    let y := make_element S y_base h4,
+    apply s_respects_equality x y h1,
+    apply and_dep_right h2
+  }
 end)
 
 lemma trivially_respects_equality {α : Type u} {s : set (Element (lean_type_to_set α))} :
@@ -316,6 +320,8 @@ Intersection U S1 T ⊆ Intersection U S2 T := begin
   intro x,
   assume h1,
   split,
+  exact x.is_element,
+  assume _,
   split,
   apply is_element_respects_equality_T x S1 S2 h,
   exact (and_dep_right h1).left,
@@ -327,6 +333,8 @@ Intersection U S T1 ⊆ Intersection U S T2 := begin
   intro x,
   assume h1,
   split,
+  exact x.is_element,
+  assume _,
   split,
   exact (and_dep_right h1).left,
   apply is_element_respects_equality_T x T1 T2 h,
@@ -510,27 +518,6 @@ unique_element_desc.mk is_inverse (begin
   let g_base := preimage ↑f f_is_bijective,
   let g := make_element (Bijections Y X) g_base (begin
     split,
-    split,
-    {
-      intros y1 y2,
-      assume h1,
-      let x1 := g_base y1,
-      let x2 := g_base y2,
-      transitivity f.element x1,
-      symmetry,
-      exact unique_element_spec (preimage_desc ↑f f_is_bijective y1),
-      transitivity f.element x2,
-      exact value_respects_equality_x (superset_element (Functions X Y) f) x1 x2 h1,
-      exact unique_element_spec (preimage_desc ↑f f_is_bijective y2)
-    },
-    {
-      intro x,
-      let y := f.element x,
-      existsi y,
-      let z := g_base y,
-      apply f_is_injective z x,
-      exact unique_element_spec (preimage_desc ↑f f_is_bijective y)
-    },
     {
       intros y1 y2,
       assume h1,
@@ -540,6 +527,30 @@ unique_element_desc.mk is_inverse (begin
       transitivity y1,
       exact unique_element_spec (preimage_desc ↑f f_is_bijective y1),
       exact h1
+    },
+    {
+      assume _,
+      split,
+      {
+        intros y1 y2,
+        assume h1,
+        let x1 := g_base y1,
+        let x2 := g_base y2,
+        transitivity f.element x1,
+        symmetry,
+        exact unique_element_spec (preimage_desc ↑f f_is_bijective y1),
+        transitivity f.element x2,
+        exact value_respects_equality_x (superset_element (Functions X Y) f) x1 x2 h1,
+        exact unique_element_spec (preimage_desc ↑f f_is_bijective y2)
+      },
+      {
+        intro x,
+        let y := f.element x,
+        existsi y,
+        let z := g_base y,
+        apply f_is_injective z x,
+        exact unique_element_spec (preimage_desc ↑f f_is_bijective y)
+      }
     }
   end),
   existsi g,
@@ -601,15 +612,23 @@ lean_type_to_set_with_equality Set (λ S T : Set, ∃ f : Element (Bijections S 
     intro S,
     let id := identity S,
     let id_bijection := make_element (Bijections S S) id.element (begin
-      existsi id.is_element,
       split,
       {
         exact id.is_element
       },
       {
-        intro y,
-        existsi y,
-        reflexivity
+        assume _,
+        split,
+        {
+          intros x y,
+          assume h1,
+          exact h1
+        },
+        {
+          intro y,
+          existsi y,
+          reflexivity
+        }
       }
     end),
     existsi id_bijection,
@@ -636,30 +655,33 @@ lean_type_to_set_with_equality Set (λ S T : Set, ∃ f : Element (Bijections S 
       let f_is_bijective := and_dep_right f.is_element,
       let g_is_bijective := and_dep_right g.is_element,
       split,
-      split,
-      {
-        intros x y,
-        assume h1,
-        apply f_is_bijective.left,
-        apply g_is_bijective.left,
-        exact h1
-      },
-      {
-        intro z,
-        apply exists.elim (g_is_bijective.right z),
-        intro y,
-        assume h1,
-        apply exists.elim (f_is_bijective.right y),
-        intro x,
-        assume h2,
-        existsi x,
-        let h3 := (and_dep_left g.is_element) (f.element x) y h2,
-        transitivity g.element y,
-        exact h3,
-        exact h1
-      },
       {
         exact comp.is_element
+      },
+      {
+        assume _,
+        split,
+        {
+          intros x y,
+          assume h1,
+          apply f_is_bijective.left,
+          apply g_is_bijective.left,
+          exact h1
+        },
+        {
+          intro z,
+          apply exists.elim (g_is_bijective.right z),
+          intro y,
+          assume h1,
+          apply exists.elim (f_is_bijective.right y),
+          intro x,
+          assume h2,
+          existsi x,
+          let h3 := (and_dep_left g.is_element) (f.element x) y h2,
+          transitivity g.element y,
+          exact h3,
+          exact h1
+        }
       }
     end),
     existsi comp_bijection,
