@@ -6,6 +6,7 @@ import CachedPromise from '../data/cachedPromise';
 export class ExpressionDialog {
   items: ExpressionDialogItem[];
   onOK: () => void;
+  onCheckOKEnabled?: () => boolean;
 }
 
 type ChangeListener = () => void;

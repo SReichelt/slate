@@ -7,8 +7,8 @@ import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
   readonly name: string;
-  readonly topLevelDefinitionTypes: LogicDefinitionTypeDescription[];
   readonly getMetaModel: Meta.MetaModelGetter;
+  readonly topLevelDefinitionTypes: LogicDefinitionTypeDescription[];
   getRootContext(): Ctx.Context;
   getChecker(): LogicChecker;
   getDisplay(): LogicDisplay;
@@ -27,6 +27,9 @@ export enum LogicDefinitionType {
 export interface LogicDefinitionTypeDescription {
   readonly definitionType: LogicDefinitionType;
   readonly name: string;
+  readonly types?: string[];
+  createTypeExpression(): Fmt.Expression;
+  createObjectContents(): Fmt.ObjectContents;
 }
 
 export interface LogicChecker {

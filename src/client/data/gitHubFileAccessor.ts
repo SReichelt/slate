@@ -32,13 +32,13 @@ export class GitHubFileAccessor extends WebFileAccessor {
     });
   }
 
-  writeFile(uri: string, text: string): CachedPromise<WriteFileResult> {
+  writeFile(uri: string, text: string, createNew: boolean): CachedPromise<WriteFileResult> {
     return this.config.then((config) => {
       if (config.apiAccess) {
         for (let target of config.targets) {
           if (uri.startsWith(target.uriPrefix)) {
             let path = uri.substring(target.uriPrefix.length);
-            let result = config.apiAccess.updateFile(target.repository, path, text)
+            let result = config.apiAccess.writeFile(target.repository, path, text, createNew)
               .then((pullRequestState) => {
                 let writeFileResult = new GitHubWriteFileResult;
                 writeFileResult.pullRequestState = pullRequestState;
@@ -49,7 +49,7 @@ export class GitHubFileAccessor extends WebFileAccessor {
         }
       }
 
-      return super.writeFile(uri, text);
+      return super.writeFile(uri, text, createNew);
     });
   }
 

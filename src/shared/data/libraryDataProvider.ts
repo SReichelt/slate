@@ -28,7 +28,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private path?: Fmt.NamedPathItem;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
   private definitionCache = new Map<string, CachedPromise<LibraryDefinition>>();
-  private editedItems = new Map<string, LibraryDefinition>();
+  private editedDefinitions = new Map<string, LibraryDefinition>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
@@ -217,6 +217,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<LibraryDefinition> {
+    let editedDefinition = this.editedDefinitions.get(name);
+    if (editedDefinition) {
+      return CachedPromise.resolve(editedDefinition);
+    }
     let result = this.definitionCache.get(name);
     if (!result) {
       let uri = this.uri + encodeURI(name) + fileExtension;
@@ -277,7 +281,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   fetchLocalSection(prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    return this.fetchSection(this.parent ? '_index' : this.childName, prefetchContents);
+    return this.fetchSection(this.getLocalSectionFileName(), prefetchContents);
+  }
+
+  private getLocalSectionFileName(): string {
+    return this.parent ? '_index' : this.childName;
   }
 
   fetchSubsection(path: Fmt.Path, itemNumber?: number[], prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
@@ -285,11 +293,68 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return provider.fetchLocalSection(prefetchContents);
   }
 
+  insertLocalSubsection(name: string, title: string, insertBefore?: string): CachedPromise<LibraryDefinition> {
+    let localSectionFileName = this.getLocalSectionFileName();
+    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      let newSubsectionRef = new Fmt.DefinitionRefExpression;
+      newSubsectionRef.path = new Fmt.Path;
+      newSubsectionRef.path.name = name;
+      let newSubsection = new FmtLibrary.MetaRefExpression_subsection;
+      newSubsection.ref = newSubsectionRef;
+      newSubsection.title = title || '';
+      let insertIndex = undefined;
+      if (insertBefore) {
+        sectionContents.items.map((item: Fmt.Expression, index: number) => {
+          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+            insertIndex = index;
+          }
+        });
+      }
+      if (insertIndex === undefined) {
+        sectionContents.items.push(newSubsection);
+      } else {
+        sectionContents.items.splice(insertIndex, 0, newSubsection);
+      }
+      if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+        sectionDefinition.state = LibraryDefinitionState.Editing;
+      }
+      this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+      let subsectionProvider = this.getProviderForSubsection(newSubsectionRef.path);
+      let metaModelPath = sectionDefinition.file.metaModelPath.clone() as Fmt.Path;
+      for (let pathItem: Fmt.PathItem | undefined = metaModelPath; pathItem; pathItem = pathItem.parentPath) {
+        if (!pathItem.parentPath) {
+          pathItem.parentPath = new Fmt.ParentPathItem;
+          break;
+        }
+      }
+      return subsectionProvider.createLocalSection(metaModelPath);
+    });
+  }
+
+  private createLocalSection(metaModelPath: Fmt.Path): LibraryDefinition {
+    let file = new Fmt.File;
+    file.metaModelPath = metaModelPath;
+    let definition = new Fmt.Definition;
+    definition.name = this.childName;
+    definition.type = new Fmt.Type;
+    definition.type.expression = new FmtLibrary.MetaRefExpression_Section;
+    definition.type.arrayDimensions = 0;
+    let contents = new FmtLibrary.ObjectContents_Section;
+    contents.logic = this.logic.name;
+    contents.items = [];
+    definition.contents = contents;
+    file.definitions.push(definition);
+    let libraryDefinition: LibraryDefinition = {
+      file: file,
+      definition: definition,
+      state: LibraryDefinitionState.EditingNew
+    };
+    this.editedDefinitions.set(this.getLocalSectionFileName(), libraryDefinition);
+    return libraryDefinition;
+  }
+
   fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let editedItem = this.editedItems.get(name);
-    if (editedItem) {
-      return CachedPromise.resolve(editedItem);
-    }
     return this.fetchDefinition(name, name, this.logic.getMetaModel);
   }
 
@@ -299,7 +364,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
-    let editedItem = this.editedItems.get(name);
+    let editedItem = this.editedDefinitions.get(name);
     if (editedItem) {
       return definitionPromise.getImmediateResult() === editedItem;
     }
@@ -322,6 +387,60 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
   }
 
+  insertLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, title: string | undefined, type: string | undefined, insertBefore?: string): CachedPromise<LibraryDefinition> {
+    let localSectionFileName = this.getLocalSectionFileName();
+    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      let newItemRef = new Fmt.DefinitionRefExpression;
+      newItemRef.path = new Fmt.Path;
+      newItemRef.path.name = name;
+      let newItem = new FmtLibrary.MetaRefExpression_item;
+      newItem.ref = newItemRef;
+      newItem.title = title;
+      newItem.type = type;
+      let insertIndex = undefined;
+      if (insertBefore) {
+        sectionContents.items.map((item: Fmt.Expression, index: number) => {
+          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+            insertIndex = index;
+          }
+        });
+      }
+      if (insertIndex === undefined) {
+        sectionContents.items.push(newItem);
+      } else {
+        sectionContents.items.splice(insertIndex, 0, newItem);
+      }
+      if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+        sectionDefinition.state = LibraryDefinitionState.Editing;
+      }
+      this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+      let metaModelPath = new Fmt.Path;
+      metaModelPath.name = this.logic.name;
+      metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
+      return this.createLocalItem(name, definitionType, metaModelPath);
+    });
+  }
+
+  private createLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, metaModelPath: Fmt.Path): LibraryDefinition {
+    let file = new Fmt.File;
+    file.metaModelPath = metaModelPath;
+    let definition = new Fmt.Definition;
+    definition.name = name;
+    definition.type = new Fmt.Type;
+    definition.type.expression = definitionType.createTypeExpression();
+    definition.type.arrayDimensions = 0;
+    definition.contents = definitionType.createObjectContents();
+    file.definitions.push(definition);
+    let libraryDefinition: LibraryDefinition = {
+      file: file,
+      definition: definition,
+      state: LibraryDefinitionState.EditingNew
+    };
+    this.editedDefinitions.set(name, libraryDefinition);
+    return libraryDefinition;
+  }
+
   editLocalItem(libraryDefinition: LibraryDefinition): LibraryDefinition {
     let clonedFile = libraryDefinition.file.clone();
     let clonedLibraryDefinition: LibraryDefinition = {
@@ -329,32 +448,91 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       definition: clonedFile.definitions[0],
       state: LibraryDefinitionState.Editing
     };
-    this.editedItems.set(libraryDefinition.definition.name, clonedLibraryDefinition);
+    this.editedDefinitions.set(libraryDefinition.definition.name, clonedLibraryDefinition);
     return clonedLibraryDefinition;
   }
 
   cancelEditing(editedLibraryDefinition: LibraryDefinition): void {
     let name = editedLibraryDefinition.definition.name;
-    if (editedLibraryDefinition === this.editedItems.get(name)) {
-      this.editedItems.delete(name);
+    if (editedLibraryDefinition === this.editedDefinitions.get(name)) {
+      this.editedDefinitions.delete(name);
+    }
+    if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
+      let sectionDefinition = this.editedDefinitions.get(this.getLocalSectionFileName());
+      if (sectionDefinition) {
+        let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+        let indexToRemove = undefined;
+        sectionContents.items.map((item: Fmt.Expression, index: number) => {
+          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+            indexToRemove = index;
+          }
+        });
+        if (indexToRemove !== undefined) {
+          sectionContents.items.splice(indexToRemove, 1);
+        }
+      }
     }
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
     let name = editedLibraryDefinition.definition.name;
-    if (editedLibraryDefinition !== this.editedItems.get(name)) {
+    if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
       throw new Error('Trying to submit definition that is not being edited');
     }
+    let prevState = editedLibraryDefinition.state;
+    editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
+    if (prevState === LibraryDefinitionState.EditingNew) {
+      let localSectionFileName = this.getLocalSectionFileName();
+      let sectionDefinition = this.editedDefinitions.get(localSectionFileName);
+      if (sectionDefinition) {
+        return this.submitLocalSection(localSectionFileName, sectionDefinition)
+          .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, true))
+          .catch((error) => {
+            editedLibraryDefinition.state = prevState;
+            return CachedPromise.reject(error);
+          });
+      }
+    }
+    return this.submitLocalDefinition(name, editedLibraryDefinition, false)
+      .catch((error) => {
+        editedLibraryDefinition.state = prevState;
+        return CachedPromise.reject(error);
+      });
+  }
+
+  private submitLocalSection(localSectionFileName: string, sectionDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
+    let prevState = sectionDefinition.state;
+    sectionDefinition.state = LibraryDefinitionState.Submitting;
+    if (this.parent && prevState === LibraryDefinitionState.EditingNew) {
+      let parentSectionFileName = this.parent.getLocalSectionFileName();
+      let parentSectionDefinition = this.parent.editedDefinitions.get(parentSectionFileName);
+      if (parentSectionDefinition) {
+        return this.parent.submitLocalSection(parentSectionFileName, parentSectionDefinition)
+          .then(() => this.submitLocalDefinition(localSectionFileName, sectionDefinition, true))
+          .catch((error) => {
+            sectionDefinition.state = prevState;
+            return CachedPromise.reject(error);
+          });
+      }
+    }
+    return this.submitLocalDefinition(localSectionFileName, sectionDefinition, false)
+      .catch((error) => {
+        sectionDefinition.state = prevState;
+        return CachedPromise.reject(error);
+      });
+  }
+
+  private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isNew: boolean): CachedPromise<WriteFileResult> {
     try {
-      editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
       let uri = this.uri + encodeURI(name) + fileExtension;
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
-      return this.fileAccessor.writeFile!(uri, contents).then((result: WriteFileResult) => {
-        editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
-        this.definitionCache.set(name, CachedPromise.resolve(editedLibraryDefinition));
-        this.editedItems.delete(name);
-        return result;
-      });
+      return this.fileAccessor.writeFile!(uri, contents, isNew)
+        .then((result: WriteFileResult) => {
+          editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
+          this.definitionCache.set(name, CachedPromise.resolve(editedLibraryDefinition));
+          this.editedDefinitions.delete(name);
+          return result;
+        });
     } catch (error) {
       return CachedPromise.reject(error);
     }

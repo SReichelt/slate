@@ -67,11 +67,11 @@ body {
   color: gray;
 }
 
-.ok, .submit {
+.ok.enabled, .submit.enabled {
   color: green;
 }
 
-.cancel {
+.cancel.enabled {
   color: red;
 }
 

@@ -123,15 +123,20 @@ structure Subset {H : Sort v} [has_base_set H] (S : H) := (base_set : BaseSet (h
 instance Subset_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Subset S) := ⟨λ _, has_base_type.base_type S⟩
 instance Subset_has_base_set {H : Sort v} [has_base_set H] {S : H} : has_base_set (Subset S) := ⟨λ T, T.base_set⟩
 def make_subset {H : Sort v} [h : has_base_set H] (S : H) (lean_set : set (lean_type_of S)) (is_subset : lean_set ⊆ lean_set_of S) (respects_equality : lean_set_respects_equality (has_base_type.base_type S) lean_set) : Subset S := @Subset.mk H h S (BaseSet.mk lean_set respects_equality) is_subset
-def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := Set.mk (has_base_type.base_type S) T.base_set
+def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := make_set (has_base_type.base_type S) T.base_set
 instance Subset_to_Set {H : Sort v} [has_base_set H] {S : H} : has_coe (Subset S) Set := ⟨subset_to_set⟩
-def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S'): Subset S := Subset.mk T.base_set (begin
+def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S') : Subset S := Subset.mk T.base_set (begin
   intro x,
   assume h1,
   let h2 := T.is_subset h1,
   exact S'.is_subset h2
 end)
 instance Subset_to_Superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} : has_coe (Subset S') (Subset S) := ⟨subset_to_superset⟩
+def set_to_subset (S : Set) : Subset S := Subset.mk S.base_set (begin
+  intro x,
+  assume h1,
+  exact h1
+end)
 
 def Element {H : Sort v} [has_base_set H] (S : H) := BaseElement (has_base_set.base_set S)
 instance Element_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Element S) := ⟨λ _, has_base_type.base_type S⟩

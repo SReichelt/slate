@@ -5,7 +5,7 @@ import * as Logic from '../logic';
 import { GenericRenderer, RenderedVariable } from '../generic/renderer';
 import { findBestMatch } from '../generic/displayMatching';
 import * as Display from '../../display/display';
-import { HLMTermType } from './hlm';
+import { HLMExpressionType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
 import { PlaceholderExpression, GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
@@ -70,45 +70,58 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let cases: ExtractedStructuralCase[] | undefined = undefined;
     let hasCases = false;
     if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
-      let hasParameters = false;
-      if (definition.parameters.length || this.editHandler) {
-        hasParameters = true;
+      let hasParameters = definition.parameters.length > 0;
+      if (hasParameters || this.editHandler) {
         if (space) {
           row.push(new Display.TextExpression(space));
         }
         row.push(this.renderParameterList(definition.parameters, true, false, false, definition));
         space = ' ';
       }
-      if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-        if (hasParameters) {
-          if (space) {
-            row.push(new Display.TextExpression(space));
+      let introText: Display.RenderedExpression | undefined = undefined;
+      if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+        if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+          introText = this.renderEquivalenceTheoremIntro(hasParameters);
+        } else {
+          if (hasParameters || this.editHandler) {
+            introText = this.renderStandardTheoremIntro(hasParameters);
           }
-          row.push(new Display.TextExpression('Then:'));
         }
-      } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-        if (space) {
-          row.push(new Display.TextExpression(space));
+        if (this.editHandler) {
+          if (!introText) {
+            introText = new Display.InsertPlaceholderExpression;
+          }
+          let semanticLink = new Display.SemanticLink(introText, false, false);
+          let onRenderStandardIntro = () => this.renderStandardTheoremIntro(hasParameters);
+          let onRenderEquivalenceIntro = () => this.renderEquivalenceTheoremIntro(hasParameters);
+          this.editHandler.addTheoremTypeMenu(semanticLink, onRenderStandardIntro, onRenderEquivalenceIntro);
+          introText.semanticLinks = [semanticLink];
         }
-        row.push(new Display.TextExpression(hasParameters ? 'Then the following are equivalent:' : 'The following are equivalent:'));
       } else {
+        if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
+          introText = this.renderImplicitDefinitionIntro(contents.parameter);
+        } else {
+          introText = this.renderExplicitDefinitionIntro();
+        }
+        if ((contents instanceof FmtHLM.ObjectContents_ExplicitOperator || contents instanceof FmtHLM.ObjectContents_ImplicitOperator) && this.editHandler) {
+          let semanticLink = new Display.SemanticLink(introText, false, false);
+          let onRenderExplicitIntro = () => this.renderExplicitDefinitionIntro();
+          let onRenderImplicitIntro = (parameter: Fmt.Parameter) => this.renderImplicitDefinitionIntro(parameter);
+          this.editHandler.addImplicitDefinitionMenu(semanticLink, onRenderExplicitIntro, onRenderImplicitIntro);
+          introText.semanticLinks = [semanticLink];
+        }
         if (contents instanceof FmtHLM.ObjectContents_SetOperator || contents instanceof FmtHLM.ObjectContents_ExplicitOperator || contents instanceof FmtHLM.ObjectContents_ImplicitOperator || contents instanceof FmtHLM.ObjectContents_Predicate) {
           cases = this.renderUtils.extractStructuralCases(contents.definition);
           hasCases = cases.length > 0 && cases[0].structuralCases !== undefined;
         }
-        let colon = hasCases ? '' : ':';
-        if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-          if (space) {
-            row.push(new Display.TextExpression(space));
-          }
-          row.push(new Display.TextExpression('For '));
-          row.push(this.renderParameter(contents.parameter, false, false, false));
-          row.push(new Display.TextExpression(', we define' + colon));
-        } else {
-          if (space) {
-            row.push(new Display.TextExpression(space));
-          }
-          row.push(new Display.TextExpression('We define' + colon));
+      }
+      if (introText) {
+        if (space) {
+          row.push(new Display.TextExpression(space));
+        }
+        row.push(introText);
+        if (!hasCases && !(introText instanceof Display.InsertPlaceholderExpression)) {
+          row.push(new Display.TextExpression(':'));
         }
       }
     }
@@ -216,6 +229,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let result = new Display.PromiseExpression(formattedInfoPromise);
     result.styleClasses = ['label'];
     return result;
+  }
+
+  private renderExplicitDefinitionIntro(): Display.RenderedExpression {
+    return new Display.TextExpression('We define');
+  }
+
+  private renderImplicitDefinitionIntro(parameter: Fmt.Parameter): Display.RenderedExpression {
+    let row: Display.RenderedExpression[] = [
+      new Display.TextExpression('For '),
+      this.renderParameter(parameter, false, true, false),
+      new Display.TextExpression(', we define')
+    ];
+    return new Display.RowExpression(row);
+  }
+
+  private renderStandardTheoremIntro(hasParameters: boolean): Display.RenderedExpression {
+    return new Display.TextExpression(hasParameters ? 'Then' : 'We have');
+  }
+
+  private renderEquivalenceTheoremIntro(hasParameters: boolean): Display.RenderedExpression {
+    return new Display.TextExpression(hasParameters ? 'Then the following are equivalent' : 'The following are equivalent');
   }
 
   renderParameterList(parameters: Fmt.ParameterList, sentence: boolean, abbreviate: boolean, forcePlural: boolean, associatedDefinition?: Fmt.Definition, elementParameterOverrides?: ElementParameterOverrides): Display.RenderedExpression {
@@ -341,6 +375,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (currentGroup.length) {
       this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
     }
+    this.addParameterInsertButton(state, indices, row, !parameters.length);
+    if (state.started && state.fullSentence && !indices) {
+      row.push(new Display.TextExpression('.'));
+      state.started = false;
+      state.inLetExpr = false;
+      state.inConstraint = false;
+    }
+    return new Display.RowExpression(row);
+  }
+
+  private addParameterInsertButton(state: ParameterListState, indices: Display.RenderedExpression[] | undefined, row: Display.RenderedExpression[], isEmpty: boolean): void {
     if (this.editHandler && state.associatedParameterList) {
       if (row.length) {
         row.push(new Display.TextExpression(' '));
@@ -349,47 +394,38 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         row.push(new Display.TextExpression(', '));
       }
       let insertButton = new Display.InsertPlaceholderExpression;
-      if (state.associatedParameterList) {
-        let semanticLink = new Display.SemanticLink(insertButton, false, false);
-        let stateCopy: ParameterListState = {
-          ...state,
-          associatedParameterList: undefined,
-          markAsDummy: true
-        };
-        if (stateCopy.started) {
-          stateCopy.fullSentence = false;
-          stateCopy.started = false;
-        }
-        let onRenderParam = (parameter: Fmt.Parameter) => this.renderParametersWithInitialState([parameter], stateCopy, indices);
-        let onInsertParam = (parameter: Fmt.Parameter) => {
-          state.associatedParameterList!.push(parameter);
-          if (stateCopy.associatedDefinition) {
-            let contents = stateCopy.associatedDefinition.contents;
-            if (contents instanceof FmtHLM.ObjectContents_Definition) {
-              contents.display = undefined;
-              contents.definitionDisplay = undefined;
-            }
-          }
-          GenericEditHandler.lastInsertedParameter = parameter;
-        };
-        let paramSelection: ParameterSelection = {
-          allowConstraint: parameters.length !== 0 || state.fullSentence,
-          allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
-          allowDefinition: state.fullSentence,
-          allowBinding: state.associatedDefinition !== undefined
-        };
-        this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection);
-        insertButton.semanticLinks = [semanticLink];
+      let semanticLink = new Display.SemanticLink(insertButton, false, false);
+      let stateCopy: ParameterListState = {
+        ...state,
+        associatedParameterList: undefined,
+        markAsDummy: true
+      };
+      if (stateCopy.started) {
+        stateCopy.fullSentence = false;
+        stateCopy.started = false;
       }
+      let onRenderParam = (parameter: Fmt.Parameter) => this.renderParametersWithInitialState([parameter], stateCopy, indices);
+      let onInsertParam = (parameter: Fmt.Parameter) => {
+        state.associatedParameterList!.push(parameter);
+        if (stateCopy.associatedDefinition) {
+          let contents = stateCopy.associatedDefinition.contents;
+          if (contents instanceof FmtHLM.ObjectContents_Definition) {
+            contents.display = undefined;
+            contents.definitionDisplay = undefined;
+          }
+        }
+        GenericEditHandler.lastInsertedParameter = parameter;
+      };
+      let paramSelection: ParameterSelection = {
+        allowConstraint: state.fullSentence || !isEmpty,
+        allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
+        allowDefinition: state.fullSentence,
+        allowBinding: state.associatedDefinition !== undefined
+      };
+      this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection);
+      insertButton.semanticLinks = [semanticLink];
       row.push(insertButton);
     }
-    if (state.started && state.fullSentence && !indices) {
-      row.push(new Display.TextExpression('.'));
-      state.started = false;
-      state.inLetExpr = false;
-      state.inConstraint = false;
-    }
-    return new Display.RowExpression(row);
   }
 
   private combineParameter(param: Fmt.Parameter, firstParam: Fmt.Parameter): boolean {
@@ -867,7 +903,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (value) {
           return this.renderSetTerm(value, fullSetTermSelection);
         } else {
-          return new Display.PlaceholderExpression(HLMTermType.SetTerm);
+          return new Display.PlaceholderExpression(HLMExpressionType.SetTerm);
         }
       };
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
@@ -909,7 +945,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (value) {
           return this.renderElementTerm(value, fullElementTermSelection);
         } else {
-          return new Display.PlaceholderExpression(HLMTermType.ElementTerm);
+          return new Display.PlaceholderExpression(HLMExpressionType.ElementTerm);
         }
       };
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
@@ -1092,7 +1128,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (value) {
           return this.renderFormula(value, fullFormulaSelection);
         } else {
-          return new Display.PlaceholderExpression(HLMTermType.Formula);
+          return new Display.PlaceholderExpression(HLMExpressionType.Formula);
         }
       };
       return this.renderStructuralCases(formula.term, formula.construction, formula.cases, renderCase);

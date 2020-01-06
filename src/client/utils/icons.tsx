@@ -13,8 +13,6 @@ export enum ButtonType {
   ViewSource,
   LogIn,
   LogOut,
-  RightArrow,
-  DownArrow,
   Insert,
   Remove
 }
@@ -32,6 +30,14 @@ function getGitHubLogo(enabled: boolean = true): React.ReactNode {
   return (
     <svg height="1em" width="1em" viewBox="0 0 16 16" key="GitHubLogo">
       <path fillRule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill={enabled ? 'black' : 'gray'}/>
+    </svg>
+  );
+}
+
+export function getIconWithContents(contents: React.ReactNodeArray): React.ReactNode {
+  return (
+    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+      {contents}
     </svg>
   );
 }
@@ -56,14 +62,6 @@ export function getButtonIconContents(buttonType: ButtonType, enabled: boolean =
       <circle cx="3" cy="0" r="0.75" fill={enabled ? 'black' : 'gray'} stroke="none" key="dot3"/>,
       <path d="M 4 -6 Q 6 -6 6 -4 L 6 -2 Q 6 0 8 0 Q 6 0 6 2 L 6 4 Q 6 6 4 6" fill={'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="right"/>
     ];
-  case ButtonType.RightArrow:
-    return [
-      <path d="M -4 -6 L 4 0 L -4 6 z" fill={'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow"/>
-    ];
-  case ButtonType.DownArrow:
-    return [
-      <path d="M -6 -4 L 0 4 L 6 -4 z" fill={'gray'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow"/>
-    ];
   case ButtonType.Insert:
     return [
       <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={enabled ? 'lime' : 'none'} stroke={enabled ? 'darkgreen' : 'gray'} strokeWidth="0.5" key="cross"/>
@@ -83,9 +81,9 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   switch (buttonType) {
   case ButtonType.OK:
   case ButtonType.Save:
-    return <span className="ok">✓</span>;
+    return <span className={'ok' + (enabled ? ' enabled' : '')}>✓</span>;
   case ButtonType.Cancel:
-    return <span className="cancel">✗</span>;
+    return <span className={'cancel' + (enabled ? ' enabled' : '')}>✗</span>;
   case ButtonType.OpenInVSCode:
     return getVSCodeLogo(enabled);
   case ButtonType.ViewInGitHub:
@@ -103,12 +101,24 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
       'Log out'
     ];
   default:
-    return (
-      <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-        {getButtonIconContents(buttonType, enabled)}
-      </svg>
-    );
+    return getIconWithContents(getButtonIconContents(buttonType, enabled));
   }
+}
+
+export function getSectionIconContents(opened: boolean, containsSelection: boolean = false): React.ReactNodeArray {
+  if (opened) {
+    return [
+      <path d="M -6 -4 L 0 4 L 6 -4 z" fill={containsSelection ? '#f2cd00' : 'silver'} stroke="black" strokeWidth="1" key="arrow"/>
+    ];
+  } else {
+    return [
+      <path d="M -4 -6 L 4 0 L -4 6 z" fill={containsSelection ? '#f2cd00' : 'none'} stroke="black" strokeWidth="1" key="arrow"/>
+    ];
+  }
+}
+
+export function getSectionIcon(opened: boolean, containsSelection: boolean = false): React.ReactNode {
+  return getIconWithContents(getSectionIconContents(opened, containsSelection));
 }
 
 export function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNodeArray {
@@ -156,11 +166,7 @@ export function getDefinitionIconContents(definitionType: Logic.LogicDefinitionT
 }
 
 export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNode {
-  return (
-    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-      {getDefinitionIconContents(definitionType, itemInfo)}
-    </svg>
-  );
+  return getIconWithContents(getDefinitionIconContents(definitionType, itemInfo));
 }
 
 export function getInsertIcon(originalIconContents: React.ReactNodeArray, enabled: boolean = true): React.ReactNode {

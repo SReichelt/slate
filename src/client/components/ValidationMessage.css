@@ -1,0 +1,20 @@
+.validation-message-container {
+  position: relative;
+}
+
+.validation-message {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  z-index: 100;
+  color: red;
+  background-color: white;
+  border: solid 0.5pt red;
+  border-radius: 2pt;
+  padding: 2pt;
+  margin-bottom: 2pt;
+  box-shadow: 1pt 2pt 5pt maroon;
+  user-select: none;
+  font-family: sans;
+  font-size: smaller;
+}

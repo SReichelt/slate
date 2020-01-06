@@ -184,7 +184,49 @@ export class APIAccess {
     return utf8.decode(atob(result.content));
   }
 
-  async updateFile(repository: Repository, path: string, text: string): Promise<PullRequestState | undefined> {
+  async writeFile(repository: Repository, path: string, text: string, createNew: boolean): Promise<PullRequestState | undefined> {
+    await this.ensureWriteAccess(repository);
+
+    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
+    let getParameters = {
+      ref: repository.branch
+    };
+    let originalSHA = undefined;
+    if (!createNew) {
+      let getResult = await this.runRequest('GET', apiPath, getParameters);
+      originalSHA = getResult.sha;
+    }
+
+    let putParameters = {
+      message: 'Contribution via web app',
+      content: btoa(utf8.encode(text)),
+      branch: repository.branch,
+      sha: originalSHA
+    };
+    let putResult = await this.runRequest('PUT', apiPath, putParameters);
+
+    repository.hasLocalChanges = true;
+
+    if (originalSHA) {
+      if (putResult.content.sha !== originalSHA) {
+        let checkResult;
+        do {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          checkResult = await this.runRequest('GET', apiPath, getParameters);
+        } while (checkResult.sha === originalSHA);
+      }
+    } else {
+      let checkResult = await this.runRequest('GET', apiPath, getParameters);
+      while (checkResult.sha !== putResult.content.sha) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        checkResult = await this.runRequest('GET', apiPath, getParameters);
+      }
+    }
+
+    return await this.createPullRequest(repository, putParameters.message);
+  }
+
+  async ensureWriteAccess(repository: Repository): Promise<void> {
     if (!repository.hasWriteAccess) {
       let forkPath = `/repos/${repository.owner}/${repository.name}/forks`;
       await this.runRequest('POST', forkPath);
@@ -194,35 +236,13 @@ export class APIAccess {
       } while (!repository.hasWriteAccess);
       repository.pullRequestAllowed = true;
     }
+  }
 
-    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
-    let getParameters = {
-      ref: repository.branch
-    };
-    let getResult = await this.runRequest('GET', apiPath, getParameters);
-
-    let putParameters = {
-      message: 'Contribution via web app',
-      content: btoa(utf8.encode(text)),
-      branch: repository.branch,
-      sha: getResult.sha
-    };
-    let putResult = await this.runRequest('PUT', apiPath, putParameters);
-
-    repository.hasLocalChanges = true;
-
-    if (putResult.content.sha !== getResult.sha) {
-      let checkResult;
-      do {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        checkResult = await this.runRequest('GET', apiPath, getParameters);
-      } while (checkResult.sha === getResult.sha);
-    }
-
+  private async createPullRequest(repository: Repository, title: string): Promise<PullRequestState | undefined> {
     if (repository.parentOwner && repository.pullRequestAllowed) {
       let pullRequestPath = `/repos/${repository.parentOwner}/${repository.name}/pulls`;
       let pullRequestParameters = {
-        title: putParameters.message,
+        title: title,
         head: `${repository.owner}:${repository.branch}`,
         base: repository.branch,
         maintainer_can_modify: true

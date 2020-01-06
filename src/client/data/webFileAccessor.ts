@@ -9,7 +9,7 @@ export class WebFileAccessor implements FileAccessor {
     return new CachedPromise(contents);
   }
 
-  writeFile(uri: string, text: string): CachedPromise<WriteFileResult> {
+  writeFile(uri: string, text: string, createNew: boolean): CachedPromise<WriteFileResult> {
     let options: RequestInit = {
       method: 'PUT',
       body: text

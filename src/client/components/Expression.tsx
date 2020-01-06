@@ -9,7 +9,6 @@ import ExpressionDialog from './ExpressionDialog';
 import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
-import Modal from 'react-responsive-modal';
 import 'simplemde/dist/simplemde.min.css';
 
 const ToolTip = require('react-portal-tooltip').default;
@@ -810,17 +809,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.state.openMenu) {
         menuClassName += ' open';
       }
-      let menu: React.ReactNode = undefined;
+      let menu: React.ReactNode = null;
       if (this.state.openDialog) {
-        let modalClassNames = {
-          modal: 'dialog',
-          overlay: 'dialog-overlay'
-        };
-        menu = (
-          <Modal open={true} onClose={this.onDialogClosed} showCloseIcon={false} classNames={modalClassNames} key={'dialog'}>
-            <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>
-          </Modal>
-        );
+        menu = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
       } else if (this.state.openMenu) {
         menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
       }

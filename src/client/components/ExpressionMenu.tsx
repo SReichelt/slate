@@ -99,14 +99,14 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
   }
 
   render(): React.ReactNode {
-    let cells: React.ReactNode = undefined;
+    let cells: React.ReactNode = null;
     let row = this.props.row;
     if (row instanceof Menu.ExpressionMenuItem) {
       cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally} interactionHandler={this.props.interactionHandler}/>;
     } else if (row instanceof Menu.ExpressionMenuItemList) {
       cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} interactionHandler={this.props.interactionHandler}/>);
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
-      let contentCell = undefined;
+      let contentCell: React.ReactNode = null;
       let onClick = undefined;
       let titleAction = row.titleAction;
       let itemHovered = this.props.hoveredExternally || (this.state.titleHovered && !row.titleAction);
@@ -180,7 +180,7 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
         }
       }
       if (row.iconType !== undefined) {
-        let icon: React.ReactNode = undefined;
+        let icon: React.ReactNode = null;
         if (typeof row.iconType === 'string') {
           switch (row.iconType) {
           case 'remove':

@@ -33,9 +33,20 @@
   padding-right: 1em;
 }
 
-.dialog-selection-table {
+.dialog-group {
   border: solid 1px gray;
   padding: 2pt;
+  margin: 0;
+}
+
+.dialog-radio-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  width: 17em;
+}
+
+.dialog-radio-button-group>* {
+  margin: 2pt;
 }
 
 .dialog-button-row {
@@ -47,4 +58,13 @@
 .dialog-overlay {
   z-index: 20;
   background-color: #00000080;
+}
+
+.dialog-optional-label {
+  font-size: smaller;
+}
+
+.dialog input {
+  font: sans-serif;
+  font-size: initial;
 }

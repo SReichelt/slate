@@ -8,6 +8,8 @@ import { HLMRenderer } from '../../shared/logics/hlm/renderer';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { OnLinkClicked } from './InteractionHandler';
 
+const Loading = require('react-loading-animation');
+
 interface StartPageProps {
   libraryDataProvider?: LibraryDataProvider;
   templates?: Fmt.File;
@@ -89,7 +91,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
 }
 
 function StartPage(props: StartPageProps) {
-  let exampleContainer: React.ReactNode = undefined;
+  let exampleContents: React.ReactNode = null;
 
   if (props.libraryDataProvider && props.templates) {
     let dummyDefinition = new Fmt.Definition;
@@ -105,11 +107,9 @@ function StartPage(props: StartPageProps) {
       renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props),
       renderTheoremExample(['Algebra', 'Semirings', 'Formulas', 'Binomial theorem'], props)
     ];
-    exampleContainer = (
-      <div className="examples">
-        {examples.map((example: React.ReactNode, index: number) => <div className="example-container" key={index}>{example}</div>)}
-      </div>
-    );
+    exampleContents = examples.map((example: React.ReactNode, index: number) => <div className="example-container" key={index}>{example}</div>);
+  } else {
+    exampleContents = <div className="loading"><Loading width={'2em'} height={'2em'}/></div>;
   }
 
   return (
@@ -122,7 +122,9 @@ function StartPage(props: StartPageProps) {
         Its unique rendering concept makes formalized definitions and theorems intuitively understandable without detailed explanation.
         So please just follow these links to some examples in the library – and then hover over the expressions therein to start exploring:
       </p>
-      {exampleContainer}
+      <div className="examples">
+        {exampleContents}
+      </div>
       <h2>Background</h2>
       <p>
         Slate is a web-based successor to the <a href="http://hlm.sourceforge.net/">HLM</a> project.

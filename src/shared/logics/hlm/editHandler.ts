@@ -6,7 +6,8 @@ import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import { GenericEditHandler, PlaceholderExpression, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
 import { LibraryDataProvider } from '../../data/libraryDataProvider';
-import { HLMTermType } from './hlm';
+import { HLMExpressionType } from './hlm';
+import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
 import CachedPromise from '../../data/cachedPromise';
 import { findBestMatch, reorderArguments } from '../generic/displayMatching';
@@ -54,7 +55,7 @@ export class HLMEditHandler extends GenericEditHandler {
   protected utils: HLMUtils;
 
   constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File) {
-    super(definition, libraryDataProvider, templates);
+    super(definition, libraryDataProvider, new HLMEditAnalysis, templates);
     this.utils = new HLMUtils(definition, libraryDataProvider);
   }
 
@@ -64,18 +65,18 @@ export class HLMEditHandler extends GenericEditHandler {
       menu.rows = [];
 
       let elementType = new FmtHLM.MetaRefExpression_Element;
-      elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+      elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
       menu.rows.push(this.getParameterPlaceholderItem(elementType, 'x', parameterList, onRenderParam, onInsertParam));
 
       let subsetType = new FmtHLM.MetaRefExpression_Subset;
-      subsetType.superset = new PlaceholderExpression(HLMTermType.SetTerm);
+      subsetType.superset = new PlaceholderExpression(HLMExpressionType.SetTerm);
       menu.rows.push(this.getParameterPlaceholderItem(subsetType, 'S', parameterList, onRenderParam, onInsertParam));
 
       menu.rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', parameterList, onRenderParam, onInsertParam));
 
       if (parameterSelection.allowConstraint) {
         let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-        constraintType.formula = new PlaceholderExpression(HLMTermType.Formula);
+        constraintType.formula = new PlaceholderExpression(HLMExpressionType.Formula);
         menu.rows.push(this.getParameterPlaceholderItem(constraintType, '_1', parameterList, onRenderParam, onInsertParam));
       }
 
@@ -92,11 +93,11 @@ export class HLMEditHandler extends GenericEditHandler {
 
         if (parameterSelection.allowDefinition) {
           let elementDefinitionType = new FmtHLM.MetaRefExpression_Def;
-          elementDefinitionType.element = new PlaceholderExpression(HLMTermType.ElementTerm);
+          elementDefinitionType.element = new PlaceholderExpression(HLMExpressionType.ElementTerm);
           advancedSubMenu.rows.push(this.getParameterPlaceholderItem(elementDefinitionType, 'x', parameterList, onRenderParam, onInsertParam));
 
           let setDefinitionType = new FmtHLM.MetaRefExpression_SetDef;
-          setDefinitionType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+          setDefinitionType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
           advancedSubMenu.rows.push(this.getParameterPlaceholderItem(setDefinitionType, 'S', parameterList, onRenderParam, onInsertParam));
 
           advancedSubMenu.rows.push(new Menu.ExpressionMenuSeparator);
@@ -104,7 +105,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
         if (parameterSelection.allowBinding) {
           let bindingType = new FmtHLM.MetaRefExpression_Binding;
-          bindingType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+          bindingType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
           bindingType.parameters = Object.create(Fmt.ParameterList.prototype);
           advancedSubMenu.rows.push(this.getParameterPlaceholderItem(bindingType, 'i', parameterList, onRenderParam, onInsertParam));
         }
@@ -309,13 +310,13 @@ export class HLMEditHandler extends GenericEditHandler {
   private getSubsetRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
     let subsetExpression = new FmtHLM.MetaRefExpression_subset;
     let elementType = new FmtHLM.MetaRefExpression_Element;
-    elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+    elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
     subsetExpression.parameter = this.createParameter(elementType, 'x');
-    subsetExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    subsetExpression.formula = new PlaceholderExpression(HLMExpressionType.Formula);
 
     let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset;
     extendedSubsetExpression.parameters = Object.create(Fmt.ParameterList.prototype);
-    extendedSubsetExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
+    extendedSubsetExpression.term = new PlaceholderExpression(HLMExpressionType.ElementTerm);
 
     let subsetMenu = new Menu.ExpressionMenu;
     subsetMenu.rows = [
@@ -330,8 +331,8 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getSetCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
     let structuralExpression = new FmtHLM.MetaRefExpression_setStructuralCases;
-    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
-    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.term = new PlaceholderExpression(HLMExpressionType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMExpressionType.SetTerm);
     structuralExpression.cases = [];
 
     let casesMenu = new Menu.ExpressionMenu;
@@ -347,17 +348,17 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getElementCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
     let structuralExpression = new FmtHLM.MetaRefExpression_structuralCases;
-    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
-    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.term = new PlaceholderExpression(HLMExpressionType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMExpressionType.SetTerm);
     structuralExpression.cases = [];
 
     let caseExpression = new FmtHLM.MetaRefExpression_cases;
     let positiveCase = new FmtHLM.ObjectContents_Case;
-    positiveCase.formula = new PlaceholderExpression(HLMTermType.Formula);
-    positiveCase.value = new PlaceholderExpression(HLMTermType.ElementTerm);
+    positiveCase.formula = new PlaceholderExpression(HLMExpressionType.Formula);
+    positiveCase.value = new PlaceholderExpression(HLMExpressionType.ElementTerm);
     let negativeCase = new FmtHLM.ObjectContents_Case;
-    negativeCase.formula = new PlaceholderExpression(HLMTermType.Formula);
-    negativeCase.value = new PlaceholderExpression(HLMTermType.ElementTerm);
+    negativeCase.formula = new PlaceholderExpression(HLMExpressionType.Formula);
+    negativeCase.value = new PlaceholderExpression(HLMExpressionType.ElementTerm);
     caseExpression.cases = [positiveCase, negativeCase];
 
     let casesMenu = new Menu.ExpressionMenu;
@@ -373,8 +374,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getConnectiveRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): Menu.ExpressionMenuRow {
-    let leftPlaceholder = expressionEditInfo.expression || new PlaceholderExpression(HLMTermType.Formula);
-    let rightPlaceholder = new PlaceholderExpression(HLMTermType.Formula);
+    let leftPlaceholder = expressionEditInfo.expression || new PlaceholderExpression(HLMExpressionType.Formula);
+    let rightPlaceholder = new PlaceholderExpression(HLMExpressionType.Formula);
     let andExpression = new FmtHLM.MetaRefExpression_and;
     andExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
     let orExpression = new FmtHLM.MetaRefExpression_or;
@@ -419,13 +420,13 @@ export class HLMEditHandler extends GenericEditHandler {
   private getQuantifierRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let forallExpression = new FmtHLM.MetaRefExpression_forall;
     forallExpression.parameters = Object.create(Fmt.ParameterList.prototype);
-    forallExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    forallExpression.formula = new PlaceholderExpression(HLMExpressionType.Formula);
     let existsExpression = new FmtHLM.MetaRefExpression_exists;
     existsExpression.parameters = Object.create(Fmt.ParameterList.prototype);
-    existsExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    existsExpression.formula = new PlaceholderExpression(HLMExpressionType.Formula);
     let existsUniqueExpression = new FmtHLM.MetaRefExpression_existsUnique;
     existsUniqueExpression.parameters = Object.create(Fmt.ParameterList.prototype);
-    existsUniqueExpression.formula = new PlaceholderExpression(HLMTermType.Formula);
+    existsUniqueExpression.formula = new PlaceholderExpression(HLMExpressionType.Formula);
     let negatedExistsExpression = new FmtHLM.MetaRefExpression_not;
     negatedExistsExpression.formula = existsExpression;
 
@@ -454,15 +455,15 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getRelationRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let equalsExpression = new FmtHLM.MetaRefExpression_equals;
-    equalsExpression.terms = [new PlaceholderExpression(HLMTermType.ElementTerm), new PlaceholderExpression(HLMTermType.ElementTerm)];
+    equalsExpression.terms = [new PlaceholderExpression(HLMExpressionType.ElementTerm), new PlaceholderExpression(HLMExpressionType.ElementTerm)];
     let inExpression = new FmtHLM.MetaRefExpression_in;
-    inExpression.element = new PlaceholderExpression(HLMTermType.ElementTerm);
-    inExpression._set = new PlaceholderExpression(HLMTermType.SetTerm);
+    inExpression.element = new PlaceholderExpression(HLMExpressionType.ElementTerm);
+    inExpression._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
     let subExpression = new FmtHLM.MetaRefExpression_sub;
-    subExpression.subset = new PlaceholderExpression(HLMTermType.SetTerm);
-    subExpression.superset = new PlaceholderExpression(HLMTermType.SetTerm);
+    subExpression.subset = new PlaceholderExpression(HLMExpressionType.SetTerm);
+    subExpression.superset = new PlaceholderExpression(HLMExpressionType.SetTerm);
     let setEqualsExpression = new FmtHLM.MetaRefExpression_setEquals;
-    setEqualsExpression.terms = [new PlaceholderExpression(HLMTermType.SetTerm), new PlaceholderExpression(HLMTermType.SetTerm)];
+    setEqualsExpression.terms = [new PlaceholderExpression(HLMExpressionType.SetTerm), new PlaceholderExpression(HLMExpressionType.SetTerm)];
     let negatedEqualsExpression = new FmtHLM.MetaRefExpression_not;
     negatedEqualsExpression.formula = equalsExpression;
     let negatedInExpression = new FmtHLM.MetaRefExpression_not;
@@ -511,8 +512,8 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getFormulaCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let structuralExpression = new FmtHLM.MetaRefExpression_structural;
-    structuralExpression.term = new PlaceholderExpression(HLMTermType.ElementTerm);
-    structuralExpression.construction = new PlaceholderExpression(HLMTermType.SetTerm);
+    structuralExpression.term = new PlaceholderExpression(HLMExpressionType.ElementTerm);
+    structuralExpression.construction = new PlaceholderExpression(HLMExpressionType.SetTerm);
     structuralExpression.cases = [];
 
     let casesMenu = new Menu.ExpressionMenu;
@@ -619,24 +620,24 @@ export class HLMEditHandler extends GenericEditHandler {
       let arg: Fmt.ObjectContents | undefined = undefined;
       if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
         let propArg = new FmtHLM.ObjectContents_PropArg;
-        propArg.formula = new PlaceholderExpression(HLMTermType.Formula);
+        propArg.formula = new PlaceholderExpression(HLMExpressionType.Formula);
         arg = propArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
         let setArg = new FmtHLM.ObjectContents_SetArg;
-        setArg._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        setArg._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
         arg = setArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Subset) {
         let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
-        subsetArg._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        subsetArg._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
         arg = subsetArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
         let elementArg = new FmtHLM.ObjectContents_ElementArg;
-        elementArg.element = new PlaceholderExpression(HLMTermType.ElementTerm);
+        elementArg.element = new PlaceholderExpression(HLMExpressionType.ElementTerm);
         arg = elementArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = new FmtHLM.ObjectContents_BindingArg;
         let elementType = new FmtHLM.MetaRefExpression_Element;
-        elementType._set = new PlaceholderExpression(HLMTermType.SetTerm);
+        elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
         bindingArg.parameter = this.createParameter(elementType, 'i', expressionEditInfo.context);
         bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
         this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
@@ -676,5 +677,107 @@ export class HLMEditHandler extends GenericEditHandler {
     } else {
       items.push(insertButton);
     }
+  }
+
+  addImplicitDefinitionMenu(semanticLink: Display.SemanticLink, onRenderExplicitIntro: Logic.RenderFn, onRenderImplicitIntro: RenderParameterFn): void {
+    semanticLink.onMenuOpened = () => {
+      let menu = new Menu.ExpressionMenu;
+      menu.rows = [
+        this.getExplicitDefinitionRow(onRenderExplicitIntro),
+        this.getImplicitDefinitionRow(onRenderImplicitIntro)
+      ];
+      return menu;
+    };
+    semanticLink.alwaysShowMenu = true;
+  }
+
+  private getExplicitDefinitionRow(onRenderExplicitIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
+      let explicitOperatorContents = new FmtHLM.ObjectContents_ExplicitOperator;
+      explicitOperatorContents.definition = [new PlaceholderExpression(HLMExpressionType.ElementTerm)];
+      explicitOperatorContents.properties = originalContents.properties;
+      explicitOperatorContents.display = originalContents.display;
+      explicitOperatorContents.definitionDisplay = originalContents.definitionDisplay;
+      this.definition.contents = explicitOperatorContents;
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderExplicitIntro();
+    item.action = action;
+    let row = new Menu.StandardExpressionMenuRow;
+    row.title = 'Explicit';
+    row.subMenu = item;
+    row.selected = this.definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator;
+    item.selected = row.selected;
+    return row;
+  }
+
+  private getImplicitDefinitionRow(onRenderImplicitIntro: RenderParameterFn): Menu.ExpressionMenuRow {
+    let elementType = new FmtHLM.MetaRefExpression_Element;
+    elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
+    let context = this.editAnalysis.definitionContentsContext.get(this.definition);
+    let parameter = this.createParameter(elementType, 'x', context);
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
+      let implicitOperatorContents = new FmtHLM.ObjectContents_ImplicitOperator;
+      implicitOperatorContents.parameter = parameter;
+      implicitOperatorContents.definition = [new PlaceholderExpression(HLMExpressionType.Formula)];
+      implicitOperatorContents.properties = originalContents.properties;
+      implicitOperatorContents.display = originalContents.display;
+      implicitOperatorContents.definitionDisplay = originalContents.definitionDisplay;
+      this.definition.contents = implicitOperatorContents;
+      GenericEditHandler.lastInsertedParameter = parameter;
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderImplicitIntro(parameter);
+    item.action = action;
+    let row = new Menu.StandardExpressionMenuRow;
+    row.title = 'Implicit';
+    row.subMenu = item;
+    row.selected = this.definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator;
+    item.selected = row.selected;
+    return row;
+  }
+
+  addTheoremTypeMenu(semanticLink: Display.SemanticLink, onRenderStandardIntro: Logic.RenderFn, onRenderEquivalenceIntro: Logic.RenderFn): void {
+    semanticLink.onMenuOpened = () => {
+      let menu = new Menu.ExpressionMenu;
+      menu.rows = [
+        this.getStandardTheoremRow(onRenderStandardIntro),
+        this.getEquivalenceTheoremRow(onRenderEquivalenceIntro)
+      ];
+      return menu;
+    };
+    semanticLink.alwaysShowMenu = true;
+  }
+
+  private getStandardTheoremRow(onRenderStandardIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let standardTheoremContents = new FmtHLM.ObjectContents_StandardTheorem;
+      standardTheoremContents.claim = new PlaceholderExpression(HLMExpressionType.Formula);
+      this.definition.contents = standardTheoremContents;
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderStandardIntro();
+    item.action = action;
+    item.selected = this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem;
+    return item;
+  }
+
+  private getEquivalenceTheoremRow(onRenderEquivalenceIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let equivalenceTheoremContents = new FmtHLM.ObjectContents_EquivalenceTheorem;
+      equivalenceTheoremContents.conditions = [new PlaceholderExpression(HLMExpressionType.Formula), new PlaceholderExpression(HLMExpressionType.Formula)];
+      this.definition.contents = equivalenceTheoremContents;
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderEquivalenceIntro();
+    item.action = action;
+    item.selected = this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem;
+    return item;
   }
 }

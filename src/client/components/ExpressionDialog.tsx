@@ -1,12 +1,10 @@
 import * as React from 'react';
-import './ExpressionDialog.css';
 import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
-import Button from './Button';
+import StandardDialog from './StandardDialog';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import EmbeddedLibraryTree from './EmbeddedLibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
-import { getButtonIcon, ButtonType } from '../utils/icons';
 
 interface ExpressionDialogProps {
   dialog: Dialog.ExpressionDialog;
@@ -14,34 +12,21 @@ interface ExpressionDialogProps {
   onCancel: () => void;
 }
 
-class ExpressionDialog extends React.Component<ExpressionDialogProps> {
+interface ExpressionDialogState {
+  okEnabled: boolean;
+}
+
+class ExpressionDialog extends React.Component<ExpressionDialogProps, ExpressionDialogState> {
   private interactionHandler = new ExpressionInteractionHandlerImpl;
 
-  render(): React.ReactNode {
-    return [
-      (
-        <ExpressionDialogContents dialog={this.props.dialog} interactionHandler={this.interactionHandler} key={'contents'}/>
-      ),
-      (
-        <div className={'dialog-button-row'} key={'buttons'}>
-          <Button toolTipText={'OK'} onClick={this.props.onOK} key={'OK'}>
-            {getButtonIcon(ButtonType.OK)}
-          </Button>
-          <Button toolTipText={'Cancel'} onClick={this.props.onCancel} key={'Cancel'}>
-            {getButtonIcon(ButtonType.Cancel)}
-          </Button>
-        </div>
-      )
-    ];
+  constructor(props: ExpressionDialogProps) {
+    super(props);
+
+    this.state = {
+      okEnabled: !props.dialog.onCheckOKEnabled || props.dialog.onCheckOKEnabled()
+    };
   }
-}
 
-interface ExpressionDialogContentsProps {
-  dialog: Dialog.ExpressionDialog;
-  interactionHandler: ExpressionInteractionHandler;
-}
-
-class ExpressionDialogContents extends React.Component<ExpressionDialogContentsProps> {
   render(): React.ReactNode {
     let rows = [];
     let index = 0;
@@ -54,17 +39,28 @@ class ExpressionDialogContents extends React.Component<ExpressionDialogContentsP
           separated = true;
         }
       } else {
-        rows.push(<ExpressionDialogItem item={item} separated={separated} separatedAbove={separated || !itemIndex} separatedBelow={!nextItem || nextItem instanceof Dialog.ExpressionDialogSeparatorItem} interactionHandler={this.props.interactionHandler} key={index++}/>);
+        rows.push(<ExpressionDialogItem item={item} separated={separated} separatedAbove={separated || !itemIndex} separatedBelow={!nextItem || nextItem instanceof Dialog.ExpressionDialogSeparatorItem} interactionHandler={this.interactionHandler} onItemChanged={this.onItemChanged} key={index++}/>);
         separated = false;
       }
     }
     return (
-      <table className={'dialog-contents'}>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
+      <StandardDialog onOK={this.props.onOK} onCancel={this.props.onCancel} okEnabled={this.state.okEnabled}>
+        <table className={'dialog-contents'}>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+      </StandardDialog>
     );
+  }
+
+  private onItemChanged = (): void => {
+    if (this.props.dialog.onCheckOKEnabled) {
+      let okEnabled = this.props.dialog.onCheckOKEnabled();
+      if (this.state.okEnabled !== okEnabled) {
+        this.setState({okEnabled: okEnabled});
+      }
+    }
   }
 }
 
@@ -74,6 +70,7 @@ interface ExpressionDialogItemProps {
   separatedAbove: boolean;
   separatedBelow: boolean;
   interactionHandler: ExpressionInteractionHandler;
+  onItemChanged?: () => void;
 }
 
 class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
@@ -142,43 +139,57 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
         </tr>
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogSelectionItem) {
+      let contents: React.ReactNode = null;
       let selectionItem = this.props.item;
       if (selectionItem.items.length) {
-        return (
-          <tr className={className}>
-            <td className={'dialog-cell'} colSpan={2}>
-              <table className={'dialog-selection-table'}>
-                <tbody>
-                  {selectionItem.items.map((item: any, index: number) => {
-                    let radioCell = null;
-                    if (selectionItem.items.length > 1) {
-                      let onClick = () => {
-                        selectionItem.selectedItem = item;
-                        selectionItem.changed();
-                      };
-                      radioCell = (
-                        <td className={'dialog-selection-radio-cell'}>
-                          <input type={'radio'} checked={selectionItem.selectedItem === item} onClick={onClick}/>
-                        </td>
-                      );
+        contents = (
+          <fieldset className={'dialog-group'}>
+            <div className={'dialog-radio-button-group'}>
+              {selectionItem.items.map((item: any, index: number) => {
+                if (selectionItem.items.length > 1) {
+                  // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
+                  // In addition, the "checked" status fails to update unless we change the key of the selected item.
+                  // I haven't figured out why.
+                  let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                    if (event.target.value === `item${index}` && selectionItem !== item) {
+                      selectionItem.selectedItem = item;
+                      selectionItem.changed();
                     }
-                    return (
-                      <tr className={'dialog-selection-row'} key={index}>
-                        {radioCell}
-                        <td className={'dialog-selection-content-cell'}>
-                          <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </td>
-          </tr>
+                  };
+                  let onClick = () => {
+                    if (selectionItem !== item) {
+                      selectionItem.selectedItem = item;
+                      selectionItem.changed();
+                    }
+                  };
+                  let selected = selectionItem.selectedItem === item;
+                  return (
+                    <div key={selected ? -index : index}>
+                      <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
+                      <label htmlFor={`radio${index}`} onClick={onClick}>
+                        <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+                      </label>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={index}>
+                      <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          </fieldset>
         );
-      } else {
-        return null;
       }
+      return (
+        <tr className={className}>
+          <td className={'dialog-cell'} colSpan={2}>
+            {contents}
+          </td>
+        </tr>
+      );
     } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
       return (
         <tr className={className}>
@@ -192,13 +203,16 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     }
   }
 
-  private onItemChanged = () => {
+  private onItemChanged = (): void => {
     this.forceUpdate();
+    if (this.props.onItemChanged) {
+      this.props.onItemChanged();
+    }
   }
 
-  private onExpressionChanged = (editorUpdateRequired: boolean) => {
+  private onExpressionChanged = (editorUpdateRequired: boolean): void => {
     if (editorUpdateRequired) {
-      this.forceUpdate();
+      this.onItemChanged();
     }
   }
 }

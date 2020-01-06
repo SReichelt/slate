@@ -9,8 +9,11 @@
   font-family: sans-serif;
   white-space: nowrap;
   background-color: #e0e0e0;
-  cursor: pointer;
   user-select: none;
+}
+
+.button.hoverable {
+  cursor: pointer;
 }
 
 .button.standalone {
@@ -26,7 +29,7 @@
   vertical-align: middle;
 }
 
-.button.button.standalone svg {
+.button.standalone svg {
   position: absolute;
   left: 0;
   right: 0;

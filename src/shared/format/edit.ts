@@ -11,6 +11,7 @@ export interface ExpressionEditInfo {
 }
 
 export class EditAnalysis {
+  definitionContentsContext = new Map<Fmt.Definition, Ctx.Context>();
   newParameterContext = new Map<Fmt.ParameterList, Ctx.Context>();
   newArgumentContext = new Map<Fmt.ArgumentList, Ctx.Context>();
   expressionEditInfo = new Map<Fmt.Expression, ExpressionEditInfo>();
@@ -38,6 +39,7 @@ export class EditAnalysis {
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     this.analyzeType(definition.type, typeContext);
     let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
+    this.definitionContentsContext.set(definition, contentsContext);
     this.analyzeDefinitions(definition.innerDefinitions, contentsContext);
     if (definition.contents) {
       this.analyzeObjectContents(definition.contents, contentsContext);
@@ -56,28 +58,28 @@ export class EditAnalysis {
     let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
     this.analyzeType(parameter.type, typeContext);
     if (parameter.defaultValue) {
-      this.analyzeExpression(parameter.defaultValue, true, (newValue) => parameter.defaultValue = newValue, context);
+      this.analyzeExpression(parameter.defaultValue, true, (newValue) => parameter.defaultValue = newValue, undefined, context);
     }
     if (parameter.dependencies) {
-      this.analyzeExpressions(parameter.dependencies, true, context);
+      this.analyzeExpressions(parameter.dependencies, 0, undefined, context);
     }
   }
 
-  analyzeArgumentList(args: Fmt.ArgumentList, onApply: (() => void) | undefined, context: Ctx.Context): void {
+  analyzeArgumentList(args: Fmt.ArgumentList, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
     let previousArgs: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
     for (let index = 0; index < args.length; index++) {
       let arg = args[index];
       let onRemove = () => args.splice(index, 1);
-      this.analyzeArgument(arg, index, previousArgs, onApply, onRemove, context);
+      this.analyzeArgument(arg, index, previousArgs, onApplyConvertedArgument, onRemove, context);
       context = context.metaModel.getNextArgumentContext(arg, index, context);
       previousArgs.push(arg);
     }
-    if (!onApply) {
+    if (!onApplyConvertedArgument) {
       this.newArgumentContext.set(args, context);
     }
   }
 
-  analyzeArgument(arg: Fmt.Argument, argIndex: number, previousArgs: Fmt.ArgumentList, onApply: (() => void) | undefined, onRemove: () => void, context: Ctx.Context): void {
+  analyzeArgument(arg: Fmt.Argument, argIndex: number, previousArgs: Fmt.ArgumentList, onApplyConvertedArgument: (() => void) | undefined, onRemove: () => void, context: Ctx.Context): void {
     let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
     let onSetValue = (newValue: Fmt.Expression | undefined) => {
       if (newValue) {
@@ -85,15 +87,15 @@ export class EditAnalysis {
       } else {
         onRemove();
       }
-      if (onApply) {
-        onApply();
+      if (onApplyConvertedArgument) {
+        onApplyConvertedArgument();
       }
     };
-    this.analyzeExpression(arg.value, arg.optional || false, onSetValue, valueContext);
+    this.analyzeExpression(arg.value, arg.optional || false, onSetValue, onApplyConvertedArgument, valueContext);
   }
 
   analyzeType(type: Fmt.Type, context: Ctx.Context): void {
-    this.analyzeExpression(type.expression, false, (newValue) => type.expression = newValue!, context);
+    this.analyzeExpression(type.expression, false, (newValue) => type.expression = newValue!, undefined, context);
   }
 
   analyzeObjectContents(contents: Fmt.ObjectContents, context: Ctx.Context): void {
@@ -101,13 +103,13 @@ export class EditAnalysis {
       this.analyzeArgumentList(contents.arguments, undefined, context);
     } else {
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      contents.toArgumentList(args, false);
+      contents.toArgumentList(args, true);
       let onApply = () => contents.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }
   }
 
-  analyzeExpression(expression: Fmt.Expression, optional: boolean, onSetValue: SetExpressionFn, context: Ctx.Context): void {
+  analyzeExpression(expression: Fmt.Expression, optional: boolean, onSetValue: SetExpressionFn, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
     this.expressionEditInfo.set(expression, {
       expression: expression,
       optional: optional,
@@ -117,29 +119,34 @@ export class EditAnalysis {
     context = new Ctx.ParentInfoContext(expression, context);
     if (expression instanceof Fmt.VariableRefExpression) {
       if (expression.indices) {
-        this.analyzeExpressions(expression.indices, false, context);
+        this.analyzeExpressions(expression.indices, expression.indices.length, undefined, context);
       }
     } else if (expression instanceof Fmt.MetaRefExpression) {
-      if (expression instanceof Fmt.GenericMetaRefExpression) {
-        this.analyzeArgumentList(expression.arguments, undefined, context);
-      } else {
-        let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-        expression.toArgumentList(args);
-        let onApply = () => expression.fromArgumentList(args);
-        this.analyzeArgumentList(args, onApply, context);
-      }
+      this.analyzeMetaRefExpression(expression, context);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       this.analyzePath(expression.path, context);
     } else if (expression instanceof Fmt.ParameterExpression) {
       this.analyzeParameterList(expression.parameters, context);
     } else if (expression instanceof Fmt.CompoundExpression) {
-      this.analyzeArgumentList(expression.arguments, undefined, context);
+      this.analyzeArgumentList(expression.arguments, onApplyConvertedArgument, context);
     } else if (expression instanceof Fmt.ArrayExpression) {
-      this.analyzeExpressions(expression.items, true, context);
+      this.analyzeExpressions(expression.items, 0, onApplyConvertedArgument, context);
     }
   }
 
-  analyzeExpressions(expressions: Fmt.Expression[], canRemove: boolean, context: Ctx.Context): void {
+  protected analyzeMetaRefExpression(expression: Fmt.MetaRefExpression, context: Ctx.Context): void {
+    if (expression instanceof Fmt.GenericMetaRefExpression) {
+      this.analyzeArgumentList(expression.arguments, undefined, context);
+    } else {
+      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      expression.toArgumentList(args);
+      let onApply = () => expression.fromArgumentList(args);
+      this.analyzeArgumentList(args, onApply, context);
+    }
+  }
+
+  analyzeExpressions(expressions: Fmt.Expression[], minLength: number, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
+    let canRemove = expressions.length > minLength;
     for (let index = 0; index < expressions.length; index++) {
       let onSetValue = (newValue: Fmt.Expression | undefined) => {
         if (newValue) {
@@ -147,8 +154,11 @@ export class EditAnalysis {
         } else {
           expressions.splice(index, 1);
         }
+        if (onApplyConvertedArgument) {
+          onApplyConvertedArgument();
+        }
       };
-      this.analyzeExpression(expressions[index], canRemove, onSetValue, context);
+      this.analyzeExpression(expressions[index], canRemove, onSetValue, onApplyConvertedArgument, context);
     }
   }
 }

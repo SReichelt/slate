@@ -1,29 +1,57 @@
 import * as Logic from '../logic';
 import * as Ctx from '../../format/context';
 import * as FmtHLM from './meta';
+import { PlaceholderExpression } from '../generic/editHandler';
 import { HLMChecker } from './checker';
 import { HLMDisplay } from './display';
 
 const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.Operator,
-    name: 'Operator'
+    name: 'Operator',
+    createTypeExpression: () => new FmtHLM.MetaRefExpression_ExplicitOperator,
+    createObjectContents: () => {
+      let result = new FmtHLM.ObjectContents_ExplicitOperator;
+      result.definition = [new PlaceholderExpression(HLMExpressionType.ElementTerm)];
+      return result;
+    }
   },
   {
     definitionType: Logic.LogicDefinitionType.SetOperator,
-    name: 'Set operator'
+    name: 'Set Operator',
+    createTypeExpression: () => new FmtHLM.MetaRefExpression_SetOperator,
+    createObjectContents: () => {
+      let result = new FmtHLM.ObjectContents_SetOperator;
+      result.definition = [new PlaceholderExpression(HLMExpressionType.SetTerm)];
+      return result;
+    }
   },
   {
     definitionType: Logic.LogicDefinitionType.Construction,
-    name: 'Construction'
+    name: 'Construction',
+    createTypeExpression: () => new FmtHLM.MetaRefExpression_Construction,
+    createObjectContents: () => new FmtHLM.ObjectContents_Construction
   },
   {
     definitionType: Logic.LogicDefinitionType.Predicate,
-    name: 'Predicate'
+    name: 'Predicate',
+    createTypeExpression: () => new FmtHLM.MetaRefExpression_Predicate,
+    createObjectContents: () => {
+      let result = new FmtHLM.ObjectContents_Predicate;
+      result.definition = [new PlaceholderExpression(HLMExpressionType.Formula)];
+      return result;
+    }
   },
   {
     definitionType: Logic.LogicDefinitionType.Theorem,
-    name: 'Theorem'
+    name: 'Theorem',
+    types: ['Proposition', 'Lemma', 'Theorem', 'Corollary', 'Example'],
+    createTypeExpression: () => new FmtHLM.MetaRefExpression_StandardTheorem,
+    createObjectContents: () => {
+      let result = new FmtHLM.ObjectContents_StandardTheorem;
+      result.claim = new PlaceholderExpression(HLMExpressionType.Formula);
+      return result;
+    }
   }
 ];
 
@@ -39,7 +67,7 @@ export class HLM implements Logic.Logic {
   getDisplay(): HLMDisplay { return this.display; }
 }
 
-export enum HLMTermType {
+export enum HLMExpressionType {
   SetTerm = Logic.LogicDefinitionType.SetOperator,
   ElementTerm = Logic.LogicDefinitionType.Operator,
   Formula = Logic.LogicDefinitionType.Predicate

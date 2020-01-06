@@ -60,7 +60,7 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
   }
 
   getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode {
-    return null;
+    return undefined;
   }
 
   enterBlocker(): void {
@@ -118,7 +118,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
         includeExtras: true,
         includeRemarks: false
       };
-      // Call function directly instead of creating a component, so that tooltip is not even displayed if it returns null.
+      // Call function directly instead of creating a component, so that tooltip is not even displayed if it returns undefined.
       let props: LibraryItemProps = {
         libraryDataProvider: parentProvider,
         definition: definition,
@@ -127,7 +127,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
       };
       return renderLibraryItem(props);
     } else {
-      return null;
+      return undefined;
     }
   }
 

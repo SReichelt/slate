@@ -21,7 +21,8 @@ export interface LibraryDefinition {
 export enum LibraryDefinitionState {
   Loaded,
   Editing,
-  Submitting
+  EditingNew,
+  Submitting,
 }
 
 export type LibraryItemNumber = number[];

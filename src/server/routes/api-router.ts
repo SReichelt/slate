@@ -6,7 +6,15 @@ import * as nodemailer from 'nodemailer';
 import * as config from '../config';
 import { exec } from 'child_process';
 
-export function apiRouter() {
+function makeDirectories(fileName: string): void {
+  let dirName = path.dirname(fileName);
+  if (dirName && !fs.existsSync(dirName)) {
+    makeDirectories(dirName);
+    fs.mkdirSync(dirName);
+  }
+}
+
+export function apiRouter(): Router {
   const router = Router();
   const rootPath = path.join(__dirname, '..', '..', '..');
   const dataPath = path.join(rootPath, 'data');
@@ -48,9 +56,20 @@ export function apiRouter() {
         response.sendStatus(501);
       }
     } else {
-      let fileName = path.join(dataPath, requestPath);
-      request.pipe(fs.createWriteStream(fileName));
-      request.on('end', () => response.sendStatus(200));
+      try {
+        let fileName = path.join(dataPath, requestPath);
+        makeDirectories(fileName);
+        let stream = fs.createWriteStream(fileName);
+        stream.on('error', (error: any) => {
+          console.log(error);
+          response.sendStatus(400);
+        });
+        stream.on('close', () => response.sendStatus(200));
+        request.pipe(stream);
+      } catch (error) {
+        console.log(error);
+        response.sendStatus(400);
+      }
     }
   });
 

@@ -8,6 +8,7 @@ import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import Button from './components/Button';
 import MenuButton from './components/MenuButton';
+import InsertDialog from './components/InsertDialog';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import renderPromise from './components/PromiseHelper';
 import CachedPromise from '../shared/data/cachedPromise';
@@ -49,7 +50,13 @@ interface GitHubState {
   gitHubUserInfo?: CachedPromise<GitHub.UserInfo>;
 }
 
-interface AppState extends SelectionState, GitHubState {
+interface InsertDialogState {
+  insertDialogLibraryDataProvider?: LibraryDataProvider;
+  insertDialogSection?: LibraryDefinition;
+  insertDialogDefinitionType?: Logic.LogicDefinitionTypeDescription;
+}
+
+interface AppState extends SelectionState, GitHubState, InsertDialogState {
   verticalLayout: boolean;
   error?: string;
   templates?: Fmt.File;
@@ -81,9 +88,13 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
-    let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
-    if (gitHubAccessToken) {
-      gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
+    try {
+      let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
+      if (gitHubAccessToken) {
+        gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
+      }
+    } catch (error) {
+      console.log(error);
     }
 
     let selectionURI = window.location.pathname;
@@ -96,7 +107,11 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (gitHubQueryStringResult.token) {
         let apiAccessPromise = gitHubQueryStringResult.token.then((accessToken) => {
-          window.localStorage.setItem('GitHubAccessToken', accessToken);
+          try {
+            window.localStorage.setItem('GitHubAccessToken', accessToken);
+          } catch (error) {
+            console.log(error);
+          }
           return new GitHub.APIAccess(accessToken);
         });
         gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
@@ -188,9 +203,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name);
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
-    if (this.state && this.state.templates) {
-      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition, this.linkClicked);
-    }
   }
 
   componentDidMount(): void {
@@ -202,7 +214,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedItemLocalPath: undefined,
         selectedItemDefinition: undefined,
         selectedItemInfo: undefined,
-        interactionHandler: undefined,
+        interactionHandler: undefined
       };
       this.updateSelectionState(state, window.location.pathname);
       this.setState(state);
@@ -270,7 +282,11 @@ class App extends React.Component<AppProps, AppState> {
       this.gitHubConfig.apiAccess = undefined;
     }
     this.setState({gitHubUserInfo: undefined});
-    window.localStorage.removeItem('GitHubAccessToken');
+    try {
+      window.localStorage.removeItem('GitHubAccessToken');
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render(): React.ReactNode {
@@ -292,7 +308,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     let navigationPane = (
-      <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}}>
+      <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
         {editListPane}
         <div className={'app-pane'} key={'Tree'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
           <div className={'app-tree'}>
@@ -302,11 +318,11 @@ class App extends React.Component<AppProps, AppState> {
       </SplitPane>
     );
 
-    let mainContents: React.ReactNode = undefined;
-    let extraContents: React.ReactNode = undefined;
-    if (this.state.selectedItemDefinition) {
-      if (this.state.templates && this.state.selectedItemProvider) {
-        let definitionPromise = this.state.selectedItemDefinition;
+    let mainContents: React.ReactNode = null;
+    let extraContents: React.ReactNode = null;
+    if (this.state.selectedItemProvider) {
+      let definitionPromise = this.state.selectedItemDefinition;
+      if (definitionPromise && this.state.templates) {
         let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
           includeProofs: true,
           abbreviateLongLists: false,
@@ -317,7 +333,7 @@ class App extends React.Component<AppProps, AppState> {
         mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definitionPromise} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
         extraContents = <SourceCodeView definition={definitionPromise} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
         let definition = definitionPromise.getImmediateResult();
-        if (definition && definition.state === LibraryDefinitionState.Editing) {
+        if (definition && (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
           if (!this.state.gitHubUserInfo && !this.runningLocally) {
             mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
           } else if (this.state.selectedItemRepository) {
@@ -383,7 +399,7 @@ class App extends React.Component<AppProps, AppState> {
       if (definition && definition.state === LibraryDefinitionState.Submitting) {
         rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
         rightButtons.push(' ');
-      } else if (definition && definition.state === LibraryDefinitionState.Editing) {
+      } else if (definition && (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
         let willSubmit: boolean | undefined;
         let repository = this.state.selectedItemRepository;
         if (repository) {
@@ -434,7 +450,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let contentsPane = (
-      <div className={'bottom-toolbar-container'}>
+      <div className={'bottom-toolbar-container'} key={'MainContents'}>
         <div className={'app-pane'} ref={(htmlNode) => (this.mainContentsPaneNode = htmlNode)}>
           <div className={'app-contents'}>
             {mainContents}
@@ -452,7 +468,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (extraContents && this.state.extraContentsVisible) {
       contentsPane = (
-        <SplitPane split={'horizontal'} defaultSize={defaultItemHeight}>
+        <SplitPane split={'horizontal'} defaultSize={defaultItemHeight} key={'Contents'}>
           {contentsPane}
           <div className={'app-pane'} ref={(htmlNode) => (this.extraContentsPaneNode = htmlNode)}>
             <div className={'app-contents'}>
@@ -465,12 +481,20 @@ class App extends React.Component<AppProps, AppState> {
       this.extraContentsPaneNode = null;
     }
 
+    let openDialog: React.ReactNode = null;
+    if (this.state.insertDialogLibraryDataProvider && this.state.insertDialogSection) {
+      openDialog = (
+        <InsertDialog libraryDataProvider={this.state.insertDialogLibraryDataProvider} section={this.state.insertDialogSection} definitionType={this.state.insertDialogDefinitionType} onOK={this.finishInsert} onCancel={this.cancelInsert} key={'InsertDialog'}/>
+      );
+    }
+
     return (
       <div className={'app'}>
-        <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3}>
+        <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3} key={'Main'}>
           {navigationPane}
           {contentsPane}
         </SplitPane>
+        {openDialog}
       </div>
     );
   }
@@ -481,8 +505,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedItemProvider: libraryDataProvider,
       selectedItemLocalPath: path,
       selectedItemDefinition: definitionPromise,
-      selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined,
-      interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider, this.state.templates, definitionPromise, this.linkClicked) : undefined
+      selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined
     });
   }
 
@@ -493,6 +516,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private navigate(state: SelectionState): void {
+    if (this.state && this.state.templates) {
+      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider!, this.state.templates, state.selectedItemDefinition, this.linkClicked);
+    }
     this.setState(state);
     let uri = '/';
     if (state.selectedItemAbsolutePath) {
@@ -525,7 +551,70 @@ class App extends React.Component<AppProps, AppState> {
     return title;
   }
 
-  private insert = (libraryDataProvider: LibraryDataProvider, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
+  private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
+    this.setState({
+      insertDialogLibraryDataProvider: libraryDataProvider,
+      insertDialogSection: section,
+      insertDialogDefinitionType: definitionType
+    });
+  }
+
+  private finishInsert = (name: string, title: string | undefined, type: string | undefined): void => {
+    let libraryDataProvider = this.state.insertDialogLibraryDataProvider;
+    if (libraryDataProvider) {
+      let definitionType = this.state.insertDialogDefinitionType;
+      // TODO position
+      if (definitionType) {
+        if (type) {
+          type = type.toLowerCase();
+        }
+        libraryDataProvider.insertLocalItem(name, definitionType, title, type)
+          .then((libraryDefinition: LibraryDefinition) => {
+            let localPath = new Fmt.Path;
+            localPath.name = name;
+            let absolutePath = libraryDataProvider!.getAbsolutePath(localPath);
+            let itemInfoPromise = libraryDataProvider!.getLocalItemInfo(name);
+            this.navigate({
+              selectedItemAbsolutePath: absolutePath,
+              selectedItemProvider: libraryDataProvider,
+              selectedItemLocalPath: localPath,
+              selectedItemDefinition: CachedPromise.resolve(libraryDefinition),
+              selectedItemInfo: itemInfoPromise
+            });
+            return itemInfoPromise.then((itemInfo: LibraryItemInfo) => {
+              this.setState((prevState) => ({
+                editedDefinitions: prevState.editedDefinitions.concat({
+                  libraryDataProvider: libraryDataProvider!,
+                  libraryDefinition: libraryDefinition,
+                  absolutePath: absolutePath,
+                  localPath: localPath,
+                  itemInfo: itemInfo
+                })
+              }));
+              this.cancelInsert();
+            });
+          })
+          .catch((error) => {
+            this.props.alert.error(`Error adding ${definitionType!.name.toLowerCase()}: ` + error.message);
+            this.forceUpdate();
+          });
+      } else {
+        libraryDataProvider.insertLocalSubsection(name, title || '')
+          .then(this.cancelInsert)
+          .catch((error) => {
+            this.props.alert.error('Error adding section: ' + error.message);
+            this.forceUpdate();
+          });
+      }
+    }
+  }
+
+  private cancelInsert = (): void => {
+    this.setState({
+      insertDialogLibraryDataProvider: undefined,
+      insertDialogSection: undefined,
+      insertDialogDefinitionType: undefined
+    });
   }
 
   private edit = (): void => {
@@ -594,10 +683,23 @@ class App extends React.Component<AppProps, AppState> {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
         libraryDataProvider.cancelEditing(definition);
+        let oldDefinition: CachedPromise<LibraryDefinition> | undefined = undefined;
+        if (definition.state === LibraryDefinitionState.EditingNew) {
+          this.navigate({
+            selectedItemAbsolutePath: undefined,
+            selectedItemProvider: libraryDataProvider,
+            selectedItemLocalPath: undefined,
+            selectedItemDefinition: undefined,
+            selectedItemInfo: undefined,
+            interactionHandler: undefined
+          });
+        } else {
+          oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name);
+        }
         this.setState((prevState) => {
           let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
           return {
-            selectedItemDefinition: libraryDataProvider!.fetchLocalItem(definition!.definition.name),
+            selectedItemDefinition: oldDefinition,
             editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
           };
         });

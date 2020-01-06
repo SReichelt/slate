@@ -40,11 +40,9 @@ export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 export type GetExpressionsFn = (path: Fmt.Path, libraryDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
-  protected editAnalysis = new Edit.EditAnalysis;
-
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected templates: Fmt.File) {
+  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected templates: Fmt.File) {
     this.editAnalysis.analyzeDefinition(definition, libraryDataProvider.logic.getRootContext());
   }
 
@@ -599,6 +597,7 @@ export abstract class GenericEditHandler {
           expressionEditInfo.onSetValue(selectionItem.selectedItem);
         }
       };
+      dialog.onCheckOKEnabled = () => (selectionItem.selectedItem !== undefined);
       return dialog;
     };
 
