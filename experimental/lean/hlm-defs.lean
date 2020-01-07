@@ -102,6 +102,16 @@ end)
 structure BaseElement {base_type : BaseType} (base_set: BaseSet base_type) := (element : base_type.α) (is_element : element ∈ base_set.lean_set)
 def make_base_element {base_type : BaseType} (base_set: BaseSet base_type) (element : base_type.α) (is_element : element ∈ base_set.lean_set) : BaseElement base_set := @BaseElement.mk base_type base_set element is_element
 
+def class_of {base_type : BaseType} {base_set: BaseSet base_type} (x : BaseElement base_set) :=
+base_class_of x.element
+
+def equals {base_type : BaseType} {x_base_set: BaseSet base_type} (x : BaseElement x_base_set) {y_base_set: BaseSet base_type} (y : BaseElement y_base_set) :=
+base_equals x.element y.element
+
+@[refl] lemma refl {base_type : BaseType} {x_base_set: BaseSet base_type} (x : BaseElement x_base_set) : equals x x := base_refl x.element
+@[symm] lemma symm {base_type : BaseType} {x_base_set: BaseSet base_type} {x : BaseElement x_base_set} {y_base_set: BaseSet base_type} {y : BaseElement y_base_set} (h1 : equals x y) : equals y x := base_symm h1
+@[trans] lemma trans {base_type : BaseType} {x_base_set: BaseSet base_type} {x : BaseElement x_base_set} {y_base_set: BaseSet base_type} {y : BaseElement y_base_set} {z_base_set: BaseSet base_type} {z : BaseElement z_base_set} (h1 : equals x y) (h2 : equals y z) : equals x z := base_trans h1 h2
+
 class has_base_type (H : Sort v) := (base_type : H → BaseType)
 class has_base_set (H : Sort v) extends has_base_type H := (base_set : Π S : H, BaseSet (has_base_type.base_type S))
 
@@ -140,23 +150,12 @@ end)
 
 def Element {H : Sort v} [has_base_set H] (S : H) := BaseElement (has_base_set.base_set S)
 instance Element_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Element S) := ⟨λ _, has_base_type.base_type S⟩
-def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := make_base_element (has_base_set.base_set S) element is_element
-
-def class_of {H : Sort v} [has_base_set H] {S : H} (x : Element S) :=
-base_class_of x.element
-
-def equals {H : Sort v} [has_base_set H] {S : H} (x y : Element S) :=
-base_equals x.element y.element
-
-@[refl] lemma refl {H : Sort v} [has_base_set H] {S : H} (x : Element S) : equals x x := base_refl x.element
-@[symm] lemma symm {H : Sort v} [has_base_set H] {S : H} {x y : Element S} (h1 : equals x y) : equals y x := base_symm h1
-@[trans] lemma trans {H : Sort v} [has_base_set H] {S : H} {x y z : Element S} (h1 : equals x y) (h2 : equals y z) : equals x z := base_trans h1 h2
-
-instance Element_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Element S) := setoid.mk equals (begin
+instance Element_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Element S) := setoid.mk (λ x y, equals x y) (begin
   split, intro x, reflexivity,
   split, intros x y, assume h1, symmetry, exact h1,
          intros x y z, assume h1 h2, transitivity y, exact h1, exact h2
 end)
+def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := make_base_element (has_base_set.base_set S) element is_element
 
 def eliminate_subset_to_set {H : Sort v} [has_base_set H] {S : H} {T : Subset S} (x : Element (subset_to_set T)) :=
 make_element T x.element x.is_element
@@ -166,7 +165,7 @@ def superset_element {H : Sort v} [has_base_set H] (S : H) {T : Subset S} (x : E
 make_element S x.element (T.is_subset x.is_element)
 instance Superset_element {H : Sort v} [has_base_set H] {S : H} {T : Subset S} : has_coe (Element T) (Element S) := ⟨λ x, superset_element S x⟩
 
-def is_element {H : Sort v} [has_base_set H] {S : H} (x : Element S) (T : Subset S) :=
+def is_element {H : Sort v} [has_base_set H] {S : H} {x_base_set : BaseSet (has_base_type.base_type S)} (x : BaseElement x_base_set) (T : Subset S) :=
 x.element ∈ T.base_set.lean_set
 instance {H : Sort v} [has_base_set H] {S : H} : has_mem (Element S) (Subset S) :=
 ⟨is_element⟩

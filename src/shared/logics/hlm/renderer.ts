@@ -1503,7 +1503,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             result.push(ellipsis);
             break;
           }
-          result.push(this.renderRegularArgument(item, type, remainingArrayDimensions - 1));
+          let renderedItem = this.renderRegularArgument(item, type, remainingArrayDimensions - 1);
+          this.addSemanticLink(renderedItem, item);
+          result.push(renderedItem);
         }
         return result;
       } else {

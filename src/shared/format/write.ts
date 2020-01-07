@@ -201,7 +201,7 @@ export class Writer {
       this.writeIdentifier(parameter.name, parameter, false);
       if (parameter.dependencies) {
         this.write('[');
-        this.writeExpressions(parameter.dependencies, indent, false, false);
+        this.writeExpressions(parameter.dependencies, indent, 0, false);
         this.write(']');
       }
       if (parameter.list) {
@@ -295,31 +295,34 @@ export class Writer {
     });
   }
 
-  writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, multiLine: boolean = false, squeeze: boolean = false): void {
+  writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, maxLineLength: number = 0, squeeze: boolean = false): void {
     let expressionIndent = indent;
     let lastExpressionIndent = indent;
     if (expressions.length <= 1 || !this.newLineStr) {
-      multiLine = false;
+      maxLineLength = 0;
     } else {
       expressionIndent = this.indent(expressionIndent);
-      lastExpressionIndent = this.indent(lastExpressionIndent, !multiLine);
+      lastExpressionIndent = this.indent(lastExpressionIndent, !maxLineLength);
     }
     let index = 0;
+    let remainingLineLength = 0;
     for (let expression of expressions) {
       if (index) {
         this.write(',');
-        if (!(multiLine || squeeze)) {
+        if (remainingLineLength && !squeeze) {
           this.write(' ');
         }
       }
-      if (multiLine) {
+      if (maxLineLength && !remainingLineLength) {
         this.writeNewLine();
         this.writeIndent(expressionIndent);
+        remainingLineLength = maxLineLength;
       }
       this.writeExpression(expression, index === expressions.length - 1 ? lastExpressionIndent : expressionIndent);
       index++;
+      remainingLineLength--;
     }
-    if (multiLine) {
+    if (maxLineLength) {
       this.writeNewLine();
       if (indent) {
         this.write(indent.outerIndent);
@@ -328,15 +331,15 @@ export class Writer {
   }
 
   writeExpressionList(expressions: Fmt.Expression[], indent?: IndentInfo, squeeze: boolean = false): void {
-    let hasLargeItem = false;
+    let maxLineLength = expressions.length > 10 ? 10 : 0;
     for (let item of expressions) {
       if (this.isLargeExpression(item)) {
-        hasLargeItem = true;
+        maxLineLength = 1;
         break;
       }
     }
     this.write('[');
-    this.writeExpressions(expressions, indent, hasLargeItem, squeeze);
+    this.writeExpressions(expressions, indent, maxLineLength, squeeze);
     this.write(']');
   }
 
