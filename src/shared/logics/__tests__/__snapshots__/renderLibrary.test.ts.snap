@@ -1444,13 +1444,9 @@ by:
 `;
 
 exports[`render hlm library: 1.4.27.13.3 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/operation 1`] = `
-"Definition 1.4.27.13.3.  Let X be a set, ⨂ be a generalized operation on X. We define
+"Definition 1.4.27.13.3.  Let X be a set, ⨂ be a generalized operation on X, x, y ∈ X. We define:
 
-  ∗_⨂
-
-by:
-
-  ∗_(e∗...) := ∗  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
+  x ⨂ y := x ∗ y if ⨂ = (e ∗ ...) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20natural%20number 1`] = `
@@ -1461,13 +1457,13 @@ exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions
 by:
 
   ⨂_(i < 0) a_i := e_⨂
-  ⨂_(i < m+1) a_i :=   (⨂_(j < m) a_j) ∗_⨂ a_m  (m ∈ ℕ)"
+  ⨂_(i < m+1) a_i :=   (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
 `;
 
 exports[`render hlm library: 1.4.27.13.5 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/Generalized%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
 "Proposition 1.4.27.13.5.  Let X be a set, ⨂ be a generalized operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
 
-  ⨂_(i < n) (a_i ∗_⨂ b_i) = (⨂_(i < n) a_i) ∗_⨂ (⨂_(i < n) b_i)
+  ⨂_(i < n) (a_i ⨂ b_i) = (⨂_(i < n) a_i) ⨂ (⨂_(i < n) b_i)
 
 No proof."
 `;
