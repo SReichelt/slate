@@ -37,8 +37,7 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
 
 async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, itemInfo: LibraryItemInfo, definition: LibraryDefinition, uri: string) {
   let rendererOptions: Logic.LogicRendererOptions = {
-    includeProofs: true,
-    abbreviateLongLists: false
+    includeProofs: true
   };
   let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
   let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {

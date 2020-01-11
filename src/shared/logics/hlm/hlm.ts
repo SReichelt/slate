@@ -9,6 +9,7 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.Operator,
     name: 'Operator',
+    hasTitle: true,
     createTypeExpression: () => new FmtHLM.MetaRefExpression_ExplicitOperator,
     createObjectContents: () => {
       let result = new FmtHLM.ObjectContents_ExplicitOperator;
@@ -19,6 +20,7 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.SetOperator,
     name: 'Set Operator',
+    hasTitle: true,
     createTypeExpression: () => new FmtHLM.MetaRefExpression_SetOperator,
     createObjectContents: () => {
       let result = new FmtHLM.ObjectContents_SetOperator;
@@ -29,12 +31,15 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.Construction,
     name: 'Construction',
+    hasTitle: true,
     createTypeExpression: () => new FmtHLM.MetaRefExpression_Construction,
     createObjectContents: () => new FmtHLM.ObjectContents_Construction
   },
   {
     definitionType: Logic.LogicDefinitionType.Predicate,
     name: 'Predicate',
+    hasTitle: true,
+    types: ['Predicate', 'Conjecture', 'Axiom'],
     createTypeExpression: () => new FmtHLM.MetaRefExpression_Predicate,
     createObjectContents: () => {
       let result = new FmtHLM.ObjectContents_Predicate;
@@ -45,6 +50,7 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.Theorem,
     name: 'Theorem',
+    hasTitle: true,
     types: ['Proposition', 'Lemma', 'Theorem', 'Corollary', 'Example'],
     createTypeExpression: () => new FmtHLM.MetaRefExpression_StandardTheorem,
     createObjectContents: () => {

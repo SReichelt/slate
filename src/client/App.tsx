@@ -15,6 +15,8 @@ import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtDisplay from '../shared/display/meta';
+import * as FmtLibrary from '../shared/logics/library';
+import * as Dialog from '../shared/display/dialog';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
@@ -27,7 +29,7 @@ import Message from './components/Message';
 
 const Loading = require('react-loading-animation');
 
-const Libraries = require('../../data/libraries/libraries.json');
+const libraries = require('../../data/libraries/libraries.json');
 
 const librariesURIPrefix = '/libraries/';
 
@@ -127,8 +129,8 @@ class App extends React.Component<AppProps, AppState> {
         targets: []
       };
       let repositories: GitHub.Repository[] = [];
-      for (let libraryName of Object.keys(Libraries)) {
-        let repository = Libraries[libraryName];
+      for (let libraryName of Object.keys(libraries)) {
+        let repository = libraries[libraryName];
         this.gitHubConfig.targets.push({
           uriPrefix: librariesURIPrefix + libraryName,
           repository: repository
@@ -325,7 +327,6 @@ class App extends React.Component<AppProps, AppState> {
       if (definitionPromise && this.state.templates) {
         let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
           includeProofs: true,
-          abbreviateLongLists: false,
           includeLabel: true,
           includeExtras: true,
           includeRemarks: true
@@ -482,9 +483,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let openDialog: React.ReactNode = null;
-    if (this.state.insertDialogLibraryDataProvider && this.state.insertDialogSection) {
+    if (this.state.insertDialogLibraryDataProvider) {
+      let dialog = new Dialog.InsertDialog;
+      dialog.definitionType = this.state.insertDialogDefinitionType;
+      dialog.onCheckNameInUse = this.checkNameInUse; 
       openDialog = (
-        <InsertDialog libraryDataProvider={this.state.insertDialogLibraryDataProvider} section={this.state.insertDialogSection} definitionType={this.state.insertDialogDefinitionType} onOK={this.finishInsert} onCancel={this.cancelInsert} key={'InsertDialog'}/>
+        <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key={'InsertDialog'}/>
       );
     }
 
@@ -559,21 +563,21 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private finishInsert = (name: string, title: string | undefined, type: string | undefined): void => {
+  private finishInsert = (result: Dialog.InsertDialogResult): void => {
     let libraryDataProvider = this.state.insertDialogLibraryDataProvider;
     if (libraryDataProvider) {
       let definitionType = this.state.insertDialogDefinitionType;
       // TODO position
       if (definitionType) {
-        if (type) {
-          type = type.toLowerCase();
+        if (result.type) {
+          result.type = result.type.toLowerCase();
         }
-        libraryDataProvider.insertLocalItem(name, definitionType, title, type)
+        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, result.type)
           .then((libraryDefinition: LibraryDefinition) => {
             let localPath = new Fmt.Path;
-            localPath.name = name;
+            localPath.name = result.name;
             let absolutePath = libraryDataProvider!.getAbsolutePath(localPath);
-            let itemInfoPromise = libraryDataProvider!.getLocalItemInfo(name);
+            let itemInfoPromise = libraryDataProvider!.getLocalItemInfo(result.name);
             this.navigate({
               selectedItemAbsolutePath: absolutePath,
               selectedItemProvider: libraryDataProvider,
@@ -599,7 +603,7 @@ class App extends React.Component<AppProps, AppState> {
             this.forceUpdate();
           });
       } else {
-        libraryDataProvider.insertLocalSubsection(name, title || '')
+        libraryDataProvider.insertLocalSubsection(name, result.title || '')
           .then(this.cancelInsert)
           .catch((error) => {
             this.props.alert.error('Error adding section: ' + error.message);
@@ -615,6 +619,21 @@ class App extends React.Component<AppProps, AppState> {
       insertDialogSection: undefined,
       insertDialogDefinitionType: undefined
     });
+  }
+
+  private checkNameInUse = (name: string): boolean => {
+    if (this.state.insertDialogSection) {
+      let nameLower = name.toLowerCase();
+      let sectionContents = this.state.insertDialogSection.definition.contents as FmtLibrary.ObjectContents_Section;
+      for (let item of sectionContents.items) {
+        if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection)
+            && item.ref instanceof Fmt.DefinitionRefExpression
+            && nameLower === item.ref.path.name.toLowerCase()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private edit = (): void => {

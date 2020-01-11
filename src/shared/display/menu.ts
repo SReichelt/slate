@@ -68,5 +68,5 @@ export class ImmediateExpressionMenuAction extends ExpressionMenuAction {
 }
 
 export class DialogExpressionMenuAction extends ExpressionMenuAction {
-  onOpen: () => Dialog.ExpressionDialog;
+  onOpen: () => Dialog.DialogBase;
 }

@@ -46,6 +46,18 @@ export abstract class GenericEditHandler {
     this.editAnalysis.analyzeDefinition(definition, libraryDataProvider.logic.getRootContext());
   }
 
+  protected getActionInsertButton(action: Menu.ExpressionMenuAction): Display.RenderedExpression {
+    let insertButton = new Display.InsertPlaceholderExpression;
+    insertButton.action = action;
+    return insertButton;
+  }
+
+  getImmediateInsertButton(onInsert: () => void): Display.RenderedExpression {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = onInsert;
+    return this.getActionInsertButton(action);
+  }
+
   addDisplayMenu(semanticLink: Display.SemanticLink, display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
     let displayItem = display && display.length === 1 ? display[0] : undefined;
     let onSetDisplayItem = (newDisplayItem: Fmt.Expression | undefined) => {

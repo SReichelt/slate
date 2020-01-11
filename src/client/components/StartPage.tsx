@@ -79,8 +79,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
   let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
   let expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
     let rendererOptions: Logic.LogicRendererOptions = {
-      includeProofs: false,
-      abbreviateLongLists: true
+      includeProofs: false
     };
     let definitionRenderer = new HLMRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
@@ -97,8 +96,7 @@ function StartPage(props: StartPageProps) {
     let dummyDefinition = new Fmt.Definition;
     dummyDefinition.name = '';
     let rendererOptions: Logic.LogicRendererOptions = {
-      includeProofs: false,
-      abbreviateLongLists: true
+      includeProofs: false
     };
     let renderer = new HLMRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
     let examples = [

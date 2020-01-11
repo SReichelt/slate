@@ -80,6 +80,8 @@ export class PlaceholderExpression extends RenderedExpression {
 }
 
 export class InsertPlaceholderExpression extends PlaceholderExpression {
+  action?: Menu.ExpressionMenuAction;
+
   constructor() {
     super(InsertPlaceholderExpression);
   }

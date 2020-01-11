@@ -863,15 +863,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let items = term.terms ? term.terms.map((item) => this.renderElementTerm(item, termSelection)) : [];
       if (this.editHandler) {
-        let onInsertTerm = (expression: Fmt.Expression) => {
-          if (term.terms) {
-            term.terms.push(expression);
-          } else {
-            term.terms = [expression];
-          }
-        };
         let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression);
-        this.editHandler.addElementTermInsertButton(items, term, onInsertTerm, onRenderTerm, termSelection);
+        this.editHandler.addEnumerationInsertButton(items, term, onRenderTerm, termSelection);
       }
       return this.renderTemplate('Enumeration', {
                                    'items': items
@@ -1497,7 +1490,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (rawArg instanceof Fmt.ArrayExpression) {
         let result: Display.ExpressionValue[] = [];
         for (let item of rawArg.items) {
-          if (this.options.abbreviateLongLists && result.length >= 10) {
+          if (this.options.maxListLength && result.length >= this.options.maxListLength) {
             let ellipsis = new Display.TextExpression('...');
             ellipsis.styleClasses = ['dummy'];
             result.push(ellipsis);
@@ -1588,6 +1581,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
           return row;
         });
+        if (this.editHandler) {
+          rows.push([this.editHandler.getConstructorInsertButton(definition.innerDefinitions)]);
+        }
         let construction = this.renderTemplate('Construction', {
                                                  'constructors': rows,
                                                });
@@ -1607,13 +1603,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         let renderLeftSide = renderDefinitionRef;
         if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
+          let definitions = contents.definition;
           let renderRightSide = (term: Fmt.Expression) => this.renderSetTerm(term, fullSetTermSelection);
-          return this.renderMultiDefinitions('Equality', cases!, renderLeftSide, renderRightSide);
+          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.SetTerm));
+          return this.renderMultiDefinitions('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
+          let definitions = contents.definition;
           let renderRightSide = (term: Fmt.Expression) => this.renderElementTerm(term, fullElementTermSelection);
-          return this.renderMultiDefinitionsWithSpecializations('Equality', cases!, renderLeftSide, renderRightSide);
+          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.ElementTerm));
+          return this.renderMultiDefinitionsWithSpecializations('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           let parameter = this.renderVariable(contents.parameter);
+          let definitions = contents.definition;
           renderLeftSide = (elementParameterOverrides?: ElementParameterOverrides) =>
             this.renderTemplate('EqualityRelation', {
                                   'left': renderDefinitionRef(elementParameterOverrides),
@@ -1625,15 +1626,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             allowCases: true
           };
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3);
+          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+          return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
+          let definitions = contents.definition;
           let formulaSelection: FormulaSelection = {
             allowTruthValue: false,
             allowEquiv: false,
             allowCases: true
           };
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3);
+          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+          return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else {
           return new Display.EmptyExpression;
         }
@@ -1643,7 +1647,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private renderMultiDefinitions(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Display.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Display.RenderedExpression, parenLevel: number = -1): Display.RenderedExpression {
+  private renderMultiDefinitions(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Display.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Display.RenderedExpression, parenLevel: number, onInsertDefinition: () => void): Display.RenderedExpression {
     let rows: Display.RenderedExpression[][] = [];
     for (let currentCase of cases) {
       let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
@@ -1676,12 +1680,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         first = false;
       }
     }
+    if (this.editHandler) {
+      let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+      rows.push([new Display.RowExpression([insertButton, new Display.TextExpression(' ')]), new Display.EmptyExpression]);
+    }
     let result = new Display.TableExpression(rows);
     result.styleClasses = ['aligned', 'definitions'];
     return result;
   }
 
-  private renderMultiDefinitionsWithSpecializations(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Display.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Display.RenderedExpression, parenLevel: number = -1): Display.RenderedExpression {
+  private renderMultiDefinitionsWithSpecializations(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Display.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Display.RenderedExpression, parenLevel: number, onInsertDefinition: () => void): Display.RenderedExpression {
     if (cases.length === 1) {
       let currentCase = cases[0];
       if (currentCase.definitions.length === 1) {
@@ -1706,17 +1714,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                     let display = findBestMatch(definitionDisplay.display, argumentLists)!;
                     let result = this.renderDisplayExpression(display, args);
                     this.addSemanticLink(result, definitionRef);
+                    if (this.editHandler) {
+                      let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+                      result = new Display.ParagraphExpression([result, insertButton]);
+                    }
                     return result;
                   }
                 }
               }
-              return this.renderMultiDefinitions(type, cases, renderLeftSide, renderRightSide, parenLevel);
+              return this.renderMultiDefinitions(type, cases, renderLeftSide, renderRightSide, parenLevel, onInsertDefinition);
             });
           return new Display.PromiseExpression(promise);
         }
       }
     }
-    return this.renderMultiDefinitions(type, cases, renderLeftSide, renderRightSide, parenLevel);
+    return this.renderMultiDefinitions(type, cases, renderLeftSide, renderRightSide, parenLevel, onInsertDefinition);
   }
 
   private addDefinitionProofs(cases: ExtractedStructuralCase[] | undefined, paragraphs: Display.RenderedExpression[]): void {
@@ -1966,15 +1978,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             'right': rightConstructor
           });
           this.addSemanticLink(equality, equalityDefinition);
+          let definitions = equalityDefinition.definition;
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, fullFormulaSelection);
           let parameters: Fmt.Parameter[] = [];
           parameters.push(...equalityDefinition.leftParameters);
           parameters.push(...equalityDefinition.rightParameters);
           let singleCase: ExtractedStructuralCase = {
             caseParameters: parameters,
-            definitions: equalityDefinition.definition
+            definitions: definitions
           };
-          let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3);
+          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.SetTerm));
+          let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3, onInsertDefinition);
           paragraphs.push(equivalenceDef);
           if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
             this.addIndentedProof(equalityDefinition.reflexivityProof, 'Reflexivity', paragraphs);

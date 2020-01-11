@@ -113,7 +113,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
       let definition = parentProvider.fetchLocalItem(path.name);
       let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
         includeProofs: false,
-        abbreviateLongLists: true,
+        maxListLength: 20,
         includeLabel: false,
         includeExtras: true,
         includeRemarks: false

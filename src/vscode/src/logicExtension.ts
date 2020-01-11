@@ -233,7 +233,7 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
             let result: vscode.CodeLens[] = [];
             let rendererOptions: Logic.LogicRendererOptions = {
                 includeProofs: true,
-                abbreviateLongLists: true
+                maxListLength: 10
             };
             if (libraryDocument.isSection) {
                 for (let range of libraryDocument.rangeList) {
@@ -308,7 +308,7 @@ class SlateLogicHoverProvider {
             let textPromise = definitionPromise.then((definition: LibraryDefinition) => {
                 let rendererOptions: Logic.LogicRendererOptions = {
                     includeProofs: false,
-                    abbreviateLongLists: true
+                    maxListLength: 20
                 };
                 let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, targetDataProvider, templates, rendererOptions);
                 let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {

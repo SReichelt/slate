@@ -8,7 +8,7 @@ import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 
 interface ExpressionDialogProps {
   dialog: Dialog.ExpressionDialog;
-  onOK: () => void;
+  onOK: (result?: Dialog.DialogResultBase) => void;
   onCancel: () => void;
 }
 

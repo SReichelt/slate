@@ -27,9 +27,20 @@ export enum LogicDefinitionType {
 export interface LogicDefinitionTypeDescription {
   readonly definitionType: LogicDefinitionType;
   readonly name: string;
+  readonly hasTitle: boolean;
   readonly types?: string[];
   createTypeExpression(): Fmt.Expression;
   createObjectContents(): Fmt.ObjectContents;
+}
+
+export function createDefinition(definitionType: LogicDefinitionTypeDescription, name: string): Fmt.Definition {
+  let definition = new Fmt.Definition;
+  definition.name = name;
+  definition.type = new Fmt.Type;
+  definition.type.expression = definitionType.createTypeExpression();
+  definition.type.arrayDimensions = 0;
+  definition.contents = definitionType.createObjectContents();
+  return definition;
 }
 
 export interface LogicChecker {
@@ -56,7 +67,7 @@ export enum DiagnosticSeverity {
 
 export interface LogicRendererOptions {
   includeProofs: boolean;
-  abbreviateLongLists: boolean;
+  maxListLength?: number;
 }
 
 export interface LogicDisplay {

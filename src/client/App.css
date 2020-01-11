@@ -19,7 +19,7 @@ body {
   background-color: #f2cd00;
 }
 
-.hoverable.pressed:hover {
+.hoverable.pressed:hover, .menu.pressed>.menu-row>.menu-placeholder-cell:hover {
   background-color: #e0c000;
 }
 

@@ -1,11 +1,29 @@
 import * as Fmt from '../format/format';
+import * as Logic from '../logics/logic';
 import * as Display from './display';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo } from '../data/libraryDataProvider';
 import CachedPromise from '../data/cachedPromise';
 
-export class ExpressionDialog {
+export interface DialogResultBase {
+}
+
+export class DialogBase {
+  onOK?: (result: DialogResultBase) => void;
+}
+
+export interface InsertDialogResult extends DialogResultBase {
+  name: string;
+  title: string | undefined;
+  type: string | undefined;
+}
+
+export class InsertDialog extends DialogBase {
+  definitionType: Logic.LogicDefinitionTypeDescription | undefined;
+  onCheckNameInUse: (name: string) => boolean;
+}
+
+export class ExpressionDialog extends DialogBase {
   items: ExpressionDialogItem[];
-  onOK: () => void;
   onCheckOKEnabled?: () => boolean;
 }
 

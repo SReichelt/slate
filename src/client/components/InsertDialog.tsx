@@ -1,16 +1,12 @@
 import * as React from 'react';
+import * as Dialog from '../../shared/display/dialog';
+import * as Logic from '../../shared/logics/logic';
 import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';
-import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
-import * as Fmt from '../../shared/format/format';
-import * as FmtLibrary from '../../shared/logics/library';
-import * as Logic from '../../shared/logics/logic';
 
 interface InsertDialogProps {
-  libraryDataProvider: LibraryDataProvider;
-  section: LibraryDefinition;
-  definitionType: Logic.LogicDefinitionTypeDescription | undefined;
-  onOK: (name: string, title: string | undefined, type: string | undefined) => void;
+  dialog: Dialog.InsertDialog;
+  onOK: (result: Dialog.InsertDialogResult) => void;
   onCancel: () => void;
 }
 
@@ -35,18 +31,19 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   render(): React.ReactNode {
+    let definitionType = this.props.dialog.definitionType;
     let titleLabel: React.ReactNode = 'Title';
-    if (this.props.definitionType) {
+    if (definitionType) {
       titleLabel = [titleLabel, ' ', <span className={'dialog-optional-label'} key={'optional'}>(optional)</span>];
     }
     let typeRow: React.ReactNode = null;
-    if (this.props.definitionType && this.props.definitionType.types) {
+    if (definitionType && definitionType.types) {
       typeRow = (
         <tr className={'dialog-row separated-below'}>
           <td className={'dialog-cell'} colSpan={2}>
             <fieldset className={'dialog-group'}>
               <div className={'dialog-radio-button-group'}>
-                {this.props.definitionType.types.map((type: string, index: number) => {
+                {definitionType.types.map((type: string, index: number) => {
                   let internalType = index ? type : undefined;
                   let checked = this.state.type === internalType;
                   return (
@@ -62,11 +59,24 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         </tr>
       );
     }
+    let titleRow: React.ReactNode = null;
+    if (!definitionType || definitionType.hasTitle) {
+      titleRow = (
+        <tr className={'dialog-row separated-below'}>
+          <td className={'dialog-cell'}>{titleLabel}:</td>
+          <td className={'dialog-cell'}>
+            <ValidationMessage error={this.state.titleError}>
+              <input type={'text'} value={this.state.title} onChange={this.onChangeTitle}/>
+            </ValidationMessage>
+          </td>
+        </tr>
+      );
+    }
     return (
       <StandardDialog onOK={this.onOK} onCancel={this.props.onCancel} okEnabled={this.state.okEnabled}>
         <table className={'dialog-contents'}>
           <tbody>
-            <tr className={'dialog-row separated-above'}>
+            <tr className={'dialog-row separated-above' + (titleRow ? '' : ' dialog-row separated-below')}>
               <td className={'dialog-cell'}>Name:</td>
               <td className={'dialog-cell'}>
                 <ValidationMessage error={this.state.nameError}>
@@ -74,14 +84,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
                 </ValidationMessage>
               </td>
             </tr>
-            <tr className={'dialog-row separated-below'}>
-              <td className={'dialog-cell'}>{titleLabel}:</td>
-              <td className={'dialog-cell'}>
-                <ValidationMessage error={this.state.titleError}>
-                  <input type={'text'} value={this.state.title} onChange={this.onChangeTitle}/>
-                </ValidationMessage>
-              </td>
-            </tr>
+            {titleRow}
             {typeRow}
           </tbody>
         </table>
@@ -101,7 +104,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
 
   private onBlurName = (event: React.ChangeEvent<HTMLInputElement>): void => {
     let newName = event.target.value;
-    if (newName && !this.props.definitionType && !this.state.title) {
+    if (newName && !this.props.dialog.definitionType && !this.state.title) {
       let titleError = this.checkTitle(newName);
       this.setState((prevState) => ({
         title: newName,
@@ -131,7 +134,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       }
     }
     let firstChar = name[0];
-    if (this.props.definitionType && (this.props.definitionType.definitionType === Logic.LogicDefinitionType.Operator || this.props.definitionType.definitionType === Logic.LogicDefinitionType.Predicate)) {
+    let definitionType = this.props.dialog.definitionType;
+    if (definitionType && (definitionType.definitionType === Logic.LogicDefinitionType.Constructor || definitionType.definitionType === Logic.LogicDefinitionType.Operator || definitionType.definitionType === Logic.LogicDefinitionType.Predicate)) {
       if (!(firstChar >= 'a' && firstChar <= 'z')) {
         return new Error(`${this.getDefinitionTypeName()} name must start with a lowercase letter`);
       }
@@ -140,21 +144,15 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         return new Error(`${this.getDefinitionTypeName()} name must start with an uppercase letter`);
       }
     }
-    let nameLower = name.toLowerCase();
-    let sectionContents = this.props.section.definition.contents as FmtLibrary.ObjectContents_Section;
-    for (let item of sectionContents.items) {
-      if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection)
-          && item.ref instanceof Fmt.DefinitionRefExpression
-          && nameLower === item.ref.path.name.toLowerCase()) {
-        return new Error('An object with this name already exists');
-      }
+    if (this.props.dialog.onCheckNameInUse(name)) {
+      return new Error('An object with this name already exists');
     }
     return undefined;
   }
 
   private checkTitle(title: string): Error | undefined {
     title = InsertDialog.trimString(title);
-    if (!this.props.definitionType && !title) {
+    if (!this.props.dialog.definitionType && !title) {
       return new Error('Title is required');
     }
     return undefined;
@@ -171,8 +169,9 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   private getDefinitionTypeName(): string {
-    if (this.props.definitionType) {
-      let name = this.props.definitionType.name.toLowerCase();
+    let definitionType = this.props.dialog.definitionType;
+    if (definitionType) {
+      let name = definitionType.name.toLowerCase();
       return name[0].toUpperCase() + name.substring(1);
     } else {
       return 'Section';
@@ -185,9 +184,13 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   private onOK = (): void => {
-    let name = InsertDialog.trimString(this.state.name);
     let title = InsertDialog.trimString(this.state.title);
-    this.props.onOK(name, title ? title : undefined, this.state.type);
+    let result: Dialog.InsertDialogResult = {
+      name: InsertDialog.trimString(this.state.name),
+      title: title ? title : undefined,
+      type: this.state.type
+    };
+    this.props.onOK(result);
   }
 }
 

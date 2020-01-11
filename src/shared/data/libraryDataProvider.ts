@@ -425,12 +425,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private createLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, metaModelPath: Fmt.Path): LibraryDefinition {
     let file = new Fmt.File;
     file.metaModelPath = metaModelPath;
-    let definition = new Fmt.Definition;
-    definition.name = name;
-    definition.type = new Fmt.Type;
-    definition.type.expression = definitionType.createTypeExpression();
-    definition.type.arrayDimensions = 0;
-    definition.contents = definitionType.createObjectContents();
+    let definition = Logic.createDefinition(definitionType, name);
     file.definitions.push(definition);
     let libraryDefinition: LibraryDefinition = {
       file: file,

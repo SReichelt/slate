@@ -498,7 +498,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           let outerDefinition = this.props.libraryDefinition ? this.props.libraryDefinition.definition : definition;
           let rendererOptions: Logic.LogicRendererOptions = {
             includeProofs: false,
-            abbreviateLongLists: true
+            maxListLength: 10
           };
           let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, this.props.libraryDataProvider, this.props.templates, rendererOptions);
           let summary = renderer.renderDefinitionSummary(definition);
@@ -515,6 +515,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           } else if (display && this.props.parentScrollPane && !this.props.selected) {
             let showPreview = false;
             if (this.state.showPreview) {
+              rendererOptions.maxListLength = 20;
               let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
                 includeLabel: false,
                 includeExtras: true,

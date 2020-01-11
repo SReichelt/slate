@@ -5,6 +5,7 @@ import * as Menu from '../../shared/display/menu';
 import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
+import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
 import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
@@ -47,8 +48,9 @@ interface ExpressionProps {
 interface ExpressionState {
   hovered: boolean;
   showPreview: boolean;
+  clicking: boolean;
   openMenu?: Menu.ExpressionMenu;
-  openDialog?: Dialog.ExpressionDialog;
+  openDialog?: Dialog.DialogBase;
 }
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
@@ -67,7 +69,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
     this.state = {
       hovered: false,
-      showPreview: false
+      showPreview: false,
+      clicking: false
     };
 
     this.updateOptionalProps(props);
@@ -109,6 +112,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private clearOpenMenu(): void {
     if (this.state.openMenu || this.state.openDialog) {
       this.setState({
+        clicking: false,
         openMenu: undefined,
         openDialog: undefined
       });
@@ -788,7 +792,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let error = expression instanceof Display.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
       result = `Error: ${error}`;
     }
-    this.semanticLinks = semanticLinks;
     if (semanticLinks && semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
       className += ' definition';
     }
@@ -796,30 +799,50 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.hasMenu = hasMenu;
     let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
     if (hasMenu || expression instanceof Display.PlaceholderExpression) {
+      let menu: React.ReactNode = null;
+      if (this.state.openDialog) {
+        if (this.state.openDialog instanceof Dialog.InsertDialog) {
+          menu = <InsertDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+        } else if (this.state.openDialog instanceof Dialog.ExpressionDialog) {
+          menu = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+        }
+      } else if (this.state.openMenu) {
+        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
+      }
+      let interactive = hasMenu;
+      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
+      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
+      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
+      if (expression instanceof Display.InsertPlaceholderExpression && expression.action && !hasMenu) {
+        onMouseDown = () => this.setState({clicking: true});
+        onMouseUp = () => this.setState({clicking: false});
+        onClick = (event: React.MouseEvent<HTMLElement>) => this.actionClicked(expression.action!, event);
+        interactive = true;
+        if (!semanticLinks) {
+          semanticLinks = [new Display.SemanticLink(expression, false, false)];
+        }
+      }
+      let onMouseEnter = interactive ? () => this.addToHoveredChildren() : undefined;
+      let onMouseLeave = interactive ? () => { this.setState({clicking: false}); this.removeFromHoveredChildren(); } : undefined;
       let menuClassName = 'menu';
       if (this.state.hovered) {
         menuClassName += ' hover';
       }
-      if (hasMenu) {
+      if (interactive) {
         menuClassName += ' interactive';
-        if (!hasVisibleMenu) {
-          menuClassName += ' hidden';
+        if (hasMenu) {
+          if (!hasVisibleMenu) {
+            menuClassName += ' hidden';
+          }
+        } else {
+          if (this.state.clicking) {
+            menuClassName += ' pressed';
+          }
         }
       }
       if (this.state.openMenu) {
         menuClassName += ' open';
       }
-      let menu: React.ReactNode = null;
-      if (this.state.openDialog) {
-        menu = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
-      } else if (this.state.openMenu) {
-        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
-      }
-      let onMouseEnter = hasMenu ? () => this.addToHoveredChildren() : undefined;
-      let onMouseLeave = hasMenu ? () => this.removeFromHoveredChildren() : undefined;
-      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
-      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
-      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let cells: React.ReactNode;
       if (expression instanceof Display.PlaceholderExpression) {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
@@ -903,6 +926,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
       }
     }
+    this.semanticLinks = semanticLinks;
     return result;
   }
 
@@ -1264,9 +1288,31 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {
     if (event.button < 1) {
+      this.setState({clicking: false});
       this.stopPropagation(event);
       if (this.props.interactionHandler && !this.props.interactionHandler.isBlocked() && semanticLink) {
         this.props.interactionHandler.linkClicked(semanticLink);
+      }
+    }
+  }
+
+  private actionClicked(action: Menu.ExpressionMenuAction, event: React.MouseEvent<HTMLElement>): void {
+    if (event.button < 1) {
+      if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
+        return;
+      }
+      this.setState({clicking: false});
+      this.stopPropagation(event);
+      if (action instanceof Menu.ImmediateExpressionMenuAction) {
+        action.onExecute();
+        if (this.props.interactionHandler) {
+          this.props.interactionHandler.expressionChanged();
+        }
+      } else if (action instanceof Menu.DialogExpressionMenuAction) {
+        this.enableInteractionBlocker();
+        this.setState({
+          openDialog: action.onOpen()
+        });
       }
     }
   }
@@ -1310,10 +1356,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private onDialogOK = () => {
+  private onDialogOK = (result: Dialog.DialogResultBase) => {
     this.clearPermanentHighlight();
-    if (this.state.openDialog) {
-      this.state.openDialog.onOK();
+    if (this.state.openDialog && this.state.openDialog.onOK) {
+      this.state.openDialog.onOK(result);
     }
     if (this.props.interactionHandler) {
       this.props.interactionHandler.expressionChanged();

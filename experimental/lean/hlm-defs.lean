@@ -55,7 +55,7 @@
 
 namespace hlm
 
--- Conjunction and disjunction are dependend in HLM.
+-- Conjunction and disjunction are dependent in HLM.
 -- This is equivalent to a sigma type; can it be simplified?
 def and_dep {left : Prop} (right : left → Prop) := left ∧ (Π l : left, right l)
 def and_dep_left {left : Prop} {right : left → Prop} (h : and_dep (λ l : left, right l)) := and.left h
@@ -73,31 +73,16 @@ def base_equals {base_type : BaseType} (x y : base_type.α) := x ≈ y
 @[symm] lemma base_symm {base_type : BaseType} {x y : base_type.α} (h1 : base_equals x y) : base_equals y x := setoid.symm h1
 @[trans] lemma base_trans {base_type : BaseType} {x y z : base_type.α} (h1 : base_equals x y) (h2 : base_equals y z) : base_equals x z := setoid.trans h1 h2
 
--- Do we really need to prove that equality is an equivalence relation?
-def lean_type_to_base_type (α : Type u) := make_base_type α (=) (begin
-  split, intro x, reflexivity,
-  split, intros x y, assume h1, symmetry, exact h1,
-         intros x y z, assume h1 h2, transitivity y, exact h1, exact h2
-end)
+def lean_type_to_base_type (α : Type u) := make_base_type α (=) ⟨@eq.refl _, @eq.symm _, @eq.trans _⟩
 
 def lean_set_respects_equality (base_type : BaseType) (lean_set : set base_type.α) := ∀ x y : base_type.α, base_equals x y → x ∈ lean_set → y ∈ lean_set
 
 structure BaseSet (base_type : BaseType) := (lean_set : set base_type.α) (respects_equality : lean_set_respects_equality base_type lean_set)
 def make_base_set (base_type : BaseType) (lean_set : set base_type.α) (respects_equality : lean_set_respects_equality base_type lean_set) := @BaseSet.mk base_type lean_set respects_equality
 
-def universal_base_set {base_type : BaseType} := make_base_set base_type set.univ (begin
-  intros x y,
-  assume h1 h2,
-  trivial
-end)
+def universal_base_set {base_type : BaseType} := make_base_set base_type set.univ (λ _ _ _ _, trivial)
 
-def lean_set_to_base_set {α : Type u} (lean_set : set α) := make_base_set (lean_type_to_base_type α) lean_set (begin
-  intros x y,
-  assume h1 h2,
-  have h3 : x = y, from h1,
-  rewrite ← h3,
-  exact h2
-end)
+def lean_set_to_base_set {α : Type u} (lean_set : set α) := make_base_set (lean_type_to_base_type α) lean_set (λ _ _, eq.subst)
 
 structure BaseElement {base_type : BaseType} (base_set: BaseSet base_type) := (element : base_type.α) (is_element : element ∈ base_set.lean_set)
 def make_base_element {base_type : BaseType} (base_set: BaseSet base_type) (element : base_type.α) (is_element : element ∈ base_set.lean_set) : BaseElement base_set := @BaseElement.mk base_type base_set element is_element
@@ -135,26 +120,13 @@ instance Subset_has_base_set {H : Sort v} [has_base_set H] {S : H} : has_base_se
 def make_subset {H : Sort v} [h : has_base_set H] (S : H) (lean_set : set (lean_type_of S)) (is_subset : lean_set ⊆ lean_set_of S) (respects_equality : lean_set_respects_equality (has_base_type.base_type S) lean_set) : Subset S := @Subset.mk H h S (BaseSet.mk lean_set respects_equality) is_subset
 def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := make_set (has_base_type.base_type S) T.base_set
 instance Subset_to_Set {H : Sort v} [has_base_set H] {S : H} : has_coe (Subset S) Set := ⟨subset_to_set⟩
-def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S') : Subset S := Subset.mk T.base_set (begin
-  intro x,
-  assume h1,
-  let h2 := T.is_subset h1,
-  exact S'.is_subset h2
-end)
+def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S') : Subset S := Subset.mk T.base_set (λ x h, S'.is_subset (T.is_subset h))
 instance Subset_to_Superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} : has_coe (Subset S') (Subset S) := ⟨subset_to_superset⟩
-def set_to_subset (S : Set) : Subset S := Subset.mk S.base_set (begin
-  intro x,
-  assume h1,
-  exact h1
-end)
+def set_to_subset (S : Set) : Subset S := Subset.mk S.base_set (λ x, id)
 
 def Element {H : Sort v} [has_base_set H] (S : H) := BaseElement (has_base_set.base_set S)
 instance Element_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Element S) := ⟨λ _, has_base_type.base_type S⟩
-instance Element_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Element S) := setoid.mk (λ x y, equals x y) (begin
-  split, intro x, reflexivity,
-  split, intros x y, assume h1, symmetry, exact h1,
-         intros x y z, assume h1 h2, transitivity y, exact h1, exact h2
-end)
+instance Element_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Element S) := setoid.mk (λ x y, equals x y) ⟨refl, λ _ _, symm, λ _ _ _, trans⟩
 def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := make_base_element (has_base_set.base_set S) element is_element
 
 def eliminate_subset_to_set {H : Sort v} [has_base_set H] {S : H} {T : Subset S} (x : Element (subset_to_set T)) :=
@@ -175,109 +147,51 @@ def is_subset {H : Sort v} [has_base_set H] {S : H} (X Y : Subset S) :=
 instance {H : Sort v} [has_base_set H] {S : H} : has_subset (Subset S) :=
 ⟨is_subset⟩
 
+@[refl] lemma is_subset_refl {H : Sort v} [has_base_set H] {S : H} (X : Subset S) : is_subset X X := λ _, id
+@[trans] lemma is_subset_trans {H : Sort v} [has_base_set H] {S : H} {X Y Z : Subset S} (h1 : is_subset X Y) (h2 : is_subset Y Z) : is_subset X Z := λ s h3, h2 s (h1 s h3)
+
 def set_equals {H : Sort v} [has_base_set H] {S : H} (X Y : Subset S) :=
 X ⊆ Y ∧ Y ⊆ X
 
-instance Subset_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Subset S) := setoid.mk set_equals (begin
-  split,
-  {
-    intro X,
-    split,
-    {
-      intro s,
-      assume h1,
-      exact h1
-    },
-    {
-      intro s,
-      assume h1,
-      exact h1
-    }
-  },
-  split,
-  {
-    intros X Y,
-    assume h1,
-    exact and.intro h1.right h1.left
-  },
-  {
-    intros X Y Z,
-    assume h1 h2,
-    split,
-    {
-      intro s,
-      assume h3,
-      apply h2.left s,
-      apply h1.left s,
-      exact h3
-    },
-    {
-      intro s,
-      assume h3,
-      apply h1.right s,
-      apply h2.right s,
-      exact h3
-    }
-  }
-end)
+instance Subset_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Subset S) :=
+setoid.mk set_equals ⟨(λ X, ⟨is_subset_refl X, is_subset_refl X⟩), (λ X Y h, ⟨h.right, h.left⟩), (λ X Y Z h1 h2, ⟨is_subset_trans h1.left h2.left, is_subset_trans h2.right h1.right⟩)⟩
 
 theorem is_element_respects_equality_x {H : Sort v} [has_base_set H] {S : H} (x1 x2 : Element S) (h : x1 ≈ x2) (T : Subset S) :
 x1 ∈ T → x2 ∈ T :=
 T.base_set.respects_equality x1.element x2.element h
 
 theorem is_element_respects_equality_T {H : Sort v} [has_base_set H] {S : H} (x : Element S) (T1 T2 : Subset S) (h : T1 ≈ T2) :
-x ∈ T1 → x ∈ T2 := h.left x
+x ∈ T1 → x ∈ T2 :=
+h.left x
 
 theorem is_subset_respects_equality_X {H : Sort v} [has_base_set H] {S : H} (X1 X2 : Subset S) (h : X1 ≈ X2) (Y : Subset S) :
-X1 ⊆ Y → X2 ⊆ Y := begin
-  assume h1,
-  intro x,
-  assume h2,
-  apply h1,
-  apply h.right,
-  exact h2
-end
+X1 ⊆ Y → X2 ⊆ Y :=
+λ h1 x h2, h1 x (h.right x h2)
 
 theorem is_subset_respects_equality_Y {H : Sort v} [has_base_set H] {S : H} (X : Subset S) (Y1 Y2 : Subset S) (h : Y1 ≈ Y2) :
-X ⊆ Y1 → X ⊆ Y2 := begin
-  assume h1,
-  intro x,
-  assume h2,
-  apply h.left,
-  apply h1,
-  exact h2
-end
+X ⊆ Y1 → X ⊆ Y2 :=
+λ h1 x h2, h.left x (h1 x h2)
 
 def subset {H : Sort v} [has_base_set H] {S : H} (s : set (Element S)) (s_respects_equality : ∀ x y : Element S, x ≈ y → x ∈ s → y ∈ s) : Subset S :=
 let lean_set := {x : lean_type_of S | and_dep (λ p : x ∈ lean_set_of S, (make_element S x p) ∈ s)} in
-make_subset S lean_set (begin
-  intros a h1,
-  exact and_dep_left h1
-end) (begin
-  intros x_base y_base,
+make_subset S lean_set (λ _, and_dep_left) (λ x_base y_base,
   assume h1 h2,
-  let h3 := and_dep_left h2,
-  split,
-  {
-    exact (has_base_set.base_set S).respects_equality x_base y_base h1 h3
-  },
-  {
-    assume h4,
-    let x := make_element S x_base h3,
-    let y := make_element S y_base h4,
-    apply s_respects_equality x y h1,
-    apply and_dep_right h2
-  }
-end)
+  let h3 := and_dep_left h2 in
+  let h4 := and_dep_right h2 in
+  ⟨(has_base_set.base_set S).respects_equality x_base y_base h1 h3,
+   (assume h5,
+    let x := make_element S x_base h3 in
+    let y := make_element S y_base h5 in
+    s_respects_equality x y h1 h4)⟩
+)
 
-lemma trivially_respects_equality {α : Type u} {s : set (Element (lean_type_to_set α))} :
-∀ x y : Element (lean_type_to_set α), x ≈ y → x ∈ s → y ∈ s := begin
-  intros x y,
-  assume h1 h2,
-  cases x, cases y,
-  have h3 : x_element = y_element, from h1,
-  rewrite ← h3,
-  exact h2
+lemma trivially_respects_equality {α : Type u} {s : set (Element (lean_type_to_set α))} (x y : Element (lean_type_to_set α)) (h : x ≈ y) :
+x ∈ s → y ∈ s := begin
+  intro h1,
+  cases x with x_base _, cases y with y_base _,
+  have h2 : x_base = y_base, from h,
+  rewrite ← h2,
+  exact h1
 end
 
 def exists_unique_element {H : Sort v} [has_base_set H] {S : H} (p : Element S → Prop) :=
@@ -298,13 +212,11 @@ theorem unique_element_equality {H : Sort v} [has_base_set H] {S : H} (desc : un
 (classical.some_spec desc.h).right
 
 theorem unique_elements_equality {H : Sort v} [has_base_set H] {S : H} (desc : unique_element_desc S) :
-∀ x y : Element S, desc.p x ∧ desc.p y → x ≈ y := begin
-  intros x y,
-  assume h1,
+∀ x y : Element S, desc.p x → desc.p y → x ≈ y := begin
+  intros x y h1 h2,
   transitivity unique_element desc,
-  exact unique_element_equality desc x h1.left,
-  symmetry,
-  exact unique_element_equality desc y h1.right
+  exact unique_element_equality desc x h1,
+  symmetry, exact unique_element_equality desc y h2
 end
 
 end hlm
@@ -317,8 +229,7 @@ open hlm
 
 def Intersection (U : Set) (S T : Subset U) :=
 subset {x : Element U | x ∈ S ∧ x ∈ T} (begin
-  intros x y,
-  assume h1 h2,
+  intros x y h1 h2,
   split,
   exact is_element_respects_equality_x x y h1 S h2.left,
   exact is_element_respects_equality_x x y h1 T h2.right
@@ -326,28 +237,26 @@ end)
 
 theorem Intersection_respects_equality_S (U : Set) (S1 S2 : Subset U) (h : S1 ≈ S2) (T : Subset U) :
 Intersection U S1 T ⊆ Intersection U S2 T := begin
-  intro x,
-  assume h1,
+  intros x h1,
   split,
-  exact x.is_element,
-  assume _,
-  split,
-  apply is_element_respects_equality_T x S1 S2 h,
-  exact (and_dep_right h1).left,
-  exact (and_dep_right h1).right
+  { exact x.is_element },
+  { intro,
+    split,
+    { apply is_element_respects_equality_T x S1 S2 h,
+      exact (and_dep_right h1).left },
+    { exact (and_dep_right h1).right } }
 end
 
 theorem Intersection_respects_equality_T (U : Set) (S : Subset U) (T1 T2 : Subset U) (h : T1 ≈ T2) :
 Intersection U S T1 ⊆ Intersection U S T2 := begin
-  intro x,
-  assume h1,
+  intros x h1,
   split,
-  exact x.is_element,
-  assume _,
-  split,
-  exact (and_dep_right h1).left,
-  apply is_element_respects_equality_T x T1 T2 h,
-  exact (and_dep_right h1).right
+  { exact x.is_element },
+  { intro,
+    split,
+    { exact (and_dep_right h1).left },
+    { apply is_element_respects_equality_T x T1 T2 h,
+      exact (and_dep_right h1).right } }
 end
 
 def Natural_numbers :=
@@ -359,31 +268,18 @@ subset {m : Element Natural_numbers | nat.lt m.element n.element} trivially_resp
 def Functions (X Y : Set) :=
 let base_type := make_base_type (Element X → Element Y) (λ f g : Element X → Element Y, ∀ x : Element X, f x ≈ g x) (begin
   split,
-  {
-    intros f x,
-    reflexivity
-  },
+  { intros f x,
+    reflexivity },
   split,
-  {
-    intros f g,
-    assume h1,
-    intro x,
-    symmetry, exact h1 x
-  },
-  {
-    intros f g h,
-    assume h1 h2,
-    intro x,
+  { intros f g h1 x,
+    symmetry, exact h1 x },
+  { intros f g h h1 h2 x,
     transitivity (g x),
     exact h1 x,
-    exact h2 x
-  }
+    exact h2 x }
 end) in
 let base_set := make_base_set base_type {f : Element X → Element Y | ∀ x y : Element X, x ≈ y → f x ≈ f y} (begin
-  intros f g,
-  assume h1 h2,
-  intros x y,
-  assume h3,
+  intros f g h1 h2 x y h3,
   transitivity (f x),
   symmetry, exact h1 x,
   transitivity (f y),
@@ -404,16 +300,11 @@ theorem value_respects_equality_x {X Y : Set} (f : Element (Functions X Y)) (x1 
 f.is_element x1 x2 h
 
 def identity (X : Set) :=
-make_element (Functions X X) id (begin
-  intros x y,
-  assume h1,
-  exact h1
-end)
+make_element (Functions X X) id (λ x y, id)
 
 def composition {X Y Z : Set} (g : Element (Functions Y Z)) (f : Element (Functions X Y)) :=
 make_element (Functions X Z) (λ x : Element X, value g (value f x)) (begin
-  intros x y,
-  assume h1,
+  intros x y h1,
   let h2 := value_respects_equality_x f x y h1,
   exact value_respects_equality_x g (value f x) (value f y) h2
 end)
@@ -433,10 +324,8 @@ end
 
 def Image {X Y : Set} (f : Element (Functions X Y)) (S : Subset X) :=
 subset {y : Element Y | ∃ x : Element X, value f x ≈ y} (begin
-  intros y1 y2,
-  assume h1 h2,
-  apply exists.elim h2,
-  intros x h3,
+  intros y1 y2 h1 h2,
+  cases h2 with x h3,
   existsi x,
   transitivity y1,
   exact h3,
@@ -448,9 +337,7 @@ def injective {X Y : Set} (f : Element (Functions X Y)) :=
 
 theorem injective_respects_equality_f {X Y : Set} (f1 f2 : Element (Functions X Y)) (h : f1 ≈ f2)
 : injective f1 → injective f2 := begin
-  assume h1,
-  intros x y,
-  assume h2,
+  intros h1 x y h2,
   apply h1 x y,
   transitivity value f2 x,
   exact value_respects_equality_f f1 f2 h x,
@@ -464,11 +351,8 @@ def surjective {X Y : Set} (f : Element (Functions X Y)) :=
 
 theorem surjective_respects_equality_f {X Y : Set} (f1 f2 : Element (Functions X Y)) (h : f1 ≈ f2)
 : surjective f1 → surjective f2 := begin
-  assume h1,
-  intro y,
-  apply exists.elim (h1 y),
-  intro x,
-  assume h2,
+  intros h1 y,
+  cases h1 y with x h2,
   existsi x,
   transitivity value f1 x,
   symmetry, exact value_respects_equality_f f1 f2 h x,
@@ -480,7 +364,7 @@ injective f ∧ surjective f
 
 theorem bijective_respects_equality_f {X Y : Set} (f1 f2 : Element (Functions X Y)) (h : f1 ≈ f2)
 : bijective f1 → bijective f2 := begin
-  assume h1,
+  intro h1,
   split,
   exact injective_respects_equality_f f1 f2 h h1.left,
   exact surjective_respects_equality_f f1 f2 h h1.right
@@ -488,31 +372,23 @@ end
 
 def Bijections (X Y : Set) :=
 subset {f : Element (Functions X Y) | bijective f} (begin
-  intros f g,
-  assume h1 h2,
+  intros f g h1 h2,
   exact bijective_respects_equality_f f g h1 h2
 end)
 
 def preimage_desc {X Y : Set} (f : Element (Functions X Y)) (h1 : bijective f) (y : Element Y) :=
 let is_preimage (x : Element X) := value f x ≈ y in
 unique_element_desc.mk is_preimage (begin
-  apply exists.elim (h1.right y),
-  intro x,
-  assume h2,
+  cases (h1.right y) with x h2,
   existsi x,
   split,
-  {
-    exact h2
-  },
-  {
-    intro z,
-    assume h3,
+  { exact h2 },
+  { intros z h3,
     apply h1.left z x,
     symmetry,
     transitivity y,
     exact h2,
-    symmetry, exact h3
-  }
+    symmetry, exact h3 }
 end)
 
 noncomputable def preimage {X Y : Set} (f : Element (Functions X Y)) (h1 : bijective f) (y : Element Y) :=
@@ -527,22 +403,16 @@ unique_element_desc.mk is_inverse (begin
   let g_base := preimage ↑f f_is_bijective,
   let g := make_element (Bijections Y X) g_base (begin
     split,
-    {
-      intros y1 y2,
-      assume h1,
+    { intros y1 y2 h1,
       let x1 := g_base y1,
       apply unique_element_equality (preimage_desc ↑f f_is_bijective y2) x1,
       show f.element x1 ≈ y2,
       transitivity y1,
       exact unique_element_spec (preimage_desc ↑f f_is_bijective y1),
-      exact h1
-    },
-    {
-      assume _,
+      exact h1 },
+    { intro,
       split,
-      {
-        intros y1 y2,
-        assume h1,
+      { intros y1 y2 h1,
         let x1 := g_base y1,
         let x2 := g_base y2,
         transitivity f.element x1,
@@ -550,38 +420,28 @@ unique_element_desc.mk is_inverse (begin
         exact unique_element_spec (preimage_desc ↑f f_is_bijective y1),
         transitivity f.element x2,
         exact value_respects_equality_x (superset_element (Functions X Y) f) x1 x2 h1,
-        exact unique_element_spec (preimage_desc ↑f f_is_bijective y2)
-      },
-      {
-        intro x,
+        exact unique_element_spec (preimage_desc ↑f f_is_bijective y2) },
+      { intro x,
         let y := f.element x,
         existsi y,
         let z := g_base y,
         apply f_is_injective z x,
-        exact unique_element_spec (preimage_desc ↑f f_is_bijective y)
-      }
-    }
+        exact unique_element_spec (preimage_desc ↑f f_is_bijective y) } }
   end),
   existsi g,
   split,
-  {
-    intro x,
+  { intro x,
     let y := f.element x,
     symmetry,
     apply unique_element_equality (preimage_desc ↑f f_is_bijective y) x,
-    show y ≈ y, reflexivity
-  },
-  {
-    intro h,
-    assume h1,
-    intro y,
+    show y ≈ y, reflexivity },
+  { intros h h1 y,
     let h2 := h1 (g.element y),
     let fgy := f.element (g.element y),
     have h3 : fgy ≈ y, from unique_element_spec (preimage_desc ↑f f_is_bijective y),
     transitivity h.element fgy,
     symmetry, exact value_respects_equality_x (superset_element (Functions Y X) h) fgy y h3,
-    exact h2
-  }
+    exact h2 }
 end)
 
 noncomputable def inverse {X Y : Set} (f : Element (Bijections X Y)) :=
@@ -604,12 +464,8 @@ def finite (S : Set) :=
 
 theorem Subsets_of_finite_sets_are_finite (S : Set) (h1 : finite S) (T : Subset S) :
 finite (subset_to_set T) := begin
-  apply exists.elim h1,
-  intro n,
-  assume h2,
-  apply exists.elim h2,
-  intro f,
-  assume h3,
+  cases h1 with n h2,
+  cases h2 with f h3,
   existsi [n, (restriction f T)],
   exact Restriction_preserves_injectivity f h3 T
 end
@@ -617,85 +473,50 @@ end
 def Cardinal_numbers :=
 lean_type_to_set_with_equality Set (λ S T : Set, ∃ f : Element (Bijections S T), true) (begin
   split,
-  {
-    intro S,
+  { intro S,
     let id := identity S,
-    let id_bijection := make_element (Bijections S S) id.element (begin
+    let id_bijection := make_element (Bijections S S) id.element ⟨id.is_element, (begin
+      intro,
       split,
-      {
-        exact id.is_element
-      },
-      {
-        assume _,
-        split,
-        {
-          intros x y,
-          assume h1,
-          exact h1
-        },
-        {
-          intro y,
-          existsi y,
-          reflexivity
-        }
-      }
-    end),
+      { intros x y h1,
+        exact h1 },
+      { intro y,
+        existsi y,
+        reflexivity }
+    end)⟩,
     existsi id_bijection,
-    trivial
-  },
+    trivial },
   split,
-  {
-    intros S T,
-    assume h1,
-    apply exists.elim h1,
-    intros f _,
+  { intros S T h1,
+    cases h1 with f _,
     existsi inverse f,
-    trivial
-  },
-  {
-    intros S T U,
-    assume h1 h2,
-    apply exists.elim h1,
-    intros f _,
-    apply exists.elim h2,
-    intros g _,
+    trivial },
+  { intros S T U h1 h2,
+    cases h1 with f _,
+    cases h2 with g _,
     let comp := composition (superset_element (Functions T U) g) (superset_element (Functions S T) f),
     let comp_bijection := make_element (Bijections S U) comp.element (begin
       let f_is_bijective := and_dep_right f.is_element,
       let g_is_bijective := and_dep_right g.is_element,
       split,
-      {
-        exact comp.is_element
-      },
-      {
-        assume _,
+      { exact comp.is_element },
+      { intro,
         split,
-        {
-          intros x y,
-          assume h1,
+        { intros x y h1,
           apply f_is_bijective.left,
           apply g_is_bijective.left,
-          exact h1
-        },
-        {
-          intro z,
-          apply exists.elim (g_is_bijective.right z),
-          intro y,
-          assume h1,
-          apply exists.elim (f_is_bijective.right y),
-          intro x,
-          assume h2,
+          exact h1 },
+        { intro z,
+          cases (g_is_bijective.right z) with y h1,
+          cases (f_is_bijective.right y) with x h2,
           existsi x,
           let h3 := (and_dep_left g.is_element) (f.element x) y h2,
           transitivity g.element y,
           exact h3,
-          exact h1
-        }
-      }
+          exact h1 } }
     end),
     existsi comp_bijection,
-    trivial
-  }
+    trivial }
 end)
 
 def Carrier (k : Element Cardinal_numbers) :=

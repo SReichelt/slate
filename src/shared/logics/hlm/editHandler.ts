@@ -4,6 +4,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
+import * as Dialog from '../../display/dialog';
 import { GenericEditHandler, PlaceholderExpression, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
 import { LibraryDataProvider } from '../../data/libraryDataProvider';
 import { HLMExpressionType } from './hlm';
@@ -654,7 +655,29 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  getConstructorInsertButton(definitions: Fmt.DefinitionList): Display.RenderedExpression {
+    let action = new Menu.DialogExpressionMenuAction;
+    action.onOpen = () => {
+      let dialog = new Dialog.InsertDialog;
+      let definitionType: Logic.LogicDefinitionTypeDescription = {
+        definitionType: Logic.LogicDefinitionType.Constructor,
+        name: 'Constructor',
+        hasTitle: false,
+        createTypeExpression: () => new FmtHLM.MetaRefExpression_Constructor,
+        createObjectContents: () => new FmtHLM.ObjectContents_Constructor
+      };
+      dialog.definitionType = definitionType;
+      dialog.onCheckNameInUse = (name: string) => definitions.some((definition: Fmt.Definition) => (definition.name === name));
+      dialog.onOK = (result: Dialog.DialogResultBase) => {
+        let insertResult = result as Dialog.InsertDialogResult;
+        definitions.push(Logic.createDefinition(definitionType, insertResult.name));
+      };
+      return dialog;
+    };
+    return this.getActionInsertButton(action);
+  }
+
+  getElementTermInsertButton(parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): Display.RenderedExpression {
     let insertButton = new Display.InsertPlaceholderExpression;
     let semanticLink = new Display.SemanticLink(insertButton, false, false);
     let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
@@ -667,6 +690,11 @@ export class HLMEditHandler extends GenericEditHandler {
       this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
     insertButton.semanticLinks = [semanticLink];
+    return insertButton;
+  }
+
+  addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+    let insertButton = this.getElementTermInsertButton(parentExpression, onInsertTerm, onRenderTerm, termSelection);
     if (items.length) {
       let lastItemWithButton = [
         items[items.length - 1],
@@ -677,6 +705,17 @@ export class HLMEditHandler extends GenericEditHandler {
     } else {
       items.push(insertButton);
     }
+  }
+
+  addEnumerationInsertButton(items: Display.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+    let onInsertTerm = (expression: Fmt.Expression) => {
+      if (term.terms) {
+        term.terms.push(expression);
+      } else {
+        term.terms = [expression];
+      }
+    };
+    this.addElementTermInsertButton(items, term, onInsertTerm, onRenderTerm, termSelection);
   }
 
   addImplicitDefinitionMenu(semanticLink: Display.SemanticLink, onRenderExplicitIntro: Logic.RenderFn, onRenderImplicitIntro: RenderParameterFn): void {

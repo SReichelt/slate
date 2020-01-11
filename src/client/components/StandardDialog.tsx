@@ -16,9 +16,16 @@ const modalClassNames = {
 };
 
 function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): React.ReactElement {
+  let onOK = (event: React.FormEvent<HTMLFormElement>) => {
+    if (props.okEnabled) {
+      props.onOK();
+    }
+    event.stopPropagation();
+    event.preventDefault();
+  };
   return (
     <Modal open={true} onClose={props.onCancel} showCloseIcon={false} classNames={modalClassNames} key={'dialog'}>
-      <form onSubmit={props.onOK}>
+      <form onSubmit={onOK}>
         {props.children}
         <div className={'dialog-button-row'} key={'buttons'}>
           <Button toolTipText={'OK'} onClick={props.onOK} enabled={props.okEnabled} key={'OK'}>
@@ -28,7 +35,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
         </div>
-        {props.okEnabled ? <input type="submit" value="OK" style={{'display': 'none'}} key={'submit'}/> : null}
+        <input type="submit" value="OK" style={{'display': 'none'}} key={'submit'}/>
       </form>
     </Modal>
   );

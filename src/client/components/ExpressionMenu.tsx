@@ -5,6 +5,8 @@ import * as Menu from '../../shared/display/menu';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 
+const clickDelay = 100;
+
 interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
@@ -87,7 +89,8 @@ interface ExpressionMenuInputRefHolder {
 }
 
 class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, ExpressionMenuRowState> {
-  inputRefHolder: ExpressionMenuInputRefHolder = {};
+  private inputRefHolder: ExpressionMenuInputRefHolder = {};
+  private ready = false;
 
   constructor(props: ExpressionMenuRowProps) {
     super(props);
@@ -96,6 +99,18 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       titleHovered: false,
       contentsHovered: false
     };
+  }
+
+  componentDidMount(): void {
+    this.ready = false;
+    setTimeout(() => this.ready = true, clickDelay);
+  }
+
+  componentDidUpdate(prevProps: ExpressionMenuRowProps): void {
+    if (this.props.row !== prevProps.row) {
+      this.ready = false;
+      setTimeout(() => this.ready = true, clickDelay);
+    }
   }
 
   render(): React.ReactNode {
@@ -172,7 +187,9 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
       if (titleAction) {
         titleCellClassName += ' clickable';
         onClick = (event: React.MouseEvent) => {
-          this.props.onItemClicked(titleAction!);
+          if (this.ready) {
+            this.props.onItemClicked(titleAction!);
+          }
           event.stopPropagation();
         };
         if (titleAction instanceof Menu.DialogExpressionMenuAction) {
@@ -271,12 +288,26 @@ interface ExpressionMenuItemState {
 }
 
 class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, ExpressionMenuItemState> {
+  private ready = false;
+
   constructor(props: ExpressionMenuItemProps) {
     super(props);
 
     this.state = {
       hovered: false
     };
+  }
+
+  componentDidMount(): void {
+    this.ready = false;
+    setTimeout(() => this.ready = true, clickDelay);
+  }
+
+  componentDidUpdate(prevProps: ExpressionMenuItemProps): void {
+    if (this.props.item !== prevProps.item) {
+      this.ready = false;
+      setTimeout(() => this.ready = true, clickDelay);
+    }
   }
 
   render(): React.ReactNode {
@@ -307,7 +338,9 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
       }
     };
     let onClick = (event: React.MouseEvent) => {
-      this.props.onItemClicked(this.props.item.action);
+      if (this.ready) {
+        this.props.onItemClicked(this.props.item.action);
+      }
       event.stopPropagation();
     };
     return (
@@ -363,6 +396,7 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
     let onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       this.props.item.text = this.state.text;
       this.props.onItemClicked(this.props.item.action);
+      event.stopPropagation();
       event.preventDefault();
     };
     let onMouseEnter = () => {
