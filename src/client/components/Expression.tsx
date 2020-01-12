@@ -770,7 +770,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       try {
         return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         className += ' error';
         result = `Error: ${error.message}`;
       }

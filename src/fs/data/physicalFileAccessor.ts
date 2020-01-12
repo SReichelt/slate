@@ -5,20 +5,31 @@ import { FileAccessor, FileContents, WriteFileResult } from '../../shared/data/f
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class PhysicalFileAccessor implements FileAccessor {
+  constructor(private basePath?: string) {}
+
   readFile(uri: string): CachedPromise<FileContents> {
-    let contents = util.promisify(fs.readFile)(decodeURI(uri), 'utf8')
+    let fileName = this.getFileName(uri);
+    let contents = util.promisify(fs.readFile)(fileName, 'utf8')
       .then((text) => new PhysicalFileContents(text));
     return new CachedPromise(contents);
   }
 
   writeFile(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    let fileName = decodeURI(uri);
+    let fileName = this.getFileName(uri);
     if (createNew) {
       this.makeDirectories(fileName);
     }
     let result = util.promisify(fs.writeFile)(fileName, text, 'utf8')
       .then(() => ({}));
     return new CachedPromise(result);
+  }
+
+  private getFileName(uri: string): string {
+    let fileName = decodeURI(uri);
+    if (this.basePath) {
+      fileName = path.join(this.basePath, fileName);
+    }
+    return fileName;
   }
 
   private makeDirectories(fileName: string): void {

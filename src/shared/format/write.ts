@@ -28,7 +28,7 @@ interface IndentInfo {
 export class Writer {
   private lineLength = 0;
 
-  constructor(private stream: OutputStream, private newLineStr: string = '\n', private indentStr: string = '  ') {}
+  constructor(private stream: OutputStream, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
 
   writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
     this.writeRange(file, false, false, false, false, () => {
@@ -127,7 +127,8 @@ export class Writer {
         this.writeOptionalParameterList(definition.parameters, indent, true);
         this.writeType(definition.type, indent);
       });
-      this.write(' {');
+      this.writeOptionalSpace();
+      this.write('{');
       let args: Fmt.ArgumentList | undefined = undefined;
       if (definition.contents) {
         args = Object.create(Fmt.ArgumentList.prototype);
@@ -178,7 +179,7 @@ export class Writer {
       if (index) {
         this.write(',');
         if (!multiLine) {
-          this.write(' ');
+          this.writeOptionalSpace();
         }
       }
       if (multiLine) {
@@ -212,7 +213,9 @@ export class Writer {
       }
       this.writeType(parameter.type, indent);
       if (parameter.defaultValue) {
-        this.write(' = ');
+        this.writeOptionalSpace();
+        this.write('=');
+        this.writeOptionalSpace();
         this.writeExpression(parameter.defaultValue, indent);
       }
     });
@@ -251,7 +254,7 @@ export class Writer {
       if (index) {
         this.write(',');
         if (!multiLine) {
-          this.write(' ');
+          this.writeOptionalSpace();
         }
       }
       if (multiLine) {
@@ -275,14 +278,17 @@ export class Writer {
     this.writeRange(arg, false, false, false, false, () => {
       if (arg.name) {
         this.writeIdentifier(arg.name, arg, true);
-        this.write(' = ');
+        this.writeOptionalSpace();
+        this.write('=');
+        this.writeOptionalSpace();
       }
       this.writeExpression(arg.value, indent);
     });
   }
 
   writeType(type: Fmt.Type, indent?: IndentInfo): void {
-    this.write(': ');
+    this.write(':');
+    this.writeOptionalSpace();
     this.writeRange(type, false, false, false, false, () => {
       this.writeExpression(type.expression, indent);
       if (type.arrayDimensions) {
@@ -310,7 +316,7 @@ export class Writer {
       if (index) {
         this.write(',');
         if (remainingLineLength && !squeeze) {
-          this.write(' ');
+          this.writeOptionalSpace();
         }
       }
       if (maxLineLength && !remainingLineLength) {
@@ -548,6 +554,10 @@ export class Writer {
     } else if (writeSpaceIfSingleLine) {
       this.write(' ');
     }
+  }
+
+  private writeOptionalSpace(): void {
+    this.write(this.spaceStr);
   }
 
   private writeIndent(indent: IndentInfo | undefined): void {

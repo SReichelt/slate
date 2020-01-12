@@ -4,7 +4,7 @@ import * as Fmt from '../format/format';
 export interface LibraryDataAccessor {
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor;
   fetchSubsection(path: Fmt.Path): CachedPromise<LibraryDefinition>;
-  fetchItem(path: Fmt.Path): CachedPromise<LibraryDefinition>;
+  fetchItem(path: Fmt.Path, fullContentsRequired: boolean): CachedPromise<LibraryDefinition>;
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo>;
   getAbsolutePath(path: Fmt.Path): Fmt.Path;
   getRelativePath(absolutePath: Fmt.Path): Fmt.Path;
@@ -19,6 +19,7 @@ export interface LibraryDefinition {
 }
 
 export enum LibraryDefinitionState {
+  Preloaded,
   Loaded,
   Editing,
   EditingNew,

@@ -18,7 +18,7 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let logic = Logics.findLogic(contents.logic)!;
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
-  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), undefined, libraryName);
+  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), undefined, false, libraryName);
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 
@@ -29,7 +29,7 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
       promise = promise.then((currentResult: boolean) =>
-        libraryDataProvider.fetchItem(ref.path)
+        libraryDataProvider.fetchItem(ref.path, true)
           .then((itemDefinition: LibraryDefinition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
           .then((itemResult: boolean) => currentResult && itemResult));
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {

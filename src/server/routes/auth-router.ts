@@ -3,7 +3,7 @@ import * as request from 'request';
 import * as config from '../config';
 
 export function authRouter() {
-  const router = Router();
+  let router = Router();
 
   router.get('/github-auth/client-id', (req, res) => {
     if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
@@ -17,7 +17,7 @@ export function authRouter() {
     if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
       let code = req.query['code'];
       request.post(`https://github.com/login/oauth/access_token?client_id=${config.GITHUB_CLIENT_ID}&client_secret=${config.GITHUB_CLIENT_SECRET}&code=${code}`)
-        .on('error', (err) => console.log(err))
+        .on('error', (error) => console.log(error))
         .pipe(res);
     } else {
       res.sendStatus(501);

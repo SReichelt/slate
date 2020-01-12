@@ -115,6 +115,14 @@ export class Reader {
   constructor(private stream: InputStream, private reportError: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private reportRange?: RangeHandler) {}
 
   readFile(): Fmt.File {
+    let file = this.readPartialFile();
+    if (this.peekChar()) {
+      this.error('Definition or end of file expected');
+    }
+    return file;
+  }
+
+  readPartialFile(): Fmt.File {
     let fileStart = this.markStart();
     let file = new Fmt.File;
     this.readChar('%');
@@ -129,9 +137,6 @@ export class Reader {
     }
     let context = metaModel.getRootContext();
     this.readDefinitions(file.definitions, metaModel.definitionTypes, context);
-    if (this.peekChar()) {
-      this.error('Definition or end of file expected');
-    }
     this.markEnd(fileStart, file, context);
     return file;
   }
@@ -628,6 +633,16 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
+  readFileName(): string {
+    this.readChar('%');
+    this.readChar('%');
+    let fileName = '';
+    do {
+      fileName += this.readAnyChar();
+    } while (!fileName.endsWith('%%'));
+    return fileName.substring(0, fileName.length - 2);
+  }
+
   private skipWhitespace(allowComments: boolean = true): RawDocumentationItem[] | undefined {
     let result: RawDocumentationItem[] | undefined = undefined;
     let c = this.stream.peekChar();
@@ -975,8 +990,8 @@ export class Reader {
 }
 
 
-export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
-  let reportError = (msg: string, range: Range) => {
+export function getDefaultErrorHandler(fileName: string): ErrorHandler {
+  return (msg: string, range: Range) => {
     let line = range.start.line + 1;
     let col = range.start.col + 1;
     let error: any = new SyntaxError(`${fileName}:${line}:${col}: ${msg}`);
@@ -985,7 +1000,10 @@ export function readStream(stream: InputStream, fileName: string, getMetaModel: 
     error.columnNumber = col;
     throw error;
   };
-  let reader = new Reader(stream, reportError, getMetaModel, reportRange);
+}
+
+export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
+  let reader = new Reader(stream, getDefaultErrorHandler(fileName), getMetaModel, reportRange);
   return reader.readFile();
 }
 

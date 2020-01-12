@@ -180,7 +180,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
               if (itemIsSubsection) {
                 itemDefinitionPromise = innerLibraryDataProvider.fetchSubsection(itemPath, undefined, false);
               } else {
-                itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false);
+                itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false, false);
               }
               return itemDefinitionPromise.then((itemDefinition: LibraryDefinition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, itemDefinition.definition, onFilter).visible);
             } else {
@@ -413,7 +413,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
       if (props.isSubsection) {
         libraryDefinitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
       } else {
-        libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path);
+        libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path, false);
       }
       this.libraryDefinitionPromise = libraryDefinitionPromise;
 

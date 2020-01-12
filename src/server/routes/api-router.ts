@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as express from 'express';
-import { Router } from 'express';
 import * as nodemailer from 'nodemailer';
 import * as config from '../config';
 import { exec } from 'child_process';
@@ -14,12 +13,11 @@ function makeDirectories(fileName: string): void {
   }
 }
 
-export function apiRouter(): Router {
-  const router = Router();
-  const rootPath = path.join(__dirname, '..', '..', '..');
-  const dataPath = path.join(rootPath, 'data');
-  const docPath = path.join(rootPath, 'docs');
-  const fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
+export function apiRouter(rootPath: string): express.Router {
+  let router = express.Router();
+  let dataPath = path.join(rootPath, 'data');
+  let docPath = path.join(rootPath, 'docs');
+  let fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
 
   router.use(express.static(dataPath));
 
@@ -46,7 +44,7 @@ export function apiRouter(): Router {
         };
         mailTransporter.sendMail(mail, (error: any) => {
           if (error) {
-            console.log(error);
+            console.error(error);
             response.sendStatus(503);
           } else {
             response.sendStatus(202);
@@ -61,13 +59,13 @@ export function apiRouter(): Router {
         makeDirectories(fileName);
         let stream = fs.createWriteStream(fileName);
         stream.on('error', (error: any) => {
-          console.log(error);
+          console.error(error);
           response.sendStatus(400);
         });
         stream.on('close', () => response.sendStatus(200));
         request.pipe(stream);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         response.sendStatus(400);
       }
     }

@@ -22,6 +22,12 @@ export class GitHubFileAccessor extends WebFileAccessor {
     return this.config.then((config) => {
       for (let target of config.targets) {
         if (uri.startsWith(target.uriPrefix)) {
+          if (uri.endsWith('.preload')) {
+            if (target.repository.hasLocalChanges) {
+              return CachedPromise.reject();
+            }
+            break;
+          }
           let path = uri.substring(target.uriPrefix.length);
           uri = GitHub.getDownloadURL(target.repository, path);
           break;

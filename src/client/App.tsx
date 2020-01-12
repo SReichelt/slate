@@ -122,6 +122,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let selectedLibraryName = 'hlm';
 
+    let canPreload = true;
     if (this.runningLocally && !gitHubAPIAccess) {
       this.fileAccessor = new WebFileAccessor;
     } else {
@@ -169,11 +170,15 @@ class App extends React.Component<AppProps, AppState> {
         gitHubConfigPromise = CachedPromise.resolve(this.gitHubConfig);
       }
       this.fileAccessor = new GitHubFileAccessor(gitHubConfigPromise);
+      if (this.runningLocally) {
+        // When running locally, preloading always returns local files. If the user has logged in to GitHub, we don't want to bypass that.
+        canPreload = false;
+      }
     }
 
     this.logic = Logics.hlm;
     let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, undefined, 'Library');
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, undefined, canPreload, 'Library');
 
     this.updateSelectionState(state, selectionURI);
     this.state = state;
@@ -203,7 +208,7 @@ class App extends React.Component<AppProps, AppState> {
       state.selectedItemProvider = libraryDataProvider;
       state.selectedItemLocalPath = path;
     }
-    state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name);
+    state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name, true);
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
   }
 
@@ -504,6 +509,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
+    let definition = definitionPromise.getImmediateResult();
+    if (!definition || definition.state === LibraryDefinitionState.Preloaded) {
+      definitionPromise = libraryDataProvider.fetchLocalItem(path.name, true);
+    }
     this.navigate({
       selectedItemAbsolutePath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
@@ -713,7 +722,7 @@ class App extends React.Component<AppProps, AppState> {
             interactionHandler: undefined
           });
         } else {
-          oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name);
+          oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
         }
         this.setState((prevState) => {
           let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));

@@ -110,7 +110,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     let path = this.getPath(semanticLink);
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
-      let definition = parentProvider.fetchLocalItem(path.name);
+      let definition = parentProvider.fetchLocalItem(path.name, false);
       let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
         includeProofs: false,
         maxListLength: 20,

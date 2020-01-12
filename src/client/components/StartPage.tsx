@@ -76,7 +76,7 @@ function renderDefinitionExample(names: string[], props: StartPageProps, rendere
 function renderTheoremExample(names: string[], props: StartPageProps): React.ReactNode {
   let examplePath = buildExamplePath(names);
   let libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
-  let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name);
+  let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name, false);
   let expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
     let rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false

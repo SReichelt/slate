@@ -578,7 +578,7 @@ export abstract class GenericEditHandler {
         treeItem.selectedItemPath = absolutePath;
         treeItem.changed();
         if (!libraryDefinitionPromise) {
-          libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path));
+          libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path), false);
         }
         libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
           let definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);

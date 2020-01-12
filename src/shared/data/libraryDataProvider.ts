@@ -27,11 +27,12 @@ interface CanonicalPathInfo {
 export class LibraryDataProvider implements LibraryDataAccessor {
   private path?: Fmt.NamedPathItem;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
-  private definitionCache = new Map<string, CachedPromise<LibraryDefinition>>();
+  private preloadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
+  private fullyLoadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private editedDefinitions = new Map<string, LibraryDefinition>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
-  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private childName: string, private itemNumber?: number[]) {
+  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private canPreload: boolean, private childName: string, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }
@@ -73,7 +74,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           provider.itemNumber = itemNumber;
         }
       } else {
-        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this, path.name, itemNumber);
+        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this, this.canPreload, path.name, itemNumber);
         this.subsectionProviderCache.set(path.name, provider);
       }
       return provider;
@@ -216,57 +217,110 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return left.arguments.isEquivalentTo(right.arguments, unificationFn, replacedParameters);
   }
 
-  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<LibraryDefinition> {
+  private getMainDefinition(file: Fmt.File, expectedName: string): Fmt.Definition {
+    if (file.definitions.length !== 1) {
+      throw new Error('File is expected to contain exactly one definition');
+    }
+    let definition = file.definitions[0];
+    if (definition.name !== expectedName) {
+      throw new Error(`Expected name "${expectedName}" but found "${definition.name}" instead`);
+    }
+    return definition;
+  }
+
+  private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
+    return this.fileAccessor.readFile(uri)
+      .then((contents: FileContents) => {
+        contents.onChange = () => {
+          this.preloadedDefinitions.clear();
+          contents.close();
+        };
+        let stream = new FmtReader.StringInputStream(contents.text);
+        let sectionReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), FmtLibrary.getMetaModel);
+        let sectionFileName = sectionReader.readFileName();
+        if (sectionFileName !== this.getLocalSectionFileName()) {
+          throw new Error(`Unrecognized section file name "${sectionFileName}"`);
+        }
+        let sectionFile = sectionReader.readPartialFile();
+        if (stream.peekChar()) {
+          let itemReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), this.logic.getMetaModel);
+          do {
+            let itemFileName = itemReader.readFileName();
+            let itemFile = itemReader.readPartialFile();
+            this.preloadedDefinitions.set(itemFileName, CachedPromise.resolve({
+              file: itemFile,
+              definition: this.getMainDefinition(itemFile, itemFileName),
+              state: LibraryDefinitionState.Preloaded
+            }));
+          } while (stream.peekChar());
+        }
+        return {
+          file: sectionFile,
+          definition: this.getMainDefinition(sectionFile, definitionName),
+          state: LibraryDefinitionState.Preloaded
+        };
+      });
+  }
+
+  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean, tryPreloading: boolean = false): CachedPromise<LibraryDefinition> {
     let editedDefinition = this.editedDefinitions.get(name);
     if (editedDefinition) {
       return CachedPromise.resolve(editedDefinition);
     }
-    let result = this.definitionCache.get(name);
+    let result = this.fullyLoadedDefinitions.get(name);
     if (!result) {
+      if (!fullContentsRequired) {
+        let preloadedDefinition = this.preloadedDefinitions.get(name);
+        if (preloadedDefinition) {
+          return preloadedDefinition;
+        }
+      }
       let uri = this.uri + encodeURI(name) + fileExtension;
-      result = this.fileAccessor.readFile(uri)
-        .then((contents: FileContents) => {
-          contents.onChange = () => {
-            this.definitionCache.delete(name);
-            contents.close();
-          };
-          let file = FmtReader.readString(contents.text, uri, getMetaModel);
-          if (file.definitions.length !== 1) {
-            throw new Error('File is expected to contain exactly one definition');
-          }
-          let definition = file.definitions[0];
-          if (definition.name !== definitionName) {
-            throw new Error(`Expected name "${definitionName}" but found "${definition.name}" instead`);
-          }
-          return {
-            file: file,
-            definition: definition,
-            state: LibraryDefinitionState.Loaded
-          };
-        });
-      this.definitionCache.set(name, result);
+      if (tryPreloading) {
+        result = this.preloadDefinitions(uri + '.preload', definitionName)
+          .catch((error) => {
+            console.log(error);
+            return this.fetchDefinition(name, definitionName, getMetaModel, fullContentsRequired, false);
+          });
+        this.preloadedDefinitions.set(name, result);
+      } else {
+        result = this.fileAccessor.readFile(uri)
+          .then((contents: FileContents) => {
+            contents.onChange = () => {
+              this.fullyLoadedDefinitions.delete(name);
+              contents.close();
+            };
+            this.preloadedDefinitions.delete(name);
+            let file = FmtReader.readString(contents.text, uri, getMetaModel);
+            return {
+              file: file,
+              definition: this.getMainDefinition(file, definitionName),
+              state: LibraryDefinitionState.Loaded
+            };
+          });
+        this.fullyLoadedDefinitions.set(name, result);
+      }
     }
     return result;
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel);
+    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel, false, this.canPreload);
     if (prefetchContents) {
       result.then((libraryDefinition: LibraryDefinition) => {
         let contents = libraryDefinition.definition.contents;
         if (contents instanceof FmtLibrary.ObjectContents_Section) {
           let index = 0;
           for (let item of contents.items) {
-            if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
+            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.canPreload)) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
-              if (!path.parentPath && !this.definitionCache.get(path.name)) {
+              if (!path.parentPath && !this.preloadedDefinitions.get(path.name) && !this.fullyLoadedDefinitions.get(path.name)) {
                 let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
-                let prefetchQueueItem: PrefetchQueueItem = {
+                this.prefetchQueue.push({
                   path: path,
                   isSubsection: item instanceof FmtLibrary.MetaRefExpression_subsection,
                   itemNumber: itemNumber
-                };
-                this.prefetchQueue.push(prefetchQueueItem);
+                });
               }
             }
             index++;
@@ -354,13 +408,25 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return libraryDefinition;
   }
 
-  fetchLocalItem(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    return this.fetchDefinition(name, name, this.logic.getMetaModel);
+  fetchLocalItem(name: string, fullContentsRequired: boolean, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
+    let resultPromise = this.fetchDefinition(name, name, this.logic.getMetaModel, fullContentsRequired);
+    if (prefetchContents) {
+      let result = resultPromise.getImmediateResult();
+      if (result && result.state === LibraryDefinitionState.Preloaded) {
+        let path = new Fmt.Path;
+        path.name = name;
+        this.prefetchQueue.push({
+          path: path,
+          isSubsection: false
+        });
+      }
+    }
+    return resultPromise;
   }
 
-  fetchItem(path: Fmt.Path, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
+  fetchItem(path: Fmt.Path, fullContentsRequired: boolean, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     let parentProvider = this.getProviderForSection(path.parentPath);
-    return parentProvider.fetchLocalItem(path.name, prefetchContents);
+    return parentProvider.fetchLocalItem(path.name, fullContentsRequired, prefetchContents);
   }
 
   isLocalItemUpToDate(name: string, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
@@ -368,18 +434,19 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (editedItem) {
       return definitionPromise.getImmediateResult() === editedItem;
     }
-    let cachedPromise = this.definitionCache.get(name);
-    if (!cachedPromise) {
-      return false;
-    }
-    if (definitionPromise === cachedPromise) {
+    return this.definitionPromisesMatch(definitionPromise, this.preloadedDefinitions.get(name))
+           || this.definitionPromisesMatch(definitionPromise, this.fullyLoadedDefinitions.get(name));
+  }
+
+  private definitionPromisesMatch(promise1: CachedPromise<LibraryDefinition> | undefined, promise2: CachedPromise<LibraryDefinition> | undefined): boolean {
+    if (promise1 === promise2) {
       return true;
     }
-    let cachedResult = cachedPromise.getImmediateResult();
-    if (!cachedResult) {
+    if (!promise1 || !promise2) {
       return false;
     }
-    return definitionPromise.getImmediateResult() === cachedResult;
+    let promise1Result = promise1.getImmediateResult();
+    return promise1Result !== undefined && promise1Result === promise2.getImmediateResult();
   }
 
   isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
@@ -524,7 +591,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
         .then((result: WriteFileResult) => {
           editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
-          this.definitionCache.set(name, CachedPromise.resolve(editedLibraryDefinition));
+          this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(editedLibraryDefinition));
+          this.preloadedDefinitions.delete(name);
           this.editedDefinitions.delete(name);
           return result;
         });
@@ -599,7 +667,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           .then(this.prefetch)
           .catch(this.prefetch);
       } else {
-        this.fetchItem(prefetchQueueItem.path, false)
+        this.fetchItem(prefetchQueueItem.path, true)
           .then(this.prefetch)
           .catch(this.prefetch);
       }

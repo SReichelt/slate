@@ -123,7 +123,7 @@ class LibraryDocumentProvider {
                 return undefined;
             }
             library = {
-                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, false, 'Library'),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);
@@ -243,7 +243,7 @@ class SlateCodeLensProvider implements vscode.CodeLensProvider {
                     if (range.object instanceof FmtLibrary.MetaRefExpression_item && range.object.ref instanceof Fmt.DefinitionRefExpression) {
                         let ref = range.object.ref;
                         result.push(new SlateCodeLens(range.range, () => {
-                            let item = libraryDataProvider.fetchItem(ref.path);
+                            let item = libraryDataProvider.fetchItem(ref.path, false);
                             let expression = item.then((definition: LibraryDefinition) => {
                                 let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
                                 try {
@@ -303,7 +303,7 @@ class SlateLogicHoverProvider {
         let libraryDocument = this.libraryDocumentProvider.getDocument(event.document);
         if (libraryDocument && this.templates && event.object instanceof Fmt.Path && event.targetMetaModelName === libraryDocument.documentLibraryDataProvider.logic.name) {
             let targetDataProvider = libraryDocument.documentLibraryDataProvider.getProviderForSection(event.object.parentPath);
-            let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name);
+            let definitionPromise = targetDataProvider.fetchLocalItem(event.object.name, false);
             let templates = this.templates;
             let textPromise = definitionPromise.then((definition: LibraryDefinition) => {
                 let rendererOptions: Logic.LogicRendererOptions = {
