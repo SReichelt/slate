@@ -24,8 +24,10 @@ export class LibraryPreloader {
   private writeFile(name: string, file: Fmt.File): string {
     let stream = new FmtWriter.StringOutputStream;
     let writer = new FmtWriter.Writer(stream, '', '', '');
+    writer.writeIdentifier(name, file, true);
+    writer.write(' ');
     writer.writeFile(file);
-    return `%%${name}%% ${stream.str}`;
+    return stream.str;
   }
 
   private minifyContents(args: Fmt.ArgumentList): void {

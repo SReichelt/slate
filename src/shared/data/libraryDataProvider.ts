@@ -237,7 +237,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         };
         let stream = new FmtReader.StringInputStream(contents.text);
         let sectionReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), FmtLibrary.getMetaModel);
-        let sectionFileName = sectionReader.readFileName();
+        let sectionFileName = sectionReader.readIdentifier();
         if (sectionFileName !== this.getLocalSectionFileName()) {
           throw new Error(`Unrecognized section file name "${sectionFileName}"`);
         }
@@ -245,7 +245,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (stream.peekChar()) {
           let itemReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), this.logic.getMetaModel);
           do {
-            let itemFileName = itemReader.readFileName();
+            let itemFileName = itemReader.readIdentifier();
             let itemFile = itemReader.readPartialFile();
             if (!this.fullyLoadedDefinitions.has(itemFileName)) {
               this.preloadedDefinitions.set(itemFileName, CachedPromise.resolve({

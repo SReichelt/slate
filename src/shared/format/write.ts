@@ -542,12 +542,12 @@ export class Writer {
     this.writeIndent(indent);
   }
 
-  private write(str: string): void {
+  write(str: string): void {
     this.stream.write(str);
     this.lineLength += str.length;
   }
 
-  private writeNewLine(writeSpaceIfSingleLine: boolean = false): void {
+  writeNewLine(writeSpaceIfSingleLine: boolean = false): void {
     if (this.newLineStr) {
       this.stream.write(this.newLineStr);
       this.lineLength = 0;
@@ -556,7 +556,7 @@ export class Writer {
     }
   }
 
-  private writeOptionalSpace(): void {
+  writeOptionalSpace(): void {
     this.write(this.spaceStr);
   }
 

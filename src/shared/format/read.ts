@@ -633,16 +633,6 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
-  readFileName(): string {
-    this.readChar('%');
-    this.readChar('%');
-    let fileName = '';
-    do {
-      fileName += this.readAnyChar();
-    } while (!fileName.endsWith('%%'));
-    return fileName.substring(0, fileName.length - 2);
-  }
-
   private skipWhitespace(allowComments: boolean = true): RawDocumentationItem[] | undefined {
     let result: RawDocumentationItem[] | undefined = undefined;
     let c = this.stream.peekChar();
