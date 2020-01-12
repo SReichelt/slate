@@ -15,6 +15,8 @@ export class WebFileAccessor implements FileAccessor {
       request.get(uri, (error, response, body) => {
         if (error) {
           reject(error);
+        } else if (response.statusCode !== 200) {
+          reject(new Error(`The server returned status code ${response.statusCode}`));
         } else {
           resolve(body);
         }
