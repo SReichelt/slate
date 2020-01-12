@@ -27,7 +27,7 @@ class DummyUpdateChecker extends UpdateChecker {
 class GitHubUpdateChecker extends UpdateChecker {
   private currentSHA?: string;
 
-  constructor(private repositoryOwner: string, private repositoryName: string, private branch: string, private checkIntervalInMS: number) {
+  constructor(private repositoryOwner: string, private repositoryName: string, private branch: string, private checkIntervalInMS: number, private delayInMS: number) {
     super();
   }
 
@@ -46,13 +46,21 @@ class GitHubUpdateChecker extends UpdateChecker {
           let result = JSON.parse(body);
           let newSHA = result.object.sha;
           if (this.currentSHA !== newSHA) {
-            console.log(`New head of ${this.repositoryName} branch ${this.branch}: ${newSHA}`);
-            callback()
-              .catch((callbackError) => console.error(callbackError))
-              .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
+            let executeCallback = () => {
+              callback()
+                .catch((callbackError) => console.error(callbackError))
+                .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
+            };
+            if (this.currentSHA) {
+              console.log(`New head of ${this.repositoryName} branch ${this.branch}: ${newSHA}`);
+              setTimeout(executeCallback, this.delayInMS);
+            } else {
+              console.log(`Head of ${this.repositoryName} branch ${this.branch}: ${newSHA}`);
+              executeCallback();
+            }
             this.currentSHA = newSHA;
           } else {
-            console.log(`Head of ${this.repositoryName} branch ${this.branch} unchanged.`);
+            console.log(`Head of ${this.repositoryName} branch ${this.branch} unchanged: ${newSHA}`);
             setTimeout(() => this.execute(callback), this.checkIntervalInMS);
           }
         } catch (error) {
@@ -76,7 +84,7 @@ export function preloadRouter(rootPath: string): express.Router {
       let updateChecker: UpdateChecker;
       if (config.IS_PRODUCTION) {
         fileAccessor = new WebFileAccessor(`https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}`);
-        updateChecker = new GitHubUpdateChecker(repository.owner, repository.name, repository.branch, 60000);
+        updateChecker = new GitHubUpdateChecker(repository.owner, repository.name, repository.branch, 60000, 60000);
       } else {
         fileAccessor = new PhysicalFileAccessor(path.join(librariesPath, libraryName));
         updateChecker = new DummyUpdateChecker;
