@@ -247,11 +247,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           do {
             let itemFileName = itemReader.readFileName();
             let itemFile = itemReader.readPartialFile();
-            this.preloadedDefinitions.set(itemFileName, CachedPromise.resolve({
-              file: itemFile,
-              definition: this.getMainDefinition(itemFile, itemFileName),
-              state: LibraryDefinitionState.Preloaded
-            }));
+            if (!this.fullyLoadedDefinitions.has(itemFileName)) {
+              this.preloadedDefinitions.set(itemFileName, CachedPromise.resolve({
+                file: itemFile,
+                definition: this.getMainDefinition(itemFile, itemFileName),
+                state: LibraryDefinitionState.Preloaded
+              }));
+            }
           } while (stream.peekChar());
         }
         return {
