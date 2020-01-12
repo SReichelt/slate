@@ -3,7 +3,7 @@ import * as Display from '../../shared/display/display';
 import * as Dialog from '../../shared/display/dialog';
 import StandardDialog from './StandardDialog';
 import Expression, { ExpressionInteractionHandler } from './Expression';
-import EmbeddedLibraryTree from './EmbeddedLibraryTree';
+import LibraryTree from './LibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 
 interface ExpressionDialogProps {
@@ -194,7 +194,9 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
       return (
         <tr className={className}>
           <td className={'dialog-cell'} colSpan={2}>
-            <EmbeddedLibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked}/>
+            <div className={'dialog-group'}>
+              <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked}/>
+            </div>
           </td>
         </tr>
       );

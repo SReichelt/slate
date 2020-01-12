@@ -5,6 +5,7 @@ import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
+import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
@@ -21,7 +22,6 @@ export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, s
 interface LibraryTreeProps {
   libraryDataProvider: LibraryDataProvider;
   templates?: Fmt.File;
-  parentScrollPane: HTMLElement | null;
   onFilter?: OnFilter;
   selectedItemPath?: Fmt.Path;
   interactionHandler?: ExpressionInteractionHandler;
@@ -29,18 +29,27 @@ interface LibraryTreeProps {
   onInsertButtonClicked?: OnInsertButtonClicked;
 }
 
-function LibraryTree(props: LibraryTreeProps): React.ReactElement {
-  let innerProps: InnerLibraryTreeProps = {
-    ...props,
-    sectionPromise: props.libraryDataProvider.fetchLocalSection(),
-    itemNumber: [],
-    indent: 0,
-  };
-  return (
-    <div className={'tree'}>
-      {InnerLibraryTreeItems(innerProps)}
-    </div>
-  );
+class LibraryTree extends React.Component<LibraryTreeProps> {
+  private treePaneNode: HTMLElement | null;
+
+  render(): React.ReactNode {
+    let innerProps = {
+      ...this.props,
+      parentScrollPane: this.treePaneNode,
+      sectionPromise: this.props.libraryDataProvider.fetchLocalSection(),
+      itemNumber: [],
+      indent: 0,
+    };
+    return (
+      <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
+        <div className={'tree'}>
+          <div className={'tree-contents'}>
+            {InnerLibraryTreeItems(innerProps)}
+          </div>
+        </div>
+      </ScrollPane>
+    );
+  }
 }
 
 export interface LibraryItemListEntry {
@@ -55,18 +64,27 @@ interface LibraryItemListProps extends LibraryTreeProps {
   items: LibraryItemListEntry[];
 }
 
-export function LibraryItemList(props: LibraryItemListProps): React.ReactElement {
-  return (
-    <div className={'tree'}>
-      {props.items.map((entry: LibraryItemListEntry, index: number) => {
-        let selected = FmtUtils.arePathsEqual(entry.absolutePath, props.selectedItemPath);
-        return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} onFilter={props.onFilter} selected={selected} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
-      })}
-    </div>
-  );
+export class LibraryItemList extends React.Component<LibraryItemListProps> {
+  private treePaneNode: HTMLElement | null;
+
+  render(): React.ReactNode {
+    return (
+      <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
+        <div className={'tree'}>
+          <div className={'tree-contents'}>
+            {this.props.items.map((entry: LibraryItemListEntry) => {
+              let selected = FmtUtils.arePathsEqual(entry.absolutePath, this.props.selectedItemPath);
+              return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} parentScrollPane={this.treePaneNode} onFilter={this.props.onFilter} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
+            })}
+          </div>
+        </div>
+      </ScrollPane>
+    );
+  }
 }
 
 interface InnerLibraryTreeProps extends LibraryTreeProps {
+  parentScrollPane: HTMLElement | null;
   sectionPromise?: CachedPromise<LibraryDefinition>;
   libraryDefinition?: LibraryDefinition;
   innerDefinitions?: Fmt.Definition[];

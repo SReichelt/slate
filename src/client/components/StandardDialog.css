@@ -35,14 +35,15 @@
 
 .dialog-group {
   border: solid 1px gray;
-  padding: 2pt;
   margin: 0;
+  padding: 0;
 }
 
 .dialog-radio-button-group {
   display: flex;
   flex-wrap: wrap;
   width: 17em;
+  padding: 2pt;
 }
 
 .dialog-radio-button-group>* {
@@ -67,4 +68,9 @@
 .dialog input {
   font: sans-serif;
   font-size: initial;
+}
+
+.dialog .tree {
+  width: 17em;
+  height: 20em;
 }

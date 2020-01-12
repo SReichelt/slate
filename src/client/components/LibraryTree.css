@@ -1,8 +1,12 @@
 .tree {
+  user-select: none;
+  padding: 2pt;
+}
+
+.tree-contents {
   display: table;
   width: 100%;
   white-space: nowrap;
-  user-select: none;
 }
 
 .tree-item-row {

@@ -2,6 +2,7 @@ import * as React from 'react';
 import './App.css';
 import SplitPane from 'react-split-pane';
 import { withAlert, InjectedAlertProp } from 'react-alert';
+import ScrollPane from './components/ScrollPane';
 import StartPage from './components/StartPage';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
@@ -32,6 +33,9 @@ const Loading = require('react-loading-animation');
 const libraries = require('../../data/libraries/libraries.json');
 
 const librariesURIPrefix = '/libraries/';
+
+const appName = 'Slate';
+const selectedLibraryName = 'hlm';
 
 interface AppProps {
   alert: InjectedAlertProp;
@@ -73,10 +77,6 @@ class App extends React.Component<AppProps, AppState> {
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
-  private treePaneNode: HTMLElement | null = null;
-  private editListPaneNode: HTMLElement | null = null;
-  private mainContentsPaneNode: HTMLElement | null = null;
-  private extraContentsPaneNode: HTMLElement | null = null;
 
   constructor(props: AppProps) {
     super(props);
@@ -119,8 +119,6 @@ class App extends React.Component<AppProps, AppState> {
         gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
       }
     }
-
-    let selectedLibraryName = 'hlm';
 
     let canPreload = true;
     if (this.runningLocally && !gitHubAPIAccess) {
@@ -182,11 +180,11 @@ class App extends React.Component<AppProps, AppState> {
 
     this.updateSelectionState(state, selectionURI);
     this.state = state;
-    let title = this.updateTitle(state);
-
+    let title = this.getTitle(state);
     if (queryString) {
       window.history.pushState(null, title, selectionURI);
     }
+    this.setDocumentTitle(state, title);
   }
 
   private updateSelectionState(state: SelectionState, uri: string): boolean {
@@ -304,23 +302,19 @@ class App extends React.Component<AppProps, AppState> {
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
-    let editListPane = <div className={'app-pane-placeholder'} key={'EditList'} ref={(htmlNode) => (this.editListPaneNode = htmlNode)}/>;
+    let editListPane = <div className={'app-pane-placeholder'} key={'EditList'}/>;
     if (this.state.editedDefinitions.length) {
       editListPane = (
-        <div className={'app-pane'} key={'EditList'} ref={(htmlNode) => (this.editListPaneNode = htmlNode)}>
-          <div className={'app-edit-list'}>
-            <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} parentScrollPane={this.editListPaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
-          </div>
+        <div className={'app-pane'} key={'EditList'}>
+          <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
         </div>
       );
     }
     let navigationPane = (
       <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
         {editListPane}
-        <div className={'app-pane'} key={'Tree'} ref={(htmlNode) => (this.treePaneNode = htmlNode)}>
-          <div className={'app-tree'}>
-            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} parentScrollPane={this.treePaneNode} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
-          </div>
+        <div className={'app-pane'} key={'Tree'}>
+          <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
         </div>
       </SplitPane>
     );
@@ -457,10 +451,12 @@ class App extends React.Component<AppProps, AppState> {
 
     let contentsPane = (
       <div className={'bottom-toolbar-container'} key={'MainContents'}>
-        <div className={'app-pane'} ref={(htmlNode) => (this.mainContentsPaneNode = htmlNode)}>
-          <div className={'app-contents'}>
-            {mainContents}
-          </div>
+        <div className={'app-pane'}>
+          <ScrollPane object={this.state.selectedItemDefinition}>
+            <div className={'app-contents'}>
+              {mainContents}
+            </div>
+          </ScrollPane>
         </div>
         <div className={'bottom-toolbar'}>
           <div className={'left'}>
@@ -476,15 +472,15 @@ class App extends React.Component<AppProps, AppState> {
       contentsPane = (
         <SplitPane split={'horizontal'} defaultSize={defaultItemHeight} key={'Contents'}>
           {contentsPane}
-          <div className={'app-pane'} ref={(htmlNode) => (this.extraContentsPaneNode = htmlNode)}>
-            <div className={'app-contents'}>
-              {extraContents}
-            </div>
+          <div className={'app-pane'}>
+            <ScrollPane object={this.state.selectedItemDefinition}>
+              <div className={'app-contents'}>
+                {extraContents}
+              </div>
+            </ScrollPane>
           </div>
         </SplitPane>
       );
-    } else {
-      this.extraContentsPaneNode = null;
     }
 
     let openDialog: React.ReactNode = null;
@@ -537,22 +533,20 @@ class App extends React.Component<AppProps, AppState> {
     if (state.selectedItemAbsolutePath) {
       uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
-    let title = this.updateTitle(state);
+    let title = this.getTitle(state);
     window.history.pushState(null, title, uri);
-    if (this.mainContentsPaneNode) {
-      this.mainContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
-    }
-    if (this.extraContentsPaneNode) {
-      this.extraContentsPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
-    }
+    this.setDocumentTitle(state, title);
   }
 
-  private updateTitle(state: SelectionState): string {
-    let appName = 'Slate';
+  private getTitle(state: SelectionState): string {
     let title = appName;
     if (state.selectedItemAbsolutePath) {
       title = `${appName}: ${state.selectedItemAbsolutePath.name}`;
     }
+    return title;
+  }
+
+  private setDocumentTitle(state: SelectionState, title: string): void {
     document.title = title;
     if (state.selectedItemInfo) {
       state.selectedItemInfo.then((info: LibraryItemInfo) => {
@@ -561,7 +555,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       });
     }
-    return title;
   }
 
   private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
