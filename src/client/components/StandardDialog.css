@@ -37,12 +37,12 @@
   border: solid 1px gray;
   margin: 0;
   padding: 0;
+  width: 17em;
 }
 
 .dialog-radio-button-group {
   display: flex;
   flex-wrap: wrap;
-  width: 17em;
   padding: 2pt;
 }
 
@@ -70,7 +70,6 @@
   font-size: initial;
 }
 
-.dialog .tree {
-  width: 17em;
+.dialog .tree-container {
   height: 20em;
 }
