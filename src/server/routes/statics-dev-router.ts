@@ -12,7 +12,7 @@ export function staticsDevRouter(): express.Router {
     }));
 
   // Any route without a dot should render the web app html (hosted by by Webpack-dev-server)
-  router.get('*.*', (request, response) => response.sendStatus(404));
+  router.get('*.slate', (request, response) => response.sendStatus(404));
   router.use('**', proxy(
     {
       target: 'http://localhost:8080/',
