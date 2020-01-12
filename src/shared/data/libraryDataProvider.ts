@@ -430,6 +430,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           path: path,
           isSubsection: false
         });
+        this.triggerPrefetching();
       }
     }
     return resultPromise;
