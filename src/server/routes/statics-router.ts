@@ -3,7 +3,7 @@ import * as express from 'express';
 
 export function staticsRouter(rootPath: string): express.Router {
   let router = express.Router();
-  let publicPath = path.join(rootPath, 'public');
+  let publicPath = path.join(rootPath, 'dist', 'public');
 
   // All the assets are in "public" folder (Done by Webpack)
   router.use('/public', express.static(publicPath));

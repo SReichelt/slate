@@ -282,7 +282,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         result = this.preloadDefinitions(uri + '.preload', definitionName)
           .catch((error) => {
             console.log(error);
-            return this.fetchDefinition(name, definitionName, getMetaModel, fullContentsRequired, false);
+            return this.fetchDefinition(name, definitionName, getMetaModel, true, false);
           });
         this.preloadedDefinitions.set(name, result);
       } else {
