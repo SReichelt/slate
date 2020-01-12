@@ -264,7 +264,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       });
   }
 
-  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean, tryPreloading: boolean = false): CachedPromise<LibraryDefinition> {
+  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean): CachedPromise<LibraryDefinition> {
     let editedDefinition = this.editedDefinitions.get(name);
     if (editedDefinition) {
       return CachedPromise.resolve(editedDefinition);
@@ -278,13 +278,22 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         }
       }
       let uri = this.uri + encodeURI(name) + fileExtension;
-      if (tryPreloading) {
-        result = this.preloadDefinitions(uri + '.preload', definitionName)
-          .catch((error) => {
-            console.log(error);
-            return this.fetchDefinition(name, definitionName, getMetaModel, true, false);
-          });
-        this.preloadedDefinitions.set(name, result);
+      if (this.canPreload && !fullContentsRequired) {
+        if (name === this.getLocalSectionFileName() && this.canPreload && !fullContentsRequired) {
+          result = this.preloadDefinitions(uri + '.preload', definitionName)
+            .catch((error) => {
+              console.log(error);
+              return this.fetchDefinition(name, definitionName, getMetaModel, true);
+            });
+          this.preloadedDefinitions.set(name, result);
+        } else {
+          result = this.fetchLocalSection(false)
+            .then(() => this.fetchDefinition(name, definitionName, getMetaModel, fullContentsRequired))
+            .catch((error) => {
+              console.log(error);
+              return this.fetchDefinition(name, definitionName, getMetaModel, true);
+            });
+        }
       } else {
         result = this.fileAccessor.readFile(uri)
           .then((contents: FileContents) => {
@@ -307,7 +316,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel, false, this.canPreload);
+    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel, false);
     if (prefetchContents) {
       result.then((libraryDefinition: LibraryDefinition) => {
         let contents = libraryDefinition.definition.contents;
