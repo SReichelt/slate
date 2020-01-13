@@ -98,7 +98,7 @@ export class LibraryItemList extends React.Component<LibraryItemListProps> {
           <div className={'tree-contents'}>
             {this.props.items.map((entry: LibraryItemListEntry) => {
               let selected = FmtUtils.arePathsEqual(entry.absolutePath, this.props.selectedItemPath);
-              return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} parentScrollPane={this.treePaneNode} searchWords={[]} onFilter={this.props.onFilter} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
+              return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} parentScrollPane={this.treePaneNode} searchWords={[]} onFilter={this.props.onFilter} autoOpen={false} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
             })}
           </div>
         </div>
@@ -187,9 +187,19 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
         path.parentPath = parentPath;
       }
       let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
-      let searchWords = filterSearchWords(props.searchWords, [path.name, title]);
-      if (searchWords.length && !isSubsection) {
-        continue;
+      let autoOpen = false;
+      let searchWords = props.searchWords;
+      if (searchWords.length) {
+        searchWords = filterSearchWords(searchWords, [path.name, title]);
+        if (isSubsection) {
+          if (!searchWords.length) {
+            autoOpen = true;
+          }
+        } else {
+          if (searchWords.length) {
+            continue;
+          }
+        }
       }
       let selected = false;
       let selectedChildPath: Fmt.Path | undefined = undefined;
@@ -205,7 +215,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: title
       };
-      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} searchWords={searchWords} onFilter={props.onFilter} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} onInsertButtonClicked={props.onInsertButtonClicked} key={path.name} indent={props.indent} visibleSiblings={visibleItems}/>);
+      treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} searchWords={searchWords} onFilter={props.onFilter} autoOpen={autoOpen} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} onInsertButtonClicked={props.onInsertButtonClicked} key={path.name} indent={props.indent} visibleSiblings={visibleItems}/>);
     }
     index++;
   }
@@ -332,6 +342,7 @@ interface LibraryTreeItemProps extends LibraryTreeItemBaseProps {
   templates?: Fmt.File;
   searchWords: string[];
   onFilter?: OnFilter;
+  autoOpen: boolean;
   selected: boolean;
   selectedChildPath?: Fmt.Path;
   interactionHandler?: ExpressionInteractionHandler;
@@ -499,10 +510,13 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
       }
     }
+    if (this.props.autoOpen && !this.state.opened) {
+      this.setState({opened: true});
+    }
   }
 
   private updateItem(props: LibraryTreeItemProps): void {
-    if (this.state.opened) {
+    if (this.state.opened && !props.autoOpen) {
       this.setState({opened: false});
     }
 
@@ -569,7 +583,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         if (libraryDefinitionPromise) {
           libraryDefinitionPromise
             .then((libraryDefinition: LibraryDefinition) => {
-              if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
+              if (this.libraryDefinitionPromise === libraryDefinitionPromise && areSearchWordsEqual(this.props.searchWords, props.searchWords) && this.props.onFilter === props.onFilter) {
                 this.triggerFilterStateUpdate(props, libraryDefinition, libraryDefinition.definition);
               }
             })
@@ -585,7 +599,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     let libraryDefinitionPromise = this.libraryDefinitionPromise;
     let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, libraryDefinition, definition, props.searchWords, props.onFilter);
     visibilityResult.visible.then((visible: boolean) => {
-      if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
+      if (this.libraryDefinitionPromise === libraryDefinitionPromise && areSearchWordsEqual(this.props.searchWords, props.searchWords) && this.props.onFilter === props.onFilter) {
         this.setState({
           filtering: false,
           filtered: !visible
@@ -600,7 +614,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     });
     if (!props.isSubsection) {
       visibilityResult.selectable.then((selectable: boolean) => {
-        if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
+        if (this.libraryDefinitionPromise === libraryDefinitionPromise && areSearchWordsEqual(this.props.searchWords, props.searchWords) && this.props.onFilter === props.onFilter) {
           this.setState({
             clickable: selectable
           });
