@@ -231,7 +231,7 @@ class InnerLibraryTreeItems extends React.Component<InnerLibraryTreeProps> {
   private visibleItems?: Set<LibraryTreeItem>;
 
   render(): React.ReactNode {
-    if (this.props.onFilter || this.props.searchWords.length) {
+    if (this.props.searchWords.length) {
       if (!this.visibleItems) {
         this.visibleItems = new Set<LibraryTreeItem>();
       }
