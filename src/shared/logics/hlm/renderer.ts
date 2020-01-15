@@ -1569,8 +1569,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowEquiv: false,
         allowCases: true
       };
-      let items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
-      return new Display.ListExpression(items, '1.');
+      let conditions = contents.conditions;
+      let items = conditions.map((formula) => this.renderFormula(formula, formulaSelection));
+      let result: Display.RenderedExpression = new Display.ListExpression(items, '1.');
+      if (this.editHandler) {
+        let onInsertDefinition = () => conditions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+        let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+        result = new Display.ParagraphExpression([result, insertButton]);
+      }
+      return result;
     } else if (contents instanceof FmtHLM.ObjectContents_Definition) {
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
         let rows = definition.innerDefinitions.map((innerDefinition) => {
