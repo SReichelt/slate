@@ -210,6 +210,12 @@ class App extends React.Component<AppProps, AppState> {
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
   }
 
+  private createInteractionHandler(state: SelectionState): void {
+    if (state.selectedItemProvider && state.selectedItemDefinition && this.state && this.state.templates) {
+      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition, this.linkClicked);
+    }
+  }
+
   componentDidMount(): void {
     window.onpopstate = () => {
       // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
@@ -222,6 +228,7 @@ class App extends React.Component<AppProps, AppState> {
         interactionHandler: undefined
       };
       this.updateSelectionState(state, window.location.pathname);
+      this.createInteractionHandler(state);
       this.setState(state);
     };
 
@@ -525,9 +532,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private navigate(state: SelectionState): void {
-    if (this.state && this.state.templates) {
-      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider!, this.state.templates, state.selectedItemDefinition, this.linkClicked);
-    }
+    this.createInteractionHandler(state);
     this.setState(state);
     let uri = '/';
     if (state.selectedItemAbsolutePath) {
@@ -605,7 +610,7 @@ class App extends React.Component<AppProps, AppState> {
             this.forceUpdate();
           });
       } else {
-        libraryDataProvider.insertLocalSubsection(name, result.title || '')
+        libraryDataProvider.insertLocalSubsection(result.name, result.title || '')
           .then(this.cancelInsert)
           .catch((error) => {
             this.props.alert.error('Error adding section: ' + error.message);

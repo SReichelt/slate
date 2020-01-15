@@ -11,6 +11,7 @@ import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
+import CachedPromise from '../../shared/data/cachedPromise';
 
 const ToolTip = require('react-portal-tooltip').default;
 const ReactMarkdownRenderer = require('react-markdown-renderer').default;
@@ -379,18 +380,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = rows;
     } else if (expression instanceof Display.ParenExpression) {
       className += ' paren';
-      let parenExpression = expression;
-      let render = parenExpression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
-        if (surroundingParenStyle === parenExpression.style) {
-          return this.renderExpression(parenExpression.body, className, semanticLinks);
+      let render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
+        if (surroundingParenStyle === expression.style) {
+          return this.renderExpression(expression.body, className, semanticLinks);
         } else {
-          return parenExpression.body.getLineHeight().then((lineHeight: number) => {
-            let parenResult: React.ReactNode = <Expression expression={parenExpression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
+          return expression.body.getLineHeight().then((lineHeight: number) => {
+            let parenResult: React.ReactNode = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
             let handled = false;
             let openParen = '';
             let closeParen = '';
             let parenClassName = 'paren-text';
-            switch (parenExpression.style) {
+            switch (expression.style) {
             case '()':
               openParen = '(';
               closeParen = ')';
@@ -564,25 +564,24 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.InnerParenExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Display.SubSupExpression) {
-      let subSupExpression = expression;
-      let render = expression.body.getLineHeight().then((lineHeight: number) => {
-        let subSupResult: React.ReactNode[] = [<Expression expression={subSupExpression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
-        let sub: React.ReactNode = subSupExpression.sub ? <Expression expression={subSupExpression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let sup: React.ReactNode = subSupExpression.sup ? <Expression expression={subSupExpression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSub: React.ReactNode = subSupExpression.preSub ? <Expression expression={subSupExpression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSup: React.ReactNode = subSupExpression.preSup ? <Expression expression={subSupExpression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+      let renderWithLineHeight = (lineHeight?: number) => {
+        let subSupResult: React.ReactNode[] = [<Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
+        let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
-          if (sub) {
-            subSupResult.push(<sub key="sub">{sub}</sub>);
+          if (expression.sub) {
+            subSupResult.push(<sub key="sub">{renderPromise(expression.sub.getLineHeight().then((subLineHeight: number) => subLineHeight ? sub : <sub>{sub}</sub>), undefined, () => sub)}</sub>);
           }
-          if (sup) {
-            subSupResult.push(<sup key="sup">{sup}</sup>);
+          if (expression.sup) {
+            subSupResult.push(<sup key="sup">{renderPromise(expression.sup.getLineHeight().then((supLineHeight: number) => supLineHeight ? sup : <sup>{sup}</sup>), undefined, () => sup)}</sup>);
           }
-          if (preSub) {
-            subSupResult.unshift(<sub key="preSub">{preSub}</sub>);
+          if (expression.preSub) {
+            subSupResult.unshift(<sub key="preSub">{renderPromise(expression.preSub.getLineHeight().then((preSubLineHeight: number) => preSubLineHeight ? preSub : <sub>{preSub}</sub>), undefined, () => preSub)}</sub>);
           }
-          if (preSup) {
-            subSupResult.unshift(<sup key="preSup">{preSup}</sup>);
+          if (expression.preSup) {
+            subSupResult.unshift(<sup key="preSup">{renderPromise(expression.preSup.getLineHeight().then((preSupLineHeight: number) => preSupLineHeight ? preSup : <sup>{preSup}</sup>), undefined, () => preSup)}</sup>);
           }
         } else {
           let empty = <span className={'subsup-empty'} key="empty"/>;
@@ -653,8 +652,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         }
         return subSupResult;
-      });
-      result = renderPromise(render);
+      };
+      let render = expression.body.getLineHeight().then(renderWithLineHeight);
+      result = renderPromise(render, undefined, renderWithLineHeight);
     } else if (expression instanceof Display.OverUnderExpression) {
       className += ' overunder';
       let bodyWithParens = new Display.InnerParenExpression(expression.body);

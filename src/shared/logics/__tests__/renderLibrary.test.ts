@@ -22,7 +22,7 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
       };
       if (item instanceof FmtLibrary.MetaRefExpression_item) {
         let ref = item.ref as Fmt.DefinitionRefExpression;
-        let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
+        let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
         let uri = libraryDataProvider.pathToURI(ref.path);
         await checkItem(libraryDataProvider, templates, itemInfo, definition, uri);
       } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
@@ -57,6 +57,6 @@ test('render hlm library', async () => {
   let templateFileName = 'data/display/templates.slate';
   let templateFile = await fileAccessor.readFile(templateFileName);
   let templates = await FmtReader.readString(templateFile.text, templateFileName, FmtDisplay.getMetaModel);
-  let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', undefined, 'Library');
+  let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', undefined, false, 'Library');
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });

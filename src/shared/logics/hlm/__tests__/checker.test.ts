@@ -11,7 +11,7 @@ async function checkSection(libraryDataProvider: LibraryDataProvider) {
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
-      let definition = await libraryDataProvider.fetchLocalItem(ref.path.name);
+      let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
       await checkItem(libraryDataProvider, definition);
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
@@ -54,6 +54,6 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, definition: L
 test('run checker test suite', async () => {
   let fileAccessor = new PhysicalFileAccessor();
   let logic = Logics.hlm;
-  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, 'src/shared/logics/hlm/__tests__/data', undefined, 'Library');
+  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, 'src/shared/logics/hlm/__tests__/data', undefined, false, 'Library');
   await checkSection(libraryDataProvider);
 });

@@ -17,10 +17,15 @@ abstract class UpdateChecker {
   protected abstract execute(callback: () => CachedPromise<void>): void;
 }
 
-class DummyUpdateChecker extends UpdateChecker {
+class SimpleUpdateChecker extends UpdateChecker {
+  constructor(private checkIntervalInMS: number) {
+    super();
+  }
+
   protected execute(callback: () => CachedPromise<void>): void {
     callback()
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+     .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
   }
 }
 
@@ -87,7 +92,7 @@ export function preloadRouter(rootPath: string): express.Router {
         updateChecker = new GitHubUpdateChecker(repository.owner, repository.name, repository.branch, 60000, 60000);
       } else {
         fileAccessor = new PhysicalFileAccessor(path.join(librariesPath, libraryName));
-        updateChecker = new DummyUpdateChecker;
+        updateChecker = new SimpleUpdateChecker(10000);
       }
       let preloader = new LibraryPreloader(fileAccessor);
       updateChecker.register(() => {

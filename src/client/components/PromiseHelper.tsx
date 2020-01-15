@@ -6,6 +6,7 @@ const Loading = require('react-loading-animation');
 
 interface PromiseHelperProps {
   promise: CachedPromise<React.ReactNode>;
+  getFallback?: () => React.ReactNode;
 }
 
 interface PromiseHelperState {
@@ -64,16 +65,18 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
       return this.state.promiseResult;
     } else if (this.state.errorMessage) {
       return <div className={'error'}>Error: {this.state.errorMessage}</div>;
+    } else if (this.props.getFallback) {
+      return this.props.getFallback();
     } else {
       return <div className={'loading'}><Loading width={'1em'} height={'1em'}/></div>;
     }
   }
 }
 
-function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string): React.ReactElement | T {
+function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string, getFallback?: () => React.ReactNode): React.ReactElement | T {
   let immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
-    return <PromiseHelper promise={promise} key={key}/>;
+    return <PromiseHelper promise={promise} getFallback={getFallback} key={key}/>;
   } else {
     return immediateResult;
   }

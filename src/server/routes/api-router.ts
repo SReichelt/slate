@@ -28,6 +28,7 @@ export function apiRouter(rootPath: string): express.Router {
 
   router.put('/libraries/*', (request, response) => {
     let requestPath = decodeURI(request.url);
+    console.log(`Received PUT request for: ${requestPath}`);
     if (config.IS_PRODUCTION) {
       if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
         let mail: any = {

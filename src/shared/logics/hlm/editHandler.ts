@@ -734,6 +734,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
+      this.definition.type.expression = new FmtHLM.MetaRefExpression_ExplicitOperator;
       let explicitOperatorContents = new FmtHLM.ObjectContents_ExplicitOperator;
       explicitOperatorContents.definition = [new PlaceholderExpression(HLMExpressionType.ElementTerm)];
       explicitOperatorContents.properties = originalContents.properties;
@@ -760,6 +761,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
+      this.definition.type.expression = new FmtHLM.MetaRefExpression_ImplicitOperator;
       let implicitOperatorContents = new FmtHLM.ObjectContents_ImplicitOperator;
       implicitOperatorContents.parameter = parameter;
       implicitOperatorContents.definition = [new PlaceholderExpression(HLMExpressionType.Formula)];
@@ -795,6 +797,7 @@ export class HLMEditHandler extends GenericEditHandler {
   private getStandardTheoremRow(onRenderStandardIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => {
+      this.definition.type.expression = new FmtHLM.MetaRefExpression_StandardTheorem;
       let standardTheoremContents = new FmtHLM.ObjectContents_StandardTheorem;
       standardTheoremContents.claim = new PlaceholderExpression(HLMExpressionType.Formula);
       this.definition.contents = standardTheoremContents;
@@ -809,6 +812,7 @@ export class HLMEditHandler extends GenericEditHandler {
   private getEquivalenceTheoremRow(onRenderEquivalenceIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => {
+      this.definition.type.expression = new FmtHLM.MetaRefExpression_EquivalenceTheorem;
       let equivalenceTheoremContents = new FmtHLM.ObjectContents_EquivalenceTheorem;
       equivalenceTheoremContents.conditions = [new PlaceholderExpression(HLMExpressionType.Formula), new PlaceholderExpression(HLMExpressionType.Formula)];
       this.definition.contents = equivalenceTheoremContents;

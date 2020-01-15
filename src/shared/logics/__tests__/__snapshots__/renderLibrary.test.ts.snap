@@ -1426,9 +1426,9 @@ exports[`render hlm library: 1.4.27.12 data/libraries/hlm/Essentials/Functions/O
 exports[`render hlm library: 1.4.27.13.1 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/Generalized%20operations 1`] = `
 "Definition 1.4.27.13.1.  Let X be a set. We define:
 
-  𝓑𝓲𝓰𝓞𝓹(X) :=: {(e ∗ ...) | ∗ : X × X → X is a commutative associative operation on X, e ∈ X such that [∀ x ∈ X : x ∗ e = e ∗ x = x]}
+  𝓑𝓲𝓰𝓞𝓹(X) :=: {(e ∗ ⋅⋅⋅) | ∗ : X × X → X is a commutative associative operation on X, e ∈ X such that [∀ x ∈ X : x ∗ e = e ∗ x = x]}
 
-  (e ∗ ...) = (f ⋆ ...)  :⇔  ∗ = ⋆ and e = f  (∗ : X × X → X is an operation on X, e ∈ X, ⋆ : X × X → X is an operation on X, f ∈ X with suitable conditions)
+  (e ∗ ⋅⋅⋅) = (f ⋆ ⋅⋅⋅)  :⇔  ∗ = ⋆ and e = f  (∗ : X × X → X is an operation on X, e ∈ X, ⋆ : X × X → X is an operation on X, f ∈ X with suitable conditions)
 
 We write “let ⨂ be a generalized operation on X” for “let ⨂ ∈ 𝓑𝓲𝓰𝓞𝓹(X).”"
 `;
@@ -1440,13 +1440,13 @@ exports[`render hlm library: 1.4.27.13.2 data/libraries/hlm/Essentials/Functions
 
 by:
 
-  e_(e∗...) := e  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
+  e_(e∗⋅⋅⋅) := e  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.4.27.13.3 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/operation 1`] = `
 "Definition 1.4.27.13.3.  Let X be a set, ⨂ be a generalized operation on X, x, y ∈ X. We define:
 
-  x ⨂ y := x ∗ y if ⨂ = (e ∗ ...) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
+  x ⨂ y := x ∗ y if ⨂ = (e ∗ ⋅⋅⋅) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
 exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20natural%20number 1`] = `
@@ -2471,7 +2471,7 @@ References.
 exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/generalized%20sum 1`] = `
 "Definition 1.6.1.46.1.  We define:
 
-  ∑ := (0 + ...)
+  ∑ := (0 + ⋅⋅⋅)
 
 References.
 
@@ -2515,7 +2515,7 @@ No proof."
 exports[`render hlm library: 1.6.1.46.6 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/generalized%20product 1`] = `
 "Definition 1.6.1.46.6.  We define:
 
-  ∏ := (1 ⋅ ...)
+  ∏ := (1 ⋅ ⋅⋅⋅)
 
 References.
 
@@ -2605,6 +2605,8 @@ exports[`render hlm library: 1.6.1.47.3 data/libraries/hlm/Essentials/Numbers/Na
 
   ℙ := {n ∈ ℕ_(>1) : n is prime}
 
+We write “let p be a prime” for “let p ∈ ℙ.”
+
 References.
 
 * https://en.wikipedia.org/wiki/Prime_number
@@ -2628,7 +2630,7 @@ References.
 exports[`render hlm library: 1.6.1.47.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
 "Proposition 1.6.1.47.5.  Let n ∈ ℕ_(>1). Then:
 
-  ∃ p ∈ ℙ : p ∣ n
+  ∃ prime p : p ∣ n
 
 No proof."
 `;
@@ -2652,7 +2654,7 @@ Let b := a + 1.
 
 ⇒^1.6.1.13 b > 1
 
-⇒^1.6.1.47.5 ∃ p ∈ ℙ : p ∣ b
+⇒^1.6.1.47.5 ∃ prime p : p ∣ b
 
 ⇒^def p ∣ (a + 1)
 
@@ -2676,7 +2678,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.1.47.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.6.1.47.7.  Let p ∈ ℙ, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
+"Proposition 1.6.1.47.7.  Let p be a prime, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ m
   2. p ∣ m^n
@@ -2692,7 +2694,7 @@ exports[`render hlm library: 1.6.1.48 data/libraries/hlm/Essentials/Numbers/Natu
     ⇔  ∄ b ∈ ℕ_(>1) : [b ∣ m and b ∣ n]
     ⇔  Div_ℕ(m) ∩ Div_ℕ(n) ⊆ {1}
     ⇔  Div_ℕ(m) ∩ Div_ℕ(n) = {1}
-    ⇔  ∄ p ∈ ℙ : [p ∣ m and p ∣ n]
+    ⇔  ∄ prime p : [p ∣ m and p ∣ n]
 
 Equivalence.  No proof.
 
@@ -3544,7 +3546,7 @@ No proof."
 exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/Integer/Generalized%20operators/generalized%20sum 1`] = `
 "Definition 1.6.4.22.1.  We define:
 
-  ∑ := (0 + ...)
+  ∑ := (0 + ⋅⋅⋅)
 
 References.
 
@@ -3556,7 +3558,7 @@ References.
 exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/Integer/Generalized%20operators/generalized%20product 1`] = `
 "Definition 1.6.4.22.2.  We define:
 
-  ∏ := (1 ⋅ ...)
+  ∏ := (1 ⋅ ⋅⋅⋅)
 
 References.
 
@@ -3566,7 +3568,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.4.23.1 data/libraries/hlm/Essentials/Numbers/Integer/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.6.4.23.1.  Let p ∈ ℙ, a ∈ ℤ, n ∈ ℕ_+. Then the following are equivalent:
+"Proposition 1.6.4.23.1.  Let p be a prime, a ∈ ℤ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ a
   2. p ∣ a^n
@@ -3583,7 +3585,7 @@ exports[`render hlm library: 1.6.4.24 data/libraries/hlm/Essentials/Numbers/Inte
     ⇔  ∀ e ∈ ℤ_± s.t. e ∣ a and e ∣ b : |e| = 1
     ⇔  Div_ℤ(a) ∩ Div_ℤ(b) ⊆ {1, −1}
     ⇔  Div_ℤ(a) ∩ Div_ℤ(b) = {1, −1}
-    ⇔  ∄ p ∈ ℙ : [p ∣ a and p ∣ b]
+    ⇔  ∄ prime p : [p ∣ a and p ∣ b]
 
 Equivalence.  No proof.
 
@@ -3892,7 +3894,7 @@ References.
 exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Rational/Generalized%20operators/generalized%20sum 1`] = `
 "Definition 1.6.5.14.1.  We define:
 
-  ∑ := (0 + ...)
+  ∑ := (0 + ⋅⋅⋅)
 
 References.
 
@@ -3904,7 +3906,7 @@ References.
 exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Rational/Generalized%20operators/generalized%20product 1`] = `
 "Definition 1.6.5.14.2.  We define:
 
-  ∏ := (1 ⋅ ...)
+  ∏ := (1 ⋅ ⋅⋅⋅)
 
 References.
 
@@ -4238,7 +4240,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20operators/generalized%20sum 1`] = `
 "Definition 1.6.6.17.1.  We define:
 
-  ∑ := (0 + ...)
+  ∑ := (0 + ⋅⋅⋅)
 
 References.
 
@@ -4250,7 +4252,7 @@ References.
 exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20operators/generalized%20product 1`] = `
 "Definition 1.6.6.17.2.  We define:
 
-  ∏ := (1 ⋅ ...)
+  ∏ := (1 ⋅ ⋅⋅⋅)
 
 References.
 
@@ -4260,7 +4262,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.6.18 data/libraries/hlm/Essentials/Numbers/Real/Roots%20of%20primes%20are%20irrational 1`] = `
-"Theorem 1.6.6.18.  Let p ∈ ℙ, n ∈ ℕ_(>1). Then:
+"Theorem 1.6.6.18.  Let p be a prime, n ∈ ℕ_(>1). Then:
 
   n√p is irrational
 
@@ -4312,13 +4314,13 @@ Choose z := b^l ⋅ y ⋅ y.
 
 ⇒^1.6.4.23.1 p ∣ a
 
-We have ∃ q ∈ ℙ : [q ∣ a and q ∣ b]:
+We have ∃ prime q : [q ∣ a and q ∣ b]:
 
 Choose q := p.
 
 a and b are coprime
 
-⇒^def ∄ r ∈ ℙ : [r ∣ a and r ∣ b]
+⇒^def ∄ prime r : [r ∣ a and r ∣ b]
 
 References.
 
@@ -4474,7 +4476,7 @@ Well-definedness.  No proof."
 exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Complex/Generalized%20operators/generalized%20sum 1`] = `
 "Definition 1.6.7.14.1.  We define:
 
-  ∑ := (0 + ...)
+  ∑ := (0 + ⋅⋅⋅)
 
 References.
 
@@ -4486,7 +4488,7 @@ References.
 exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Complex/Generalized%20operators/generalized%20product 1`] = `
 "Definition 1.6.7.14.2.  We define:
 
-  ∏ := (1 ⋅ ...)
+  ∏ := (1 ⋅ ⋅⋅⋅)
 
 References.
 
@@ -5090,7 +5092,7 @@ exports[`render hlm library: 2.5.14 data/libraries/hlm/Algebra/Monoids/generaliz
 
 by:
 
-  ∏_[M,∗,e] := (e ∗ ...)  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+  ∏_[M,∗,e] := (e ∗ ⋅⋅⋅)  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
@@ -5403,7 +5405,7 @@ exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/generalize
 
 by:
 
-  ∏_[G,∗,e,i] := (e ∗ ...)  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  ∏_[G,∗,e,i] := (e ∗ ⋅⋅⋅)  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.7.1 data/libraries/hlm/Algebra/Semirings/Semirings 1`] = `
@@ -6713,9 +6715,22 @@ exports[`render hlm library: 2.9.4.3 data/libraries/hlm/Algebra/Fields/Examples/
 `;
 
 exports[`render hlm library: 2.9.4.4 data/libraries/hlm/Algebra/Fields/Examples/prime%20field 1`] = `
-"Definition 2.9.4.4.  Let p ∈ ℙ. We define:
+"Definition 2.9.4.4.  Let p be a prime. We define:
 
   𝔽_p := ℤ∕pℤ"
+`;
+
+exports[`render hlm library: 2.9.5.1 data/libraries/hlm/Algebra/Fields/Prime%20fields/Eulers%20criterion 1`] = `
+"Proposition 2.9.5.1 (Euler's criterion).  Let p be an odd prime, a ∈ 𝔽_p. Then the following are equivalent:
+
+  1. ∃ y ∈ 𝔽_p : y^2 = a
+  2. a^((p−1)/2) = 1_(𝔽_p)
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Euler's_criterion"
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Vector%20spaces/Vector%20spaces 1`] = `
