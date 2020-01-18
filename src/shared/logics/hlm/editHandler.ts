@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as Ctx from '../../format/context';
 import * as Edit from '../../format/edit';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
@@ -310,9 +311,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getSubsetRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
     let subsetExpression = new FmtHLM.MetaRefExpression_subset;
-    let elementType = new FmtHLM.MetaRefExpression_Element;
-    elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
-    subsetExpression.parameter = this.createParameter(elementType, 'x');
+    subsetExpression.parameter = this.createElementParameter('x', expressionEditInfo.context);
     subsetExpression.formula = new PlaceholderExpression(HLMExpressionType.Formula);
 
     let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset;
@@ -637,9 +636,7 @@ export class HLMEditHandler extends GenericEditHandler {
         arg = elementArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = new FmtHLM.ObjectContents_BindingArg;
-        let elementType = new FmtHLM.MetaRefExpression_Element;
-        elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
-        bindingArg.parameter = this.createParameter(elementType, 'i', expressionEditInfo.context);
+        bindingArg.parameter = this.createElementParameter('i', expressionEditInfo.context);
         bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
         this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
         arg = bindingArg;
@@ -675,6 +672,45 @@ export class HLMEditHandler extends GenericEditHandler {
       return dialog;
     };
     return this.getActionInsertButton(action);
+  }
+
+  getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Display.RenderedExpression {
+    let insertButton = new Display.InsertPlaceholderExpression;
+    let semanticLink = new Display.SemanticLink(insertButton, false, false);
+    semanticLink.onMenuOpened = () => {
+      let menu = new Menu.ExpressionMenu;
+      menu.rows = [this.getEmbeddingRow(definitionContents, onRenderEmbedding)];
+      return menu;
+    };
+    insertButton.semanticLinks = [semanticLink];
+    return insertButton;
+  }
+
+  private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let context = this.editAnalysis.definitionContentsContext.get(this.definition);
+    let parameter = this.createElementParameter('x', context);
+    let parameterType = parameter.type.expression as FmtHLM.MetaRefExpression_Element;
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let embedding = new FmtHLM.ObjectContents_Embedding;
+      embedding.parameter = parameter;
+      embedding.target = new PlaceholderExpression(HLMExpressionType.ElementTerm);
+      definitionContents.embedding = embedding;
+      GenericEditHandler.lastInsertedParameter = embedding.parameter;
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderEmbedding(parameterType._set);
+    item.action = action;
+    let row = new Menu.StandardExpressionMenuRow;
+    row.title = 'Embedding';
+    row.subMenu = item;
+    return row;
+  }
+
+  private createElementParameter(defaultName: string, context?: Ctx.Context): Fmt.Parameter {
+    let elementType = new FmtHLM.MetaRefExpression_Element;
+    elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
+    return this.createParameter(elementType, defaultName, context);
   }
 
   getElementTermInsertButton(parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): Display.RenderedExpression {
@@ -754,10 +790,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getImplicitDefinitionRow(onRenderImplicitIntro: RenderParameterFn): Menu.ExpressionMenuRow {
-    let elementType = new FmtHLM.MetaRefExpression_Element;
-    elementType._set = new PlaceholderExpression(HLMExpressionType.SetTerm);
     let context = this.editAnalysis.definitionContentsContext.get(this.definition);
-    let parameter = this.createParameter(elementType, 'x', context);
+    let parameter = this.createElementParameter('x', context);
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
@@ -822,5 +856,29 @@ export class HLMEditHandler extends GenericEditHandler {
     item.action = action;
     item.selected = this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem;
     return item;
+  }
+
+  createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
+    let result = new FmtHLM.ObjectContents_EqualityDefinition;
+    let leftParameters = new Fmt.ParameterList;
+    parameters.clone(leftParameters);
+    result.leftParameters = leftParameters;
+    let rightParameters = new Fmt.ParameterList;
+    parameters.clone(rightParameters);
+    this.addApostrophes(rightParameters);
+    result.rightParameters = rightParameters;
+    result.definition = [new PlaceholderExpression(HLMExpressionType.Formula)];
+    return result;
+  }
+
+  private addApostrophes(parameters: Fmt.ParameterList): void {
+    for (let param of parameters) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+        this.addApostrophes(type.parameters);
+      } else {
+        param.name += '\'';
+      }
+    }
   }
 }

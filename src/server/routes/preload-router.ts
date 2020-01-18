@@ -92,7 +92,7 @@ export function preloadRouter(rootPath: string): express.Router {
         updateChecker = new GitHubUpdateChecker(repository.owner, repository.name, repository.branch, 60000, 60000);
       } else {
         fileAccessor = new PhysicalFileAccessor(path.join(librariesPath, libraryName));
-        updateChecker = new SimpleUpdateChecker(10000);
+        updateChecker = new SimpleUpdateChecker(20000);
       }
       let preloader = new LibraryPreloader(fileAccessor);
       updateChecker.register(() => {

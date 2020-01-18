@@ -5,16 +5,16 @@ import * as FmtHLM from './meta';
 
 export class HLMEditAnalysis extends Edit.EditAnalysis {
   analyzeObjectContents(contents: Fmt.ObjectContents, context: Ctx.Context): void {
-    if (contents instanceof FmtHLM.ObjectContents_Construction) {
-      if (contents.embedding) {
-        this.analyzeParameter(contents.embedding.parameter, context);
-        this.analyzeExpression(contents.embedding.target, false, (value) => (contents.embedding!.target = value!), undefined, context);
-      }
-    } else if (contents instanceof FmtHLM.ObjectContents_Constructor) {
-      if (contents.equalityDefinition) {
-        this.analyzeExpressions(contents.equalityDefinition.definition, 1, undefined, context);
-      }
-    } else if (contents instanceof FmtHLM.ObjectContents_SetOperator || contents instanceof FmtHLM.ObjectContents_ExplicitOperator || contents instanceof FmtHLM.ObjectContents_ImplicitOperator || contents instanceof FmtHLM.ObjectContents_Predicate) {
+    if (contents instanceof FmtHLM.ObjectContents_Construction || contents instanceof FmtHLM.ObjectContents_Constructor) {
+      super.analyzeObjectContents(contents, context);
+    } else if (contents instanceof FmtHLM.ObjectContents_Embedding) {
+      this.analyzeParameter(contents.parameter, context);
+      this.analyzeExpression(contents.target, false, (value) => (contents.target = value!), undefined, context);
+    } else if (contents instanceof FmtHLM.ObjectContents_EqualityDefinition
+               || contents instanceof FmtHLM.ObjectContents_SetOperator
+               || contents instanceof FmtHLM.ObjectContents_ExplicitOperator
+               || contents instanceof FmtHLM.ObjectContents_ImplicitOperator
+               || contents instanceof FmtHLM.ObjectContents_Predicate) {
       this.analyzeExpressions(contents.definition, 1, undefined, context);
     } else if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
       this.analyzeExpression(contents.claim, false, (value) => (contents.claim = value!), undefined, context);
