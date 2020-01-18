@@ -6721,7 +6721,7 @@ exports[`render hlm library: 2.9.4.4 data/libraries/hlm/Algebra/Fields/Examples/
 `;
 
 exports[`render hlm library: 2.9.5.1 data/libraries/hlm/Algebra/Fields/Prime%20fields/Eulers%20criterion 1`] = `
-"Proposition 2.9.5.1 (Euler's criterion).  Let p be an odd prime, a ∈ 𝔽_p. Then the following are equivalent:
+"Proposition 2.9.5.1 (Euler's criterion).  Let p be an odd prime, a ∈ (𝔽_p)^×. Then the following are equivalent:
 
   1. ∃ y ∈ 𝔽_p : y^2 = a
   2. a^((p−1)/2) = 1_(𝔽_p)
