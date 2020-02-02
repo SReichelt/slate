@@ -17,7 +17,17 @@
 --   can be generated automatically when translating from HLM, but which need to be written
 --   manually otherwise. Perhaps it is possible to write Lean tactics for them.)
 --
--- Conceptually (in pseudocode), the translation is as follows:
+-- The most idiomatic translation of HLM sets to Lean would be as follows:
+-- * An HLM parameter S: Set ("let S be a set") is simply translated to S : Type*, with the
+--   intention of translating subsets as subtypes wherever applicable.
+-- * An HLM parameter T: Subset(S) ("let T ⊆ S") is translated to T : set S if S is of (HLM)
+--   type Set, or T : set (subtype S) if S if of (HLM) type Subset.
+-- * An HLM parameter x: Element(S) ("let x ∈ S") is translated to x : S if S is of (HLM) type
+--   Set, or x : subtype S if S if of (HLM) type Subset. (An alternative translation for the
+--   second case would simply be x ∈ S, which uses special Lean syntactic sugar.)
+--
+-- However, the following (pseudocode) translation more closely matches the HLM-specific
+-- concept of sets:
 -- * An HLM parameter S: Set ("let S be a set") is translated to S : Set, where
 --     structure Set := (α : Type u) (s : set α).
 --   That is, Set bundles a Lean type with a Lean set of that type.
@@ -29,7 +39,7 @@
 -- * An HLM parameter x: Element(S) ("let x ∈ S") is translated to x : Element S, where
 --     structure Element (S : {Set | Subset ?}) := (a : S.α) (is_element : a ∈ S.s).
 --   The Element structure simply bundles an element of the required type with a proof that it
---   is indeed an element of the given set.
+--   is indeed an element of the given set. Note that this is exactly the same as subtype S.s.
 --
 -- These definitions translate the type system of HLM, in the sense that a translated
 -- expression is well-typed in Lean if and only if the original expression is well-typed in
@@ -69,7 +79,7 @@ def make_base_type (α : Type u) (equality : α → α → Prop) (is_equivalence
 def base_class_of {base_type : BaseType} (x : base_type.α) := ⟦x⟧
 def base_equals {base_type : BaseType} (x y : base_type.α) := x ≈ y
 
-@[refl] lemma base_refl {base_type : BaseType} (x : base_type.α) : x ≈ x := setoid.refl x
+@[refl] lemma base_refl {base_type : BaseType} (x : base_type.α) : base_equals x x := setoid.refl x
 @[symm] lemma base_symm {base_type : BaseType} {x y : base_type.α} (h1 : base_equals x y) : base_equals y x := setoid.symm h1
 @[trans] lemma base_trans {base_type : BaseType} {x y z : base_type.α} (h1 : base_equals x y) (h2 : base_equals y z) : base_equals x z := setoid.trans h1 h2
 
@@ -100,34 +110,38 @@ base_equals x.element y.element
 class has_base_type (H : Sort v) := (base_type : H → BaseType)
 class has_base_set (H : Sort v) extends has_base_type H := (base_set : Π S : H, BaseSet (has_base_type.base_type S))
 
-def lean_type_of {H : Sort v} [has_base_type H] (S : H) := (has_base_type.base_type S).α
+def lean_type_of {H : Sort v} [h : has_base_type H] (S : H) := (has_base_type.base_type S).α
 def lean_set_of {H : Sort v} [has_base_set H] (S : H) := (has_base_set.base_set S).lean_set
 
 -- The coercions do not seem to work within definitions, even with ↑. Need to figure out why.
 -- However, they seem to be used implicitly in proofs, as can be seen by commenting them out.
 
 structure Set := (base_type : BaseType) (base_set : BaseSet base_type)
-instance Set_has_base_type : has_base_type Set := ⟨λ S, S.base_type⟩
-instance Set_has_base_set : has_base_set Set := ⟨λ S, S.base_set⟩
+instance Set_has_base_type : has_base_type Set := ⟨Set.base_type⟩
+instance Set_has_base_set : has_base_set Set := ⟨Set.base_set⟩
 def make_set (base_type : BaseType) (base_set : BaseSet base_type) := Set.mk base_type base_set
 def lean_type_to_set (α : Type u) := Set.mk (lean_type_to_base_type α) universal_base_set
+instance Lean_Type_to_Set : has_coe (Type u) Set := ⟨lean_type_to_set⟩
 def lean_type_to_set_with_equality (α : Type u) (equality : α → α → Prop) (is_equivalence : equivalence equality) := Set.mk (make_base_type α equality is_equivalence) universal_base_set
+def lean_setoid_to_set (α : Type u) [h : setoid α] := Set.mk (BaseType.mk α h) universal_base_set
 def lean_set_to_set {α : Type u} (lean_set : set α) := Set.mk (lean_type_to_base_type α) (lean_set_to_base_set lean_set)
+instance Lean_Set_to_Set {α : Type u} : has_coe (set α) Set := ⟨lean_set_to_set⟩
 
 structure Subset {H : Sort v} [has_base_set H] (S : H) := (base_set : BaseSet (has_base_type.base_type S)) (is_subset : base_set.lean_set ⊆ lean_set_of S)
 instance Subset_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Subset S) := ⟨λ _, has_base_type.base_type S⟩
-instance Subset_has_base_set {H : Sort v} [has_base_set H] {S : H} : has_base_set (Subset S) := ⟨λ T, T.base_set⟩
+instance Subset_has_base_set {H : Sort v} [has_base_set H] {S : H} : has_base_set (Subset S) := ⟨Subset.base_set⟩
 def make_subset {H : Sort v} [h : has_base_set H] (S : H) (lean_set : set (lean_type_of S)) (is_subset : lean_set ⊆ lean_set_of S) (respects_equality : lean_set_respects_equality (has_base_type.base_type S) lean_set) : Subset S := @Subset.mk H h S (BaseSet.mk lean_set respects_equality) is_subset
 def subset_to_set {H : Sort v} [has_base_set H] {S : H} (T : Subset S) := make_set (has_base_type.base_type S) T.base_set
 instance Subset_to_Set {H : Sort v} [has_base_set H] {S : H} : has_coe (Subset S) Set := ⟨subset_to_set⟩
-def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S') : Subset S := Subset.mk T.base_set (λ x h, S'.is_subset (T.is_subset h))
+def subset_to_superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} (T : Subset S') : Subset S := Subset.mk T.base_set (λ _ h, S'.is_subset (T.is_subset h))
 instance Subset_to_Superset {H : Sort v} [has_base_set H] {S : H} {S' : Subset S} : has_coe (Subset S') (Subset S) := ⟨subset_to_superset⟩
-def set_to_subset (S : Set) : Subset S := Subset.mk S.base_set (λ x, id)
+def set_to_subset (S : Set) : Subset S := Subset.mk S.base_set (λ _, id)
 
 def Element {H : Sort v} [has_base_set H] (S : H) := BaseElement (has_base_set.base_set S)
 instance Element_has_base_type {H : Sort v} [has_base_set H] {S : H} : has_base_type (Element S) := ⟨λ _, has_base_type.base_type S⟩
 instance Element_is_setoid {H : Sort v} [has_base_set H] {S : H} : setoid (Element S) := setoid.mk (λ x y, equals x y) ⟨refl, λ _ _, symm, λ _ _ _, trans⟩
 def make_element {H : Sort v} [h : has_base_set H] (S : H) (element : lean_type_of S) (is_element : element ∈ lean_set_of S) : Element S := make_base_element (has_base_set.base_set S) element is_element
+instance Lean_Object_to_Element {α : Type u} : has_coe α (Element (lean_type_to_set α)) := ⟨λ x, make_element _ x trivial⟩
 
 def eliminate_subset_to_set {H : Sort v} [has_base_set H] {S : H} {T : Subset S} (x : Element (subset_to_set T)) :=
 make_element T x.element x.is_element
@@ -135,7 +149,7 @@ instance Eliminate_subset_to_set {H : Sort v} [has_base_set H] {S : H} {T : Subs
 
 def superset_element {H : Sort v} [has_base_set H] (S : H) {T : Subset S} (x : Element T) :=
 make_element S x.element (T.is_subset x.is_element)
-instance Superset_element {H : Sort v} [has_base_set H] {S : H} {T : Subset S} : has_coe (Element T) (Element S) := ⟨λ x, superset_element S x⟩
+instance Superset_element {H : Sort v} [has_base_set H] {S : H} {T : Subset S} : has_coe (Element T) (Element S) := ⟨superset_element S⟩
 
 def is_element {H : Sort v} [has_base_set H] {S : H} {x_base_set : BaseSet (has_base_type.base_type S)} (x : BaseElement x_base_set) (T : Subset S) :=
 x.element ∈ T.base_set.lean_set
@@ -219,6 +233,11 @@ theorem unique_elements_equality {H : Sort v} [has_base_set H] {S : H} (desc : u
   symmetry, exact unique_element_equality desc y h2
 end
 
+class has_embedding (S : Set) (T : Set) :=
+(f : Element S → Element T) (is_well_defined : ∀ x y : Element S, x ≈ y ↔ f x ≈ f y)
+
+instance embed (S : Set) (T : Set) [h : has_embedding S T] : has_coe (Element S) (Element T) := ⟨h.f⟩
+
 end hlm
 
 
@@ -262,8 +281,72 @@ end
 def Natural_numbers :=
 lean_type_to_set ℕ
 
+def Natural_numbers_zero :=
+make_element Natural_numbers nat.zero trivial
+
+def Natural_numbers_sum (m n : Element Natural_numbers) :=
+make_element Natural_numbers (nat.add m.element n.element) trivial
+
+theorem Natural_numbers_sum_respects_equality_m (m1 m2 : Element Natural_numbers) (h : m1 ≈ m2) (n : Element Natural_numbers) :
+Natural_numbers_sum m1 n ≈ Natural_numbers_sum m2 n := begin
+  have h1 : m1.element = m2.element, from h,
+  unfold Natural_numbers_sum,
+  rewrite h1
+end
+
+theorem Natural_numbers_sum_respects_equality_n (m n1 n2 : Element Natural_numbers) (h : n1 ≈ n2) :
+Natural_numbers_sum m n1 ≈ Natural_numbers_sum m n2 := begin
+  have h1 : n1.element = n2.element, from h,
+  unfold Natural_numbers_sum,
+  rewrite h1
+end
+
+theorem Natural_numbers_sum_associative (k m n : Element Natural_numbers) :
+Natural_numbers_sum (Natural_numbers_sum k m) n ≈ Natural_numbers_sum k (Natural_numbers_sum m n) :=
+nat.add_assoc k.element m.element n.element
+
+theorem Natural_numbers_sum_commutative (m n : Element Natural_numbers) :
+Natural_numbers_sum m n ≈ Natural_numbers_sum n m :=
+nat.add_comm m.element n.element
+
+theorem Natural_numbers_sum_right_cancel (k m n : Element Natural_numbers) :
+Natural_numbers_sum k n ≈ Natural_numbers_sum m n → k ≈ m :=
+nat.add_right_cancel
+
+def Natural_numbers_less (m n : Element Natural_numbers) :=
+nat.lt m.element n.element
+
 def Initial_segment (n : Element Natural_numbers) :=
-subset {m : Element Natural_numbers | nat.lt m.element n.element} trivially_respects_equality
+subset {m : Element Natural_numbers | Natural_numbers_less m n} trivially_respects_equality
+
+structure Integers_Struct :=
+difference :: (n m : Element Natural_numbers)
+instance Integers_setoid : setoid Integers_Struct := setoid.mk (λ a b : Integers_Struct, Natural_numbers_sum a.n b.m ≈ Natural_numbers_sum a.m b.n) (begin
+  split,
+  { intro a,
+    exact Natural_numbers_sum_commutative a.n a.m },
+  split,
+  { intros a b h1,
+    symmetry,
+    transitivity Natural_numbers_sum a.n b.m,
+    exact Natural_numbers_sum_commutative b.m a.n,
+    transitivity Natural_numbers_sum a.m b.n,
+    exact h1,
+    exact Natural_numbers_sum_commutative a.m b.n },
+  { intros a b c h1 h2,
+    have h3 : Natural_numbers_sum (Natural_numbers_sum a.n c.m) b.n ≈ Natural_numbers_sum (Natural_numbers_sum a.m c.n) b.n, begin
+      transitivity Natural_numbers_sum (Natural_numbers_sum a.n c.n) b.m,
+      sorry,  -- rewrite using h1, associativity, commutativity
+      sorry   -- rewrite using h2, associativity, commutativity
+    end,
+    exact Natural_numbers_sum_right_cancel (Natural_numbers_sum a.n c.m) (Natural_numbers_sum a.m c.n) b.n h3 }
+end)
+
+def Integers :=
+lean_setoid_to_set Integers_Struct
+
+instance Integers_embedding : has_embedding Natural_numbers Integers :=
+⟨(λ n : Element Natural_numbers, make_element Integers (Integers_Struct.difference n Natural_numbers_zero) trivial), sorry⟩
 
 def Functions (X Y : Set) :=
 let base_type := make_base_type (Element X → Element Y) (λ f g : Element X → Element Y, ∀ x : Element X, f x ≈ g x) (begin
@@ -522,5 +605,5 @@ end)
 def Carrier (k : Element Cardinal_numbers) :=
 k.element
 
-def Homomorphisms (k j : Element Cardinal_numbers) :=
-Functions (Carrier k) (Carrier j)
+def Homomorphisms (k l : Element Cardinal_numbers) :=
+Functions (Carrier k) (Carrier l)

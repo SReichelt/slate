@@ -18,11 +18,20 @@ export interface HLMSubstitutionContext {
 }
 
 export interface HLMTypeSearchParameters {
+  followDefinitions: boolean;
   followEmbeddings: boolean;
   resolveConstructionArguments: boolean;
   extractStructuralCasesFromConstructionArguments: boolean;
   inTypeCast: boolean;
 }
+
+const eliminateVariablesOnly: HLMTypeSearchParameters = {
+  followDefinitions: false,
+  followEmbeddings: false,
+  resolveConstructionArguments: false,
+  extractStructuralCasesFromConstructionArguments: false,
+  inTypeCast: false
+};
 
 export class HLMUtils extends GenericUtils {
   getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
@@ -181,6 +190,16 @@ export class HLMUtils extends GenericUtils {
       return result;
     });
     return resultPromise;
+  }
+
+  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
+    return expression.substitute((subExpression: Fmt.Expression) => {
+      if (subExpression === originalExpression) {
+        return substitutedExpression;
+      } else {
+        return subExpression;
+      }
+    });
   }
 
   substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
@@ -557,12 +576,15 @@ export class HLMUtils extends GenericUtils {
         return CachedPromise.reject(new Error('Set variable expected'));
       }
     } else if (term instanceof Fmt.DefinitionRefExpression) {
+      if (!typeSearchParameters.followDefinitions) {
+        return CachedPromise.resolve(undefined);
+      }
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression | undefined | CachedPromise<Fmt.Expression | undefined> => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
           if (typeSearchParameters.followEmbeddings && definition.contents.embedding) {
             let type = definition.contents.embedding.parameter.type.expression;
             if (type instanceof FmtHLM.MetaRefExpression_Element) {
-              return this.substitutePath(type._set, term.path, [definition]);
+              return this.followSetTermWithPath(type._set, term.path, definition);
             } else {
               return CachedPromise.reject(new Error('Element parameter expected'));
             }
@@ -573,17 +595,20 @@ export class HLMUtils extends GenericUtils {
           let definitionList = definition.contents.definition;
           if (definitionList.length) {
             let item = definitionList[0];
-            return this.substitutePath(item, term.path, [definition]);
+            return this.followSetTermWithPath(item, term.path, definition);
           }
         }
         return undefined;
       });
     } else if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       if (term.terms && term.terms.length) {
-        return this.getDeclaredSet(term.terms[0]);
-      } else {
-        return CachedPromise.resolve(undefined);
+        for (let element of term.terms) {
+          if (!(element instanceof Fmt.PlaceholderExpression)) {
+            return this.getDeclaredSet(element);
+          }
+        }
       }
+      return CachedPromise.resolve(undefined);
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       let type = term.parameter.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
@@ -638,6 +663,8 @@ export class HLMUtils extends GenericUtils {
       return resultPromise;
     } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
       return CachedPromise.resolve(term.term);
+    } else if (term instanceof Fmt.PlaceholderExpression) {
+      return CachedPromise.resolve(undefined);
     } else {
       return CachedPromise.reject(new Error('Set term expected'));
     }
@@ -836,14 +863,14 @@ export class HLMUtils extends GenericUtils {
             if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
               if (definition.contents.definition.length) {
                 let item = definition.contents.definition[0];
-                return this.getDeclaredSetInternal(this.substitutePath(item, path, [definition]), visitedDefinitions);
+                return this.getFinalSetWithPath(item, path, definition);
               } else {
                 return this.getWildcardFinalSet();
               }
             } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
               let type = definition.contents.parameter.type.expression;
               if (type instanceof FmtHLM.MetaRefExpression_Element) {
-                return CachedPromise.resolve(this.substitutePath(type._set, path, [definition]));
+                return this.followSetTermWithPath(type._set, path, definition);
               } else {
                 return CachedPromise.reject(new Error('Element parameter expected'));
               }
@@ -881,6 +908,10 @@ export class HLMUtils extends GenericUtils {
         return CachedPromise.resolve(term._set);
       } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
         term = term.term;
+      } else if (term instanceof Fmt.PlaceholderExpression) {
+        let result = new FmtHLM.MetaRefExpression_enumeration;
+        result.terms = [term];
+        return CachedPromise.resolve(result);
       } else {
         return CachedPromise.reject(new Error('Element term expected'));
       }
@@ -888,7 +919,28 @@ export class HLMUtils extends GenericUtils {
   }
 
   getFinalSet(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression> {
-    return this.getDeclaredSet(term).then((set: Fmt.Expression) => this.getFinalSuperset(set, typeSearchParameters));
+    return this.getFinalSetInternal(term, typeSearchParameters, []);
+  }
+
+  private getFinalSetInternal(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
+    return this.getDeclaredSetInternal(term, visitedDefinitions).then((set: Fmt.Expression) => this.getFinalSupersetInternal(set, typeSearchParameters, visitedDefinitions));
+  }
+
+  private getTargetUtils(path: Fmt.Path, definition: Fmt.Definition): HLMUtils {
+    let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(path.parentPath);
+    return new HLMUtils(definition, libraryDataAccessor);
+  }
+
+  private followSetTermWithPath(term: Fmt.Expression, path: Fmt.Path, definition: Fmt.Definition): CachedPromise<Fmt.Expression> {
+    let targetUtils = this.getTargetUtils(path, definition);
+    return targetUtils.getFinalSuperset(term, eliminateVariablesOnly)
+      .then((finalSet: Fmt.Expression) => this.substitutePath(finalSet, path, [definition]));
+  }
+
+  private getFinalSetWithPath(term: Fmt.Expression, path: Fmt.Path, definition: Fmt.Definition): CachedPromise<Fmt.Expression> {
+    let targetUtils = this.getTargetUtils(path, definition);
+    return targetUtils.getFinalSet(term, eliminateVariablesOnly)
+      .then((finalSet: Fmt.Expression) => this.substitutePath(finalSet, path, [definition]));
   }
 
   getWildcardFinalSet(): Fmt.Expression {

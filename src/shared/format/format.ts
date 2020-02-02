@@ -850,6 +850,25 @@ export class ArrayExpression extends Expression {
   }
 }
 
+export class PlaceholderExpression extends Expression {
+  constructor(public placeholderType: any) {
+    super();
+  }
+
+  substitute(fn: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression {
+    if (fn) {
+      return fn(this);
+    } else {
+      return new PlaceholderExpression(this.placeholderType);
+    }
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
+    // Don't identify different placeholders.
+    return false;
+  }
+}
+
 export class DocumentationComment {
   items: DocumentationItem[];
 
@@ -922,7 +941,7 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
 
 function writeToString(doWrite: (writer: FmtWriter.Writer) => void): string {
   let stream = new FmtWriter.StringOutputStream;
-  let writer = new FmtWriter.Writer(stream, '', '');
+  let writer = new FmtWriter.Writer(stream, true, '', '');
   doWrite(writer);
   return stream.str;
 }

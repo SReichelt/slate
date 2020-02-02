@@ -1,16 +1,21 @@
 import * as Display from './display';
 import * as Dialog from './dialog';
+import CachedPromise from '../data/cachedPromise';
 
 export abstract class ExpressionMenuBase {
   abstract isSelected(): boolean;
 }
 
 export class ExpressionMenu extends ExpressionMenuBase {
-  rows: ExpressionMenuRow[];
+  rows: CachedPromise<ExpressionMenuRow[]>;
   variable: boolean = false;
 
   isSelected(): boolean {
-    return this.rows.some((row) => row.isSelected());
+    let rows = this.rows.getImmediateResult();
+    if (rows && rows.some((row) => row.selected)) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -32,11 +37,18 @@ export class ExpressionMenuItem extends ExpressionMenuCell {
 }
 
 export class ExpressionMenuItemList extends ExpressionMenuRow {
-  items: ExpressionMenuItem[];
+  items: CachedPromise<ExpressionMenuItem[]>;
   variable: boolean = false;
 
   isSelected(): boolean {
-    return super.isSelected() || this.items.some((item) => item.selected);
+    if (super.isSelected()) {
+      return true;
+    }
+    let items = this.items.getImmediateResult();
+    if (items && items.some((item) => item.selected)) {
+      return true;
+    }
+    return false;
   }
 }
 

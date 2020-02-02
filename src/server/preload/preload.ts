@@ -23,7 +23,7 @@ export class LibraryPreloader {
 
   private writeFile(name: string, file: Fmt.File): string {
     let stream = new FmtWriter.StringOutputStream;
-    let writer = new FmtWriter.Writer(stream, '', '', '');
+    let writer = new FmtWriter.Writer(stream, false, '', '', '');
     writer.writeIdentifier(name, file, true);
     writer.write(' ');
     writer.writeFile(file);

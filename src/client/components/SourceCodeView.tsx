@@ -44,7 +44,7 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
   render(): React.ReactNode {
     let render = this.props.definition.then((definition: LibraryDefinition) => {
       let stream = new SourceCodeDisplay.SourceCodeStream;
-      let writer = new FmtWriter.Writer(stream);
+      let writer = new FmtWriter.Writer(stream, true);
       let indent = {
         indent: '',
         outerIndent: ''

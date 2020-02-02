@@ -7,7 +7,7 @@ import { findBestMatch } from '../generic/displayMatching';
 import * as Display from '../../display/display';
 import { HLMExpressionType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
-import { PlaceholderExpression, GenericEditHandler } from '../generic/editHandler';
+import { GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
@@ -970,8 +970,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let negationCount = 0;
     while (formula instanceof FmtHLM.MetaRefExpression_not) {
       let innerFormula = formula.formula;
-      if ((innerFormula instanceof FmtHLM.MetaRefExpression_setEquals || innerFormula instanceof FmtHLM.MetaRefExpression_equals)
-          && innerFormula.terms.length !== 2) {
+      if (innerFormula instanceof Fmt.VariableRefExpression
+          || innerFormula instanceof Fmt.PlaceholderExpression
+          || ((innerFormula instanceof FmtHLM.MetaRefExpression_setEquals || innerFormula instanceof FmtHLM.MetaRefExpression_equals)
+              && innerFormula.terms.length !== 2)) {
         break;
       }
       negationCount++;
@@ -1139,7 +1141,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     };
     let termDisplay = this.renderElementTerm(term, termSelection);
     let rows: Display.RenderedExpression[][];
-    if (construction instanceof PlaceholderExpression) {
+    if (construction instanceof Fmt.PlaceholderExpression) {
       let formula = this.renderTemplate('EqualityRelation', {
                                           'left': termDisplay,
                                           'right': new Display.TextExpression('…')
@@ -1220,7 +1222,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return new Display.PromiseExpression(expressionPromise);
     } else if (expression instanceof FmtHLM.MetaRefExpression_previous) {
       return new Display.TextExpression('…');
-    } else if (expression instanceof PlaceholderExpression) {
+    } else if (expression instanceof Fmt.PlaceholderExpression) {
       return new Display.PlaceholderExpression(expression.placeholderType);
     } else {
       return new Display.ErrorExpression('Unknown expression type');
@@ -1576,7 +1578,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let items = conditions.map((formula) => this.renderFormula(formula, formulaSelection));
       let result: Display.RenderedExpression = new Display.ListExpression(items, '1.');
       if (this.editHandler) {
-        let onInsertDefinition = () => conditions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+        let onInsertDefinition = () => conditions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
         let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
         result = new Display.ParagraphExpression([result, insertButton]);
       }
@@ -1615,12 +1617,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
           let definitions = contents.definition;
           let renderRightSide = (term: Fmt.Expression) => this.renderSetTerm(term, fullSetTermSelection);
-          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.SetTerm));
+          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
           return this.renderMultiDefinitions('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
           let definitions = contents.definition;
           let renderRightSide = (term: Fmt.Expression) => this.renderElementTerm(term, fullElementTermSelection);
-          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.ElementTerm));
+          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
           return this.renderMultiDefinitionsWithSpecializations('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           let parameter = this.renderVariable(contents.parameter);
@@ -1636,7 +1638,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             allowCases: true
           };
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
           return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
           let definitions = contents.definition;
@@ -1646,7 +1648,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             allowCases: true
           };
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
           return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else {
           return new Display.EmptyExpression;
@@ -2005,7 +2007,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             caseParameters: parameters,
             definitions: definitions
           };
-          let onInsertDefinition = () => definitions.push(new PlaceholderExpression(HLMExpressionType.Formula));
+          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
           let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3, onInsertDefinition);
           paragraphs.push(equivalenceDef);
           if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {

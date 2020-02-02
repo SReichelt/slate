@@ -2,8 +2,12 @@ import * as React from 'react';
 import './ExpressionMenu.css';
 import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
+import renderPromise from './PromiseHelper';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
+import CachedPromise from '../../shared/data/cachedPromise';
+
+const Loading = require('react-loading-animation');
 
 const clickDelay = 100;
 
@@ -27,44 +31,48 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
   }
 
   render(): React.ReactNode {
-    let rows = [];
-    let index = 0;
-    let separated = false;
-    for (let row of this.props.menu.rows) {
-      if (row instanceof Menu.ExpressionMenuSeparator) {
-        if (index) {
-          separated = true;
+    let contentPromise = this.props.menu.rows.then((menuRows: Menu.ExpressionMenuRow[]) => {
+      let rows = [];
+      let index = 0;
+      let separated = false;
+      for (let row of menuRows) {
+        if (row instanceof Menu.ExpressionMenuSeparator) {
+          if (index) {
+            separated = true;
+          }
+        } else {
+          let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
+          let hoveredExternally = this.props.hoveredExternally && index === 0;
+          let subMenuOpen = (this.state.openSubMenu === row);
+          rows.push(<ExpressionMenuRow row={row} separated={separated} key={index++} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler}/>);
+          separated = false;
         }
-      } else {
-        let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
-        let hoveredExternally = this.props.hoveredExternally && index === 0;
-        let subMenuOpen = (this.state.openSubMenu === row);
-        rows.push(<ExpressionMenuRow row={row} separated={separated} key={index++} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler}/>);
-        separated = false;
       }
-    }
-    let className = 'open-menu';
-    if (this.props.menu.variable) {
-      className += ' variable';
-    }
-    let ref = (htmlNode: HTMLDivElement | null) => {
-      if (htmlNode && !this.scrolled) {
-        this.scrolled = true;
-        htmlNode.scrollIntoView({
-          block: 'end',
-          inline: 'end'
-        });
+      let className = 'open-menu';
+      if (this.props.menu.variable) {
+        className += ' variable';
       }
-    };
-    return (
-      <div className={className} ref={ref}>
-        <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>
-      </div>
-    );
+      let ref = (htmlNode: HTMLDivElement | null) => {
+        if (htmlNode && !this.scrolled) {
+          this.scrolled = true;
+          htmlNode.scrollIntoView({
+            block: 'end',
+            inline: 'end'
+          });
+        }
+      };
+      return (
+        <div className={className} ref={ref}>
+          <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
+            <tbody>
+              {rows}
+            </tbody>
+          </table>
+        </div>
+      );
+    });
+
+    return renderPromise(contentPromise);
   }
 }
 
@@ -114,150 +122,172 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
   }
 
   render(): React.ReactNode {
-    let cells: React.ReactNode = null;
+    let cellsPromise: CachedPromise<React.ReactNode> = CachedPromise.resolve(null);
     let row = this.props.row;
     if (row instanceof Menu.ExpressionMenuItem) {
-      cells = <ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally} interactionHandler={this.props.interactionHandler}/>;
+      cellsPromise = CachedPromise.resolve(<ExpressionMenuItem item={row} colSpan={2} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} hoveredExternally={this.props.hoveredExternally} interactionHandler={this.props.interactionHandler}/>);
     } else if (row instanceof Menu.ExpressionMenuItemList) {
-      cells = row.items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} interactionHandler={this.props.interactionHandler}/>);
+      cellsPromise = row.items.then((items: Menu.ExpressionMenuItem[]) => {
+        if (items.length) {
+          return items.map((item: Menu.ExpressionMenuItem, index: number) => <ExpressionMenuItem item={item} key={index} onItemClicked={this.props.onItemClicked} onEnter={this.props.onEnter} onLeave={this.props.onLeave} interactionHandler={this.props.interactionHandler}/>);
+        } else {
+          return null;
+        }
+      });
     } else if (row instanceof Menu.StandardExpressionMenuRow) {
-      let contentCell: React.ReactNode = null;
-      let onClick = undefined;
-      let titleAction = row.titleAction;
-      let itemHovered = this.props.hoveredExternally || (this.state.titleHovered && !row.titleAction);
-      let subMenuMainRow: Menu.ExpressionMenuRow | undefined = undefined;
-      if (row.previewSubMenu) {
-        if (row.subMenu instanceof Menu.ExpressionMenu && row.subMenu.rows.length) {
-          subMenuMainRow = row.subMenu.rows[0];
-          for (let subMenuRow of row.subMenu.rows) {
-            if (subMenuRow.isSelected()) {
-              subMenuMainRow = subMenuRow;
+      let standardRow = row;
+      let subMenuRowsPromise = row.subMenu instanceof Menu.ExpressionMenu ? row.subMenu.rows : CachedPromise.resolve([]);
+      cellsPromise = subMenuRowsPromise.then((subMenuRows: Menu.ExpressionMenuRow[]) => {
+        let contentCell: React.ReactNode = null;
+        let onClick = undefined;
+        let titleAction = standardRow.titleAction;
+        let itemHovered = this.props.hoveredExternally || (this.state.titleHovered && !standardRow.titleAction);
+        let subMenuMainRow: Menu.ExpressionMenuRow | undefined = undefined;
+        if (standardRow.previewSubMenu) {
+          if (standardRow.subMenu instanceof Menu.ExpressionMenu && subMenuRows.length) {
+            subMenuMainRow = subMenuRows[0];
+            for (let subMenuRow of subMenuRows) {
+              if (subMenuRow.isSelected()) {
+                subMenuMainRow = subMenuRow;
+                break;
+              }
+            }
+          } else if (standardRow.subMenu instanceof Menu.ExpressionMenuRow) {
+            subMenuMainRow = standardRow.subMenu;
+          }
+          if (subMenuMainRow) {
+            let onEnter = () => {
+              this.setState({contentsHovered: true});
+              if (this.props.onEnter) {
+                this.props.onEnter(false);
+              }
+            };
+            let onLeave = () => {
+              this.setState({contentsHovered: false});
+              if (this.props.onLeave) {
+                this.props.onLeave();
+              }
+            };
+            if (subMenuMainRow instanceof Menu.ExpressionMenuItem) {
+              contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered} interactionHandler={this.props.interactionHandler}/>;
+              if (!titleAction) {
+                titleAction = subMenuMainRow.action;
+              }
+            } else if (subMenuMainRow instanceof Menu.ExpressionMenuTextInput) {
+              contentCell = <ExpressionMenuTextInput item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered} inputRefHolder={this.inputRefHolder}/>;
+              onClick = (event: React.MouseEvent) => {
+                let input = this.inputRefHolder.inputRef;
+                if (input) {
+                  input.focus();
+                }
+                event.stopPropagation();
+              };
+            } else {
+              // TODO (low priority) support submenus in content cell
+              contentCell = (
+                <td className={'open-menu-content-cell'} key={'content'}>
+                  <table className={'open-menu-content-cell-table'}>
+                    <tbody>
+                      <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} subMenuOpen={false} interactionHandler={this.props.interactionHandler}/>
+                    </tbody>
+                  </table>
+                </td>
+              );
+            }
+          }
+        }
+        let title: any = standardRow.title;
+        if (title instanceof Display.RenderedExpression) {
+          title = <Expression expression={title} key={'title'}/>;
+        }
+        let titleCellClassName = 'open-menu-title-cell';
+        if (titleAction) {
+          titleCellClassName += ' clickable';
+          onClick = (event: React.MouseEvent) => {
+            if (this.ready) {
+              this.props.onItemClicked(titleAction!);
+            }
+            event.stopPropagation();
+          };
+          if (titleAction instanceof Menu.DialogExpressionMenuAction) {
+            title = [title, '...'];
+          }
+        }
+        if (standardRow.iconType !== undefined) {
+          let icon: React.ReactNode = null;
+          if (typeof standardRow.iconType === 'string') {
+            switch (standardRow.iconType) {
+            case 'remove':
+              icon = getButtonIcon(ButtonType.Remove);
               break;
             }
-          }
-        } else if (row.subMenu instanceof Menu.ExpressionMenuRow) {
-          subMenuMainRow = row.subMenu;
-        }
-        if (subMenuMainRow) {
-          let onEnter = () => {
-            this.setState({contentsHovered: true});
-            if (this.props.onEnter) {
-              this.props.onEnter(false);
-            }
-          };
-          let onLeave = () => {
-            this.setState({contentsHovered: false});
-            if (this.props.onLeave) {
-              this.props.onLeave();
-            }
-          };
-          if (subMenuMainRow instanceof Menu.ExpressionMenuItem) {
-            contentCell = <ExpressionMenuItem item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered} interactionHandler={this.props.interactionHandler}/>;
-            if (!titleAction) {
-              titleAction = subMenuMainRow.action;
-            }
-          } else if (subMenuMainRow instanceof Menu.ExpressionMenuTextInput) {
-            contentCell = <ExpressionMenuTextInput item={subMenuMainRow} key={'content'} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} hoveredExternally={itemHovered} inputRefHolder={this.inputRefHolder}/>;
-            onClick = (event: React.MouseEvent) => {
-              let input = this.inputRefHolder.inputRef;
-              if (input) {
-                input.focus();
-              }
-              event.stopPropagation();
-            };
           } else {
-            // TODO (low priority) support submenus in content cell
-            contentCell = (
-              <td className={'open-menu-content-cell'} key={'content'}>
-                <table className={'open-menu-content-cell-table'}>
-                  <tbody>
-                    <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} subMenuOpen={false} interactionHandler={this.props.interactionHandler}/>
-                  </tbody>
-                </table>
-              </td>
-            );
+            icon = getDefinitionIcon(standardRow.iconType);
+          }
+          if (icon) {
+            title = [
+              <span className={'open-menu-title-cell-icon'} key={'icon'}>{icon}</span>,
+              title
+            ];
           }
         }
-      }
-      let title: any = row.title;
-      if (title instanceof Display.RenderedExpression) {
-        title = <Expression expression={title} key={'title'}/>;
-      }
-      let titleCellClassName = 'open-menu-title-cell';
-      if (titleAction) {
-        titleCellClassName += ' clickable';
-        onClick = (event: React.MouseEvent) => {
-          if (this.ready) {
-            this.props.onItemClicked(titleAction!);
+        if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {
+          titleCellClassName += ' hover';
+        }
+        if (standardRow.isSelected()) {
+          titleCellClassName += ' selected';
+        }
+        let hasSubMenu = false;
+        let onMouseEnter = () => {
+          this.setState({titleHovered: true});
+          if (this.props.onEnter) {
+            this.props.onEnter(hasSubMenu);
           }
-          event.stopPropagation();
         };
-        if (titleAction instanceof Menu.DialogExpressionMenuAction) {
-          title = [title, '...'];
-        }
-      }
-      if (row.iconType !== undefined) {
-        let icon: React.ReactNode = null;
-        if (typeof row.iconType === 'string') {
-          switch (row.iconType) {
-          case 'remove':
-            icon = getButtonIcon(ButtonType.Remove);
-            break;
+        let onMouseLeave = () => {
+          this.setState({titleHovered: false});
+          if (this.props.onLeave) {
+            this.props.onLeave();
+          }
+        };
+        if (standardRow.subMenu instanceof Menu.ExpressionMenu && subMenuRows.length > 1) {
+          hasSubMenu = true;
+          title = (
+            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} key={'title'}>
+              {title}
+              <span key={'arrow'}>&nbsp;&nbsp;&nbsp;&nbsp;<span className={'open-menu-arrow'}>&nbsp;▶&nbsp;</span></span>
+            </div>
+          );
+          if (this.props.subMenuOpen) {
+            let subMenu = (
+              <ExpressionMenu menu={standardRow.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered} interactionHandler={this.props.interactionHandler} key={'subMenu'}/>
+            );
+            title = [title, subMenu];
           }
         } else {
-          icon = getDefinitionIcon(row.iconType);
+          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>{title}</div>;
         }
-        if (icon) {
-          title = [
-            <span className={'open-menu-title-cell-icon'} key={'icon'}>{icon}</span>,
-            title
-          ];
+        let colSpan = contentCell ? 1 : 2;
+        let cells: React.ReactNode = <th colSpan={colSpan} className={titleCellClassName} key={'title'}>{title}</th>;
+        if (contentCell) {
+          cells = [cells, contentCell];
         }
-      }
-      if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {
-        titleCellClassName += ' hover';
-      }
-      if (row.isSelected()) {
-        titleCellClassName += ' selected';
-      }
-      let hasSubMenu = false;
-      let onMouseEnter = () => {
-        this.setState({titleHovered: true});
-        if (this.props.onEnter) {
-          this.props.onEnter(hasSubMenu);
+        if (standardRow.subMenu instanceof Menu.ExpressionMenuItemList) {
+          return standardRow.subMenu.items.then((items: Menu.ExpressionMenuItem[]) => {
+            if (items.length) {
+              return cells;
+            } else {
+              return null;
+            }
+          });
+        } else {
+          return cells;
         }
-      };
-      let onMouseLeave = () => {
-        this.setState({titleHovered: false});
-        if (this.props.onLeave) {
-          this.props.onLeave();
-        }
-      };
-      if (row.subMenu instanceof Menu.ExpressionMenu && row.subMenu.rows.length > 1) {
-        hasSubMenu = true;
-        title = (
-          <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} key={'title'}>
-            {title}
-            <span key={'arrow'}>&nbsp;&nbsp;&nbsp;&nbsp;<span className={'open-menu-arrow'}>&nbsp;▶&nbsp;</span></span>
-          </div>
-        );
-        if (this.props.subMenuOpen) {
-          let subMenu = (
-            <ExpressionMenu menu={row.subMenu} onItemClicked={this.props.onItemClicked} hoveredExternally={subMenuMainRow && itemHovered} interactionHandler={this.props.interactionHandler} key={'subMenu'}/>
-          );
-          title = [title, subMenu];
-        }
-      } else {
-        title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>{title}</div>;
-      }
-      let colSpan = contentCell ? 1 : 2;
-      cells = <th colSpan={colSpan} className={titleCellClassName} key={'title'}>{title}</th>;
-      if (contentCell) {
-        cells = [cells, contentCell];
-      }
+      });
     } else if (row instanceof Menu.ExpressionMenuTextInput) {
-      cells = <ExpressionMenuTextInput item={row} colSpan={2} onItemClicked={this.props.onItemClicked} inputRefHolder={this.inputRefHolder}/>;
+      cellsPromise = CachedPromise.resolve(<ExpressionMenuTextInput item={row} colSpan={2} onItemClicked={this.props.onItemClicked} inputRefHolder={this.inputRefHolder}/>);
     }
+
     let className = 'open-menu-row';
     if (this.props.separated) {
       className += ' separated';
@@ -265,11 +295,28 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
     if (row.extraSpace) {
       className += ' extra-space';
     }
-    return (
+
+    let resultPromise = cellsPromise.then((cells: React.ReactNode) => {
+      if (cells) {
+        return (
+          <tr className={className}>
+            {cells}
+          </tr>
+        );
+      } else {
+        return null;
+      }
+    });
+
+    let getFallback = () => (
       <tr className={className}>
-        {cells}
+        <td className={'loading'}>
+          <Loading width={'1em'} height={'1em'}/>
+        </td>
       </tr>
     );
+
+    return renderPromise(resultPromise, undefined, getFallback);
   }
 }
 

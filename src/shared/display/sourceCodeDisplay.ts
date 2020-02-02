@@ -21,14 +21,17 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
     this.result = root;
   }
 
-  write(str: string): void {
+  private addExpression(expression: Display.RenderedExpression): void {
     let back = this.stack[this.stack.length - 1];
-    let text = new Display.TextExpression(str);
-    back.range.items.push(text);
+    back.range.items.push(expression);
+  }
+
+  write(str: string): void {
+    this.addExpression(new Display.TextExpression(str));
   }
 
   error(message: string): void {
-    this.write('?');
+    this.addExpression(new Display.ErrorExpression(message));
   }
 
   startRange(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean): void {

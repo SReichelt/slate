@@ -28,7 +28,7 @@ interface IndentInfo {
 export class Writer {
   private lineLength = 0;
 
-  constructor(private stream: OutputStream, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
+  constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
 
   writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
     this.writeRange(file, false, false, false, false, () => {
@@ -391,6 +391,12 @@ export class Writer {
         this.write('}');
       } else if (expression instanceof Fmt.ArrayExpression) {
         this.writeExpressionList(expression.items, indent, false);
+      } else if (expression instanceof Fmt.PlaceholderExpression) {
+        if (this.allowPlaceholders) {
+          this.write('?');
+        } else {
+          this.error('Object contains unfilled placeholder');
+        }
       } else {
         this.error('Unsupported expression type');
       }
