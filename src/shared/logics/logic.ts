@@ -91,4 +91,5 @@ export interface LogicRenderer {
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: RenderedDefinitionOptions): Display.RenderedExpression | undefined;
   renderDefinitionSummary(innerDefinition?: Fmt.Definition): Display.RenderedExpression | undefined;
   getDefinitionParts(): ObjectRenderFns;
+  updateEditorState(onAutoFilled?: () => void): CachedPromise<void>;
 }

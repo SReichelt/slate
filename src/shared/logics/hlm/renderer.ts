@@ -2721,4 +2721,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
   }
+
+  updateEditorState(onAutoFilled?: () => void): CachedPromise<void> {
+    if (this.editHandler) {
+      return this.editHandler.update(onAutoFilled);
+    } else {
+      return CachedPromise.resolve();
+    }
+  }
 }

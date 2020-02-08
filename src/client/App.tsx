@@ -328,29 +328,45 @@ class App extends React.Component<AppProps, AppState> {
 
     let mainContents: React.ReactNode = null;
     let extraContents: React.ReactNode = null;
+
     if (this.state.selectedItemProvider) {
       let definitionPromise = this.state.selectedItemDefinition;
-      if (definitionPromise && this.state.templates) {
-        let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-          includeProofs: true,
-          includeLabel: true,
-          includeExtras: true,
-          includeRemarks: true
-        };
-        mainContents = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definitionPromise} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
-        extraContents = <SourceCodeView definition={definitionPromise} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
-        let definition = definitionPromise.getImmediateResult();
-        if (definition && (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
-          if (!this.state.gitHubUserInfo && !this.runningLocally) {
-            mainContents = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
-          } else if (this.state.selectedItemRepository) {
-            let repository = this.state.selectedItemRepository;
-            if (!repository.hasWriteAccess) {
-              mainContents = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContents];
-            } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
-              mainContents = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContents];
+      if (definitionPromise) {
+        let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+          let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+            includeProofs: true,
+            includeLabel: true,
+            includeExtras: true,
+            includeRemarks: true
+          };
+          if (this.state.selectedItemProvider && this.state.templates) {
+            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+            if (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew) {
+              if (!this.state.gitHubUserInfo && !this.runningLocally) {
+                result = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
+              } else if (this.state.selectedItemRepository) {
+                let repository = this.state.selectedItemRepository;
+                if (!repository.hasWriteAccess) {
+                  result = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
+                } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
+                  result = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, result];
+                }
+              }
             }
+            return result;
+          } else {
+            return null;
           }
+        });
+        mainContents = renderPromise(mainContentsPromise);
+
+        if (this.state.extraContentsVisible) {
+          let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+            return <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+          });
+          extraContents = renderPromise(extraContentsPromise);
+        } else {
+          extraContents = true;
         }
       }
     } else {

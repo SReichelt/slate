@@ -1,10 +1,11 @@
+import * as React from 'react';
 import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
-import { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
+import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
-import { LibraryItemProps, renderLibraryItem } from './LibraryItem';
+import renderPromise from './PromiseHelper';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 
@@ -110,24 +111,28 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     let path = this.getPath(semanticLink);
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
-      let definition = parentProvider.fetchLocalItem(path.name, false);
-      let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-        includeProofs: false,
-        maxListLength: 20,
-        includeLabel: false,
-        includeExtras: true,
-        includeRemarks: false
-      };
-      // Call function directly instead of creating a component, so that tooltip is not even displayed if it returns undefined.
-      let props: LibraryItemProps = {
-        libraryDataProvider: parentProvider,
-        definition: definition,
-        templates: this.templates,
-        options: renderedDefinitionOptions
-      };
-      return renderLibraryItem(props);
+      let definitionPromise = parentProvider.fetchLocalItem(path.name, false);
+
+      // Render library item directly instead of creating a component, so that tooltip is not even displayed if it returns null.
+      let render = definitionPromise.then((definition: LibraryDefinition) => {
+        let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+          includeProofs: false,
+          maxListLength: 20,
+          includeLabel: false,
+          includeExtras: true,
+          includeRemarks: false
+        };
+        let renderer = parentProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, parentProvider, this.templates, renderedDefinitionOptions);
+        let expression = renderer.renderDefinition(undefined, renderedDefinitionOptions);
+        if (expression) {
+          return <Expression expression={expression}/>;
+        } else {
+          return null;
+        }
+      });
+      return renderPromise(render);
     } else {
-      return undefined;
+      return null;
     }
   }
 

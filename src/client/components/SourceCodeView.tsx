@@ -3,11 +3,9 @@ import * as FmtWriter from '../../shared/format/write';
 import * as SourceCodeDisplay from '../../shared/display/sourceCodeDisplay';
 import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
 import Expression, { ExpressionInteractionHandler } from './Expression';
-import CachedPromise from '../../shared/data/cachedPromise';
-import renderPromise from './PromiseHelper';
 
 interface SourceCodeViewProps {
-  definition: CachedPromise<LibraryDefinition>;
+  definition: LibraryDefinition;
   interactionHandler?: ExpressionInteractionHandler;
 }
 
@@ -42,18 +40,14 @@ class SourceCodeView extends React.Component<SourceCodeViewProps> {
   }
 
   render(): React.ReactNode {
-    let render = this.props.definition.then((definition: LibraryDefinition) => {
-      let stream = new SourceCodeDisplay.SourceCodeStream;
-      let writer = new FmtWriter.Writer(stream, true);
-      let indent = {
-        indent: '',
-        outerIndent: ''
-      };
-      writer.writeDefinition(definition.definition, indent);
-      return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} tooltipPosition="top"/>;
-    });
-
-    return renderPromise(render);
+    let stream = new SourceCodeDisplay.SourceCodeStream;
+    let writer = new FmtWriter.Writer(stream, true);
+    let indent = {
+      indent: '',
+      outerIndent: ''
+    };
+    writer.writeDefinition(this.props.definition.definition, indent);
+    return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} tooltipPosition="top"/>;
   }
 
   private onExpressionChanged = () => {

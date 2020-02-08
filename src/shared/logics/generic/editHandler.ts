@@ -27,8 +27,11 @@ export type GetExpressionsFn = (path: Fmt.Path, libraryDefinition: Fmt.Definitio
 export abstract class GenericEditHandler {
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected templates: Fmt.File) {
-    this.editAnalysis.analyzeDefinition(definition, libraryDataProvider.logic.getRootContext());
+  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected templates: Fmt.File) {}
+
+  update(): CachedPromise<void> {
+    this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
+    return CachedPromise.resolve();
   }
 
   protected getActionInsertButton(action: Menu.ExpressionMenuAction): Display.RenderedExpression {

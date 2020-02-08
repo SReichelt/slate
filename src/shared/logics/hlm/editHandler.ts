@@ -62,9 +62,31 @@ export class HLMEditHandler extends GenericEditHandler {
     super(definition, libraryDataProvider, new HLMEditAnalysis, templates);
     this.utils = new HLMUtils(definition, libraryDataProvider);
     this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, this.utils, true);
+    this.update();
+  }
 
-    this.checker.checkDefinition()
-      .catch(() => {});
+  update(onAutoFilled?: () => void): CachedPromise<void> {
+    return super.update().then(() =>
+      this.checker.checkDefinition()
+        .then((result: Logic.LogicCheckResult): void | CachedPromise<void> => {
+          if (onAutoFilled && !result.hasErrors) {
+            let autoFilled = false;
+            let onFillPlaceholder = (placeholder: Fmt.PlaceholderExpression, value: Fmt.Expression) => {
+              let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(placeholder);
+              if (expressionEditInfo) {
+                expressionEditInfo.onSetValue(value);
+                autoFilled = true;
+              }
+            };
+            return this.checker.fillAutoPlaceholders(onFillPlaceholder)
+              .then((): void | CachedPromise<void> => {
+                if (autoFilled) {
+                  onAutoFilled();
+                }
+              });
+          }
+        })
+        .catch(() => {}));
   }
 
   addParameterMenu(semanticLink: Display.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
