@@ -44,6 +44,7 @@
     "react-simplemde-editor": "^3.6.22",
     "react-split-pane": "^0.1.89",
     "request": "^2.88.0",
+    "scroll-into-view-if-needed": "^2.2.24",
     "tslib": "^1.10.0",
     "utf8": "^3.0.0"
   },

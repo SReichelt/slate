@@ -11,7 +11,6 @@ import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
-import CachedPromise from '../../shared/data/cachedPromise';
 
 const ToolTip = require('react-portal-tooltip').default;
 const ReactMarkdownRenderer = require('react-markdown-renderer').default;

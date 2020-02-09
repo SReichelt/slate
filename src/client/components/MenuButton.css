@@ -5,7 +5,21 @@
 
 .menu-button-popup {
   position: absolute;
-  bottom: 100%;
   left: 0;
   z-index: 100;
+  display: block;
+  font-size: initial;
+}
+
+.menu-button-popup-top {
+  bottom: 100%;
+}
+
+.menu-button-popup-bottom {
+  top: 100%;
+}
+
+.menu-button-popup>* {
+  display: block;
+  text-align: left;
 }

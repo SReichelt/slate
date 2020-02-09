@@ -1,11 +1,14 @@
 import * as React from 'react';
 import './Button.css';
 
+const clickDelay = 500;
+
 interface ButtonProps {
   className?: string;
   toolTipText?: string;
   enabled?: boolean;
   selected?: boolean;
+  isMenuItem?: boolean;
   onClick?: () => void;
 }
 
@@ -14,6 +17,8 @@ interface ButtonState {
 }
 
 class Button extends React.Component<ButtonProps, ButtonState> {
+  private ready = false;
+
   constructor(props: ButtonProps) {
     super(props);
     this.state = {
@@ -21,6 +26,11 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     };
   }
   
+  componentDidMount(): void {
+    this.ready = false;
+    setTimeout(() => (this.ready = true), clickDelay);
+  }
+
   render(): React.ReactNode {
     let className = 'button';
     if (this.props.className) {
@@ -37,16 +47,23 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         onClick = (event: React.MouseEvent<HTMLElement>) => {
           event.stopPropagation();
           event.preventDefault();
-          propsOnClick();
+          if (this.ready && !this.props.isMenuItem) {
+            propsOnClick();
+          }
         };
       }
       onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         event.preventDefault();
         this.setState({pressed: true});
+        this.ready = true;
       };
       onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
-        event.stopPropagation();
+        if (this.props.isMenuItem && this.ready && this.props.onClick) {
+          this.props.onClick();
+        } else {
+          event.stopPropagation();
+        }
         event.preventDefault();
         this.setState({pressed: false});
       };

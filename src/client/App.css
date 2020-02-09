@@ -15,7 +15,7 @@ body {
   background-color: #ffd700;
 }
 
-.hoverable.selected, .menu.open>.menu-row>.menu-placeholder-cell, .menu.open>.menu-row>.menu-dropdown-cell, .open-menu .selected {
+.hoverable.selected, .menu-button.open, .menu.open>.menu-row>.menu-placeholder-cell, .menu.open>.menu-row>.menu-dropdown-cell, .open-menu .selected {
   background-color: #f2cd00;
 }
 

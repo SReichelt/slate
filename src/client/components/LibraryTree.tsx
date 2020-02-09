@@ -9,8 +9,9 @@ import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
-import { ButtonType, getButtonIcon, getButtonIconContents, getSectionIcon, getSectionIconContents, getDefinitionIcon, getDefinitionIconContents, getInsertIcon } from '../utils/icons';
+import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
 import Button from './Button';
+import MenuButton from './MenuButton';
 
 const Loading = require('react-loading-animation');
 const ToolTip = require('react-portal-tooltip').default;
@@ -221,7 +222,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
   }
 
   if (section && props.onInsertButtonClicked && !props.searchWords.length) {
-    treeItems.push(<LibraryTreeInsertionItem libraryDataProvider={props.libraryDataProvider} parentScrollPane={props.parentScrollPane} section={section} onInsertButtonClicked={props.onInsertButtonClicked} key={'<insert>'} indent={props.indent}/>);
+    treeItems.push(<LibraryTreeInsertionItem libraryDataProvider={props.libraryDataProvider} parentScrollPane={props.parentScrollPane} section={section} onInsertButtonClicked={props.onInsertButtonClicked} key="<insert>" indent={props.indent}/>);
   }
 
   return <>{treeItems}</>;
@@ -728,7 +729,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           specialIcon = getButtonIcon(ButtonType.Edit);
           break;
         case LibraryDefinitionState.EditingNew:
-          specialIcon = getInsertIcon(getButtonIconContents(ButtonType.Edit));
+          specialIcon = getButtonIcon(ButtonType.Insert);
           break;
         case LibraryDefinitionState.Submitting:
           specialIcon = <Loading width={'1em'} height={'1em'}/>;
@@ -825,29 +826,32 @@ interface LibraryTreeInsertionItemState {
 class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps, LibraryTreeInsertionItemState> {
   constructor(props: LibraryTreeInsertionItemProps) {
     super(props);
-
     this.state = {};
   }
 
   render(): React.ReactNode {
-    let definitionButtons: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
-      let toolTipText = `New ${definitionType.name}`;
+    let menuItems: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
       let onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, definitionType);
       return (
-        <Button className={'standalone'} toolTipText={toolTipText} onClick={onClick} key={definitionType.definitionType}>
-          {getInsertIcon(getDefinitionIconContents(definitionType.definitionType))}
+        <Button isMenuItem={true} onClick={onClick} key={definitionType.definitionType}>
+          {[getDefinitionIcon(definitionType.definitionType), ' ', `New ${definitionType.name.toLowerCase()}...`]}
         </Button>
       );
     });
-    let buttonRow = (
-      <div className={'tree-item-insert-buttons'}>
-        <Button className={'standalone'} toolTipText={'New Section'} onClick={() => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, undefined)} key={'section'}>
-          {getInsertIcon(getSectionIconContents(false))}
+    {
+      let onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, undefined);
+      menuItems.unshift(
+        <Button isMenuItem={true} onClick={onClick} key="section">
+          {[getSectionIcon(false), ' ', 'New section...']}
         </Button>
-        {definitionButtons}
-      </div>
+      );
+    }
+    let insertButton = (
+      <MenuButton className={'tree-item-insert-button standalone'} menuClassName={'open-menu'} toolTipText={'Add new item'} menu={menuItems} key="insert-button">
+        {getButtonIcon(ButtonType.Insert)}
+      </MenuButton>
     );
-    let treeItemContents = this.getTreeItemContents(undefined, undefined, buttonRow);
+    let treeItemContents = this.getTreeItemContents(undefined, undefined, insertButton);
     return (
       <div className={'tree-item-row'} key="item">
         <div className={'tree-item'} ref={(htmlNode) => (this.htmlNode = htmlNode)}>

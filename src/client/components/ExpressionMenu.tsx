@@ -6,6 +6,7 @@ import renderPromise from './PromiseHelper';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 import CachedPromise from '../../shared/data/cachedPromise';
+import scrollIntoView from 'scroll-into-view-if-needed';
 
 const Loading = require('react-loading-animation');
 
@@ -55,7 +56,8 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
       let ref = (htmlNode: HTMLDivElement | null) => {
         if (htmlNode && !this.scrolled) {
           this.scrolled = true;
-          htmlNode.scrollIntoView({
+          scrollIntoView(htmlNode, {
+            scrollMode: 'if-needed',
             block: 'end',
             inline: 'end'
           });
@@ -111,13 +113,13 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
 
   componentDidMount(): void {
     this.ready = false;
-    setTimeout(() => this.ready = true, clickDelay);
+    setTimeout(() => (this.ready = true), clickDelay);
   }
 
   componentDidUpdate(prevProps: ExpressionMenuRowProps): void {
     if (this.props.row !== prevProps.row) {
       this.ready = false;
-      setTimeout(() => this.ready = true, clickDelay);
+      setTimeout(() => (this.ready = true), clickDelay);
     }
   }
 
@@ -347,13 +349,13 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
 
   componentDidMount(): void {
     this.ready = false;
-    setTimeout(() => this.ready = true, clickDelay);
+    setTimeout(() => (this.ready = true), clickDelay);
   }
 
   componentDidUpdate(prevProps: ExpressionMenuItemProps): void {
     if (this.props.item !== prevProps.item) {
       this.ready = false;
-      setTimeout(() => this.ready = true, clickDelay);
+      setTimeout(() => (this.ready = true), clickDelay);
     }
   }
 

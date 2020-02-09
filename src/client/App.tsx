@@ -396,13 +396,13 @@ class App extends React.Component<AppProps, AppState> {
         }
         let userMenu: React.ReactNode[] = [
           (
-            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} onClick={this.logOutOfGitHub} key={'LogOut'}>
+            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key={'LogOut'}>
               {getButtonIcon(ButtonType.LogOut)}
             </Button>
           )
         ];
         return (
-          <MenuButton menu={userMenu} key={'UserMenu'}>
+          <MenuButton menu={userMenu} menuOnTop={true} openOnHover={true} key={'UserMenu'}>
             {userID}
           </MenuButton>
         );

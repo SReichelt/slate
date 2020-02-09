@@ -34,15 +34,15 @@ function getGitHubLogo(enabled: boolean = true): React.ReactNode {
   );
 }
 
-export function getIconWithContents(contents: React.ReactNodeArray): React.ReactNode {
+function getIconWithContents(contents: React.ReactNodeArray): React.ReactNode {
   return (
-    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
+    <svg height="1em" width="1em" viewBox="-8 -8 16 16" key="icon">
       {contents}
     </svg>
   );
 }
 
-export function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true): React.ReactNodeArray {
+function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true): React.ReactNodeArray {
   switch (buttonType) {
   case ButtonType.Submit:
     return [
@@ -105,7 +105,7 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   }
 }
 
-export function getSectionIconContents(opened: boolean, containsSelection: boolean = false): React.ReactNodeArray {
+function getSectionIconContents(opened: boolean, containsSelection: boolean = false): React.ReactNodeArray {
   if (opened) {
     return [
       <path d="M -6 -4 L 0 4 L 6 -4 z" fill={containsSelection ? '#f2cd00' : 'silver'} stroke="black" strokeWidth="1" key="arrow"/>
@@ -121,7 +121,7 @@ export function getSectionIcon(opened: boolean, containsSelection: boolean = fal
   return getIconWithContents(getSectionIconContents(opened, containsSelection));
 }
 
-export function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNodeArray {
+function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNodeArray {
   switch (definitionType) {
   case Logic.LogicDefinitionType.Construction:
     return [
@@ -167,20 +167,4 @@ export function getDefinitionIconContents(definitionType: Logic.LogicDefinitionT
 
 export function getDefinitionIcon(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNode {
   return getIconWithContents(getDefinitionIconContents(definitionType, itemInfo));
-}
-
-export function getInsertIcon(originalIconContents: React.ReactNodeArray, enabled: boolean = true): React.ReactNode {
-  return (
-    <svg height="1em" width="1em" viewBox="-8 -8 16 16">
-      {originalIconContents}
-      <line x1="1" y1="-4" x2="7" y2="-4" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background1"/>
-      <line x1="4" y1="-1" x2="4" y2="-7" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background2"/>
-      <line x1="2" y1="-2" x2="6" y2="-6" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background3"/>
-      <line x1="2" y1="-6" x2="6" y2="-2" stroke="darkgreen" strokeWidth="6" opacity="75%" key="insert-background4"/>
-      <line x1="1" y1="-4" x2="7" y2="-4" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line1"/>
-      <line x1="4" y1="-1" x2="4" y2="-7" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line2"/>
-      <line x1="2" y1="-2" x2="6" y2="-6" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line3"/>
-      <line x1="2" y1="-6" x2="6" y2="-2" stroke={enabled ? 'lime' : 'gray'} strokeWidth="1" key="insert-line4"/>
-    </svg>
-  );
 }
