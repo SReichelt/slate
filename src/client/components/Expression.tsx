@@ -11,6 +11,7 @@ import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
+import CachedPromise from '../../shared/data/cachedPromise';
 
 const ToolTip = require('react-portal-tooltip').default;
 const ReactMarkdownRenderer = require('react-markdown-renderer').default;
@@ -1303,10 +1304,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       this.setState({clicking: false});
       this.stopPropagation(event);
       if (action instanceof Menu.ImmediateExpressionMenuAction) {
-        action.onExecute();
-        if (this.props.interactionHandler) {
-          this.props.interactionHandler.expressionChanged();
+        let result = action.onExecute();
+        if (!(result instanceof CachedPromise)) {
+          result = CachedPromise.resolve();
         }
+        result.then(() => {
+          if (this.props.interactionHandler) {
+            this.props.interactionHandler.expressionChanged();
+          }
+        });
       } else if (action instanceof Menu.DialogExpressionMenuAction) {
         this.enableInteractionBlocker();
         this.setState({
@@ -1340,12 +1346,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {
     if (action instanceof Menu.ImmediateExpressionMenuAction) {
-      action.onExecute();
-      this.disableInteractionBlocker();
-      this.clearPermanentHighlight();
-      if (this.props.interactionHandler) {
-        this.props.interactionHandler.expressionChanged();
+      let result = action.onExecute();
+      if (!(result instanceof CachedPromise)) {
+        result = CachedPromise.resolve();
       }
+      result.then(() => {
+        this.disableInteractionBlocker();
+        this.clearPermanentHighlight();
+        if (this.props.interactionHandler) {
+          this.props.interactionHandler.expressionChanged();
+        }
+      });
     } else if (action instanceof Menu.DialogExpressionMenuAction) {
       this.disableWindowClickListener();
       this.setState({

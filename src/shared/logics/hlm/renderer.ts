@@ -210,25 +210,55 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderDefinitionLabel(itemInfo: CachedPromise<LibraryItemInfo>): Display.RenderedExpression {
     let formattedInfoPromise = itemInfo.then((info: LibraryItemInfo) => {
-      let text: string;
-      if (info.type) {
-        text = info.type.charAt(0).toUpperCase() + info.type.slice(1);
-      } else {
-        text = this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem ? 'Proposition' : 'Definition';
-      }
+      let typeLabelText = this.getDefinitionTypeLabel(info.type);
+      let text = this.editHandler ? '' : typeLabelText;
       text += ' ';
       text += formatItemNumber(info.itemNumber);
-      if (info.title) {
-        let title = new Display.TextExpression(' (' + info.title + ')');
-        title.styleClasses = ['title'];
-        return new Display.RowExpression([new Display.TextExpression(text), title, new Display.TextExpression('.')]);
+      if (info.title || this.editHandler) {
+        let title: Display.RenderedExpression;
+        if (info.title) {
+          title = new Display.TextExpression(`(${info.title})`);
+          title.styleClasses = ['title'];
+        } else {
+          title = new Display.InsertPlaceholderExpression;
+        }
+        if (this.editHandler) {
+          let semanticLink = new Display.SemanticLink(title, false, false);
+          this.editHandler.addTitleMenu(semanticLink, info);
+          title.semanticLinks = [semanticLink];
+        }
+        let row: Display.RenderedExpression[] = [new Display.TextExpression(text + ' '), title, new Display.TextExpression('.')];
+        if (this.editHandler) {
+          let typeLabel = new Display.TextExpression(typeLabelText);
+          if (this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+            let semanticLink = new Display.SemanticLink(typeLabel, false, false);
+            let onRenderType = (type: string | undefined) => {
+              let renderedType = new Display.TextExpression(this.getDefinitionTypeLabel(type));
+              renderedType.styleClasses = ['label'];
+              return renderedType;
+            };
+            this.editHandler.addTypeMenu(semanticLink, onRenderType, info);
+            typeLabel.semanticLinks = [semanticLink];
+          }
+          row.unshift(typeLabel);
+        }
+        return new Display.RowExpression(row);
+      } else {
+        text += '.';
+        return new Display.TextExpression(text);
       }
-      text += '.';
-      return new Display.TextExpression(text);
     });
     let result = new Display.PromiseExpression(formattedInfoPromise);
     result.styleClasses = ['label'];
     return result;
+  }
+
+  private getDefinitionTypeLabel(type: string | undefined): string {
+    if (type) {
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    } else {
+      return this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem ? 'Proposition' : 'Definition';
+    }
   }
 
   private renderExplicitDefinitionIntro(): Display.RenderedExpression {

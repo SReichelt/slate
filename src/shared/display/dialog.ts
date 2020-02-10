@@ -14,7 +14,6 @@ export class DialogBase {
 export interface InsertDialogResult extends DialogResultBase {
   name: string;
   title: string | undefined;
-  type: string | undefined;
 }
 
 export class InsertDialog extends DialogBase {

@@ -12,6 +12,8 @@ import { GenericRenderer, RenderedVariable } from './renderer';
 import { getNextDefaultName } from '../../format/common';
 import CachedPromise from '../../data/cachedPromise';
 
+export type RenderTypeFn = (type: string | undefined) => Display.RenderedExpression;
+
 export type SetDisplayFn = (display: Fmt.Expression[] | undefined) => void;
 export type SetDisplayItemFn = (displayItem: Fmt.Expression | undefined) => void;
 
@@ -32,6 +34,50 @@ export abstract class GenericEditHandler {
   update(): CachedPromise<void> {
     this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
     return CachedPromise.resolve();
+  }
+
+  protected getTypeRow(type: string | undefined, onRenderType: RenderTypeFn, info: LibraryItemInfo): Menu.ExpressionMenuRow {
+    let action = new Menu.ImmediateExpressionMenuAction;
+    action.onExecute = () => {
+      let newInfo = {
+        ...info,
+        type: type
+      };
+      return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
+    };
+    let item = new Menu.ExpressionMenuItem;
+    item.expression = onRenderType(type);
+    item.action = action;
+    item.selected = info.type === type;
+    return item;
+  }
+
+  addTitleMenu(semanticLink: Display.SemanticLink, info: LibraryItemInfo): void {
+    semanticLink.onMenuOpened = () => {
+      let menu = new Menu.ExpressionMenu;
+      menu.rows = CachedPromise.resolve([this.getTitleRow(info)]);
+      return menu;
+    };
+    semanticLink.alwaysShowMenu = true;
+  }
+
+  private getTitleRow(info: LibraryItemInfo): Menu.ExpressionMenuRow {
+    let titleItem = new Menu.ExpressionMenuTextInput;
+    titleItem.text = info.title || '';
+    titleItem.expectedTextLength = 20;
+    let textAction = new Menu.ImmediateExpressionMenuAction;
+    textAction.onExecute = () => {
+      let newInfo = {
+        ...info,
+        title: titleItem.text ? titleItem.text : undefined
+      };
+      return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
+    };
+    titleItem.action = textAction;
+    let titleRow = new Menu.StandardExpressionMenuRow;
+    titleRow.title = 'Title';
+    titleRow.subMenu = titleItem;
+    return titleRow;
   }
 
   protected getActionInsertButton(action: Menu.ExpressionMenuAction): Display.RenderedExpression {
@@ -169,6 +215,7 @@ export abstract class GenericEditHandler {
     } else {
       integerItem.text = '';
     }
+    integerItem.expectedTextLength = 4;
     let integerAction = new Menu.ImmediateExpressionMenuAction;
     integerAction.onExecute = () => {
       let newDisplayItem = new Fmt.IntegerExpression;
@@ -190,6 +237,7 @@ export abstract class GenericEditHandler {
     } else {
       textItem.text = '';
     }
+    textItem.expectedTextLength = 4;
     let textAction = new Menu.ImmediateExpressionMenuAction;
     textAction.onExecute = () => {
       let newDisplayItem = new Fmt.StringExpression;

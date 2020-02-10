@@ -340,8 +340,14 @@ class App extends React.Component<AppProps, AppState> {
             includeRemarks: true
           };
           if (this.state.selectedItemProvider && this.state.templates) {
-            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={this.state.selectedItemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
-            if (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew) {
+            let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
+            let itemInfo = this.state.selectedItemInfo;
+            if (editing && this.state.selectedItemLocalPath) {
+              // When editing, item info may change according to user input. Need to make sure to get the correct instance -- the one where the changes happen.
+              itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
+            }
+            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+            if (editing) {
               if (!this.state.gitHubUserInfo && !this.runningLocally) {
                 result = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
               } else if (this.state.selectedItemRepository) {
@@ -592,10 +598,7 @@ class App extends React.Component<AppProps, AppState> {
       let definitionType = this.state.insertDialogDefinitionType;
       // TODO position
       if (definitionType) {
-        if (result.type) {
-          result.type = result.type.toLowerCase();
-        }
-        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, result.type)
+        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined)
           .then((libraryDefinition: LibraryDefinition) => {
             let localPath = new Fmt.Path;
             localPath.name = result.name;
@@ -668,7 +671,7 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryDataProvider && definitionPromise && absolutePath && localPath && itemInfoPromise) {
       definitionPromise.then((definition: LibraryDefinition) => {
         itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
-          let clonedDefinition = libraryDataProvider!.editLocalItem(definition);
+          let clonedDefinition = libraryDataProvider!.editLocalItem(definition, itemInfo);
           this.setState((prevState) => ({
             selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
             editedDefinitions: prevState.editedDefinitions.concat({

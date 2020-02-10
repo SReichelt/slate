@@ -69,6 +69,7 @@ export class ExpressionMenuSeparator extends ExpressionMenuRow {
 
 export class ExpressionMenuTextInput extends ExpressionMenuCell {
   text: string;
+  expectedTextLength: number;
   action: ExpressionMenuAction;
 }
 
@@ -76,7 +77,7 @@ export abstract class ExpressionMenuAction {
 }
 
 export class ImmediateExpressionMenuAction extends ExpressionMenuAction {
-  onExecute: () => void;
+  onExecute: () => void | CachedPromise<void>;
 }
 
 export class DialogExpressionMenuAction extends ExpressionMenuAction {

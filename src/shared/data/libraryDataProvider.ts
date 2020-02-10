@@ -30,6 +30,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private preloadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private fullyLoadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private editedDefinitions = new Map<string, LibraryDefinition>();
+  private editedItemInfos = new Map<string, LibraryItemInfo>();
+  private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private canPreload: boolean, private childName: string, private itemNumber?: number[]) {
@@ -467,38 +469,55 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   insertLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, title: string | undefined, type: string | undefined, insertBefore?: string): CachedPromise<LibraryDefinition> {
-    let localSectionFileName = this.getLocalSectionFileName();
-    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
-      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
-      let newItemRef = new Fmt.DefinitionRefExpression;
-      newItemRef.path = new Fmt.Path;
-      newItemRef.path.name = name;
-      let newItem = new FmtLibrary.MetaRefExpression_item;
-      newItem.ref = newItemRef;
-      newItem.title = title;
-      newItem.type = type;
-      let insertIndex = undefined;
-      if (insertBefore) {
-        sectionContents.items.map((item: Fmt.Expression, index: number) => {
-          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
-            insertIndex = index;
-          }
+    let itemNumberPromise: CachedPromise<void>;
+    if (this.itemNumber) {
+      itemNumberPromise = CachedPromise.resolve();
+    } else {
+      itemNumberPromise = this.parent!.getLocalItemInfo(this.childName)
+        .then((ownItemInfo: LibraryItemInfo) => {
+          this.itemNumber = ownItemInfo.itemNumber;
         });
-      }
-      if (insertIndex === undefined) {
-        sectionContents.items.push(newItem);
-      } else {
-        sectionContents.items.splice(insertIndex, 0, newItem);
-      }
-      if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
-        sectionDefinition.state = LibraryDefinitionState.Editing;
-      }
-      this.editedDefinitions.set(localSectionFileName, sectionDefinition);
-      let metaModelPath = new Fmt.Path;
-      metaModelPath.name = this.logic.name;
-      metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
-      return this.createLocalItem(name, definitionType, metaModelPath);
-    });
+    }
+    let localSectionFileName = this.getLocalSectionFileName();
+    return itemNumberPromise
+      .then(() => this.fetchSection(localSectionFileName, false))
+      .then((sectionDefinition: LibraryDefinition) => {
+        let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+        let newItemRef = new Fmt.DefinitionRefExpression;
+        newItemRef.path = new Fmt.Path;
+        newItemRef.path.name = name;
+        let newItem = new FmtLibrary.MetaRefExpression_item;
+        newItem.ref = newItemRef;
+        newItem.title = title;
+        newItem.type = type;
+        let insertIndex = undefined;
+        if (insertBefore) {
+          sectionContents.items.map((item: Fmt.Expression, index: number) => {
+            if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+              insertIndex = index;
+            }
+          });
+        }
+        if (insertIndex === undefined) {
+          insertIndex = sectionContents.items.length;
+          sectionContents.items.push(newItem);
+        } else {
+          sectionContents.items.splice(insertIndex, 0, newItem);
+        }
+        if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+          sectionDefinition.state = LibraryDefinitionState.Editing;
+        }
+        this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+        let metaModelPath = new Fmt.Path;
+        metaModelPath.name = this.logic.name;
+        metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
+        this.editedItemInfos.set(name, {
+          itemNumber: [...this.itemNumber!, insertIndex + 1],
+          type: type,
+          title: title
+        });
+        return this.createLocalItem(name, definitionType, metaModelPath);
+      });
   }
 
   private createLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, metaModelPath: Fmt.Path): LibraryDefinition {
@@ -515,14 +534,17 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return libraryDefinition;
   }
 
-  editLocalItem(libraryDefinition: LibraryDefinition): LibraryDefinition {
+  editLocalItem(libraryDefinition: LibraryDefinition, itemInfo: LibraryItemInfo): LibraryDefinition {
+    let name = libraryDefinition.definition.name;
     let clonedFile = libraryDefinition.file.clone();
     let clonedLibraryDefinition: LibraryDefinition = {
       file: clonedFile,
       definition: clonedFile.definitions[0],
       state: LibraryDefinitionState.Editing
     };
-    this.editedDefinitions.set(libraryDefinition.definition.name, clonedLibraryDefinition);
+    this.editedDefinitions.set(name, clonedLibraryDefinition);
+    this.editedItemInfos.set(name, itemInfo);
+    this.originalItemInfos.set(name, {...itemInfo});
     return clonedLibraryDefinition;
   }
 
@@ -531,21 +553,37 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (editedLibraryDefinition === this.editedDefinitions.get(name)) {
       this.editedDefinitions.delete(name);
     }
-    if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
-      let sectionDefinition = this.editedDefinitions.get(this.getLocalSectionFileName());
-      if (sectionDefinition) {
-        let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
-        let indexToRemove = undefined;
-        sectionContents.items.map((item: Fmt.Expression, index: number) => {
-          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+    let origInfo = this.originalItemInfos.get(name);
+    let sectionDefinition = this.editedDefinitions.get(this.getLocalSectionFileName());
+    if (sectionDefinition) {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      let indexToRemove = undefined;
+      sectionContents.items.map((item: Fmt.Expression, index: number) => {
+        if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
+          if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
             indexToRemove = index;
+          } else {
+            if (origInfo) {
+              if (item instanceof FmtLibrary.MetaRefExpression_item) {
+                item.type = origInfo.type;
+              }
+              item.title = origInfo.title;
+            }
           }
-        });
-        if (indexToRemove !== undefined) {
-          sectionContents.items.splice(indexToRemove, 1);
         }
+      });
+      if (indexToRemove !== undefined) {
+        sectionContents.items.splice(indexToRemove, 1);
       }
     }
+    if (origInfo) {
+      let editedInfo = this.editedItemInfos.get(name);
+      if (editedInfo) {
+        Object.assign(editedInfo, origInfo);
+      }
+    }
+    this.editedItemInfos.delete(name);
+    this.originalItemInfos.delete(name);
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
@@ -606,6 +644,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(editedLibraryDefinition));
           this.preloadedDefinitions.delete(name);
           this.editedDefinitions.delete(name);
+          this.editedItemInfos.delete(name);
+          this.originalItemInfos.delete(name);
           return result;
         });
     } catch (error) {
@@ -624,42 +664,71 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   getLocalItemInfo(name: string): CachedPromise<LibraryItemInfo> {
-    return this.fetchLocalSection(false)
-      .then((libraryDefinition: LibraryDefinition) => {
-        let contents = libraryDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
-        let type: string | undefined = undefined;
-        let title: string | undefined = undefined;
-        let index = 0;
-        for (let item of contents.items) {
-          if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
-            if ((item.ref as Fmt.DefinitionRefExpression).path.name === name) {
-              if (item instanceof FmtLibrary.MetaRefExpression_item) {
-                type = item.type;
-              }
-              title = item.title;
-              break;
+    let editedInfo = this.editedItemInfos.get(name);
+    if (editedInfo) {
+      return CachedPromise.resolve(editedInfo);
+    }
+    return this.fetchLocalSection(false).then((sectionDefinition: LibraryDefinition) => {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      let type: string | undefined = undefined;
+      let title: string | undefined = undefined;
+      let index = 0;
+      for (let item of sectionContents.items) {
+        if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
+          if ((item.ref as Fmt.DefinitionRefExpression).path.name === name) {
+            if (item instanceof FmtLibrary.MetaRefExpression_item) {
+              type = item.type;
             }
+            title = item.title;
+            break;
           }
-          index++;
         }
-        if (this.itemNumber) {
-          return {
-            itemNumber: [...this.itemNumber, index + 1],
-            type: type,
-            title: title
-          };
-        } else {
-          return this.parent!.getLocalItemInfo(this.childName)
-            .then((ownItemInfo: LibraryItemInfo) => {
-              this.itemNumber = ownItemInfo.itemNumber;
-              return {
-                itemNumber: [...this.itemNumber, index + 1],
-                type: type,
-                title: title
-              };
-            });
+        index++;
+      }
+      if (this.itemNumber) {
+        return {
+          itemNumber: [...this.itemNumber, index + 1],
+          type: type,
+          title: title
+        };
+      } else {
+        return this.parent!.getLocalItemInfo(this.childName)
+          .then((ownItemInfo: LibraryItemInfo) => {
+            this.itemNumber = ownItemInfo.itemNumber;
+            return {
+              itemNumber: [...this.itemNumber, index + 1],
+              type: type,
+              title: title
+            };
+          });
+      }
+    });
+  }
+
+  setLocalItemInfo(name: string, info: LibraryItemInfo): CachedPromise<void> {
+    let localSectionFileName = this.getLocalSectionFileName();
+    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      for (let item of sectionContents.items) {
+        if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
+          if ((item.ref as Fmt.DefinitionRefExpression).path.name === name) {
+            if (item instanceof FmtLibrary.MetaRefExpression_item) {
+              item.type = info.type;
+            }
+            item.title = info.title;
+            break;
+          }
         }
-      });
+      }
+      if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+        sectionDefinition.state = LibraryDefinitionState.Editing;
+      }
+      this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+      let editedInfo = this.editedItemInfos.get(name);
+      if (editedInfo) {
+        Object.assign(editedInfo, info);
+      }
+    });
   }
 
   private triggerPrefetching(): void {

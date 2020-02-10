@@ -27,8 +27,6 @@ export enum LogicDefinitionType {
 export interface LogicDefinitionTypeDescription {
   readonly definitionType: LogicDefinitionType;
   readonly name: string;
-  readonly hasTitle: boolean;
-  readonly types?: string[];
   createTypeExpression(): Fmt.Expression;
   createObjectContents(): Fmt.ObjectContents;
 }

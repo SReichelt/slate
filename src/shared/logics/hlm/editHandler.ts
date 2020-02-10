@@ -6,8 +6,8 @@ import * as Logic from '../logic';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { GenericEditHandler, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
-import { LibraryDataProvider } from '../../data/libraryDataProvider';
+import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
+import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
@@ -87,6 +87,30 @@ export class HLMEditHandler extends GenericEditHandler {
           }
         })
         .catch(() => {}));
+  }
+
+  addTypeMenu(semanticLink: Display.SemanticLink, onRenderType: RenderTypeFn, info: LibraryItemInfo): void {
+    semanticLink.onMenuOpened = () => {
+      let rows = [this.getTypeRow(undefined, onRenderType, info)];
+      let contents = this.definition.contents;
+      if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+        rows.push(
+          this.getTypeRow('lemma', onRenderType, info),
+          this.getTypeRow('theorem', onRenderType, info),
+          this.getTypeRow('corollary', onRenderType, info),
+          this.getTypeRow('example', onRenderType, info)
+        );
+      } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
+        rows.push(
+          this.getTypeRow('conjecture', onRenderType, info),
+          this.getTypeRow('axiom', onRenderType, info)
+        );
+      }
+      let menu = new Menu.ExpressionMenu;
+      menu.rows = CachedPromise.resolve(rows);
+      return menu;
+    };
+    semanticLink.alwaysShowMenu = true;
   }
 
   addParameterMenu(semanticLink: Display.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
@@ -752,7 +776,6 @@ export class HLMEditHandler extends GenericEditHandler {
       let definitionType: Logic.LogicDefinitionTypeDescription = {
         definitionType: Logic.LogicDefinitionType.Constructor,
         name: 'Constructor',
-        hasTitle: false,
         createTypeExpression: () => new FmtHLM.MetaRefExpression_Constructor,
         createObjectContents: () => new FmtHLM.ObjectContents_Constructor
       };

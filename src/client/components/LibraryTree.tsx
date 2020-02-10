@@ -211,11 +211,17 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
           selected = true;
         }
       }
-      let itemInfo: LibraryItemInfo = {
-        itemNumber: [...props.itemNumber, index + 1],
-        type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
-        title: title
-      };
+      let itemInfo: LibraryItemInfo | undefined = undefined;
+      if (selected) {
+        itemInfo = props.libraryDataProvider.getItemInfo(path).getImmediateResult();
+      }
+      if (!itemInfo) {
+        itemInfo = {
+          itemNumber: [...props.itemNumber, index + 1],
+          type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
+          title: title
+        };
+      }
       treeItems.push(<LibraryTreeItem libraryDataProvider={props.libraryDataProvider} libraryDefinition={props.libraryDefinition} isSubsection={isSubsection} path={path} itemInfo={itemInfo} templates={props.templates} parentScrollPane={props.parentScrollPane} searchWords={searchWords} onFilter={props.onFilter} autoOpen={autoOpen} selected={selected} selectedChildPath={selectedChildPath} interactionHandler={props.interactionHandler} onItemClicked={props.onItemClicked} onInsertButtonClicked={props.onInsertButtonClicked} key={path.name} indent={props.indent} visibleSiblings={visibleItems}/>);
     }
     index++;

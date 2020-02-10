@@ -481,7 +481,7 @@ class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextInputPro
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
         <form onSubmit={onSubmit}>
-          <input type={'text'} value={this.state.text} size={4} onChange={onChange} onFocus={onFocus} onBlur={onBlur} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
+          <input type={'text'} value={this.state.text} size={this.props.item.expectedTextLength} onChange={onChange} onFocus={onFocus} onBlur={onBlur} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
         </form>
       </td>
     );
