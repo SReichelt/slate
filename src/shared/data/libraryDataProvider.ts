@@ -592,20 +592,19 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       throw new Error('Trying to submit definition that is not being edited');
     }
     let prevState = editedLibraryDefinition.state;
+    let createNew = prevState === LibraryDefinitionState.EditingNew;
     editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
-    if (prevState === LibraryDefinitionState.EditingNew) {
-      let localSectionFileName = this.getLocalSectionFileName();
-      let sectionDefinition = this.editedDefinitions.get(localSectionFileName);
-      if (sectionDefinition) {
-        return this.submitLocalSection(localSectionFileName, sectionDefinition)
-          .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, true, false))
-          .catch((error) => {
-            editedLibraryDefinition.state = prevState;
-            return CachedPromise.reject(error);
-          });
-      }
+    let localSectionFileName = this.getLocalSectionFileName();
+    let sectionDefinition = this.editedDefinitions.get(localSectionFileName);
+    if (sectionDefinition) {
+      return this.submitLocalSection(localSectionFileName, sectionDefinition)
+        .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, createNew, false))
+        .catch((error) => {
+          editedLibraryDefinition.state = prevState;
+          return CachedPromise.reject(error);
+        });
     }
-    return this.submitLocalDefinition(name, editedLibraryDefinition, false, false)
+    return this.submitLocalDefinition(name, editedLibraryDefinition, createNew, false)
       .catch((error) => {
         editedLibraryDefinition.state = prevState;
         return CachedPromise.reject(error);

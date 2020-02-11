@@ -77,6 +77,7 @@ export abstract class GenericEditHandler {
     let titleRow = new Menu.StandardExpressionMenuRow;
     titleRow.title = 'Title';
     titleRow.subMenu = titleItem;
+    titleRow.selected = info.title !== undefined;
     return titleRow;
   }
 
