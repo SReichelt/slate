@@ -79,13 +79,14 @@ export class LibraryPreloader {
             }
           }
         }
-        let result = CachedPromise.resolve(this.writeFile(name, file));
-        for (let promise of promises) {
-          result = result
-            .then((contents: string) => promise.then((newContents: string) => (contents + newContents)))
-            .catch((error) => promise.then(() => CachedPromise.reject(error)));
-        }
-        return result;
+        return CachedPromise.all(promises)
+          .then((allFileContents: string[]) => {
+            let contents = this.writeFile(name, file);
+            for (let fileContents of allFileContents) {
+              contents += fileContents;
+            }
+            return contents;
+          });
       })
       .then((contents: string) => {
         this.preloadedSections.set(indexURI, contents);

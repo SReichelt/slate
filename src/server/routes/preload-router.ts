@@ -25,7 +25,7 @@ class SimpleUpdateChecker extends UpdateChecker {
   protected execute(callback: () => CachedPromise<void>): void {
     callback()
       .catch((error) => console.error(error))
-     .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
+      .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
   }
 }
 

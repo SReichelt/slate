@@ -39,7 +39,7 @@ class CachedPromise<T> implements PromiseLike<T> {
       return new CachedPromise(this.promise.then(onfulfilled, onrejected));
     } else if (onfulfilled) {
       try {
-        let result = onfulfilled(this.result as T);
+        let result = onfulfilled(this.result!);
         return CachedPromise.construct<TResult1>(result);
       } catch (error) {
         if (onrejected) {
@@ -68,6 +68,24 @@ class CachedPromise<T> implements PromiseLike<T> {
 
   getImmediateResult(): T | undefined {
     return this.result;
+  }
+
+  static all<U>(promises: CachedPromise<U>[]): CachedPromise<U[]> {
+    let values: (U | PromiseLike<U>)[] = [];
+    let pending = false;
+    for (let promise of promises) {
+      if (promise.promise) {
+        values.push(promise.promise);
+        pending = true;
+      } else {
+        values.push(promise.result!);
+      }
+    }
+    if (pending) {
+      return new CachedPromise(Promise.all(values));
+    } else {
+      return CachedPromise.resolve(values as U[]);
+    }
   }
 }
 
