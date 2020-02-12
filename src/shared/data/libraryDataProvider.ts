@@ -281,7 +281,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
       let uri = this.uri + encodeURI(name) + fileExtension;
       if (this.canPreload && !fullContentsRequired) {
-        if (name === this.getLocalSectionFileName() && this.canPreload && !fullContentsRequired) {
+        if (name === this.getLocalSectionFileName()) {
           result = this.preloadDefinitions(uri + '.preload', definitionName)
             .catch((error) => {
               console.log(error);
@@ -290,10 +290,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           this.preloadedDefinitions.set(name, result);
         } else {
           result = this.fetchLocalSection(false)
-            .then(() => this.fetchDefinition(name, definitionName, getMetaModel, fullContentsRequired))
-            .catch((error) => {
-              console.log(error);
-              return this.fetchDefinition(name, definitionName, getMetaModel, true);
+            .then(() => {
+              let preloadedDefinition = this.preloadedDefinitions.get(name);
+              if (preloadedDefinition) {
+                return preloadedDefinition;
+              } else {
+                return this.fetchDefinition(name, definitionName, getMetaModel, true);
+              }
             });
         }
       } else {
