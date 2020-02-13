@@ -180,6 +180,7 @@ function StartPage(props: StartPageProps) {
         <li><a href="https://nodejs.org/">Node.js</a></li>
         <li><a href="https://www.typescriptlang.org/">TypeScript</a></li>
         <li><a href="https://github.com/gilamran/fullstack-typescript">fullstack-typescript</a> template</li>
+        <li><a href="https://github.com/indutny/bn.js">bn.js</a></li>
         <li><a href="https://github.com/kemitchell/markdown-escape.js">markdown-escape</a></li>
       </ul>
       <p>Frontend:</p>
@@ -200,6 +201,9 @@ function StartPage(props: StartPageProps) {
         <li><a href="https://github.com/chimurai/http-proxy-middleware">http-proxy-middleware</a></li>
         <li><a href="https://nodemailer.com/">Nodemailer</a></li>
       </ul>
+      <p>
+        For the full list, see <a href="https://github.com/SReichelt/slate/blob/master/package.json">package.json</a>.
+      </p>
       <p>
         Slate itself is licensed under the <a href="https://github.com/SReichelt/slate/blob/master/LICENSE">MIT license</a>.
         To review the licensing terms of third-party components, please consult their respective documentation.
