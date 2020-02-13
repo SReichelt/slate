@@ -1509,9 +1509,9 @@ We write “let 𝐚 be a sequence on S with length α” for “let 𝐚 ∈�
 exports[`render hlm library: 1.5.2 data/libraries/hlm/Essentials/Sequences/Finite%20sequences 1`] = `
 "Definition 1.5.2.  Let S be a set. We define:
 
-  S^∗ :=: {(n, 𝐚) | n ∈ ℕ, 𝐚 is a sequence on S with length n}
+  S^∗ :=: {(𝐚)_(S^n) | n ∈ ℕ, 𝐚 is a sequence on S with length n}
 
-  (m, 𝐚) = (n, 𝐛)  :⇔  m = n and 𝐚 = 𝐛  (m ∈ ℕ, 𝐚 is a sequence on S with length m, n ∈ ℕ, 𝐛 is a sequence on S with length n)
+  (𝐚)_(S^m) = (𝐛)_(S^n)  :⇔  m = n and 𝐚 = 𝐛  (m ∈ ℕ, 𝐚 is a sequence on S with length m, n ∈ ℕ, 𝐛 is a sequence on S with length n)
 
 We write “let 𝒂 be a finite sequence on S” for “let 𝒂 ∈ S^∗.”
 
@@ -1537,7 +1537,7 @@ exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/finit
 
 by:
 
-  |(n, 𝐚)| := n  (n ∈ ℕ, 𝐚 is a sequence on S with length n)"
+  |(𝐚)_(S^n)| := n  (n ∈ ℕ, 𝐚 is a sequence on S with length n)"
 `;
 
 exports[`render hlm library: 1.5.5 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
@@ -1583,12 +1583,12 @@ This definition produces an infinite sequence from a function."
 exports[`render hlm library: 1.5.7 data/libraries/hlm/Essentials/Sequences/Ordinal-indexed%20sequences 1`] = `
 "Definition 1.5.7.  Let S be a set. We define:
 
-  S^⋆ :=: {(α, 𝐚) | α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α}
+  S^⋆ :=: {(𝐚)_(S^α) | α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α}
 
-  (α, 𝐚) = (β, 𝐛)  :⇔  α = β and 𝐚 = 𝐛  (α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α, β ∈ 𝓞𝓻𝓭, 𝐛 is a sequence on S with length β)
+  (𝐚)_(S^α) = (𝐛)_(S^β)  :⇔  α = β and 𝐚 = 𝐛  (α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α, β ∈ 𝓞𝓻𝓭, 𝐛 is a sequence on S with length β)
 
 S^∗ ⊆: S^⋆ via
-(n, 𝐚) = (n, 𝐚)
+(𝐚)_(S^n) = (𝐚)_(S^n)
 
 Well-definedness.  No proof.
 
@@ -1606,7 +1606,7 @@ exports[`render hlm library: 1.5.8 data/libraries/hlm/Essentials/Sequences/ordin
 
 by:
 
-  |(α, 𝐚)| := α  (α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α)"
+  |(𝐚)_(S^α)| := α  (α ∈ 𝓞𝓻𝓭, 𝐚 is a sequence on S with length α)"
 `;
 
 exports[`render hlm library: 1.5.9 data/libraries/hlm/Essentials/Sequences/finite 1`] = `
@@ -1625,24 +1625,34 @@ by:
   (a_k)_(k ∈ ℕ) starts with (b_j)_(j < n)  :⇔  ∀ k ∈ ℕ_(<n) : a_k = b_k  (a_k ∈ S for each k ∈ ℕ, b_j ∈ S for each j ∈ 𝓞𝓻𝓭_(<n))"
 `;
 
-exports[`render hlm library: 1.5.11 data/libraries/hlm/Essentials/Sequences/index%20in%20well-ordered%20set 1`] = `
-"Definition 1.5.11.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
+exports[`render hlm library: 1.5.11 data/libraries/hlm/Essentials/Sequences/starts%20with%20finite%20sequence 1`] = `
+"Definition 1.5.11.  Let S be a set, 𝐚 be a sequence on S, 𝒃 be a finite sequence on S. We define
+
+  𝐚 starts with 𝒃
+
+by:
+
+  𝐚 starts with (𝐛)_(S^n)  :⇔  𝐚 starts with 𝐛  (n ∈ ℕ, 𝐛 is a sequence on S with length n)"
+`;
+
+exports[`render hlm library: 1.5.12 data/libraries/hlm/Essentials/Sequences/index%20in%20well-ordered%20set 1`] = `
+"Definition 1.5.12.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
 
   idx_⪯(s) := [T, ⪯∣_T]"
 `;
 
-exports[`render hlm library: 1.5.12 data/libraries/hlm/Essentials/Sequences/indexed%20element%20in%20well-ordered%20set 1`] = `
-"Definition 1.5.12.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], β ∈ 𝓞𝓻𝓭_(<α). For s ∈ S, we define:
+exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/indexed%20element%20in%20well-ordered%20set 1`] = `
+"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], β ∈ 𝓞𝓻𝓭_(<α). For s ∈ S, we define:
 
   S_⪯[β] = s  :⇔  idx_⪯(s) = β
 
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/sequence%20from%20well-ordered%20set 1`] = `
-"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯]. We define:
+exports[`render hlm library: 1.5.14 data/libraries/hlm/Essentials/Sequences/sequence%20from%20well-ordered%20set 1`] = `
+"Definition 1.5.14.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯]. We define:
 
-  seq_⪯(S) := (α, (S_⪯[β])_(β < α))
+  seq_⪯(S) := ((S_⪯[β])_(β < α))_(S^α)
 
 Remarks.
 
@@ -2383,7 +2393,7 @@ exports[`render hlm library: 1.6.1.41.4 data/libraries/hlm/Essentials/Numbers/Na
 "Definition 1.6.1.41.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
 
   seq(M) := seq_(≤∣_M)(M)
-   = (α, (M[n])_(n < α))
+   = ((M[n])_(n < α))_(M^α)
 
 Equality.  No proof.
 
@@ -6358,7 +6368,7 @@ exports[`render hlm library: 2.8.27.1.12.3 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  (a_k)_(k < |𝐱|) ⋅ (α, (x_k)_(k < α)) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝐱|), α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)"
+  (a_k)_(k < |𝐱|) ⋅ ((x_k)_(k < α))_((Carrier(𝐌))^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝐱|), α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)"
 `;
 
 exports[`render hlm library: 2.8.27.1.12.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Coordinates/linearly%20dependent 1`] = `
@@ -6376,7 +6386,7 @@ exports[`render hlm library: 2.8.27.1.12.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈(α, (x_k)_(k < α))〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)
+  〈((x_k)_(k < α))_((Carrier(𝐌))^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)
    = {𝐚 ⋅ 𝐱 : 𝐚 ∈ Coord(𝐱)}
 
 Equality.  No proof."
@@ -6621,7 +6631,7 @@ exports[`render hlm library: 2.8.27.2.12.3 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  (α, (x_k)_(k < α)) ⋅ (a_k)_(k < |𝐱|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝐱|), α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)"
+  ((x_k)_(k < α))_((Carrier(𝐌))^α) ⋅ (a_k)_(k < |𝐱|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝐱|), α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)"
 `;
 
 exports[`render hlm library: 2.8.27.2.12.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Coordinates/linearly%20dependent 1`] = `
@@ -6639,7 +6649,7 @@ exports[`render hlm library: 2.8.27.2.12.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈(α, (x_k)_(k < α))〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)
+  〈((x_k)_(k < α))_((Carrier(𝐌))^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a sequence on Carrier(𝐌) with length α)
    = {𝐱 ⋅ 𝐚 : 𝐚 ∈ Coord(𝐱)}
 
 Equality.  No proof."
