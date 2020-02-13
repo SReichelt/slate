@@ -50,6 +50,10 @@ export interface LogicCheckResult {
   hasErrors: boolean;
 }
 
+export interface LogicCheckResultWithExpression extends LogicCheckResult {
+  expression: Fmt.Expression;
+}
+
 export interface LogicCheckDiagnostic {
   object: Object;
   severity: DiagnosticSeverity;

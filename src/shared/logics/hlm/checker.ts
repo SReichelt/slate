@@ -23,7 +23,7 @@ interface HLMCheckerStructuralCaseRef {
   parameters: Fmt.ParameterList | undefined;
 }
 
-type HLMCheckerRecheckFn = (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => void;
+type HLMCheckerRecheckFn = (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => HLMCheckerContext;
 type HLMCheckerFillPlaceholderFn = (placeholder: Fmt.PlaceholderExpression, value: Fmt.Expression) => void;
 
 interface HLMCheckerContext {
@@ -85,12 +85,13 @@ export class HLMDefinitionChecker {
     hasErrors: false
   };
   private pendingChecks: PendingCheck[] = [];
+  private pendingChecksPromise?: CachedPromise<Logic.LogicCheckResult>;
 
   constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private editing: boolean) {}
 
   checkDefinition(): CachedPromise<Logic.LogicCheckResult> {
-    if (this.pendingChecks.length) {
-      return this.getPendingChecksPromise()
+    if (this.pendingChecksPromise) {
+      return this.pendingChecksPromise
         .catch(() => {})
         .then(() => this.checkDefinition());
     } else {
@@ -117,9 +118,9 @@ export class HLMDefinitionChecker {
     }
   }
 
-  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<Logic.LogicCheckResult> {
-    if (this.pendingChecks.length) {
-      return this.getPendingChecksPromise()
+  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<Logic.LogicCheckResultWithExpression> {
+    if (this.pendingChecksPromise) {
+      return this.pendingChecksPromise
         .catch(() => {})
         .then(() => this.recheckWithSubstitution(originalExpression, substitutedExpression));
     } else {
@@ -127,23 +128,45 @@ export class HLMDefinitionChecker {
         diagnostics: [],
         hasErrors: false
       };
+      let recheckContext: HLMCheckerContext | undefined = undefined;
       if (this.rootContext.editData && this.rootContext.editData.recheckFns) {
         let recheckFn = this.rootContext.editData.recheckFns.get(originalExpression);
         if (recheckFn) {
           try {
-            recheckFn(originalExpression, substitutedExpression);
+            recheckContext = recheckFn(originalExpression, substitutedExpression);
           } catch (error) {
             this.error(substitutedExpression, error.message);
           }
         }
       }
-      return this.getPendingChecksPromise();
+      return this.getPendingChecksPromise().then((result: Logic.LogicCheckResult) => {
+        if (result.hasErrors) {
+          return {
+            ...result,
+            expression: substitutedExpression
+          };
+        } else {
+          let resultExpression = substitutedExpression.substitute((subExpression: Fmt.Expression) => {
+            if (subExpression instanceof Fmt.PlaceholderExpression && recheckContext) {
+              let restriction = recheckContext.editData!.restrictions.get(subExpression);
+              if (restriction && restriction.exactValue) {
+                return restriction.exactValue;
+              }
+            }
+            return subExpression;
+          });
+          return {
+            ...result,
+            expression: resultExpression
+          };
+        }
+      });
     }
   }
 
   fillAutoPlaceholders(onFillPlaceholder: HLMCheckerFillPlaceholderFn): CachedPromise<void> {
-    if (this.pendingChecks.length) {
-      return this.getPendingChecksPromise()
+    if (this.pendingChecksPromise) {
+      return this.pendingChecksPromise
         .catch(() => {})
         .then(() => this.fillAutoPlaceholders(onFillPlaceholder));
     } else {
@@ -205,9 +228,19 @@ export class HLMDefinitionChecker {
   private getPendingChecksPromise(): CachedPromise<Logic.LogicCheckResult> {
     let nextCheck = this.pendingChecks.shift();
     if (nextCheck) {
-      return nextCheck().then(() => this.getPendingChecksPromise());
+      let pendingChecksPromise = nextCheck()
+        .then(() => this.getPendingChecksPromise())
+        .catch((error) => {
+          this.pendingChecks.length = 0;
+          return CachedPromise.reject(error);
+        });
+      if (!pendingChecksPromise.getImmediateResult()) {
+        this.pendingChecksPromise = pendingChecksPromise;
+      }
+      return pendingChecksPromise;
     } else {
-      return CachedPromise.resolve(this.result);
+      this.pendingChecksPromise = undefined;
+      return CachedPromise.resolve({...this.result});
     }
   }
 
@@ -432,6 +465,7 @@ export class HLMDefinitionChecker {
             return CachedPromise.resolve();
           };
           this.pendingChecks.push(checkRestrictions);
+          return recheckContext;
         },
         currentPlaceholderCollection: {
           containsNonAutoPlaceholders: context.currentPlaceholderCollection !== undefined && context.currentPlaceholderCollection.containsNonAutoPlaceholders,

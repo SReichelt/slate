@@ -640,11 +640,11 @@ export class HLMEditHandler extends GenericEditHandler {
     }
     if (checkType && expressionEditInfo.expression) {
       return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-        .then((checkResult: Logic.LogicCheckResult) => {
+        .then((checkResult: Logic.LogicCheckResultWithExpression) => {
           if (checkResult.hasErrors) {
             return [];
           } else {
-            return [expression];
+            return [checkResult.expression];
           }
         })
         .catch(() => []);
@@ -673,11 +673,11 @@ export class HLMEditHandler extends GenericEditHandler {
       result = result.then((currentResult: Fmt.Expression[]) => {
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-            .then((checkResult: Logic.LogicCheckResult) => {
+            .then((checkResult: Logic.LogicCheckResultWithExpression) => {
               if (checkResult.hasErrors) {
                 return currentResult;
               } else {
-                return currentResult.concat(expression);
+                return currentResult.concat(checkResult.expression);
               }
             })
             .catch(() => currentResult);
