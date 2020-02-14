@@ -49,9 +49,9 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^8.10.52",
-        "@types/vscode": "^1.37.0",
-        "tslint": "^5.19.0",
+        "@types/node": "^8.10.59",
+        "@types/vscode": "^1.42.0",
+        "tslint": "^5.20.1",
         "typescript": "^2.6.1"
     }
 }

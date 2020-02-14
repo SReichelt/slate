@@ -1422,6 +1422,42 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
 
 let parseAllTimer: NodeJS.Timer | undefined = undefined;
 
+function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>, condition?: (document: vscode.TextDocument) => boolean): void {
+    if (parseAllTimer) {
+        clearTimeout(parseAllTimer);
+        parseAllTimer = undefined;
+    }
+    parseAllTimer = setTimeout(() => {
+        metaModelCache = new Map<string, ParsedMetaModel>();
+        try {
+            for (let document of vscode.workspace.textDocuments) {
+                if (!condition || condition(document)) {
+                    parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
+                }
+            }
+        } finally {
+            metaModelCache = undefined;
+        }
+    }, 500);
+}
+
+function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>): void {
+    let invalidatedDiagnosticUris: vscode.Uri[] = [];
+    diagnosticCollection.forEach((diagnosticUri: vscode.Uri) => {
+        for (let uri of uris) {
+            if (diagnosticUri === uri || diagnosticUri.toString().startsWith(uri.toString())) {
+                invalidatedDiagnosticUris.push(diagnosticUri);
+                break;
+            }
+        }
+    });
+    for (let uri of invalidatedDiagnosticUris) {
+        diagnosticCollection.delete(uri);
+    }
+    parsedFileCache.clear();
+    triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter);
+}
+
 export function activate(context: vscode.ExtensionContext): void {
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
@@ -1434,28 +1470,22 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
-            parsedFileCache.delete(event.document.uri.fsPath);
-            parseDocument(event.document, diagnosticCollection, parsedDocuments, parseEventEmitter);
-            if (parseAllTimer) {
-                clearTimeout(parseAllTimer);
-                parseAllTimer = undefined;
-            }
-            parseAllTimer = setTimeout(() => {
-                // TODO only reparse affected documents (maintain a list of documents to reparse)
-                parsedFileCache.clear();
-                metaModelCache = new Map<string, ParsedMetaModel>();
-                try {
-                    for (let document of vscode.workspace.textDocuments) {
-                        if (document !== event.document) {
-                            parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
-                        }
-                    }
-                } finally {
-                    metaModelCache = undefined;
-                }
-            }, 500);
+            let changedDocument = event.document;
+            parsedFileCache.delete(changedDocument.uri.fsPath);
+            parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
+            // TODO only reparse affected documents (maintain a list of documents to reparse)
+            triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, (document) => (document !== changedDocument));
         })
     );
+    if (vscode.workspace.onDidDeleteFiles && vscode.workspace.onDidRenameFiles) {
+        context.subscriptions.push(
+            vscode.workspace.onDidDeleteFiles((event) => invalidateUris(event.files.slice(), diagnosticCollection, parsedDocuments, parseEventEmitter)),
+            vscode.workspace.onDidRenameFiles((event) => {
+                let uris = event.files.map((file) => file.oldUri);
+                invalidateUris(uris, diagnosticCollection, parsedDocuments, parseEventEmitter);
+            })
+        );
+    }
     let definitionProvider = new SlateDefinitionProvider(parsedDocuments, hoverEventEmitter);
     context.subscriptions.push(
         vscode.languages.registerDocumentSymbolProvider(SLATE_MODE, new SlateDocumentSymbolProvider(parsedDocuments)),
