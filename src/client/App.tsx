@@ -269,7 +269,6 @@ class App extends React.Component<AppProps, AppState> {
     this.fileAccessor.readFile(templateUri)
       .then((contents: FileContents) => {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
-        contents.close();
         this.setState({
           templates: templates,
           rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, this.state.selectedItemDefinition, this.linkClicked)

@@ -359,8 +359,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
         let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/display/templates' + fileExtension;
         fileAccessor.readFile(templatesUri)
             .then((contents: FileContents) => {
-                context.subscriptions.push({ dispose() { contents.close(); } });
-                contents.onChange = () => {
+                let onChange = () => {
                     try {
                         let templates = FmtReader.readString(contents.text, templatesUri, FmtDisplay.getMetaModel);
                         codeLensProvider.templates = templates;
@@ -369,7 +368,11 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
                     }
                     changeCodeLensesEventEmitter.fire();
                 };
-                contents.onChange();
+                if (contents.addWatcher) {
+                    let watcher = contents.addWatcher(onChange);
+                    context.subscriptions.push({ dispose() { watcher.close(); } });
+                }
+                onChange();
             });
     }
 }

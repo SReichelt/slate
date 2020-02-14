@@ -29,5 +29,4 @@ export class WebFileAccessor implements FileAccessor {
 
 class WebFileContents implements FileContents {
   constructor(public text: string) {}
-  close(): void {}
 }

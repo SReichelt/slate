@@ -1,5 +1,5 @@
 import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
-import { FileAccessor, FileContents, WriteFileResult } from './fileAccessor';
+import { FileAccessor, FileContents, WriteFileResult, FileWatcher } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as Meta from '../format/metaModel';
@@ -33,6 +33,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
+  private fileWatchers = new Map<LibraryDefinition, FileWatcher>();
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private canPreload: boolean, private childName: string, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
@@ -233,10 +234,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
     return this.fileAccessor.readFile(uri)
       .then((contents: FileContents) => {
-        contents.onChange = () => {
-          this.preloadedDefinitions.clear();
-          contents.close();
-        };
+        if (contents.addWatcher) {
+          contents.addWatcher((watcher: FileWatcher) => {
+            this.preloadedDefinitions.clear();
+            watcher.close();
+          });
+        }
         let stream = new FmtReader.StringInputStream(contents.text);
         let sectionReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), FmtLibrary.getMetaModel);
         let sectionFileName = sectionReader.readIdentifier();
@@ -302,17 +305,22 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       } else {
         result = this.fileAccessor.readFile(uri)
           .then((contents: FileContents) => {
-            contents.onChange = () => {
-              this.fullyLoadedDefinitions.delete(name);
-              contents.close();
-            };
             this.preloadedDefinitions.delete(name);
             let file = FmtReader.readString(contents.text, uri, getMetaModel);
-            return {
+            let libraryDefinition: LibraryDefinition = {
               file: file,
               definition: this.getMainDefinition(file, definitionName),
               state: LibraryDefinitionState.Loaded
             };
+            if (contents.addWatcher) {
+              let fileWatcher = contents.addWatcher((watcher: FileWatcher) => {
+                this.fullyLoadedDefinitions.delete(name);
+                watcher.close();
+                this.fileWatchers.delete(libraryDefinition);
+              });
+              this.fileWatchers.set(libraryDefinition, fileWatcher);
+            }
+            return libraryDefinition;
           });
         this.fullyLoadedDefinitions.set(name, result);
       }

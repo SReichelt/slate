@@ -8,7 +8,10 @@ export interface FileAccessor {
 
 export interface FileContents {
   text: string;
-  onChange?: () => void;
+  addWatcher?(onChange: (watcher: FileWatcher) => void): FileWatcher;
+}
+
+export interface FileWatcher {
   close(): void;
 }
 

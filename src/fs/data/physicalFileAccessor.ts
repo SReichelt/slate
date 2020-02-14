@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import { FileAccessor, FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
+import { FileAccessor, FileContents, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class PhysicalFileAccessor implements FileAccessor {
@@ -10,7 +10,7 @@ export class PhysicalFileAccessor implements FileAccessor {
   readFile(uri: string): CachedPromise<FileContents> {
     let fileName = this.getFileName(uri);
     let contents = util.promisify(fs.readFile)(fileName, 'utf8')
-      .then((text) => new PhysicalFileContents(text));
+      .then((text) => new PhysicalFileContents(fileName, text));
     return new CachedPromise(contents);
   }
 
@@ -42,6 +42,26 @@ export class PhysicalFileAccessor implements FileAccessor {
 }
 
 class PhysicalFileContents implements FileContents {
-  constructor(public text: string) {}
-  close(): void {}
+  constructor(private fileName: string, public text: string) {}
+
+  addWatcher(onChange: (watcher: FileWatcher) => void): FileWatcher {
+    let watcher: FileWatcher;
+    let listener = () => {
+      onChange(watcher);
+    };
+    watcher = new PhysicalFileWatcher(this.fileName, listener);
+    fs.watchFile(this.fileName, listener);
+    return watcher;
+  }
+}
+
+class PhysicalFileWatcher implements FileWatcher {
+  constructor(private fileName: string, private listener?: () => void) {}
+
+  close(): void {
+    if (this.listener) {
+      fs.unwatchFile(this.fileName, this.listener);
+      this.listener = undefined;
+    }
+  }
 }

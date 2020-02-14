@@ -1,4 +1,4 @@
-import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
+import { FileAccessor, FileContents, FileWatcher } from '../../shared/data/fileAccessor';
 import * as Fmt from '../../shared/format/format';
 import * as Meta from '../../shared/format/metaModel';
 import * as FmtReader from '../../shared/format/read';
@@ -8,15 +8,19 @@ import CachedPromise from '../../shared/data/cachedPromise';
 
 export class LibraryPreloader {
   private preloadedSections = new Map<string, string>();
+  private watchers = new Set<FileWatcher>();
 
   constructor(private fileAccessor: FileAccessor) {}
 
   private readFile(indexURI: string, uri: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {
     return this.fileAccessor.readFile(uri).then((contents: FileContents) => {
-      contents.onChange = () => {
-        this.preloadedSections.delete(indexURI);
-        contents.close();
-      };
+      if (contents.addWatcher) {
+        this.watchers.add(contents.addWatcher((watcher: FileWatcher) => {
+          this.preloadedSections.delete(indexURI);
+          watcher.close();
+          this.watchers.delete(watcher);
+        }));
+      }
       return FmtReader.readString(contents.text, uri, getMetaModel);
     });
   }
@@ -99,5 +103,9 @@ export class LibraryPreloader {
 
   clear() {
     this.preloadedSections.clear();
+    for (let watcher of this.watchers) {
+      watcher.close();
+    }
+    this.watchers.clear();
   }
 }
