@@ -1176,11 +1176,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                           'left': termDisplay,
                                           'right': new Display.TextExpression('…')
                                         });
-      let row = this.buildCaseRow(renderCase(undefined), formula);
-      let ellipsis = new Display.TextExpression('⋮');
-      ellipsis.styleClasses = ['ellipsis'];
-      let ellipsisRow = [ellipsis, ellipsis];
-      rows = [row, ellipsisRow];
+      if (this.editHandler && this.editHandler.isTemporaryExpression(term)) {
+        let row = this.buildCaseRow(renderCase(undefined), formula);
+        let ellipsis = new Display.TextExpression('⋮');
+        ellipsis.styleClasses = ['ellipsis'];
+        let ellipsisRow = [ellipsis, ellipsis];
+        rows = [row, ellipsisRow];
+      } else {
+        let ellipsis = new Display.TextExpression('…');
+        let row = this.buildCaseRow(ellipsis, formula);
+        rows = [row];
+      }
     } else {
       let constructionExpr = construction as Fmt.DefinitionRefExpression;
       let constructionPath = constructionExpr.path;

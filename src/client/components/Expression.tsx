@@ -848,14 +848,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else if (hasVisibleMenu) {
         cells = [
-          <span className={'menu-cell'} key={'content'}>{result}</span>,
+          <span className={'menu-cell ' + className} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
       } else {
-        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
+        cells = <span className={'menu-cell ' + className} key={'content'}>{result}</span>;
       }
       result = (
-        <span className={className + ' menu-container'}>
+        <span className={'menu-container'}>
           <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}

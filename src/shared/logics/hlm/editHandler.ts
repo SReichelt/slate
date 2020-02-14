@@ -89,6 +89,10 @@ export class HLMEditHandler extends GenericEditHandler {
         .catch(() => {}));
   }
 
+  isTemporaryExpression(expression: Fmt.Expression): boolean {
+    return this.editAnalysis.expressionEditInfo.get(expression) === undefined;
+  }
+
   addTypeMenu(semanticLink: Display.SemanticLink, onRenderType: RenderTypeFn, info: LibraryItemInfo): void {
     semanticLink.onMenuOpened = () => {
       let rows = [this.getTypeRow(undefined, onRenderType, info)];

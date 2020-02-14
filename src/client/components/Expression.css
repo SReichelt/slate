@@ -318,7 +318,7 @@ div.display-math {
   vertical-align: middle;
 }
 
-.table.inline {
+.table.inline, .table.single-case {
   vertical-align: initial;
 }
 
