@@ -7,6 +7,7 @@ export enum ButtonType {
   Save,
   Submit,
   Cancel,
+  Close,
   Edit,
   OpenInVSCode,
   ViewInGitHub,
@@ -83,6 +84,7 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   case ButtonType.Save:
     return <span className={'ok' + (enabled ? ' enabled' : '')}>✓</span>;
   case ButtonType.Cancel:
+  case ButtonType.Close:
     return <span className={'cancel' + (enabled ? ' enabled' : '')}>✗</span>;
   case ButtonType.OpenInVSCode:
     return getVSCodeLogo(enabled);

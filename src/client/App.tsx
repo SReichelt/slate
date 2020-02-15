@@ -68,7 +68,7 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
   extraContentsVisible: boolean;
-  editedDefinitions: LibraryItemListEntry[];
+  editedDefinitions?: LibraryItemListEntry[];
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -85,8 +85,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let state: AppState = {
       verticalLayout: window.innerHeight > window.innerWidth,
-      extraContentsVisible: false,
-      editedDefinitions: []
+      extraContentsVisible: false
     };
 
     let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
@@ -247,7 +246,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     window.onbeforeunload = () => {
-      if (this.state.editedDefinitions.length) {
+      if (this.state.editedDefinitions && this.state.editedDefinitions.length) {
         return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
       } else {
         return null;
@@ -309,15 +308,27 @@ class App extends React.Component<AppProps, AppState> {
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let editListPane = <div className={'app-pane-placeholder'} key={'EditList'}/>;
-    if (this.state.editedDefinitions.length) {
+    if (this.state.editedDefinitions) {
+      let editList: React.ReactNode;
+      if (this.state.editedDefinitions.length) {
+        editList = <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>;
+      } else {
+        editList = (
+          <div className={'empty-list'}>
+            <Button toolTipText={'Close'} onClick={() => this.setState({editedDefinitions: undefined})}>
+              {getButtonIcon(ButtonType.Close)}
+            </Button>
+          </div>
+        );
+      }
       editListPane = (
         <div className={'app-pane'} key={'EditList'}>
-          <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>
+          {editList}
         </div>
       );
     }
     let navigationPane = (
-      <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
+      <SplitPane split={'horizontal'} size={this.state.editedDefinitions ? undefined : 0} resizerStyle={this.state.editedDefinitions ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
         {editListPane}
         <div className={'app-pane'} key={'Tree'}>
           <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
@@ -611,14 +622,15 @@ class App extends React.Component<AppProps, AppState> {
               selectedItemInfo: itemInfoPromise
             });
             return itemInfoPromise.then((itemInfo: LibraryItemInfo) => {
+              let editedDefinition: LibraryItemListEntry = {
+                libraryDataProvider: libraryDataProvider!,
+                libraryDefinition: libraryDefinition,
+                absolutePath: absolutePath,
+                localPath: localPath,
+                itemInfo: itemInfo
+              };
               this.setState((prevState) => ({
-                editedDefinitions: prevState.editedDefinitions.concat({
-                  libraryDataProvider: libraryDataProvider!,
-                  libraryDefinition: libraryDefinition,
-                  absolutePath: absolutePath,
-                  localPath: localPath,
-                  itemInfo: itemInfo
-                })
+                editedDefinitions: prevState.editedDefinitions ? prevState.editedDefinitions.concat(editedDefinition) : [editedDefinition]
               }));
               this.cancelInsert();
             });
@@ -671,15 +683,16 @@ class App extends React.Component<AppProps, AppState> {
       definitionPromise.then((definition: LibraryDefinition) => {
         itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
           let clonedDefinition = libraryDataProvider!.editLocalItem(definition, itemInfo);
+          let editedDefinition: LibraryItemListEntry = {
+            libraryDataProvider: libraryDataProvider!,
+            libraryDefinition: clonedDefinition,
+            absolutePath: absolutePath!,
+            localPath: localPath!,
+            itemInfo: itemInfo
+          };
           this.setState((prevState) => ({
             selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
-            editedDefinitions: prevState.editedDefinitions.concat({
-              libraryDataProvider: libraryDataProvider!,
-              libraryDefinition: clonedDefinition,
-              absolutePath: absolutePath!,
-              localPath: localPath!,
-              itemInfo: itemInfo
-            })
+            editedDefinitions: prevState.editedDefinitions ? prevState.editedDefinitions.concat(editedDefinition) : [editedDefinition]
           }));
         });
       });
@@ -695,10 +708,15 @@ class App extends React.Component<AppProps, AppState> {
         libraryDataProvider.submitLocalItem(definition)
           .then((writeFileResult: WriteFileResult) => {
             this.setState((prevState) => {
-              let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
-              return {
-                editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
-              };
+              if (prevState.editedDefinitions) {
+                let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
+                if (index >= 0) {
+                  return {
+                    editedDefinitions: prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1))
+                  };
+                }
+              }
+              return {};
             });
             if (writeFileResult instanceof GitHubWriteFileResult) {
               if (writeFileResult.pullRequestState !== undefined) {
@@ -741,10 +759,17 @@ class App extends React.Component<AppProps, AppState> {
           oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
         }
         this.setState((prevState) => {
-          let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
+          if (prevState.editedDefinitions) {
+            let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
+            if (index >= 0) {
+              return {
+                selectedItemDefinition: oldDefinition,
+                editedDefinitions: prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1))
+              };
+            }
+          }
           return {
             selectedItemDefinition: oldDefinition,
-            editedDefinitions: index >= 0 ? prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1)) : prevState.editedDefinitions
           };
         });
       }

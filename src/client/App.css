@@ -153,3 +153,7 @@ body {
   width: 1.5em;
   vertical-align: middle;
 }
+
+.empty-list {
+  text-align: right;
+}
