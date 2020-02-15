@@ -936,23 +936,23 @@ export class HLMDefinitionChecker {
 
   private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, context: HLMCheckerContext): void {
     this.checkElementTerm(term, context);
+    this.checkSetTerm(construction, this.getAutoFillContext(context));
+    let typeSearchParameters: HLMTypeSearchParameters = {
+      followDefinitions: true,
+      followEmbeddings: false,
+      resolveConstructionArguments: false,
+      extractStructuralCasesFromConstructionArguments: false,
+      inTypeCast: false
+    };
+    let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
+      .then((finalSet: Fmt.Expression) => {
+        if (!this.checkSetTermEquivalence(construction, finalSet, context)) {
+          this.error(term, 'Term must be an element of the specified construction');
+        }
+      })
+      .catch((error) => this.conditionalError(term, error.message));
+    this.addPendingCheck(checkConstructionRef);
     if (construction instanceof Fmt.DefinitionRefExpression) {
-      this.checkSetTerm(construction, this.getAutoFillContext(context));
-      let typeSearchParameters: HLMTypeSearchParameters = {
-        followDefinitions: true,
-        followEmbeddings: false,
-        resolveConstructionArguments: false,
-        extractStructuralCasesFromConstructionArguments: false,
-        inTypeCast: false
-      };
-      let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
-        .then((finalSet: Fmt.Expression) => {
-          if (!this.checkSetTermEquivalence(construction, finalSet, context)) {
-            this.error(term, 'Term must be an element of the specified construction');
-          }
-        })
-        .catch((error) => this.conditionalError(term, error.message));
-      this.addPendingCheck(checkConstructionRef);
       let constructionPathWithoutArguments = new Fmt.Path;
       constructionPathWithoutArguments.name = construction.path.name;
       constructionPathWithoutArguments.parentPath = construction.path.parentPath;
@@ -1006,7 +1006,7 @@ export class HLMDefinitionChecker {
         })
         .catch((error) => this.error(term, error.message));
       this.addPendingCheck(checkCases);
-    } else {
+    } else if (!(construction instanceof Fmt.PlaceholderExpression)) {
       this.error(construction, 'Construction reference expected');
     }
 

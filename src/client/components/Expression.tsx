@@ -11,6 +11,7 @@ import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 const ToolTip = require('react-portal-tooltip').default;
@@ -753,9 +754,26 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           return <textarea value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
+          let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'];
+          if (expression.searchURLs) {
+            let searchURLs = expression.searchURLs;
+            let onSearch = () => {
+              for (let url of searchURLs) {
+                window.open(url, '_blank');
+              }
+            };
+            let searchButton: SimpleMDE.ToolbarIcon = {
+              name: 'search',
+              action: onSearch,
+              className: 'fa fa-search',
+              title: 'Search Default References (requires disabling popup blockers)'
+            };
+            toolbar.push('|', searchButton);
+          }
           let options: SimpleMDE.Options = {
-            toolbar: ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'],
-            status: false
+            toolbar: toolbar,
+            status: false,
+            autoDownloadFontAwesome: false
           };
           return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
         }

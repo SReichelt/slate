@@ -1171,7 +1171,28 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     };
     let termDisplay = this.renderElementTerm(term, termSelection);
     let rows: Display.RenderedExpression[][];
-    if (construction instanceof Fmt.PlaceholderExpression) {
+    if (cases.length) {
+      rows = cases.map((structuralCase) => {
+        let constructorDisplay: Display.RenderedExpression;
+        if (construction instanceof Fmt.DefinitionRefExpression) {
+          let constructorPromise = this.utils.getStructuralCaseTerm(construction.path, structuralCase);
+          let constructorDisplayPromise = constructorPromise.then((constructorExpr: Fmt.Expression) => this.renderElementTerm(constructorExpr, termSelection));
+          constructorDisplay = new Display.PromiseExpression(constructorDisplayPromise);
+        } else {
+          constructorDisplay = new Display.TextExpression('…');
+        }
+        let formula = this.renderTemplate('EqualityRelation', {
+                                            'left': termDisplay,
+                                            'right': constructorDisplay
+                                          });
+        let value = renderCase(structuralCase.value);
+        let row = this.buildCaseRow(value, formula);
+        if (structuralCase.parameters) {
+          this.addCaseParameters(structuralCase.parameters, undefined, row);
+        }
+        return row;
+      });
+    } else {
       let formula = this.renderTemplate('EqualityRelation', {
                                           'left': termDisplay,
                                           'right': new Display.TextExpression('…')
@@ -1187,24 +1208,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let row = this.buildCaseRow(ellipsis, formula);
         rows = [row];
       }
-    } else {
-      let constructionExpr = construction as Fmt.DefinitionRefExpression;
-      let constructionPath = constructionExpr.path;
-      rows = cases.map((structuralCase) => {
-        let value = renderCase(structuralCase.value);
-        let constructorPromise = this.utils.getStructuralCaseTerm(constructionPath, structuralCase);
-        let constructorDisplayPromise = constructorPromise.then((constructorExpr: Fmt.Expression) => this.renderElementTerm(constructorExpr, termSelection));
-        let constructorDisplay = new Display.PromiseExpression(constructorDisplayPromise);
-        let formula = this.renderTemplate('EqualityRelation', {
-                                            'left': termDisplay,
-                                            'right': constructorDisplay
-                                          });
-        let row = this.buildCaseRow(value, formula);
-        if (structuralCase.parameters) {
-          this.addCaseParameters(structuralCase.parameters, undefined, row);
-        }
-        return row;
-      });
     }
     if (rows.length === 1) {
       return this.renderTemplate('SingleCase', {

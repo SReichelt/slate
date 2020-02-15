@@ -7,7 +7,7 @@ import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferenceSearchURLs } from '../../data/libraryDataProvider';
 import { GenericRenderer, RenderedVariable } from './renderer';
 import { getNextDefaultName } from '../../format/common';
 import CachedPromise from '../../data/cachedPromise';
@@ -755,5 +755,9 @@ export abstract class GenericEditHandler {
         definition.documentation = undefined;
       }
     };
+    if (kind === 'references') {
+      let searchQuery = encodeURI(this.definition.name);
+      markdown.searchURLs = defaultReferenceSearchURLs.map((url: string) => (url + searchQuery));
+    }
   }
 }

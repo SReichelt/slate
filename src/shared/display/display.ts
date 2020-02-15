@@ -276,6 +276,7 @@ export class RadicalExpression extends RenderedExpression {
 
 export class MarkdownExpression extends RenderedExpression {
   onTextChanged?: (newText: string) => void;
+  searchURLs?: string[];
 
   constructor(public text: string) {
     super();

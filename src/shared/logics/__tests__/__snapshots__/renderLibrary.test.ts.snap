@@ -14,7 +14,8 @@ References.
 * https://en.wikipedia.org/wiki/Empty_set
 * http://mathworld.wolfram.com/EmptySet.html
 * https://proofwiki.org/wiki/Definition:Empty_Set
-* https://ncatlab.org/nlab/show/empty+set"
+* https://ncatlab.org/nlab/show/empty+set
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_def"
 `;
 
 exports[`render hlm library: 1.1.2 data/libraries/hlm/Essentials/Sets/Empty%20set%20is%20subset%20of%20any%20set 1`] = `
@@ -26,7 +27,11 @@ Proof.  Let x ∈ ∅. Then x ∈ S:
 
 x ∈ ∅
 
-⇒^def ⚡"
+⇒^def ⚡
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_subset"
 `;
 
 exports[`render hlm library: 1.1.3 data/libraries/hlm/Essentials/Sets/empty 1`] = `
@@ -67,7 +72,11 @@ Choose x := a.
 
 Remarks.
 
-In HLM, multiple alternative definitions can be given for an operator or predicate, if they can be shown to be equal/equivalent. In proofs, the most convenient alternative can be selected at will, which reduces the number of necessary steps. Sometimes, it also makes sense to prove a property according to one alternative and then use it according to another."
+In HLM, multiple alternative definitions can be given for an operator or predicate, if they can be shown to be equal/equivalent. In proofs, the most convenient alternative can be selected at will, which reduces the number of necessary steps. Sometimes, it also makes sense to prove a property according to one alternative and then use it according to another.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.nonempty"
 `;
 
 exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`] = `
@@ -155,7 +164,8 @@ References.
 * https://en.wikipedia.org/wiki/Finite_set
 * http://mathworld.wolfram.com/FiniteSet.html
 * https://proofwiki.org/wiki/Definition:Finite_Set
-* https://ncatlab.org/nlab/show/finite+set"
+* https://ncatlab.org/nlab/show/finite+set
+* https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite"
 `;
 
 exports[`render hlm library: 1.1.5 data/libraries/hlm/Essentials/Sets/Subsets%20of%20finite%20sets%20are%20finite 1`] = `
@@ -175,7 +185,11 @@ Choose m := n, f := g∣_T. We show that g∣_T is injective:
 
 Remarks.
 
-This is just an example proof. It could be rewritten in a very concise way as a proof about cardinals."
+This is just an example proof. It could be rewritten in a very concise way as a proof about cardinals.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite_subset"
 `;
 
 exports[`render hlm library: 1.1.6 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
@@ -191,7 +205,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)
 * http://mathworld.wolfram.com/Intersection.html
-* https://proofwiki.org/wiki/Definition:Set_Intersection"
+* https://proofwiki.org/wiki/Definition:Set_Intersection
+* https://ncatlab.org/nlab/show/intersection
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
 `;
 
 exports[`render hlm library: 1.1.7 data/libraries/hlm/Essentials/Sets/Intersection%20is%20associative 1`] = `
@@ -203,7 +219,8 @@ No proof.
 
 References.
 
-* https://proofwiki.org/wiki/Intersection_is_Associative"
+* https://proofwiki.org/wiki/Intersection_is_Associative
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_assoc"
 `;
 
 exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection%20is%20commutative 1`] = `
@@ -215,7 +232,8 @@ No proof.
 
 References.
 
-* https://proofwiki.org/wiki/Intersection_is_Commutative"
+* https://proofwiki.org/wiki/Intersection_is_Commutative
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_comm"
 `;
 
 exports[`render hlm library: 1.1.9 data/libraries/hlm/Essentials/Sets/Intersection%20is%20subset%20of%20argument 1`] = `
@@ -227,7 +245,8 @@ No proof.
 
 References.
 
-* https://proofwiki.org/wiki/Intersection_is_Subset"
+* https://proofwiki.org/wiki/Intersection_is_Subset
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_subset_left"
 `;
 
 exports[`render hlm library: 1.1.10 data/libraries/hlm/Essentials/Sets/Union 1`] = `
@@ -243,7 +262,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Union_(set_theory)
 * http://mathworld.wolfram.com/Union.html
-* https://proofwiki.org/wiki/Definition:Set_Union"
+* https://proofwiki.org/wiki/Definition:Set_Union
+* https://ncatlab.org/nlab/show/union
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
 `;
 
 exports[`render hlm library: 1.1.11 data/libraries/hlm/Essentials/Sets/Union%20is%20associative 1`] = `
@@ -255,7 +276,8 @@ No proof.
 
 References.
 
-* https://proofwiki.org/wiki/Union_is_Associative"
+* https://proofwiki.org/wiki/Union_is_Associative
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_assoc"
 `;
 
 exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union%20is%20commutative 1`] = `
@@ -267,7 +289,8 @@ No proof.
 
 References.
 
-* https://proofwiki.org/wiki/Union_is_Commutative"
+* https://proofwiki.org/wiki/Union_is_Commutative
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_comm"
 `;
 
 exports[`render hlm library: 1.1.13 data/libraries/hlm/Essentials/Sets/Union%20is%20superset%20of%20argument 1`] = `
@@ -275,7 +298,11 @@ exports[`render hlm library: 1.1.13 data/libraries/hlm/Essentials/Sets/Union%20i
 
   S ⊆ S ∪ T
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.subset_union_left"
 `;
 
 exports[`render hlm library: 1.1.14 data/libraries/hlm/Essentials/Sets/Relative%20complement 1`] = `
@@ -290,7 +317,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
 * http://mathworld.wolfram.com/SetDifference.html
-* https://proofwiki.org/wiki/Definition:Set_Difference"
+* https://proofwiki.org/wiki/Definition:Set_Difference
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
 `;
 
 exports[`render hlm library: 1.1.15 data/libraries/hlm/Essentials/Sets/Disjoint%20union 1`] = `
@@ -316,7 +344,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Disjoint_union
 * http://mathworld.wolfram.com/DisjointUnion.html
-* https://proofwiki.org/wiki/Definition:Disjoint_Union_(Set_Theory)"
+* https://proofwiki.org/wiki/Definition:Disjoint_Union_(Set_Theory)
+* https://ncatlab.org/nlab/show/disjoint+union#special_cases
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sum"
 `;
 
 exports[`render hlm library: 1.1.16 data/libraries/hlm/Essentials/Sets/Cartesian%20product 1`] = `
@@ -336,7 +366,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Cartesian_product
 * http://mathworld.wolfram.com/CartesianProduct.html
-* https://proofwiki.org/wiki/Definition:Cartesian_Product"
+* https://proofwiki.org/wiki/Definition:Cartesian_Product
+* https://ncatlab.org/nlab/show/cartesian+product
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#prod"
 `;
 
 exports[`render hlm library: 1.1.17 data/libraries/hlm/Essentials/Sets/Power%20set 1`] = `
@@ -358,7 +390,8 @@ References.
 * http://mathworld.wolfram.com/PowerSet.html
 * https://proofwiki.org/wiki/Definition:Power_Set
 * https://ncatlab.org/nlab/show/power+set
-* https://coq.inria.fr/library/Coq.Sets.Powerset.html"
+* https://coq.inria.fr/library/Coq.Sets.Powerset.html
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
 `;
 
 exports[`render hlm library: 1.1.18 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
@@ -421,7 +454,8 @@ The generalized Cartesian product over an index set can be constructed in HLM vi
 References.
 
 * https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
-* https://proofwiki.org/wiki/Definition:Cartesian_Product/Family_of_Sets"
+* https://proofwiki.org/wiki/Definition:Cartesian_Product/Family_of_Sets
+* https://ncatlab.org/nlab/show/cartesian+product#in_sets"
 `;
 
 exports[`render hlm library: 1.1.23 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
@@ -490,7 +524,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Axiom_of_choice
 * http://mathworld.wolfram.com/AxiomofChoice.html
-* https://proofwiki.org/wiki/Axiom:Axiom_of_Choice"
+* https://proofwiki.org/wiki/Axiom:Axiom_of_Choice
+* https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
 exports[`render hlm library: 1.2.1 data/libraries/hlm/Essentials/Properties/Properties 1`] = `
@@ -552,7 +587,8 @@ References.
 * https://en.wikipedia.org/wiki/Binary_relation
 * http://mathworld.wolfram.com/Relation.html
 * https://proofwiki.org/wiki/Definition:Relation
-* https://ncatlab.org/nlab/show/relation#binary_relations"
+* https://ncatlab.org/nlab/show/relation#binary_relations
+* https://leanprover-community.github.io/mathlib_docs/data/rel.html#rel"
 `;
 
 exports[`render hlm library: 1.3.2 data/libraries/hlm/Essentials/Relations/related 1`] = `
@@ -581,7 +617,8 @@ exports[`render hlm library: 1.3.4 data/libraries/hlm/Essentials/Relations/conve
 References.
 
 * https://en.wikipedia.org/wiki/Converse_relation
-* https://proofwiki.org/wiki/Definition:Inverse_Relation"
+* https://proofwiki.org/wiki/Definition:Inverse_Relation
+* https://leanprover-community.github.io/mathlib_docs/data/rel.html#rel.inv"
 `;
 
 exports[`render hlm library: 1.3.5 data/libraries/hlm/Essentials/Relations/implies 1`] = `
@@ -591,7 +628,12 @@ exports[`render hlm library: 1.3.5 data/libraries/hlm/Essentials/Relations/impli
 
 Remarks.
 
-This definition is equivalent to the first relation being a subset of the second if relations are encoded as subsets."
+This definition is equivalent to the first relation being a subset of the second if relations are encoded as subsets.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#contains (for endorelations only)
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#subrelation (ditto)"
 `;
 
 exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/conjunction 1`] = `
@@ -684,7 +726,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
 * http://mathworld.wolfram.com/Relation.html
-* https://proofwiki.org/wiki/Definition:Endorelation"
+* https://proofwiki.org/wiki/Definition:Endorelation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Relation"
 `;
 
 exports[`render hlm library: 1.3.13 data/libraries/hlm/Essentials/Relations/restriction 1`] = `
@@ -705,7 +748,8 @@ exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/equa
 References.
 
 * https://en.wikipedia.org/wiki/Binary_relation#Particular_binary_relations: identity relation
-* https://proofwiki.org/wiki/Definition:Diagonal_Relation"
+* https://proofwiki.org/wiki/Definition:Diagonal_Relation
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#eq"
 `;
 
 exports[`render hlm library: 1.3.15 data/libraries/hlm/Essentials/Relations/reflexive 1`] = `
@@ -718,7 +762,9 @@ References.
 * https://en.wikipedia.org/wiki/Reflexive_relation
 * http://mathworld.wolfram.com/Reflexive.html
 * https://proofwiki.org/wiki/Definition:Reflexive_Relation
-* https://ncatlab.org/nlab/show/reflexive+relation"
+* https://ncatlab.org/nlab/show/reflexive+relation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Reflexive
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#reflexive"
 `;
 
 exports[`render hlm library: 1.3.16 data/libraries/hlm/Essentials/Relations/connex 1`] = `
@@ -728,7 +774,10 @@ exports[`render hlm library: 1.3.16 data/libraries/hlm/Essentials/Relations/conn
 
 References.
 
-* https://en.wikipedia.org/wiki/Connex_relation"
+* https://en.wikipedia.org/wiki/Connex_relation
+* https://proofwiki.org/wiki/Definition:Total_Relation
+* https://ncatlab.org/nlab/show/total+relation
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#total"
 `;
 
 exports[`render hlm library: 1.3.17 data/libraries/hlm/Essentials/Relations/symmetric 1`] = `
@@ -744,7 +793,9 @@ References.
 * https://en.wikipedia.org/wiki/Symmetric_relation
 * http://mathworld.wolfram.com/SymmetricRelation.html
 * https://proofwiki.org/wiki/Definition:Symmetric_Relation
-* https://ncatlab.org/nlab/show/symmetric+relation"
+* https://ncatlab.org/nlab/show/symmetric+relation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Symmetric
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#symmetric"
 `;
 
 exports[`render hlm library: 1.3.18 data/libraries/hlm/Essentials/Relations/antisymmetric 1`] = `
@@ -756,7 +807,10 @@ References.
 
 * https://en.wikipedia.org/wiki/Antisymmetric_relation
 * http://mathworld.wolfram.com/AntisymmetricRelation.html
-* https://proofwiki.org/wiki/Definition:Antisymmetric_Relation"
+* https://proofwiki.org/wiki/Definition:Antisymmetric_Relation
+* https://ncatlab.org/nlab/show/antisymmetric+relation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Antisymmetric
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#anti_symmetric"
 `;
 
 exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/transitive 1`] = `
@@ -767,8 +821,11 @@ exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/tran
 References.
 
 * https://en.wikipedia.org/wiki/Transitive_relation
+* http://mathworld.wolfram.com/Transitive.html
 * https://proofwiki.org/wiki/Definition:Transitive_Relation
-* https://ncatlab.org/nlab/show/transitive+relation"
+* https://ncatlab.org/nlab/show/transitive+relation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Transitive
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#transitive"
 `;
 
 exports[`render hlm library: 1.3.20 data/libraries/hlm/Essentials/Relations/preorder 1`] = `
@@ -781,7 +838,9 @@ References.
 * https://en.wikipedia.org/wiki/Preorder
 * http://mathworld.wolfram.com/Preorder.html
 * https://proofwiki.org/wiki/Definition:Preordering
-* https://ncatlab.org/nlab/show/preorder"
+* https://ncatlab.org/nlab/show/preorder
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Preorder
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#preorder"
 `;
 
 exports[`render hlm library: 1.3.21 data/libraries/hlm/Essentials/Relations/partial%20order 1`] = `
@@ -794,7 +853,11 @@ Equivalence.  No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition"
+* https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
+* http://mathworld.wolfram.com/PartialOrder.html
+* https://proofwiki.org/wiki/Definition:Ordering
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Order
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#partial_order"
 `;
 
 exports[`render hlm library: 1.3.22 data/libraries/hlm/Essentials/Relations/total%20order 1`] = `
@@ -807,7 +870,10 @@ Equivalence.  No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Total_order"
+* https://en.wikipedia.org/wiki/Total_order
+* http://mathworld.wolfram.com/TotallyOrderedSet.html
+* https://proofwiki.org/wiki/Definition:Total_Ordering
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#linear_order"
 `;
 
 exports[`render hlm library: 1.3.23 data/libraries/hlm/Essentials/Relations/lower%20bound 1`] = `
@@ -855,7 +921,10 @@ exports[`render hlm library: 1.3.27 data/libraries/hlm/Essentials/Relations/well
 
 References.
 
-* https://en.wikipedia.org/wiki/Well-order"
+* https://en.wikipedia.org/wiki/Well-order
+* http://mathworld.wolfram.com/WellOrderedSet.html
+* https://proofwiki.org/wiki/Definition:Well-Ordering
+* https://ncatlab.org/nlab/show/well-order"
 `;
 
 exports[`render hlm library: 1.3.28 data/libraries/hlm/Essentials/Relations/equivalence 1`] = `
@@ -868,11 +937,13 @@ References.
 * https://en.wikipedia.org/wiki/Equivalence_relation
 * http://mathworld.wolfram.com/EquivalenceRelation.html
 * https://proofwiki.org/wiki/Definition:Equivalence_Relation
-* https://ncatlab.org/nlab/show/equivalence+relation"
+* https://ncatlab.org/nlab/show/equivalence+relation
+* https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Equivalence
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#equivalence"
 `;
 
 exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/Equivalence%20classes 1`] = `
-"Definition 1.3.29 (Equivalence classes).  Let S be a set, ∼ be an equivalence relation on S. We define:
+"Definition 1.3.29.  Let S be a set, ∼ be an equivalence relation on S. We define:
 
   S∕∼ :=: {[s]_∼ | s ∈ S}
 
@@ -897,7 +968,8 @@ References.
 * https://en.wikipedia.org/wiki/Equivalence_class
 * http://mathworld.wolfram.com/EquivalenceClass.html
 * https://proofwiki.org/wiki/Definition:Equivalence_Class
-* https://ncatlab.org/nlab/show/equivalence+class"
+* https://ncatlab.org/nlab/show/equivalence+class
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/quot.html#quotient"
 `;
 
 exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succession 1`] = `
@@ -946,7 +1018,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Reflexive_closure
 * http://mathworld.wolfram.com/ReflexiveClosure.html
-* https://proofwiki.org/wiki/Definition:Reflexive_Closure"
+* https://proofwiki.org/wiki/Definition:Reflexive_Closure
+* https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.refl_gen"
 `;
 
 exports[`render hlm library: 1.3.32.3 data/libraries/hlm/Essentials/Relations/Closures/symmetric%20closure 1`] = `
@@ -982,7 +1055,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Transitive_closure
 * http://mathworld.wolfram.com/TransitiveClosure.html
-* https://proofwiki.org/wiki/Definition:Transitive_Closure_(Relation_Theory)"
+* https://proofwiki.org/wiki/Definition:Transitive_Closure_(Relation_Theory)
+* https://ncatlab.org/nlab/show/transitive+closure
+* https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.trans_gen"
 `;
 
 exports[`render hlm library: 1.3.32.6 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20transitive%20closure 1`] = `
@@ -997,7 +1072,9 @@ Equality.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive closure
-* https://proofwiki.org/wiki/Definition:Reflexive_Transitive_Closure"
+* https://proofwiki.org/wiki/Definition:Reflexive_Transitive_Closure
+* https://ncatlab.org/nlab/show/transitive+closure
+* https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.refl_trans_gen"
 `;
 
 exports[`render hlm library: 1.3.32.7 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20transitive%20closure 1`] = `
@@ -1034,7 +1111,8 @@ References.
 * https://en.wikipedia.org/wiki/Function_(mathematics)
 * http://mathworld.wolfram.com/Function.html
 * https://proofwiki.org/wiki/Definition:Mapping
-* https://ncatlab.org/nlab/show/function"
+* https://ncatlab.org/nlab/show/function
+* https://coq.inria.fr/library/Coq.Program.Basics.html#arrow"
 `;
 
 exports[`render hlm library: 1.4.2 data/libraries/hlm/Essentials/Functions/value 1`] = `
@@ -1048,11 +1126,14 @@ by:
 
 Remarks.
 
-This definition works due to the special way that functions are defined. The [corresponding definition](../Relations/mapping%20value) for mappings is an implicit definition.
+This explicit definition works due to the special way that functions are defined. Within proofs, it enables unfolding of function application if the function has an explicit definition.
+The [corresponding definition](../Relations/mapping%20value) for mappings is an implicit definition instead.
 
 References.
 
-* https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation"
+* https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation
+* https://coq.inria.fr/library/Coq.Program.Basics.html#apply
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.app"
 `;
 
 exports[`render hlm library: 1.4.3 data/libraries/hlm/Essentials/Functions/operator 1`] = `
@@ -1071,7 +1152,8 @@ exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Image
 References.
 
 * https://en.wikipedia.org/wiki/Image_(mathematics)
-* https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset"
+* https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.image"
 `;
 
 exports[`render hlm library: 1.4.5 data/libraries/hlm/Essentials/Functions/Preimage 1`] = `
@@ -1102,7 +1184,9 @@ exports[`render hlm library: 1.4.7 data/libraries/hlm/Essentials/Functions/ident
 References.
 
 * https://en.wikipedia.org/wiki/Identity_function
-* https://proofwiki.org/wiki/Definition:Identity_Mapping"
+* https://proofwiki.org/wiki/Definition:Identity_Mapping
+* https://coq.inria.fr/library/Coq.Init.Datatypes.html#id
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#id"
 `;
 
 exports[`render hlm library: 1.4.8 data/libraries/hlm/Essentials/Functions/generalized%20restriction 1`] = `
@@ -1124,7 +1208,11 @@ exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/codom
 
 Remarks.
 
-This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition."
+This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Restriction/Mapping"
 `;
 
 exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/restriction 1`] = `
@@ -1134,7 +1222,10 @@ exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/rest
 
 References.
 
-* https://en.wikipedia.org/wiki/Restriction_(mathematics)"
+* https://en.wikipedia.org/wiki/Restriction_(mathematics)
+* https://proofwiki.org/wiki/Definition:Restriction/Mapping
+* https://ncatlab.org/nlab/show/restriction
+* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.restrict"
 `;
 
 exports[`render hlm library: 1.4.11 data/libraries/hlm/Essentials/Functions/composition 1`] = `
@@ -1146,7 +1237,10 @@ References.
 
 * https://en.wikipedia.org/wiki/Function_composition
 * http://mathworld.wolfram.com/Composition.html
-* https://proofwiki.org/wiki/Definition:Composition_of_Mappings"
+* https://proofwiki.org/wiki/Definition:Composition_of_Mappings
+* https://ncatlab.org/nlab/show/composition
+* https://coq.inria.fr/library/Coq.Program.Basics.html#compose
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp"
 `;
 
 exports[`render hlm library: 1.4.12 data/libraries/hlm/Essentials/Functions/Composition%20is%20associative 1`] = `
@@ -1160,7 +1254,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Function_composition#Properties
 * http://mathworld.wolfram.com/Composition.html
-* https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative"
+* https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative
+* https://coq.inria.fr/library/Coq.Program.Combinators.html#compose_assoc
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp.assoc"
 `;
 
 exports[`render hlm library: 1.4.13 data/libraries/hlm/Essentials/Functions/cartesian%20product 1`] = `
@@ -1187,7 +1283,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Injective_function
 * http://mathworld.wolfram.com/Injection.html
-* https://proofwiki.org/wiki/Definition:Injection"
+* https://proofwiki.org/wiki/Definition:Injection
+* https://ncatlab.org/nlab/show/injection
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.injective"
 `;
 
 exports[`render hlm library: 1.4.15 data/libraries/hlm/Essentials/Functions/surjective 1`] = `
@@ -1203,7 +1301,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Surjective_function
 * http://mathworld.wolfram.com/Surjection.html
-* https://proofwiki.org/wiki/Definition:Surjection"
+* https://proofwiki.org/wiki/Definition:Surjection
+* https://ncatlab.org/nlab/show/surjection
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.surjective"
 `;
 
 exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/bijective 1`] = `
@@ -1212,7 +1312,7 @@ exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/bije
   f is bijective  :⇔  f is injective and f is surjective
     ⇔  ∀ y ∈ Y : ∃! x ∈ X : f(x) = y
     ⇔  ∃ g : Y → X : [g ∘ f = id_X and f ∘ g = id_Y]
-    ⇔  ∃! h : Y → X : [h ∘ f = id_X and f ∘ h = id_Y]
+    ⇔  ∃! g : Y → X : [g ∘ f = id_X and f ∘ g = id_Y]
 
 Equivalence.  No proof.
 
@@ -1221,7 +1321,10 @@ References.
 * https://en.wikipedia.org/wiki/Bijective_function
 * http://mathworld.wolfram.com/Bijection.html
 * https://proofwiki.org/wiki/Definition:Bijection
-* https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse"
+* https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse
+* https://ncatlab.org/nlab/show/bijection
+* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.bijective
+* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.bijective_iff_has_inverse"
 `;
 
 exports[`render hlm library: 1.4.17 data/libraries/hlm/Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
@@ -1279,7 +1382,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Bijective_function
 * http://mathworld.wolfram.com/Bijection.html
-* https://proofwiki.org/wiki/Definition:Bijection"
+* https://proofwiki.org/wiki/Definition:Bijection
+* https://ncatlab.org/nlab/show/bijection"
 `;
 
 exports[`render hlm library: 1.4.23 data/libraries/hlm/Essentials/Functions/inverse 1`] = `
@@ -1296,7 +1400,9 @@ References.
 
 * https://en.wikipedia.org/wiki/Inverse_function
 * http://mathworld.wolfram.com/InverseFunction.html
-* https://proofwiki.org/wiki/Definition:Inverse_Mapping"
+* https://proofwiki.org/wiki/Definition:Inverse_Mapping
+* https://ncatlab.org/nlab/show/inverse
+* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.inv_fun"
 `;
 
 exports[`render hlm library: 1.4.24 data/libraries/hlm/Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
@@ -1370,7 +1476,10 @@ exports[`render hlm library: 1.4.27.5 data/libraries/hlm/Essentials/Functions/Op
 
 References.
 
-* https://en.wikipedia.org/wiki/Associative_property"
+* https://en.wikipedia.org/wiki/Associative_property
+* http://mathworld.wolfram.com/Associative.html
+* https://proofwiki.org/wiki/Definition:Associative_Operation
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
 `;
 
 exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
@@ -1380,19 +1489,36 @@ exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Op
 
 References.
 
-* https://en.wikipedia.org/wiki/Commutative_property"
+* https://en.wikipedia.org/wiki/Commutative_property
+* http://mathworld.wolfram.com/Commutative.html
+* https://proofwiki.org/wiki/Definition:Commutative/Operation
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
 `;
 
 exports[`render hlm library: 1.4.27.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
 "Definition 1.4.27.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
-  ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)"
+  ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)
+
+References.
+
+* https://en.wikipedia.org/wiki/Distributive_property
+* http://mathworld.wolfram.com/Distributive.html
+* https://proofwiki.org/wiki/Definition:Distributive_Operation/Left
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
 `;
 
 exports[`render hlm library: 1.4.27.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
 "Definition 1.4.27.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
-  ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)"
+  ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)
+
+References.
+
+* https://en.wikipedia.org/wiki/Distributive_property
+* http://mathworld.wolfram.com/Distributive.html
+* https://proofwiki.org/wiki/Definition:Distributive_Operation/Right
+* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
 `;
 
 exports[`render hlm library: 1.4.27.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
@@ -1402,7 +1528,10 @@ exports[`render hlm library: 1.4.27.9 data/libraries/hlm/Essentials/Functions/Op
 
 References.
 
-* https://en.wikipedia.org/wiki/Distributive_property"
+* https://en.wikipedia.org/wiki/Distributive_property
+* http://mathworld.wolfram.com/Distributive.html
+* https://proofwiki.org/wiki/Definition:Distributive_Operation
+* https://ncatlab.org/nlab/show/distributive+law"
 `;
 
 exports[`render hlm library: 1.4.27.10 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
@@ -1423,18 +1552,23 @@ exports[`render hlm library: 1.4.27.12 data/libraries/hlm/Essentials/Functions/O
   ∗∣_A := ∗∣_(A×A)^A"
 `;
 
-exports[`render hlm library: 1.4.27.13.1 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/Generalized%20operations 1`] = `
+exports[`render hlm library: 1.4.27.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
 "Definition 1.4.27.13.1.  Let X be a set. We define:
 
   𝓑𝓲𝓰𝓞𝓹(X) :=: {(e ∗ ⋅⋅⋅) | ∗ : X × X → X is a commutative associative operation on X, e ∈ X such that [∀ x ∈ X : x ∗ e = e ∗ x = x]}
 
   (e ∗ ⋅⋅⋅) = (f ⋆ ⋅⋅⋅)  :⇔  ∗ = ⋆ and e = f  (∗ : X × X → X is an operation on X, e ∈ X, ⋆ : X × X → X is an operation on X, f ∈ X with suitable conditions)
 
-We write “let ⨂ be a generalized operation on X” for “let ⨂ ∈ 𝓑𝓲𝓰𝓞𝓹(X).”"
+We write “let ⨂ be an iterated operation on X” for “let ⨂ ∈ 𝓑𝓲𝓰𝓞𝓹(X).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Iterated_binary_operation
+* https://proofwiki.org/wiki/Definition:Iterated_Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.27.13.2 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/neutral%20element 1`] = `
-"Definition 1.4.27.13.2.  Let X be a set, ⨂ be a generalized operation on X. We define
+exports[`render hlm library: 1.4.27.13.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/neutral%20element 1`] = `
+"Definition 1.4.27.13.2.  Let X be a set, ⨂ be an iterated operation on X. We define
 
   e_⨂
 
@@ -1443,14 +1577,14 @@ by:
   e_(e∗⋅⋅⋅) := e  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.27.13.3 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/operation 1`] = `
-"Definition 1.4.27.13.3.  Let X be a set, ⨂ be a generalized operation on X, x, y ∈ X. We define:
+exports[`render hlm library: 1.4.27.13.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
+"Definition 1.4.27.13.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
 
   x ⨂ y := x ∗ y if ⨂ = (e ∗ ⋅⋅⋅) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20natural%20number 1`] = `
-"Definition 1.4.27.13.4.  Let X be a set, ⨂ be a generalized operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
+"Definition 1.4.27.13.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
 
   ⨂_(i < n) a_i
 
@@ -1460,22 +1594,22 @@ by:
   ⨂_(i < m+1) a_i :=   (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 1.4.27.13.5 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/Generalized%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
-"Proposition 1.4.27.13.5.  Let X be a set, ⨂ be a generalized operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.4.27.13.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
+"Proposition 1.4.27.13.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
 
   ⨂_(i < n) (a_i ⨂ b_i) = (⨂_(i < n) a_i) ⨂ (⨂_(i < n) b_i)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.27.13.6 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20integer 1`] = `
-"Definition 1.4.27.13.6.  Let X be a set, ⨂ be a generalized operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ ℤ_[j,k]. We define:
+exports[`render hlm library: 1.4.27.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
+"Definition 1.4.27.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ ℤ_[j,k]. We define:
 
   ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
 `;
 
-exports[`render hlm library: 1.4.27.13.7 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20finite%20set 1`] = `
-"Definition 1.4.27.13.7.  Let X be a set, ⨂ be a generalized operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
+exports[`render hlm library: 1.4.27.13.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
+"Definition 1.4.27.13.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
     ⇔  ∃ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
@@ -1485,8 +1619,8 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.4.27.13.8 data/libraries/hlm/Essentials/Functions/Operations/Generalized%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
-"Definition 1.4.27.13.8.  Let X be a set, ⨂ be a generalized operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
+exports[`render hlm library: 1.4.27.13.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
+"Definition 1.4.27.13.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ J ⊆ I s.t. J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] : ⨂_(j ∈ J) a_j = x
     ⇔  ∃ J ⊆ I : [J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] and ⨂_(j ∈ J) a_j = x]
@@ -2478,7 +2612,7 @@ References.
 * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C"
 `;
 
-exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/generalized%20sum 1`] = `
+exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.1.46.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
@@ -2490,7 +2624,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.1.46.2 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20sum%20grows 1`] = `
+exports[`render hlm library: 1.6.1.46.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
 "Proposition 1.6.1.46.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∑_(j < m) a_j ≤ ∑_(k < n) a_k
@@ -2498,7 +2632,7 @@ exports[`render hlm library: 1.6.1.46.2 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.3 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+exports[`render hlm library: 1.6.1.46.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
 "Proposition 1.6.1.46.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
@@ -2506,7 +2640,7 @@ exports[`render hlm library: 1.6.1.46.3 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.4 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20sum%20over%20constant 1`] = `
+exports[`render hlm library: 1.6.1.46.4 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20constant 1`] = `
 "Proposition 1.6.1.46.4.  Let n, a ∈ ℕ. Then:
 
   ∑_(i < n) a = n ⋅ a
@@ -2514,7 +2648,7 @@ exports[`render hlm library: 1.6.1.46.4 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.5 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20sum%20over%20variable 1`] = `
+exports[`render hlm library: 1.6.1.46.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
 "Proposition 1.6.1.46.5.  Let n ∈ ℕ. Then:
 
   ∑_(i < n) i = (n, 2) = {(n ⋅ (n − 1))/2 if n ≠ 0, 0 if n = 0
@@ -2522,7 +2656,7 @@ exports[`render hlm library: 1.6.1.46.5 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.6 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/generalized%20product 1`] = `
+exports[`render hlm library: 1.6.1.46.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.1.46.6.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
@@ -2534,7 +2668,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.6.1.46.7 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20product%20multiplies 1`] = `
+exports[`render hlm library: 1.6.1.46.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
 "Proposition 1.6.1.46.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   (∏_(j < m) a_j) ∣ (∏_(k < n) a_k)
@@ -2542,7 +2676,7 @@ exports[`render hlm library: 1.6.1.46.7 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.8 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20product%20of%20positive%20numbers%20grows 1`] = `
+exports[`render hlm library: 1.6.1.46.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
 "Proposition 1.6.1.46.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∏_(j < m) a_j ≤ ∏_(k < n) a_k
@@ -2550,7 +2684,7 @@ exports[`render hlm library: 1.6.1.46.8 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.9 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
+exports[`render hlm library: 1.6.1.46.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
 "Proposition 1.6.1.46.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ∣ (∏_(k < n) a_k)
@@ -2558,7 +2692,7 @@ exports[`render hlm library: 1.6.1.46.9 data/libraries/hlm/Essentials/Numbers/Na
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.10 data/libraries/hlm/Essentials/Numbers/Natural/Generalized%20operators/Generalized%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+exports[`render hlm library: 1.6.1.46.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
 "Proposition 1.6.1.46.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
@@ -3553,7 +3687,7 @@ exports[`render hlm library: 1.6.4.21 data/libraries/hlm/Essentials/Numbers/Inte
 No proof."
 `;
 
-exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/Integer/Generalized%20operators/generalized%20sum 1`] = `
+exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/Integer/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.4.22.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
@@ -3565,7 +3699,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/Integer/Generalized%20operators/generalized%20product 1`] = `
+exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/Integer/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.4.22.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
@@ -3901,7 +4035,7 @@ References.
 * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower"
 `;
 
-exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Rational/Generalized%20operators/generalized%20sum 1`] = `
+exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Rational/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.5.14.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
@@ -3913,7 +4047,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Rational/Generalized%20operators/generalized%20product 1`] = `
+exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Rational/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.5.14.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
@@ -4247,7 +4381,7 @@ exports[`render hlm library: 1.6.6.16 data/libraries/hlm/Essentials/Numbers/Real
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20operators/generalized%20sum 1`] = `
+exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Real/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.6.17.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
@@ -4259,7 +4393,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Real/Generalized%20operators/generalized%20product 1`] = `
+exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Real/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.6.17.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
@@ -4483,7 +4617,7 @@ exports[`render hlm library: 1.6.7.13 data/libraries/hlm/Essentials/Numbers/Comp
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Complex/Generalized%20operators/generalized%20sum 1`] = `
+exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Complex/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.7.14.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
@@ -4495,7 +4629,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Complex/Generalized%20operators/generalized%20product 1`] = `
+exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Complex/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.7.14.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
@@ -5095,7 +5229,7 @@ exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/power%20t
   a^z := {a^z if z ≥ 0, (a^-1)^(−z) if z < 0"
 `;
 
-exports[`render hlm library: 2.5.14 data/libraries/hlm/Algebra/Monoids/generalized%20operation 1`] = `
+exports[`render hlm library: 2.5.14 data/libraries/hlm/Algebra/Monoids/iterated%20operation 1`] = `
 "Definition 2.5.14.  Let 𝐌 be a commutative monoid. We define
 
   ∏_𝐌
@@ -5408,7 +5542,7 @@ exports[`render hlm library: 2.6.15.7 data/libraries/hlm/Algebra/Groups/Order/La
 No proof."
 `;
 
-exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/generalized%20operation 1`] = `
+exports[`render hlm library: 2.6.16 data/libraries/hlm/Algebra/Groups/iterated%20operation 1`] = `
 "Definition 2.6.16.  Let 𝐆 be an abelian group. We define
 
   ∏_𝐆
@@ -5613,13 +5747,13 @@ exports[`render hlm library: 2.7.13.1 data/libraries/hlm/Algebra/Semirings/Examp
   ℕ := [ℕ, +, 0, ⋅, 1]"
 `;
 
-exports[`render hlm library: 2.7.14.1 data/libraries/hlm/Algebra/Semirings/Generalized%20operations/generalized%20sum 1`] = `
+exports[`render hlm library: 2.7.14.1 data/libraries/hlm/Algebra/Semirings/Iterated%20operations/iterated%20sum 1`] = `
 "Definition 2.7.14.1.  Let 𝐑 be a semiring. We define:
 
   ∑_𝐑 := ∏_[𝐑,+]"
 `;
 
-exports[`render hlm library: 2.7.14.2 data/libraries/hlm/Algebra/Semirings/Generalized%20operations/generalized%20product 1`] = `
+exports[`render hlm library: 2.7.14.2 data/libraries/hlm/Algebra/Semirings/Iterated%20operations/iterated%20product 1`] = `
 "Definition 2.7.14.2.  Let 𝐑 be a commutative semiring. We define:
 
   ∏_𝐑 := ∏_[𝐑,⋅]"
@@ -5923,13 +6057,13 @@ exports[`render hlm library: 2.8.23 data/libraries/hlm/Algebra/Rings/kronecker%2
   δ_𝐑,i,j := {1_𝐑 if i = j, 0_𝐑 if i ≠ j"
 `;
 
-exports[`render hlm library: 2.8.24.1 data/libraries/hlm/Algebra/Rings/Generalized%20operations/generalized%20sum 1`] = `
+exports[`render hlm library: 2.8.24.1 data/libraries/hlm/Algebra/Rings/Iterated%20operations/iterated%20sum 1`] = `
 "Definition 2.8.24.1.  Let 𝐑 be a ring. We define:
 
   ∑_𝐑 := ∏_[𝐑,+]"
 `;
 
-exports[`render hlm library: 2.8.24.2 data/libraries/hlm/Algebra/Rings/Generalized%20operations/generalized%20product 1`] = `
+exports[`render hlm library: 2.8.24.2 data/libraries/hlm/Algebra/Rings/Iterated%20operations/iterated%20product 1`] = `
 "Definition 2.8.24.2.  Let 𝐑 be a commutative ring. We define:
 
   ∏_𝐑 := ∏_[𝐑,⋅]"
@@ -6240,7 +6374,7 @@ Remarks.
 This definition lets us multiply elements without decomposing the ring."
 `;
 
-exports[`render hlm library: 2.8.27.1.9 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/generalized%20sum 1`] = `
+exports[`render hlm library: 2.8.27.1.9 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/iterated%20sum 1`] = `
 "Definition 2.8.27.1.9.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
 
   ∑_𝐌 := ∏_[𝐌,+]"
@@ -6503,7 +6637,7 @@ Remarks.
 This definition lets us multiply elements without decomposing the ring."
 `;
 
-exports[`render hlm library: 2.8.27.2.9 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/generalized%20sum 1`] = `
+exports[`render hlm library: 2.8.27.2.9 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/iterated%20sum 1`] = `
 "Definition 2.8.27.2.9.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
 
   ∑_𝐌 := ∏_[𝐌,+]"

@@ -13,6 +13,26 @@ export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, Library
 
 const fileExtension = '.slate';
 
+export const defaultReferences = [
+  'https://en.wikipedia.org/wiki/',
+  'http://mathworld.wolfram.com/',
+  'https://proofwiki.org/wiki/',
+  'https://ncatlab.org/nlab/show/',
+  'https://leanprover-community.github.io/mathlib_docs/',
+  'https://coq.inria.fr/library/',
+  'http://oeis.org/'
+];
+const defaultReferencesString = defaultReferences.map((ref) => `* ${ref}...`).reduce((prev, cur) => `${prev}\n${cur}`);
+export const defaultReferenceSearchURLs = [
+  'https://en.wikipedia.org/w/index.php?search=',
+  'http://mathworld.wolfram.com/search/?query=',
+  'https://proofwiki.org/w/index.php?search=',
+  'https://www.google.com/search?q=site%3Ancatlab.org+',
+  'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+',
+  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
+  'http://oeis.org/search?q='
+];
+
 interface PrefetchQueueItem {
   path: Fmt.Path;
   isSubsection: boolean;
@@ -535,6 +555,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let file = new Fmt.File;
     file.metaModelPath = metaModelPath;
     let definition = Logic.createDefinition(definitionType, name);
+    let references = new Fmt.DocumentationItem;
+    references.kind = 'references';
+    references.text = defaultReferencesString;
+    definition.documentation = new Fmt.DocumentationComment;
+    definition.documentation.items = [references];
     file.definitions.push(definition);
     let libraryDefinition: LibraryDefinition = {
       file: file,
@@ -601,6 +626,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let name = editedLibraryDefinition.definition.name;
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
       throw new Error('Trying to submit definition that is not being edited');
+    }
+    if (editedLibraryDefinition.definition.documentation) {
+      for (let item of editedLibraryDefinition.definition.documentation.items) {
+        if (item.text === defaultReferencesString) {
+          throw new Error('References must be adapted before submitting.');
+        }
+      }
     }
     let prevState = editedLibraryDefinition.state;
     let createNew = prevState === LibraryDefinitionState.EditingNew;

@@ -26,6 +26,7 @@
   "repository": "github:sreichelt/slate",
   "homepage": "https://sreichelt.github.io/slate",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.12.1",
     "bn.js": "^5.1.1",
     "express": "^4.17.1",
     "http-proxy-middleware": "^0.18.0",
