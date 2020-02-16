@@ -29,8 +29,7 @@ export const defaultReferenceSearchURLs = [
   'https://proofwiki.org/w/index.php?search=',
   'https://www.google.com/search?q=site%3Ancatlab.org+',
   'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+',
-  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
-  'http://oeis.org/search?q='
+  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+'
 ];
 
 interface PrefetchQueueItem {

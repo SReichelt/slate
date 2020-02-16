@@ -884,14 +884,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         outerClassNameSuffix = ' ' + className;
       }
       if (expression instanceof Display.PlaceholderExpression) {
-        cells = <span className={'menu-placeholder-cell'}>{result}</span>;
+        cells = <span className={'menu-placeholder-cell expr'}>{result}</span>;
       } else if (hasVisibleMenu) {
         cells = [
-          <span className={'menu-cell'} key={'content'}>{result}</span>,
+          <span className={'menu-cell expr'} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
       } else {
-        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
+        cells = <span className={'menu-cell expr'} key={'content'}>{result}</span>;
       }
       result = (
         <span className={'menu-container' + outerClassNameSuffix}>

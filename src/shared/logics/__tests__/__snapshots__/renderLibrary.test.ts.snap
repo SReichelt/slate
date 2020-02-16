@@ -2975,14 +2975,40 @@ We write “let φ : κ ↔ μ be an isomorphism” for “let φ ∈�
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/identity 1`] = `
+exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Automorphisms 1`] = `
 "Definition 1.6.2.4.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  Aut(κ) := Iso(κ, κ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism"
+`;
+
+exports[`render hlm library: 1.6.2.4.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/automorphism%20group 1`] = `
+"Definition 1.6.2.4.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  Aut(κ) := [Aut(κ)]_(𝑆_(Carrier(κ)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group"
+`;
+
+exports[`render hlm library: 1.6.2.4.5 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/identity 1`] = `
+"Definition 1.6.2.4.5.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
   id_κ := id_(Carrier(κ))"
 `;
 
-exports[`render hlm library: 1.6.2.4.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.2.4.4.  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+exports[`render hlm library: 1.6.2.4.6 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 1.6.2.4.6.  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
 
   1. κ ≤ μ and μ ≤ κ
   2. Iso(κ, μ) is nonempty
@@ -3216,14 +3242,40 @@ We write “let φ : α ↔ β be an isomorphism” for “let φ ∈�
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/identity 1`] = `
+exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Automorphisms 1`] = `
 "Definition 1.6.3.4.3.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  Aut(α) := Iso(α, α)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism"
+`;
+
+exports[`render hlm library: 1.6.3.4.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/automorphism%20group 1`] = `
+"Definition 1.6.3.4.4.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  Aut(α) := [Aut(α)]_(𝑆_(Carrier(α)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group"
+`;
+
+exports[`render hlm library: 1.6.3.4.5 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/identity 1`] = `
+"Definition 1.6.3.4.5.  Let α ∈ 𝓞𝓻𝓭. We define:
 
   id_α := id_(Carrier(α))"
 `;
 
-exports[`render hlm library: 1.6.3.4.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.3.4.4.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+exports[`render hlm library: 1.6.3.4.6 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 1.6.3.4.6.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
 
   1. α ≤ β and β ≤ α
   2. Iso(α, β) is nonempty
@@ -4813,14 +4865,42 @@ We write “let φ : 𝐒 ↔ 𝐓 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.2.4.3 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/identity 1`] = `
+exports[`render hlm library: 2.2.4.3 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Automorphisms 1`] = `
 "Definition 2.2.4.3.  Let 𝐒 be a pointed set. We define:
+
+  Aut(𝐒) := Iso(𝐒, 𝐒)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+`;
+
+exports[`render hlm library: 2.2.4.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.2.4.4.  Let 𝐒 be a pointed set. We define:
+
+  Aut(𝐒) := [Aut(𝐒)]_(𝑆_(Carrier(𝐒)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+`;
+
+exports[`render hlm library: 2.2.4.5 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/identity 1`] = `
+"Definition 2.2.4.5.  Let 𝐒 be a pointed set. We define:
 
   id_𝐒 := id_(Carrier(𝐒))"
 `;
 
-exports[`render hlm library: 2.2.4.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.2.4.4.  Let 𝐒, 𝐓 be pointed sets. Then the following are equivalent:
+exports[`render hlm library: 2.2.4.6 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.2.4.6.  Let 𝐒, 𝐓 be pointed sets. Then the following are equivalent:
 
   1. Iso(𝐒, 𝐓) is nonempty
   2. 𝐒 = 𝐓
@@ -4832,8 +4912,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of pointed sets."
 `;
 
-exports[`render hlm library: 2.2.4.5 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.2.4.5.  Let 𝐒, 𝐓 be pointed sets, φ : 𝐒 ↔ 𝐓 be an isomorphism. Then:
+exports[`render hlm library: 2.2.4.7 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.2.4.7.  Let 𝐒, 𝐓 be pointed sets, φ : 𝐒 ↔ 𝐓 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐓, 𝐒)
 
@@ -4944,14 +5024,42 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.3.6.3 data/libraries/hlm/Algebra/Magmas/Homomorphisms/identity 1`] = `
+exports[`render hlm library: 2.3.6.3 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Automorphisms 1`] = `
 "Definition 2.3.6.3.  Let 𝐌 be a magma. We define:
+
+  Aut(𝐌) := Iso(𝐌, 𝐌)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+`;
+
+exports[`render hlm library: 2.3.6.4 data/libraries/hlm/Algebra/Magmas/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.3.6.4.  Let 𝐌 be a magma. We define:
+
+  Aut(𝐌) := [Aut(𝐌)]_(𝑆_(Carrier(𝐌)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+`;
+
+exports[`render hlm library: 2.3.6.5 data/libraries/hlm/Algebra/Magmas/Homomorphisms/identity 1`] = `
+"Definition 2.3.6.5.  Let 𝐌 be a magma. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.3.6.4 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.3.6.4.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
+exports[`render hlm library: 2.3.6.6 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.3.6.6.  Let 𝐌, 𝐍 be magmas. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -4963,8 +5071,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of magmas."
 `;
 
-exports[`render hlm library: 2.3.6.5 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.3.6.5.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.3.6.7 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.3.6.7.  Let 𝐌, 𝐍 be magmas, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
@@ -5153,14 +5261,42 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
+exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Automorphisms 1`] = `
 "Definition 2.5.7.3.  Let 𝐌 be a monoid. We define:
+
+  Aut(𝐌) := Iso(𝐌, 𝐌)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+`;
+
+exports[`render hlm library: 2.5.7.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.5.7.4.  Let 𝐌 be a monoid. We define:
+
+  Aut(𝐌) := [Aut(𝐌)]_(𝑆_(Carrier(𝐌)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+`;
+
+exports[`render hlm library: 2.5.7.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
+"Definition 2.5.7.5.  Let 𝐌 be a monoid. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.5.7.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.5.7.4.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
+exports[`render hlm library: 2.5.7.6 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.5.7.6.  Let 𝐌, 𝐍 be monoids. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -5172,8 +5308,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of monoids."
 `;
 
-exports[`render hlm library: 2.5.7.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.5.7.5.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.5.7.7 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.5.7.7.  Let 𝐌, 𝐍 be monoids, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
@@ -5384,20 +5520,48 @@ We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.6.11.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
-"Definition 2.6.11.3.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
+exports[`render hlm library: 2.6.11.3 data/libraries/hlm/Algebra/Groups/Homomorphisms/Automorphisms 1`] = `
+"Definition 2.6.11.3.  Let 𝐆 be a group. We define:
+
+  Aut(𝐆) := Iso(𝐆, 𝐆)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Group_Automorphism
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+`;
+
+exports[`render hlm library: 2.6.11.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.6.11.4.  Let 𝐆 be a group. We define:
+
+  Aut(𝐆) := [Aut(𝐆)]_(𝑆_(Carrier(𝐆)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+`;
+
+exports[`render hlm library: 2.6.11.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
+"Definition 2.6.11.5.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐆 : φ(g) = e_𝐇}"
 `;
 
-exports[`render hlm library: 2.6.11.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
-"Definition 2.6.11.4.  Let 𝐆 be a group. We define:
+exports[`render hlm library: 2.6.11.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
+"Definition 2.6.11.6.  Let 𝐆 be a group. We define:
 
   id_𝐆 := id_(Carrier(𝐆))"
 `;
 
-exports[`render hlm library: 2.6.11.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.6.11.5.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
+exports[`render hlm library: 2.6.11.7 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.6.11.7.  Let 𝐆, 𝐇 be groups. Then the following are equivalent:
 
   1. Iso(𝐆, 𝐇) is nonempty
   2. 𝐆 = 𝐇
@@ -5409,8 +5573,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of groups."
 `;
 
-exports[`render hlm library: 2.6.11.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.6.11.6.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
+exports[`render hlm library: 2.6.11.8 data/libraries/hlm/Algebra/Groups/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.6.11.8.  Let 𝐆, 𝐇 be groups, φ : 𝐆 ↔ 𝐇 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐇, 𝐆)
 
@@ -5683,20 +5847,48 @@ We write “let φ : 𝐑 ↔ 𝐒 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.7.9.3 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Kernel 1`] = `
-"Definition 2.7.9.3.  Let 𝐑, 𝐒 be semirings, φ : 𝐑 → 𝐒 be a homomorphism. We define:
+exports[`render hlm library: 2.7.9.3 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Automorphisms 1`] = `
+"Definition 2.7.9.3.  Let 𝐑 be a semiring. We define:
+
+  Aut(𝐑) := Iso(𝐑, 𝐑)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut"
+`;
+
+exports[`render hlm library: 2.7.9.4 data/libraries/hlm/Algebra/Semirings/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.7.9.4.  Let 𝐑 be a semiring. We define:
+
+  Aut(𝐑) := [Aut(𝐑)]_(𝑆_(Carrier(𝐑)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut.group"
+`;
+
+exports[`render hlm library: 2.7.9.5 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Kernel 1`] = `
+"Definition 2.7.9.5.  Let 𝐑, 𝐒 be semirings, φ : 𝐑 → 𝐒 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐑 : φ(g) = 0_𝐒}"
 `;
 
-exports[`render hlm library: 2.7.9.4 data/libraries/hlm/Algebra/Semirings/Homomorphisms/identity 1`] = `
-"Definition 2.7.9.4.  Let 𝐑 be a semiring. We define:
+exports[`render hlm library: 2.7.9.6 data/libraries/hlm/Algebra/Semirings/Homomorphisms/identity 1`] = `
+"Definition 2.7.9.6.  Let 𝐑 be a semiring. We define:
 
   id_𝐑 := id_(Carrier(𝐑))"
 `;
 
-exports[`render hlm library: 2.7.9.5 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.7.9.5.  Let 𝐑, 𝐒 be semirings. Then the following are equivalent:
+exports[`render hlm library: 2.7.9.7 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.7.9.7.  Let 𝐑, 𝐒 be semirings. Then the following are equivalent:
 
   1. Iso(𝐑, 𝐒) is nonempty
   2. 𝐑 = 𝐒
@@ -5708,8 +5900,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of semirings."
 `;
 
-exports[`render hlm library: 2.7.9.6 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.7.9.6.  Let 𝐑, 𝐒 be semirings, φ : 𝐑 ↔ 𝐒 be an isomorphism. Then:
+exports[`render hlm library: 2.7.9.8 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.7.9.8.  Let 𝐑, 𝐒 be semirings, φ : 𝐑 ↔ 𝐒 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐒, 𝐑)
 
@@ -5913,20 +6105,48 @@ We write “let φ : 𝐑 ↔ 𝐒 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.8.11.3 data/libraries/hlm/Algebra/Rings/Homomorphisms/Kernel 1`] = `
-"Definition 2.8.11.3.  Let 𝐑, 𝐒 be rings, φ : 𝐑 → 𝐒 be a homomorphism. We define:
+exports[`render hlm library: 2.8.11.3 data/libraries/hlm/Algebra/Rings/Homomorphisms/Automorphisms 1`] = `
+"Definition 2.8.11.3.  Let 𝐑 be a ring. We define:
+
+  Aut(𝐑) := Iso(𝐑, 𝐑)
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut"
+`;
+
+exports[`render hlm library: 2.8.11.4 data/libraries/hlm/Algebra/Rings/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.8.11.4.  Let 𝐑 be a ring. We define:
+
+  Aut(𝐑) := [Aut(𝐑)]_(𝑆_(Carrier(𝐑)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut.group"
+`;
+
+exports[`render hlm library: 2.8.11.5 data/libraries/hlm/Algebra/Rings/Homomorphisms/Kernel 1`] = `
+"Definition 2.8.11.5.  Let 𝐑, 𝐒 be rings, φ : 𝐑 → 𝐒 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐑 : φ(g) = 0_𝐒}"
 `;
 
-exports[`render hlm library: 2.8.11.4 data/libraries/hlm/Algebra/Rings/Homomorphisms/identity 1`] = `
-"Definition 2.8.11.4.  Let 𝐑 be a ring. We define:
+exports[`render hlm library: 2.8.11.6 data/libraries/hlm/Algebra/Rings/Homomorphisms/identity 1`] = `
+"Definition 2.8.11.6.  Let 𝐑 be a ring. We define:
 
   id_𝐑 := id_(Carrier(𝐑))"
 `;
 
-exports[`render hlm library: 2.8.11.5 data/libraries/hlm/Algebra/Rings/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.8.11.5.  Let 𝐑, 𝐒 be rings. Then the following are equivalent:
+exports[`render hlm library: 2.8.11.7 data/libraries/hlm/Algebra/Rings/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.8.11.7.  Let 𝐑, 𝐒 be rings. Then the following are equivalent:
 
   1. Iso(𝐑, 𝐒) is nonempty
   2. 𝐑 = 𝐒
@@ -5938,8 +6158,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of rings."
 `;
 
-exports[`render hlm library: 2.8.11.6 data/libraries/hlm/Algebra/Rings/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.8.11.6.  Let 𝐑, 𝐒 be rings, φ : 𝐑 ↔ 𝐒 be an isomorphism. Then:
+exports[`render hlm library: 2.8.11.8 data/libraries/hlm/Algebra/Rings/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.8.11.8.  Let 𝐑, 𝐒 be rings, φ : 𝐑 ↔ 𝐒 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐒, 𝐑)
 

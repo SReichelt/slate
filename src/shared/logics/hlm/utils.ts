@@ -626,6 +626,9 @@ export class HLMUtils extends GenericUtils {
             return currentResult;
           } else {
             if (this.referencesCaseParameter(structuralCase)) {
+              if (term.term instanceof Fmt.PlaceholderExpression) {
+                return this.getWildcardFinalSet();
+              }
               if (term.cases.length === 1 && term.term instanceof Fmt.DefinitionRefExpression && term.term.path.parentPath instanceof Fmt.Path && structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
                 if (term.term.path.parentPath.isEquivalentTo(structuralCase._constructor.path.parentPath) && term.term.path.name === structuralCase._constructor.path.name) {
                   let constructorPath = term.term.path;
