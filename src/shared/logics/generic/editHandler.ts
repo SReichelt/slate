@@ -357,7 +357,8 @@ export abstract class GenericEditHandler {
         let onSetParamDisplay = (newValue: Fmt.Expression | undefined) => {
           newDisplayItem.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
         };
-        return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamDisplay, variables, renderedTemplateArguments, false, param.optional, isPredicate, renderer);
+        let canRemove = param.optional && value !== undefined;
+        return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamDisplay, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
       // TODO tooltip
       dialog.items.push(paramItem);
