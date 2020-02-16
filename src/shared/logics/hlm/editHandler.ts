@@ -744,39 +744,60 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private fillArguments(expressionEditInfo: Edit.ExpressionEditInfo, params: Fmt.ParameterList, args: Fmt.ArgumentList): void {
     for (let param of params) {
-      let paramType = param.type.expression;
-      let arg: Fmt.ObjectContents | undefined = undefined;
-      if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
-        let propArg = new FmtHLM.ObjectContents_PropArg;
-        propArg.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-        arg = propArg;
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
-        let setArg = new FmtHLM.ObjectContents_SetArg;
-        setArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-        arg = setArg;
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Subset) {
-        let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
-        subsetArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-        arg = subsetArg;
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
-        let elementArg = new FmtHLM.ObjectContents_ElementArg;
-        elementArg.element = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
-        arg = elementArg;
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
-        let bindingArg = new FmtHLM.ObjectContents_BindingArg;
-        bindingArg.parameter = this.createElementParameter(param.name, expressionEditInfo.context);
-        bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
-        this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
-        arg = bindingArg;
-      }
-      if (arg) {
-        let argValue = new Fmt.CompoundExpression;
-        arg.toCompoundExpression(argValue, false);
+      let argValue = this.createArgumentValue(expressionEditInfo, param);
+      if (argValue) {
         let argument = new Fmt.Argument;
         argument.name = param.name;
         argument.value = argValue;
         args.push(argument);
       }
+    }
+  }
+
+  private createArgumentValue(expressionEditInfo: Edit.ExpressionEditInfo, param: Fmt.Parameter): Fmt.Expression | undefined {
+    if (param.type.arrayDimensions) {
+      // TODO
+      return undefined;
+    }
+    let contents = this.createArgumentContents(expressionEditInfo, param);
+    if (contents) {
+      let argValue = new Fmt.CompoundExpression;
+      contents.toCompoundExpression(argValue, false);
+      return argValue;
+    }
+    let paramType = param.type.expression;
+    if (paramType instanceof FmtHLM.MetaRefExpression_Nat) {
+      return new Fmt.PlaceholderExpression(undefined);
+    }
+    return undefined;
+  }
+
+  private createArgumentContents(expressionEditInfo: Edit.ExpressionEditInfo, param: Fmt.Parameter): Fmt.ObjectContents | undefined {
+    let paramType = param.type.expression;
+    if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
+      let propArg = new FmtHLM.ObjectContents_PropArg;
+      propArg.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
+      return propArg;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
+      let setArg = new FmtHLM.ObjectContents_SetArg;
+      setArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      return setArg;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Subset) {
+      let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
+      subsetArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      return subsetArg;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
+      let elementArg = new FmtHLM.ObjectContents_ElementArg;
+      elementArg.element = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+      return elementArg;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+      let bindingArg = new FmtHLM.ObjectContents_BindingArg;
+      bindingArg.parameter = this.createElementParameter(param.name, expressionEditInfo.context);
+      bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
+      this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
+      return bindingArg;
+    } else {
+      return undefined;
     }
   }
 

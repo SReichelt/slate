@@ -33,23 +33,25 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
     let definitionType = this.props.dialog.definitionType;
     let titleRow: React.ReactNode = null;
     if (!definitionType) {
+      let titleClassName = this.state.titleError ? 'input-error' : undefined;
       titleRow = (
         <tr className={'dialog-row separated-below'}>
           <td className={'dialog-cell'}>Title:</td>
           <td className={'dialog-cell'}>
             <ValidationMessage error={this.state.titleError}>
-              <input type={'text'} value={this.state.title} onChange={this.onChangeTitle}/>
+              <input type={'text'} className={titleClassName} value={this.state.title} onChange={this.onChangeTitle}/>
             </ValidationMessage>
           </td>
         </tr>
       );
     }
+    let nameClassName = this.state.nameError ? 'input-error' : undefined;
     let nameRow = (
       <tr className={'dialog-row separated-above' + (titleRow ? '' : ' dialog-row separated-below')}>
         <td className={'dialog-cell'}>Name:</td>
         <td className={'dialog-cell'}>
           <ValidationMessage error={this.state.nameError}>
-            <input type={'text'} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true}/>
+            <input type={'text'} className={nameClassName} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true}/>
           </ValidationMessage>
         </td>
       </tr>

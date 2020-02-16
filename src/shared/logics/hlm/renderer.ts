@@ -1576,8 +1576,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
         return this.renderElementTerm(arg.element, fullElementTermSelection);
       } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
-        let arg = rawArg as Fmt.IntegerExpression;
-        return this.renderInteger(arg.value);
+        let result: Display.TextExpression;
+        if (rawArg instanceof Fmt.PlaceholderExpression) {
+          result = new Display.TextExpression('');
+          result.requestTextInput = true;
+        } else {
+          let arg = rawArg as Fmt.IntegerExpression;
+          result = this.renderInteger(arg.value);
+        }
+        if (this.editHandler) {
+          this.editHandler.addIntegerEditor(result, rawArg, false);
+        }
+        return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
         let arg = rawArg as Fmt.DefinitionRefExpression;
         let definitionRef = this.renderGenericExpression(arg, 2);

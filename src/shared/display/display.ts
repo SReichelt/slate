@@ -88,7 +88,7 @@ export class InsertPlaceholderExpression extends PlaceholderExpression {
 }
 
 export class TextExpression extends RenderedExpression {
-  onTextChanged?: (newText: string) => void;
+  onTextChanged?: (newText: string) => boolean;
   requestTextInput: boolean = false;
 
   constructor(public text: string) {

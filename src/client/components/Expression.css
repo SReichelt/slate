@@ -707,12 +707,12 @@ div.display-math {
   font-size: 50%;
 }
 
-.expr>input, .expr>textarea {
+.expr input, .expr textarea {
   font-family: inherit;
   font-size: inherit;
 }
 
-.expr>input {
+.expr input {
   text-align: center;
   color: black;
   background-color: white;
@@ -720,12 +720,12 @@ div.display-math {
   border-radius: 2px;
 }
 
-.expr.hover>input {
+.expr.hover input {
   color: inherit;
   background-color: inherit;
 }
 
-.expr>textarea {
+.expr textarea {
   width: 100%;
 	min-height: 4em;
 }

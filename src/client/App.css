@@ -11,6 +11,10 @@ body {
   margin: 2pt;
 }
 
+.input-error {
+  background-color: #ffe0e0 !important;
+}
+
 .hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover>.menu-row>.menu-placeholder-cell, .menu.hover>.menu-row>.menu-dropdown-cell, .menu.hidden.hover>.menu-row>.menu-cell, .open-menu .hover, .open-menu .selected.hover {
   background-color: #ffd700;
 }

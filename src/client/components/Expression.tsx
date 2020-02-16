@@ -51,6 +51,7 @@ interface ExpressionState {
   hovered: boolean;
   showPreview: boolean;
   clicking: boolean;
+  inputError: boolean;
   openMenu?: Menu.ExpressionMenu;
   openDialog?: Dialog.DialogBase;
 }
@@ -72,7 +73,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.state = {
       hovered: false,
       showPreview: false,
-      clicking: false
+      clicking: false,
+      inputError: false
     };
 
     this.updateOptionalProps(props);
@@ -218,12 +220,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let onChange = (newText: string) => {
           expression.text = newText;
+          this.setState({inputError: false});
           this.forceUpdate();
           if (expression.onTextChanged) {
-            expression.onTextChanged(newText);
-          }
-          if (this.props.interactionHandler) {
-            this.props.interactionHandler.expressionChanged();
+            if (expression.onTextChanged(newText)) {
+              if (this.props.interactionHandler) {
+                this.props.interactionHandler.expressionChanged();
+              }
+            } else {
+              this.setState({inputError: true});
+            }
           }
           setTimeout(() => this.highlightPermanently(), 0);
         };
@@ -238,12 +244,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             }
           };
         }
-        let size = expression.text.length;
-        if (size < 1) {
-          size = 1;
-        }
-        let style = {'width': `${size}em`};
-        result = <input value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref}/>;
+        let inputClassName = this.state.inputError ? 'input-error' : undefined;
+        let size = expression.text.length + 1;
+        let style = {'width': `${size}ch`, 'min-width': `${size}ex`};
+        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
         isInputControl = true;
       } else {
         let text = expression.text;

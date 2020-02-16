@@ -703,7 +703,9 @@ export abstract class GenericEditHandler {
 
   addVariableNameEditor(text: Display.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.ParameterList) {
     text.onTextChanged = (newText: string) => {
-      // TODO prevent empty variable names (but allow them temporarily)
+      if (!newText) {
+        return false;
+      }
       // TODO prevent shadowing of other variables
       if (newText.endsWith(',')) {
         let newName = newText.substring(0, newText.length - 1);
@@ -719,6 +721,7 @@ export abstract class GenericEditHandler {
       } else {
         param.name = newText;
       }
+      return true;
     };
     if (GenericEditHandler.lastInsertedParameter === param) {
       text.requestTextInput = true;
@@ -759,6 +762,30 @@ export abstract class GenericEditHandler {
     if (kind === 'references') {
       let searchQuery = encodeURI(this.definition.name);
       markdown.searchURLs = defaultReferenceSearchURLs.map((url: string) => (url + searchQuery));
+    }
+  }
+
+  addIntegerEditor(text: Display.TextExpression, expression: Fmt.Expression, negativeValuesAllowed: boolean): void {
+    let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(expression);
+    if (expressionEditInfo) {
+      text.onTextChanged = (newText: string) => {
+        if (!newText || newText === '-') {
+          return false;
+        }
+        let newValue: Fmt.BN;
+        try {
+          newValue = new Fmt.BN(newText);
+        } catch (error) {
+          return false;
+        }
+        if (newValue.isNeg() && !negativeValuesAllowed) {
+          return false;
+        }
+        let newExpression = new Fmt.IntegerExpression;
+        newExpression.value = newValue;
+        expressionEditInfo!.onSetValue(newExpression);
+        return true;
+      };
     }
   }
 }
