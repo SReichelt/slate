@@ -820,15 +820,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getSingularArticle(nextWord?: string): string {
+    // TODO handle single-letter case, in particular variables include e.g. greek letters
+    // (Note: We currently do not even have access to the variable name.)
     if (nextWord && nextWord.length > 1) {
-      let firstChar = nextWord.charAt(0);
-      if (firstChar === 'a' || firstChar === 'e' || firstChar === 'i' || firstChar === 'o' || firstChar === 'u') {
+      let firstChar = nextWord.charAt(0).toLowerCase();
+      switch (firstChar) {
+      case 'a':
+      case 'e':
+      case 'i':
+      case 'o':
+      case 'u':
         // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
         // Other languages are even worse.
         return 'an';
+      default:
+        return 'a';
       }
     }
-    return 'a';
+    return 'a/an';
   }
 
   private getDisplayDefinitionRef(type: Fmt.Expression): Fmt.Expression | undefined {

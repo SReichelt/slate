@@ -297,6 +297,17 @@ $MultiProperty(operands: %Expr[], property: %Expr): %Template {
   )
 }
 
+$DependentWord(word: %Expr, argument: %Expr): %Template {
+  display = [
+    $InnerParens(
+      body = argument,
+      maxLevel = 2
+    ),
+    '-',
+    word
+  ]
+}
+
 $SubsetParameter(subset: %Expr, superset: %Expr): %Template {
   display = $Relation(
     symbol = '⊆',
