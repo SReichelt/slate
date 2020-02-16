@@ -203,7 +203,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (definition !== this.definition) {
         definitions.unshift(this.definition);
       }
-      return this.renderDefinitionRef(definitions, undefined, 1);
+      let omitArguments = contents instanceof FmtHLM.ObjectContents_Construction ? 1 : 2;
+      return this.renderDefinitionRef(definitions, undefined, omitArguments);
     }
     return undefined;
   }
@@ -1348,14 +1349,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderSpecificDisplayExpression(display: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression {
-    if (omitArguments && display instanceof Fmt.DefinitionRefExpression) {
+    if (omitArguments > 1 && display instanceof Fmt.DefinitionRefExpression) {
       let abbr: Fmt.Expression | undefined = undefined;
       if (display.path.name === 'Operator'
           || display.path.name === 'AssociativeOperator'
           || display.path.name === 'Relation'
           || display.path.name === 'TextualRelation'
           || display.path.name === 'BooleanOperator'
-          || (omitArguments > 1
+          || (omitArguments > 2
               && (display.path.name === 'UnaryOperator'
                   || display.path.name === 'PrefixUnaryOperator'
                   || display.path.name === 'UnaryBooleanOperator'))) {
@@ -1397,7 +1398,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         display = abbr;
       }
     }
-    let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, !!omitArguments);
+    let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, omitArguments > 0);
     return this.renderDisplayExpression(display, args, negationCount);
   }
 
@@ -1598,7 +1599,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
         let arg = rawArg as Fmt.DefinitionRefExpression;
-        let definitionRef = this.renderGenericExpression(arg, 2);
+        let definitionRef = this.renderGenericExpression(arg, 3);
         this.addSemanticLink(definitionRef, arg);
         return definitionRef;
       } else {
