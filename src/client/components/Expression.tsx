@@ -839,8 +839,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       if (expression instanceof Display.InsertPlaceholderExpression && expression.action && !hasMenu) {
-        onMouseDown = () => this.setState({clicking: true});
-        onMouseUp = () => this.setState({clicking: false});
+        onMouseDown = (event: React.MouseEvent<HTMLElement>) => { this.setState({clicking: true}); this.stopPropagation(event); };
+        onMouseUp = (event: React.MouseEvent<HTMLElement>) => { this.setState({clicking: false}); this.stopPropagation(event); };
         onClick = (event: React.MouseEvent<HTMLElement>) => this.actionClicked(expression.action!, event);
         interactive = true;
         if (!semanticLinks) {

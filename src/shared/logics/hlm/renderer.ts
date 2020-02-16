@@ -972,6 +972,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let formula = this.renderFormula(item.formula, formulaSelection);
         return this.buildCaseRow(value, formula);
       });
+      if (this.editHandler) {
+        rows.push([this.editHandler.getCaseInsertButton(term)]);
+      }
       return this.renderTemplate('Cases', {
                                    'cases': rows
                                  });

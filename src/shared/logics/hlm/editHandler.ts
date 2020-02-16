@@ -1029,4 +1029,19 @@ export class HLMEditHandler extends GenericEditHandler {
       }
     }
   }
+
+  getCaseInsertButton(term: FmtHLM.MetaRefExpression_cases): Display.RenderedExpression {
+    let onInsert = () => {
+      let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
+      if (expressionEditInfo) {
+        let newCase = new FmtHLM.ObjectContents_Case;
+        newCase.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
+        newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+        let newTerm = term.clone() as FmtHLM.MetaRefExpression_cases;
+        newTerm.cases.push(newCase);
+        expressionEditInfo.onSetValue(newTerm);
+      }
+    };
+    return this.getImmediateInsertButton(onInsert);
+  }
 }
