@@ -2980,6 +2980,8 @@ exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Car
 
   Aut(κ) := Iso(κ, κ)
 
+We write “let φ : κ ↔ κ be an automorphism” for “let φ ∈ Aut(κ).”
+
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
@@ -3246,6 +3248,8 @@ exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ord
 "Definition 1.6.3.4.3.  Let α ∈ 𝓞𝓻𝓭. We define:
 
   Aut(α) := Iso(α, α)
+
+We write “let φ : α ↔ α be an automorphism” for “let φ ∈ Aut(α).”
 
 References.
 
@@ -4870,6 +4874,8 @@ exports[`render hlm library: 2.2.4.3 data/libraries/hlm/Algebra/Pointed%20sets/H
 
   Aut(𝐒) := Iso(𝐒, 𝐒)
 
+We write “let φ : 𝐒 ↔ 𝐒 be an automorphism” for “let φ ∈ Aut(𝐒).”
+
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
@@ -5028,6 +5034,8 @@ exports[`render hlm library: 2.3.6.3 data/libraries/hlm/Algebra/Magmas/Homomorph
 "Definition 2.3.6.3.  Let 𝐌 be a magma. We define:
 
   Aut(𝐌) := Iso(𝐌, 𝐌)
+
+We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ ∈ Aut(𝐌).”
 
 References.
 
@@ -5265,6 +5273,8 @@ exports[`render hlm library: 2.5.7.3 data/libraries/hlm/Algebra/Monoids/Homomorp
 "Definition 2.5.7.3.  Let 𝐌 be a monoid. We define:
 
   Aut(𝐌) := Iso(𝐌, 𝐌)
+
+We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ ∈ Aut(𝐌).”
 
 References.
 
@@ -5524,6 +5534,8 @@ exports[`render hlm library: 2.6.11.3 data/libraries/hlm/Algebra/Groups/Homomorp
 "Definition 2.6.11.3.  Let 𝐆 be a group. We define:
 
   Aut(𝐆) := Iso(𝐆, 𝐆)
+
+We write “let φ : 𝐆 ↔ 𝐆 be an automorphism” for “let φ ∈ Aut(𝐆).”
 
 References.
 
@@ -5852,6 +5864,8 @@ exports[`render hlm library: 2.7.9.3 data/libraries/hlm/Algebra/Semirings/Homomo
 
   Aut(𝐑) := Iso(𝐑, 𝐑)
 
+We write “let φ : 𝐑 ↔ 𝐑 be an automorphism” for “let φ ∈ Aut(𝐑).”
+
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
@@ -6109,6 +6123,8 @@ exports[`render hlm library: 2.8.11.3 data/libraries/hlm/Algebra/Rings/Homomorph
 "Definition 2.8.11.3.  Let 𝐑 be a ring. We define:
 
   Aut(𝐑) := Iso(𝐑, 𝐑)
+
+We write “let φ : 𝐑 ↔ 𝐑 be an automorphism” for “let φ ∈ Aut(𝐑).”
 
 References.
 
@@ -6644,20 +6660,48 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.8.27.1.10.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Kernel 1`] = `
-"Definition 2.8.27.1.10.3.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
+exports[`render hlm library: 2.8.27.1.10.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Automorphisms 1`] = `
+"Definition 2.8.27.1.10.3.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
+
+  Aut(𝐌) := Iso(𝐌, 𝐌)
+
+We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ ∈ Aut(𝐌).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism"
+`;
+
+exports[`render hlm library: 2.8.27.1.10.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.8.27.1.10.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
+
+  Aut(𝐌) := [Aut(𝐌)]_(𝑆_(Carrier(𝐌)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group"
+`;
+
+exports[`render hlm library: 2.8.27.1.10.5 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Kernel 1`] = `
+"Definition 2.8.27.1.10.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐌 : φ(g) = 0_𝐍}"
 `;
 
-exports[`render hlm library: 2.8.27.1.10.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/identity 1`] = `
-"Definition 2.8.27.1.10.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
+exports[`render hlm library: 2.8.27.1.10.6 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/identity 1`] = `
+"Definition 2.8.27.1.10.6.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.8.27.1.10.5 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.8.27.1.10.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. Then the following are equivalent:
+exports[`render hlm library: 2.8.27.1.10.7 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.8.27.1.10.7.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -6669,8 +6713,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of modules."
 `;
 
-exports[`render hlm library: 2.8.27.1.10.6 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.8.27.1.10.6.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.8.27.1.10.8 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.8.27.1.10.8.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
@@ -6907,20 +6951,48 @@ We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.8.27.2.10.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Kernel 1`] = `
-"Definition 2.8.27.2.10.3.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
+exports[`render hlm library: 2.8.27.2.10.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Automorphisms 1`] = `
+"Definition 2.8.27.2.10.3.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
+
+  Aut(𝐌) := Iso(𝐌, 𝐌)
+
+We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ ∈ Aut(𝐌).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism
+* http://mathworld.wolfram.com/Automorphism.html
+* https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/automorphism"
+`;
+
+exports[`render hlm library: 2.8.27.2.10.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/automorphism%20group 1`] = `
+"Definition 2.8.27.2.10.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
+
+  Aut(𝐌) := [Aut(𝐌)]_(𝑆_(Carrier(𝐌)))
+
+References.
+
+* https://en.wikipedia.org/wiki/Automorphism_group
+* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://proofwiki.org/wiki/Definition:Automorphism_Group
+* https://ncatlab.org/nlab/show/automorphism#automorphism_group"
+`;
+
+exports[`render hlm library: 2.8.27.2.10.5 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Kernel 1`] = `
+"Definition 2.8.27.2.10.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 → 𝐍 be a homomorphism. We define:
 
   Ker(φ) := {g ∈ 𝐌 : φ(g) = 0_𝐍}"
 `;
 
-exports[`render hlm library: 2.8.27.2.10.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/identity 1`] = `
-"Definition 2.8.27.2.10.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
+exports[`render hlm library: 2.8.27.2.10.6 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/identity 1`] = `
+"Definition 2.8.27.2.10.6.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
 
   id_𝐌 := id_(Carrier(𝐌))"
 `;
 
-exports[`render hlm library: 2.8.27.2.10.5 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 2.8.27.2.10.5.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. Then the following are equivalent:
+exports[`render hlm library: 2.8.27.2.10.7 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Equality%20criterion 1`] = `
+"Proposition 2.8.27.2.10.7.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. Then the following are equivalent:
 
   1. Iso(𝐌, 𝐍) is nonempty
   2. 𝐌 = 𝐍
@@ -6932,8 +7004,8 @@ Remarks.
 This follows immediately from the HLM-specific definition of equality of modules."
 `;
 
-exports[`render hlm library: 2.8.27.2.10.6 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
-"Proposition 2.8.27.2.10.6.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
+exports[`render hlm library: 2.8.27.2.10.8 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Inverse%20of%20isomorphism%20is%20also%20isomorphism 1`] = `
+"Proposition 2.8.27.2.10.8.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules, φ : 𝐌 ↔ 𝐍 be an isomorphism. Then:
 
   φ^-1 ∈ Iso(𝐍, 𝐌)
 
