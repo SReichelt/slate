@@ -1429,8 +1429,30 @@ exports[`render hlm library: 1.4.26 data/libraries/hlm/Essentials/Functions/Appl
 No proof."
 `;
 
-exports[`render hlm library: 1.4.27.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
-"Definition 1.4.27.1.  Let X, Y, Z be sets. We define:
+exports[`render hlm library: 1.4.27 data/libraries/hlm/Essentials/Functions/power%20to%20natural%20number 1`] = `
+"Definition 1.4.27.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
+
+  f^n
+
+by:
+
+  f^0 := id_X
+  f^(x+1) :=   f ∘ f^x  (x ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Iterated_function
+* http://mathworld.wolfram.com/IteratedMap.html"
+`;
+
+exports[`render hlm library: 1.4.28 data/libraries/hlm/Essentials/Functions/power%20to%20integer 1`] = `
+"Definition 1.4.28.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
+
+  f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
+`;
+
+exports[`render hlm library: 1.4.29.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
+"Definition 1.4.29.1.  Let X, Y, Z be sets. We define:
 
   𝓞𝓹(X, Y, Z) := (X × Y → Z)
 
@@ -1441,22 +1463,22 @@ References.
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.27.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
-"Definition 1.4.27.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
+exports[`render hlm library: 1.4.29.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
+"Definition 1.4.29.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
 
   x ∗ y := ∗(x, y)"
 `;
 
-exports[`render hlm library: 1.4.27.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
-"Definition 1.4.27.3 (Operator as operation).
+exports[`render hlm library: 1.4.29.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
+"Definition 1.4.29.3 (Operator as operation).
 
 Remarks.
 
 This is a macro to convert an operator taking elements of _X_ and _Y_ and returning an element of _Z_ to an operation from _X_ and _Y_ to _Z_."
 `;
 
-exports[`render hlm library: 1.4.27.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
-"Definition 1.4.27.4 (Inner operations).  Let X be a set. We define:
+exports[`render hlm library: 1.4.29.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
+"Definition 1.4.29.4 (Inner operations).  Let X be a set. We define:
 
   𝓞𝓹(X) := 𝓞𝓹(X, X, X)
 
@@ -1469,8 +1491,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.27.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
-"Definition 1.4.27.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
+exports[`render hlm library: 1.4.29.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
+"Definition 1.4.29.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
 
   ∗ is associative  :⇔  ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)
 
@@ -1482,8 +1504,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
 `;
 
-exports[`render hlm library: 1.4.27.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
-"Definition 1.4.27.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
+exports[`render hlm library: 1.4.29.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
+"Definition 1.4.29.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
 
   ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x
 
@@ -1495,8 +1517,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
 `;
 
-exports[`render hlm library: 1.4.27.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
-"Definition 1.4.27.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.29.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
+"Definition 1.4.29.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)
 
@@ -1508,8 +1530,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
 `;
 
-exports[`render hlm library: 1.4.27.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
-"Definition 1.4.27.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.29.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
+"Definition 1.4.29.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)
 
@@ -1521,8 +1543,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
 `;
 
-exports[`render hlm library: 1.4.27.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
-"Definition 1.4.27.9.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
+exports[`render hlm library: 1.4.29.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
+"Definition 1.4.29.9.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
 
   ∗ is distributive over ⋆  :⇔  ∗ is left-distributive over ⋆ and ∗ is right-distributive over ⋆
 
@@ -1534,26 +1556,26 @@ References.
 * https://ncatlab.org/nlab/show/distributive+law"
 `;
 
-exports[`render hlm library: 1.4.27.10 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
-"Definition 1.4.27.10.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.10 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
+"Definition 1.4.29.10.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_(X×A) := ∗∣_(X×A)^A"
 `;
 
-exports[`render hlm library: 1.4.27.11 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
-"Definition 1.4.27.11.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.11 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
+"Definition 1.4.29.11.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
 
   ∗∣_(A×Y) := ∗∣_(A×Y)^A"
 `;
 
-exports[`render hlm library: 1.4.27.12 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
-"Definition 1.4.27.12.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.12 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
+"Definition 1.4.29.12.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_A := ∗∣_(A×A)^A"
 `;
 
-exports[`render hlm library: 1.4.27.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
-"Definition 1.4.27.13.1.  Let X be a set. We define:
+exports[`render hlm library: 1.4.29.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
+"Definition 1.4.29.13.1.  Let X be a set. We define:
 
   𝓑𝓲𝓰𝓞𝓹(X) :=: {(e ∗ ⋅⋅⋅) | ∗ : X × X → X is a commutative associative operation on X, e ∈ X such that [∀ x ∈ X : x ∗ e = e ∗ x = x]}
 
@@ -1567,8 +1589,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Iterated_Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.27.13.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/neutral%20element 1`] = `
-"Definition 1.4.27.13.2.  Let X be a set, ⨂ be an iterated operation on X. We define
+exports[`render hlm library: 1.4.29.13.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/neutral%20element 1`] = `
+"Definition 1.4.29.13.2.  Let X be a set, ⨂ be an iterated operation on X. We define
 
   e_⨂
 
@@ -1577,39 +1599,39 @@ by:
   e_(e∗⋅⋅⋅) := e  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.27.13.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
-"Definition 1.4.27.13.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
+exports[`render hlm library: 1.4.29.13.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
+"Definition 1.4.29.13.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
 
   x ⨂ y := x ∗ y if ⨂ = (e ∗ ⋅⋅⋅) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.27.13.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
-"Definition 1.4.27.13.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.4.29.13.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
+"Definition 1.4.29.13.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
 
   ⨂_(i < n) a_i
 
 by:
 
   ⨂_(i < 0) a_i := e_⨂
-  ⨂_(i < m+1) a_i :=   (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
+  ⨂_(i < m+1) a_i := (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 1.4.27.13.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
-"Proposition 1.4.27.13.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.4.29.13.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
+"Proposition 1.4.29.13.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
 
   ⨂_(i < n) (a_i ⨂ b_i) = (⨂_(i < n) a_i) ⨂ (⨂_(i < n) b_i)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.27.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
-"Definition 1.4.27.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ ℤ_[j,k]. We define:
+exports[`render hlm library: 1.4.29.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
+"Definition 1.4.29.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ ℤ_[j,k]. We define:
 
   ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
 `;
 
-exports[`render hlm library: 1.4.27.13.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
-"Definition 1.4.27.13.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
+exports[`render hlm library: 1.4.29.13.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
+"Definition 1.4.29.13.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
     ⇔  ∃ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
@@ -1619,8 +1641,8 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.4.27.13.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
-"Definition 1.4.27.13.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
+exports[`render hlm library: 1.4.29.13.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
+"Definition 1.4.29.13.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ J ⊆ I s.t. J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] : ⨂_(j ∈ J) a_j = x
     ⇔  ∃ J ⊆ I : [J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] and ⨂_(j ∈ J) a_j = x]
@@ -2448,7 +2470,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.1.38 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
-"Corollary 1.6.1.38 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and ∀ m ∈ ℕ s.t. m is p : m + 1 is p. Then:
+"Corollary 1.6.1.38 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and [∀ m ∈ ℕ s.t. m is p : m + 1 is p]. Then:
 
   ∀ n ∈ ℕ : n is p
 

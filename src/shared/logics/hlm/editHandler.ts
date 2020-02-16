@@ -71,14 +71,21 @@ export class HLMEditHandler extends GenericEditHandler {
         .then((result: Logic.LogicCheckResult): void | CachedPromise<void> => {
           if (onAutoFilled && !result.hasErrors) {
             let autoFilled = false;
-            let onFillPlaceholder = (placeholder: Fmt.PlaceholderExpression, value: Fmt.Expression) => {
-              let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(placeholder);
+            let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
+              let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
               if (expressionEditInfo) {
-                expressionEditInfo.onSetValue(value);
+                for (let parameters of newParameterLists) {
+                  let context = expressionEditInfo.context;
+                  for (let param of parameters) {
+                    param.name = this.getUnusedDefaultName(param.name, context);
+                    context = context.metaModel.getNextParameterContext(param, context);
+                  }
+                }
+                expressionEditInfo.onSetValue(filledExpression);
                 autoFilled = true;
               }
             };
-            return this.checker.fillAutoPlaceholders(onFillPlaceholder)
+            return this.checker.autoFill(onFillExpression)
               .then((): void | CachedPromise<void> => {
                 if (autoFilled) {
                   onAutoFilled();
@@ -757,7 +764,7 @@ export class HLMEditHandler extends GenericEditHandler {
         arg = elementArg;
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = new FmtHLM.ObjectContents_BindingArg;
-        bindingArg.parameter = this.createElementParameter('i', expressionEditInfo.context);
+        bindingArg.parameter = this.createElementParameter(param.name, expressionEditInfo.context);
         bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
         this.fillArguments(expressionEditInfo, paramType.parameters, bindingArg.arguments);
         arg = bindingArg;

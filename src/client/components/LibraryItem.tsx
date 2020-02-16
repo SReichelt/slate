@@ -82,7 +82,7 @@ class LibraryItem extends React.Component<LibraryItemProps, LibraryItemState> {
     if (editorUpdateRequired) {
       let onAutoFilled = () => {
         if (this.props.interactionHandler) {
-          this.props.interactionHandler.expressionChanged(false);
+          this.props.interactionHandler.expressionChanged(true);
         }
       };
       this.state.renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());

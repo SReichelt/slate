@@ -476,7 +476,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       this.addBindingParameterGroup(parameters, type, definition, remainingDefinitions, state, indices, row);
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      this.addConstraint(type, state, row);
+      this.addConstraint(type, remainingParameters, state, row);
     } else {
       this.addRegularParameterGroup(parameters, type, definition, remainingParameters, remainingDefinitions, state, indices, row);
     }
@@ -548,7 +548,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.started = true;
   }
 
-  private addConstraint(type: FmtHLM.MetaRefExpression_Constraint, state: ParameterListState, row: Display.RenderedExpression[]): void {
+  private addConstraint(type: FmtHLM.MetaRefExpression_Constraint, remainingParameters: Fmt.Parameter[], state: ParameterListState, row: Display.RenderedExpression[]): void {
     if (state.inLetExpr && !state.inDefinition) {
       let connective: string;
       if (state.inConstraint) {
@@ -568,8 +568,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         row.push(new Display.TextExpression(state.fullSentence && !state.started ? 'Assume ' : 'assume '));
       }
     }
-    state.inConstraint = true;
-    state.inDefinition = false;
 
     let formulaSelection: FormulaSelection = {
       allowTruthValue: false,
@@ -577,7 +575,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       allowCases: true
     };
     let formula = this.renderFormula(type.formula, formulaSelection);
-    if (state.sentence) {
+    if (state.sentence && !(state.inConstraint || (remainingParameters.length && remainingParameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Constraint))) {
       row.push(formula);
     } else {
       let formulaWithParens = new Display.InnerParenExpression(formula);
@@ -585,6 +583,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       row.push(formulaWithParens);
     }
 
+    state.inConstraint = true;
+    state.inDefinition = false;
     state.started = true;
   }
 

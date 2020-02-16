@@ -117,6 +117,9 @@ export function escapeIdentifier(identifier: string): string {
 
 export function getNextDefaultName(name: string): string {
   if (name.length === 1) {
+    if (name === 'n') {
+      return 'x';
+    }
     let charCode = name.charCodeAt(0);
     if (charCode >= 0x41 && charCode <= 0x5a) {
       return String.fromCharCode(charCode === 0x5a ? 0x41 : charCode + 1);

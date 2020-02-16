@@ -10,6 +10,13 @@ $OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template
 $Fraction(numerator: %Expr, denominator: %Expr): %Template {}
 $Radical(radicand: %Expr, degree?: %Expr): %Template {}
 
+$DefinitionColon: %Template {
+  display = $Style(
+    body = ':',
+    styleClass = 'def-colon'
+  )
+}
+
 $Group(items: %Expr[], separator: %Expr = ', '): %Template {
   display = %for(
     param = items,
@@ -308,7 +315,7 @@ $ElementParameter(element: %Expr, set: %Expr): %Template {
 
 $VariableDefinition(left: %Expr, right: %Expr): %Template {
   display = $Relation(
-    symbol = ':=',
+    symbol = [$DefinitionColon, '='],
     operands = [left, right],
     space = ' '
   )
@@ -329,14 +336,14 @@ $EqualityRelation(left: %Expr, right: %Expr): %Template {
 
 $EqualityDefinition(left: %Expr, right: %Expr): %Template {
   display = $Relation(
-    symbol = ':=',
+    symbol = [$DefinitionColon, '='],
     operands = [left, right]
   )
 }
 
 $ConstructionDefinition(left: %Expr, right: %Expr): %Template {
   display = $Relation(
-    symbol = ':=:',
+    symbol = [$DefinitionColon, '=', $DefinitionColon],
     operands = [left, right]
   )
 }
@@ -358,7 +365,7 @@ $EquivalenceRelation(left: %Expr, right: %Expr): %Template {
 
 $EquivalenceDefinition(left: %Expr, right: %Expr): %Template {
   display = $Relation(
-    symbol = ':⇔',
+    symbol = [$DefinitionColon, '⇔'],
     operands = [left, right],
     space = '  ',
     parenLevel = -3
@@ -390,14 +397,14 @@ $SubsetRelation(subset: %Expr, superset: %Expr): %Template {
 
 $EmbeddingDefinition(subset: %Expr, superset: %Expr): %Template {
   display = $Relation(
-    symbol = '⊆:',
+    symbol = ['⊆', $DefinitionColon],
     operands = [subset, superset]
   )
 }
 
 $FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLevel: %Int = 0): %Template {
   display = $Operator(
-    symbol = ':',
+    symbol = $DefinitionColon,
     operands = [function, body],
     space = space,
     minParenLevel = minParenLevel,

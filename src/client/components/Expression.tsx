@@ -210,6 +210,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     }
     let result: React.ReactNode = null;
+    let innerClassName = '';
     let isInputControl = false;
     if (expression instanceof Display.EmptyExpression) {
       result = '\u200b';
@@ -348,7 +349,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       return result;
     } else if (expression instanceof Display.TableExpression) {
-      className += ' table';
+      innerClassName += ' table';
       let colCount = 0;
       for (let row of expression.items) {
         if (colCount < row.length) {
@@ -380,7 +381,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       result = rows;
     } else if (expression instanceof Display.ParenExpression) {
-      className += ' paren';
+      innerClassName += ' paren';
       let render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
         if (surroundingParenStyle === expression.style) {
           return this.renderExpression(expression.body, className, semanticLinks);
@@ -657,7 +658,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let render = expression.body.getLineHeight().then(renderWithLineHeight);
       result = renderPromise(render, undefined, renderWithLineHeight);
     } else if (expression instanceof Display.OverUnderExpression) {
-      className += ' overunder';
+      innerClassName += ' overunder';
       let bodyWithParens = new Display.InnerParenExpression(expression.body);
       let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
@@ -686,11 +687,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
         );
       } else {
-        className += ' noover';
+        innerClassName += ' noover';
       }
       result = rows;
     } else if (expression instanceof Display.FractionExpression) {
-      className += ' fraction';
+      innerClassName += ' fraction';
       result = [
         (
           <span className={'fraction-numerator-row'} key="numerator">
@@ -708,7 +709,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         )
       ];
     } else if (expression instanceof Display.RadicalExpression) {
-      className += ' radical';
+      innerClassName += ' radical';
       result = (
         <span className={'radical-row'}>
           <span className={'radical-degree-col'}>
@@ -754,6 +755,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           return <textarea value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
+          let key = 'markdown-editor';
           let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'];
           if (expression.searchURLs) {
             let searchURLs = expression.searchURLs;
@@ -769,13 +771,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               title: 'Search Default References (requires disabling popup blockers)'
             };
             toolbar.push('|', searchButton);
+            key = 'markdown-editor-with-search';
           }
           let options: SimpleMDE.Options = {
             toolbar: toolbar,
             status: false,
             autoDownloadFontAwesome: false
           };
-          return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options}/>;
+          return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
         }
       } else {
         let options = {
@@ -862,18 +865,32 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         menuClassName += ' open';
       }
       let cells: React.ReactNode;
+      let outerClassNameSuffix = '';
+      if (innerClassName) {
+        // Correct rendering of inline menus is a bit tricky.
+        // If innerClassName is set, we are not allowed to nest any additional elements between the
+        // one annotated with innerClassName and the current result; in particular we will break
+        // CSS rules by doing so. Moreover, we must be careful not to break apart className and
+        // innerClassName, as some conditions in Expression.css expect them to be on the same level.
+        // On the other hand, some conditions related e.g. to alignment only work if className is
+        // assigned to the outermost element. Therefore we do that whenever we can, and hope for the
+        // best.
+        result = <span className={className + innerClassName}>{result}</span>;
+      } else {
+        outerClassNameSuffix = ' ' + className;
+      }
       if (expression instanceof Display.PlaceholderExpression) {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else if (hasVisibleMenu) {
         cells = [
-          <span className={'menu-cell ' + className} key={'content'}>{result}</span>,
+          <span className={'menu-cell'} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
       } else {
-        cells = <span className={'menu-cell ' + className} key={'content'}>{result}</span>;
+        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
       }
       result = (
-        <span className={'menu-container'}>
+        <span className={'menu-container' + outerClassNameSuffix}>
           <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}
@@ -883,6 +900,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         </span>
       );
     } else {
+      className += innerClassName;
       if (this.state.hovered) {
         className += ' hover';
       }

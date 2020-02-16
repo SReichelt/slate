@@ -521,6 +521,10 @@ div.display-math {
   font-size: 70%;
 }
 
+.def-colon {
+  vertical-align: .04em;
+}
+
 .ellipsis {
   line-height: initial;
   font-size: smaller;
