@@ -50,7 +50,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     return (
       <div className={'tree-container'}>
         <div className={'tree-search-area'}>
-          <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText}/>
+          <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true}/>
         </div>
         <div className={'tree-area'}>
           <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
