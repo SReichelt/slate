@@ -93,8 +93,12 @@ div.display-math {
   display: block;
 }
 
-.paragraph+.paragraph .display-math {
+.paragraph:not(:first-child) .display-math {
   margin-top: 1ex;
+}
+
+.paragraph:not(:last-child) .display-math {
+  margin-bottom: 1ex;
 }
 
 .display-math, .indented {
