@@ -85,6 +85,13 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     super();
   }
 
+  expressionChanged(editorUpdateRequired: boolean = true): void {
+    if (this.definition) {
+      this.definition.then((definition: LibraryDefinition) => (definition.modified = true));
+    }
+    super.expressionChanged(editorUpdateRequired);
+  }
+
   getURI(semanticLink: Display.SemanticLink): string | undefined {
     let path = this.getPath(semanticLink);
     if (path) {

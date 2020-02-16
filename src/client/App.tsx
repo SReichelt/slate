@@ -246,11 +246,14 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     window.onbeforeunload = () => {
-      if (this.state.editedDefinitions && this.state.editedDefinitions.length) {
-        return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
-      } else {
-        return null;
+      if (this.state.editedDefinitions) {
+        for (let editedDefinition of this.state.editedDefinitions) {
+          if (editedDefinition.libraryDefinition.modified) {
+            return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
+          }
+        }
       }
+      return null;
     };
 
     GitHub.getClientID()
@@ -683,6 +686,7 @@ class App extends React.Component<AppProps, AppState> {
       definitionPromise.then((definition: LibraryDefinition) => {
         itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
           let clonedDefinition = libraryDataProvider!.editLocalItem(definition, itemInfo);
+          let clonedDefinitionPromise = CachedPromise.resolve(clonedDefinition);
           let editedDefinition: LibraryItemListEntry = {
             libraryDataProvider: libraryDataProvider!,
             libraryDefinition: clonedDefinition,
@@ -691,7 +695,8 @@ class App extends React.Component<AppProps, AppState> {
             itemInfo: itemInfo
           };
           this.setState((prevState) => ({
-            selectedItemDefinition: CachedPromise.resolve(clonedDefinition),
+            selectedItemDefinition: clonedDefinitionPromise,
+            interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider!, this.state.templates, clonedDefinitionPromise, this.linkClicked) : undefined,
             editedDefinitions: prevState.editedDefinitions ? prevState.editedDefinitions.concat(editedDefinition) : [editedDefinition]
           }));
         });

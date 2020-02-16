@@ -16,6 +16,7 @@ export interface LibraryDefinition {
   file: Fmt.File;
   definition: Fmt.Definition;
   state: LibraryDefinitionState;
+  modified?: boolean;
 }
 
 export enum LibraryDefinitionState {

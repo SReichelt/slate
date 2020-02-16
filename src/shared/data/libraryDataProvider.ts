@@ -414,9 +414,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       } else {
         sectionContents.items.splice(insertIndex, 0, newSubsection);
       }
-      if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+      if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
         sectionDefinition.state = LibraryDefinitionState.Editing;
       }
+      sectionDefinition.modified = true;
       this.editedDefinitions.set(localSectionFileName, sectionDefinition);
       let subsectionProvider = this.getProviderForSubsection(newSubsectionRef.path);
       let metaModelPath = sectionDefinition.file.metaModelPath.clone() as Fmt.Path;
@@ -446,7 +447,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let libraryDefinition: LibraryDefinition = {
       file: file,
       definition: definition,
-      state: LibraryDefinitionState.EditingNew
+      state: LibraryDefinitionState.EditingNew,
+      modified: false
     };
     this.editedDefinitions.set(this.getLocalSectionFileName(), libraryDefinition);
     return libraryDefinition;
@@ -535,9 +537,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         } else {
           sectionContents.items.splice(insertIndex, 0, newItem);
         }
-        if (sectionDefinition.state === LibraryDefinitionState.Loaded) {
+        if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
           sectionDefinition.state = LibraryDefinitionState.Editing;
         }
+        sectionDefinition.modified = true;
         this.editedDefinitions.set(localSectionFileName, sectionDefinition);
         let metaModelPath = new Fmt.Path;
         metaModelPath.name = this.logic.name;
@@ -564,7 +567,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let libraryDefinition: LibraryDefinition = {
       file: file,
       definition: definition,
-      state: LibraryDefinitionState.EditingNew
+      state: LibraryDefinitionState.EditingNew,
+      modified: false
     };
     this.editedDefinitions.set(name, libraryDefinition);
     return libraryDefinition;
@@ -576,7 +580,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let clonedLibraryDefinition: LibraryDefinition = {
       file: clonedFile,
       definition: clonedFile.definitions[0],
-      state: LibraryDefinitionState.Editing
+      state: LibraryDefinitionState.Editing,
+      modified: false
     };
     this.editedDefinitions.set(name, clonedLibraryDefinition);
     this.editedItemInfos.set(name, itemInfo);
@@ -683,6 +688,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
         .then((result: WriteFileResult) => {
           editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
+          editedLibraryDefinition.modified = undefined;
           this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(editedLibraryDefinition));
           this.preloadedDefinitions.delete(name);
           this.editedDefinitions.delete(name);
