@@ -36,10 +36,12 @@ export const fullSetTermSelection: SetTermSelection = {
 
 export interface ElementTermSelection {
   allowCases: boolean;
+  allowConstructors: boolean;
 }
 
 export const fullElementTermSelection: ElementTermSelection = {
-  allowCases: true
+  allowCases: true,
+  allowConstructors: true
 };
 
 export interface FormulaSelection {
@@ -295,7 +297,7 @@ export class HLMEditHandler extends GenericEditHandler {
       {
         let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
           let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_MacroOperator || type instanceof FmtHLM.MetaRefExpression_Constructor) {
+          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_MacroOperator || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor)) {
             return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true);
           } else {
             return undefined;

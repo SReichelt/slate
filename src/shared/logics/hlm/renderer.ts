@@ -901,7 +901,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   renderSetTermInternal(term: Fmt.Expression, markParametersAsDummy: boolean): Display.RenderedExpression {
     if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       let termSelection: ElementTermSelection = {
-        allowCases: false
+        allowCases: false,
+        allowConstructors: true
       };
       let items = term.terms ? term.terms.map((item) => this.renderElementTerm(item, termSelection)) : [];
       if (this.editHandler) {
@@ -927,7 +928,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
       let element = this.renderUtils.convertStructuralCaseToOverride(term.parameters, term.term, elementParameterOverrides);
       let termSelection: ElementTermSelection = {
-        allowCases: false
+        allowCases: false,
+        allowConstructors: true
       };
       return this.renderTemplate('SetBuilder', {
                                    'element': this.renderElementTerm(element, termSelection),
@@ -1125,7 +1127,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       let elementTermSelection: ElementTermSelection = {
-        allowCases: false
+        allowCases: false,
+        allowConstructors: true
       };
       let setTermSelection: SetTermSelection = {
         allowEnumeration: true,
@@ -1179,7 +1182,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], renderCase: (value: Fmt.Expression | undefined) => Display.RenderedExpression): Display.RenderedExpression {
     let termSelection: ElementTermSelection = {
-      allowCases: false
+      allowCases: false,
+      allowConstructors: false
     };
     let termDisplay = this.renderElementTerm(term, termSelection);
     let rows: Display.RenderedExpression[][];
@@ -1254,7 +1258,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression {
     if (expression instanceof Fmt.VariableRefExpression) {
       let termSelection: ElementTermSelection = {
-        allowCases: false
+        allowCases: false,
+        allowConstructors: true
       };
       let indices = expression.indices ? expression.indices.map((term) => this.renderElementTerm(term, termSelection)) : undefined;
       let isDefinition = expression instanceof DefinitionVariableRefExpression;

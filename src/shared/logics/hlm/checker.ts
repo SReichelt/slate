@@ -1109,7 +1109,8 @@ export class HLMDefinitionChecker {
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
       .then((finalSet: Fmt.Expression) => {
-        if (!this.checkSetTermEquivalence(construction, finalSet, context)) {
+        if (!((finalSet instanceof Fmt.DefinitionRefExpression || finalSet instanceof Fmt.PlaceholderExpression)
+              && this.checkSetTermEquivalence(construction, finalSet, context))) {
           this.error(term, 'Term must be an element of the specified construction');
         }
       })
