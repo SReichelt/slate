@@ -84,7 +84,7 @@ class LibraryDocumentProvider {
         }
         let path = library.libraryDataProvider.uriToPath(event.document.uri.toString());
         if (!path || event.hasErrors) {
-            library.diagnosticCollection.set(event.document.uri, []);
+            library.diagnosticCollection.delete(event.document.uri);
             return undefined;
         }
         let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
@@ -92,7 +92,7 @@ class LibraryDocumentProvider {
             try {
                 event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
             } catch (error) {
-                library.diagnosticCollection.set(event.document.uri, []);
+                library.diagnosticCollection.delete(event.document.uri);
                 return undefined;
             }
         }
@@ -169,6 +169,18 @@ class LibraryDocumentProvider {
 
     getDocument(document: vscode.TextDocument): LibraryDocument | undefined {
         return this.documents.get(document);
+    }
+
+    invalidateUri(uri: vscode.Uri): void {
+        for (let library of this.libraries.values()) {
+            library.diagnosticCollection.delete(uri);
+        }
+    }
+
+    invalidateUris(uris: vscode.Uri[]): void {
+        for (let uri of uris) {
+            this.invalidateUri(uri);
+        }
     }
 }
 
@@ -354,6 +366,12 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
         vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
+    if (vscode.workspace.onDidDeleteFiles && vscode.workspace.onDidRenameFiles) {
+        context.subscriptions.push(
+            vscode.workspace.onDidDeleteFiles((event) => libraryDocumentProvider.invalidateUris(event.files.slice())),
+            vscode.workspace.onDidRenameFiles((event) => libraryDocumentProvider.invalidateUris(event.files.map((file) => file.oldUri)))
+        );
+    }
 
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
         let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/display/templates' + fileExtension;

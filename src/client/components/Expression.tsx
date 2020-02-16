@@ -780,6 +780,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           let options: SimpleMDE.Options = {
             toolbar: toolbar,
             status: false,
+            spellChecker: false,
             autoDownloadFontAwesome: false
           };
           return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;

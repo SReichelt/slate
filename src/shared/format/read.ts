@@ -275,14 +275,15 @@ export class Reader {
   }
 
   tryReadParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): boolean {
+    let result = false;
     let parameterListStart = this.markStart();
-    if (!this.tryReadChar('(')) {
-      return false;
+    if (this.tryReadChar('(')) {
+      this.readParameters(parameters, context);
+      this.readChar(')');
+      result = true;
     }
-    this.readParameters(parameters, context);
-    this.readChar(')');
     this.markEnd(parameterListStart, parameters, context);
-    return true;
+    return result;
   }
 
   readParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): void {
@@ -350,14 +351,15 @@ export class Reader {
   }
 
   tryReadArgumentList(args: Fmt.ArgumentList, context: Ctx.Context): boolean {
+    let result = false;
     let argumentListStart = this.markStart();
-    if (!this.tryReadChar('(')) {
-      return false;
+    if (this.tryReadChar('(')) {
+      this.readArguments(args, context);
+      this.readChar(')');
+      result = true;
     }
-    this.readArguments(args, context);
-    this.readChar(')');
     this.markEnd(argumentListStart, args, context);
-    return true;
+    return result;
   }
 
   readOptionalArgumentList(args: Fmt.ArgumentList, context: Ctx.Context): void {
