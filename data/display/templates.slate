@@ -17,6 +17,16 @@ $DefinitionColon: %Template {
   )
 }
 
+$BottomEllipsis: %Template {
+  /* Not using unicode character '…' because it has too much space in TeX font. */
+  display = '...'
+}
+
+$MiddleEllipsis: %Template {
+  /* Not using unicode character '⋯' because it has too much space in TeX font. */
+  display = '⋅⋅⋅'
+}
+
 $Group(items: %Expr[], separator: %Expr = ', '): %Template {
   display = %for(
     param = items,

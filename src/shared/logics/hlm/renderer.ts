@@ -1553,7 +1553,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let result: Display.ExpressionValue[] = [];
         for (let item of rawArg.items) {
           if (this.options.maxListLength && result.length >= this.options.maxListLength) {
-            let ellipsis = new Display.TextExpression('...');
+            let ellipsis = this.renderTemplate('BottomEllipsis');
             ellipsis.styleClasses = ['dummy'];
             result.push(ellipsis);
             break;

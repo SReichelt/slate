@@ -1625,7 +1625,7 @@ No proof."
 `;
 
 exports[`render hlm library: 1.4.29.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
-"Definition 1.4.29.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ ℤ_[j,k]. We define:
+"Definition 1.4.29.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
 
   ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
 `;
@@ -1659,13 +1659,40 @@ exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Sequences/Tuple
 
   (a_k)_(k < α) = (b_k)_(k < α)  :⇔    ∀ k ∈ 𝓞𝓻𝓭_(<α) : a_k = b_k  (a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α), b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α))
 
-We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”"
+We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”
+
+Remarks.
+
+This is a slightly generalized notion of “tuple” where the length _α_ can be an arbitrary ordinal number. If _α_ is a natural number, it matches the common definition.
+
+We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit _S_ from the constructor.
+
+In this definition, the codomain is a fixed set _S_. If each item is an element of a different set, a [generalized Cartesian product](../Sets/Generalized%20cartesian%20product) can be used instead.
+
+References.
+
+* https://en.wikipedia.org/wiki/Tuple
+* http://mathworld.wolfram.com/n-Tuple.html
+* https://proofwiki.org/wiki/Definition:Ordered_Tuple/On_Set
+* https://ncatlab.org/nlab/show/tuple
+* https://coq.inria.fr/library/Coq.Vectors.VectorDef.html
+* https://leanprover-community.github.io/mathlib_docs/core/data/vector.html#vector (finite) or https://leanprover-community.github.io/mathlib_docs/data/seq/seq.html#seq (infinite)"
 `;
 
 exports[`render hlm library: 1.5.2 data/libraries/hlm/Essentials/Sequences/tuple 1`] = `"Definition 1.5.2 (Tuple)."`;
 
-exports[`render hlm library: 1.5.3 data/libraries/hlm/Essentials/Sequences/Finite%20sequences 1`] = `
-"Definition 1.5.3.  Let S be a set. We define:
+exports[`render hlm library: 1.5.3 data/libraries/hlm/Essentials/Sequences/tuple%20from%20function 1`] = `
+"Definition 1.5.3.  Let S be a set, α ∈ 𝓞𝓻𝓭, f : 𝓞𝓻𝓭_(<α) → S be a function. We define:
+
+  tpl(f) := (f(k))_(k < α)
+
+Remarks.
+
+This definition produces a tuple from a function."
+`;
+
+exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/Finite%20sequences 1`] = `
+"Definition 1.5.4.  Let S be a set. We define:
 
   S^∗ :=: {(𝐚)_(S^n) | n ∈ ℕ, 𝐚 is a/an n-tuple on S}
 
@@ -1675,7 +1702,7 @@ We write “let 𝒂 be a finite sequence on S” for “let 𝒂 ∈ S^∗.
 
 Remarks.
 
-Finite sequences could alternatively be defined inductively (i.e. as lists). However, the given definition is closer to the definition of [infinite sequences](Infinite%20sequences), and often more useful in mathematical contexts.
+Finite sequences could alternatively be defined inductively (i.e. as lists). However, since we also need a definition for tuples of a given length, we base our definition on that.
 
 References.
 
@@ -1683,21 +1710,27 @@ References.
 * http://mathworld.wolfram.com/Sequence.html
 * https://proofwiki.org/wiki/Definition:Finite_Sequence
 * https://ncatlab.org/nlab/show/free+monoid
-* https://coq.inria.fr/library/Coq.Lists.List.html"
+* https://coq.inria.fr/library/Coq.Init.Datatypes.html#list
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#list"
 `;
 
-exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/finite%20sequence%20length 1`] = `
-"Definition 1.5.4.  Let S be a set, 𝒂 be a finite sequence on S. We define
+exports[`render hlm library: 1.5.5 data/libraries/hlm/Essentials/Sequences/finite%20sequence%20length 1`] = `
+"Definition 1.5.5.  Let S be a set, 𝒂 be a finite sequence on S. We define
 
   |𝒂|
 
 by:
 
-  |(𝐚)_(S^n)| := n  (n ∈ ℕ, 𝐚 is a/an n-tuple on S)"
+  |(𝐚)_(S^n)| := n  (n ∈ ℕ, 𝐚 is a/an n-tuple on S)
+
+References.
+
+* https://coq.inria.fr/library/Coq.Init.Datatypes.html#length
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/list/basic.html#list.length"
 `;
 
-exports[`render hlm library: 1.5.5 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
-"Definition 1.5.5.  Let S be a set. We define:
+exports[`render hlm library: 1.5.6 data/libraries/hlm/Essentials/Sequences/Infinite%20sequences 1`] = `
+"Definition 1.5.6.  Let S be a set. We define:
 
   S^ω :=: {(a_n)_(n ∈ ℕ) | a_n ∈ S for each n ∈ ℕ}
 
@@ -1714,20 +1747,22 @@ Remarks.
 
 We omit the word “infinite” because infinite sequences are used much more frequently than finite ones.
 
-We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily deconstruct a sequence into its elements and the ability to omit _S_ from the constructor.
+We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily destruct a sequence into its elements, and the ability to omit _S_ from the constructor.
 
-Sequences of particular sets are treated in appropriate subsections concerning those sets.
+Even though our generalized definition of “[tuple](Tuples)” covers infinite sequences as a special case, we use this additional definition (with an appropriate embedding) to make the constructor look nicer.
 
 References.
 
 * https://en.wikipedia.org/wiki/Sequence
 * http://mathworld.wolfram.com/Sequence.html
 * https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
-* https://ncatlab.org/nlab/show/sequence"
+* https://ncatlab.org/nlab/show/sequence
+* https://coq.inria.fr/library/Coq.Lists.Streams.html#Stream
+* https://leanprover-community.github.io/mathlib_docs/core/data/stream.html#stream"
 `;
 
-exports[`render hlm library: 1.5.6 data/libraries/hlm/Essentials/Sequences/sequence%20from%20function 1`] = `
-"Definition 1.5.6.  Let S be a set, f : ℕ → S be a function. We define:
+exports[`render hlm library: 1.5.7 data/libraries/hlm/Essentials/Sequences/sequence%20from%20function 1`] = `
+"Definition 1.5.7.  Let S be a set, f : ℕ → S be a function. We define:
 
   seq(f) := (f(n))_(n ∈ ℕ)
 
@@ -1736,8 +1771,8 @@ Remarks.
 This definition produces an infinite sequence from a function."
 `;
 
-exports[`render hlm library: 1.5.7 data/libraries/hlm/Essentials/Sequences/Ordinal-indexed%20sequences 1`] = `
-"Definition 1.5.7.  Let S be a set. We define:
+exports[`render hlm library: 1.5.8 data/libraries/hlm/Essentials/Sequences/Ordinal-indexed%20sequences 1`] = `
+"Definition 1.5.8.  Let S be a set. We define:
 
   S^⋆ :=: {(𝐚)_(S^α) | α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S}
 
@@ -1755,8 +1790,8 @@ References.
 * https://en.wikipedia.org/wiki/Ordinal_number#Transfinite_sequence (but we use arbitrary ordinals, not only limit ordinals)"
 `;
 
-exports[`render hlm library: 1.5.8 data/libraries/hlm/Essentials/Sequences/ordinal-indexed%20sequence%20length 1`] = `
-"Definition 1.5.8.  Let S be a set, 𝒂 be an ordinal-indexed sequence on S. We define
+exports[`render hlm library: 1.5.9 data/libraries/hlm/Essentials/Sequences/ordinal-indexed%20sequence%20length 1`] = `
+"Definition 1.5.9.  Let S be a set, 𝒂 be an ordinal-indexed sequence on S. We define
 
   |𝒂|
 
@@ -1765,14 +1800,14 @@ by:
   |(𝐚)_(S^α)| := α  (α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S)"
 `;
 
-exports[`render hlm library: 1.5.9 data/libraries/hlm/Essentials/Sequences/finite 1`] = `
-"Definition 1.5.9.  Let S be a set, 𝒂 be an ordinal-indexed sequence on S. We define:
+exports[`render hlm library: 1.5.10 data/libraries/hlm/Essentials/Sequences/finite 1`] = `
+"Definition 1.5.10.  Let S be a set, 𝒂 be an ordinal-indexed sequence on S. We define:
 
   𝒂 is finite  :⇔  |𝒂| is finite"
 `;
 
-exports[`render hlm library: 1.5.10 data/libraries/hlm/Essentials/Sequences/starts%20with 1`] = `
-"Definition 1.5.10.  Let S be a set, 𝐚 be a sequence on S, n ∈ ℕ, 𝐛 be a/an n-tuple on S. We define
+exports[`render hlm library: 1.5.11 data/libraries/hlm/Essentials/Sequences/starts%20with 1`] = `
+"Definition 1.5.11.  Let S be a set, 𝐚 be a sequence on S, n ∈ ℕ, 𝐛 be a/an n-tuple on S. We define
 
   𝐚 starts with 𝐛
 
@@ -1781,8 +1816,8 @@ by:
   (a_k)_(k ∈ ℕ) starts with (b_j)_(j < n)  :⇔  ∀ k ∈ ℕ_(<n) : a_k = b_k  (a_k ∈ S for each k ∈ ℕ, b_j ∈ S for each j ∈ 𝓞𝓻𝓭_(<n))"
 `;
 
-exports[`render hlm library: 1.5.11 data/libraries/hlm/Essentials/Sequences/starts%20with%20finite%20sequence 1`] = `
-"Definition 1.5.11.  Let S be a set, 𝐚 be a sequence on S, 𝒃 be a finite sequence on S. We define
+exports[`render hlm library: 1.5.12 data/libraries/hlm/Essentials/Sequences/starts%20with%20finite%20sequence 1`] = `
+"Definition 1.5.12.  Let S be a set, 𝐚 be a sequence on S, 𝒃 be a finite sequence on S. We define
 
   𝐚 starts with 𝒃
 
@@ -1791,28 +1826,40 @@ by:
   𝐚 starts with (𝐛)_(S^n)  :⇔  𝐚 starts with 𝐛  (n ∈ ℕ, 𝐛 is a/an n-tuple on S)"
 `;
 
-exports[`render hlm library: 1.5.12 data/libraries/hlm/Essentials/Sequences/index%20in%20well-ordered%20set 1`] = `
-"Definition 1.5.12.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
+exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/index%20in%20well-ordered%20set 1`] = `
+"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
 
-  idx_⪯(s) := [T, ⪯∣_T]"
+  idx_⪯(s) := [T, ⪯∣_T]
+
+Remarks.
+
+This is a helper definition which yields the index of _s_ within the sequence defined by the given well-order. This index is an ordinal number which is defined using the set of all elements less than _s_."
 `;
 
-exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/indexed%20element%20in%20well-ordered%20set 1`] = `
-"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], β ∈ 𝓞𝓻𝓭_(<α). For s ∈ S, we define:
+exports[`render hlm library: 1.5.14 data/libraries/hlm/Essentials/Sequences/indexed%20element%20in%20well-ordered%20set 1`] = `
+"Definition 1.5.14.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], β ∈ 𝓞𝓻𝓭_(<α). For s ∈ S, we define:
 
   S_⪯[β] = s  :⇔  idx_⪯(s) = β
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+Remarks.
+
+This is just the inverse of the previous definition."
 `;
 
-exports[`render hlm library: 1.5.14 data/libraries/hlm/Essentials/Sequences/sequence%20from%20well-ordered%20set 1`] = `
-"Definition 1.5.14.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯]. We define:
+exports[`render hlm library: 1.5.15 data/libraries/hlm/Essentials/Sequences/sequence%20from%20well-ordered%20set 1`] = `
+"Definition 1.5.15.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯]. We define:
 
   seq_⪯(S) := ((S_⪯[β])_(β < α))_(S^α)
 
 Remarks.
 
-This definition produces an ordinal-indexed sequence from a well-ordered set."
+This definition produces an ordinal-indexed sequence from a well-ordered set.
+
+References.
+
+* https://en.wikipedia.org/wiki/Well-order#Ordinal_numbers"
 `;
 
 exports[`render hlm library: 1.6.1.1 data/libraries/hlm/Essentials/Numbers/Natural/Natural%20numbers 1`] = `
@@ -3644,8 +3691,14 @@ exports[`render hlm library: 1.6.4.10.10 data/libraries/hlm/Essentials/Numbers/I
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.6.4.10.11 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
-"Definition 1.6.4.10.11.  Let n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.4.10.11 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Interval 1`] = `
+"Definition 1.6.4.10.11.  Let a, b ∈ ℤ. We define:
+
+  {a, ..., b} := {c ∈ ℤ : a ≤ c and c ≤ b}"
+`;
+
+exports[`render hlm library: 1.6.4.10.12 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
+"Definition 1.6.4.10.12.  Let n ∈ ℕ. We define:
 
   nℤ := {n ⋅ z : z ∈ ℤ}"
 `;
