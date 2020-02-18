@@ -244,7 +244,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             }
           };
         }
-        let inputClassName = this.state.inputError ? 'input-error' : undefined;
+        let inputClassName = 'expr-input';
+        if (this.state.inputError) {
+          inputClassName += ' input-error';
+        }
         let size = expression.text.length + 1;
         let style = {'width': `${size}ch`, 'min-width': `${size}ex`};
         result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
@@ -757,7 +760,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         };
         if ('ontouchstart' in window) {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
-          return <textarea value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+          return <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
           let key = 'markdown-editor';
           let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'];
@@ -885,14 +888,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         outerClassNameSuffix = ' ' + className;
       }
       if (expression instanceof Display.PlaceholderExpression) {
-        cells = <span className={'menu-placeholder-cell expr'}>{result}</span>;
+        cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else if (hasVisibleMenu) {
         cells = [
-          <span className={'menu-cell expr'} key={'content'}>{result}</span>,
+          <span className={'menu-cell'} key={'content'}>{result}</span>,
           <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
         ];
       } else {
-        cells = <span className={'menu-cell expr'} key={'content'}>{result}</span>;
+        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
       }
       result = (
         <span className={'menu-container' + outerClassNameSuffix}>

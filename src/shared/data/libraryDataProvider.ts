@@ -18,8 +18,8 @@ export const defaultReferences = [
   'http://mathworld.wolfram.com/',
   'https://proofwiki.org/wiki/',
   'https://ncatlab.org/nlab/show/',
-  'https://leanprover-community.github.io/mathlib_docs/',
   'https://coq.inria.fr/library/',
+  'https://leanprover-community.github.io/mathlib_docs/',
   'http://oeis.org/'
 ];
 const defaultReferencesString = defaultReferences.map((ref) => `* ${ref}...`).reduce((prev, cur) => `${prev}\n${cur}`);
@@ -28,8 +28,8 @@ export const defaultReferenceSearchURLs = [
   'http://mathworld.wolfram.com/search/?query=',
   'https://proofwiki.org/w/index.php?search=',
   'https://www.google.com/search?q=site%3Ancatlab.org+',
-  'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+',
-  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+'
+  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
+  'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+'
 ];
 
 interface PrefetchQueueItem {

@@ -979,7 +979,12 @@ exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succ
 
 Remarks.
 
-This definition constructs a partial order on the disjoint union of two sets _S_ and _T_ from partial orders on _S_ and _T_. Elements of _S_ are always considered smaller than elements of _T_. This is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum)."
+This definition constructs a partial order on the disjoint union of two sets _S_ and _T_ from partial orders on _S_ and _T_. Elements of _S_ are always considered smaller than elements of _T_. This is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum).
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_arithmetic#Addition
+* https://leanprover-community.github.io/mathlib_docs/data/sum.html#sum.lex"
 `;
 
 exports[`render hlm library: 1.3.31 data/libraries/hlm/Essentials/Relations/lexicographical%20order 1`] = `
@@ -989,7 +994,15 @@ exports[`render hlm library: 1.3.31 data/libraries/hlm/Essentials/Relations/lexi
 
 Remarks.
 
-This definition constructs a partial order on the Cartesian product of two sets _S_ and _T_ from partial orders on _S_ and _T_, combining the two partial orders lexicographically. It is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product)."
+This definition constructs a partial order on the Cartesian product of two sets _S_ and _T_ from partial orders on _S_ and _T_, combining the two partial orders lexicographically. It is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product).
+
+References.
+
+* https://en.wikipedia.org/wiki/Lexicographical_order#Cartesian_products
+* http://mathworld.wolfram.com/LexicographicOrder.html
+* https://proofwiki.org/wiki/Definition:Lexicographic_Order
+* https://ncatlab.org/nlab/show/lexicographic+order
+* https://leanprover-community.github.io/mathlib_docs/core/init/wf.html#prod.lex"
 `;
 
 exports[`render hlm library: 1.3.32.1 data/libraries/hlm/Essentials/Relations/Closures/closure 1`] = `
@@ -1883,6 +1896,7 @@ References.
 * https://ncatlab.org/nlab/show/natural+number
 * https://coq.inria.fr/library/Coq.Init.Nat.html
 * https://coq.inria.fr/library/Coq.NArith.BinNat.html
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#nat
 * http://oeis.org/A001477"
 `;
 
@@ -1918,7 +1932,8 @@ References.
 * https://en.wikipedia.org/wiki/Natural_number#Addition
 * https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#add
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.add"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.add
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#nat.add"
 `;
 
 exports[`render hlm library: 1.6.1.4 data/libraries/hlm/Essentials/Numbers/Natural/Addition%20of%20one%20yields%20successor 1`] = `
@@ -1930,7 +1945,11 @@ No proof.
 
 Remarks.
 
-This proposition justifies the notation for the successor constructor."
+This proposition justifies the notation for the successor constructor.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.add_one"
 `;
 
 exports[`render hlm library: 1.6.1.5 data/libraries/hlm/Essentials/Numbers/Natural/Sum%20is%20associative 1`] = `
@@ -1943,7 +1962,8 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_associativity
-* https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative"
+* https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_assoc"
 `;
 
 exports[`render hlm library: 1.6.1.6 data/libraries/hlm/Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
@@ -1966,7 +1986,8 @@ References.
 * https://proofwiki.org/wiki/Identity_Element_of_Natural_Number_Addition_is_Zero
 * https://proofwiki.org/wiki/Natural_Number_Addition_Commutes_with_Zero
 * https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_l
-* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l"
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_add"
 `;
 
 exports[`render hlm library: 1.6.1.7 data/libraries/hlm/Essentials/Numbers/Natural/Successor%20can%20be%20pulled%20over%20addition 1`] = `
@@ -1986,7 +2007,8 @@ Proof.  We show that {(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1)
 References.
 
 * https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
-* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l"
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.succ_add"
 `;
 
 exports[`render hlm library: 1.6.1.8 data/libraries/hlm/Essentials/Numbers/Natural/Sum%20is%20commutative 1`] = `
@@ -1999,7 +2021,8 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_commutativity
-* https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative"
+* https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_comm"
 `;
 
 exports[`render hlm library: 1.6.1.9 data/libraries/hlm/Essentials/Numbers/Natural/less%20or%20equal 1`] = `
@@ -2016,7 +2039,8 @@ References.
 * https://en.wikipedia.org/wiki/Natural_number#Order
 * https://proofwiki.org/wiki/Definition:Ordering_on_Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#leb
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.leb"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.leb
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.le"
 `;
 
 exports[`render hlm library: 1.6.1.10 data/libraries/hlm/Essentials/Numbers/Natural/less 1`] = `
@@ -2034,7 +2058,9 @@ Equivalence.  No proof.
 References.
 
 * https://coq.inria.fr/library/Coq.Init.Nat.html#ltb
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.ltb"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.ltb
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.lt
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.lt_of_le_and_ne"
 `;
 
 exports[`render hlm library: 1.6.1.11 data/libraries/hlm/Essentials/Numbers/Natural/Less%20or%20equal%20is%20a%20total%20order 1`] = `
@@ -2042,7 +2068,12 @@ exports[`render hlm library: 1.6.1.11 data/libraries/hlm/Essentials/Numbers/Natu
 
   ≤ is a total order
 
-No proof."
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Natural_number#Order
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.linear_order"
 `;
 
 exports[`render hlm library: 1.6.1.12 data/libraries/hlm/Essentials/Numbers/Natural/Less%20and%20less%20or%20equal%20combine%20to%20less 1`] = `
@@ -2050,7 +2081,11 @@ exports[`render hlm library: 1.6.1.12 data/libraries/hlm/Essentials/Numbers/Natu
 
   a < c
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.lt_of_lt_of_le"
 `;
 
 exports[`render hlm library: 1.6.1.13 data/libraries/hlm/Essentials/Numbers/Natural/Less%20or%20equal%20and%20less%20combine%20to%20less 1`] = `
@@ -2066,7 +2101,11 @@ exports[`render hlm library: 1.6.1.14 data/libraries/hlm/Essentials/Numbers/Natu
 
   n ≥ 0
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_le"
 `;
 
 exports[`render hlm library: 1.6.1.15 data/libraries/hlm/Essentials/Numbers/Natural/Zero%20is%20the%20only%20number%20less%20than%20or%20equal%20to%20zero 1`] = `
@@ -2082,7 +2121,11 @@ exports[`render hlm library: 1.6.1.16 data/libraries/hlm/Essentials/Numbers/Natu
 
   n + 1 > n
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.lt_succ_self"
 `;
 
 exports[`render hlm library: 1.6.1.17.1 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(less) 1`] = `
@@ -2139,6 +2182,7 @@ Equality.  No proof.
 References.
 
 * https://proofwiki.org/wiki/Axiom:Axiomatization_of_1-Based_Natural_Numbers
+* https://leanprover-community.github.io/mathlib_docs/data/pnat/basic.html#pnat
 * http://oeis.org/A000027"
 `;
 
@@ -2282,19 +2326,15 @@ exports[`render hlm library: 1.6.1.20 data/libraries/hlm/Essentials/Numbers/Natu
 
   a = b
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_right_cancel"
 `;
 
-exports[`render hlm library: 1.6.1.21 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20a%20positive%20number%20is%20injective 1`] = `
-"Proposition 1.6.1.21.  Let a, b ∈ ℕ, c ∈ ℕ_+ such that a ⋅ c = b ⋅ c. Then:
-
-  a = b
-
-No proof."
-`;
-
-exports[`render hlm library: 1.6.1.22 data/libraries/hlm/Essentials/Numbers/Natural/difference 1`] = `
-"Definition 1.6.1.22.  Let n ∈ ℕ, m ∈ ℕ_(≤n). For x ∈ ℕ_(≤n), we define:
+exports[`render hlm library: 1.6.1.21 data/libraries/hlm/Essentials/Numbers/Natural/difference 1`] = `
+"Definition 1.6.1.21.  Let n ∈ ℕ, m ∈ ℕ_(≤n). For x ∈ ℕ_(≤n), we define:
 
   n − m = x  :⇔  n = x + m
 
@@ -2304,11 +2344,13 @@ References.
 
 * https://proofwiki.org/wiki/Definition:Subtraction/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#sub (truncated subtraction, thus incompatible with integer subtraction)
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.sub (ditto)"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.sub (ditto)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.sub (ditto)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.sub_le"
 `;
 
-exports[`render hlm library: 1.6.1.23 data/libraries/hlm/Essentials/Numbers/Natural/product 1`] = `
-"Definition 1.6.1.23.  Let m, n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.22 data/libraries/hlm/Essentials/Numbers/Natural/product 1`] = `
+"Definition 1.6.1.22.  Let m, n ∈ ℕ. We define
 
   m ⋅ n
 
@@ -2322,37 +2364,62 @@ References.
 * https://en.wikipedia.org/wiki/Natural_number#Multiplication
 * https://proofwiki.org/wiki/Definition:Multiplication/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#mul
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.mul"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.mul
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.mul"
 `;
 
-exports[`render hlm library: 1.6.1.24 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20one%20is%20neutral 1`] = `
-"Proposition 1.6.1.24.  Let n ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.23 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20one%20is%20neutral 1`] = `
+"Proposition 1.6.1.23.  Let n ∈ ℕ. Then:
 
   n ⋅ 1 = n
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_one"
 `;
 
-exports[`render hlm library: 1.6.1.25 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20associative 1`] = `
-"Proposition 1.6.1.25.
+exports[`render hlm library: 1.6.1.24 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20associative 1`] = `
+"Proposition 1.6.1.24.
 
   ⋅ is associative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_assoc"
 `;
 
-exports[`render hlm library: 1.6.1.26 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20commutative 1`] = `
-"Proposition 1.6.1.26.
+exports[`render hlm library: 1.6.1.25 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20commutative 1`] = `
+"Proposition 1.6.1.25.
 
   ⋅ is commutative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_comm"
 `;
 
-exports[`render hlm library: 1.6.1.27 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20distributive%20over%20sum 1`] = `
-"Proposition 1.6.1.27.
+exports[`render hlm library: 1.6.1.26 data/libraries/hlm/Essentials/Numbers/Natural/Product%20is%20distributive%20over%20sum 1`] = `
+"Proposition 1.6.1.26.
 
   ⋅ is distributive over +
+
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.distrib"
+`;
+
+exports[`render hlm library: 1.6.1.27 data/libraries/hlm/Essentials/Numbers/Natural/Multiplication%20by%20a%20positive%20number%20is%20injective 1`] = `
+"Proposition 1.6.1.27.  Let a, b ∈ ℕ, c ∈ ℕ_+ such that a ⋅ c = b ⋅ c. Then:
+
+  a = b
 
 No proof."
 `;
@@ -2370,7 +2437,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Divisor
 * http://mathworld.wolfram.com/Divisor.html
-* https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers"
+* https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers
+* (https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.comm_semiring)"
 `;
 
 exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natural/Divisors 1`] = `
@@ -2392,7 +2460,11 @@ exports[`render hlm library: 1.6.1.30 data/libraries/hlm/Essentials/Numbers/Natu
 
   m ≤ n
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.le_of_dvd"
 `;
 
 exports[`render hlm library: 1.6.1.31 data/libraries/hlm/Essentials/Numbers/Natural/Divisibility%20criterion 1`] = `
@@ -2434,7 +2506,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Quotient
 * https://coq.inria.fr/library/Coq.Init.Nat.html#div (truncated division, thus incompatible with division of rational numbers)
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/div.html#nat.div (ditto)"
 `;
 
 exports[`render hlm library: 1.6.1.34 data/libraries/hlm/Essentials/Numbers/Natural/power 1`] = `
@@ -2452,7 +2525,8 @@ References.
 * https://en.wikipedia.org/wiki/Exponentiation#Integer_exponents
 * https://proofwiki.org/wiki/Definition:Power_(Algebra)#Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#pow
-* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow"
+* https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.pow"
 `;
 
 exports[`render hlm library: 1.6.1.35 data/libraries/hlm/Essentials/Numbers/Natural/inductive 1`] = `
@@ -2631,6 +2705,7 @@ References.
 * http://mathworld.wolfram.com/Factorial.html
 * https://proofwiki.org/wiki/Definition:Factorial
 * https://coq.inria.fr/library/Coq.Arith.Factorial.html#fact
+* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.fact
 * http://oeis.org/A000142"
 `;
 
@@ -2663,7 +2738,8 @@ We use this definition of the binomial coefficient because it does not need any 
 
 References.
 
-* https://en.wikipedia.org/wiki/Pascal%27s_rule"
+* https://en.wikipedia.org/wiki/Pascal%27s_rule
+* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose"
 `;
 
 exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
@@ -2678,7 +2754,8 @@ References.
 * https://en.wikipedia.org/wiki/Binomial_coefficient
 * http://mathworld.wolfram.com/BinomialCoefficient.html
 * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
-* https://coq.inria.fr/library/Coq.Reals.Binomial.html#C"
+* https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
+* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose_eq_fact_div_fact"
 `;
 
 exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
@@ -2798,7 +2875,9 @@ References.
 * http://mathworld.wolfram.com/PrimeNumber.html
 * https://proofwiki.org/wiki/Definition:Prime_Number
 * https://ncatlab.org/nlab/show/prime+number
-* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime"
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.prime
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime"
 `;
 
 exports[`render hlm library: 1.6.1.47.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
@@ -2810,7 +2889,8 @@ No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime_2"
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime_2
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.prime_two"
 `;
 
 exports[`render hlm library: 1.6.1.47.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
@@ -2837,6 +2917,7 @@ No proof.
 
 References.
 
+* https://en.wikipedia.org/wiki/List_of_prime_numbers
 * http://oeis.org/A000040"
 `;
 
@@ -2845,7 +2926,11 @@ exports[`render hlm library: 1.6.1.47.5 data/libraries/hlm/Essentials/Numbers/Na
 
   ∃ prime p : p ∣ n
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_prime_and_dvd"
 `;
 
 exports[`render hlm library: 1.6.1.47.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
@@ -2887,7 +2972,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Euclid%27s_theorem
 * http://mathworld.wolfram.com/EuclidsTheorems.html
-* https://proofwiki.org/wiki/Euclid%27s_Theorem"
+* https://proofwiki.org/wiki/Euclid%27s_Theorem
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
 
 exports[`render hlm library: 1.6.1.47.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
@@ -2897,7 +2983,12 @@ exports[`render hlm library: 1.6.1.47.7 data/libraries/hlm/Essentials/Numbers/Na
   2. p ∣ m^n
   3. p^n ∣ m^n
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.prime.dvd_of_dvd_pow
+* https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime_pow"
 `;
 
 exports[`render hlm library: 1.6.1.48 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
@@ -2920,7 +3011,8 @@ References.
 * https://en.wikipedia.org/wiki/Coprime_integers
 * http://mathworld.wolfram.com/RelativelyPrime.html
 * https://proofwiki.org/wiki/Definition:Coprime/Integers
-* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)"
+* https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/gcd.html#nat.coprime"
 `;
 
 exports[`render hlm library: 1.6.1.49 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
@@ -2978,7 +3070,8 @@ References.
 * https://en.wikipedia.org/wiki/Cardinal_number
 * http://mathworld.wolfram.com/CardinalNumber.html
 * https://proofwiki.org/wiki/Definition:Cardinal
-* https://ncatlab.org/nlab/show/cardinal+number"
+* https://ncatlab.org/nlab/show/cardinal+number
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal"
 `;
 
 exports[`render hlm library: 1.6.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Carrier 1`] = `
@@ -2994,7 +3087,7 @@ We write “let a ∈ κ” for “let a ∈ Carrier(κ).”
 
 Remarks.
 
-This definition retrieves a representative set from a cardinal number, and enables typical abuse of notation."
+This definition retrieves a representative set from a cardinal number."
 `;
 
 exports[`render hlm library: 1.6.2.4.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Homomorphisms 1`] = `
@@ -3008,7 +3101,14 @@ Remarks.
 
 The definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as magmas. Thus it makes sense to define a homomorphism between cardinal numbers as a function between representative sets.
 
-Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal."
+Although these sets are not unique, the type system prevents the ambiguities that could arise, as long as the equality definition of the structure does not define any non-isomorphic elements as equal.
+
+References.
+
+* https://en.wikipedia.org/wiki/Homomorphism
+* http://mathworld.wolfram.com/Homomorphism.html
+* https://proofwiki.org/wiki/Definition:Homomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/homomorphism"
 `;
 
 exports[`render hlm library: 1.6.2.4.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Isomorphisms 1`] = `
@@ -3019,7 +3119,18 @@ exports[`render hlm library: 1.6.2.4.2 data/libraries/hlm/Essentials/Numbers/Car
 
 We write “let φ : κ ↔ μ be an isomorphism” for “let φ ∈ Iso(κ, μ).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+Remarks.
+
+An isomorphism between cardinal numbers is simply a bijection between their representative sets. Thus, the existence of an isomorphism implies that the two cardinal numbers are in fact equal, as is shown [below](Equality%20criterion).
+
+References.
+
+* https://en.wikipedia.org/wiki/Isomorphism
+* http://mathworld.wolfram.com/Isomorphism.html
+* https://proofwiki.org/wiki/Definition:Isomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/isomorphism"
 `;
 
 exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Automorphisms 1`] = `
@@ -3028,6 +3139,10 @@ exports[`render hlm library: 1.6.2.4.3 data/libraries/hlm/Essentials/Numbers/Car
   Aut(κ) := Iso(κ, κ)
 
 We write “let φ : κ ↔ κ be an automorphism” for “let φ ∈ Aut(κ).”
+
+Remarks.
+
+Automorphisms of cardinal numbers, i.e. self-bijections of a set, might not be a particular useful concept. They are included for completeness.
 
 References.
 
@@ -3041,6 +3156,14 @@ exports[`render hlm library: 1.6.2.4.4 data/libraries/hlm/Essentials/Numbers/Car
 "Definition 1.6.2.4.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
   Aut(κ) := [Aut(κ)]_(𝑆_(Carrier(κ)))
+
+Remarks.
+
+The automorphism group, as a subgroup of the symmetric group of the carrier.
+
+This definition makes a forward reference to concepts related to groups.
+
+Alternatively, automorphism groups could be defined more generally via category theory, but using them would require specifying the specific category to use.
 
 References.
 
@@ -3056,22 +3179,6 @@ exports[`render hlm library: 1.6.2.4.5 data/libraries/hlm/Essentials/Numbers/Car
   id_κ := id_(Carrier(κ))"
 `;
 
-exports[`render hlm library: 1.6.2.4.6 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.2.4.6.  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
-
-  1. κ ≤ μ and μ ≤ κ
-  2. Iso(κ, μ) is nonempty
-  3. κ = μ
-
-No proof.
-
-References.
-
-* [https://en.wikipedia.org/wiki/Schröder-Bernstein_theorem](https://en.wikipedia.org/wiki/Schr%C3%B6der-Bernstein_theorem)
-* http://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
-* [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)"
-`;
-
 exports[`render hlm library: 1.6.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
 "Definition 1.6.2.5.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
@@ -3082,7 +3189,8 @@ Equivalence.  No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Cardinal_number"
+* https://en.wikipedia.org/wiki/Cardinal_number
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.has_le"
 `;
 
 exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
@@ -3119,16 +3227,37 @@ exports[`render hlm library: 1.6.2.7.4 data/libraries/hlm/Essentials/Numbers/Car
   𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
 `;
 
-exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
-"Proposition 1.6.2.8.
+exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
+"Theorem 1.6.2.8 (Schröder-Bernstein).  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+
+  1. κ ≤ μ and μ ≤ κ
+  2. Iso(κ, μ) is nonempty
+  3. κ = μ
+
+No proof.
+
+Remarks.
+
+This is essentially the Schröder-Bernstein theorem together with the HLM-specific equality criterion on structures.
+
+References.
+
+* [https://en.wikipedia.org/wiki/Schröder-Bernstein_theorem](https://en.wikipedia.org/wiki/Schr%C3%B6der-Bernstein_theorem)
+* http://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
+* [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)
+* https://leanprover-community.github.io/mathlib_docs/set_theory/schroeder_bernstein.html#function.embedding.antisymm"
+`;
+
+exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
+"Proposition 1.6.2.9.
 
   ≤ is a partial order
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.2.9 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
-"Proposition 1.6.2.9.  The following are equivalent:
+exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
+"Proposition 1.6.2.10.  The following are equivalent:
 
   1. AC
   2. ≤ is a total order
@@ -3137,11 +3266,15 @@ No proof.
 
 Remarks.
 
-The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total."
+The non-circularity requirements of HLM have a subtle effect on this proposition: Even though the axiom of choice, by itself, does not exclude the set of cardinal numbers, this proposition cannot be used to conclude that the cardinal numbers have a choice function if the order on cardinal numbers is total.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.linear_order"
 `;
 
-exports[`render hlm library: 1.6.2.10 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
-"Definition 1.6.2.10.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
+"Definition 1.6.2.11.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
   κ + μ
 
@@ -3153,11 +3286,12 @@ References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_addition
 * http://mathworld.wolfram.com/CardinalAddition.html
-* https://proofwiki.org/wiki/Definition:Sum_of_Cardinals"
+* https://proofwiki.org/wiki/Definition:Sum_of_Cardinals
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.add_def"
 `;
 
-exports[`render hlm library: 1.6.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
-"Definition 1.6.2.11.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
+"Definition 1.6.2.12.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
   κ ⋅ μ
 
@@ -3169,11 +3303,12 @@ References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_multiplication
 * http://mathworld.wolfram.com/CardinalMultiplication.html
-* https://proofwiki.org/wiki/Definition:Product_of_Cardinals"
+* https://proofwiki.org/wiki/Definition:Product_of_Cardinals
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.mul_def"
 `;
 
-exports[`render hlm library: 1.6.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
-"Definition 1.6.2.12.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
+"Definition 1.6.2.13.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
 
   κ^μ
 
@@ -3185,11 +3320,12 @@ References.
 
 * http://mathworld.wolfram.com/CardinalExponentiation.html
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
-* https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals"
+* https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.power_def"
 `;
 
-exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/finite 1`] = `
-"Definition 1.6.2.13.  Let κ ∈ 𝓒𝓻𝓭. We define:
+exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/finite 1`] = `
+"Definition 1.6.2.14.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
   κ is finite  :⇔  Carrier(κ) is finite
     ⇔  κ ∈ ℕ
@@ -3199,8 +3335,8 @@ exports[`render hlm library: 1.6.2.13 data/libraries/hlm/Essentials/Numbers/Card
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
-"Proposition 1.6.2.14.  Let S be a set. Then:
+exports[`render hlm library: 1.6.2.15 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.6.2.15.  Let S be a set. Then:
 
   |𝒫(S)| = 2^|S|
 
@@ -3212,8 +3348,8 @@ References.
 * http://mathworld.wolfram.com/CardinalExponentiation.html"
 `;
 
-exports[`render hlm library: 1.6.2.15.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
-"Definition 1.6.2.15.1.  Let α ∈ {0}. We define:
+exports[`render hlm library: 1.6.2.16.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
+"Definition 1.6.2.16.1.  Let α ∈ {0}. We define:
 
   ℵ_α := |ℕ|
    = |ℤ|
@@ -3223,18 +3359,31 @@ Equality.  No proof.
 
 Remarks.
 
-This definition is currently a stub that should be extended to arbitrary aleph numbers."
+This definition is currently a stub that should be extended to arbitrary aleph numbers.
+
+References.
+
+* https://en.wikipedia.org/wiki/Aleph_number
+* http://mathworld.wolfram.com/Aleph-0.html
+* https://ncatlab.org/nlab/show/aleph
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#cardinal.aleph_zero"
 `;
 
-exports[`render hlm library: 1.6.2.15.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
-"Definition 1.6.2.15.2.  We define:
+exports[`render hlm library: 1.6.2.16.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
+"Definition 1.6.2.16.2.  We define:
 
   𝔠 := |ℝ|
    = |ℂ|
    = |𝒫(ℕ)|
    = 2^(ℵ_0)
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Continuum_(set_theory)
+* http://mathworld.wolfram.com/Continuum.html
+* https://ncatlab.org/nlab/show/continuum"
 `;
 
 exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordinal%20numbers 1`] = `
@@ -3247,7 +3396,15 @@ exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordin
 ℕ ⊆: 𝓞𝓻𝓭 via
 n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_number
+* http://mathworld.wolfram.com/OrdinalNumber.html
+* https://proofwiki.org/wiki/Definition:Ordinal
+* https://ncatlab.org/nlab/show/ordinal+number
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal"
 `;
 
 exports[`render hlm library: 1.6.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Carrier 1`] = `
@@ -3263,32 +3420,48 @@ We write “let a ∈ α” for “let a ∈ Carrier(α).”
 
 Remarks.
 
-This definition retrieves a representative set from an ordinal number, and enables typical abuse of notation."
+This definition retrieves a representative set from an ordinal number."
 `;
 
 exports[`render hlm library: 1.6.3.3 data/libraries/hlm/Essentials/Numbers/Ordinal/before 1`] = `
 "Definition 1.6.3.3.  Let α ∈ 𝓞𝓻𝓭, a, b ∈ α. We define:
 
-  a ≤ b  :⇔  a ⪯ b if α = [A, ⪯] (A is a set, ⪯ is a relation on A with suitable conditions)"
+  a ≤ b  :⇔  a ⪯ b if α = [A, ⪯] (A is a set, ⪯ is a relation on A with suitable conditions)
+
+Remarks.
+
+This definition can be used to access underlying well-ordering of a given ordinal number. It must not be confused with comparison of two ordinal numbers, which is defined a little further below."
 `;
 
 exports[`render hlm library: 1.6.3.4.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Homomorphisms 1`] = `
 "Definition 1.6.3.4.1.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  Hom(α, β) := {f : Carrier(α) → Carrier(β) : ∀ a, b ∈ α s.t. a ≤ b : f(a) ≤ f(b)}
+  Hom(α, β) := {f : Carrier(α) → Carrier(β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
 
-We write “let φ : α → β be a homomorphism” for “let φ ∈ Hom(α, β).”"
+We write “let φ : α → β be a homomorphism” for “let φ ∈ Hom(α, β).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Order_embedding
+* https://proofwiki.org/wiki/Definition:Order_Embedding
+* https://leanprover-community.github.io/mathlib_docs/order/order_iso.html#order_embedding"
 `;
 
 exports[`render hlm library: 1.6.3.4.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
 "Definition 1.6.3.4.2.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
   Iso(α, β) := {homomorphisms φ : α → β : φ is bijective}
-   = {f : Carrier(α) ↔ Carrier(β) : ∀ a, b ∈ α s.t. a ≤ b : f(a) ≤ f(b)}
+   = {f : Carrier(α) ↔ Carrier(β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
 
 We write “let φ : α ↔ β be an isomorphism” for “let φ ∈ Iso(α, β).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Order_isomorphism
+* https://proofwiki.org/wiki/Definition:Order_Isomorphism
+* https://leanprover-community.github.io/mathlib_docs/order/order_iso.html#order_iso"
 `;
 
 exports[`render hlm library: 1.6.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Automorphisms 1`] = `
@@ -3311,6 +3484,14 @@ exports[`render hlm library: 1.6.3.4.4 data/libraries/hlm/Essentials/Numbers/Ord
 
   Aut(α) := [Aut(α)]_(𝑆_(Carrier(α)))
 
+Remarks.
+
+The automorphism group, as a subgroup of the symmetric group of the carrier.
+
+This definition makes a forward reference to concepts related to groups.
+
+Alternatively, automorphism groups could be defined more generally via category theory, but using them would require specifying the specific category to use.
+
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
@@ -3323,16 +3504,6 @@ exports[`render hlm library: 1.6.3.4.5 data/libraries/hlm/Essentials/Numbers/Ord
 "Definition 1.6.3.4.5.  Let α ∈ 𝓞𝓻𝓭. We define:
 
   id_α := id_(Carrier(α))"
-`;
-
-exports[`render hlm library: 1.6.3.4.6 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Equality%20criterion 1`] = `
-"Proposition 1.6.3.4.6.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
-
-  1. α ≤ β and β ≤ α
-  2. Iso(α, β) is nonempty
-  3. α = β
-
-No proof."
 `;
 
 exports[`render hlm library: 1.6.3.5.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordered%20subsets/subset%20ordinal 1`] = `
@@ -3351,13 +3522,21 @@ exports[`render hlm library: 1.6.3.6 data/libraries/hlm/Essentials/Numbers/Ordin
   α ≤ β  :⇔  ∃ homomorphism φ : α → β : φ is injective
     ⇔  ∃ S ⊆ Carrier(β) : α = [S]_β
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.le"
 `;
 
 exports[`render hlm library: 1.6.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
 "Definition 1.6.3.7.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  α < β  :⇔  α ≤ β and α ≠ β"
+  α < β  :⇔  α ≤ β and α ≠ β
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.lt"
 `;
 
 exports[`render hlm library: 1.6.3.8.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less) 1`] = `
@@ -3384,36 +3563,71 @@ exports[`render hlm library: 1.6.3.8.4 data/libraries/hlm/Essentials/Numbers/Ord
   𝓞𝓻𝓭_(>α) := {β ∈ 𝓞𝓻𝓭 : β > α}"
 `;
 
-exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
-"Proposition 1.6.3.9.
+exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
+"Proposition 1.6.3.9.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+
+  1. α ≤ β and β ≤ α
+  2. Iso(α, β) is nonempty
+  3. α = β
+
+No proof.
+
+Remarks.
+
+This is the ordinal-number analogue of the Schröder-Bernstein theorem, together with the HLM-specific equality criterion on structures."
+`;
+
+exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/Less%20or%20equal%20is%20a%20well-order 1`] = `
+"Proposition 1.6.3.10.
 
   ≤ is a well-order
 
-No proof."
+No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Ordinals_are_Well-Ordered
+* https://ncatlab.org/nlab/show/well-order#examples
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.is_well_order"
 `;
 
-exports[`render hlm library: 1.6.3.10 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
-"Definition 1.6.3.10.  Let α, β ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
+"Definition 1.6.3.11.  Let α, β ∈ 𝓞𝓻𝓭. We define
 
   α + β
 
 by:
 
-  [A, ⪯] + [B, ⊑] := [A ⊎ B, ⪯ ≪ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)"
+  [A, ⪯] + [B, ⊑] := [A ⊎ B, ⪯ ≪ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_arithmetic#Addition
+* http://mathworld.wolfram.com/OrdinalAddition.html
+* https://proofwiki.org/wiki/Definition:Ordinal_Addition
+* https://ncatlab.org/nlab/show/ordinal+sum
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.has_add"
 `;
 
-exports[`render hlm library: 1.6.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
-"Definition 1.6.3.11.  Let α, β ∈ 𝓞𝓻𝓭. We define
+exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
+"Definition 1.6.3.12.  Let α, β ∈ 𝓞𝓻𝓭. We define
 
   α ⋅ β
 
 by:
 
-  [A, ⪯] ⋅ [B, ⊑] := [A × B, ⪯ ∠ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)"
+  [A, ⪯] ⋅ [B, ⊑] := [A × B, ⪯ ∠ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_arithmetic#Multiplication
+* http://mathworld.wolfram.com/OrdinalMultiplication.html
+* https://proofwiki.org/wiki/Definition:Ordinal_Multiplication
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.type_mul"
 `;
 
-exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/finite 1`] = `
-"Definition 1.6.3.12.  Let α ∈ 𝓞𝓻𝓭. We define:
+exports[`render hlm library: 1.6.3.13 data/libraries/hlm/Essentials/Numbers/Ordinal/finite 1`] = `
+"Definition 1.6.3.13.  Let α ∈ 𝓞𝓻𝓭. We define:
 
   α is finite  :⇔  Carrier(α) is finite
     ⇔  α ∈ ℕ
@@ -3423,10 +3637,16 @@ exports[`render hlm library: 1.6.3.12 data/libraries/hlm/Essentials/Numbers/Ordi
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.6.3.13.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Examples/omega 1`] = `
-"Definition 1.6.3.13.1.  We define:
+exports[`render hlm library: 1.6.3.14.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Examples/omega 1`] = `
+"Definition 1.6.3.14.1.  We define:
 
-  ω := [ℕ, ≤]"
+  ω := [ℕ, ≤]
+
+References.
+
+* https://en.wikipedia.org/wiki/Ordinal_number#Ordinals_extend_the_natural_numbers
+* http://mathworld.wolfram.com/OrdinalNumber.html
+* https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.omega"
 `;
 
 exports[`render hlm library: 1.6.4.1 data/libraries/hlm/Essentials/Numbers/Integer/Integers 1`] = `
