@@ -30,7 +30,7 @@ module.exports = {
   output: {
     path: path.join(projectRoot, 'dist', 'public'),
     filename: `[name]-${version}-bundle.js`,
-    publicPath: '/public/'
+    publicPath: 'public/'
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
