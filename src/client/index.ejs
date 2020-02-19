@@ -5,6 +5,7 @@
     <title>
       <%= htmlWebpackPlugin.options.title %>
     </title>
+    <base href="/" />
     <style>
       body {
         font-family: sans-serif;
@@ -25,171 +26,171 @@
       }
       @font-face {
         font-family: 'TeX';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_AMS-Regular.svg#MathJax_AMS-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_AMS-Regular.svg#MathJax_AMS-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
         unicode-range: U+0-2203, U+2206-FFFF;
       }
       @font-face {
         font-family: 'TeX';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
       }
       @font-face {
         font-family: 'TeX';
         font-weight: bold;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
         font-weight: bold;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Bold.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Bold.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Bold.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Bold.svg#MathJax_Main-Bold') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Size1-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Size1-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Size1-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Size1-Regular.svg#MathJax_Size1-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
         unicode-range: U+30-39;
       }
       @font-face {
         font-family: 'TeX-Var';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Math-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Math-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Math-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Math-Regular.svg#MathJax_Math-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Math-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Math-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Math-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Math-Regular.svg#MathJax_Math-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Var';
         font-weight: bold;
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Math-BoldItalic.svg#MathJax_Math-BoldItalic') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Math-BoldItalic.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Math-BoldItalic.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Math-BoldItalic.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Math-BoldItalic.svg#MathJax_Math-BoldItalic') format('svg');
       }
       @font-face {
         font-family: 'TeX-Sans';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_SansSerif-Regular.svg#MathJax_SansSerif-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_SansSerif-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_SansSerif-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_SansSerif-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_SansSerif-Regular.svg#MathJax_SansSerif-Regular') format('svg');
         unicode-range: U+30-FFFF;
       }
       @font-face {
         font-family: 'TeX-Calligraphic';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Italic.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Italic.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Italic.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Italic.svg#MathJax_Main-Italic') format('svg');
       }
       @font-face {
         font-family: 'TeX-Calligraphic';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Caligraphic-Regular.svg#MathJax_Caligraphic-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Caligraphic-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Caligraphic-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Caligraphic-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Caligraphic-Regular.svg#MathJax_Caligraphic-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Fraktur';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Fraktur-Regular.svg#MathJax_Fraktur-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Fraktur-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Fraktur-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Fraktur-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Fraktur-Regular.svg#MathJax_Fraktur-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-DoubleStruck';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_AMS-Regular.svg#MathJax_AMS-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_AMS-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_AMS-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_AMS-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_AMS-Regular.svg#MathJax_AMS-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Large';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Large';
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
-      }
-      @font-face {
-        font-family: 'TeX-Large';
-        font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
       }
       @font-face {
         font-family: 'TeX-Large';
         font-style: italic;
-        src: url('/fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
-             url('/fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
-             url('/fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
-             url('/fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Main-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Main-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Main-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Main-Regular.svg#MathJax_Main-Regular') format('svg');
+      }
+      @font-face {
+        font-family: 'TeX-Large';
+        font-style: italic;
+        src: url('fonts/HTML-CSS/TeX/eot/MathJax_Size2-Regular.eot') format('eot'),
+             url('fonts/HTML-CSS/TeX/woff/MathJax_Size2-Regular.woff') format('woff'),
+             url('fonts/HTML-CSS/TeX/otf/MathJax_Size2-Regular.otf') format('opentype'),
+             url('fonts/HTML-CSS/TeX/svg/MathJax_Size2-Regular.svg#MathJax_Size2-Regular') format('svg');
       }
       .preload-font {
         visibility: hidden;

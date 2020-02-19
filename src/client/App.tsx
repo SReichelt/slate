@@ -32,7 +32,7 @@ const Loading = require('react-loading-animation');
 
 const libraries = require('../../data/libraries/libraries.json');
 
-const librariesURIPrefix = '/libraries/';
+const librariesURIPrefix = 'libraries/';
 
 const appName = 'Slate';
 const selectedLibraryName = 'hlm';
@@ -267,7 +267,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    let templateUri = '/display/templates.slate';
+    let templateUri = 'display/templates.slate';
     this.fileAccessor.readFile(templateUri)
       .then((contents: FileContents) => {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);

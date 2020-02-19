@@ -3,7 +3,7 @@ import * as utf8 from 'utf8';
 import { fetchText } from '../utils/fetch';
 
 export function getClientID(): Promise<string> {
-  return fetchText('/github-auth/client-id');
+  return fetchText('github-auth/client-id');
 }
 
 export function getLoginURL(clientID: string, baseURL: string, path: string): string {
