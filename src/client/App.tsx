@@ -187,6 +187,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private updateSelectionState(state: SelectionState, uri: string): boolean {
+    if (uri.startsWith('/')) {
+      uri = uri.substring(1);
+    }
     let path = this.libraryDataProvider.uriToPath(uri);
     if (path) {
       this.fillSelectionState(state, this.libraryDataProvider, path);

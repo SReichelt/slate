@@ -82,10 +82,7 @@ References.
 exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`] = `
 "Definition 1.1.4.  Let S be a set. We define:
 
-  S is finite  :⇔  |S| ∈ ℕ
-    ⇔  ∃ x ∈ ℕ : |S| = x
-    ⇔  ∃ y ∈ ℕ : |S| ≤ y
-    ⇔  ∃ z ∈ ℕ : |S| < z
+  S is finite  :⇔  |S| is finite
     ⇔  ∃ k ∈ ℕ, f : S ↔ ℕ_(<k)
     ⇔  ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S
     ⇔  ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective
@@ -95,17 +92,17 @@ exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`]
 
 Equivalence.
 
-1⇒5. Assume |S| ∈ ℕ. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
+1⇒2. Assume |S| ∈ ℕ. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
 
 |S| = |ℕ_(<|S|)|
 
 ⇒^def ∃ r : S ↔ ℕ_(<|S|)
 
 Choose k := |S|, f := r.
-5⇒6. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
+2⇒3. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
 
 Choose l := k, g := f^-1.
-6⇒1. Assume ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S. Then |S| ∈ ℕ:
+3⇒1. Assume ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S. Then |S| ∈ ℕ:
 
 We have |ℕ_(<l)| = |S|:
 
@@ -118,38 +115,16 @@ Choose s := g.
 l ∈ ℕ
 
 ⇒^[l = |S|] |S| ∈ ℕ
-5⇒7. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
+2⇒4. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
 
 def ⇒ f is injective
 
 Choose m := k, h := f.
-7⇒8. Assume ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
+4⇒5. Assume ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
 
 ⇒^1.6.1.17.6 ℕ_(<m) ⊆ ℕ_(≤m)
 
 Choose n := m, i := h∣_S^(ℕ_(≤m)).
-8⇒3. Assume ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective. Then ∃ y ∈ ℕ : |S| ≤ y:
-
-i ∈ (S → ℕ_(≤n))
-
-⇒^def i ∈ (S → ℕ_(<(n+1)))
-
-Choose y := (n+1). We show that |S| ≤ (n+1):
-
-We show that ∃ t : S → ℕ_(<(n+1)) : t is injective:
-
-Choose t := i.
-3⇒5. Assume ∃ y ∈ ℕ : |S| ≤ y. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-
-⇒^def ∃ u : S → ℕ_(<y) : u is injective
-
-Let T := u(S).
-
-Let o := |T|_≤y.
-
-Let v :  ℕ_(<o) → T, z ↦ T[z].
-
-Choose k := o, f := v^-1 ∘ u∣_S^T.
 
 Remarks.
 
@@ -192,8 +167,44 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite_subset"
 `;
 
-exports[`render hlm library: 1.1.6 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
-"Definition 1.1.6.  Let U be a set, S, T ⊆ U. We define:
+exports[`render hlm library: 1.1.6 data/libraries/hlm/Essentials/Sets/countable 1`] = `
+"Definition 1.1.6.  Let S be a set. We define:
+
+  S is countable  :⇔  |S| is countable
+    ⇔  ∃ f : S → ℕ : f is injective
+
+  S is uncountable  :⇔  S is not countable
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Countable_set
+* http://mathworld.wolfram.com/CountableSet.html
+* https://proofwiki.org/wiki/Definition:Countable_Set
+* https://ncatlab.org/nlab/show/countable+set
+* https://leanprover-community.github.io/mathlib_docs/data/set/countable.html#set.countable"
+`;
+
+exports[`render hlm library: 1.1.7 data/libraries/hlm/Essentials/Sets/countably%20infinite 1`] = `
+"Definition 1.1.7.  Let S be a set. We define:
+
+  S is countably infinite  :⇔  |S| is countably infinite
+    ⇔  S is countable and S is infinite
+    ⇔  ∃ f : S ↔ ℕ
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Countable_set
+* http://mathworld.wolfram.com/CountablyInfinite.html
+* https://proofwiki.org/wiki/Definition:Countably_Infinite_Set
+* https://ncatlab.org/nlab/show/countable+set (called “denumerable” here)"
+`;
+
+exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
+"Definition 1.1.8.  Let U be a set, S, T ⊆ U. We define:
 
   S ∩ T := {x ∈ U : x ∈ S and x ∈ T}
 
@@ -210,8 +221,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
 `;
 
-exports[`render hlm library: 1.1.7 data/libraries/hlm/Essentials/Sets/Intersection%20is%20associative 1`] = `
-"Proposition 1.1.7.  Let U be a set, R, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.9 data/libraries/hlm/Essentials/Sets/Intersection%20is%20associative 1`] = `
+"Proposition 1.1.9.  Let U be a set, R, S, T ⊆ U. Then:
 
   (R ∩ S) ∩ T = R ∩ (S ∩ T)
 
@@ -223,8 +234,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_assoc"
 `;
 
-exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection%20is%20commutative 1`] = `
-"Proposition 1.1.8.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.10 data/libraries/hlm/Essentials/Sets/Intersection%20is%20commutative 1`] = `
+"Proposition 1.1.10.  Let U be a set, S, T ⊆ U. Then:
 
   S ∩ T = T ∩ S
 
@@ -236,8 +247,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_comm"
 `;
 
-exports[`render hlm library: 1.1.9 data/libraries/hlm/Essentials/Sets/Intersection%20is%20subset%20of%20argument 1`] = `
-"Proposition 1.1.9.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.11 data/libraries/hlm/Essentials/Sets/Intersection%20is%20subset%20of%20argument 1`] = `
+"Proposition 1.1.11.  Let U be a set, S, T ⊆ U. Then:
 
   S ∩ T ⊆ S
 
@@ -249,8 +260,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_subset_left"
 `;
 
-exports[`render hlm library: 1.1.10 data/libraries/hlm/Essentials/Sets/Union 1`] = `
-"Definition 1.1.10.  Let U be a set, S, T ⊆ U. We define:
+exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union 1`] = `
+"Definition 1.1.12.  Let U be a set, S, T ⊆ U. We define:
 
   S ∪ T := {x ∈ U : x ∈ S or x ∈ T}
 
@@ -267,8 +278,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
 `;
 
-exports[`render hlm library: 1.1.11 data/libraries/hlm/Essentials/Sets/Union%20is%20associative 1`] = `
-"Proposition 1.1.11.  Let U be a set, R, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.13 data/libraries/hlm/Essentials/Sets/Union%20is%20associative 1`] = `
+"Proposition 1.1.13.  Let U be a set, R, S, T ⊆ U. Then:
 
   (R ∪ S) ∪ T = R ∪ (S ∪ T)
 
@@ -280,8 +291,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_assoc"
 `;
 
-exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union%20is%20commutative 1`] = `
-"Proposition 1.1.12.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.14 data/libraries/hlm/Essentials/Sets/Union%20is%20commutative 1`] = `
+"Proposition 1.1.14.  Let U be a set, S, T ⊆ U. Then:
 
   S ∪ T = T ∪ S
 
@@ -293,8 +304,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_comm"
 `;
 
-exports[`render hlm library: 1.1.13 data/libraries/hlm/Essentials/Sets/Union%20is%20superset%20of%20argument 1`] = `
-"Proposition 1.1.13.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.15 data/libraries/hlm/Essentials/Sets/Union%20is%20superset%20of%20argument 1`] = `
+"Proposition 1.1.15.  Let U be a set, S, T ⊆ U. Then:
 
   S ⊆ S ∪ T
 
@@ -305,8 +316,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.subset_union_left"
 `;
 
-exports[`render hlm library: 1.1.14 data/libraries/hlm/Essentials/Sets/Relative%20complement 1`] = `
-"Definition 1.1.14.  Let U be a set, S, T ⊆ U. We define:
+exports[`render hlm library: 1.1.16 data/libraries/hlm/Essentials/Sets/Relative%20complement 1`] = `
+"Definition 1.1.16.  Let U be a set, S, T ⊆ U. We define:
 
   S ∖ T := {x ∈ U : x ∈ S and x ∉ T}
    = {x ∈ S : x ∉ T}
@@ -321,8 +332,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
 `;
 
-exports[`render hlm library: 1.1.15 data/libraries/hlm/Essentials/Sets/Disjoint%20union 1`] = `
-"Definition 1.1.15.  Let S, T be sets. We define:
+exports[`render hlm library: 1.1.17 data/libraries/hlm/Essentials/Sets/Disjoint%20union 1`] = `
+"Definition 1.1.17.  Let S, T be sets. We define:
 
   S ⊎ T :=: {l(s) | s ∈ S, r(t) | t ∈ T}
 
@@ -349,8 +360,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sum"
 `;
 
-exports[`render hlm library: 1.1.16 data/libraries/hlm/Essentials/Sets/Cartesian%20product 1`] = `
-"Definition 1.1.16.  Let S, T be sets. We define:
+exports[`render hlm library: 1.1.18 data/libraries/hlm/Essentials/Sets/Cartesian%20product 1`] = `
+"Definition 1.1.18.  Let S, T be sets. We define:
 
   S × T :=: {(s, t) | s ∈ S, t ∈ T}
 
@@ -371,8 +382,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#prod"
 `;
 
-exports[`render hlm library: 1.1.17 data/libraries/hlm/Essentials/Sets/Power%20set 1`] = `
-"Definition 1.1.17.  Let S be a set. We define:
+exports[`render hlm library: 1.1.19 data/libraries/hlm/Essentials/Sets/Power%20set 1`] = `
+"Definition 1.1.19.  Let S be a set. We define:
 
   𝒫(S) :=: {(T) | T ⊆ S}
 
@@ -394,8 +405,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
 `;
 
-exports[`render hlm library: 1.1.18 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
-"Definition 1.1.18.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
+"Definition 1.1.20.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
 
@@ -409,8 +420,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.19 data/libraries/hlm/Essentials/Sets/Generalized%20intersection%20using%20power%20set 1`] = `
-"Definition 1.1.19.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.21 data/libraries/hlm/Essentials/Sets/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.21.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋂S := ⋂_((T) ∈ S) T
 
@@ -419,8 +430,8 @@ References.
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
 `;
 
-exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generalized%20union 1`] = `
-"Definition 1.1.20.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.22 data/libraries/hlm/Essentials/Sets/Generalized%20union 1`] = `
+"Definition 1.1.22.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
 
@@ -430,8 +441,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.21 data/libraries/hlm/Essentials/Sets/Generalized%20union%20using%20power%20set 1`] = `
-"Definition 1.1.21.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.23 data/libraries/hlm/Essentials/Sets/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.23.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋃S := ⋃_((T) ∈ S) T
 
@@ -440,8 +451,8 @@ References.
 * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
 `;
 
-exports[`render hlm library: 1.1.22 data/libraries/hlm/Essentials/Sets/Generalized%20cartesian%20product 1`] = `
-"Definition 1.1.22.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+exports[`render hlm library: 1.1.24 data/libraries/hlm/Essentials/Sets/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.24.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
   ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
 
@@ -458,8 +469,8 @@ References.
 * https://ncatlab.org/nlab/show/cartesian+product#in_sets"
 `;
 
-exports[`render hlm library: 1.1.23 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
-"Definition 1.1.23.  We define:
+exports[`render hlm library: 1.1.25 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
+"Definition 1.1.25.  We define:
 
   𝓣𝓻𝓾𝓽𝓱 :=: {[p] | p is a proposition}
 
@@ -478,8 +489,8 @@ References.
 * https://ncatlab.org/nlab/show/truth+value"
 `;
 
-exports[`render hlm library: 1.1.24.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
-"Definition 1.1.24.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.26.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.26.1.  Let S be a set. We define:
 
   𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
@@ -490,14 +501,14 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
 `;
 
-exports[`render hlm library: 1.1.24.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
-"Definition 1.1.24.2.  Let S be a set. We define:
+exports[`render hlm library: 1.1.26.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.26.2.  Let S be a set. We define:
 
   S has a choice function  :⇔  𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
 `;
 
-exports[`render hlm library: 1.1.24.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
-"Axiom 1.1.24.3 (Axiom of choice).  We define:
+exports[`render hlm library: 1.1.26.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.26.3 (Axiom of choice).  We define:
 
   AC  :⇔  ∀ sets S : S has a choice function
 
@@ -3324,19 +3335,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.power_def"
 `;
 
-exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/finite 1`] = `
-"Definition 1.6.2.14.  Let κ ∈ 𝓒𝓻𝓭. We define:
-
-  κ is finite  :⇔  Carrier(κ) is finite
-    ⇔  κ ∈ ℕ
-
-  κ is infinite  :⇔  κ is not finite
-
-Equivalence.  No proof."
-`;
-
-exports[`render hlm library: 1.6.2.15 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
-"Proposition 1.6.2.15.  Let S be a set. Then:
+exports[`render hlm library: 1.6.2.14 data/libraries/hlm/Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.6.2.14.  Let S be a set. Then:
 
   |𝒫(S)| = 2^|S|
 
@@ -3348,8 +3348,8 @@ References.
 * http://mathworld.wolfram.com/CardinalExponentiation.html"
 `;
 
-exports[`render hlm library: 1.6.2.16.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
-"Definition 1.6.2.16.1.  Let α ∈ {0}. We define:
+exports[`render hlm library: 1.6.2.15.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
+"Definition 1.6.2.15.1.  Let α ∈ {0}. We define:
 
   ℵ_α := |ℕ|
    = |ℤ|
@@ -3369,8 +3369,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#cardinal.aleph_zero"
 `;
 
-exports[`render hlm library: 1.6.2.16.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
-"Definition 1.6.2.16.2.  We define:
+exports[`render hlm library: 1.6.2.15.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
+"Definition 1.6.2.15.2.  We define:
 
   𝔠 := |ℝ|
    = |ℂ|
@@ -3381,9 +3381,81 @@ Equality.  No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Continuum_(set_theory)
+* https://en.wikipedia.org/wiki/Cardinality_of_the_continuum
 * http://mathworld.wolfram.com/Continuum.html
-* https://ncatlab.org/nlab/show/continuum"
+* https://ncatlab.org/nlab/show/continuum
+* https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.mk_real"
+`;
+
+exports[`render hlm library: 1.6.2.16 data/libraries/hlm/Essentials/Numbers/Cardinal/finite 1`] = `
+"Definition 1.6.2.16.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  κ is finite  :⇔  κ ∈ ℕ
+    ⇔  ∃ x ∈ ℕ : κ = x
+    ⇔  ∃ y ∈ ℕ : κ ≤ y
+    ⇔  ∃ z ∈ ℕ : κ < z
+
+  κ is infinite  :⇔  κ is not finite
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.2.17 data/libraries/hlm/Essentials/Numbers/Cardinal/countable 1`] = `
+"Definition 1.6.2.17.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  κ is countable  :⇔  κ ≤ ℵ_0
+    ⇔  ∃ M ⊆ ℕ : κ = |M|
+
+  κ is uncountable  :⇔  κ is not countable
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.2.18 data/libraries/hlm/Essentials/Numbers/Cardinal/countably%20infinite 1`] = `
+"Definition 1.6.2.18.  Let κ ∈ 𝓒𝓻𝓭. We define:
+
+  κ is countably infinite  :⇔  κ is countable and κ is infinite
+    ⇔  κ = ℵ_0
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.2.19 data/libraries/hlm/Essentials/Numbers/Cardinal/Cantors%20theorem 1`] = `
+"Theorem 1.6.2.19 (Cantor's theorem).  Let S be a set. Then:
+
+  |𝒫(S)| > |S|
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cantor%27s_theorem
+* http://mathworld.wolfram.com/CantorsTheorem.html
+* https://proofwiki.org/wiki/Cantor%27s_Theorem
+* https://ncatlab.org/nlab/show/Cantor%27s+theorem
+* https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.cantor"
+`;
+
+exports[`render hlm library: 1.6.2.20 data/libraries/hlm/Essentials/Numbers/Cardinal/Cantors%20theorem%20generalized 1`] = `
+"Corollary 1.6.2.20.  Let κ ∈ 𝓒𝓻𝓭_(>1), μ ∈ 𝓒𝓻𝓭. Then:
+
+  κ^μ > μ
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.2.21 data/libraries/hlm/Essentials/Numbers/Cardinal/Continuum%20is%20uncountable 1`] = `
+"Corollary 1.6.2.21.
+
+  𝔠 is uncountable
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cardinality_of_the_continuum
+* https://proofwiki.org/wiki/Real_Numbers_are_Uncountable
+* https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.not_countable_real"
 `;
 
 exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordinal%20numbers 1`] = `
@@ -3626,19 +3698,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.type_mul"
 `;
 
-exports[`render hlm library: 1.6.3.13 data/libraries/hlm/Essentials/Numbers/Ordinal/finite 1`] = `
-"Definition 1.6.3.13.  Let α ∈ 𝓞𝓻𝓭. We define:
-
-  α is finite  :⇔  Carrier(α) is finite
-    ⇔  α ∈ ℕ
-
-  α is infinite  :⇔  α is not finite
-
-Equivalence.  No proof."
-`;
-
-exports[`render hlm library: 1.6.3.14.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Examples/omega 1`] = `
-"Definition 1.6.3.14.1.  We define:
+exports[`render hlm library: 1.6.3.13.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Examples/omega 1`] = `
+"Definition 1.6.3.13.1.  We define:
 
   ω := [ℕ, ≤]
 
@@ -3647,6 +3708,45 @@ References.
 * https://en.wikipedia.org/wiki/Ordinal_number#Ordinals_extend_the_natural_numbers
 * http://mathworld.wolfram.com/OrdinalNumber.html
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.omega"
+`;
+
+exports[`render hlm library: 1.6.3.14 data/libraries/hlm/Essentials/Numbers/Ordinal/cardinality 1`] = `
+"Definition 1.6.3.14.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  |α| := |Carrier(α)|"
+`;
+
+exports[`render hlm library: 1.6.3.15 data/libraries/hlm/Essentials/Numbers/Ordinal/finite 1`] = `
+"Definition 1.6.3.15.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  α is finite  :⇔  |α| is finite
+    ⇔  Carrier(α) is finite
+    ⇔  α ∈ ℕ
+
+  α is infinite  :⇔  α is not finite
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.16 data/libraries/hlm/Essentials/Numbers/Ordinal/countable 1`] = `
+"Definition 1.6.3.16.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  α is countable  :⇔  |α| is countable
+    ⇔  Carrier(α) is countable
+
+  α is uncountable  :⇔  α is not countable
+
+Equivalence.  No proof."
+`;
+
+exports[`render hlm library: 1.6.3.17 data/libraries/hlm/Essentials/Numbers/Ordinal/countably%20infinite 1`] = `
+"Definition 1.6.3.17.  Let α ∈ 𝓞𝓻𝓭. We define:
+
+  α is countably infinite  :⇔  α is countable and α is infinite
+    ⇔  |α| is countably infinite
+    ⇔  Carrier(α) is countably infinite
+
+Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.6.4.1 data/libraries/hlm/Essentials/Numbers/Integer/Integers 1`] = `
@@ -3687,7 +3787,8 @@ References.
 * http://mathworld.wolfram.com/Integer.html
 * https://proofwiki.org/wiki/Definition:Integer
 * https://ncatlab.org/nlab/show/integer
-* https://coq.inria.fr/library/Coq.ZArith.BinInt.html (but uses a different encoding as an inductive data type with three constructors)"
+* https://coq.inria.fr/library/Coq.ZArith.BinInt.html (but uses a different encoding as an inductive data type with three constructors)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int (but uses a different encoding as an inductive data type with two constructors)"
 `;
 
 exports[`render hlm library: 1.6.4.2 data/libraries/hlm/Essentials/Numbers/Integer/sum 1`] = `
@@ -3709,7 +3810,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Integer#Construction
 * https://proofwiki.org/wiki/Definition:Addition/Integers
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.add (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.add
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add"
 `;
 
 exports[`render hlm library: 1.6.4.3 data/libraries/hlm/Essentials/Numbers/Integer/Sum%20is%20associative 1`] = `
@@ -3717,7 +3819,11 @@ exports[`render hlm library: 1.6.4.3 data/libraries/hlm/Essentials/Numbers/Integ
 
   + is associative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add_assoc"
 `;
 
 exports[`render hlm library: 1.6.4.4 data/libraries/hlm/Essentials/Numbers/Integer/Sum%20is%20commutative 1`] = `
@@ -3725,7 +3831,11 @@ exports[`render hlm library: 1.6.4.4 data/libraries/hlm/Essentials/Numbers/Integ
 
   + is commutative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add_comm"
 `;
 
 exports[`render hlm library: 1.6.4.5 data/libraries/hlm/Essentials/Numbers/Integer/inverse 1`] = `
@@ -3741,7 +3851,8 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.opp (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.opp
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.neg"
 `;
 
 exports[`render hlm library: 1.6.4.6 data/libraries/hlm/Essentials/Numbers/Integer/difference 1`] = `
@@ -3760,7 +3871,8 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.sub (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.sub
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.has_sub"
 `;
 
 exports[`render hlm library: 1.6.4.7 data/libraries/hlm/Essentials/Numbers/Integer/Actual%20difference%20equals%20formal%20difference 1`] = `
@@ -3795,7 +3907,7 @@ Note that the comparison on the right is comparison on natural numbers.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.leb (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.leb"
 `;
 
 exports[`render hlm library: 1.6.4.9 data/libraries/hlm/Essentials/Numbers/Integer/less 1`] = `
@@ -3809,7 +3921,7 @@ Equivalence.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.ltb (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.ltb"
 `;
 
 exports[`render hlm library: 1.6.4.10.1 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(less) 1`] = `
@@ -3933,7 +4045,8 @@ References.
 * https://en.wikipedia.org/wiki/Absolute_value
 * http://mathworld.wolfram.com/AbsoluteValue.html
 * https://proofwiki.org/wiki/Definition:Absolute_Value
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.nat_abs"
 `;
 
 exports[`render hlm library: 1.6.4.12 data/libraries/hlm/Essentials/Numbers/Integer/product 1`] = `
@@ -3953,7 +4066,8 @@ Note that the sums and products on the right are operations on natural numbers.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul (but uses a different encoding)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul"
 `;
 
 exports[`render hlm library: 1.6.4.13 data/libraries/hlm/Essentials/Numbers/Integer/Product%20is%20associative 1`] = `
@@ -3961,7 +4075,11 @@ exports[`render hlm library: 1.6.4.13 data/libraries/hlm/Essentials/Numbers/Inte
 
   ⋅ is associative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul_assoc"
 `;
 
 exports[`render hlm library: 1.6.4.14 data/libraries/hlm/Essentials/Numbers/Integer/Product%20is%20commutative 1`] = `
@@ -3969,7 +4087,11 @@ exports[`render hlm library: 1.6.4.14 data/libraries/hlm/Essentials/Numbers/Inte
 
   ⋅ is commutative
 
-No proof."
+No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul_comm"
 `;
 
 exports[`render hlm library: 1.6.4.15 data/libraries/hlm/Essentials/Numbers/Integer/divisible 1`] = `
@@ -3996,7 +4118,8 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.div (truncated division, thus incompatible with division of rational numbers)"
+* https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.div (truncated division, thus incompatible with division of rational numbers)
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.div (ditto)"
 `;
 
 exports[`render hlm library: 1.6.4.18 data/libraries/hlm/Essentials/Numbers/Integer/power 1`] = `
@@ -4122,7 +4245,8 @@ References.
 * http://mathworld.wolfram.com/RationalNumber.html
 * https://proofwiki.org/wiki/Definition:Rational_Number
 * https://ncatlab.org/nlab/show/rational+number
-* https://coq.inria.fr/library/Coq.QArith.QArith_base.html"
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Q (together with https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qeq)
+* https://leanprover-community.github.io/mathlib_docs/data/rat/basic.html#rat (but uses coprimality requirement instead of equivalence relation)"
 `;
 
 exports[`render hlm library: 1.6.5.2 data/libraries/hlm/Essentials/Numbers/Rational/sum 1`] = `
@@ -4140,7 +4264,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Addition
 * https://proofwiki.org/wiki/Definition:Addition/Rational_Numbers
-* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qplus"
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qplus
+* https://leanprover-community.github.io/mathlib_docs/data/rat/basic.html#rat.add"
 `;
 
 exports[`render hlm library: 1.6.5.3 data/libraries/hlm/Essentials/Numbers/Rational/inverse 1`] = `
@@ -4157,7 +4282,8 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Inverse
-* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qopp"
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qopp
+* https://leanprover-community.github.io/mathlib_docs/data/rat/basic.html#rat.neg"
 `;
 
 exports[`render hlm library: 1.6.5.4 data/libraries/hlm/Essentials/Numbers/Rational/difference 1`] = `
@@ -4177,7 +4303,9 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Subtraction
-* https://proofwiki.org/wiki/Definition:Subtraction/Rational_Numbers"
+* https://proofwiki.org/wiki/Definition:Subtraction/Rational_Numbers
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qminus
+* https://leanprover-community.github.io/mathlib_docs/data/rat/basic.html#rat.sub_def"
 `;
 
 exports[`render hlm library: 1.6.5.5 data/libraries/hlm/Essentials/Numbers/Rational/less%20or%20equal 1`] = `
@@ -4193,7 +4321,9 @@ Well-definedness.  No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Rational_number#Ordering"
+* https://en.wikipedia.org/wiki/Rational_number#Ordering
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qle
+* https://leanprover-community.github.io/mathlib_docs/data/rat/order.html#rat.le"
 `;
 
 exports[`render hlm library: 1.6.5.6 data/libraries/hlm/Essentials/Numbers/Rational/less 1`] = `
@@ -4202,7 +4332,12 @@ exports[`render hlm library: 1.6.5.6 data/libraries/hlm/Essentials/Numbers/Ratio
   a < b  :⇔  a ≱ b
     ⇔  a ≤ b and a ≠ b
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qlt
+* https://leanprover-community.github.io/mathlib_docs/data/rat/order.html#rat.lt_def"
 `;
 
 exports[`render hlm library: 1.6.5.7.1 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(less) 1`] = `
@@ -4304,7 +4439,8 @@ References.
 * https://en.wikipedia.org/wiki/Absolute_value
 * http://mathworld.wolfram.com/AbsoluteValue.html
 * https://proofwiki.org/wiki/Definition:Absolute_Value
-* https://coq.inria.fr/library/Coq.QArith.Qabs.html"
+* https://coq.inria.fr/library/Coq.QArith.Qabs.html
+* https://leanprover-community.github.io/mathlib_docs/data/rat/order.html#rat.abs_def"
 `;
 
 exports[`render hlm library: 1.6.5.9 data/libraries/hlm/Essentials/Numbers/Rational/product 1`] = `
@@ -4322,7 +4458,8 @@ References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Multiplication
 * https://proofwiki.org/wiki/Definition:Multiplication/Rational_Numbers
-* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qmult"
+* https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qmult
+* https://leanprover-community.github.io/mathlib_docs/data/rat/basic.html#rat.mul"
 `;
 
 exports[`render hlm library: 1.6.5.10 data/libraries/hlm/Essentials/Numbers/Rational/quotient 1`] = `
@@ -4417,7 +4554,14 @@ exports[`render hlm library: 1.6.5.15.1 data/libraries/hlm/Essentials/Numbers/Ra
 
 by:
 
-  (a_n)_(n ∈ ℕ) converges to l  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : |a_m − l| < ε  (a_n ∈ ℚ for each n ∈ ℕ)"
+  (a_n)_(n ∈ ℕ) converges to l  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : |a_m − l| < ε  (a_n ∈ ℚ for each n ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Limit_of_a_sequence
+* http://mathworld.wolfram.com/ConvergentSequence.html
+* https://proofwiki.org/wiki/Definition:Convergent_Sequence/Normed_Division_Ring
+* https://ncatlab.org/nlab/show/convergence"
 `;
 
 exports[`render hlm library: 1.6.5.15.2 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/convergent 1`] = `
@@ -4433,7 +4577,14 @@ exports[`render hlm library: 1.6.5.15.3 data/libraries/hlm/Essentials/Numbers/Ra
 
   lim_(n → ∞) a_n = l  :⇔  𝐚 converges to l
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Limit_of_a_sequence
+* http://mathworld.wolfram.com/Limit.html
+* https://proofwiki.org/wiki/Definition:Limit_of_Sequence/Normed_Division_Ring
+* https://ncatlab.org/nlab/show/convergence"
 `;
 
 exports[`render hlm library: 1.6.5.15.4 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/cauchy 1`] = `
@@ -4443,7 +4594,15 @@ exports[`render hlm library: 1.6.5.15.4 data/libraries/hlm/Essentials/Numbers/Ra
 
 by:
 
-  (a_n)_(n ∈ ℕ) is Cauchy  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ l, m ∈ ℕ_(≥n) : |a_l − a_m| < ε  (a_n ∈ ℚ for each n ∈ ℕ)"
+  (a_n)_(n ∈ ℕ) is Cauchy  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ l, m ∈ ℕ_(≥n) : |a_l − a_m| < ε  (a_n ∈ ℚ for each n ∈ ℕ)
+
+References.
+
+* https://en.wikipedia.org/wiki/Cauchy_sequence
+* http://mathworld.wolfram.com/CauchySequence.html
+* https://proofwiki.org/wiki/Definition:Cauchy_Sequence
+* https://ncatlab.org/nlab/show/Cauchy+sequence
+* https://leanprover-community.github.io/mathlib_docs/data/real/cau_seq.html#is_cau_seq"
 `;
 
 exports[`render hlm library: 1.6.5.15.5 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20sum 1`] = `
@@ -4505,7 +4664,16 @@ exports[`render hlm library: 1.6.6.1 data/libraries/hlm/Essentials/Numbers/Real/
 ℚ ⊆: ℝ via
 x = [(x)_(k ∈ ℕ)]
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Real_number
+* http://mathworld.wolfram.com/RealNumber.html
+* https://proofwiki.org/wiki/Definition:Real_Number
+* https://ncatlab.org/nlab/show/real+number
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal
+* https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real"
 `;
 
 exports[`render hlm library: 1.6.6.2 data/libraries/hlm/Essentials/Numbers/Real/sum 1`] = `
@@ -4517,7 +4685,11 @@ by:
 
   [r_a] + [r_b] := [r_a + r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_plus"
 `;
 
 exports[`render hlm library: 1.6.6.3 data/libraries/hlm/Essentials/Numbers/Real/inverse 1`] = `
@@ -4529,7 +4701,11 @@ by:
 
   −[r_a] := [−r_a]  (r_a is a sequence on ℚ with suitable conditions)
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_opp"
 `;
 
 exports[`render hlm library: 1.6.6.4 data/libraries/hlm/Essentials/Numbers/Real/difference 1`] = `
@@ -4544,7 +4720,11 @@ by:
 
 Equality.  No proof.
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_minus"
 `;
 
 exports[`render hlm library: 1.6.6.5 data/libraries/hlm/Essentials/Numbers/Real/less%20or%20equal 1`] = `
@@ -4556,7 +4736,12 @@ by:
 
   [(x_n)_(n ∈ ℕ)] ≤ [(y_n)_(n ∈ ℕ)]  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : x_m ≤ y_m + ε  ((x_n)_(n ∈ ℕ) is a sequence on ℚ, (y_n)_(n ∈ ℕ) is a sequence on ℚ with suitable conditions)
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CRealLe
+* https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real.le"
 `;
 
 exports[`render hlm library: 1.6.6.6 data/libraries/hlm/Essentials/Numbers/Real/less 1`] = `
@@ -4565,7 +4750,12 @@ exports[`render hlm library: 1.6.6.6 data/libraries/hlm/Essentials/Numbers/Real/
   a < b  :⇔  a ≱ b
     ⇔  a ≤ b and a ≠ b
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CRealLt
+* https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real.has_lt"
 `;
 
 exports[`render hlm library: 1.6.6.7.1 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(less) 1`] = `
@@ -4662,7 +4852,11 @@ by:
 
   [r_a] ⋅ [r_b] := [r_a ⋅ r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyRealsMult.html#CReal_mult"
 `;
 
 exports[`render hlm library: 1.6.6.9 data/libraries/hlm/Essentials/Numbers/Real/quotient 1`] = `
@@ -4717,7 +4911,11 @@ Well-definedness.  No proof."
 exports[`render hlm library: 1.6.6.15 data/libraries/hlm/Essentials/Numbers/Real/square%20root 1`] = `
 "Definition 1.6.6.15.  Let a ∈ ℝ_0^+. We define:
 
-  √a := 2√a"
+  √a := 2√a
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real.sqrt"
 `;
 
 exports[`render hlm library: 1.6.6.16 data/libraries/hlm/Essentials/Numbers/Real/rational 1`] = `
@@ -4729,7 +4927,11 @@ exports[`render hlm library: 1.6.6.16 data/libraries/hlm/Essentials/Numbers/Real
 
   a is irrational  :⇔  a is not rational
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irrational"
 `;
 
 exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Real/Iterated%20operators/iterated%20sum 1`] = `
@@ -4832,7 +5034,11 @@ Proof.
 
 1.6.1.47.2 ⇒ 2 is prime
 
-⇒^1.6.6.18 2√2 is irrational"
+⇒^1.6.6.18 2√2 is irrational
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irr_sqrt_two"
 `;
 
 exports[`render hlm library: 1.6.7.1 data/libraries/hlm/Essentials/Numbers/Complex/Complex%20numbers 1`] = `
@@ -4849,13 +5055,29 @@ Well-definedness.  No proof.
 
 Remarks.
 
-The constructor notation is later justified by a [proposition](Actual%20linear%20combination%20equals%20formal%20linear%20combination)."
+The constructor notation is later justified by a [proposition](Actual%20linear%20combination%20equals%20formal%20linear%20combination).
+
+References.
+
+* https://en.wikipedia.org/wiki/Complex_numbers
+* http://mathworld.wolfram.com/ComplexNumber.html
+* https://proofwiki.org/wiki/Definition:Complex_Number
+* https://ncatlab.org/nlab/show/complex+number
+* https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex"
 `;
 
 exports[`render hlm library: 1.6.7.2 data/libraries/hlm/Essentials/Numbers/Complex/imaginary%20unit 1`] = `
 "Definition 1.6.7.2.  We define:
 
-  𝒊 := (0+1𝒊)"
+  𝒊 := (0+1𝒊)
+
+References.
+
+* https://en.wikipedia.org/wiki/Imaginary_unit
+* http://mathworld.wolfram.com/ImaginaryUnit.html
+* https://proofwiki.org/wiki/Definition:Imaginary_Unit
+* https://ncatlab.org/nlab/show/imaginary+unit
+* https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex.I"
 `;
 
 exports[`render hlm library: 1.6.7.3 data/libraries/hlm/Essentials/Numbers/Complex/sum 1`] = `
@@ -4865,7 +5087,11 @@ exports[`render hlm library: 1.6.7.3 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+(i_a)𝒊) + (r_b+(i_b)𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+  (r_a+(i_a)𝒊) + (r_b+(i_b)𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex.has_add"
 `;
 
 exports[`render hlm library: 1.6.7.4 data/libraries/hlm/Essentials/Numbers/Complex/Sum%20is%20associative 1`] = `
@@ -4914,7 +5140,11 @@ exports[`render hlm library: 1.6.7.8 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+(i_a)𝒊) ⋅ (r_b+(i_b)𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)"
+  (r_a+(i_a)𝒊) ⋅ (r_b+(i_b)𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex.has_mul"
 `;
 
 exports[`render hlm library: 1.6.7.9 data/libraries/hlm/Essentials/Numbers/Complex/Product%20is%20associative 1`] = `

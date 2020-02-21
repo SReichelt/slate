@@ -93,11 +93,11 @@ div.display-math {
   display: block;
 }
 
-.paragraph:not(:first-child) .display-math {
+.paragraph:not(:first-child) .display-math:first-child {
   margin-top: 1ex;
 }
 
-.paragraph:not(:last-child) .display-math {
+.paragraph:not(:last-child) .display-math:last-child {
   margin-bottom: 1ex;
 }
 
