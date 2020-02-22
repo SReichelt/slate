@@ -81,6 +81,7 @@ interface HLMCheckerFillExpressionArgs {
   filledExpression: Fmt.Expression;
 }
 
+// TODO create pending checks on demand only, so that they can be omitted during rechecking if hasErrors is already true
 type PendingCheck = () => CachedPromise<void>;
 
 export class HLMDefinitionChecker {
@@ -252,22 +253,26 @@ export class HLMDefinitionChecker {
   }
 
   private getPendingChecksPromise(): CachedPromise<Logic.LogicCheckResult> {
-    let nextCheck = this.pendingChecks.shift();
-    if (nextCheck) {
-      let pendingChecksPromise = nextCheck()
-        .then(() => this.getPendingChecksPromise())
+    for (;;) {
+      let nextCheck = this.pendingChecks.shift();
+      if (!nextCheck) {
+        break;
+      }
+      let nextCheckResult = nextCheck();
+      if (nextCheckResult.isResolved()) {
+        continue;
+      }
+      this.pendingChecksPromise = nextCheckResult
+        .then(() => this.getPendingChecksPromise());
+      return this.pendingChecksPromise
         .catch((error) => {
+          this.pendingChecksPromise = undefined;
           this.pendingChecks.length = 0;
           return CachedPromise.reject(error);
         });
-      if (!pendingChecksPromise.getImmediateResult()) {
-        this.pendingChecksPromise = pendingChecksPromise;
-      }
-      return pendingChecksPromise;
-    } else {
-      this.pendingChecksPromise = undefined;
-      return CachedPromise.resolve({...this.result});
     }
+    this.pendingChecksPromise = undefined;
+    return CachedPromise.resolve({...this.result});
   }
 
   private checkRootDefinition(): void {
@@ -1397,10 +1402,6 @@ export class HLMDefinitionChecker {
     let addToCompatibleSets = placeholder.placeholderType === HLMExpressionType.SetTerm && !(restriction && HLMDefinitionChecker.containsEquivalentItem(restriction.compatibleSets, expression));
     let setExactValueSuggestion = !(expression instanceof Fmt.PlaceholderExpression);
     if (addToCompatibleSets || setExactValueSuggestion) {
-      if (!state.newRestrictions) {
-        state.newRestrictions = new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(state.context.editData!.restrictions);
-        restriction = state.newRestrictions.get(placeholder);
-      }
       if (restriction) {
         restriction = {...restriction};
       } else {
@@ -1410,18 +1411,27 @@ export class HLMDefinitionChecker {
           context: state.context
         };
       }
+      let restrictionModified = false;
       if (addToCompatibleSets) {
         restriction.compatibleSets = [...restriction.compatibleSets, expression];
+        restrictionModified = true;
       }
       if (setExactValueSuggestion) {
         if (state.exactValueRequried && !restriction.exactValue) {
           restriction.exactValueSuggestion = expression;
           restriction.exactValue = expression;
+          restrictionModified = true;
         } else if (!restriction.exactValueSuggestion) {
           restriction.exactValueSuggestion = expression;
+          restrictionModified = true;
         }
       }
-      state.newRestrictions.set(placeholder, restriction);
+      if (restrictionModified) {
+        if (!state.newRestrictions) {
+          state.newRestrictions = new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(state.context.editData!.restrictions);
+        }
+        state.newRestrictions.set(placeholder, restriction);
+      }
     }
     return undefined;
   }

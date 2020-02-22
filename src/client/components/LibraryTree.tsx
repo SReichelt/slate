@@ -212,7 +212,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
         }
       }
       let itemInfo: LibraryItemInfo | undefined = undefined;
-      if (selected) {
+      if (selected && !isSubsection && !(path.parentPath instanceof Fmt.Path)) {
         itemInfo = props.libraryDataProvider.getItemInfo(path).getImmediateResult();
       }
       if (!itemInfo) {

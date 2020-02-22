@@ -105,8 +105,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       return new Error('Name is required');
     }
     for (let c of name) {
-      if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === ' ' || c === '(' || c === ')')) {
-        return new Error('Name can only contain alphanumeric characters, spaces, and parentheses');
+      if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === ' ' || c === '-' || c === '(' || c === ')')) {
+        return new Error('Name can only contain alphanumeric characters, spaces, dashes, and parentheses');
       }
     }
     let firstChar = name[0];

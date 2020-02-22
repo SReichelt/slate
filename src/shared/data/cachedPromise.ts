@@ -66,6 +66,10 @@ class CachedPromise<T> implements PromiseLike<T> {
     }
   }
 
+  isResolved(): boolean {
+    return !this.promise;
+  }
+
   getImmediateResult(): T | undefined {
     return this.result;
   }
