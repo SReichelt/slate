@@ -52,6 +52,7 @@ interface HLMCheckerEditData {
 }
 
 interface HLMCheckerPlaceholderRestriction {
+  exactValueSuggestion?: Fmt.Expression;
   exactValue?: Fmt.Expression;
   compatibleSets: Fmt.Expression[];
   declaredSets: Fmt.Expression[];
@@ -219,8 +220,8 @@ export class HLMDefinitionChecker {
       for (let placeholder of placeholderCollection.placeholders) {
         let placeholderRestriction = this.rootContext.editData.restrictions.get(placeholder);
         if (placeholderRestriction) {
-          if (placeholderRestriction.exactValue) {
-            placeholderValues.set(placeholder, placeholderRestriction.exactValue);
+          if (placeholderRestriction.exactValueSuggestion) {
+            placeholderValues.set(placeholder, placeholderRestriction.exactValueSuggestion);
             placeholderCollection.unfilledPlaceholderCount--;
           } else if (placeholderRestriction.compatibleSets.length) {
             let compatibleSets = placeholderRestriction.compatibleSets;
@@ -1393,49 +1394,34 @@ export class HLMDefinitionChecker {
     if (restriction && restriction.exactValue) {
       return restriction.exactValue;
     }
-    if (placeholder.placeholderType === HLMExpressionType.SetTerm) {
-      let addToCompatibleSets = !(restriction && HLMDefinitionChecker.containsEquivalentItem(restriction.compatibleSets, expression));
-      let setExactValue = state.exactValueRequried && !(expression instanceof Fmt.PlaceholderExpression);
-      if (addToCompatibleSets || setExactValue) {
-        if (!state.newRestrictions) {
-          state.newRestrictions = new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(state.context.editData!.restrictions);
-          restriction = state.newRestrictions.get(placeholder);
-        }
-        if (addToCompatibleSets) {
-          if (restriction) {
-            restriction = {
-              ...restriction,
-              compatibleSets: [...restriction.compatibleSets, expression]
-            };
-          } else {
-            restriction = {
-              compatibleSets: [expression],
-              declaredSets: [],
-              context: state.context
-            };
-          }
-          if (setExactValue) {
-            restriction.exactValue = expression;
-          }
-        } else if (setExactValue) {
-          if (restriction) {
-            restriction = {
-              ...restriction,
-              exactValue: expression
-            };
-          } else {
-            restriction = {
-              exactValue: expression,
-              compatibleSets: [],
-              declaredSets: [],
-              context: state.context
-            };
-          }
-        }
-        if (restriction) {
-          state.newRestrictions.set(placeholder, restriction);
+    let addToCompatibleSets = placeholder.placeholderType === HLMExpressionType.SetTerm && !(restriction && HLMDefinitionChecker.containsEquivalentItem(restriction.compatibleSets, expression));
+    let setExactValueSuggestion = !(expression instanceof Fmt.PlaceholderExpression);
+    if (addToCompatibleSets || setExactValueSuggestion) {
+      if (!state.newRestrictions) {
+        state.newRestrictions = new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(state.context.editData!.restrictions);
+        restriction = state.newRestrictions.get(placeholder);
+      }
+      if (restriction) {
+        restriction = {...restriction};
+      } else {
+        restriction = {
+          compatibleSets: [],
+          declaredSets: [],
+          context: state.context
+        };
+      }
+      if (addToCompatibleSets) {
+        restriction.compatibleSets = [...restriction.compatibleSets, expression];
+      }
+      if (setExactValueSuggestion) {
+        if (state.exactValueRequried && !restriction.exactValue) {
+          restriction.exactValueSuggestion = expression;
+          restriction.exactValue = expression;
+        } else if (!restriction.exactValueSuggestion) {
+          restriction.exactValueSuggestion = expression;
         }
       }
+      state.newRestrictions.set(placeholder, restriction);
     }
     return undefined;
   }
