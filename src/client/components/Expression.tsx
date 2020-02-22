@@ -177,7 +177,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   render(): React.ReactNode {
-    return this.renderExpression(this.props.expression, 'expr', undefined, this.props.addInnerParens, this.props.addInnerParens);
+    try {
+      return this.renderExpression(this.props.expression, 'expr', undefined, this.props.addInnerParens, this.props.addInnerParens);
+    } catch (error) {
+      console.error(error);
+      return <span className={'expr error'}>Error: {error.message}</span>;
+    }
   }
 
   private renderExpression(expression: Display.RenderedExpression, className: string, semanticLinks: Display.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): React.ReactNode {
@@ -249,7 +254,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           inputClassName += ' input-error';
         }
         let size = expression.text.length + 1;
-        let style = {'width': `${size}ch`, 'min-width': `${size}ex`};
+        let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
         result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
         isInputControl = true;
       } else {
@@ -796,13 +801,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         return <ReactMarkdownRenderer markdown={expression.text} options={options}/>;
       }
     } else if (expression instanceof Display.IndirectExpression) {
-      try {
-        return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
-      } catch (error) {
-        console.error(error);
-        className += ' error';
-        result = `Error: ${error.message}`;
-      }
+      return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Display.PromiseExpression) {
       let render = expression.promise.then((innerExpression: Display.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
       return renderPromise(render);
@@ -926,8 +925,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         if (uri && process.env.NODE_ENV !== 'development') {
           /* This causes nested anchors, which, strictly speaking, are illegal.
-            However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
-            So we do this anyway, but only in production mode, to prevent warnings from React. */
+             However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+             So we do this anyway, but only in production mode, to prevent warnings from React. */
           result = (
             <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}

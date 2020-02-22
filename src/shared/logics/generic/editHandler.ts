@@ -1,5 +1,4 @@
 import * as Fmt from '../../format/format';
-import * as Ctx from '../../format/context';
 import * as FmtUtils from '../../format/utils';
 import * as Edit from '../../format/edit';
 import * as Logic from '../logic';
@@ -8,8 +7,8 @@ import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferenceSearchURLs } from '../../data/libraryDataProvider';
+import { GenericUtils } from './utils';
 import { GenericRenderer, RenderedVariable } from './renderer';
-import { getNextDefaultName } from '../../format/common';
 import CachedPromise from '../../data/cachedPromise';
 
 export type RenderTypeFn = (type: string | undefined) => Display.RenderedExpression;
@@ -29,7 +28,7 @@ export type GetExpressionsFn = (path: Fmt.Path, libraryDefinition: Fmt.Definitio
 export abstract class GenericEditHandler {
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected templates: Fmt.File) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File) {}
 
   update(): CachedPromise<void> {
     this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
@@ -523,7 +522,7 @@ export abstract class GenericEditHandler {
 
   protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
     let context = this.editAnalysis.newParameterContext.get(parameterList);
-    let parameter = this.createParameter(type, defaultName, context);
+    let parameter = this.utils.createParameter(type, defaultName, context);
 
     let action = new Menu.ImmediateExpressionMenuAction;
     action.onExecute = () => onInsertParam(parameter);
@@ -532,35 +531,6 @@ export abstract class GenericEditHandler {
     item.expression = onRenderParam(parameter);
     item.action = action;
     return item;
-  }
-
-  protected getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
-    let newName = defaultName;
-    let suffix = '';
-    let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
-    while (variableNames.indexOf(newName + suffix) >= 0) {
-      newName = getNextDefaultName(newName);
-      if (newName === defaultName) {
-        suffix += '\'';
-      }
-    }
-    return newName + suffix;
-  }
-
-  protected createParameter(type: Fmt.Expression, defaultName: string, context?: Ctx.Context): Fmt.Parameter {
-    if (context) {
-      defaultName = this.getUnusedDefaultName(defaultName, context);
-    }
-    let parameter = new Fmt.Parameter;
-    parameter.name = defaultName;
-    let parameterType = new Fmt.Type;
-    parameterType.expression = type;
-    parameterType.arrayDimensions = 0;
-    parameter.type = parameterType;
-    if (context) {
-      parameter.previousParameter = context.getPreviousParameter();
-    }
-    return parameter;
   }
 
   protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variable: Fmt.Parameter) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
@@ -692,7 +662,7 @@ export abstract class GenericEditHandler {
         let paramClone = param.clone();
         let context = this.editAnalysis.newParameterContext.get(parameterList);
         if (context) {
-          paramClone.name = this.getUnusedDefaultName(paramClone.name, context);
+          paramClone.name = this.utils.getUnusedDefaultName(paramClone.name, context);
         }
         parameterList.splice(index + 1, 0, paramClone);
         return paramClone;

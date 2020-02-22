@@ -1,5 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as FmtUtils from '../../format/utils';
+import * as Ctx from '../../format/context';
+import { getNextDefaultName } from '../../format/common';
 import { LibraryDataAccessor, LibraryDefinition, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -89,5 +91,34 @@ export class GenericUtils {
     let newPath = Object.create(path);
     newPath.parentPath = path.parentPath ? GenericUtils.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
+  }
+
+  getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
+    let newName = defaultName;
+    let suffix = '';
+    let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
+    while (variableNames.indexOf(newName + suffix) >= 0) {
+      newName = getNextDefaultName(newName);
+      if (newName === defaultName) {
+        suffix += '\'';
+      }
+    }
+    return newName + suffix;
+  }
+
+  createParameter(type: Fmt.Expression, defaultName: string, context?: Ctx.Context): Fmt.Parameter {
+    if (context) {
+      defaultName = this.getUnusedDefaultName(defaultName, context);
+    }
+    let parameter = new Fmt.Parameter;
+    parameter.name = defaultName;
+    let parameterType = new Fmt.Type;
+    parameterType.expression = type;
+    parameterType.arrayDimensions = 0;
+    parameter.type = parameterType;
+    if (context) {
+      parameter.previousParameter = context.getPreviousParameter();
+    }
+    return parameter;
   }
 }
