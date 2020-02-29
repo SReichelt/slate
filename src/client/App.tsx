@@ -348,13 +348,14 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedItemProvider) {
       let definitionPromise = this.state.selectedItemDefinition;
       if (definitionPromise) {
+        const renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+          includeProofs: true,
+          includeLabel: true,
+          includeExtras: true,
+          includeRemarks: true
+        };
+
         let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-          let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-            includeProofs: true,
-            includeLabel: true,
-            includeExtras: true,
-            includeRemarks: true
-          };
           if (this.state.selectedItemProvider && this.state.templates) {
             let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
             let itemInfo = this.state.selectedItemInfo;
@@ -384,11 +385,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (this.state.extraContentsVisible) {
           let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-            return <SourceCodeView definition={definition} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+            return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
           });
-          extraContents = renderPromise(extraContentsPromise);
+          extraContents = renderPromise(extraContentsPromise, 'SourceCode');
         } else {
-          extraContents = true;
+          extraContents = <div key={'SourceCode'}/>;
         }
       }
     } else {

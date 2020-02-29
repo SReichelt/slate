@@ -146,6 +146,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.clearHoverAndMenu();
     this.disableInteractionBlocker();
     this.disableWindowClickListener();
+    this.semanticLinks = undefined;
   }
 
   private enableWindowClickListener(): void {

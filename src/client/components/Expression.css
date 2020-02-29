@@ -1,4 +1,4 @@
-.expr {
+.expr, .source-code .open-menu .expr {
   font-family: 'TeX', serif;
   line-height: 110%;
   text-decoration: initial;

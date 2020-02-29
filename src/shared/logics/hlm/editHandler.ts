@@ -724,8 +724,9 @@ export class HLMEditHandler extends GenericEditHandler {
       for (let parentPath of parentPaths) {
         let resultPath = new Fmt.Path;
         resultPath.name = path.name;
+        let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
         let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, expressionEditInfo.context);
-        this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createElementParameter);
+        this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createPlaceholder, createElementParameter);
         resultPath.parentPath = parentPath;
         if (displayExpression) {
           reorderArguments(resultPath.arguments, displayExpression);

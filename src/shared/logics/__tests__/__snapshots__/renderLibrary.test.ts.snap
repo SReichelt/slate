@@ -130,9 +130,7 @@ Remarks.
 
 This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
 
-Note also that the definition heavily relies on the embedding of the natural numbers into the cardinal numbers, which is completely transparent in HLM.
-
-These are just some example proofs, some equivalences are missing at the moment.
+These are just some example proofs, which will be completed later.
 
 References.
 
@@ -1475,8 +1473,16 @@ exports[`render hlm library: 1.4.28 data/libraries/hlm/Essentials/Functions/powe
   f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
 `;
 
-exports[`render hlm library: 1.4.29.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
-"Definition 1.4.29.1.  Let X, Y, Z be sets. We define:
+exports[`render hlm library: 1.4.29 data/libraries/hlm/Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
+"Proposition 1.4.29.  Let X be a set, a ∈ ℤ. Then:
+
+  (id_X)^a = id_X
+
+No proof."
+`;
+
+exports[`render hlm library: 1.4.30.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
+"Definition 1.4.30.1.  Let X, Y, Z be sets. We define:
 
   𝓞𝓹(X, Y, Z) := (X × Y → Z)
 
@@ -1487,22 +1493,22 @@ References.
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.29.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
-"Definition 1.4.29.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
+exports[`render hlm library: 1.4.30.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
+"Definition 1.4.30.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
 
   x ∗ y := ∗(x, y)"
 `;
 
-exports[`render hlm library: 1.4.29.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
-"Definition 1.4.29.3 (Operator as operation).
+exports[`render hlm library: 1.4.30.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
+"Definition 1.4.30.3 (Operator as operation).
 
 Remarks.
 
 This is a macro to convert an operator taking elements of _X_ and _Y_ and returning an element of _Z_ to an operation from _X_ and _Y_ to _Z_."
 `;
 
-exports[`render hlm library: 1.4.29.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
-"Definition 1.4.29.4 (Inner operations).  Let X be a set. We define:
+exports[`render hlm library: 1.4.30.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
+"Definition 1.4.30.4 (Inner operations).  Let X be a set. We define:
 
   𝓞𝓹(X) := 𝓞𝓹(X, X, X)
 
@@ -1515,8 +1521,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.29.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
-"Definition 1.4.29.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
+exports[`render hlm library: 1.4.30.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
+"Definition 1.4.30.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
 
   ∗ is associative  :⇔  ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)
 
@@ -1528,8 +1534,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
 `;
 
-exports[`render hlm library: 1.4.29.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
-"Definition 1.4.29.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
+exports[`render hlm library: 1.4.30.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
+"Definition 1.4.30.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
 
   ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x
 
@@ -1541,8 +1547,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
 `;
 
-exports[`render hlm library: 1.4.29.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
-"Definition 1.4.29.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.30.7 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
+"Definition 1.4.30.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)
 
@@ -1554,8 +1560,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
 `;
 
-exports[`render hlm library: 1.4.29.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
-"Definition 1.4.29.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.30.8 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
+"Definition 1.4.30.8.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)
 
@@ -1567,8 +1573,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
 `;
 
-exports[`render hlm library: 1.4.29.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
-"Definition 1.4.29.9.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
+exports[`render hlm library: 1.4.30.9 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
+"Definition 1.4.30.9.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
 
   ∗ is distributive over ⋆  :⇔  ∗ is left-distributive over ⋆ and ∗ is right-distributive over ⋆
 
@@ -1580,26 +1586,26 @@ References.
 * https://ncatlab.org/nlab/show/distributive+law"
 `;
 
-exports[`render hlm library: 1.4.29.10 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
-"Definition 1.4.29.10.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.30.10 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
+"Definition 1.4.30.10.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_(X×A) := ∗∣_(X×A)^A"
 `;
 
-exports[`render hlm library: 1.4.29.11 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
-"Definition 1.4.29.11.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.30.11 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
+"Definition 1.4.30.11.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
 
   ∗∣_(A×Y) := ∗∣_(A×Y)^A"
 `;
 
-exports[`render hlm library: 1.4.29.12 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
-"Definition 1.4.29.12.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.30.12 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
+"Definition 1.4.30.12.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_A := ∗∣_(A×A)^A"
 `;
 
-exports[`render hlm library: 1.4.29.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
-"Definition 1.4.29.13.1.  Let X be a set. We define:
+exports[`render hlm library: 1.4.30.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
+"Definition 1.4.30.13.1.  Let X be a set. We define:
 
   𝓑𝓲𝓰𝓞𝓹(X) :=: {(e ∗ ⋅⋅⋅) | ∗ : X × X → X is a commutative associative operation on X, e ∈ X such that [∀ x ∈ X : x ∗ e = e ∗ x = x]}
 
@@ -1613,8 +1619,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Iterated_Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.29.13.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/neutral%20element 1`] = `
-"Definition 1.4.29.13.2.  Let X be a set, ⨂ be an iterated operation on X. We define
+exports[`render hlm library: 1.4.30.13.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/neutral%20element 1`] = `
+"Definition 1.4.30.13.2.  Let X be a set, ⨂ be an iterated operation on X. We define
 
   e_⨂
 
@@ -1623,14 +1629,14 @@ by:
   e_(e∗⋅⋅⋅) := e  (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.29.13.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
-"Definition 1.4.29.13.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
+exports[`render hlm library: 1.4.30.13.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
+"Definition 1.4.30.13.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
 
   x ⨂ y := x ∗ y if ⨂ = (e ∗ ⋅⋅⋅) (∗ : X × X → X is an operation on X, e ∈ X with suitable conditions)"
 `;
 
-exports[`render hlm library: 1.4.29.13.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
-"Definition 1.4.29.13.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.4.30.13.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
+"Definition 1.4.30.13.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
 
   ⨂_(i < n) a_i
 
@@ -1640,22 +1646,22 @@ by:
   ⨂_(i < m+1) a_i := (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 1.4.29.13.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
-"Proposition 1.4.29.13.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.4.30.13.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
+"Proposition 1.4.30.13.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
 
   ⨂_(i < n) (a_i ⨂ b_i) = (⨂_(i < n) a_i) ⨂ (⨂_(i < n) b_i)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.29.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
-"Definition 1.4.29.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
+exports[`render hlm library: 1.4.30.13.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
+"Definition 1.4.30.13.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
 
   ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
 `;
 
-exports[`render hlm library: 1.4.29.13.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
-"Definition 1.4.29.13.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
+exports[`render hlm library: 1.4.30.13.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
+"Definition 1.4.30.13.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
     ⇔  ∃ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
@@ -1665,8 +1671,8 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.4.29.13.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
-"Definition 1.4.29.13.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
+exports[`render hlm library: 1.4.30.13.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
+"Definition 1.4.30.13.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, assume ∃ J ⊆ I : [J is finite and ∀ k ∈ I ∖ J : a_k = e_⨂]. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ J ⊆ I s.t. J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] : ⨂_(j ∈ J) a_j = x
     ⇔  ∃ J ⊆ I : [J is finite and [∀ k ∈ I ∖ J : a_k = e_⨂] and ⨂_(j ∈ J) a_j = x]
@@ -2439,6 +2445,9 @@ exports[`render hlm library: 1.6.1.28 data/libraries/hlm/Essentials/Numbers/Natu
 "Definition 1.6.1.28.  Let m ∈ ℕ_+, n ∈ ℕ. We define:
 
   m ∣ n  :⇔  ∃ x ∈ ℕ : m ⋅ x = n
+    ⇔  ∃! x ∈ ℕ : m ⋅ x = n
+
+Equivalence.  No proof.
 
 Remarks.
 
@@ -2503,6 +2512,7 @@ References.
 * http://mathworld.wolfram.com/EvenNumber.html
 * https://coq.inria.fr/library/Coq.Init.Nat.html#even
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.even
+* https://leanprover-community.github.io/mathlib_docs/data/nat/parity.html#nat.even
 * http://oeis.org/A005843"
 `;
 
@@ -5222,7 +5232,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 2.1.1 data/libraries/hlm/Algebra/Isomorphisms/element%20transform 1`] = `
+exports[`render hlm library: 2.1.1 data/libraries/hlm/Algebra/Isomorphisms/element%20transport 1`] = `
 "Definition 2.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X. We define:
 
   φ[x] := φ(x)
@@ -5231,10 +5241,10 @@ Remarks.
 
 The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of “isomorphism” that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
 
-Each of the definitions transforms an object defined on *X* into the equivalent object defined on *Y*, according to the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
+Each of the definitions transports an object defined on *X* to *Y* along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
 `;
 
-exports[`render hlm library: 2.1.2 data/libraries/hlm/Algebra/Isomorphisms/function%20transform 1`] = `
+exports[`render hlm library: 2.1.2 data/libraries/hlm/Algebra/Isomorphisms/function%20transport 1`] = `
 "Definition 2.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X be a function. We define
 
   φ[f]
@@ -5247,7 +5257,7 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.3 data/libraries/hlm/Algebra/Isomorphisms/inner%20operation%20transform 1`] = `
+exports[`render hlm library: 2.1.3 data/libraries/hlm/Algebra/Isomorphisms/inner%20operation%20transport 1`] = `
 "Definition 2.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X. We define
 
   φ[∗]
@@ -5260,7 +5270,7 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/left%20operation%20transform 1`] = `
+exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/left%20operation%20transport 1`] = `
 "Definition 2.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X be an operation. We define
 
   φ[∗]
@@ -5273,7 +5283,7 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/right%20operation%20transform 1`] = `
+exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/right%20operation%20transport 1`] = `
 "Definition 2.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X be an operation. We define
 
   φ[∗]
@@ -5286,7 +5296,7 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.6 data/libraries/hlm/Algebra/Isomorphisms/relation%20transform 1`] = `
+exports[`render hlm library: 2.1.6 data/libraries/hlm/Algebra/Isomorphisms/relation%20transport 1`] = `
 "Definition 2.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
 
   φ[≺]
@@ -5296,7 +5306,7 @@ by:
   φ[[p_x_1,x_2]_(x_1,x_2 ∈ X)] := [p_φ^-1(y_1),φ^-1(y_2)]_(y_1,y_2 ∈ Y)  (p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)"
 `;
 
-exports[`render hlm library: 2.1.7 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transform 1`] = `
+exports[`render hlm library: 2.1.7 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transport 1`] = `
 "Definition 2.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
 
   (φ_1, φ_2, φ_3)[∙]
@@ -7790,9 +7800,9 @@ This definition retrieves a representative set of objects from a category (which
 exports[`render hlm library: 4.3 data/libraries/hlm/Category%20theory/Morphisms 1`] = `
 "Definition 4.3.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
 
-  (𝐗 → 𝐘) := M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  Hom(𝐗, 𝐘) := M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
-We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ (𝐗 → 𝐘).”
+We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ Hom(𝐗, 𝐘).”
 
 References.
 
@@ -7825,11 +7835,11 @@ References.
 exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
 "Definition 4.6.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
-  (𝓒 → 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
+  Fun(𝓒, 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
 
   (𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) = (𝓒 → 𝓓, 𝐗 ↦ 𝐃'_𝐗, (f : 𝐘 → 𝐙) ↦ d'_𝐘,𝐙,f)  :⇔  [∀ 𝐗 ∈ 𝓒 : 𝐃_𝐗 = 𝐃'_𝐗] and ∀ 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 : d_𝐘,𝐙,f = d'_𝐘,𝐙,f  (𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, 𝐃'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d'_𝐘,𝐙,f : 𝐃'_𝐘 → 𝐃'_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙 with suitable conditions)
 
-We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ (𝓒 → 𝓓).”
+We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ Fun(𝓒, 𝓓).”
 
 We write “let F :  𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f” for “let F := (𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f).”
 
@@ -7880,11 +7890,11 @@ exports[`render hlm library: 4.6.5 data/libraries/hlm/Category%20theory/Functors
 exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
 "Definition 4.7.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
 
-  (F ⇀ G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
+  Infranat(F, G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
 
   (n_𝐗)_(𝐗 ∈ 𝓒) = (m_𝐗)_(𝐗 ∈ 𝓒)  :⇔  ∀ 𝐗 ∈ 𝓒 : n_𝐗 = m_𝐗  (n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒, m_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒)
 
-We write “let η : F ⇀ G be an infranatural transformation” for “let η ∈ (F ⇀ G).”
+We write “let η : F ⇀ G be an infranatural transformation” for “let η ∈ Infranat(F, G).”
 
 References.
 
@@ -7923,9 +7933,9 @@ References.
 exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
 "Definition 4.7.5.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
 
-  (F ⇒ G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
+  Nat(F, G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
 
-We write “let η : F ⇒ G be a natural transformation” for “let η ∈ (F ⇒ G).”
+We write “let η : F ⇒ G be a natural transformation” for “let η ∈ Nat(F, G).”
 
 References.
 
@@ -8082,7 +8092,7 @@ The objects of this category are actually isomorphism classes of fields."
 exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
 "Definition 4.8.14.  Let u ∈ ℕ. We define:
 
-  𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (𝓐 → 𝓑)_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
+  𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (Fun(𝓐, 𝓑))_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
 Remarks.
 
@@ -8097,12 +8107,51 @@ References.
 exports[`render hlm library: 4.8.15 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
 "Definition 4.8.15.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
 
-  𝐅𝐮𝐧(𝓒, 𝓓) := [𝓒 → 𝓓, (A ⇒ B)_(A,B ∈ (𝓒→𝓓)), (id_C)_(C ∈ (𝓒→𝓓)), (∘)_(D,E,F ∈ (𝓒→𝓓))]_(u+1)
+  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(u+1)
 
 References.
 
 * https://en.wikipedia.org/wiki/Functor_category
 * https://ncatlab.org/nlab/show/functor+category"
+`;
+
+exports[`render hlm library: 4.9.1 data/libraries/hlm/Category%20theory/Yoneda/hom-functor 1`] = `
+"Definition 4.9.1.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐀 ∈ 𝓒. We define:
+
+  Hom(𝐀, −) :  𝓒 → 𝐒𝐞𝐭_u, 𝐗 ↦ |Hom(𝐀, 𝐗)|, (f : 𝐘 → 𝐙) ↦ (Hom(𝐀, 𝐘) → Hom(𝐀, 𝐙), g ↦ f ∘ g)
+
+References.
+
+* https://en.wikipedia.org/wiki/Hom_functor
+* https://proofwiki.org/wiki/Definition:Covariant_Hom_Functor
+* https://ncatlab.org/nlab/show/hom-functor"
+`;
+
+exports[`render hlm library: 4.9.2 data/libraries/hlm/Category%20theory/Yoneda/yoneda%20equivalence 1`] = `
+"Definition 4.9.2.  Let u ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_u be a functor, 𝐀 ∈ 𝓒. We define:
+
+  yoneda(F, 𝐀) :  Nat(Hom(𝐀, −), F) → Carrier(F(𝐀)), η ↦ η_𝐀(id_𝐀)
+
+References.
+
+* https://en.wikipedia.org/wiki/Yoneda_lemma#Formal_statement
+* https://proofwiki.org/wiki/Bijection_in_Yoneda_Lemma_for_Covariant_Functors
+* https://ncatlab.org/nlab/show/Yoneda+lemma"
+`;
+
+exports[`render hlm library: 4.9.3 data/libraries/hlm/Category%20theory/Yoneda/Yoneda%20lemma%20bijection 1`] = `
+"Theorem 4.9.3.  Let u ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_u be a functor, 𝐀 ∈ 𝓒. Then:
+
+  yoneda(F, 𝐀) is bijective and (yoneda(F, 𝐀))^-1 = (Carrier(F(𝐀)) → Nat(Hom(𝐀, −), F), x ↦ (Hom(𝐀, 𝐗) → Carrier(F(𝐗)), f ↦ F(f)(x))_(𝐗 ∈ 𝓒))
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Yoneda_lemma#Formal_statement
+* https://proofwiki.org/wiki/Bijection_in_Yoneda_Lemma_for_Covariant_Functors
+* https://ncatlab.org/nlab/show/Yoneda+lemma
+* https://leanprover-community.github.io/mathlib_docs/category_theory/yoneda.html"
 `;
 
 exports[`render hlm library: 5.1 data/libraries/hlm/Formal%20systems/Variables 1`] = `

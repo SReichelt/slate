@@ -6,9 +6,9 @@ import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export interface LibraryItemProps {
-  libraryDataProvider: LibraryDataProvider;
+  libraryDataProvider?: LibraryDataProvider;
   definition: LibraryDefinition;
-  templates: Fmt.File;
+  templates?: Fmt.File;
   itemInfo?: CachedPromise<LibraryItemInfo>;
   options: Logic.FullRenderedDefinitionOptions;
   interactionHandler?: ExpressionInteractionHandler;
@@ -16,10 +16,10 @@ export interface LibraryItemProps {
 
 interface LibraryItemState {
   definitionState: LibraryDefinitionState;
-  renderer: Logic.LogicRenderer;
+  renderer?: Logic.LogicRenderer;
 }
 
-class LibraryItem extends React.Component<LibraryItemProps, LibraryItemState> {
+export abstract class LibraryItemBase extends React.Component<LibraryItemProps, LibraryItemState> {
   constructor(props: LibraryItemProps) {
     super(props);
 
@@ -62,30 +62,41 @@ class LibraryItem extends React.Component<LibraryItemProps, LibraryItemState> {
     }
   }
 
-  render(): React.ReactNode {
-    let expression = this.state.renderer.renderDefinition(this.props.itemInfo, this.props.options);
-    if (expression) {
-      return <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>;
+  private createRenderer(props: LibraryItemProps): Logic.LogicRenderer | undefined {
+    if (props.libraryDataProvider && props.templates) {
+      let logic = props.libraryDataProvider.logic;
+      let logicDisplay = logic.getDisplay();
+      let editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
+      return logicDisplay.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing);
     } else {
-      return null;
+      return undefined;
     }
   }
 
-  private createRenderer(props: LibraryItemProps): Logic.LogicRenderer {
-    let logic = props.libraryDataProvider.logic;
-    let logicDisplay = logic.getDisplay();
-    let editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
-    return logicDisplay.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing);
+  protected abstract onExpressionChanged: (editorUpdateRequired: boolean) => void;
+}
+
+class LibraryItem extends LibraryItemBase {
+  render(): React.ReactNode {
+    if (this.state.renderer) {
+      let expression = this.state.renderer.renderDefinition(this.props.itemInfo, this.props.options);
+      if (expression) {
+        return <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>;
+      }
+    }
+    return null;
   }
 
-  private onExpressionChanged = (editorUpdateRequired: boolean) => {
+  protected onExpressionChanged = (editorUpdateRequired: boolean) => {
     if (editorUpdateRequired) {
       let onAutoFilled = () => {
         if (this.props.interactionHandler) {
           this.props.interactionHandler.expressionChanged(true);
         }
       };
-      this.state.renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
+      if (this.state.renderer) {
+        this.state.renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
+      }
     }
   }
 }

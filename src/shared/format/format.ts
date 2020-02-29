@@ -851,7 +851,7 @@ export class ArrayExpression extends Expression {
 }
 
 export class PlaceholderExpression extends Expression {
-  constructor(public placeholderType: any) {
+  constructor(public placeholderType: any, public isTemporary: boolean = false) {
     super();
   }
 

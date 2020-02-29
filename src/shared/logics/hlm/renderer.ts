@@ -2483,6 +2483,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return undefined;
   }
 
+  addPlaceholderMenu(placeholder: Fmt.PlaceholderExpression, semanticLink: Display.SemanticLink): void {
+    if (this.editHandler) {
+      switch (placeholder.placeholderType) {
+      case HLMExpressionType.SetTerm:
+        {
+          let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, false);
+          this.editHandler.addSetTermMenu(semanticLink, placeholder, onRenderTerm, fullSetTermSelection);
+        }
+        break;
+      case HLMExpressionType.ElementTerm:
+        {
+          let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression);
+          this.editHandler.addElementTermMenu(semanticLink, placeholder, onRenderTerm, fullElementTermSelection);
+        }
+        break;
+      case HLMExpressionType.Formula:
+        {
+          let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0];
+          this.editHandler.addFormulaMenu(semanticLink, placeholder, onRenderFormula, fullFormulaSelection);
+        }
+        break;
+      }
+    }
+  }
+
   getDefinitionParts(): Logic.ObjectRenderFns {
     let result = new Map<Object, Logic.RenderFn>();
     this.addDefinitionParts([this.definition], result);

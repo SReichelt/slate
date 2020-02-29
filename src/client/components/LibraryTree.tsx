@@ -36,6 +36,7 @@ interface LibraryTreeState {
 
 class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
   private treePaneNode: HTMLElement | null;
+  private searchTimer: any;
 
   constructor(props: LibraryTreeProps) {
     super(props);
@@ -43,6 +44,13 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     this.state = {
       searchWords: []
     };
+  }
+
+  componentWillUnmount(): void {
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = undefined;
+    }
   }
 
   render(): React.ReactNode {
@@ -73,7 +81,10 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
         this.setState({searchWords: searchWords});
       }
     };
-    setTimeout(updateSearchWords, 20);
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+    }
+    this.searchTimer = setTimeout(updateSearchWords, 20);
   }
 }
 
@@ -307,7 +318,9 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
       selectable: CachedPromise.resolve(false)
     };
   } else if (onFilter) {
-    let ownResultPromise = onFilter(libraryDataProvider, path, libraryDefinition, definition);
+    let ensureDelayPromise = new CachedPromise(Promise.resolve());
+    let ownResultPromise = ensureDelayPromise.then(() =>
+      onFilter(libraryDataProvider, path, libraryDefinition, definition));
     let resultPromise = ownResultPromise;
     for (let innerDefinition of definition.innerDefinitions) {
       resultPromise = resultPromise.then((currentResult: boolean) => {
@@ -436,6 +449,9 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
   private hovered: boolean = false;
   private refreshTooltip: boolean = false;
   private updateTimer: any;
+  private previewTimer: any;
+  private scrollTimer: any;
+  private siblingsTimer: any;
 
   constructor(props: LibraryTreeItemProps) {
     super(props);
@@ -474,6 +490,18 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     if (this.updateTimer) {
       clearTimeout(this.updateTimer);
       this.updateTimer = undefined;
+    }
+    if (this.previewTimer) {
+      clearTimeout(this.previewTimer);
+      this.previewTimer = undefined;
+    }
+    if (this.scrollTimer) {
+      clearTimeout(this.scrollTimer);
+      this.scrollTimer = undefined;
+    }
+    if (this.siblingsTimer) {
+      clearTimeout(this.siblingsTimer);
+      this.siblingsTimer = undefined;
     }
     if (this.props.interactionHandler && this.props.selected) {
       this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
@@ -615,7 +643,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           if (!visible) {
             props.visibleSiblings.delete(this);
           }
-          LibraryTreeItem.checkVisibleSiblings(props.visibleSiblings);
+          this.checkVisibleSiblings(props.visibleSiblings);
         }
       }
     });
@@ -634,7 +662,10 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     if (props.selectedChildPath && !this.clicked) {
       this.setState({opened: true});
     } else if (props.selected && !this.clicked) {
-      setTimeout(this.scrollIntoView, 100);
+      if (this.scrollTimer) {
+        clearTimeout(this.scrollTimer);
+      }
+      this.scrollTimer = setTimeout(this.scrollIntoView, 100);
     } else {
       this.clicked = false;
     }
@@ -785,7 +816,10 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         this.setState({showPreview: true});
       }
     };
-    setTimeout(show, 250);
+    if (this.previewTimer) {
+      clearTimeout(this.previewTimer);
+    }
+    this.previewTimer = setTimeout(show, 250);
   }
 
   private mouseLeft = (): void => {
@@ -807,7 +841,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     this.updateTimer = setTimeout(() => this.forceUpdate(), 200);
   }
 
-  private static checkVisibleSiblings(visibleSiblings: Set<LibraryTreeItem>): void {
+  private checkVisibleSiblings(visibleSiblings: Set<LibraryTreeItem>): void {
     let check = () => {
       if (visibleSiblings.size <= 2) {
         for (let item of visibleSiblings) {
@@ -817,7 +851,10 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         }
       }
     };
-    setTimeout(check, 10);
+    if (this.siblingsTimer) {
+      clearTimeout(this.siblingsTimer);
+    }
+    this.siblingsTimer = setTimeout(check, 10);
   }
 }
 

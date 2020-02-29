@@ -35,6 +35,7 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
   inTypeCast: false
 };
 
+type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
 type CreateParameterFn = (defaultName: string) => Fmt.Parameter;
 
 export class HLMUtils extends GenericUtils {
@@ -501,6 +502,8 @@ export class HLMUtils extends GenericUtils {
         }
         return undefined;
       });
+    } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+      return CachedPromise.resolve([term.term]);
     }
     return CachedPromise.resolve(undefined);
   }
@@ -520,6 +523,11 @@ export class HLMUtils extends GenericUtils {
         }
         return undefined;
       });
+    } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+      // TODO to avoid inconsistencies, construct a new term as a member of term._set instead, transforming all arguments according to the equalities that permitted the use of asElementOf
+      return CachedPromise.resolve([term.term]);
+    } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+      return CachedPromise.resolve([term.term]);
     }
     return CachedPromise.resolve(undefined);
   }
@@ -632,11 +640,12 @@ export class HLMUtils extends GenericUtils {
             if (this.referencesCaseParameter(structuralCase)) {
               if (term.term instanceof Fmt.PlaceholderExpression && structuralCase.parameters) {
                 let args = Object.create(Fmt.ArgumentList.prototype);
+                let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType, true);
                 let createElementParameter = (defaultName: string) => this.createElementParameter(defaultName);
-                this.fillPlaceholderArguments(structuralCase.parameters, args, createElementParameter);
+                this.fillPlaceholderArguments(structuralCase.parameters, args, createPlaceholder, createElementParameter);
                 return this.substituteArguments(structuralCase.value, structuralCase.parameters, args);
-              } else if (term.cases.length === 1 && term.term instanceof Fmt.DefinitionRefExpression && term.term.path.parentPath instanceof Fmt.Path && structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
-                if (term.term.path.parentPath.isEquivalentTo(structuralCase._constructor.path.parentPath) && term.term.path.name === structuralCase._constructor.path.name) {
+              } else if (term.cases.length === 1 && term.term instanceof Fmt.DefinitionRefExpression && term.term.path.parentPath instanceof Fmt.Path && term.construction instanceof Fmt.DefinitionRefExpression && structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
+                if (term.term.path.parentPath.isEquivalentTo(term.construction.path) && term.term.path.name === structuralCase._constructor.path.name) {
                   let constructorPath = term.term.path;
                   return this.getOuterDefinition(structuralCase._constructor).then((definition: Fmt.Definition) => {
                     let innerDefinition = definition.innerDefinitions.getDefinition(constructorPath.name);
@@ -1273,9 +1282,9 @@ export class HLMUtils extends GenericUtils {
     return left.isEquivalentTo(right, fn);
   }
 
-  fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createElementParameter: CreateParameterFn): void {
+  fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): void {
     for (let param of params) {
-      let argValue = this.createArgumentValue(param, createElementParameter);
+      let argValue = this.createArgumentValue(param, createPlaceholder, createElementParameter);
       if (argValue) {
         let argument = new Fmt.Argument;
         argument.name = param.name;
@@ -1285,12 +1294,12 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  private createArgumentValue(param: Fmt.Parameter, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
+  private createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
     if (param.type.arrayDimensions) {
       // TODO
       return undefined;
     }
-    let contents = this.createArgumentContents(param, createElementParameter);
+    let contents = this.createArgumentContents(param, createPlaceholder, createElementParameter);
     if (contents) {
       let argValue = new Fmt.CompoundExpression;
       contents.toCompoundExpression(argValue, false);
@@ -1303,29 +1312,29 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  private createArgumentContents(param: Fmt.Parameter, createElementParameter: CreateParameterFn): Fmt.ObjectContents | undefined {
+  private createArgumentContents(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.ObjectContents | undefined {
     let paramType = param.type.expression;
     if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
       let propArg = new FmtHLM.ObjectContents_PropArg;
-      propArg.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
+      propArg.formula = createPlaceholder(HLMExpressionType.Formula);
       return propArg;
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Set) {
       let setArg = new FmtHLM.ObjectContents_SetArg;
-      setArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      setArg._set = createPlaceholder(HLMExpressionType.SetTerm);
       return setArg;
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Subset) {
       let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
-      subsetArg._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      subsetArg._set = createPlaceholder(HLMExpressionType.SetTerm);
       return subsetArg;
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Element) {
       let elementArg = new FmtHLM.ObjectContents_ElementArg;
-      elementArg.element = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+      elementArg.element = createPlaceholder(HLMExpressionType.ElementTerm);
       return elementArg;
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
       let bindingArg = new FmtHLM.ObjectContents_BindingArg;
       bindingArg.parameter = createElementParameter(param.name);
       bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
-      this.fillPlaceholderArguments(paramType.parameters, bindingArg.arguments, createElementParameter);
+      this.fillPlaceholderArguments(paramType.parameters, bindingArg.arguments, createPlaceholder, createElementParameter);
       return bindingArg;
     } else {
       return undefined;
