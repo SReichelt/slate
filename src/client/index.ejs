@@ -2,14 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>
-      <%= htmlWebpackPlugin.options.title %>
-    </title>
-    <base href="/" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <%= htmlWebpackPlugin.options.additionalHeadElements %>
     <style>
-      body {
-        font-family: sans-serif;
-      }
       .loading-screen {
         text-align: center;
       }

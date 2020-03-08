@@ -81,10 +81,10 @@ body {
 
 .app {
   position: fixed;
-  top: 1ex;
-  bottom: 1ex;
-  left: 1ex;
-  right: 1ex;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .app-pane {
@@ -93,7 +93,6 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  border: solid 1px gray;
 }
 
 .app-pane-placeholder {
@@ -115,10 +114,8 @@ body {
   right: 0;
   bottom: 0;
   height: 1.5em;
-  border: solid 1px gray;
   background-color: #f0f0f0;
   z-index: 1;
-  padding-top: 0.5px;
 }
 
 .bottom-toolbar>.left {
@@ -137,13 +134,11 @@ body {
 
 .Resizer.vertical {
   width: 5pt;
-  margin: 1pt;
   cursor: col-resize;
 }
 
 .Resizer.horizontal {
   height: 5pt;
-  margin: 1pt;
   cursor: row-resize;
 }
 

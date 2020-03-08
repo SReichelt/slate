@@ -9,7 +9,13 @@
   box-shadow: 1pt 2pt 5pt silver;
   white-space: nowrap;
   user-select: none;
-  font-size: initial;
+}
+
+.open-menu, .open-menu-row>th, .open-menu-arrow {
+  font-weight: normal;
+  font-style: initial;
+  line-height: initial;
+  text-align: left;
 }
 
 .open-menu-title-cell>.open-menu {
@@ -20,14 +26,6 @@
 .open-menu.variable {
   max-height: 20em;
   overflow: auto;
-}
-
-.open-menu, .open-menu-row>th, .open-menu-arrow {
-  font-family: sans-serif;
-  font-weight: normal;
-  font-style: initial;
-  line-height: initial;
-  text-align: left;
 }
 
 .open-menu-row>* {

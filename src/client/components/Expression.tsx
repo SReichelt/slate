@@ -7,6 +7,7 @@ import renderPromise from './PromiseHelper';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
+import config from '../utils/config';
 import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
@@ -237,7 +238,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               this.setState({inputError: true});
             }
           }
-          setTimeout(() => this.highlightPermanently(), 0);
+          setImmediate(() => this.highlightPermanently());
         };
         let ref = undefined;
         if (expression.requestTextInput) {
@@ -246,7 +247,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               expression.requestTextInput = false;
               htmlNode.select();
               htmlNode.focus();
-              setTimeout(() => this.highlightPermanently(), 0);
+              setImmediate(() => this.highlightPermanently());
             }
           };
         }
@@ -924,7 +925,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             className += ' link';
           }
         }
-        if (uri && process.env.NODE_ENV !== 'development') {
+        if (uri && !(config.development || config.embedded)) {
           /* This causes nested anchors, which, strictly speaking, are illegal.
              However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
              So we do this anyway, but only in production mode, to prevent warnings from React. */

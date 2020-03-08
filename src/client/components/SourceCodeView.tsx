@@ -8,7 +8,8 @@ class SourceCodeView extends LibraryItemBase {
   private timer: any;
 
   render(): React.ReactNode {
-    let stream = new SourceCodeDisplay.SourceCodeStream(this.state.renderer);
+    let renderer = this.getRenderer();
+    let stream = new SourceCodeDisplay.SourceCodeStream(renderer);
     let writer = new FmtWriter.Writer(stream, true);
     let indent = {
       indent: '',
@@ -23,8 +24,9 @@ class SourceCodeView extends LibraryItemBase {
       clearTimeout(this.timer);
     }
     let update = () => {
-      if (this.state.renderer) {
-        this.state.renderer.updateEditorState().then(() => this.forceUpdate());
+      let renderer = this.getRenderer();
+      if (renderer) {
+        renderer.updateEditorState().then(() => this.forceUpdate());
       } else {
         this.forceUpdate();
       }

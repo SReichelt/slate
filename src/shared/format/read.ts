@@ -517,6 +517,9 @@ export class Reader {
         arrayExpression.items = this.readExpressions(context);
         this.readChar(']');
         expression = arrayExpression;
+      } else if (this.tryReadChar('?')) {
+        this.error('Unfilled placeholder', this.markEnd(expressionStart));
+        expression = new Fmt.PlaceholderExpression(undefined);
       } else {
         let str = this.tryReadString('\'');
         if (str !== undefined) {

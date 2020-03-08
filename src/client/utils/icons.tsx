@@ -15,7 +15,8 @@ export enum ButtonType {
   LogIn,
   LogOut,
   Insert,
-  Remove
+  Remove,
+  TableOfContents
 }
 
 function getVSCodeLogo(enabled: boolean = true): React.ReactNode {
@@ -72,6 +73,16 @@ function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true):
       <rect x="-7" y="-7" width="14" height="14" rx="2" ry="2" fill={enabled ? 'red' : 'none'} stroke={enabled ? 'maroon' : 'gray'} strokeWidth="0.5" key="frame"/>,
       <line x1="-4" y1="-4" x2="4" y2="4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2" key="cross1"/>,
       <line x1="-4" y1="4" x2="4" y2="-4" stroke={enabled ? 'white' : 'gray'} strokeWidth="2" key="cross2"/>
+    ];
+  case ButtonType.TableOfContents:
+    return [
+      <path d="M -7 -7 L -4 -3 L -1 -7 z" fill={enabled ? '#f2cd00' : 'none'} stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow1"/>,
+      <line x1="0" y1="-5" x2="7" y2="-5" stroke={enabled ? 'black' : 'gray'} strokeWidth="2" key="line1"/>,
+      <path d="M -6 0 L -2 3 L -6 6 z" fill="none" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="arrow2"/>,
+      <line x1="2" y1="-2" x2="7" y2="-2" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="line2"/>,
+      <line x1="2" y1="0" x2="7" y2="0" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="line3"/>,
+      <line x1="0" y1="3" x2="7" y2="3" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="line4"/>,
+      <line x1="0" y1="6" x2="7" y2="6" stroke={enabled ? 'black' : 'gray'} strokeWidth="1" key="line5"/>
     ];
   default:
     return [];

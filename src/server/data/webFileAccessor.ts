@@ -1,5 +1,6 @@
 import * as request from 'request';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
+import { StandardFileContents } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class WebFileAccessor implements FileAccessor {
@@ -22,11 +23,7 @@ export class WebFileAccessor implements FileAccessor {
         }
       });
     });
-    let contents = promise.then((text) => new WebFileContents(text));
+    let contents = promise.then((text) => new StandardFileContents(text));
     return new CachedPromise(contents);
   }
-}
-
-class WebFileContents implements FileContents {
-  constructor(public text: string) {}
 }

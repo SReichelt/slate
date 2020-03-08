@@ -7,12 +7,36 @@ const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 const config = require('../server/config');
 const projectRoot = path.join(__dirname, '..', '..');
 
+const additionalHeadElementsDefault = `
+<base href="/" />
+<style>
+  body {
+    font-family: sans-serif;
+  }
+</style>
+`;
+const additionalHeadElementsEmbedded = `
+<base href="<%= baseURL %>" />
+<style>
+  body {
+    font-size: initial;
+  }
+</style>
+`;
+
 const plugins = [
   new HtmlWebpackPlugin({
     title: 'Slate',
     favicon: 'slate.png',
     filename: 'index.html',
-    template: 'index.ejs'
+    template: 'index.ejs',
+    'additionalHeadElements': additionalHeadElementsDefault
+  }),
+  new HtmlWebpackPlugin({
+    title: 'Slate',
+    filename: 'embedded.ejs',
+    template: 'index.ejs',
+    'additionalHeadElements': additionalHeadElementsEmbedded
   })
 ];
 

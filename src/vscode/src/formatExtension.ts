@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';  // TODO replace with vscode.workspace.fs
+import * as fs from 'fs';  // TODO replace with vscode.workspace.fs / WorkspaceFileAccessor
 import * as Fmt from '../../shared/format/format';
 import * as Ctx from '../../shared/format/context';
 import * as Meta from '../../shared/format/metaModel';
@@ -12,16 +12,17 @@ import * as FmtMeta from '../../shared/format/meta';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtWriter from '../../shared/format/write';
 import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaModelWithFallback } from '../../fs/format/dynamic';
+import { WorkspaceFileAccessor } from './workspaceFileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
+import { languageId, SLATE_MODE } from './slate';
 import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery } from './utils';
 import * as LogicExtension from './logicExtension';
-
-const languageId = 'slate';
-const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
+import * as WebviewExtension from './webviewExtension';
 
 interface ParsedDocument {
     uri: vscode.Uri;
     file?: Fmt.File;
+    hasErrors: boolean;
     rangeList: RangeInfo[];
     rangeMap: Map<Object, RangeInfo>;
     metaModelDocument?: ParsedDocument;
@@ -1326,19 +1327,21 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         fileContents = readRange(uri, undefined, false, sourceDocument) || '';
     }
     let stream = new FmtReader.StringInputStream(fileContents);
+    let parsedDocument: ParsedDocument = {
+        uri: uri,
+        hasErrors: false,
+        rangeList: [],
+        rangeMap: new Map<Object, RangeInfo>(),
+        metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
+    };
     let reportError = diagnostics ? (msg: string, range: FmtReader.Range) => {
+        parsedDocument.hasErrors = true;
         diagnostics.push({
             message: msg,
             range: convertRange(range),
             severity: vscode.DiagnosticSeverity.Error
         });
     } : () => {};
-    let parsedDocument: ParsedDocument = {
-        uri: uri,
-        rangeList: [],
-        rangeMap: new Map<Object, RangeInfo>(),
-        metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
-    };
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
         if (metaModelCache) {
@@ -1355,6 +1358,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         }
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
+            hasErrors: false,
             rangeList: [],
             rangeMap: new Map<Object, RangeInfo>()
         };
@@ -1389,6 +1393,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     try {
         parsedDocument.file = reader.readFile();
     } catch (error) {
+        parsedDocument.hasErrors = true;
         if (diagnostics && !diagnostics.length) {
             let dummyPosition = new vscode.Position(0, 0);
             diagnostics.push({
@@ -1412,7 +1417,7 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
         if (parseEventEmitter) {
-            parseEventEmitter.fire({document: document, file: parsedDocument.file, hasErrors: diagnostics.length > 0});
+            parseEventEmitter.fire({document: document, file: parsedDocument.file, hasErrors: parsedDocument.hasErrors});
         }
         return parsedDocument;
     } else {
@@ -1463,6 +1468,7 @@ export function activate(context: vscode.ExtensionContext): void {
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
     let parseEventEmitter = new vscode.EventEmitter<LogicExtension.ParseDocumentEvent>();
     let hoverEventEmitter = new vscode.EventEmitter<LogicExtension.HoverEvent>();
+    let fileAccessor = new WorkspaceFileAccessor;
     context.subscriptions.push(
         parseEventEmitter,
         hoverEventEmitter
@@ -1472,7 +1478,10 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.workspace.onDidChangeTextDocument((event) => {
             let changedDocument = event.document;
             parsedFileCache.delete(changedDocument.uri.fsPath);
-            parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
+            let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
+            if (parsedDocument && !parsedDocument.hasErrors) {
+                fileAccessor.documentChanged(changedDocument);
+            }
             // TODO only reparse affected documents (maintain a list of documents to reparse)
             triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, (document) => (document !== changedDocument));
         })
@@ -1499,13 +1508,15 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.languages.registerRenameProvider(SLATE_MODE, new SlateRenameProvider(parsedDocuments)),
         vscode.languages.registerDocumentFormattingEditProvider(SLATE_MODE, new SlateDocumentFormatter)
     );
-    LogicExtension.activate(context, parseEventEmitter.event, hoverEventEmitter.event);
+    LogicExtension.activate(context, parseEventEmitter.event, hoverEventEmitter.event, fileAccessor);
     for (let document of vscode.workspace.textDocuments) {
         parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
     }
+    WebviewExtension.activate(context, fileAccessor);
 }
 
 export function deactivate(): void {
+    WebviewExtension.deactivate();
     LogicExtension.deactivate();
     if (parseAllTimer) {
         clearTimeout(parseAllTimer);

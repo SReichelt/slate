@@ -6,7 +6,6 @@
   padding: 0.25em;
   vertical-align: middle;
   text-align: center;
-  font-family: sans-serif;
   white-space: nowrap;
   background-color: #e0e0e0;
   user-select: none;
@@ -39,7 +38,7 @@
 }
 
 .button.standalone .button svg {
-  position: initial;
+  position: unset;
 }
 
 .button img {

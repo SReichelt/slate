@@ -66,8 +66,7 @@
 }
 
 .dialog input {
-  font: sans-serif;
-  font-size: initial;
+  font-size: unset;
 }
 
 .dialog .tree-container {

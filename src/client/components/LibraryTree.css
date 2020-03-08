@@ -15,7 +15,7 @@
 
 .tree-search-input {
   width: 100%;
-  font-size: initial;
+  font-size: unset;
 }
 
 .tree-area {

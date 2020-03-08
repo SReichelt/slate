@@ -12,6 +12,7 @@ export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, Library
 
 
 const fileExtension = '.slate';
+const indexFileName = '_index';
 
 export const defaultReferences = [
   'https://en.wikipedia.org/wiki/',
@@ -26,11 +27,18 @@ const defaultReferencesString = defaultReferences.map((ref) => `* ${ref}...`).re
 export const defaultReferenceSearchURLs = [
   'https://en.wikipedia.org/w/index.php?search=',
   'http://mathworld.wolfram.com/search/?query=',
-  'https://proofwiki.org/w/index.php?search=',
+  'https://www.google.com/search?q=site%3Aproofwiki.org+',
   'https://www.google.com/search?q=site%3Ancatlab.org+',
   'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
   'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+'
 ];
+
+export interface LibraryDataProviderConfig {
+  canPreload: boolean;
+}
+export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
+  canPreload: false,
+};
 
 interface PrefetchQueueItem {
   path: Fmt.Path;
@@ -52,9 +60,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
-  private fileWatchers = new Map<LibraryDefinition, FileWatcher>();
 
-  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private parent: LibraryDataProvider | undefined, private canPreload: boolean, private childName: string, private itemNumber?: number[]) {
+  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }
@@ -96,7 +103,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           provider.itemNumber = itemNumber;
         }
       } else {
-        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this, this.canPreload, path.name, itemNumber);
+        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this.config, path.name, this, itemNumber);
         this.subsectionProviderCache.set(path.name, provider);
       }
       return provider;
@@ -302,7 +309,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         }
       }
       let uri = this.uri + encodeURI(name) + fileExtension;
-      if (this.canPreload && !fullContentsRequired) {
+      if (this.config.canPreload && !fullContentsRequired) {
         if (name === this.getLocalSectionFileName()) {
           result = this.preloadDefinitions(uri + '.preload', definitionName)
             .catch((error) => {
@@ -325,20 +332,26 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         result = this.fileAccessor.readFile(uri)
           .then((contents: FileContents) => {
             this.preloadedDefinitions.delete(name);
+            let libraryDefinition: LibraryDefinition | undefined = undefined;
+            if (contents.addWatcher) {
+              contents.addWatcher((watcher: FileWatcher) => {
+                if (libraryDefinition) {
+                  try {
+                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel);
+                    libraryDefinition.definition = this.getMainDefinition(libraryDefinition.file, definitionName);
+                  } catch (error) {
+                    this.fullyLoadedDefinitions.delete(name);
+                    watcher.close();
+                  }
+                }
+              });
+            }
             let file = FmtReader.readString(contents.text, uri, getMetaModel);
-            let libraryDefinition: LibraryDefinition = {
+            libraryDefinition = {
               file: file,
               definition: this.getMainDefinition(file, definitionName),
               state: LibraryDefinitionState.Loaded
             };
-            if (contents.addWatcher) {
-              let fileWatcher = contents.addWatcher((watcher: FileWatcher) => {
-                this.fullyLoadedDefinitions.delete(name);
-                watcher.close();
-                this.fileWatchers.delete(libraryDefinition);
-              });
-              this.fileWatchers.set(libraryDefinition, fileWatcher);
-            }
             return libraryDefinition;
           });
         this.fullyLoadedDefinitions.set(name, result);
@@ -355,7 +368,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (contents instanceof FmtLibrary.ObjectContents_Section) {
           let index = 0;
           for (let item of contents.items) {
-            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.canPreload)) {
+            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.config.canPreload)) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
               if (!path.parentPath && !this.preloadedDefinitions.get(path.name) && !this.fullyLoadedDefinitions.get(path.name)) {
                 let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
@@ -382,7 +395,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private getLocalSectionFileName(): string {
-    return this.parent ? '_index' : this.childName;
+    return this.parent ? indexFileName : this.childName;
   }
 
   fetchSubsection(path: Fmt.Path, itemNumber?: number[], prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
@@ -416,8 +429,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
         sectionDefinition.state = LibraryDefinitionState.Editing;
       }
-      sectionDefinition.modified = true;
       this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+      this.localDefinitionModified(localSectionFileName, sectionDefinition);
       let subsectionProvider = this.getProviderForSubsection(newSubsectionRef.path);
       let metaModelPath = sectionDefinition.file.metaModelPath.clone() as Fmt.Path;
       for (let pathItem: Fmt.PathItem | undefined = metaModelPath; pathItem; pathItem = pathItem.parentPath) {
@@ -443,14 +456,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     contents.items = [];
     definition.contents = contents;
     file.definitions.push(definition);
-    let libraryDefinition: LibraryDefinition = {
-      file: file,
-      definition: definition,
-      state: LibraryDefinitionState.EditingNew,
-      modified: false
-    };
-    this.editedDefinitions.set(this.getLocalSectionFileName(), libraryDefinition);
-    return libraryDefinition;
+    let name = this.getLocalSectionFileName();
+    return this.createLocalDefinition(name, file, definition);
   }
 
   fetchLocalItem(name: string, fullContentsRequired: boolean, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
@@ -539,8 +546,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
           sectionDefinition.state = LibraryDefinitionState.Editing;
         }
-        sectionDefinition.modified = true;
         this.editedDefinitions.set(localSectionFileName, sectionDefinition);
+        this.localDefinitionModified(localSectionFileName, sectionDefinition);
         let metaModelPath = new Fmt.Path;
         metaModelPath.name = this.logic.name;
         metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
@@ -563,6 +570,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     definition.documentation = new Fmt.DocumentationComment;
     definition.documentation.items = [references];
     file.definitions.push(definition);
+    return this.createLocalDefinition(name, file, definition);
+  }
+
+  private createLocalDefinition(name: string, file: Fmt.File, definition: Fmt.Definition): LibraryDefinition {
     let libraryDefinition: LibraryDefinition = {
       file: file,
       definition: definition,
@@ -570,6 +581,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       modified: false
     };
     this.editedDefinitions.set(name, libraryDefinition);
+    this.prePublishLocalDefinition(name, libraryDefinition, true);
     return libraryDefinition;
   }
 
@@ -586,6 +598,19 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     this.editedItemInfos.set(name, itemInfo);
     this.originalItemInfos.set(name, {...itemInfo});
     return clonedLibraryDefinition;
+  }
+
+  localItemModified(editedLibraryDefinition: LibraryDefinition): void {
+    let name = editedLibraryDefinition.definition.name;
+    this.localDefinitionModified(name, editedLibraryDefinition);
+  }
+
+  private localDefinitionModified(name: string, editedLibraryDefinition: LibraryDefinition): void {
+    if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
+      throw new Error('Trying to modify definition that is not being edited');
+    }
+    editedLibraryDefinition.modified = true;
+    this.prePublishLocalDefinition(name, editedLibraryDefinition, false);
   }
 
   cancelEditing(editedLibraryDefinition: LibraryDefinition): void {
@@ -624,6 +649,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
     this.editedItemInfos.delete(name);
     this.originalItemInfos.delete(name);
+    if (this.fileAccessor.unPrePublishFile) {
+      let uri = this.uri + encodeURI(name) + fileExtension;
+      this.fileAccessor.unPrePublishFile(uri)
+        .catch(() => {});
+    }
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
@@ -678,6 +708,28 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         sectionDefinition.state = prevState;
         return CachedPromise.reject(error);
       });
+  }
+
+  private prePublishLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, createNew: boolean): void {
+    if (this.fileAccessor.prePublishFile) {
+      try {
+        let uri = this.uri + encodeURI(name) + fileExtension;
+        let contents = FmtWriter.writeString(editedLibraryDefinition.file, true);
+        if (createNew) {
+          this.fileAccessor.writeFile!(uri, contents, true, false)
+            .then(() => {
+              if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
+                editedLibraryDefinition.state = LibraryDefinitionState.Editing;
+              }
+            })
+            .catch(() => {});
+        } else {
+          this.fileAccessor.prePublishFile(uri, contents, false, false)
+            .catch(() => {});
+        }
+      } catch (error) {
+      }
+    }
   }
 
   private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
@@ -784,7 +836,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         this.prefetch();
       }
     };
-    setTimeout(prefetch, 0);
+    setImmediate(prefetch);
   }
 
   private prefetch = (): boolean => {
@@ -826,8 +878,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         slashPos = uri.indexOf('/');
       }
       if (uri) {
+        let name = decodeURI(uri);
+        if (name.endsWith(fileExtension)) {
+          name = name.substring(0, name.length - fileExtension.length);
+        }
+        if (name === indexFileName) {
+          return undefined;
+        }
         let result = new Fmt.Path;
-        result.name = decodeURI(uri);
+        result.name = name;
         result.parentPath = path;
         return result;
       }

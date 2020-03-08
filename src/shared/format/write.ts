@@ -603,13 +603,13 @@ export class Writer {
 }
 
 
-export function writeStream(file: Fmt.File, stream: OutputStream): void {
-  let writer = new Writer(stream);
+export function writeStream(file: Fmt.File, stream: OutputStream, allowPlaceholders: boolean = false): void {
+  let writer = new Writer(stream, allowPlaceholders);
   writer.writeFile(file);
 }
 
-export function writeString(file: Fmt.File): string {
+export function writeString(file: Fmt.File, allowPlaceholders: boolean = false): string {
   let stream = new StringOutputStream;
-  writeStream(file, stream);
+  writeStream(file, stream, allowPlaceholders);
   return stream.str;
 }

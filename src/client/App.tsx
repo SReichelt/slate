@@ -18,12 +18,15 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtDisplay from '../shared/display/meta';
 import * as FmtLibrary from '../shared/logics/library';
 import * as Dialog from '../shared/display/dialog';
+import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
+import * as Embedding from '../shared/data/embedding';
 import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
+import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
-import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderConfig } from '../shared/data/libraryDataProvider';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import Message from './components/Message';
@@ -64,15 +67,15 @@ interface InsertDialogState {
 
 interface AppState extends SelectionState, GitHubState, InsertDialogState {
   verticalLayout: boolean;
+  navigationPaneVisible: boolean;
+  extraContentsVisible: boolean;
   error?: string;
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
-  extraContentsVisible: boolean;
   editedDefinitions?: LibraryItemListEntry[];
 }
 
 class App extends React.Component<AppProps, AppState> {
-  private runningLocally: boolean;
   private gitHubConfig?: GitHubConfig;
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
@@ -81,106 +84,80 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
 
-    this.runningLocally = (process.env.NODE_ENV === 'development');
-
     let state: AppState = {
       verticalLayout: window.innerHeight > window.innerWidth,
+      navigationPaneVisible: true,
       extraContentsVisible: false
     };
 
-    let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
-    try {
-      let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
-      if (gitHubAccessToken) {
-        gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    let canPreload = false;
+    let selectionURI: string | undefined = undefined;
+    let queryString: string | undefined = undefined;
 
-    let selectionURI = window.location.pathname;
-
-    let queryString = window.location.search;
-    if (queryString && !gitHubAPIAccess) {
-      let gitHubQueryStringResult = GitHub.parseQueryString(queryString);
-      if (gitHubQueryStringResult.path) {
-        selectionURI = gitHubQueryStringResult.path;
-      }
-      if (gitHubQueryStringResult.token) {
-        let apiAccessPromise = gitHubQueryStringResult.token.then((accessToken) => {
-          try {
-            window.localStorage.setItem('GitHubAccessToken', accessToken);
-          } catch (error) {
-            console.log(error);
-          }
-          return new GitHub.APIAccess(accessToken);
-        });
-        gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
-      }
-    }
-
-    let canPreload = true;
-    if (this.runningLocally && !gitHubAPIAccess) {
-      this.fileAccessor = new WebFileAccessor;
-    } else {
-      this.gitHubConfig = {
-        targets: []
+    if (config.vsCodeAPI) {
+      let fileAccessor = new VSCodeExtensionFileAccessor;
+      window.onmessage = (event: MessageEvent) => {
+        let message: Embedding.ResponseMessage = event.data;
+        fileAccessor.messageReceived(message);
+        this.processEmbeddingResponseMessage(message);
       };
-      let repositories: GitHub.Repository[] = [];
-      for (let libraryName of Object.keys(libraries)) {
-        let repository = libraries[libraryName];
-        this.gitHubConfig.targets.push({
-          uriPrefix: librariesURIPrefix + libraryName,
-          repository: repository
-        });
-        repositories.push(repository);
-        if (libraryName === selectedLibraryName) {
-          state.selectedItemRepository = repository;
+      this.fileAccessor = fileAccessor;
+      state.navigationPaneVisible = false;
+    } else {
+      let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
+      try {
+        let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
+        if (gitHubAccessToken) {
+          gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+      selectionURI = window.location.pathname;
+      queryString = window.location.search;
+
+      if (queryString && !gitHubAPIAccess) {
+        let gitHubQueryStringResult = GitHub.parseQueryString(queryString);
+        if (gitHubQueryStringResult.path) {
+          selectionURI = gitHubQueryStringResult.path;
+        }
+        if (gitHubQueryStringResult.token) {
+          let apiAccessPromise = gitHubQueryStringResult.token.then((accessToken) => {
+            try {
+              window.localStorage.setItem('GitHubAccessToken', accessToken);
+            } catch (error) {
+              console.log(error);
+            }
+            return new GitHub.APIAccess(accessToken);
+          });
+          gitHubAPIAccess = new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
         }
       }
-      let gitHubConfigPromise: CachedPromise<GitHubConfig>;
-      if (gitHubAPIAccess) {
-        state.gitHubUserInfo = gitHubAPIAccess.then((apiAccess) => {
-          this.gitHubConfig!.apiAccess = apiAccess;
-          return apiAccess.getUserInfo(repositories);
-        });
-        gitHubConfigPromise = state.gitHubUserInfo
-          .then(() => {
-            let result: CachedPromise<void> = CachedPromise.resolve();
-            if (this.gitHubConfig && this.gitHubConfig.apiAccess) {
-              let apiAccess = this.gitHubConfig.apiAccess;
-              for (let target of this.gitHubConfig.targets) {
-                let repository = target.repository;
-                if (repository.parentOwner && !repository.hasPullRequest) {
-                  result = result
-                    .then(() => apiAccess.fastForward(repository, false))
-                    .then(() => void (repository.pullRequestAllowed = true))
-                    .catch(() => void (repository.hasLocalChanges = true));
-                }
-              }
-            }
-            return result;
-          })
-          .catch(() => {})
-          .then(() => this.gitHubConfig!);
+
+      if (config.runningLocally && !gitHubAPIAccess) {
+        this.fileAccessor = new WebFileAccessor;
+        canPreload = true;
       } else {
-        gitHubConfigPromise = CachedPromise.resolve(this.gitHubConfig);
-      }
-      this.fileAccessor = new GitHubFileAccessor(gitHubConfigPromise);
-      if (this.runningLocally) {
+        this.initializeGitHubConfig(state, gitHubAPIAccess);
         // When running locally, preloading always returns local files. If the user has logged in to GitHub, we don't want to bypass that.
-        canPreload = false;
+        canPreload = !config.runningLocally;
       }
     }
 
     this.logic = Logics.hlm;
     let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, undefined, canPreload, 'Library');
+    let libraryDataProviderConfig: LibraryDataProviderConfig = {
+      canPreload: canPreload
+    };
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderConfig, 'Library');
 
-    this.updateSelectionState(state, selectionURI);
+    if (selectionURI) {
+      this.updateSelectionState(state, selectionURI);
+    }
     this.state = state;
     let title = this.getTitle(state);
-    if (queryString) {
+    if (selectionURI && queryString) {
       window.history.pushState(null, title, selectionURI);
     }
     this.setDocumentTitle(state, title);
@@ -212,62 +189,70 @@ class App extends React.Component<AppProps, AppState> {
     state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
   }
 
-  private createInteractionHandler(state: SelectionState): void {
-    if (state.selectedItemProvider && state.selectedItemDefinition && this.state && this.state.templates) {
-      state.interactionHandler = new LibraryItemInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition, this.linkClicked);
+  private setNewInteractionHandler(state: SelectionState): void {
+    state.interactionHandler = this.createInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition);
+  }
+
+  private createInteractionHandler(libraryDataProvider: LibraryDataProvider | undefined, templates: Fmt.File | undefined, selectedItemDefinition: CachedPromise<LibraryDefinition> | undefined): LibraryItemInteractionHandler | undefined {
+    if (libraryDataProvider && selectedItemDefinition && templates) {
+      return new LibraryItemInteractionHandler(libraryDataProvider, templates, selectedItemDefinition, this.linkClicked);
+    } else {
+      return undefined;
     }
   }
 
   componentDidMount(): void {
-    window.onpopstate = () => {
-      // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
-      let state: SelectionState = {
-        selectedItemAbsolutePath: undefined,
-        selectedItemProvider: undefined,
-        selectedItemLocalPath: undefined,
-        selectedItemDefinition: undefined,
-        selectedItemInfo: undefined,
-        interactionHandler: undefined
+    if (!config.embedded) {
+      window.onpopstate = () => {
+        // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
+        let state: SelectionState = {
+          selectedItemAbsolutePath: undefined,
+          selectedItemProvider: undefined,
+          selectedItemLocalPath: undefined,
+          selectedItemDefinition: undefined,
+          selectedItemInfo: undefined,
+          interactionHandler: undefined
+        };
+        this.updateSelectionState(state, window.location.pathname);
+        this.setNewInteractionHandler(state);
+        this.setState(state);
       };
-      this.updateSelectionState(state, window.location.pathname);
-      this.createInteractionHandler(state);
-      this.setState(state);
-    };
 
-    window.onresize = () => {
-      if (!(this.state.interactionHandler && this.state.interactionHandler.isBlocked())) {
-        if (window.innerHeight > window.innerWidth * 1.25) {
-          if (!this.state.verticalLayout) {
-            this.setState({verticalLayout: true});
-          }
-        } else if (window.innerHeight * 1.25 < window.innerWidth) {
-          if (this.state.verticalLayout) {
-            this.setState({verticalLayout: false});
+      window.onresize = () => {
+        if (!(this.state.interactionHandler && this.state.interactionHandler.isBlocked())) {
+          if (window.innerHeight > window.innerWidth * 1.25) {
+            if (!this.state.verticalLayout) {
+              this.setState({verticalLayout: true});
+            }
+          } else if (window.innerHeight * 1.25 < window.innerWidth) {
+            if (this.state.verticalLayout) {
+              this.setState({verticalLayout: false});
+            }
           }
         }
-      }
-    };
+      };
 
-    window.onbeforeunload = () => {
-      if (this.state.editedDefinitions) {
-        for (let editedDefinition of this.state.editedDefinitions) {
-          if (editedDefinition.libraryDefinition.modified) {
-            return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
+      window.onbeforeunload = () => {
+        if (this.state.editedDefinitions) {
+          for (let editedDefinition of this.state.editedDefinitions) {
+            if (editedDefinition.libraryDefinition.modified) {
+              return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
+            }
           }
         }
+        return null;
+      };
+
+      GitHub.getClientID()
+        .then((clientID) => this.setState({gitHubClientID: clientID}))
+        .catch(() => {});
+
+      if (this.state.gitHubUserInfo) {
+        this.state.gitHubUserInfo.catch((error) => {
+          this.discardGitHubLogin();
+          this.props.alert.error('GitHub login failed: ' + error.message);
+        });
       }
-      return null;
-    };
-
-    GitHub.getClientID()
-      .then((clientID) => this.setState({gitHubClientID: clientID}))
-      .catch(() => {});
-
-    if (this.state.gitHubUserInfo) {
-      this.state.gitHubUserInfo.catch((error) => {
-        this.discardGitHubLogin();
-        this.props.alert.error('GitHub login failed: ' + error.message);
-      });
     }
 
     let templateUri = 'display/templates.slate';
@@ -276,10 +261,10 @@ class App extends React.Component<AppProps, AppState> {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
         this.setState({
           templates: templates,
-          rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, this.state.selectedItemDefinition, this.linkClicked)
+          rootInteractionHandler: this.createInteractionHandler(this.libraryDataProvider, templates, this.state.selectedItemDefinition)
         });
         if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-          this.setState({interactionHandler: new LibraryItemInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition, this.linkClicked)});
+          this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
         }
       })
       .catch((error) => {
@@ -291,6 +276,55 @@ class App extends React.Component<AppProps, AppState> {
   componentWillUnmount(): void {
     window.onresize = null;
     window.onpopstate = null;
+    window.onbeforeunload = null;
+    window.onmessage = null;
+  }
+
+  private initializeGitHubConfig(state: AppState, gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined): void {
+    this.gitHubConfig = {
+      targets: []
+    };
+    let repositories: GitHub.Repository[] = [];
+    for (let libraryName of Object.keys(libraries)) {
+      let repository = libraries[libraryName];
+      this.gitHubConfig.targets.push({
+        uriPrefix: librariesURIPrefix + libraryName,
+        repository: repository
+      });
+      repositories.push(repository);
+      if (libraryName === selectedLibraryName) {
+        state.selectedItemRepository = repository;
+      }
+    }
+    let gitHubConfigPromise: CachedPromise<GitHubConfig>;
+    if (gitHubAPIAccess) {
+      state.gitHubUserInfo = gitHubAPIAccess.then((apiAccess) => {
+        this.gitHubConfig!.apiAccess = apiAccess;
+        return apiAccess.getUserInfo(repositories);
+      });
+      gitHubConfigPromise = state.gitHubUserInfo
+        .then(() => {
+          let result: CachedPromise<void> = CachedPromise.resolve();
+          if (this.gitHubConfig && this.gitHubConfig.apiAccess) {
+            let apiAccess = this.gitHubConfig.apiAccess;
+            for (let target of this.gitHubConfig.targets) {
+              let repository = target.repository;
+              if (repository.parentOwner && !repository.hasPullRequest) {
+                result = result
+                  .then(() => apiAccess.fastForward(repository, false))
+                  .then(() => void (repository.pullRequestAllowed = true))
+                  .catch(() => void (repository.hasLocalChanges = true));
+              }
+            }
+          }
+          return result;
+        })
+        .catch(() => {})
+        .then(() => this.gitHubConfig!);
+    } else {
+      gitHubConfigPromise = CachedPromise.resolve(this.gitHubConfig);
+    }
+    this.fileAccessor = new GitHubFileAccessor(gitHubConfigPromise);
   }
 
   private discardGitHubLogin(): void {
@@ -305,6 +339,19 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private processEmbeddingResponseMessage(message: Embedding.ResponseMessage): void {
+    switch (message.command) {
+    case 'SELECT':
+      this.navigateToURI(message.uri);
+      break;
+    case 'UPDATE':
+      if (this.state.interactionHandler) {
+        this.state.interactionHandler.expressionChanged(true, false);
+      }
+      break;
+    }
+  }
+
   render(): React.ReactNode {
     if (this.state.error) {
       return <div className={'error'}>Error: {this.state.error}</div>;
@@ -313,34 +360,37 @@ class App extends React.Component<AppProps, AppState> {
     let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
     let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
-    let editListPane = <div className={'app-pane-placeholder'} key={'EditList'}/>;
-    if (this.state.editedDefinitions) {
-      let editList: React.ReactNode;
-      if (this.state.editedDefinitions.length) {
-        editList = <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>;
-      } else {
-        editList = (
-          <div className={'empty-list'}>
-            <Button toolTipText={'Close'} onClick={() => this.setState({editedDefinitions: undefined})}>
-              {getButtonIcon(ButtonType.Close)}
-            </Button>
+    let navigationPane: React.ReactNode = null;
+    if (this.state.navigationPaneVisible) {
+      let editListPane = <div className={'app-pane-placeholder'} key={'EditList'}/>;
+      if (this.state.editedDefinitions) {
+        let editList: React.ReactNode;
+        if (this.state.editedDefinitions.length) {
+          editList = <LibraryItemList libraryDataProvider={this.libraryDataProvider} items={this.state.editedDefinitions} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked}/>;
+        } else {
+          editList = (
+            <div className={'empty-list'}>
+              <Button toolTipText={'Close'} onClick={() => this.setState({editedDefinitions: undefined})}>
+                {getButtonIcon(ButtonType.Close)}
+              </Button>
+            </div>
+          );
+        }
+        editListPane = (
+          <div className={'app-pane'} key={'EditList'}>
+            {editList}
           </div>
         );
       }
-      editListPane = (
-        <div className={'app-pane'} key={'EditList'}>
-          {editList}
-        </div>
+      navigationPane = (
+        <SplitPane split={'horizontal'} size={this.state.editedDefinitions ? undefined : 0} resizerStyle={this.state.editedDefinitions ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
+          {editListPane}
+          <div className={'app-pane'} key={'Tree'}>
+            <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
+          </div>
+        </SplitPane>
       );
     }
-    let navigationPane = (
-      <SplitPane split={'horizontal'} size={this.state.editedDefinitions ? undefined : 0} resizerStyle={this.state.editedDefinitions ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
-        {editListPane}
-        <div className={'app-pane'} key={'Tree'}>
-          <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
-        </div>
-      </SplitPane>
-    );
 
     let mainContents: React.ReactNode = null;
     let extraContents: React.ReactNode = null;
@@ -365,7 +415,7 @@ class App extends React.Component<AppProps, AppState> {
             }
             let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
             if (editing) {
-              if (!this.state.gitHubUserInfo && !this.runningLocally) {
+              if (!this.state.gitHubUserInfo && !config.runningLocally) {
                 result = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
               } else if (this.state.selectedItemRepository) {
                 let repository = this.state.selectedItemRepository;
@@ -383,16 +433,18 @@ class App extends React.Component<AppProps, AppState> {
         });
         mainContents = renderPromise(mainContentsPromise);
 
-        if (this.state.extraContentsVisible) {
-          let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-            return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
-          });
-          extraContents = renderPromise(extraContentsPromise, 'SourceCode');
-        } else {
-          extraContents = <div key={'SourceCode'}/>;
+        if (!config.embedded) {
+          if (this.state.extraContentsVisible) {
+            let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+            });
+            extraContents = renderPromise(extraContentsPromise, 'SourceCode');
+          } else {
+            extraContents = <div key={'SourceCode'}/>;
+          }
         }
       }
-    } else {
+    } else if (!config.embedded) {
       mainContents = <StartPage libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onLinkClicked={this.linkClicked} key={'StartPage'}/>;
       if (this.state.selectedItemRepository) {
         let repository = this.state.selectedItemRepository;
@@ -405,6 +457,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let leftButtons: React.ReactNode[] = [];
+    if (config.embedded) {
+      leftButtons.push(
+        <Button toolTipText={'Table of Contents'} selected={this.state.navigationPaneVisible} onClick={() => this.setState((prevState) => ({navigationPaneVisible: !prevState.navigationPaneVisible}))} key={'ViewSource'}>
+          {getButtonIcon(ButtonType.TableOfContents)}
+        </Button>
+      );
+    }
     if (this.state.gitHubUserInfo) {
       let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
         let userID: React.ReactNode[] = [];
@@ -451,7 +510,7 @@ class App extends React.Component<AppProps, AppState> {
         if (repository) {
           willSubmit = (repository.parentOwner && repository.pullRequestAllowed) || !repository.hasWriteAccess;
         } else {
-          willSubmit = !this.runningLocally;
+          willSubmit = !config.runningLocally;
         }
         rightButtons.push(
           <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key={'Submit'}>
@@ -471,19 +530,21 @@ class App extends React.Component<AppProps, AppState> {
           </Button>
         ));
         rightButtons.push(renderPromise(editButtonPromise, 'EditButton'));
-        if (this.runningLocally) {
-          rightButtons.push(
-            <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
-              {getButtonIcon(ButtonType.OpenInVSCode)}
-            </Button>
-          );
-        }
-        if (this.fileAccessor instanceof GitHubFileAccessor) {
-          rightButtons.push(
-            <Button toolTipText={'View in GitHub'} onClick={this.openRemotely} key={'ViewInGitHub'}>
-              {getButtonIcon(ButtonType.ViewInGitHub)}
-            </Button>
-          );
+        if (!config.embedded) {
+          if (config.runningLocally) {
+            rightButtons.push(
+              <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
+                {getButtonIcon(ButtonType.OpenInVSCode)}
+              </Button>
+            );
+          }
+          if (this.fileAccessor instanceof GitHubFileAccessor) {
+            rightButtons.push(
+              <Button toolTipText={'View in GitHub'} onClick={this.openRemotely} key={'ViewInGitHub'}>
+                {getButtonIcon(ButtonType.ViewInGitHub)}
+              </Button>
+            );
+          }
         }
       }
     }
@@ -539,15 +600,30 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    return (
-      <div className={'app'}>
-        <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3} key={'Main'}>
-          {navigationPane}
+    if (navigationPane) {
+      return (
+        <div className={'app'}>
+          <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3} key={'Main'}>
+            {navigationPane}
+            {contentsPane}
+          </SplitPane>
+          {openDialog}
+        </div>
+      );
+    } else {
+      return (
+        <div className={'app'}>
           {contentsPane}
-        </SplitPane>
-        {openDialog}
-      </div>
-    );
+          {openDialog}
+        </div>
+      );
+    }
+  }
+
+  private navigateToURI(uri: string): void {
+    let state: SelectionState = {};
+    this.updateSelectionState(state, uri);
+    this.navigate(state, false);
   }
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
@@ -570,15 +646,26 @@ class App extends React.Component<AppProps, AppState> {
     this.navigate(state);
   }
 
-  private navigate(state: SelectionState): void {
-    this.createInteractionHandler(state);
+  private navigate(state: SelectionState, notify: boolean = true): void {
+    this.setNewInteractionHandler(state);
     this.setState(state);
     let uri = '/';
     if (state.selectedItemAbsolutePath) {
       uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
     let title = this.getTitle(state);
-    window.history.pushState(null, title, uri);
+    if (notify) {
+      if (config.embedded) {
+        let libraryDataProvider = state.selectedItemProvider;
+        let path = state.selectedItemLocalPath;
+        if (libraryDataProvider && path) {
+          libraryDataProvider.openLocalItem(path.name, true)
+            .catch(() => {});
+        }
+      } else {
+        window.history.pushState(null, title, uri);
+      }
+    }
     this.setDocumentTitle(state, title);
   }
 
@@ -700,7 +787,7 @@ class App extends React.Component<AppProps, AppState> {
           };
           this.setState((prevState) => ({
             selectedItemDefinition: clonedDefinitionPromise,
-            interactionHandler: this.state.templates ? new LibraryItemInteractionHandler(libraryDataProvider!, this.state.templates, clonedDefinitionPromise, this.linkClicked) : undefined,
+            interactionHandler: this.createInteractionHandler(libraryDataProvider!, this.state.templates, clonedDefinitionPromise),
             editedDefinitions: prevState.editedDefinitions ? prevState.editedDefinitions.concat(editedDefinition) : [editedDefinition]
           }));
         });

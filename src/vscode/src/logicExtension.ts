@@ -9,15 +9,12 @@ import * as Display from '../../shared/display/display';
 import { renderAsText } from '../../shared/display/textOutput';
 import * as Logic from '../../shared/logics/logic';
 import * as Logics from '../../shared/logics/logics';
-import { FileContents } from '../../shared/data/fileAccessor';
-import { WorkspaceFileAccessor } from './workspaceFileAccessor';
-import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
+import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
+import { LibraryDataProvider, LibraryDefinition, defaultLibraryDataProviderConfig } from '../../shared/data/libraryDataProvider';
 import { fileExtension } from '../../fs/format/dynamic';
-import { RangeInfo, convertRangeInfo } from './utils';
 import CachedPromise from '../../shared/data/cachedPromise';
-
-const languageId = 'slate';
-const SLATE_MODE: vscode.DocumentFilter = { language: languageId, scheme: 'file' };
+import { languageId, SLATE_MODE } from './slate';
+import { RangeInfo, convertRangeInfo } from './utils';
 
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
@@ -51,7 +48,7 @@ class LibraryDocumentProvider {
     private libraries = new Map<string, Library>();
     private documents = new Map<vscode.TextDocument, LibraryDocument>();
 
-    constructor(private fileAccessor: WorkspaceFileAccessor) {}
+    constructor(private fileAccessor: FileAccessor) {}
 
     parseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
         let libraryDocument = this.tryParseDocument(event);
@@ -123,7 +120,7 @@ class LibraryDocumentProvider {
                 return undefined;
             }
             library = {
-                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, undefined, false, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, defaultLibraryDataProviderConfig, 'Library'),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);
@@ -342,8 +339,7 @@ class SlateLogicHoverProvider {
     }
 }
 
-export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onShowHover: vscode.Event<HoverEvent>): void {
-    let fileAccessor = new WorkspaceFileAccessor;
+export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onShowHover: vscode.Event<HoverEvent>, fileAccessor: FileAccessor): void {
     let libraryDocumentProvider = new LibraryDocumentProvider(fileAccessor);
     let diagnosticsProvider = new SlateDiagnosticsProvider(libraryDocumentProvider);
     let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
@@ -362,7 +358,6 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             } catch (error) {
             }
         }),
-        vscode.workspace.onDidChangeTextDocument((event) => fileAccessor.documentChanged(event.document)),
         vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );

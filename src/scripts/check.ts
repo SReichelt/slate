@@ -6,7 +6,7 @@ import * as FmtLibrary from '../shared/logics/library';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import { PhysicalFileAccessor } from '../fs/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDefinition } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, defaultLibraryDataProviderConfig } from '../shared/data/libraryDataProvider';
 import CachedPromise from '../shared/data/cachedPromise';
 
 let fileAccessor = new PhysicalFileAccessor;
@@ -18,7 +18,7 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let logic = Logics.findLogic(contents.logic)!;
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
-  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), undefined, false, libraryName);
+  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), defaultLibraryDataProviderConfig, libraryName);
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 

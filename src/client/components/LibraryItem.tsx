@@ -14,20 +14,11 @@ export interface LibraryItemProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-interface LibraryItemState {
-  definitionState: LibraryDefinitionState;
+export abstract class LibraryItemBase extends React.Component<LibraryItemProps> {
   renderer?: Logic.LogicRenderer;
-}
-
-export abstract class LibraryItemBase extends React.Component<LibraryItemProps, LibraryItemState> {
-  constructor(props: LibraryItemProps) {
-    super(props);
-
-    this.state = {
-      definitionState: props.definition.state,
-      renderer: this.createRenderer(props)
-    };
-  }
+  rendererProps?: React.PropsWithChildren<LibraryItemProps>;
+  rendererDefinitionState?: LibraryDefinitionState;
+  rendererDefinition?: Fmt.Definition;
 
   componentDidMount(): void {
     if (this.props.interactionHandler) {
@@ -42,16 +33,6 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps, 
   }
 
   componentDidUpdate(prevProps: LibraryItemProps): void {
-    if (this.props.libraryDataProvider !== prevProps.libraryDataProvider
-        || this.props.definition !== prevProps.definition
-        || this.props.definition.state !== this.state.definitionState
-        || this.props.templates !== prevProps.templates
-        || Object.keys(this.props).some((key: string) => (this.props as any)[key] !== (prevProps as any)[key])) {
-      this.setState({
-        definitionState: this.props.definition.state,
-        renderer: this.createRenderer(this.props)
-      });
-    }
     if (this.props.interactionHandler !== prevProps.interactionHandler) {
       if (prevProps.interactionHandler) {
         prevProps.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
@@ -73,13 +54,27 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps, 
     }
   }
 
+  protected getRenderer(): Logic.LogicRenderer | undefined {
+    if (!this.rendererProps
+        || Object.keys(this.props).some((key: string) => (this.props as any)[key] !== (this.rendererProps as any)[key])
+        || this.props.definition.state !== this.rendererDefinitionState
+        || this.props.definition.definition !== this.rendererDefinition) {
+      this.renderer = this.createRenderer(this.props);
+      this.rendererProps = {...this.props};
+      this.rendererDefinitionState = this.props.definition.state;
+      this.rendererDefinition = this.props.definition.definition;
+    }
+    return this.renderer;
+  }
+
   protected abstract onExpressionChanged: (editorUpdateRequired: boolean) => void;
 }
 
 class LibraryItem extends LibraryItemBase {
   render(): React.ReactNode {
-    if (this.state.renderer) {
-      let expression = this.state.renderer.renderDefinition(this.props.itemInfo, this.props.options);
+    let renderer = this.getRenderer();
+    if (renderer) {
+      let expression = renderer.renderDefinition(this.props.itemInfo, this.props.options);
       if (expression) {
         return <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>;
       }
@@ -94,8 +89,9 @@ class LibraryItem extends LibraryItemBase {
           this.props.interactionHandler.expressionChanged(true);
         }
       };
-      if (this.state.renderer) {
-        this.state.renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
+      let renderer = this.getRenderer();
+      if (renderer) {
+        renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
       }
     }
   }

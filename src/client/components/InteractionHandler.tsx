@@ -3,8 +3,8 @@ import * as Fmt from '../../shared/format/format';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
-import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
+import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import renderPromise from './PromiseHelper';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
@@ -85,9 +85,9 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     super();
   }
 
-  expressionChanged(editorUpdateRequired: boolean = true): void {
-    if (this.definition) {
-      this.definition.then((definition: LibraryDefinition) => (definition.modified = true));
+  expressionChanged(editorUpdateRequired: boolean = true, notifyLibraryDataProvider: boolean = true): void {
+    if (notifyLibraryDataProvider && this.definition) {
+      this.definition.then((definition: LibraryDefinition) => this.libraryDataProvider.localItemModified(definition));
     }
     super.expressionChanged(editorUpdateRequired);
   }

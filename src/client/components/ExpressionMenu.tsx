@@ -53,6 +53,14 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
       if (this.props.menu.variable) {
         className += ' variable';
       }
+      let style: React.CSSProperties = {};
+      let bodyStyle = window.getComputedStyle(document.body);
+      if (bodyStyle.fontFamily) {
+        style.fontFamily = bodyStyle.fontFamily;
+      }
+      if (bodyStyle.fontSize) {
+        style.fontSize = bodyStyle.fontSize;
+      }
       let ref = (htmlNode: HTMLDivElement | null) => {
         if (htmlNode && !this.scrolled) {
           this.scrolled = true;
@@ -64,7 +72,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         }
       };
       return (
-        <div className={className} ref={ref}>
+        <div className={className} style={style} ref={ref}>
           <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
             <tbody>
               {rows}

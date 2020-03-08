@@ -1,11 +1,13 @@
 {
     "name": "slate",
     "displayName": "Slate",
-    "description": "Provides syntax highlighting for the Slate proof assistant language.",
+    "description": "Provides syntax highlighting, navigation, auto-completion, and GUI integration for the Slate proof assistant language.",
     "version": "0.0.1",
+    "publisher": "SReichelt",
     "engines": {
-        "vscode": "^1.26.0"
+        "vscode": "^1.42.0"
     },
+    "repository": "github:sreichelt/slate",
     "categories": [
         "Programming Languages"
     ],
@@ -34,20 +36,35 @@
             "slate": {
                 "files.encoding": "utf-8"
             }
-        }
+        },
+        "commands": [
+            {
+                "command": "slate.showGraphicalEditor",
+                "title": "Show graphical editor",
+                "category": "Slate",
+                "when": "editorLangId == slate"
+            }
+        ]
     },
     "activationEvents": [
-        "onLanguage:slate"
+        "onLanguage:slate",
+        "onCommand:slate.showGraphicalEditor"
     ],
     "main": "./out/vscode/src/formatExtension",
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "compile": "npm run prepare-compile && tsc -p ./",
+        "watch": "npm run prepare-compile && tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "prepare-compile": "mkdir -p ./webview && cp -r ../../dist/public ./webview/ && mkdir -p ./webview/fonts/HTML-CSS && cp -r ../../node_modules/mathjax/fonts/HTML-CSS/TeX ./webview/fonts/HTML-CSS/"
+    },
+    "dependencies": {
+        "vscode": "*",
+        "ejs": "^3.0.1"
     },
     "devDependencies": {
+        "@types/ejs": "^3.0.1",
         "@types/mocha": "^2.2.42",
         "@types/node": "^8.10.59",
         "@types/vscode": "^1.42.0",

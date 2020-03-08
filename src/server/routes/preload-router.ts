@@ -11,7 +11,7 @@ import CachedPromise from '../../shared/data/cachedPromise';
 
 abstract class UpdateChecker {
   register(callback: () => CachedPromise<void>): void {
-    setTimeout(() => this.execute(callback), 0);
+    setImmediate(() => this.execute(callback));
   }
 
   protected abstract execute(callback: () => CachedPromise<void>): void;
