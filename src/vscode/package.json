@@ -59,8 +59,6 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "package": "vsce package"
     },
     "dependencies": {
@@ -73,7 +71,6 @@
         "@types/vscode": "^1.42.0",
         "tslint": "^6.0.0",
         "typescript": "^3.8.3",
-        "vsce": "^1.74.0",
-        "vscode": "*"
+        "vsce": "^1.74.0"
     }
 }
