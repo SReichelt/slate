@@ -15,7 +15,7 @@ import { fileExtension, getFileNameFromPathStr, getFileNameFromPath, getMetaMode
 import { WorkspaceFileAccessor } from './workspaceFileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import { languageId, SLATE_MODE } from './slate';
-import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery } from './utils';
+import { RangeInfo, convertRange, convertRangeInfo, areUrisEqual, matchesQuery, replaceDocumentText } from './utils';
 import * as LogicExtension from './logicExtension';
 import * as WebviewExtension from './webviewExtension';
 
@@ -1233,12 +1233,9 @@ class SlateDocumentFormatter implements vscode.DocumentFormattingEditProvider {
                 return undefined;
             }
             let formatted = FmtWriter.writeString(file);
-            if (formatted !== unformatted) {
-                let range = new vscode.Range(
-                    document.positionAt(0),
-                    document.positionAt(unformatted.length)
-                );
-                return [new vscode.TextEdit(range, formatted)];
+            let textEdit = replaceDocumentText(document, formatted);
+            if (textEdit) {
+                return [textEdit];
             }
         } catch (error) {
         }

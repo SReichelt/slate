@@ -51,3 +51,28 @@ export function matchesQuery(name: string, query: string): boolean {
     }
     return true;
 }
+
+export function replaceDocumentText(document: vscode.TextDocument, newText: string): vscode.TextEdit | undefined {
+    let oldText = document.getText();
+    if (newText === oldText) {
+        return undefined;
+    }
+    let start = 0;
+    for (; start < newText.length && start < oldText.length; start++) {
+        if (newText.charAt(start) !== oldText.charAt(start)) {
+            break;
+        }
+    }
+    let oldEnd = oldText.length;
+    let newEnd = newText.length;
+    for (; oldEnd > start && newEnd > start; oldEnd--, newEnd--) {
+        if (newText.charAt(newEnd - 1) !== oldText.charAt(oldEnd - 1)) {
+            break;
+        }
+    }
+    let range = new vscode.Range(
+        document.positionAt(start),
+        document.positionAt(oldEnd)
+    );
+    return new vscode.TextEdit(range, newText.substring(start, newEnd));
+}

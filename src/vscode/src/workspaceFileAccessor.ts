@@ -2,13 +2,14 @@
 
 import * as vscode from 'vscode';
 import { TextDecoder } from 'util';
-import { areUrisEqual } from './utils';
+import { areUrisEqual, replaceDocumentText } from './utils';
 import { FileAccessor, FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
 import { StandardWatchableFileContents, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class WorkspaceFileAccessor implements FileAccessor {
     private watchers: StandardFileWatcher[] = [];
+    private applyingEdit = false;
 
     readFile(uri: string): CachedPromise<FileContents> {
         let vscodeUri = vscode.Uri.parse(uri);
@@ -34,34 +35,15 @@ export class WorkspaceFileAccessor implements FileAccessor {
             let workspaceEdit = new vscode.WorkspaceEdit;
             workspaceEdit.createFile(vscodeUri);
             workspaceEdit.insert(vscodeUri, new vscode.Position(0, 0), text);
-            resultPromise = vscode.workspace.applyEdit(workspaceEdit)
-                .then(() => {});
+            resultPromise = this.applyEdit(workspaceEdit, false);
         } else {
             resultPromise = vscode.workspace.openTextDocument(vscodeUri)
                 .then((document: vscode.TextDocument) => {
-                    let currentText = document.getText();
-                    if (text !== currentText) {
-                        let start = 0;
-                        for (; start < text.length && start < currentText.length; start++) {
-                            if (text.charAt(start) !== currentText.charAt(start)) {
-                                break;
-                            }
-                        }
-                        let oldEnd = currentText.length;
-                        let newEnd = text.length;
-                        for (; oldEnd > start && newEnd > start; oldEnd--, newEnd--) {
-                            if (text.charAt(newEnd - 1) !== currentText.charAt(oldEnd - 1)) {
-                                break;
-                            }
-                        }
+                    let textEdit = replaceDocumentText(document, text);
+                    if (textEdit) {
                         let workspaceEdit = new vscode.WorkspaceEdit;
-                        let range = new vscode.Range(
-                            document.positionAt(start),
-                            document.positionAt(oldEnd)
-                        );
-                        workspaceEdit.replace(vscodeUri, range, text.substring(start, newEnd));
-                        return vscode.workspace.applyEdit(workspaceEdit)
-                            .then(() => {});
+                        workspaceEdit.set(vscodeUri, [textEdit]);
+                        return this.applyEdit(workspaceEdit, false);
                     }
                     return undefined;
                 });
@@ -91,20 +73,15 @@ export class WorkspaceFileAccessor implements FileAccessor {
         for (let document of vscode.workspace.textDocuments) {
             if (areUrisEqual(document.uri, vscodeUri)) {
                 if (document.isDirty) {
-                    let currentText = document.getText();
                     let resultPromise = vscode.workspace.fs.readFile(vscodeUri)
                         .then((buffer: Uint8Array) => {
                             let textDecoder = new TextDecoder;
                             let text = textDecoder.decode(buffer);
-                            if (text !== currentText) {
+                            let textEdit = replaceDocumentText(document, text);
+                            if (textEdit) {
                                 let workspaceEdit = new vscode.WorkspaceEdit;
-                                let range = new vscode.Range(
-                                    document.positionAt(0),
-                                    document.positionAt(currentText.length)
-                                );
-                                workspaceEdit.replace(vscodeUri, range, text);
-                                return vscode.workspace.applyEdit(workspaceEdit)
-                                    .then(() => {});
+                                workspaceEdit.set(vscodeUri, [textEdit]);
+                                return this.applyEdit(workspaceEdit, true);
                             }
                             return undefined;
                         });
@@ -127,12 +104,27 @@ export class WorkspaceFileAccessor implements FileAccessor {
     }
 
     documentChanged(document: vscode.TextDocument): void {
+        if (this.applyingEdit) {
+            return;
+        }
         for (let watcher of this.watchers) {
             if (areUrisEqual((watcher.contents as WorkspaceFileContents).uri, document.uri)) {
                 watcher.contents.text = document.getText();
                 watcher.changed();
             }
         }
+    }
+
+    private applyEdit(workspaceEdit: vscode.WorkspaceEdit, notifyWatchers: boolean): Thenable<void> {
+        let finished: () => void;
+        if (notifyWatchers) {
+            finished = () => {};
+        } else {
+            this.applyingEdit = true;
+            finished = () => { this.applyingEdit = false; };
+        }
+        return vscode.workspace.applyEdit(workspaceEdit)
+            .then(finished, finished);
     }
 }
 

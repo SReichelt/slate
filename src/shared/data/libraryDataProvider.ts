@@ -339,6 +339,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
                   try {
                     libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel);
                     libraryDefinition.definition = this.getMainDefinition(libraryDefinition.file, definitionName);
+                    let currentEditedDefinition = this.editedDefinitions.get(name);
+                    if (currentEditedDefinition) {
+                      currentEditedDefinition.file = libraryDefinition.file.clone();
+                      currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
+                    }
                   } catch (error) {
                     this.fullyLoadedDefinitions.delete(name);
                     watcher.close();
@@ -590,7 +595,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let clonedFile = libraryDefinition.file.clone();
     let clonedLibraryDefinition: LibraryDefinition = {
       file: clonedFile,
-      definition: clonedFile.definitions[0],
+      definition: this.getMainDefinition(clonedFile, name),
       state: LibraryDefinitionState.Editing,
       modified: false
     };
