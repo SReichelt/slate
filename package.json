@@ -4,7 +4,7 @@
   "description": "Slate Proof Assistant",
   "main": "index.js",
   "engines": {
-    "node": ">=10.15.2"
+    "node": ">=13.9.0"
   },
   "scripts": {
     "postinstall": "npm install --prefix ./src/vscode",
@@ -18,7 +18,7 @@
     "dev-client": "cd src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server/server.js\"",
-    "build-vscode": "cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
+    "build-vscode": "cd src/vscode && ls ./node_modules && vsce package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\""
   },

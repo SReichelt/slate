@@ -58,8 +58,7 @@
         "clean": "rimraf out",
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "package": "./node_modules/vsce/out/vsce package"
+        "watch": "tsc -watch -p ./"
     },
     "dependencies": {
         "ejs": "^3.0.1"
