@@ -20,7 +20,7 @@
     "build-vscode": "cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\"",
-    "heroku-prebuild": "cd src/vscode && npm install"
+    "heroku-prebuild": "npm install --prefix ./src/vscode"
   },
   "license": "MIT",
   "author": "Sebastian Reichelt",
