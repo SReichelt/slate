@@ -7,7 +7,10 @@
     "engines": {
         "vscode": "^1.42.0"
     },
+    "license": "MIT",
+    "author": "Sebastian Reichelt",
     "repository": "github:sreichelt/slate",
+    "homepage": "https://sreichelt.github.io/slate",
     "categories": [
         "Programming Languages"
     ],
@@ -53,22 +56,23 @@
     "main": "./out/vscode/src/formatExtension",
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "npm run prepare-compile && tsc -p ./",
-        "watch": "npm run prepare-compile && tsc -watch -p ./",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "prepare-compile": "mkdir -p ./webview && cp -r ../../dist/public ./webview/ && mkdir -p ./webview/fonts/HTML-CSS && cp -r ../../node_modules/mathjax/fonts/HTML-CSS/TeX ./webview/fonts/HTML-CSS/"
+        "package": "vsce package"
     },
     "dependencies": {
-        "vscode": "*",
         "ejs": "^3.0.1"
     },
     "devDependencies": {
         "@types/ejs": "^3.0.1",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^8.10.59",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "^13.9.0",
         "@types/vscode": "^1.42.0",
-        "tslint": "^5.20.1",
-        "typescript": "^2.6.1"
+        "tslint": "^6.0.0",
+        "typescript": "^3.8.3",
+        "vsce": "^1.74.0",
+        "vscode": "*"
     }
 }
