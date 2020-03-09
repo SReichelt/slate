@@ -59,7 +59,7 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "package": "vsce package"
+        "package": "./node_modules/vsce/out/vsce package"
     },
     "dependencies": {
         "ejs": "^3.0.1"
