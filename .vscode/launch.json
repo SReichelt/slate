@@ -14,7 +14,7 @@
                 "dev"
             ],
             "port": 9229,
-            "timeout": 60000
+            "timeout": 120000
         },
         {
             "type": "chrome",
@@ -27,7 +27,7 @@
                 "webpack:///../*": "${webRoot}/../*",
                 "webpack:///*":    "*"
             },
-            "timeout": 60000
+            "timeout": 120000
         },
         {
             "type": "firefox",

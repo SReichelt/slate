@@ -11,7 +11,8 @@ import config from '../utils/config';
 import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
-import 'simplemde/dist/simplemde.min.css';
+import * as SimpleMDE from 'easymde';
+import 'easymde/dist/easymde.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
 

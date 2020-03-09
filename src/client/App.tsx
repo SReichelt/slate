@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './App.css';
 import SplitPane from 'react-split-pane';
-import { withAlert, InjectedAlertProp } from 'react-alert';
+import { withAlert, AlertManager } from 'react-alert';
 import ScrollPane from './components/ScrollPane';
 import StartPage from './components/StartPage';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
@@ -41,7 +41,7 @@ const appName = 'Slate';
 const selectedLibraryName = 'hlm';
 
 interface AppProps {
-  alert: InjectedAlertProp;
+  alert: AlertManager;
 }
 
 interface SelectionState {
@@ -261,7 +261,7 @@ class App extends React.Component<AppProps, AppState> {
         let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
         this.setState({
           templates: templates,
-          rootInteractionHandler: this.createInteractionHandler(this.libraryDataProvider, templates, this.state.selectedItemDefinition)
+          rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, undefined, this.linkClicked)
         });
         if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
           this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
@@ -911,4 +911,4 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-export default withAlert(App);
+export default withAlert()(App);
