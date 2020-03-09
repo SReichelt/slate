@@ -2,10 +2,11 @@
   "name": "slate",
   "version": "0.1.0",
   "description": "Slate Proof Assistant",
+  "license": "MIT",
+  "author": "Sebastian Reichelt",
+  "repository": "github:sreichelt/slate",
+  "homepage": "https://sreichelt.github.io/slate",
   "main": "index.js",
-  "engines": {
-    "node": ">=13.9.0"
-  },
   "scripts": {
     "postinstall": "NODE_ENV= npm install --prefix ./src/vscode",
     "clean": "rimraf dist",
@@ -23,10 +24,9 @@
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\" && npm run package-vscode"
   },
-  "license": "MIT",
-  "author": "Sebastian Reichelt",
-  "repository": "github:sreichelt/slate",
-  "homepage": "https://sreichelt.github.io/slate",
+  "engines": {
+    "node": ">=13.9.0"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
     "bn.js": "^5.1.1",
