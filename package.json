@@ -7,6 +7,7 @@
     "node": ">=6.9.5"
   },
   "scripts": {
+    "postinstall": "npm install --prefix ./src/vscode",
     "clean": "rimraf dist",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "test": "src/scripts/checkLibrary.sh && jest",
@@ -19,8 +20,7 @@
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server/server.js\"",
     "build-vscode": "cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
-    "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\"",
-    "heroku-prebuild": "npm install --prefix ./src/vscode"
+    "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\""
   },
   "license": "MIT",
   "author": "Sebastian Reichelt",

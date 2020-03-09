@@ -55,6 +55,7 @@
     ],
     "main": "./out/vscode/src/formatExtension",
     "scripts": {
+        "clean": "rimraf out",
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
