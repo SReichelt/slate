@@ -17,11 +17,13 @@ export function apiRouter(rootPath: string): express.Router {
   let router = express.Router();
   let dataPath = path.join(rootPath, 'data');
   let docPath = path.join(rootPath, 'docs');
+  let downloadPath = path.join(rootPath, 'download');
   let fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
 
   router.use(express.static(dataPath));
 
   router.use('/docs', express.static(docPath));
+  router.use('/download', express.static(downloadPath));
   router.use('/fonts', express.static(fontPath));
 
   let mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
