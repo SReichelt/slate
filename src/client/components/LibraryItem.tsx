@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './LibraryItem.css';
 import * as Fmt from '../../shared/format/format';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
@@ -76,7 +77,11 @@ class LibraryItem extends LibraryItemBase {
     if (renderer) {
       let expression = renderer.renderDefinition(this.props.itemInfo, this.props.options);
       if (expression) {
-        return <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>;
+        return (
+          <div className="library-item">
+            <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>
+          </div>
+        );
       }
     }
     return null;

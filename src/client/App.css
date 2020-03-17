@@ -1,82 +1,20 @@
 body {
+  font-family: var(--font-family);
   overflow: hidden;
+  color: var(--foreground-color);
+  background-color: var(--background-color);
 }
 
 .error {
   display: inline-block;
-  color: red;
-  font-family: sans;
-  border: solid 1pt red;
+  color: var(--error-foreground-color);
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
+  border: solid 1pt var(--error-foreground-color);
   padding: 2pt;
   margin: 2pt;
-}
-
-.input-error {
-  background-color: #ffe0e0 !important;
-}
-
-.hoverable:hover, .editor-toolbar a.fa:hover, .expr.hover, .expr.hover span, .menu.hover>.menu-row>.menu-placeholder-cell, .menu.hover>.menu-row>.menu-dropdown-cell, .menu.hidden.hover>.menu-row>.menu-cell, .open-menu .hover, .open-menu .selected.hover {
-  background-color: #ffd700;
-}
-
-.hoverable.selected, .menu-button.open, .menu.open>.menu-row>.menu-placeholder-cell, .menu.open>.menu-row>.menu-dropdown-cell, .open-menu .selected {
-  background-color: #f2cd00;
-}
-
-.hoverable.pressed:hover, .menu.pressed>.menu-row>.menu-placeholder-cell:hover {
-  background-color: #e0c000;
-}
-
-.expr.definition.hover, .expr.definition.hover span, .expr.definition>.menu.hover>.menu-row>.menu-placeholder-cell, .expr.definition>.menu.hover>.menu-row>.menu-dropdown-cell {
-  background-color: #80ff00;
-}
-
-.expr.definition>.menu.open>.menu-row>.menu-placeholder-cell, .expr.definition>.menu.open>.menu-row>.menu-dropdown-cell {
-  background-color: #74e700;
-}
-
-.menu.hover {
-  border-color: #c0c0c0;
-}
-
-.menu.open {
-  border-color: #a0a0a0;
-}
-
-.example:hover {
-  background-color: #fff09b;
-}
-
-.menu.hover .menu-cell {
-  background-color: #fdefbd;
-}
-
-.expr.definition>.menu.hover .menu-cell {
-  background-color: #daffb5;
-}
-
-.menu.open .menu-cell {
-  background-color: #f8e8a0;
-}
-
-.expr.definition>.menu.open .menu-cell {
-  background-color: #c9fc97;
-}
-
-.menu.hover .menu-placeholder-cell, .menu.open .menu-placeholder-cell, .menu.hover .menu-dropdown-cell, .menu.open .menu-dropdown-cell {
-  color: #606060;
-}
-
-.disabled {
-  color: gray;
-}
-
-.ok.enabled, .submit.enabled {
-  color: green;
-}
-
-.cancel.enabled {
-  color: red;
 }
 
 .app {
@@ -114,7 +52,7 @@ body {
   right: 0;
   bottom: 0;
   height: 1.5em;
-  background-color: #f0f0f0;
+  background-color: var(--toolbar-background-color);
   z-index: 1;
 }
 
@@ -132,6 +70,10 @@ body {
   vertical-align: middle;
 }
 
+.Resizer {
+  background-color: var(--resizer-color);
+}
+
 .Resizer.vertical {
   width: 5pt;
   cursor: col-resize;
@@ -143,7 +85,7 @@ body {
 }
 
 .Resizer:hover {
-  background-color: #e0e0e0;
+  background-color: var(--resizer-hover-color);
 }
 
 .submitting {
@@ -155,4 +97,12 @@ body {
 
 .empty-list {
   text-align: right;
+}
+
+a {
+  color: var(--link-foreground-color)
+}
+
+a:active {
+  color: var(--link-active-foreground-color)
 }

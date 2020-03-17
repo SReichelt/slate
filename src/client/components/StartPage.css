@@ -17,16 +17,20 @@
 }
 
 .example-container:not(:last-child) {
-  border-right: dotted 1px gray;
+  border-right: dotted 1px var(--item-separator-color);
 }
 
 .example {
   display: block;
   padding: 1ex;
-  background-color: #ececec;
+  background-color: var(--item-background-color-2);
   cursor: pointer;
   text-decoration: initial;
   color: initial;
+}
+
+.example:hover {
+  background-color: var(--expression-light-hover-background-color);
 }
 
 .example>* {

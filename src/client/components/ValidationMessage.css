@@ -15,6 +15,8 @@
   margin-bottom: 2pt;
   box-shadow: 1pt 2pt 5pt maroon;
   user-select: none;
-  font-family: sans;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
   font-size: smaller;
+  font-style: normal;
 }

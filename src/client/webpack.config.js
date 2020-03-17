@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const version = require('../../package.json').version;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
 const config = require('../server/config');
@@ -14,14 +15,12 @@ const additionalHeadElementsDefault = `
     font-family: sans-serif;
   }
 </style>
+<link href="public/theme-default.css" rel="stylesheet" />
 `;
 const additionalHeadElementsEmbedded = `
 <base href="<%= baseURL %>" />
-<style>
-  body {
-    font-size: initial;
-  }
-</style>
+<meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
+<link href="public/theme-vscode.css" rel="stylesheet" />
 `;
 
 const plugins = [
@@ -37,7 +36,12 @@ const plugins = [
     filename: 'embedded.ejs',
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsEmbedded
-  })
+  }),
+  new CopyWebpackPlugin([
+    {
+      from: 'theme-*.css'
+    }
+  ])
 ];
 
 if (!config.IS_PRODUCTION) {

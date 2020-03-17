@@ -171,7 +171,8 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         let baseURL = webview.asWebviewUri(webViewURI);
 
         let indexTemplatePromise = ejs.renderFile(indexTemplateFileName, {
-            'baseURL': baseURL.toString()
+            'baseURL': baseURL.toString(),
+            'cspSource': webview.cspSource
         });
         indexTemplatePromise.then((indexTemplate: string) => {
             if (panel) {

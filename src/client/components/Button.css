@@ -1,13 +1,18 @@
 .button {
   display: inline-block;
-  height: 1em;
-  min-width: 1.5em;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
   line-height: 100%;
-  padding: 0.25em;
   vertical-align: middle;
   text-align: center;
   white-space: nowrap;
-  background-color: #e0e0e0;
+  height: 1em;
+  min-width: 1.5em;
+  padding: 0.25em;
+  color: var(--button-foreground-color);
+  background-color: var(--button-background-color);
   user-select: none;
 }
 
@@ -15,8 +20,20 @@
   cursor: pointer;
 }
 
+.button.hoverable:hover {
+  background-color: var(--button-hover-background-color);
+}
+
+.button.selected {
+  background-color: var(--button-selected-background-color);
+}
+
+.button.hoverable.pressed:hover {
+  background-color: var(--button-pressed-background-color);
+}
+
 .button.standalone {
-  border: solid 1px #d0d0d0;
+  border: solid 1px var(--button-border-color);
   border-radius: 2px;
   min-width: 1em;
   padding: 0.125em;

@@ -3,6 +3,10 @@
   cursor: default;
 }
 
+.menu-button.open {
+  background-color: var(--button-selected-background-color);
+}
+
 .menu-button-popup {
   position: absolute;
   left: 0;
@@ -22,4 +26,24 @@
 .menu-button-popup>* {
   display: block;
   text-align: left;
+}
+
+.menu-button-popup .button {
+  color: var(--menu-foreground-color);
+  background-color: var(--menu-background-color);
+}
+
+.menu-button-popup .button.hoverable:hover {
+  color: var(--menu-hover-foreground-color);
+  background-color: var(--menu-hover-background-color);
+}
+
+.menu-button-popup .button.selected {
+  color: var(--menu-selected-foreground-color);
+  background-color: var(--menu-selected-background-color);
+}
+
+.menu-button-popup .button.hoverable.pressed:hover {
+  color: var(--menu-hover-foreground-color);
+  background-color: var(--menu-hover-background-color);
 }

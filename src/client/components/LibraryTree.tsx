@@ -733,8 +733,8 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
               }
             }
             let previewStyle = {
-              style: {'background': '#fff8c0'},
-              arrowStyle: {'color': '#fff8c0'}
+              style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
+              arrowStyle: {'color': 'var(--tooltip-background-color)'}
             };
             let preview = (
               <ToolTip active={showPreview} position="right" arrow="center" parent={this} style={previewStyle} key="preview">

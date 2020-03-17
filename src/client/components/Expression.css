@@ -7,6 +7,14 @@
   text-align: left;
 }
 
+.expr.hover, .expr.hover span {
+  background-color: var(--expression-hover-background-color);
+}
+
+.expr.definition.hover, .expr.definition.hover span {
+  background-color: var(--definition-hover-background-color);
+}
+
 span.expr.interactive {
   cursor: text;
 }
@@ -107,7 +115,7 @@ div.display-math {
 
 .addendum {
   font-size: 75%;
-  color: gray;
+  color: var(--addendum-foreground-color);
 }
 
 .display-math>.aligned-row>.aligned-left, .display-math>.aligned-row>.aligned-right {
@@ -288,12 +296,12 @@ div.display-math {
 }
 
 .paren-left-hairline {
-  border-left: dashed 1px gray;
+  border-left: dashed 1px var(--light-foreground-color);
   padding-left: 1pt;
 }
 
 .paren-right-hairline {
-  border-right: dashed 1px gray;
+  border-right: dashed 1px var(--light-foreground-color);
   padding-right: 1pt;
 }
 
@@ -535,16 +543,16 @@ div.display-math {
 }
 
 .dummy {
-  color: #606060;
+  color: var(--dummy-foreground-color);
 }
 
 .var.dummy {
-  border: 1px dotted #e0e0a0;
+  border: 1px dotted var(--dummy-border-color);
   margin: -1px;
 }
 
 .open-menu .dummy {
-  color: #a0a0a0;
+  color: var(--dummy-foreground-color-menu);
 }
 
 .bold {
@@ -572,7 +580,9 @@ div.display-math {
 }
 
 .monospace, .source-code, .source-code .expr {
-  font-family: 'Courier New', 'Courier', monospace;
+  font-family: var(--source-code-font-family);
+  font-weight: var(--source-code-font-weight);
+  font-size: var(--source-code-font-size);
   font-style: normal;
 }
 
@@ -607,15 +617,15 @@ div.display-math {
 }
 
 .arg {
-  color: gray;
+  color: var(--source-code-arg-foreground-color);
 }
 
 .keyword, .keyword .expr, .comment .keyword, .comment .keyword .expr, .meta-ref, .meta-ref .expr {
-  color: blue;
+  color: var(--source-code-keyword-foreground-color);
 }
 
 .comment, .comment .expr {
-  color: green;
+  color: var(--source-code-comment-foreground-color);
 }
 
 .source-code .var {
@@ -625,12 +635,12 @@ div.display-math {
 
 .source-code.string {
   font-family: 'TeX', serif;
-  color: maroon;
+  color: var(--source-code-string-foreground-color);
 }
 
 .source-code.number {
   font-family: 'TeX', serif;
-  color: teal;
+  color: var(--source-code-number-foreground-color);
 }
 
 .expr svg {
@@ -650,7 +660,7 @@ div.display-math {
 
 .preview>a {
   text-decoration: initial;
-  color: initial;
+  color: unset;
 }
 
 .menu-container {
@@ -661,14 +671,18 @@ div.display-math {
 
 .menu {
   display: inline-table;
-  border: solid 1px #d0d0d0;
+  border: solid 1px var(--expression-menu-border-color);
   border-radius: 2px;
   border-collapse: initial;
   border-spacing: 0;
 }
 
 .menu.hidden {
-  border: solid 1px #e0e0e0;
+  border: solid 1px var(--expression-menu-hidden-border-color);
+}
+
+.menu.hover {
+  border-color: var(--expression-menu-hover-border-color);
 }
 
 .menu-row {
@@ -679,14 +693,22 @@ div.display-math {
   display: table-cell;
   padding: 2px 3px;
   cursor: default;
-  background-color: #fcfcfc;
+  background-color: var(--expression-menu-background-color);
 }
 
 .menu-placeholder-cell, .menu-dropdown-cell {
   display: table-cell;
   vertical-align: middle;
-  color: #808080;
-  background-color: #e0e0e0;
+  color: var(--dropdown-foreground-color);
+  background-color: var(--dropdown-background-color);
+}
+
+.menu.hover .menu-placeholder-cell, .menu.hover .menu-dropdown-cell {
+  color: var(--dropdown-hover-foreground-color);
+}
+
+.menu.open .menu-placeholder-cell, .menu.open .menu-dropdown-cell {
+  color: var(--dropdown-selected-foreground-color);
 }
 
 .menu.interactive>.menu-row>.menu-placeholder-cell, .menu.interactive>.menu-row>.menu-dropdown-cell {
@@ -705,33 +727,82 @@ div.display-math {
 }
 
 .menu-dropdown-cell {
-  font-family: sans-serif;
+  font-family: var(--font-family);
   font-style: normal;
-  font-weight: normal;
+  font-weight: var(--font-weight);
   font-size: 50%;
+}
+
+.menu.hover>.menu-row>.menu-placeholder-cell, .menu.hover>.menu-row>.menu-dropdown-cell, .menu.hidden.hover>.menu-row>.menu-cell {
+  background-color: var(--expression-hover-background-color);
+}
+
+.menu.open>.menu-row>.menu-placeholder-cell, .menu.open>.menu-row>.menu-dropdown-cell {
+  background-color: var(--expression-selected-background-color);
+}
+
+.menu.pressed>.menu-row>.menu-placeholder-cell:hover {
+  background-color: var(--expression-pressed-background-color);
+}
+
+.expr.definition>.menu.hover>.menu-row>.menu-placeholder-cell, .expr.definition>.menu.hover>.menu-row>.menu-dropdown-cell {
+  background-color: var(--definition-hover-background-color);
+}
+
+.expr.definition>.menu.open>.menu-row>.menu-placeholder-cell, .expr.definition>.menu.open>.menu-row>.menu-dropdown-cell {
+  background-color: var(--definition-selected-background-color);
+}
+
+.menu.open {
+  border-color: var(--expression-menu-selected-border-color);
+}
+
+.menu.hover .menu-cell {
+  background-color: var(--expression-light-hover-background-color);
+}
+
+.expr.definition>.menu.hover .menu-cell {
+  background-color: var(--definition-light-hover-background-color);
+}
+
+.menu.open .menu-cell {
+  background-color: var(--expression-light-selected-background-color);
+}
+
+.expr.definition>.menu.open .menu-cell {
+  background-color: var(--definition-light-selected-background-color);
 }
 
 .expr-input, .expr-textarea {
   font-family: inherit;
   font-size: inherit;
+  color: var(--input-foreground-color);
+  background-color: var(--input-background-color);
+  border: solid 1px var(--input-border-color);
+  border-radius: 2px;
 }
 
 .expr-input {
   text-align: center;
-  color: black;
-  background-color: white;
-  border: solid 1px silver;
-  border-radius: 2px;
 }
 
-.expr-input.hover {
+.hover .expr-input {
   color: inherit;
   background-color: inherit;
+}
+
+.expr-input.input-error {
+  background-color: var(--input-error-background-color);
 }
 
 .expr-textarea {
   width: 100%;
 	min-height: 4em;
+}
+
+.expr .CodeMirror {
+  color: var(--input-foreground-color);
+  background-color: var(--input-background-color);
 }
 
 .expr .CodeMirror, .expr .CodeMirror-scroll {
@@ -744,4 +815,14 @@ div.display-math {
 
 .expr .editor-toolbar:after {
   margin-top: 1px;
+}
+
+.expr .editor-toolbar button {
+  color: var(--foreground-color);
+  background-color: var(--background-color);
+}
+
+.expr .editor-toolbar button:hover {
+  color: var(--button-foreground-color);
+  background-color: var(--button-hover-background-color);
 }

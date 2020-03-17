@@ -15,7 +15,14 @@
 
 .tree-search-input {
   width: 100%;
-  font-size: unset;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
+  color: var(--input-foreground-color);
+  background-color: var(--input-background-color);
+  border: solid 1px var(--input-border-color);
+  border-radius: 2px;
 }
 
 .tree-area {
@@ -39,23 +46,33 @@
 
 .tree-contents:empty::after {
   content: 'No matching items found.';
-  color: gray;
+  color: var(--disabled-color);
   padding: 2pt;
 }
 
 .tree-item-row {
   display: table-row;
-  background-color: #fcfcfc;
+  background-color: var(--item-background-color-1);
 }
 
 .tree-item-row:nth-child(odd) {
-  background-color: #f8f8f8;
+  background-color: var(--item-background-color-2);
 }
 
 .tree-item {
   display: table-cell;
   text-decoration: initial;
-  color: #000000;
+  color: var(--item-foreground-color);
+}
+
+.tree-item.hoverable:hover {
+  background-color: var(--item-hover-background-color);
+  color: var(--item-hover-foreground-color);
+}
+
+.tree-item.hoverable.selected {
+  background-color: var(--item-selected-background-color);
+  color: var(--item-selected-foreground-color);
 }
 
 .tree-item-contents {
@@ -97,7 +114,7 @@
 
 .tree-item-minor {
   font-size: smaller;
-  color: gray;
+  color: var(--item-minor-foreground-color);
 }
 
 .tree-item-insert-button {

@@ -3,17 +3,30 @@
   top: 100%;
   left: 0;
   z-index: 100;
-  border: solid 1px #a0a0a0;
-  background-color: #f8f8f8;
+  border: solid 1px var(--menu-border-color);
+  color: var(--menu-foreground-color);
+  background-color: var(--menu-background-color);
   cursor: default;
-  box-shadow: 1pt 2pt 5pt silver;
+  box-shadow: 1pt 2pt 5pt var(--shadow-color);
   white-space: nowrap;
   user-select: none;
 }
 
+.open-menu .hover, .open-menu .selected.hover {
+  color: var(--menu-hover-foreground-color);
+  background-color: var(--menu-hover-background-color);
+}
+
+.open-menu .selected {
+  color: var(--menu-selected-foreground-color);
+  background-color: var(--menu-selected-background-color);
+}
+
 .open-menu, .open-menu-row>th, .open-menu-arrow {
-  font-weight: normal;
-  font-style: initial;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
   line-height: initial;
   text-align: left;
 }
@@ -33,15 +46,15 @@
 }
 
 .open-menu-row:not(:last-child)>* {
-  border-bottom: solid 1px #e0e0e0;
+  border-bottom: solid 1px var(--menu-separator-color);
 }
 
 .open-menu-row>*:not(:last-child), .open-menu-content-cell-table .open-menu-row>* {
-  border-right: solid 1px #e0e0e0;
+  border-right: solid 1px var(--menu-separator-color);
 }
 
 .open-menu-row.separated>* {
-  border-top: solid 1px #e0e0e0;
+  border-top: solid 1px var(--menu-separator-color);
 }
 
 .open-menu-title-cell {
@@ -83,4 +96,6 @@
 .open-menu-item input {
   font-family: 'TeX', serif;
   font-size: initial;
+  color: var(--input-foreground-color);
+  background-color: var(--input-background-color);
 }

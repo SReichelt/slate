@@ -419,7 +419,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-round-row'}>
                       <span className={'paren-round-left'}>
                         <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
-                          <path d="M 1 -5 C -0.25 -4 -0.25 4 1 5 C 0 3 0 -3 1 -5 Z" fill="black"/>
+                          <path d="M 1 -5 C -0.25 -4 -0.25 4 1 5 C 0 3 0 -3 1 -5 Z" fill="var(--foreground-color)"/>
                         </svg>
                       </span>
                       <span className={'paren-round-body'}>
@@ -427,7 +427,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                       </span>
                       <span className={'paren-round-right'}>
                         <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
-                          <path d="M 0 -5 C 1.25 -4 1.25 4 0 5 C 1 3 1 -3 0 -5 Z" fill="black"/>
+                          <path d="M 0 -5 C 1.25 -4 1.25 4 0 5 C 1 3 1 -3 0 -5 Z" fill="var(--foreground-color)"/>
                         </svg>
                       </span>
                     </span>
@@ -480,7 +480,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="black"/>
+                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="var(--foreground-color)"/>
                         </svg>
                       </span>
                       <span className={'paren-curly-body'}>
@@ -488,7 +488,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                       </span>
                       <span className={'paren-curly-right'}>
                         <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 0 -5 Q 0.6 -5 0.6 -3.5 L 0.6 -2 Q 0.6 0 1 0 Q 0.6 0 0.6 2 L 0.6 3.5 Q 0.6 5 0 5 Q 0.45 5 0.45 3 L 0.45 1.5 Q 0.45 -0.2 1 0 Q 0.45 0.2 0.45 -1.5 L 0.45 -3 Q 0.45 -5 0 -5 Z" fill="black"/>
+                          <path d="M 0 -5 Q 0.6 -5 0.6 -3.5 L 0.6 -2 Q 0.6 0 1 0 Q 0.6 0 0.6 2 L 0.6 3.5 Q 0.6 5 0 5 Q 0.45 5 0.45 3 L 0.45 1.5 Q 0.45 -0.2 1 0 Q 0.45 0.2 0.45 -1.5 L 0.45 -3 Q 0.45 -5 0 -5 Z" fill="var(--foreground-color)"/>
                         </svg>
                       </span>
                     </span>
@@ -514,7 +514,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-curly-row'}>
                       <span className={'paren-curly-left'}>
                         <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="black"/>
+                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="var(--foreground-color)"/>
                         </svg>
                       </span>
                       <span className={bodyClassName}>
@@ -537,7 +537,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                     <span className={'paren-angle-row'}>
                       <span className={'paren-angle-left'}>
                         <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                          <path d="M 0.9 0 L 0.1 0.5 L 0.9 1" y2="0" stroke="black" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
+                          <path d="M 0.9 0 L 0.1 0.5 L 0.9 1" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
                         </svg>
                       </span>
                       <span className={'paren-angle-body'}>
@@ -545,7 +545,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
                       </span>
                       <span className={'paren-angle-right'}>
                         <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                          <path d="M 0.1 0 L 0.9 0.5 L 0.1 1" y2="0" stroke="black" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
+                          <path d="M 0.1 0 L 0.9 0.5 L 0.1 1" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
                         </svg>
                       </span>
                     </span>
@@ -737,8 +737,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               <span className={'radical-degree-bottom-row'}>
                 <span className={'radical-degree-bottom-cell'}>
                   <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                    <line x1="0" y1="0.35" x2="0.4" y2="0.1" stroke="black" strokeWidth="0.05" strokeLinecap="square"/>
-                    <line x1="0.5" y1="0.12" x2="1" y2="1" stroke="black" strokeWidth="0.2" strokeLinecap="square"/>
+                    <line x1="0" y1="0.35" x2="0.4" y2="0.1" stroke="var(--foreground-color)" strokeWidth="0.05" strokeLinecap="square"/>
+                    <line x1="0.5" y1="0.12" x2="1" y2="1" stroke="var(--foreground-color)" strokeWidth="0.2" strokeLinecap="square"/>
                   </svg>
                 </span>
               </span>
@@ -746,7 +746,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
           <span className={'radical-diagonal'}>
             <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-              <line x1="0" y1="1" x2="0.95" y2="0" stroke="black" strokeWidth="0.1" strokeLinecap="square"/>
+              <line x1="0" y1="1" x2="0.95" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square"/>
             </svg>
           </span>
           <span className={'radical-radicand'}>
@@ -954,8 +954,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             }
           }
           let previewStyle = {
-            style: {'background': '#fff8c0'},
-            arrowStyle: {'color': '#fff8c0'}
+            style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
+            arrowStyle: {'color': 'var(--tooltip-background-color)'}
           };
           let preview = (
             <ToolTip active={showPreview} position={this.tooltipPosition} arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">

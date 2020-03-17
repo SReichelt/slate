@@ -2,6 +2,17 @@
   padding: 0;
   border-radius: 2pt;
   margin: auto auto;
+  color: var(--dialog-foreground-color);
+  background-color: var(--dialog-background-color);
+}
+
+.dialog, .dialog-cell, .dialog input {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
+  line-height: initial;
+  text-align: left;
 }
 
 .dialog-contents {
@@ -9,7 +20,7 @@
 }
 
 .dialog-row.separated {
-  border-top: solid 1px gray;
+  border-top: solid 1px var(--dialog-separator-color);
 }
 
 .dialog-row.separated-above>* {
@@ -22,8 +33,6 @@
 
 .dialog-cell {
   padding: 2pt;
-  font-weight: normal;
-  text-align: left;
 }
 
 .dialog-cell:first-child {
@@ -35,7 +44,7 @@
 }
 
 .dialog-group {
-  border: solid 1px gray;
+  border: solid 1px var(--dialog-group-border-color);
   margin: 0;
   padding: 0;
   width: 17em;
@@ -52,14 +61,14 @@
 }
 
 .dialog-button-row {
-  border-top: solid 1px gray;
-  background-color: #f0f0f0;
+  border-top: solid 1px var(--dialog-button-row-border-color);
+  background-color: var(--dialog-button-row-background-color);
   text-align: right;
 }
 
 .dialog-overlay {
   z-index: 20;
-  background-color: #00000080;
+  background-color: var(--dialog-overlay-color);
 }
 
 .dialog-optional-label {
@@ -67,7 +76,13 @@
 }
 
 .dialog input {
-  font-size: unset;
+  color: var(--input-foreground-color);
+  background-color: var(--input-background-color);
+}
+
+.dialog input.input-error {
+  color: var(--input-error-foreground-color);
+  background-color: var(--input-error-background-color);
 }
 
 .dialog .tree-container {
