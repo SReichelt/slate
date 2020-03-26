@@ -1139,8 +1139,8 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `\n`;
     outFileStr += `export const metaModel = new MetaModel;\n`;
     outFileStr += `\n`;
-    outFileStr += `export function getMetaModel(path: Fmt.Path): MetaModel {\n`;
-    outFileStr += `  if (path.name !== '${metaModel.name}') {\n`;
+    outFileStr += `export function getMetaModel(path?: Fmt.Path): MetaModel {\n`;
+    outFileStr += `  if (path && path.name !== '${metaModel.name}') {\n`;
     outFileStr += `    throw new Error('File of type "${metaModel.name}" expected');\n`;
     outFileStr += `  }\n`;
     outFileStr += `  return metaModel;\n`;

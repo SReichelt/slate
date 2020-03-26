@@ -15,12 +15,25 @@
   background-color: var(--definition-hover-background-color);
 }
 
-span.expr.interactive {
-  cursor: text;
+span.expr.interactive.link {
+  cursor: pointer!important;
 }
 
-span.expr.interactive.link {
-  cursor: pointer;
+span.expr.interactive.link span.expr.interactive {
+  cursor: initial;
+}
+
+.markdown span.expr.interactive.link {
+  text-decoration: underline!important;
+  color: var(--link-foreground-color)
+}
+
+.markdown span.expr.interactive.link:active {
+  color: var(--link-active-foreground-color)
+}
+
+.markdown span.expr.interactive.link span.expr.interactive {
+  text-decoration: initial;
 }
 
 .label, .sub-heading {

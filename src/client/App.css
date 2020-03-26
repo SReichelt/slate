@@ -7,14 +7,14 @@ body {
 
 .error {
   display: inline-block;
-  color: var(--error-foreground-color);
-  font-family: var(--font-family);
-  font-weight: var(--font-weight);
-  font-size: var(--font-size);
-  font-style: normal;
-  border: solid 1pt var(--error-foreground-color);
-  padding: 2pt;
-  margin: 2pt;
+  color: var(--error-foreground-color)!important;
+  font-family: var(--font-family)!important;
+  font-weight: var(--font-weight)!important;
+  font-size: var(--font-size)!important;
+  font-style: normal!important;
+  border: solid 1pt var(--error-foreground-color)!important;
+  padding: 2pt!important;
+  margin: 2pt!important;
 }
 
 .app {

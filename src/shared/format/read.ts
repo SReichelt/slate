@@ -28,6 +28,7 @@ export interface InputStream {
   readChar(): string;
   peekChar(): string;
   getLocation(): Location;
+  fork(): InputStream;
 }
 
 export class StringInputStream implements InputStream {
@@ -72,9 +73,21 @@ export class StringInputStream implements InputStream {
       col: this.col
     };
   }
+
+  fork(): InputStream {
+    let result = new StringInputStream(this.str);
+    result.pos = this.pos;
+    result.endPos = this.endPos;
+    result.line = this.line;
+    result.col = this.col;
+    return result;
+  }
 }
 
-export type ErrorHandler = (msg: string, range: Range) => void;
+export interface ErrorHandler {
+  error(msg: string, range: Range): void;
+  checkMarkdownCode: boolean;
+}
 
 export interface ObjectRangeInfo {
   object: Object;
@@ -111,8 +124,9 @@ export class Reader {
   private markedEnd?: Location;
   private triedChars: string[] = [];
   private atError = false;
+  private metaModel: Meta.MetaModel | undefined;
 
-  constructor(private stream: InputStream, private reportError: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private reportRange?: RangeHandler) {}
+  constructor(private stream: InputStream, private errorHandler: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private reportRange?: RangeHandler) {}
 
   readFile(): Fmt.File {
     let file = this.readPartialFile();
@@ -128,16 +142,19 @@ export class Reader {
     this.readChar('%');
     file.metaModelPath = this.readPath(undefined);
     this.readChar('%');
-    let metaModel: Meta.MetaModel | undefined;
     try {
-      metaModel = this.getMetaModel(file.metaModelPath);
+      this.metaModel = this.getMetaModel(file.metaModelPath);
     } catch (error) {
       this.error(error.message, this.markEnd(fileStart));
-      metaModel = new Meta.DummyMetaModel(file.metaModelPath.name);
+      this.metaModel = new Meta.DummyMetaModel(file.metaModelPath.name);
     }
-    let context = metaModel.getRootContext();
-    this.readDefinitions(file.definitions, metaModel.definitionTypes, context);
-    this.markEnd(fileStart, file, context);
+    try {
+      let context = this.metaModel.getRootContext();
+      this.readDefinitions(file.definitions, this.metaModel.definitionTypes, context);
+      this.markEnd(fileStart, file, context);
+    } finally {
+      this.metaModel = undefined;
+    }
     return file;
   }
 
@@ -672,6 +689,8 @@ export class Reader {
             let inUnescapedName = false;
             let inEscapedName = false;
             let inEscapeSequence = false;
+            let inMarkdownCode = '';
+            let atMarkdownStart = false;
             let kind: string | undefined = undefined;
             let name: string | undefined = undefined;
             let text = '';
@@ -713,6 +732,9 @@ export class Reader {
                 afterAsterisk = false;
               }
               if (isDocumentationComment && c) {
+                if (c !== '`') {
+                  atMarkdownStart = false;
+                }
                 if (c === '\r' || c === '\n') {
                   if (text) {
                     text += c;
@@ -817,6 +839,32 @@ export class Reader {
                       itemStart = commentLineStart;
                     }
                     itemEnd = this.stream.getLocation();
+                    if (c === '`') {
+                      if (inMarkdownCode) {
+                        if (atMarkdownStart) {
+                          inMarkdownCode += c;
+                        } else if (text.endsWith(inMarkdownCode)) {
+                          inMarkdownCode = '';
+                        }
+                      } else {
+                        inMarkdownCode = c;
+                        atMarkdownStart = true;
+                      }
+                      if (atMarkdownStart && this.errorHandler.checkMarkdownCode && this.stream.peekChar() !== '`') {
+                        let origStream = this.stream;
+                        this.stream = this.stream.fork();
+                        try {
+                          let dummyContext = new Ctx.DummyContext(this.metaModel!);
+                          this.readExpression(false, this.metaModel!.functions, dummyContext);
+                          this.skipWhitespace(false);
+                          for (let endChar of inMarkdownCode) {
+                            this.readChar(endChar);
+                          }
+                        } finally {
+                          this.stream = origStream;
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -978,30 +1026,37 @@ export class Reader {
           end: end
         };
       }
-      this.reportError(msg, range);
+      this.errorHandler.error(msg, range);
       this.atError = true;
     }
   }
 }
 
 
-export function getDefaultErrorHandler(fileName: string): ErrorHandler {
-  return (msg: string, range: Range) => {
+export class DefaultErrorHandler implements ErrorHandler {
+  constructor(private fileName?: string, public checkMarkdownCode: boolean = false) {}
+
+  error(msg: string, range: Range): void {
     let line = range.start.line + 1;
     let col = range.start.col + 1;
-    let error: any = new SyntaxError(`${fileName}:${line}:${col}: ${msg}`);
-    error.fileName = fileName;
+    msg = `${line}:${col}: ${msg}`;
+    if (this.fileName) {
+      msg = `${this.fileName}:${msg}`;
+    }
+    let error: any = new SyntaxError(msg);
+    error.fileName = this.fileName;
     error.lineNumber = line;
     error.columnNumber = col;
     throw error;
-  };
+  }
 }
 
-export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
-  let reader = new Reader(stream, getDefaultErrorHandler(fileName), getMetaModel, reportRange);
+export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler, checkMarkdownCode: boolean = false): Fmt.File {
+  let errorHandler = new DefaultErrorHandler(fileName, checkMarkdownCode);
+  let reader = new Reader(stream, errorHandler, getMetaModel, reportRange);
   return reader.readFile();
 }
 
-export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
-  return readStream(new StringInputStream(str), fileName, getMetaModel, reportRange);
+export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler, checkMarkdownCode: boolean = false): Fmt.File {
+  return readStream(new StringInputStream(str), fileName, getMetaModel, reportRange, checkMarkdownCode);
 }

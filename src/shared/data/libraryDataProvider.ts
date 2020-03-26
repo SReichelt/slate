@@ -60,6 +60,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
+  checkMarkdownCode = false;
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
@@ -70,6 +71,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       path.name = this.childName;
       path.parentPath = this.parent.path;
       this.path = path;
+      this.checkMarkdownCode = this.parent.checkMarkdownCode;
     } else {
       this.itemNumber = [];
     }
@@ -267,14 +269,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           });
         }
         let stream = new FmtReader.StringInputStream(contents.text);
-        let sectionReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), FmtLibrary.getMetaModel);
+        let errorHandler = new FmtReader.DefaultErrorHandler(uri);
+        let sectionReader = new FmtReader.Reader(stream, errorHandler, FmtLibrary.getMetaModel);
         let sectionFileName = sectionReader.readIdentifier();
         if (sectionFileName !== this.getLocalSectionFileName()) {
           throw new Error(`Unrecognized section file name "${sectionFileName}"`);
         }
         let sectionFile = sectionReader.readPartialFile();
         if (stream.peekChar()) {
-          let itemReader = new FmtReader.Reader(stream, FmtReader.getDefaultErrorHandler(uri), this.logic.getMetaModel);
+          let itemReader = new FmtReader.Reader(stream, errorHandler, this.logic.getMetaModel);
           do {
             let itemFileName = itemReader.readIdentifier();
             let itemFile = itemReader.readPartialFile();
@@ -337,7 +340,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
               contents.addWatcher((watcher: FileWatcher) => {
                 if (libraryDefinition) {
                   try {
-                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel);
+                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.checkMarkdownCode);
                     libraryDefinition.definition = this.getMainDefinition(libraryDefinition.file, definitionName);
                     let currentEditedDefinition = this.editedDefinitions.get(name);
                     if (currentEditedDefinition) {
@@ -351,7 +354,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
                 }
               });
             }
-            let file = FmtReader.readString(contents.text, uri, getMetaModel);
+            let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.checkMarkdownCode);
             libraryDefinition = {
               file: file,
               definition: this.getMainDefinition(file, definitionName),
@@ -743,9 +746,16 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
       return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
         .then((result: WriteFileResult) => {
-          editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
-          editedLibraryDefinition.modified = undefined;
-          this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(editedLibraryDefinition));
+          let fullyLoadedDefinitionPromise = this.fullyLoadedDefinitions.get(name);
+          if (fullyLoadedDefinitionPromise) {
+            let fullyLoadedDefinition = fullyLoadedDefinitionPromise.getImmediateResult();
+            if (fullyLoadedDefinition) {
+              fullyLoadedDefinition.file = editedLibraryDefinition.file;
+              fullyLoadedDefinition.definition = editedLibraryDefinition.definition;
+            } else {
+              this.fullyLoadedDefinitions.delete(name);
+            }
+          }
           this.preloadedDefinitions.delete(name);
           this.editedDefinitions.delete(name);
           this.editedItemInfos.delete(name);

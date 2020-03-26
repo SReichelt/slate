@@ -92,6 +92,7 @@ export type ObjectRenderFns = Map<Object, RenderFn>;
 export interface LogicRenderer {
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: RenderedDefinitionOptions): Display.RenderedExpression | undefined;
   renderDefinitionSummary(innerDefinition?: Fmt.Definition): Display.RenderedExpression | undefined;
+  renderExpression(expression: Fmt.Expression): Display.RenderedExpression;
   addPlaceholderMenu(placeholder: Fmt.PlaceholderExpression, semanticLink: Display.SemanticLink): void;
   getDefinitionParts(): ObjectRenderFns;
   updateEditorState(onAutoFilled?: () => void): CachedPromise<void>;

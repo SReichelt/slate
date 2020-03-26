@@ -391,8 +391,8 @@ export class MetaModel extends Meta.MetaModel {
 
 export const metaModel = new MetaModel;
 
-export function getMetaModel(path: Fmt.Path): MetaModel {
-  if (path.name !== 'library') {
+export function getMetaModel(path?: Fmt.Path): MetaModel {
+  if (path && path.name !== 'library') {
     throw new Error('File of type "library" expected');
   }
   return metaModel;

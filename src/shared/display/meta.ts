@@ -718,8 +718,8 @@ export class MetaModel extends Meta.MetaModel {
 
 export const metaModel = new MetaModel;
 
-export function getMetaModel(path: Fmt.Path): MetaModel {
-  if (path.name !== 'display') {
+export function getMetaModel(path?: Fmt.Path): MetaModel {
+  if (path && path.name !== 'display') {
     throw new Error('File of type "display" expected');
   }
   return metaModel;

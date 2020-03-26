@@ -891,15 +891,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderSetTerm(term: Fmt.Expression, termSelection: SetTermSelection): Display.RenderedExpression {
     let result = this.renderSetTermInternal(term, false);
+    if (!result) {
+      return new Display.ErrorExpression('Unknown expression type');
+    }
     let semanticLink = this.addSemanticLink(result, term);
     if (this.editHandler) {
-      let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, true);
+      let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, true)!;
       this.editHandler.addSetTermMenu(semanticLink, term, onRenderTerm, termSelection);
     }
     return result;
   }
 
-  renderSetTermInternal(term: Fmt.Expression, markParametersAsDummy: boolean): Display.RenderedExpression {
+  renderSetTermInternal(term: Fmt.Expression, markParametersAsDummy: boolean): Display.RenderedExpression | undefined {
     if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
       let termSelection: ElementTermSelection = {
         allowCases: false,
@@ -907,7 +910,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let items = term.terms ? term.terms.map((item) => this.renderElementTerm(item, termSelection)) : [];
       if (this.editHandler) {
-        let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression);
+        let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
         this.editHandler.addEnumerationInsertButton(items, term, onRenderTerm, termSelection);
       }
       return this.renderTemplate('Enumeration', {
@@ -947,7 +950,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return this.renderStructuralCases(term.term, term.construction, term.cases, renderCase);
     } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
       let result = this.renderSetTermInternal(term.term, markParametersAsDummy);
-      return new Display.DecoratedExpression(result);
+      if (result) {
+        result = new Display.DecoratedExpression(result);
+      }
+      return result;
     } else {
       return this.renderGenericExpression(term);
     }
@@ -955,15 +961,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderElementTerm(term: Fmt.Expression, termSelection: ElementTermSelection): Display.RenderedExpression {
     let result = this.renderElementTermInternal(term);
+    if (!result) {
+      return new Display.ErrorExpression('Unknown expression type');
+    }
     let semanticLink = this.addSemanticLink(result, term);
     if (this.editHandler) {
-      let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression);
+      let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
       this.editHandler.addElementTermMenu(semanticLink, term, onRenderTerm, termSelection);
     }
     return result;
   }
 
-  renderElementTermInternal(term: Fmt.Expression): Display.RenderedExpression {
+  renderElementTermInternal(term: Fmt.Expression): Display.RenderedExpression | undefined {
     if (term instanceof FmtHLM.MetaRefExpression_cases) {
       let rows = term.cases.map((item) => {
         let value = this.renderElementTerm(item.value, fullElementTermSelection);
@@ -994,7 +1003,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return this.renderElementTermInternal(term.term);
     } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
       let result = this.renderElementTermInternal(term.term);
-      return new Display.DecoratedExpression(result);
+      if (result) {
+        result = new Display.DecoratedExpression(result);
+      }
+      return result;
     } else {
       return this.renderGenericExpression(term);
     }
@@ -1002,16 +1014,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderFormula(formula: Fmt.Expression, formulaSelection: FormulaSelection): Display.RenderedExpression {
     let [result, innerFormula] = this.renderFormulaInternal(formula);
+    if (!result) {
+      return new Display.ErrorExpression('Unknown expression type');
+    }
     let semanticLink = this.addSemanticLink(result, formula);
     if (this.editHandler) {
-      let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0];
+      let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
       this.editHandler.addFormulaMenu(semanticLink, formula, onRenderFormula, formulaSelection);
     }
     this.addSemanticLink(result, innerFormula);
     return result;
   }
 
-  private renderFormulaInternal(formula: Fmt.Expression): [Display.RenderedExpression, Fmt.Expression] {
+  private renderFormulaInternal(formula: Fmt.Expression): [Display.RenderedExpression | undefined, Fmt.Expression] {
     let negationCount = 0;
     while (formula instanceof FmtHLM.MetaRefExpression_not) {
       let innerFormula = formula.formula;
@@ -1025,11 +1040,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       formula = innerFormula;
     }
     let result = this.renderFormulaWithNegationCount(formula, negationCount);
-    result.optionalParenStyle = '[]';
+    if (result) {
+      result.optionalParenStyle = '[]';
+    }
     return [result, formula];
   }
 
-  private renderFormulaWithNegationCount(formula: Fmt.Expression, negationCount: number): Display.RenderedExpression {
+  private renderFormulaWithNegationCount(formula: Fmt.Expression, negationCount: number): Display.RenderedExpression | undefined {
     if (formula instanceof FmtHLM.MetaRefExpression_not) {
       let formulaSelection: FormulaSelection = {
         allowTruthValue: false,
@@ -1256,7 +1273,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression {
+  private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression | undefined {
     if (expression instanceof Fmt.VariableRefExpression) {
       let termSelection: ElementTermSelection = {
         allowCases: false,
@@ -1282,8 +1299,32 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (expression instanceof Fmt.PlaceholderExpression) {
       return new Display.PlaceholderExpression(expression.placeholderType);
     } else {
-      return new Display.ErrorExpression('Unknown expression type');
+      return undefined;
     }
+  }
+
+  renderExpression(expression: Fmt.Expression): Display.RenderedExpression {
+    let result: Display.RenderedExpression | undefined;
+    if (expression instanceof Fmt.DefinitionRefExpression && !expression.path.arguments.length) {
+      let definitionPromise = this.utils.getDefinition(expression.path);
+      let expressionPromise = definitionPromise.then((definition) => {
+        return this.renderDefinitionRef([definition], undefined, 2);
+      });
+      result = new Display.PromiseExpression(expressionPromise);
+    } else {
+      result = this.renderSetTermInternal(expression, false);
+      if (!result) {
+        result = this.renderElementTermInternal(expression);
+      }
+      if (!result) {
+        result = this.renderFormulaInternal(expression)[0];
+      }
+      if (!result) {
+        return new Display.ErrorExpression('Unknown expression type');
+      }
+    }
+    this.addSemanticLink(result, expression);
+    return result;
   }
 
   renderExampleExpression(expression: Fmt.DefinitionRefExpression): Display.RenderedExpression {
@@ -1598,9 +1639,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
-        let arg = rawArg as Fmt.DefinitionRefExpression;
-        let definitionRef = this.renderGenericExpression(arg, 3);
-        this.addSemanticLink(definitionRef, arg);
+        let definitionRef = this.renderGenericExpression(rawArg, 3);
+        if (!definitionRef) {
+          return new Display.ErrorExpression('Definition reference expected');
+        }
+        this.addSemanticLink(definitionRef, rawArg);
         return definitionRef;
       } else {
         return new Display.ErrorExpression('Unhandled parameter type');
@@ -2488,19 +2531,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       switch (placeholder.placeholderType) {
       case HLMExpressionType.SetTerm:
         {
-          let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, false);
+          let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, false)!;
           this.editHandler.addSetTermMenu(semanticLink, placeholder, onRenderTerm, fullSetTermSelection);
         }
         break;
       case HLMExpressionType.ElementTerm:
         {
-          let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression);
+          let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
           this.editHandler.addElementTermMenu(semanticLink, placeholder, onRenderTerm, fullElementTermSelection);
         }
         break;
       case HLMExpressionType.Formula:
         {
-          let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0];
+          let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
           this.editHandler.addFormulaMenu(semanticLink, placeholder, onRenderFormula, fullFormulaSelection);
         }
         break;

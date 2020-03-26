@@ -128,7 +128,7 @@ Choose n := m, i := h∣_S^(ℕ_(≤m)).
 
 Remarks.
 
-This definition uses [functions](../Functions/Functions) as well as the [natural](../Numbers/Natural/Natural%20numbers) and [cardinal](../Numbers/Cardinal/Cardinal%20numbers) numbers, all of which are defined in later sections. That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
+This definition uses functions as well as the natural and cardinal numbers, all of which are defined in later sections (see \`$../Functions/Functions\`, \`$../Numbers/Natural/\\"Natural numbers\\"\`, \`$../Numbers/Cardinal/\\"Cardinal numbers\\"\`). That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
 
 These are just some example proofs, which will be completed later.
 
@@ -208,7 +208,7 @@ exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersecti
 
 Remarks.
 
-Due to the type system of HLM, it is impossible to define the intersection of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset _U_, although the intersection is, of course, independent of _U_. Since a suitable value for _U_ can always be inferred automatically, _U_ can be omitted from the notation.
+Due to the type system of HLM, it is impossible to define the intersection of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset \`U\`, although the intersection is, of course, independent of \`U\`. Since a suitable value for \`U\` can always be inferred automatically, \`U\` can be omitted from the notation.
 
 References.
 
@@ -265,7 +265,7 @@ exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union 1`]
 
 Remarks.
 
-Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset _U_, although the intersection is, of course, independent of _U_. Since a suitable value for _U_ can always be inferred automatically, _U_ can be omitted from the notation.
+Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset \`U\`, although the intersection is, of course, independent of \`U\`. Since a suitable value for \`U\` can always be inferred automatically, \`U\` can be omitted from the notation.
 
 References.
 
@@ -410,7 +410,7 @@ exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generaliz
 
 Remarks.
 
-Similarly to the definition of the intersection of two sets, we have to specify a common superset _U_ for all sets. As a side effect, _I_ is allowed to be empty, in which case the result is simply _U_.
+Similarly to the definition of the intersection of two sets, we have to specify a common superset \`U\` for all sets. As a side effect, \`I\` is allowed to be empty, in which case the result is simply \`U\`.
 
 References.
 
@@ -478,7 +478,7 @@ We write “let p be a truth value” for “let p ∈ 𝓣𝓻𝓾𝓽𝓱.
 
 Remarks.
 
-This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set of [binary digits](../Numbers/Natural/Subsets/Binary%20digits).
+This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set \`$../Numbers/Natural/Subsets/\\"Binary digits\\"\` of binary digits.
 
 References.
 
@@ -514,11 +514,11 @@ Remarks.
 
 This is the simplest formulation of the axiom of choice that can be formalized in HLM. The standard formulation is not directly applicable because an indexed family of arbitrary sets cannot be defined as an object – there is no suitable equality definition.
 
-It is possible to state, as a theorem, that AC implies that the [Cartesian product](../Generalized%20cartesian%20product) of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
+It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../\\"Generalized cartesian product\\"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
 
 HLM actually does not have “axioms” as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
 * The simplest solution is to add “assume AC” as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
-* A preferred method is to replace this with “assume _S_ has a choice function” for a suitable _S_.
+* A preferred method is to replace this with “assume \`S\` has a choice function” for a suitable \`S\`.
 * Better yet, build the result explicitly from a given choice function.
 
 Hopefully this will not be too inconvenient. It does have a few advantages:
@@ -548,7 +548,7 @@ We write “let p be a property on S” for “let p ∈ 𝓟𝓻𝓹(S).”
 
 Remarks.
 
-This definition encodes a property (aka unary relation) on _S_ as a proposition depending on an element of _S_ (up to equivalence). Since it is equally possible to encode a unary relation on _S_ as a subset of _S_, this definition is interchangeable with the definition of the [power set](../Sets/Power%20set). The given definition is just more convenient.
+This definition encodes a property (aka unary relation) on \`S\` as a proposition depending on an element of \`S\` (up to equivalence). Since it is equally possible to encode a unary relation on \`S\` as a subset of \`S\`, this definition is interchangeable with \`$../Sets/\\"Power set\\"\`. The given definition is just more convenient.
 
 References.
 
@@ -567,7 +567,7 @@ by:
 
 Remarks.
 
-“_s_ is _p_” is shorthand for “_s_ has property _p_.”"
+“\`s\` is \`p\`” is shorthand for “\`s\` has property \`p\`.”"
 `;
 
 exports[`render hlm library: 1.2.3 data/libraries/hlm/Essentials/Properties/predicate 1`] = `
@@ -575,7 +575,7 @@ exports[`render hlm library: 1.2.3 data/libraries/hlm/Essentials/Properties/pred
 
 Remarks.
 
-This is a macro to convert a predicate taking an element of _S_ to a property on _S_."
+This is a macro to convert a predicate taking an element of \`S\` to a property on \`S\`."
 `;
 
 exports[`render hlm library: 1.3.1 data/libraries/hlm/Essentials/Relations/Relations 1`] = `
@@ -589,7 +589,7 @@ We write “let ≺ be a relation from S to T” for “let ≺ ∈ 𝓡𝓮
 
 Remarks.
 
-This definition encodes a relation from _S_ to _T_ as a proposition depending on an element of _S_ and an element of _T_ (up to equivalence). It would be equally possible to encode relations as subsets of the Cartesian product; the given definition is just more convenient.
+This definition encodes a relation from \`S\` to \`T\` as a proposition depending on an element of \`S\` and an element of \`T\` (up to equivalence). It would be equally possible to encode relations as subsets of the Cartesian product; the given definition is just more convenient.
 
 References.
 
@@ -615,7 +615,7 @@ exports[`render hlm library: 1.3.3 data/libraries/hlm/Essentials/Relations/predi
 
 Remarks.
 
-This is a macro to convert a predicate taking elements of _S_ and _T_ to a relation from _S_ to _T_."
+This is a macro to convert a predicate taking elements of \`S\` and \`T\` to a relation from \`S\` to \`T\`."
 `;
 
 exports[`render hlm library: 1.3.4 data/libraries/hlm/Essentials/Relations/converse 1`] = `
@@ -652,7 +652,7 @@ exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/conju
 
 Remarks.
 
-This definition is equivalent to the [intersection](../Sets/Intersection) of two relations if relations are encoded as subsets."
+This definition is the equivalent of \`$../Sets/Intersection(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {≺}, T = {⊂})\` (if relations were encoded as subsets)."
 `;
 
 exports[`render hlm library: 1.3.7 data/libraries/hlm/Essentials/Relations/disjunction 1`] = `
@@ -662,7 +662,7 @@ exports[`render hlm library: 1.3.7 data/libraries/hlm/Essentials/Relations/disju
 
 Remarks.
 
-This definition is equivalent to the [union](../Sets/Union) of two relations if relations are encoded as subsets."
+This definition is the equivalent of \`$../Sets/Union(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {≺}, T = {⊂})\` (if relations were encoded as subsets)."
 `;
 
 exports[`render hlm library: 1.3.8 data/libraries/hlm/Essentials/Relations/generalized%20conjunction 1`] = `
@@ -672,7 +672,7 @@ exports[`render hlm library: 1.3.8 data/libraries/hlm/Essentials/Relations/gener
 
 Remarks.
 
-This definition is equivalent to the [generalized intersection](../Sets/Generalized%20intersection%20using%20power%20set) of relations if relations are encoded as subsets."
+This definition is the equivalent of \`$../Sets/\\"Generalized intersection using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
 `;
 
 exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/generalized%20disjunction 1`] = `
@@ -682,7 +682,7 @@ exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/gener
 
 Remarks.
 
-This definition is equivalent to the [generalized union](../Sets/Generalized%20union%20using%20power%20set) of relations if relations are encoded as subsets."
+This definition is the equivalent of \`$../Sets/\\"Generalized union using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
 `;
 
 exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapping 1`] = `
@@ -692,7 +692,7 @@ exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapp
 
 Remarks.
 
-In this library, “mapping” and “[function](../Functions/Functions)” are not synonymous but interchangeable, via a [definition](../Functions/mapping%20as%20function) that turns a mapping into a function. The difference is not fundamental but a matter of convenience.
+In this library, “mapping” and “function” are not synonymous but interchangeable, via a definition that transforms a mapping to a function (see \`$../Functions/\\"mapping as function\\"\`). The difference is not fundamental but a matter of convenience.
 
 References.
 
@@ -746,7 +746,7 @@ exports[`render hlm library: 1.3.13 data/libraries/hlm/Essentials/Relations/rest
 
 Remarks.
 
-This definition is not exactly standard but very simple. The main reason to include it is that the result is defined to be a relation on _T_ instead of _S_, which is sometimes needed."
+This definition is not exactly standard but very simple. The main reason to include it is that the result is defined to be a relation on \`T\` instead of \`S\`, which is sometimes needed."
 `;
 
 exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/equality 1`] = `
@@ -968,7 +968,7 @@ Remarks.
 
 This definition uses the “construction” concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
 
-A more traditional definition where equivalence classes are subsets of _S_ is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
+A more traditional definition where equivalence classes are subsets of \`S\` is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
 
 In the end, there may need to be two different but interchangeable definitions of equivalence classes.
 
@@ -988,7 +988,7 @@ exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succ
 
 Remarks.
 
-This definition constructs a partial order on the disjoint union of two sets _S_ and _T_ from partial orders on _S_ and _T_. Elements of _S_ are always considered smaller than elements of _T_. This is used to define [addition of ordinal numbers](../Numbers/Ordinal/sum).
+This definition constructs a partial order on the disjoint union of two sets \`S\` and \`T\` from partial orders on \`S\` and \`T\`. Elements of \`S\` are always considered smaller than elements of \`T\`. This is used to define addition of ordinal numbers (see \`$../Numbers/Ordinal/sum\`).
 
 References.
 
@@ -1003,7 +1003,7 @@ exports[`render hlm library: 1.3.31 data/libraries/hlm/Essentials/Relations/lexi
 
 Remarks.
 
-This definition constructs a partial order on the Cartesian product of two sets _S_ and _T_ from partial orders on _S_ and _T_, combining the two partial orders lexicographically. It is used to define [multiplication of ordinal numbers](../Numbers/Ordinal/product).
+This definition constructs a partial order on the Cartesian product of two sets \`S\` and \`T\` from partial orders on \`S\` and \`T\`, combining the two partial orders lexicographically. It is used to define multiplication of ordinal numbers (see \`$../Numbers/Ordinal/product\`).
 
 References.
 
@@ -1122,7 +1122,7 @@ We write “let f :  X → Y, x ↦ y_x” for “let f := (X�
 
 Remarks.
 
-This definition uses a feature of the HLM logic called “bindings.” It is [equivalent](mapping%20as%function) to the usual set-theoretic definition, which is called “[mapping](../Relations/mapping)” in this library to distinguish the two definitions.
+This definition uses a feature of the HLM logic called “bindings.” It is equivalent to the usual set-theoretic definition, which is called “mapping” in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
 
 The major advantage of the definition using bindings is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
 
@@ -1149,7 +1149,7 @@ by:
 Remarks.
 
 This explicit definition works due to the special way that functions are defined. Within proofs, it enables unfolding of function application if the function has an explicit definition.
-The [corresponding definition](../Relations/mapping%20value) for mappings is an implicit definition instead.
+The corresponding definition for mappings (see \`$../Relations/\\"mapping value\\"\`) is an implicit definition instead.
 
 References.
 
@@ -1163,7 +1163,7 @@ exports[`render hlm library: 1.4.3 data/libraries/hlm/Essentials/Functions/opera
 
 Remarks.
 
-This is a macro to convert an operator taking an element of _X_ and returning an element of _Y_ to a function from _X_ to _Y_."
+This is a macro to convert an operator taking an element of \`X\` and returning an element of \`Y\` to a function from \`X\` to \`Y\`."
 `;
 
 exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Image 1`] = `
@@ -1218,9 +1218,9 @@ exports[`render hlm library: 1.4.8 data/libraries/hlm/Essentials/Functions/gener
 
 Remarks.
 
-This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously extends the codomain to a superset _B_ of _Y_.
+This definition is a slight extension of \`$restriction\` that simultaneously extends the codomain to a superset \`B\` of \`Y\`.
 
-It might seem tempting to remove the need for this definition by implicitly treating a function to _Y_ as a function to a superset _B_ of _Y_, without explicitly specifying _B_. However, this might lead to confusion as the resulting function may not be surjective even though the original function is."
+It might seem tempting to remove the need for this definition by implicitly treating a function to \`Y\` as a function to a superset \`B\` of \`Y\`, without explicitly specifying \`B\`. However, this could lead to confusion as the resulting function may not be surjective even though the original function is."
 `;
 
 exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/codomain%20restriction 1`] = `
@@ -1230,7 +1230,7 @@ exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/codom
 
 Remarks.
 
-This definition slightly extends the notion of [function restriction](restriction) in that it simultaneously restricts the codomain to a subset _B_ of _Y_, under the condition that the range is contained in this subset. It is compatible with the previous definition.
+This definition is a slight extension of \`$restriction\` that simultaneously restricts the codomain to a subset \`B\` of \`Y\`, under the condition that the range is contained in this subset. It is compatible with the previous definition.
 
 References.
 
@@ -1504,7 +1504,7 @@ exports[`render hlm library: 1.4.30.3 data/libraries/hlm/Essentials/Functions/Op
 
 Remarks.
 
-This is a macro to convert an operator taking elements of _X_ and _Y_ and returning an element of _Z_ to an operation from _X_ and _Y_ to _Z_."
+This is a macro to convert an operator taking elements of \`X\` and \`Y\` and returning an element of \`Z\` to an operation from \`X\` and \`Y\` to \`Z\`."
 `;
 
 exports[`render hlm library: 1.4.30.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
@@ -1601,7 +1601,11 @@ exports[`render hlm library: 1.4.30.11 data/libraries/hlm/Essentials/Functions/O
 exports[`render hlm library: 1.4.30.12 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
 "Definition 1.4.30.12.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
 
-  ∗∣_A := ∗∣_(A×A)^A"
+  ∗∣_A := ∗∣_(A×A)^A
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Restriction/Operation"
 `;
 
 exports[`render hlm library: 1.4.30.13.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
@@ -1693,11 +1697,11 @@ We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”
 
 Remarks.
 
-This is a slightly generalized notion of “tuple” where the length _α_ can be an arbitrary ordinal number. If _α_ is a natural number, it matches the common definition.
+This is a slightly generalized notion of “tuple” where the length \`α\` can be an arbitrary ordinal number. If \`α\` is a natural number, it matches the common definition.
 
-We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit _S_ from the constructor.
+We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit \`S\` from the constructor.
 
-In this definition, the codomain is a fixed set _S_. If each item is an element of a different set, a [generalized Cartesian product](../Sets/Generalized%20cartesian%20product) can be used instead.
+In this definition, the codomain is a fixed set \`S\`. If each item is an element of a different set, a generalized Cartesian product \`$../Sets/\\"Generalized cartesian product\\"\` can be used instead.
 
 References.
 
@@ -1777,9 +1781,9 @@ Remarks.
 
 We omit the word “infinite” because infinite sequences are used much more frequently than finite ones.
 
-We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily destruct a sequence into its elements, and the ability to omit _S_ from the constructor.
+We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily destruct a sequence into its elements, and the ability to omit \`S\` from the constructor.
 
-Even though our generalized definition of “[tuple](Tuples)” covers infinite sequences as a special case, we use this additional definition (with an appropriate embedding) to make the constructor look nicer.
+Even though the more general definition \`$Tuples\` covers infinite sequences as a special case, we use this additional definition (with an appropriate embedding) to make the constructor look nicer.
 
 References.
 
@@ -1863,7 +1867,7 @@ exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/inde
 
 Remarks.
 
-This is a helper definition which yields the index of _s_ within the sequence defined by the given well-order. This index is an ordinal number which is defined using the set of all elements less than _s_."
+This is a helper definition which yields the index of \`s\` within the sequence defined by the given well-order. This index is an ordinal number which is defined using the set of all elements less than \`s\`."
 `;
 
 exports[`render hlm library: 1.5.14 data/libraries/hlm/Essentials/Sequences/indexed%20element%20in%20well-ordered%20set 1`] = `
@@ -1901,7 +1905,7 @@ exports[`render hlm library: 1.6.1.1 data/libraries/hlm/Essentials/Numbers/Natur
 
 Remarks.
 
-The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the “successor” constructor, but we could just as well write “S(_n_)”. The notation is justified by an appropriate [proposition](Addition%20of%20one%20yields%20successor).
+The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the “successor” constructor, but we could just as well write “S(\`n\`)”. The notation is justified by \`$\\"Addition of one yields successor\\"\`.
 
 In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
 
@@ -2231,7 +2235,7 @@ Remarks.
 
 There are, of course, many equivalent definitions of binary digits. The simplest definition would be a construction with two constructors. However, we also want the sets to be embedded in the natural numbers, and (currently) this requires everything to be mapped to a single constructor of the target set. So we simply define binary digits as a subset of the natural numbers.
 
-In some cases, the set of [truth values](../../../Sets/Truth%20values) may be more convenient to use.
+In some cases, the set \`$../../../Sets/\\"Truth values\\"\` of truth values may be more convenient to use.
 
 References.
 
@@ -2259,7 +2263,7 @@ Choose c := {f(k) if f(k) > i, i if f(k) ≤ i.
 
 Remarks.
 
-This lemma is necessary to prove the following theorem. _k_ and _f_ do not appear in the result, but they enable a proof via structural induction on _k_."
+This lemma is necessary to prove the following theorem. \`k\` and \`f\` do not appear in the result, but they enable a proof via structural induction on \`k\`."
 `;
 
 exports[`render hlm library: 1.6.1.19 data/libraries/hlm/Essentials/Numbers/Natural/Finiteness%20criterion 1`] = `
@@ -2451,7 +2455,7 @@ Equivalence.  No proof.
 
 Remarks.
 
-The constraint that _m_ is nonzero is not really necessary but added for consistency with the definition of the [set of divisors](Divisors).
+The constraint that \`m\` is nonzero is not really necessary but added for consistency with the definition of the set of divisors \`$Divisors\`.
 
 References.
 
@@ -2468,7 +2472,7 @@ exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natu
 
 Remarks.
 
-We specifically exclude 0 from the list of its own divisors in order to simplify the definition of [division](quotient).
+We specifically exclude 0 from the set of divisors in order to simplify the definition of \`$quotient\`.
 
 References.
 
@@ -2557,7 +2561,7 @@ exports[`render hlm library: 1.6.1.35 data/libraries/hlm/Essentials/Numbers/Natu
 
 Remarks.
 
-This definition should be considered part of the [induction principle](Induction%20principle).
+This definition should be considered part of \`$\\"Induction principle\\"\`.
 
 References.
 
@@ -2620,7 +2624,7 @@ No proof.
 
 Remarks.
 
-This is just a slight reformulation based on the definition of a [property](../../Properties/Properties).
+This is just a slight reformulation based on the definition of a property (see \`$../../Properties/Properties\`).
 
 References.
 
@@ -2667,7 +2671,7 @@ by:
 
 Remarks.
 
-This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite), and to provide a [way](../Sequences/finite%20sequence) of obtaining a sequence from a finite set of natural numbers."
+This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`), and to provide a way of obtaining a sequence from a finite set of natural numbers (see \`$\\"sequence from subset\\"\`)."
 `;
 
 exports[`render hlm library: 1.6.1.41.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
@@ -2682,7 +2686,7 @@ by:
 
 Remarks.
 
-This definition is used to prove the equivalence of alternative definitions of [finiteness](../../../Sets/finite). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
+This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
 `;
 
 exports[`render hlm library: 1.6.1.41.3 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.6.1.41.3 (Tuple)."`;
@@ -2784,6 +2788,10 @@ exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Na
 
   ∑ := (0 + ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Summation
@@ -2828,9 +2836,13 @@ exports[`render hlm library: 1.6.1.46.6 data/libraries/hlm/Essentials/Numbers/Na
 
   ∏ := (1 ⋅ ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
-* https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
+* https://en.wikipedia.org/wiki/Multiplication#Capital_pi_notation
 * http://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
@@ -2885,9 +2897,9 @@ Equivalence.  No proof.
 
 Remarks.
 
-Note that this definition presupposes that _n_ is greater than 1. Otherwise, not all equivalences would hold.
+Note that this definition presupposes that \`$../less(n = {n}, m = {$../number(value = 1)})\`. Otherwise, not all equivalences would hold.
 
-In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the [set of prime numbers](Prime%20numbers), no such explicit exclusion of 1 is necessary.
+In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the set \`$\\"Prime numbers\\"\` of prime numbers, no such explicit exclusion of 1 is necessary.
 
 References.
 
@@ -3025,7 +3037,7 @@ Equivalence.  No proof.
 
 Remarks.
 
-Note that in addition to this definition for natural numbers, there is a compatible [definition for integers](../Integer/coprime).
+Note that in addition to this definition for natural numbers, there is a compatible definition for integers: \`$../Integer/coprime\`.
 
 References.
 
@@ -3082,9 +3094,9 @@ Given that two arbitrary sets cannot be compared element-wise due to the type sy
 
 HLM does not distinguish between sets and proper classes; instead there are rules preventing certain circularities. Thus, the set of cardinals can be treated like any other set in most situations.
 
-When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions, including e.g. the definition of [finiteness](../../Sets/finite).
+When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions and theorems (see \`$finite\`, \`$\\"Cardinality of power set\\"\`).
 
-In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures such as [magmas](../../../Algebra/Magmas/Magmas). This is especially visible in the use of this definition in the [category of sets](../../../Category%20theory/Individual%20categories/cardinals).
+In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures (see e.g. \`$../../../Algebra/\\"Pointed sets\\"/\\"Pointed sets\\"\`, \`$../../../Algebra/Magmas/Magmas\`, \`$../../../Algebra/Groups/Groups\`). This is especially visible in the use of this definition in the category of sets \`$../../../\\"Category theory\\"/\\"Individual categories\\"/cardinals\`.
 
 References.
 
@@ -3144,7 +3156,7 @@ Equality.  No proof.
 
 Remarks.
 
-An isomorphism between cardinal numbers is simply a bijection between their representative sets. Thus, the existence of an isomorphism implies that the two cardinal numbers are in fact equal, as is shown [below](Equality%20criterion).
+An isomorphism between cardinal numbers is simply a bijection between their representative sets. Thus, the existence of an isomorphism implies that the two cardinal numbers are in fact equal, as is shown below in \`$../\\"Equality criterion\\"\`).
 
 References.
 
@@ -3785,7 +3797,7 @@ Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x 
 
 Remarks.
 
-This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by a [proposition](Actual%20difference%20equals%20formal%20difference).
+This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by \`$\\"Actual difference equals formal difference\\"\`).
 
 Since an equality definition for each constructor is always part of a construction, we do not need to build the equivalence classes explicitly, they are implicit in the choice of the equality definition.
 
@@ -3894,7 +3906,7 @@ No proof.
 
 Remarks.
 
-This proposition justifies the notation used for the constructor. Note that the subtraction on the right is subtraction on integers, i.e. on the embedding of the natural numbers _m_ and _n_ into the integers."
+This proposition justifies the notation used for the constructor. Note that the subtraction on the right is subtraction in \`$Integers\`, using the embedding of the natural numbers \`m\` and \`n\` into the integers."
 `;
 
 exports[`render hlm library: 1.6.4.8 data/libraries/hlm/Essentials/Numbers/Integer/less%20or%20equal 1`] = `
@@ -4006,7 +4018,7 @@ Equality.  No proof.
 
 Remarks.
 
-Due to the embedding of natural numbers into integers, this is just an alias for the set of natural numbers."
+Due to the embedding of \`$../../Natural/\\"Natural numbers\\"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/\\"Natural numbers\\"\`."
 `;
 
 exports[`render hlm library: 1.6.4.10.9 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Positive%20numbers 1`] = `
@@ -4020,7 +4032,7 @@ Equality.  No proof.
 
 Remarks.
 
-Due to the embedding of natural numbers into integers, this is just an alias for the set of positive natural numbers."
+Due to the embedding of \`$../../Natural/\\"Natural numbers\\"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/Subsets/\\"Positive numbers\\"\`."
 `;
 
 exports[`render hlm library: 1.6.4.10.10 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Nonzero%20numbers 1`] = `
@@ -4176,6 +4188,10 @@ exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/In
 
   ∑ := (0 + ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Summation
@@ -4187,6 +4203,10 @@ exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/In
 "Definition 1.6.4.22.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
+
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
 
 References.
 
@@ -4214,6 +4234,7 @@ exports[`render hlm library: 1.6.4.24 data/libraries/hlm/Essentials/Numbers/Inte
     ⇔  Div_ℤ(a) ∩ Div_ℤ(b) ⊆ {1, −1}
     ⇔  Div_ℤ(a) ∩ Div_ℤ(b) = {1, −1}
     ⇔  ∄ prime p : [p ∣ a and p ∣ b]
+    ⇔  |a| and |b| are coprime
 
 Equivalence.  No proof.
 
@@ -4245,9 +4266,9 @@ Well-definedness.  No proof.
 
 Remarks.
 
-This definition is rather similar to the definition of [integers](../Integer/Integers). Again, the constructor notation is later justified by a [proposition](Actual%20quotient%20equals%20formal%20quotient).
+This definition is rather similar to \`$../Integer/Integers\`. The constructor notation is later justified by \`$\\"Actual quotient equals formal quotient\\"\`.
 
-Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of [comparison](less%20or%20equal) would probably need to be split into several cases.
+Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of \`$\\"less or equal\\"\` would probably need to be split into several cases.
 
 References.
 
@@ -4499,7 +4520,7 @@ No proof.
 
 Remarks.
 
-This proposition justifies the notation used for the constructor. Note that the division on the right is division on rational numbers, i.e. on the embedding of the integers _b_ and _a_ into the rational numbers."
+This proposition justifies the notation used for the constructor. Note that the division on the right is division in \`$\\"Rational numbers\\"\`, using the embedding of the integers \`n\` and \`d\` into the rational numbers."
 `;
 
 exports[`render hlm library: 1.6.5.12 data/libraries/hlm/Essentials/Numbers/Rational/power 1`] = `
@@ -4538,6 +4559,10 @@ exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Ra
 
   ∑ := (0 + ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Summation
@@ -4549,6 +4574,10 @@ exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Ra
 "Definition 1.6.5.14.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
+
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
 
 References.
 
@@ -4949,6 +4978,10 @@ exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Re
 
   ∑ := (0 + ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Summation
@@ -4960,6 +4993,10 @@ exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Re
 "Definition 1.6.6.17.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
+
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
 
 References.
 
@@ -5031,8 +5068,9 @@ a and b are coprime
 
 References.
 
-* https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for _n_ = 2)
-* https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for _n_ = 2)"
+* https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for \`n\` = 2)
+* https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for \`n\` = 2)
+* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irr_sqrt_of_prime (for \`n\` = 2)"
 `;
 
 exports[`render hlm library: 1.6.6.19 data/libraries/hlm/Essentials/Numbers/Real/Square%20root%20of%20two%20is%20irrational 1`] = `
@@ -5065,7 +5103,7 @@ Well-definedness.  No proof.
 
 Remarks.
 
-The constructor notation is later justified by a [proposition](Actual%20linear%20combination%20equals%20formal%20linear%20combination).
+The constructor notation is later justified by \`$\\"Actual linear combination equals formal linear combination\\"\`.
 
 References.
 
@@ -5182,7 +5220,7 @@ No proof.
 
 Remarks.
 
-This proposition justifies the notation used for the constructor. Note that the operations on the right are operations on complex numbers, i.e. on the embedding of the real numbers _r_ and _i_ into the complex numbers."
+This proposition justifies the notation used for the constructor. Note that the operations on the right are operations on complex numbers, i.e. on the embedding of the real numbers \`r\` and \`i\` into the complex numbers."
 `;
 
 exports[`render hlm library: 1.6.7.12.1 data/libraries/hlm/Essentials/Numbers/Complex/Subsets/Hole 1`] = `
@@ -5213,6 +5251,10 @@ exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Co
 
   ∑ := (0 + ⋅⋅⋅)
 
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Summation
@@ -5224,6 +5266,10 @@ exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Co
 "Definition 1.6.7.14.2.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
+
+Remarks.
+
+Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
 
 References.
 
@@ -5241,7 +5287,7 @@ Remarks.
 
 The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of “isomorphism” that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
 
-Each of the definitions transports an object defined on *X* to *Y* along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
+Each of the definitions transports an object defined on \`X\` to \`Y\` along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
 `;
 
 exports[`render hlm library: 2.1.2 data/libraries/hlm/Algebra/Isomorphisms/function%20transport 1`] = `
@@ -5330,11 +5376,13 @@ We write “let 𝐒 be a pointed set” for “let 𝐒 ∈ 𝓟𝓽𝓢�
 
 Remarks.
 
-Strictly speaking, the elements of this set are not pointed sets but isomorphism classes of pointed sets, which are similar to [cardinal numbers](../../Essentials/Numbers/Cardinal/Cardinal%20numbers). Due to the rules of HLM, it is not even possible to define pointed sets (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
+Strictly speaking, the elements of this set are not pointed sets but isomorphism classes of pointed sets, which are similar to cardinal numbers (see \`$../../Essentials/Numbers/Cardinal/\\"Cardinal numbers\\"\`). Due to the rules of HLM, it is not even possible to define pointed sets (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
 
 References.
 
-* https://en.wikipedia.org/wiki/Pointed_set"
+* https://en.wikipedia.org/wiki/Pointed_set
+* https://proofwiki.org/wiki/Definition:Pointed_Set
+* https://ncatlab.org/nlab/show/pointed+set"
 `;
 
 exports[`render hlm library: 2.2.2 data/libraries/hlm/Algebra/Pointed%20sets/Carrier 1`] = `
@@ -5368,7 +5416,13 @@ exports[`render hlm library: 2.2.4.1 data/libraries/hlm/Algebra/Pointed%20sets/H
 
   Hom(𝐒, 𝐓) := {f : Carrier(𝐒) → Carrier(𝐓) : f(base(𝐒)) = base(𝐓)}
 
-We write “let φ : 𝐒 → 𝐓 be a homomorphism” for “let φ ∈ Hom(𝐒, 𝐓).”"
+We write “let φ : 𝐒 → 𝐓 be a homomorphism” for “let φ ∈ Hom(𝐒, 𝐓).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Homomorphism
+* https://proofwiki.org/wiki/Definition:Homomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/homomorphism"
 `;
 
 exports[`render hlm library: 2.2.4.2 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Isomorphisms 1`] = `
@@ -5379,7 +5433,13 @@ exports[`render hlm library: 2.2.4.2 data/libraries/hlm/Algebra/Pointed%20sets/H
 
 We write “let φ : 𝐒 ↔ 𝐓 be an isomorphism” for “let φ ∈ Iso(𝐒, 𝐓).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Isomorphism
+* https://proofwiki.org/wiki/Definition:Isomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/isomorphism"
 `;
 
 exports[`render hlm library: 2.2.4.3 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Automorphisms 1`] = `
@@ -5395,7 +5455,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
 `;
 
 exports[`render hlm library: 2.2.4.4 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/automorphism%20group 1`] = `
@@ -5409,7 +5469,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
 `;
 
 exports[`render hlm library: 2.2.4.5 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/identity 1`] = `
@@ -5475,7 +5535,10 @@ Strictly speaking, the elements of this set are not magmas but isomorphism class
 
 References.
 
-* https://en.wikipedia.org/wiki/Magma_(algebra)"
+* https://en.wikipedia.org/wiki/Magma_(algebra)
+* https://mathworld.wolfram.com/Magma.html
+* https://proofwiki.org/wiki/Definition:Magma
+* https://ncatlab.org/nlab/show/magma"
 `;
 
 exports[`render hlm library: 2.3.2 data/libraries/hlm/Algebra/Magmas/Carrier 1`] = `
@@ -5511,7 +5574,11 @@ exports[`render hlm library: 2.3.4 data/libraries/hlm/Algebra/Magmas/associative
 
 by:
 
-  [M, ∗] is associative  :⇔  ∗ is associative  (M is a set, ∗ : M × M → M is an operation on M)"
+  [M, ∗] is associative  :⇔  ∗ is associative  (M is a set, ∗ : M × M → M is an operation on M)
+
+References.
+
+* https://ncatlab.org/nlab/show/associative+magma"
 `;
 
 exports[`render hlm library: 2.3.5 data/libraries/hlm/Algebra/Magmas/commutative 1`] = `
@@ -5521,7 +5588,11 @@ exports[`render hlm library: 2.3.5 data/libraries/hlm/Algebra/Magmas/commutative
 
 by:
 
-  [M, ∗] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M)"
+  [M, ∗] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M)
+
+References.
+
+* https://ncatlab.org/nlab/show/commutative+magma"
 `;
 
 exports[`render hlm library: 2.3.6.1 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Homomorphisms 1`] = `
@@ -5529,7 +5600,13 @@ exports[`render hlm library: 2.3.6.1 data/libraries/hlm/Algebra/Magmas/Homomorph
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
-We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Magma_(algebra)#Morphism_of_magmas
+* https://proofwiki.org/wiki/Definition:Homomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/homomorphism"
 `;
 
 exports[`render hlm library: 2.3.6.2 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Isomorphisms 1`] = `
@@ -5540,7 +5617,13 @@ exports[`render hlm library: 2.3.6.2 data/libraries/hlm/Algebra/Magmas/Homomorph
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Isomorphism
+* https://proofwiki.org/wiki/Definition:Isomorphism_(Abstract_Algebra)
+* https://ncatlab.org/nlab/show/isomorphism"
 `;
 
 exports[`render hlm library: 2.3.6.3 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Automorphisms 1`] = `
@@ -5556,7 +5639,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
 `;
 
 exports[`render hlm library: 2.3.6.4 data/libraries/hlm/Algebra/Magmas/Homomorphisms/automorphism%20group 1`] = `
@@ -5570,7 +5653,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
 `;
 
 exports[`render hlm library: 2.3.6.5 data/libraries/hlm/Algebra/Magmas/Homomorphisms/identity 1`] = `
@@ -5603,7 +5686,11 @@ No proof."
 exports[`render hlm library: 2.3.7.1 data/libraries/hlm/Algebra/Magmas/Submagmas/submagma%20set 1`] = `
 "Definition 2.3.7.1.  Let 𝐌 be a magma, S ⊆ Carrier(𝐌). We define:
 
-  S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S"
+  S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Submagma"
 `;
 
 exports[`render hlm library: 2.3.7.2 data/libraries/hlm/Algebra/Magmas/Submagmas/subset%20magma 1`] = `
@@ -5643,13 +5730,23 @@ For S' ⊆ S, we canonically treat elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(
 
 Remarks.
 
-This is an inductive definition of binary trees with leafs labeled by elements of _S_. It does not really belong in this section but is required for the definition of a free magma."
+This is an inductive definition of binary trees with leaves labeled by elements of \`S\`. It does not really belong in this section but is required for the definition of a free magma (see \`$\\"free magma\\"\`).
+
+References.
+
+* https://en.wikipedia.org/wiki/Binary_tree
+* https://mathworld.wolfram.com/BinaryTree.html
+* https://proofwiki.org/wiki/Definition:Binary_Tree"
 `;
 
 exports[`render hlm library: 2.3.8.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
 "Definition 2.3.8.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
 
-  free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]"
+  free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]
+
+References.
+
+* https://en.wikipedia.org/wiki/Magma_(algebra)#Free_magma"
 `;
 
 exports[`render hlm library: 2.3.8.3 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20on%20set 1`] = `
@@ -5690,7 +5787,11 @@ We write “let 𝐒 be a semigroup” for “let 𝐒 ∈ 𝓢𝓮𝓶𝓲�
 
 References.
 
-* https://en.wikipedia.org/wiki/Semigroup"
+* https://en.wikipedia.org/wiki/Semigroup
+* https://mathworld.wolfram.com/Semigroup.html
+* https://proofwiki.org/wiki/Definition:Semigroup
+* https://ncatlab.org/nlab/show/semigroup
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#semigroup"
 `;
 
 exports[`render hlm library: 2.5.1 data/libraries/hlm/Algebra/Monoids/Monoids 1`] = `
@@ -5704,7 +5805,11 @@ We write “let 𝐌 be a monoid” for “let 𝐌 ∈ 𝓜𝓸𝓷.”
 
 References.
 
-* https://en.wikipedia.org/wiki/Monoid"
+* https://en.wikipedia.org/wiki/Monoid
+* https://mathworld.wolfram.com/Monoid.html
+* https://proofwiki.org/wiki/Definition:Monoid
+* https://ncatlab.org/nlab/show/monoid
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#monoid"
 `;
 
 exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/semigroup%20with%20identity 1`] = `
@@ -5760,7 +5865,11 @@ exports[`render hlm library: 2.5.6 data/libraries/hlm/Algebra/Monoids/commutativ
 
 by:
 
-  [M, ∗, e] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+  [M, ∗, e] is commutative  :⇔  ∗ is commutative  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#comm_monoid"
 `;
 
 exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
@@ -5768,7 +5877,14 @@ exports[`render hlm library: 2.5.7.1 data/libraries/hlm/Algebra/Monoids/Homomorp
 
   Hom(𝐌, 𝐍) := {f : Carrier(𝐌) → Carrier(𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
-We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”"
+We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
+
+References.
+
+* https://en.wikipedia.org/wiki/Monoid#Monoid_homomorphisms
+* https://proofwiki.org/wiki/Definition:Monoid_Homomorphism
+* https://ncatlab.org/nlab/show/homomorphism
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/hom.html#monoid_hom"
 `;
 
 exports[`render hlm library: 2.5.7.2 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Isomorphisms 1`] = `
@@ -5795,7 +5911,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
 `;
 
 exports[`render hlm library: 2.5.7.4 data/libraries/hlm/Algebra/Monoids/Homomorphisms/automorphism%20group 1`] = `
@@ -5809,7 +5925,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
 `;
 
 exports[`render hlm library: 2.5.7.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
@@ -5842,7 +5958,15 @@ No proof."
 exports[`render hlm library: 2.5.8.1 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
 "Definition 2.5.8.1.  Let 𝐌 be a monoid, S ⊆ Carrier(𝐌). We define:
 
-  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐌 ∈ S"
+  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐌 ∈ S
+
+References.
+
+* https://en.wikipedia.org/wiki/Monoid#Submonoids
+* (https://mathworld.wolfram.com/Submonoid.html seems incorrect)
+* (https://proofwiki.org/wiki/Definition:Submonoid: ditto)
+* https://ncatlab.org/nlab/show/submonoid
+* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid.html#is_submonoid"
 `;
 
 exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
@@ -5867,13 +5991,23 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.5.9.1 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20addition 1`] = `
 "Definition 2.5.9.1.  We define:
 
-  (ℕ, +) := [ℕ, +, 0]"
+  (ℕ, +) := [ℕ, +, 0]
+
+References.
+
+* https://en.wikipedia.org/wiki/Monoid#Examples
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_monoid"
 `;
 
 exports[`render hlm library: 2.5.9.2 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20multiplication 1`] = `
 "Definition 2.5.9.2.  We define:
 
-  (ℕ, ⋅) := [ℕ, ⋅, 1]"
+  (ℕ, ⋅) := [ℕ, ⋅, 1]
+
+References.
+
+* https://en.wikipedia.org/wiki/Monoid#Examples
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.monoid"
 `;
 
 exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/invertible 1`] = `
@@ -5917,7 +6051,17 @@ exports[`render hlm library: 2.5.14 data/libraries/hlm/Algebra/Monoids/iterated%
 
 by:
 
-  ∏_[M,∗,e] := (e ∗ ⋅⋅⋅)  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+  ∏_[M,∗,e] := (e ∗ ⋅⋅⋅)  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
+
+Remarks.
+
+Usage example: \`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐌 = {𝐌})}, ⨂ = {$\\"iterated operation\\"(𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+
+References.
+
+* https://en.wikipedia.org/wiki/Multiplication#Capital_pi_notation
+* http://mathworld.wolfram.com/Product.html
+* https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
 exports[`render hlm library: 2.6.1 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
@@ -6021,7 +6165,15 @@ exports[`render hlm library: 2.6.10.1 data/libraries/hlm/Algebra/Groups/Homomorp
 
 We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ ∈ Hom(𝐆, 𝐇).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Group_homomorphism
+* https://mathworld.wolfram.com/GroupHomomorphism.html
+* https://proofwiki.org/wiki/Definition:Group_Homomorphism
+* https://ncatlab.org/nlab/show/homomorphism
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/hom.html#monoid_hom"
 `;
 
 exports[`render hlm library: 2.6.10.2 data/libraries/hlm/Algebra/Groups/Homomorphisms/Isomorphisms 1`] = `
@@ -6048,7 +6200,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Group_Automorphism
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
 `;
 
 exports[`render hlm library: 2.6.10.4 data/libraries/hlm/Algebra/Groups/Homomorphisms/automorphism%20group 1`] = `
@@ -6062,7 +6214,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#mul_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
 `;
 
 exports[`render hlm library: 2.6.10.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
@@ -6263,7 +6415,11 @@ exports[`render hlm library: 2.6.15 data/libraries/hlm/Algebra/Groups/iterated%2
 
 by:
 
-  ∏_[G,∗,e,i] := (e ∗ ⋅⋅⋅)  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  ∏_[G,∗,e,i] := (e ∗ ⋅⋅⋅)  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+
+Remarks.
+
+Usage example: \`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐆 = {𝐆})}, ⨂ = {$\\"iterated operation\\"(𝐆 = {𝐆})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.7.1 data/libraries/hlm/Algebra/Semirings/Semirings 1`] = `
@@ -6388,7 +6544,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut"
 `;
 
 exports[`render hlm library: 2.7.9.4 data/libraries/hlm/Algebra/Semirings/Homomorphisms/automorphism%20group 1`] = `
@@ -6402,7 +6558,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut.group"
 `;
 
 exports[`render hlm library: 2.7.9.5 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Kernel 1`] = `
@@ -6494,13 +6650,21 @@ exports[`render hlm library: 2.7.13.1 data/libraries/hlm/Algebra/Semirings/Examp
 exports[`render hlm library: 2.7.14.1 data/libraries/hlm/Algebra/Semirings/Iterated%20operations/iterated%20sum 1`] = `
 "Definition 2.7.14.1.  Let 𝐑 be a semiring. We define:
 
-  ∑_𝐑 := ∏_[𝐑,+]"
+  ∑_𝐑 := ∏_[𝐑,+]
+
+Remarks.
+
+Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.7.14.2 data/libraries/hlm/Algebra/Semirings/Iterated%20operations/iterated%20product 1`] = `
 "Definition 2.7.14.2.  Let 𝐑 be a commutative semiring. We define:
 
-  ∏_𝐑 := ∏_[𝐑,⋅]"
+  ∏_𝐑 := ∏_[𝐑,⋅]
+
+Remarks.
+
+Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Semirings/Formulas/Binomial%20theorem 1`] = `
@@ -6621,7 +6785,11 @@ exports[`render hlm library: 2.8.11.1 data/libraries/hlm/Algebra/Rings/Homomorph
 
 We write “let φ : 𝐑 → 𝐒 be a homomorphism” for “let φ ∈ Hom(𝐑, 𝐒).”
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://mathworld.wolfram.com/RingHomomorphism.html"
 `;
 
 exports[`render hlm library: 2.8.11.2 data/libraries/hlm/Algebra/Rings/Homomorphisms/Isomorphisms 1`] = `
@@ -6648,7 +6816,7 @@ References.
 * http://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut"
 `;
 
 exports[`render hlm library: 2.8.11.4 data/libraries/hlm/Algebra/Rings/Homomorphisms/automorphism%20group 1`] = `
@@ -6662,7 +6830,7 @@ References.
 * http://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
-* https://leanprover-community.github.io/mathlib_docs/data/equiv/algebra.html#ring_aut.group"
+* https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut.group"
 `;
 
 exports[`render hlm library: 2.8.11.5 data/libraries/hlm/Algebra/Rings/Homomorphisms/Kernel 1`] = `
@@ -6834,13 +7002,21 @@ exports[`render hlm library: 2.8.23 data/libraries/hlm/Algebra/Rings/kronecker%2
 exports[`render hlm library: 2.8.24.1 data/libraries/hlm/Algebra/Rings/Iterated%20operations/iterated%20sum 1`] = `
 "Definition 2.8.24.1.  Let 𝐑 be a ring. We define:
 
-  ∑_𝐑 := ∏_[𝐑,+]"
+  ∑_𝐑 := ∏_[𝐑,+]
+
+Remarks.
+
+Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.8.24.2 data/libraries/hlm/Algebra/Rings/Iterated%20operations/iterated%20product 1`] = `
 "Definition 2.8.24.2.  Let 𝐑 be a commutative ring. We define:
 
-  ∏_𝐑 := ∏_[𝐑,⋅]"
+  ∏_𝐑 := ∏_[𝐑,⋅]
+
+Remarks.
+
+Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.8.25.1 data/libraries/hlm/Algebra/Rings/Polynomials/Polynomials 1`] = `
@@ -7151,7 +7327,11 @@ This definition lets us multiply elements without decomposing the ring."
 exports[`render hlm library: 2.8.27.1.9 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/iterated%20sum 1`] = `
 "Definition 2.8.27.1.9.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
 
-  ∑_𝐌 := ∏_[𝐌,+]"
+  ∑_𝐌 := ∏_[𝐌,+]
+
+Remarks.
+
+Usage example: \`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.8.27.1.10.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Homomorphisms 1`] = `
@@ -7294,7 +7474,7 @@ exports[`render hlm library: 2.8.27.1.12.2 data/libraries/hlm/Algebra/Rings/Modu
 
 Remarks.
 
-This defines the set of valid coordinate sequences corresponding to a given element sequence. This set only depends on the length of the element sequence. A coordinate sequence is a sequence of ring elements with the same length and finite support."
+This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝐱\`. This set only depends on the length of \`𝐱\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support."
 `;
 
 exports[`render hlm library: 2.8.27.1.12.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Coordinates/linear%20combination 1`] = `
@@ -7442,7 +7622,11 @@ This definition lets us multiply elements without decomposing the ring."
 exports[`render hlm library: 2.8.27.2.9 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/iterated%20sum 1`] = `
 "Definition 2.8.27.2.9.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
 
-  ∑_𝐌 := ∏_[𝐌,+]"
+  ∑_𝐌 := ∏_[𝐌,+]
+
+Remarks.
+
+Usage example: \`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`."
 `;
 
 exports[`render hlm library: 2.8.27.2.10.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Homomorphisms 1`] = `
@@ -7585,7 +7769,7 @@ exports[`render hlm library: 2.8.27.2.12.2 data/libraries/hlm/Algebra/Rings/Modu
 
 Remarks.
 
-This defines the set of valid coordinate sequences corresponding to a given element sequence. This set only depends on the length of the element sequence. A coordinate sequence is a sequence of ring elements with the same length and finite support."
+This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝐱\`. This set only depends on the length of \`𝐱\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support."
 `;
 
 exports[`render hlm library: 2.8.27.2.12.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Coordinates/linear%20combination 1`] = `
@@ -7771,7 +7955,7 @@ This definition of categories includes the additional requirement that all categ
 
 For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
 
-The natural number _u_ is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, _u_ can be regarded as a “universe size” that is relevant only in the context of category theory. (The “universes” that are implicit in other contexts are already large enough.)
+The natural number \`u\` is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, \`u\` can be regarded as a “universe size” that is relevant only in the context of category theory. (The “universes” that are implicit in other contexts are already large enough.)
 
 References.
 
@@ -7833,7 +8017,7 @@ References.
 `;
 
 exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
-"Definition 4.6.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+"Definition 4.6.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
   Fun(𝓒, 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
 
@@ -7842,10 +8026,6 @@ exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors
 We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ Fun(𝓒, 𝓓).”
 
 We write “let F :  𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f” for “let F := (𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f).”
-
-Remarks.
-
-This definition requires both categories to live in a common universe, which is not strictly required.
 
 References.
 
@@ -7856,7 +8036,7 @@ References.
 `;
 
 exports[`render hlm library: 4.6.2 data/libraries/hlm/Category%20theory/Functors/object%20value 1`] = `
-"Definition 4.6.2.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
+"Definition 4.6.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
 
   F(𝐗)
 
@@ -7866,7 +8046,7 @@ by:
 `;
 
 exports[`render hlm library: 4.6.3 data/libraries/hlm/Category%20theory/Functors/morphism%20value 1`] = `
-"Definition 4.6.3.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
+"Definition 4.6.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
 
   F(f)
 
@@ -7882,13 +8062,13 @@ exports[`render hlm library: 4.6.4 data/libraries/hlm/Category%20theory/Functors
 `;
 
 exports[`render hlm library: 4.6.5 data/libraries/hlm/Category%20theory/Functors/composition 1`] = `
-"Definition 4.6.5.  Let u ∈ ℕ, 𝓒, 𝓓, 𝓔 be u-small categories, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
+"Definition 4.6.5.  Let u, v, w ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, 𝓔 be a/an w-small category, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
 
   G ∘ F :  𝓒 → 𝓔, 𝐗 ↦ G(F(𝐗)), (f : 𝐘 → 𝐙) ↦ G(F(f))"
 `;
 
 exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
-"Definition 4.7.1.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
+"Definition 4.7.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
 
   Infranat(F, G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
 
@@ -7902,7 +8082,7 @@ References.
 `;
 
 exports[`render hlm library: 4.7.2 data/libraries/hlm/Category%20theory/Natural%20transformations/component 1`] = `
-"Definition 4.7.2.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
+"Definition 4.7.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
 
   η_𝐗
 
@@ -7912,7 +8092,7 @@ by:
 `;
 
 exports[`render hlm library: 4.7.3 data/libraries/hlm/Category%20theory/Natural%20transformations/identity 1`] = `
-"Definition 4.7.3.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F : 𝓒 → 𝓓 be a functor. We define:
+"Definition 4.7.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor. We define:
 
   id_F := (id_(F(𝐗)))_(𝐗 ∈ 𝓒)
    = (F(id_𝐗))_(𝐗 ∈ 𝓒)
@@ -7921,7 +8101,7 @@ Equality.  No proof."
 `;
 
 exports[`render hlm library: 4.7.4 data/libraries/hlm/Category%20theory/Natural%20transformations/vertical%20composition 1`] = `
-"Definition 4.7.4.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
+"Definition 4.7.4.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
 
   ε ∘ η := (ε_𝐗 ∘ η_𝐗)_(𝐗 ∈ 𝓒)
 
@@ -7931,7 +8111,7 @@ References.
 `;
 
 exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
-"Definition 4.7.5.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories, F, G : 𝓒 → 𝓓 be functors. We define:
+"Definition 4.7.5.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
 
   Nat(F, G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
 
@@ -7952,7 +8132,7 @@ exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Individu
 
 Remarks.
 
-This is one possible formalization of the discrete category obtained from elements of _S_. Note that the existence of an _x_ in the definition of morphism composition implies that _d_=_e_=_f_.
+This is one possible formalization of the discrete category obtained from elements of \`S\`. Note that the existence of an \`x\` in the definition of morphism composition implies that \`%equals(d, e, f)\`.
 
 References.
 
@@ -8096,7 +8276,7 @@ exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Individ
 
 Remarks.
 
-This defines the category of small categories, or, more generally, a category in _V_ of all categories in _U_.
+This defines the category of small categories, or, more generally, a category in \`$../../Essentials/Numbers/Natural/sum(m = {u}, n = {$../../Essentials/Numbers/Natural/number(value = 1)})\` of all categories in \`u\`.
 
 References.
 
@@ -8105,9 +8285,9 @@ References.
 `;
 
 exports[`render hlm library: 4.8.15 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
-"Definition 4.8.15.  Let u ∈ ℕ, 𝓒, 𝓓 be u-small categories. We define:
+"Definition 4.8.15.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
-  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(u+1)
+  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(u+v+1)
 
 References.
 
@@ -8116,9 +8296,9 @@ References.
 `;
 
 exports[`render hlm library: 4.9.1 data/libraries/hlm/Category%20theory/Yoneda/hom-functor 1`] = `
-"Definition 4.9.1.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐀 ∈ 𝓒. We define:
+"Definition 4.9.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝐀 ∈ 𝓒. We define:
 
-  Hom(𝐀, −) :  𝓒 → 𝐒𝐞𝐭_u, 𝐗 ↦ |Hom(𝐀, 𝐗)|, (f : 𝐘 → 𝐙) ↦ (Hom(𝐀, 𝐘) → Hom(𝐀, 𝐙), g ↦ f ∘ g)
+  Hom_v(𝐀, −) :  𝓒 → 𝐒𝐞𝐭_v, 𝐗 ↦ |Hom(𝐀, 𝐗)|, (f : 𝐘 → 𝐙) ↦ (Hom(𝐀, 𝐘) → Hom(𝐀, 𝐙), g ↦ f ∘ g)
 
 References.
 
@@ -8128,9 +8308,9 @@ References.
 `;
 
 exports[`render hlm library: 4.9.2 data/libraries/hlm/Category%20theory/Yoneda/yoneda%20equivalence 1`] = `
-"Definition 4.9.2.  Let u ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_u be a functor, 𝐀 ∈ 𝓒. We define:
+"Definition 4.9.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. We define:
 
-  yoneda(F, 𝐀) :  Nat(Hom(𝐀, −), F) → Carrier(F(𝐀)), η ↦ η_𝐀(id_𝐀)
+  yoneda(F, 𝐀) :  Nat(Hom_v(𝐀, −), F) → Carrier(F(𝐀)), η ↦ η_𝐀(id_𝐀)
 
 References.
 
@@ -8140,9 +8320,9 @@ References.
 `;
 
 exports[`render hlm library: 4.9.3 data/libraries/hlm/Category%20theory/Yoneda/Yoneda%20lemma%20bijection 1`] = `
-"Theorem 4.9.3.  Let u ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_u be a functor, 𝐀 ∈ 𝓒. Then:
+"Theorem 4.9.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. Then:
 
-  yoneda(F, 𝐀) is bijective and (yoneda(F, 𝐀))^-1 = (Carrier(F(𝐀)) → Nat(Hom(𝐀, −), F), x ↦ (Hom(𝐀, 𝐗) → Carrier(F(𝐗)), f ↦ F(f)(x))_(𝐗 ∈ 𝓒))
+  yoneda(F, 𝐀) is bijective and (yoneda(F, 𝐀))^-1 = (Carrier(F(𝐀)) → Nat(Hom_v(𝐀, −), F), x ↦ (Hom(𝐀, 𝐗) → Carrier(F(𝐗)), f ↦ F(f)(x))_(𝐗 ∈ 𝓒))
 
 No proof.
 
@@ -8179,7 +8359,7 @@ exports[`render hlm library: 5.2 data/libraries/hlm/Formal%20systems/Fresh%20var
 
 Remarks.
 
-This is just the subset of variables that do not appear in _V_. It should be used whenever a new bound variable is needed."
+This is just the subset of variables that do not appear in \`V\`. It should be used whenever a new bound variable is needed."
 `;
 
 exports[`render hlm library: 5.3 data/libraries/hlm/Formal%20systems/Rewriting%20rules 1`] = `
@@ -8193,7 +8373,7 @@ For T' ⊆ T, we canonically treat elements of 𝓡𝓮𝔀𝓻(T') as eleme
 
 Remarks.
 
-This definition just provides some useful notation for rewriting rules for terms in _T_. It is actually equivalent to the Cartesian product of _T_ with itself."
+This definition just provides some useful notation for rewriting rules for terms in \`T\`. It is actually equivalent to the Cartesian product of \`T\` with itself."
 `;
 
 exports[`render hlm library: 5.4.1 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/Terms 1`] = `
@@ -8215,7 +8395,7 @@ Well-definedness.  No proof.
 
 Remarks.
 
-This formalization of the untyped lambda calculus is fairly standard except for one thing: The right side of a lambda abstraction depends on the value of the bound variable used to define it (which is kind of the point of bound variables). To prevent wild pseudo-terms that actually differ in nontrivial ways depending on the variable, there needs to be an additional substitutability constraint. Although substitution is defined later, we can use it in this case because we are applying it to subterms only (i.e. we are employing mutual induction).
+This formalization of the untyped lambda calculus is fairly standard except for one aspect: The right side of a lambda abstraction depends on the value of the bound variable used to define it (which is kind of the point of bound variables). To prevent wild pseudo-terms that actually differ in nontrivial ways depending on the variable, there needs to be an additional substitutability constraint. Although substitution is defined later, we can use it in this case because we are applying it to subterms only (i.e. we are employing mutual induction).
 
 References.
 
@@ -8236,7 +8416,7 @@ by:
 
 Remarks.
 
-Note that we do not allow _x_ to appear free in _R_. This ensures that _x_ does not appear free in the result either, which is important for e.g. the definition of [beta reduction](beta%20reduction).
+Note that we do not allow \`x\` to appear free in \`R\`. This ensures that \`x\` does not appear free in the result either, which is important for e.g. the definition \`$\\"beta reduction\\"\` of beta reduction.
 
 References.
 
@@ -8255,7 +8435,7 @@ This definition checks whether a rewrite rule matches a pair of terms. It consid
 `;
 
 exports[`render hlm library: 5.4.4 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/beta%20reduction 1`] = `
-"Definition 5.4.4.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+"Definition 5.4.4 (β reduction).  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
 
   β_V := {(λz. M_z) N → M_y[y := N] : M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), N ∈ 𝓣_V, y ∈ Fresh(V)}
 
@@ -8266,7 +8446,7 @@ References.
 `;
 
 exports[`render hlm library: 5.4.5 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/eta%20conversion 1`] = `
-"Definition 5.4.5.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
+"Definition 5.4.5 (η conversion).  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
 
   η_V := {λz. M z → M : M ∈ 𝓣_V}
 

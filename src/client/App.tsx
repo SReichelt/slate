@@ -85,7 +85,7 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
 
     let state: AppState = {
-      verticalLayout: window.innerHeight > window.innerWidth,
+      verticalLayout: !config.embedded && window.innerHeight > window.innerWidth,
       navigationPaneVisible: true,
       extraContentsVisible: false
     };

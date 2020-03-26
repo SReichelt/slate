@@ -19,6 +19,7 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
   let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), defaultLibraryDataProviderConfig, libraryName);
+  libraryDataProvider.checkMarkdownCode = true;
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 

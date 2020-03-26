@@ -6533,8 +6533,8 @@ export class MetaModel extends Meta.MetaModel {
 
 export const metaModel = new MetaModel;
 
-export function getMetaModel(path: Fmt.Path): MetaModel {
-  if (path.name !== 'hlm') {
+export function getMetaModel(path?: Fmt.Path): MetaModel {
+  if (path && path.name !== 'hlm') {
     throw new Error('File of type "hlm" expected');
   }
   return metaModel;

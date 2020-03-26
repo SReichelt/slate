@@ -12,6 +12,7 @@ export function isSpecialCharacter(c: string): boolean {
     isWhitespaceCharacter(c)
     || c === '"'
     || c === '\''
+    || c === '`'
     || c === '$'
     || c === '%'
     || c === '#'

@@ -17,7 +17,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 const ToolTip = require('react-portal-tooltip').default;
-const ReactMarkdownRenderer = require('react-markdown-renderer').default;
+const RemarkableReactRenderer = require('remarkable-react').default;
+const Remarkable = require('remarkable').Remarkable;
+const linkify = require('remarkable/linkify').linkify;
 
 export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
@@ -36,6 +38,7 @@ export interface ExpressionInteractionHandler {
   enterBlocker(): void;
   leaveBlocker(): void;
   isBlocked(): boolean;
+  renderCode(code: string): React.ReactNode;
 }
 
 let previewContents: React.ReactNode = null;
@@ -755,6 +758,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         </span>
       );
     } else if (expression instanceof Display.MarkdownExpression) {
+      let markdown: React.ReactNode;
       if (this.props.interactionHandler && expression.onTextChanged) {
         let onChange = (newText: string) => {
           expression.text = newText;
@@ -768,25 +772,28 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         };
         if ('ontouchstart' in window) {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
-          return <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+          markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
           let key = 'markdown-editor';
-          let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview', 'guide'];
-          if (expression.searchURLs) {
-            let searchURLs = expression.searchURLs;
-            let onSearch = () => {
-              for (let url of searchURLs) {
-                window.open(url, '_blank');
-              }
-            };
-            let searchButton: SimpleMDE.ToolbarIcon = {
-              name: 'search',
-              action: onSearch,
-              className: 'fa fa-search',
-              title: 'Search Default References (requires disabling popup blockers)'
-            };
-            toolbar.push('|', searchButton);
-            key = 'markdown-editor-with-search';
+          let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
+          if (!config.embedded) {
+            toolbar.push('guide');
+            if (expression.searchURLs) {
+              let searchURLs = expression.searchURLs;
+              let onSearch = () => {
+                for (let url of searchURLs) {
+                  window.open(url, '_blank');
+                }
+              };
+              let searchButton: SimpleMDE.ToolbarIcon = {
+                name: 'search',
+                action: onSearch,
+                className: 'fa fa-search',
+                title: 'Search Default References (requires disabling popup blockers)'
+              };
+              toolbar.push('|', searchButton);
+              key = 'markdown-editor-with-search';
+            }
           }
           let options: SimpleMDE.Options = {
             toolbar: toolbar,
@@ -794,15 +801,33 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             spellChecker: false,
             autoDownloadFontAwesome: false
           };
-          return <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
+          markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
         }
       } else {
-        let options = {
-          linkify: true,
+        let md = new Remarkable({
           linkTarget: '_blank'
-        };
-        return <ReactMarkdownRenderer markdown={expression.text} options={options}/>;
+        });
+        md.use(linkify);
+        md.renderer = new RemarkableReactRenderer({
+          components: {
+            code: (props: any) => {
+              if (this.props.interactionHandler && typeof props.content === 'string') {
+                let result = this.props.interactionHandler.renderCode(props.content);
+                if (result !== undefined) {
+                  return result;
+                }
+              }
+              return <code>{props.content}</code>;
+            }
+          }
+        });
+        markdown = md.render(expression.text);
       }
+      return (
+        <div className={className + ' markdown'}>
+          {markdown}
+        </div>
+      );
     } else if (expression instanceof Display.IndirectExpression) {
       return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Display.PromiseExpression) {

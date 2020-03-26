@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as Fmt from '../../shared/format/format';
+import * as FmtReader from '../../shared/format/read';
+import * as Ctx from '../../shared/format/context';
 import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
@@ -77,6 +79,10 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 
   isBlocked(): boolean {
     return this.blockCounter !== 0;
+  }
+
+  renderCode(code: string): React.ReactNode {
+    return undefined;
   }
 }
 
@@ -156,6 +162,36 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
         }
       }
       return path;
+    } else {
+      return undefined;
+    }
+  }
+
+  renderCode(code: string): React.ReactNode {
+    if (this.definition) {
+      try {
+        let logic = this.libraryDataProvider.logic;
+        let metaModel = logic.getMetaModel();
+        let stream = new FmtReader.StringInputStream(code);
+        let errorHandler = new FmtReader.DefaultErrorHandler;
+        let reader = new FmtReader.Reader(stream, errorHandler, () => metaModel);
+        let context = new Ctx.DummyContext(metaModel);
+        let expression = reader.readExpression(false, metaModel.functions, context);
+        let renderedExpressionPromise = this.definition.then((definition: LibraryDefinition) => {
+          let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+            includeProofs: true,
+            includeLabel: true,
+            includeExtras: true,
+            includeRemarks: true
+          };
+          let renderer = logic.getDisplay().getDefinitionRenderer(definition.definition, this.libraryDataProvider, this.templates, renderedDefinitionOptions);
+          return renderer.renderExpression(expression);
+        });
+        let renderedExpression = new Display.PromiseExpression(renderedExpressionPromise);
+        return <Expression expression={renderedExpression} interactionHandler={this}/>;
+      } catch (error) {
+        return <span className="error">Error: {error.message}</span>;
+      }
     } else {
       return undefined;
     }

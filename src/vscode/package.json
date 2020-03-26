@@ -40,11 +40,24 @@
 		"commands": [
 			{
 				"command": "slate.showGraphicalEditor",
-				"title": "Show graphical editor",
+				"title": "Show Graphical Preview/Editor",
 				"category": "Slate",
-				"when": "editorLangId == slate"
+				"when": "editorLangId == slate",
+				"icon": {
+					"light": "./media/preview-right-light.svg",
+					"dark": "./media/preview-right-dark.svg"
+				}
 			}
-		]
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "slate.showGraphicalEditor",
+					"when": "editorLangId == slate",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"activationEvents": [
 		"onLanguage:slate",
@@ -55,7 +68,7 @@
 		"clean": "rimraf out *.vsix",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"package": "vsce package"
+		"package": "vsce package -o slate.vsix"
 	},
 	"engines": {
 		"vscode": "^1.42.0"

@@ -1315,6 +1315,23 @@ function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagnostics:
 let parsedFileCache = new Map<string, ParsedDocument>();
 let metaModelCache: Map<string, ParsedMetaModel> | undefined = undefined;
 
+class ErrorHandler implements FmtReader.ErrorHandler {
+    constructor(private parsedDocument: ParsedDocument, private diagnostics?: vscode.Diagnostic[]) {}
+
+    error(msg: string, range: FmtReader.Range): void {
+        this.parsedDocument.hasErrors = true;
+        if (this.diagnostics) {
+            this.diagnostics.push({
+                message: msg,
+                range: convertRange(range),
+                severity: vscode.DiagnosticSeverity.Error
+            });
+        }
+    }
+
+    checkMarkdownCode = true;
+}
+
 function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): ParsedDocument {
     let cachedDocument = parsedFileCache.get(uri.fsPath);
     if (cachedDocument) {
@@ -1331,14 +1348,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         rangeMap: new Map<Object, RangeInfo>(),
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
     };
-    let reportError = diagnostics ? (msg: string, range: FmtReader.Range) => {
-        parsedDocument.hasErrors = true;
-        diagnostics.push({
-            message: msg,
-            range: convertRange(range),
-            severity: vscode.DiagnosticSeverity.Error
-        });
-    } : () => {};
+    let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
         if (metaModelCache) {
@@ -1386,7 +1396,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         parsedDocument.rangeList.push(rangeInfo);
         parsedDocument.rangeMap.set(info.object, rangeInfo);
     };
-    let reader = new FmtReader.Reader(stream, reportError, getDocumentMetaModel, reportRange);
+    let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
     try {
         parsedDocument.file = reader.readFile();
     } catch (error) {
