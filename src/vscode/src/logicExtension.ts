@@ -10,7 +10,7 @@ import { renderAsText } from '../../shared/display/textOutput';
 import * as Logic from '../../shared/logics/logic';
 import * as Logics from '../../shared/logics/logics';
 import { FileAccessor, FileContents } from '../../shared/data/fileAccessor';
-import { LibraryDataProvider, LibraryDefinition, defaultLibraryDataProviderConfig } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderConfig } from '../../shared/data/libraryDataProvider';
 import { fileExtension } from '../../fs/format/dynamic';
 import CachedPromise from '../../shared/data/cachedPromise';
 import { languageId, SLATE_MODE } from './slate';
@@ -119,8 +119,13 @@ class LibraryDocumentProvider {
             if (!logic) {
                 return undefined;
             }
+            let config: LibraryDataProviderConfig = {
+                canPreload: false,
+                watchForChanges: true,
+                checkMarkdownCode: false
+            };
             library = {
-                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, defaultLibraryDataProviderConfig, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, config, 'Library'),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);

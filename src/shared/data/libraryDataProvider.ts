@@ -35,9 +35,13 @@ export const defaultReferenceSearchURLs = [
 
 export interface LibraryDataProviderConfig {
   canPreload: boolean;
+  watchForChanges: boolean;
+  checkMarkdownCode: boolean;
 }
 export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
   canPreload: false,
+  watchForChanges: false,
+  checkMarkdownCode: false
 };
 
 interface PrefetchQueueItem {
@@ -60,7 +64,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
-  checkMarkdownCode = false;
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
@@ -71,7 +74,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       path.name = this.childName;
       path.parentPath = this.parent.path;
       this.path = path;
-      this.checkMarkdownCode = this.parent.checkMarkdownCode;
     } else {
       this.itemNumber = [];
     }
@@ -262,7 +264,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
     return this.fileAccessor.readFile(uri)
       .then((contents: FileContents) => {
-        if (contents.addWatcher) {
+        if (this.config.watchForChanges && contents.addWatcher) {
           contents.addWatcher((watcher: FileWatcher) => {
             this.preloadedDefinitions.clear();
             watcher.close();
@@ -336,11 +338,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           .then((contents: FileContents) => {
             this.preloadedDefinitions.delete(name);
             let libraryDefinition: LibraryDefinition | undefined = undefined;
-            if (contents.addWatcher) {
+            if (this.config.watchForChanges && contents.addWatcher) {
               contents.addWatcher((watcher: FileWatcher) => {
                 if (libraryDefinition) {
                   try {
-                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.checkMarkdownCode);
+                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
                     libraryDefinition.definition = this.getMainDefinition(libraryDefinition.file, definitionName);
                     let currentEditedDefinition = this.editedDefinitions.get(name);
                     if (currentEditedDefinition) {
@@ -354,7 +356,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
                 }
               });
             }
-            let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.checkMarkdownCode);
+            let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
             libraryDefinition = {
               file: file,
               definition: this.getMainDefinition(file, definitionName),

@@ -148,7 +148,9 @@ class App extends React.Component<AppProps, AppState> {
     this.logic = Logics.hlm;
     let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
     let libraryDataProviderConfig: LibraryDataProviderConfig = {
-      canPreload: canPreload
+      canPreload: canPreload,
+      watchForChanges: true,
+      checkMarkdownCode: false
     };
     this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderConfig, 'Library');
 
