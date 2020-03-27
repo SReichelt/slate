@@ -16,7 +16,7 @@ const indexFileName = '_index';
 
 export const defaultReferences = [
   'https://en.wikipedia.org/wiki/',
-  'http://mathworld.wolfram.com/',
+  'https://mathworld.wolfram.com/',
   'https://proofwiki.org/wiki/',
   'https://ncatlab.org/nlab/show/',
   'https://coq.inria.fr/library/',
@@ -26,7 +26,7 @@ export const defaultReferences = [
 const defaultReferencesString = defaultReferences.map((ref) => `* ${ref}...`).reduce((prev, cur) => `${prev}\n${cur}`);
 export const defaultReferenceSearchURLs = [
   'https://en.wikipedia.org/w/index.php?search=',
-  'http://mathworld.wolfram.com/search/?query=',
+  'https://mathworld.wolfram.com/search/?query=',
   'https://www.google.com/search?q=site%3Aproofwiki.org+',
   'https://www.google.com/search?q=site%3Ancatlab.org+',
   'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
@@ -746,6 +746,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
       return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
         .then((result: WriteFileResult) => {
+          editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
           let fullyLoadedDefinitionPromise = this.fullyLoadedDefinitions.get(name);
           if (fullyLoadedDefinitionPromise) {
             let fullyLoadedDefinition = fullyLoadedDefinitionPromise.getImmediateResult();
