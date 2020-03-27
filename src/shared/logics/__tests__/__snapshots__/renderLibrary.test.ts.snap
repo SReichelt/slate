@@ -12,7 +12,7 @@ This defines the empty set as an enumeration with no elements. Note that sets ar
 References.
 
 * https://en.wikipedia.org/wiki/Empty_set
-* http://mathworld.wolfram.com/EmptySet.html
+* https://mathworld.wolfram.com/EmptySet.html
 * https://proofwiki.org/wiki/Definition:Empty_Set
 * https://ncatlab.org/nlab/show/empty+set
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_def"
@@ -135,7 +135,7 @@ These are just some example proofs, which will be completed later.
 References.
 
 * https://en.wikipedia.org/wiki/Finite_set
-* http://mathworld.wolfram.com/FiniteSet.html
+* https://mathworld.wolfram.com/FiniteSet.html
 * https://proofwiki.org/wiki/Definition:Finite_Set
 * https://ncatlab.org/nlab/show/finite+set
 * https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite"
@@ -178,7 +178,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Countable_set
-* http://mathworld.wolfram.com/CountableSet.html
+* https://mathworld.wolfram.com/CountableSet.html
 * https://proofwiki.org/wiki/Definition:Countable_Set
 * https://ncatlab.org/nlab/show/countable+set
 * https://leanprover-community.github.io/mathlib_docs/data/set/countable.html#set.countable"
@@ -196,7 +196,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Countable_set
-* http://mathworld.wolfram.com/CountablyInfinite.html
+* https://mathworld.wolfram.com/CountablyInfinite.html
 * https://proofwiki.org/wiki/Definition:Countably_Infinite_Set
 * https://ncatlab.org/nlab/show/countable+set (called “denumerable” here)"
 `;
@@ -213,7 +213,7 @@ Due to the type system of HLM, it is impossible to define the intersection of tw
 References.
 
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)
-* http://mathworld.wolfram.com/Intersection.html
+* https://mathworld.wolfram.com/Intersection.html
 * https://proofwiki.org/wiki/Definition:Set_Intersection
 * https://ncatlab.org/nlab/show/intersection
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
@@ -270,7 +270,7 @@ Due to the type system of HLM, it is impossible to define the union of two arbit
 References.
 
 * https://en.wikipedia.org/wiki/Union_(set_theory)
-* http://mathworld.wolfram.com/Union.html
+* https://mathworld.wolfram.com/Union.html
 * https://proofwiki.org/wiki/Definition:Set_Union
 * https://ncatlab.org/nlab/show/union
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
@@ -325,7 +325,7 @@ Equality.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
-* http://mathworld.wolfram.com/SetDifference.html
+* https://mathworld.wolfram.com/SetDifference.html
 * https://proofwiki.org/wiki/Definition:Set_Difference
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
 `;
@@ -352,7 +352,7 @@ A construction always includes definitions of equality for each constructor. In 
 References.
 
 * https://en.wikipedia.org/wiki/Disjoint_union
-* http://mathworld.wolfram.com/DisjointUnion.html
+* https://mathworld.wolfram.com/DisjointUnion.html
 * https://proofwiki.org/wiki/Definition:Disjoint_Union_(Set_Theory)
 * https://ncatlab.org/nlab/show/disjoint+union#special_cases
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sum"
@@ -374,7 +374,7 @@ The Cartesian product is, again, a “construction.” Note that HLM does not ha
 References.
 
 * https://en.wikipedia.org/wiki/Cartesian_product
-* http://mathworld.wolfram.com/CartesianProduct.html
+* https://mathworld.wolfram.com/CartesianProduct.html
 * https://proofwiki.org/wiki/Definition:Cartesian_Product
 * https://ncatlab.org/nlab/show/cartesian+product
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#prod"
@@ -396,7 +396,7 @@ The power set is another example of a construction. It is slightly nonstandard i
 References.
 
 * https://en.wikipedia.org/wiki/Power_set
-* http://mathworld.wolfram.com/PowerSet.html
+* https://mathworld.wolfram.com/PowerSet.html
 * https://proofwiki.org/wiki/Definition:Power_Set
 * https://ncatlab.org/nlab/show/power+set
 * https://coq.inria.fr/library/Coq.Sets.Powerset.html
@@ -532,7 +532,7 @@ As a last resort, HLM could be extended in two different ways:
 References.
 
 * https://en.wikipedia.org/wiki/Axiom_of_choice
-* http://mathworld.wolfram.com/AxiomofChoice.html
+* https://mathworld.wolfram.com/AxiomofChoice.html
 * https://proofwiki.org/wiki/Axiom:Axiom_of_Choice
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
@@ -594,7 +594,7 @@ This definition encodes a relation from \`S\` to \`T\` as a proposition dependin
 References.
 
 * https://en.wikipedia.org/wiki/Binary_relation
-* http://mathworld.wolfram.com/Relation.html
+* https://mathworld.wolfram.com/Relation.html
 * https://proofwiki.org/wiki/Definition:Relation
 * https://ncatlab.org/nlab/show/relation#binary_relations
 * https://leanprover-community.github.io/mathlib_docs/data/rel.html#rel"
@@ -697,7 +697,7 @@ In this library, “mapping” and “function” are not synonymous but interch
 References.
 
 * https://en.wikipedia.org/wiki/Function_(mathematics)
-* http://mathworld.wolfram.com/Function.html
+* https://mathworld.wolfram.com/Function.html
 * https://proofwiki.org/wiki/Definition:Mapping"
 `;
 
@@ -734,7 +734,7 @@ Since endorelations are used often, we encode them as a separate construction wi
 References.
 
 * https://en.wikipedia.org/wiki/Binary_relation#Relations_over_a_set
-* http://mathworld.wolfram.com/Relation.html
+* https://mathworld.wolfram.com/Relation.html
 * https://proofwiki.org/wiki/Definition:Endorelation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Relation"
 `;
@@ -769,7 +769,7 @@ exports[`render hlm library: 1.3.15 data/libraries/hlm/Essentials/Relations/refl
 References.
 
 * https://en.wikipedia.org/wiki/Reflexive_relation
-* http://mathworld.wolfram.com/Reflexive.html
+* https://mathworld.wolfram.com/Reflexive.html
 * https://proofwiki.org/wiki/Definition:Reflexive_Relation
 * https://ncatlab.org/nlab/show/reflexive+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Reflexive
@@ -800,7 +800,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Symmetric_relation
-* http://mathworld.wolfram.com/SymmetricRelation.html
+* https://mathworld.wolfram.com/SymmetricRelation.html
 * https://proofwiki.org/wiki/Definition:Symmetric_Relation
 * https://ncatlab.org/nlab/show/symmetric+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Symmetric
@@ -815,7 +815,7 @@ exports[`render hlm library: 1.3.18 data/libraries/hlm/Essentials/Relations/anti
 References.
 
 * https://en.wikipedia.org/wiki/Antisymmetric_relation
-* http://mathworld.wolfram.com/AntisymmetricRelation.html
+* https://mathworld.wolfram.com/AntisymmetricRelation.html
 * https://proofwiki.org/wiki/Definition:Antisymmetric_Relation
 * https://ncatlab.org/nlab/show/antisymmetric+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Antisymmetric
@@ -830,7 +830,7 @@ exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/tran
 References.
 
 * https://en.wikipedia.org/wiki/Transitive_relation
-* http://mathworld.wolfram.com/Transitive.html
+* https://mathworld.wolfram.com/Transitive.html
 * https://proofwiki.org/wiki/Definition:Transitive_Relation
 * https://ncatlab.org/nlab/show/transitive+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Transitive
@@ -845,7 +845,7 @@ exports[`render hlm library: 1.3.20 data/libraries/hlm/Essentials/Relations/preo
 References.
 
 * https://en.wikipedia.org/wiki/Preorder
-* http://mathworld.wolfram.com/Preorder.html
+* https://mathworld.wolfram.com/Preorder.html
 * https://proofwiki.org/wiki/Definition:Preordering
 * https://ncatlab.org/nlab/show/preorder
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Preorder
@@ -863,7 +863,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
-* http://mathworld.wolfram.com/PartialOrder.html
+* https://mathworld.wolfram.com/PartialOrder.html
 * https://proofwiki.org/wiki/Definition:Ordering
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Order
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#partial_order"
@@ -880,7 +880,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Total_order
-* http://mathworld.wolfram.com/TotallyOrderedSet.html
+* https://mathworld.wolfram.com/TotallyOrderedSet.html
 * https://proofwiki.org/wiki/Definition:Total_Ordering
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#linear_order"
 `;
@@ -931,7 +931,7 @@ exports[`render hlm library: 1.3.27 data/libraries/hlm/Essentials/Relations/well
 References.
 
 * https://en.wikipedia.org/wiki/Well-order
-* http://mathworld.wolfram.com/WellOrderedSet.html
+* https://mathworld.wolfram.com/WellOrderedSet.html
 * https://proofwiki.org/wiki/Definition:Well-Ordering
 * https://ncatlab.org/nlab/show/well-order"
 `;
@@ -944,7 +944,7 @@ exports[`render hlm library: 1.3.28 data/libraries/hlm/Essentials/Relations/equi
 References.
 
 * https://en.wikipedia.org/wiki/Equivalence_relation
-* http://mathworld.wolfram.com/EquivalenceRelation.html
+* https://mathworld.wolfram.com/EquivalenceRelation.html
 * https://proofwiki.org/wiki/Definition:Equivalence_Relation
 * https://ncatlab.org/nlab/show/equivalence+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Equivalence
@@ -975,7 +975,7 @@ In the end, there may need to be two different but interchangeable definitions o
 References.
 
 * https://en.wikipedia.org/wiki/Equivalence_class
-* http://mathworld.wolfram.com/EquivalenceClass.html
+* https://mathworld.wolfram.com/EquivalenceClass.html
 * https://proofwiki.org/wiki/Definition:Equivalence_Class
 * https://ncatlab.org/nlab/show/equivalence+class
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/quot.html#quotient"
@@ -1008,7 +1008,7 @@ This definition constructs a partial order on the Cartesian product of two sets 
 References.
 
 * https://en.wikipedia.org/wiki/Lexicographical_order#Cartesian_products
-* http://mathworld.wolfram.com/LexicographicOrder.html
+* https://mathworld.wolfram.com/LexicographicOrder.html
 * https://proofwiki.org/wiki/Definition:Lexicographic_Order
 * https://ncatlab.org/nlab/show/lexicographic+order
 * https://leanprover-community.github.io/mathlib_docs/core/init/wf.html#prod.lex"
@@ -1039,7 +1039,7 @@ Equality.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Reflexive_closure
-* http://mathworld.wolfram.com/ReflexiveClosure.html
+* https://mathworld.wolfram.com/ReflexiveClosure.html
 * https://proofwiki.org/wiki/Definition:Reflexive_Closure
 * https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.refl_gen"
 `;
@@ -1076,7 +1076,7 @@ exports[`render hlm library: 1.3.32.5 data/libraries/hlm/Essentials/Relations/Cl
 References.
 
 * https://en.wikipedia.org/wiki/Transitive_closure
-* http://mathworld.wolfram.com/TransitiveClosure.html
+* https://mathworld.wolfram.com/TransitiveClosure.html
 * https://proofwiki.org/wiki/Definition:Transitive_Closure_(Relation_Theory)
 * https://ncatlab.org/nlab/show/transitive+closure
 * https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.trans_gen"
@@ -1131,7 +1131,7 @@ Function [extensionality](https://en.wikipedia.org/wiki/Extensionality) is a con
 References.
 
 * https://en.wikipedia.org/wiki/Function_(mathematics)
-* http://mathworld.wolfram.com/Function.html
+* https://mathworld.wolfram.com/Function.html
 * https://proofwiki.org/wiki/Definition:Mapping
 * https://ncatlab.org/nlab/show/function
 * https://coq.inria.fr/library/Coq.Program.Basics.html#arrow"
@@ -1258,7 +1258,7 @@ exports[`render hlm library: 1.4.11 data/libraries/hlm/Essentials/Functions/comp
 References.
 
 * https://en.wikipedia.org/wiki/Function_composition
-* http://mathworld.wolfram.com/Composition.html
+* https://mathworld.wolfram.com/Composition.html
 * https://proofwiki.org/wiki/Definition:Composition_of_Mappings
 * https://ncatlab.org/nlab/show/composition
 * https://coq.inria.fr/library/Coq.Program.Basics.html#compose
@@ -1275,7 +1275,7 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Function_composition#Properties
-* http://mathworld.wolfram.com/Composition.html
+* https://mathworld.wolfram.com/Composition.html
 * https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative
 * https://coq.inria.fr/library/Coq.Program.Combinators.html#compose_assoc
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp.assoc"
@@ -1304,7 +1304,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Injective_function
-* http://mathworld.wolfram.com/Injection.html
+* https://mathworld.wolfram.com/Injection.html
 * https://proofwiki.org/wiki/Definition:Injection
 * https://ncatlab.org/nlab/show/injection
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.injective"
@@ -1322,7 +1322,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Surjective_function
-* http://mathworld.wolfram.com/Surjection.html
+* https://mathworld.wolfram.com/Surjection.html
 * https://proofwiki.org/wiki/Definition:Surjection
 * https://ncatlab.org/nlab/show/surjection
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.surjective"
@@ -1341,7 +1341,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Bijective_function
-* http://mathworld.wolfram.com/Bijection.html
+* https://mathworld.wolfram.com/Bijection.html
 * https://proofwiki.org/wiki/Definition:Bijection
 * https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse
 * https://ncatlab.org/nlab/show/bijection
@@ -1403,7 +1403,7 @@ Bijections are important enough to warrant their own notation. A bidirectional a
 References.
 
 * https://en.wikipedia.org/wiki/Bijective_function
-* http://mathworld.wolfram.com/Bijection.html
+* https://mathworld.wolfram.com/Bijection.html
 * https://proofwiki.org/wiki/Definition:Bijection
 * https://ncatlab.org/nlab/show/bijection"
 `;
@@ -1421,7 +1421,7 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Inverse_function
-* http://mathworld.wolfram.com/InverseFunction.html
+* https://mathworld.wolfram.com/InverseFunction.html
 * https://proofwiki.org/wiki/Definition:Inverse_Mapping
 * https://ncatlab.org/nlab/show/inverse
 * https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.inv_fun"
@@ -1464,7 +1464,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Iterated_function
-* http://mathworld.wolfram.com/IteratedMap.html"
+* https://mathworld.wolfram.com/IteratedMap.html"
 `;
 
 exports[`render hlm library: 1.4.28 data/libraries/hlm/Essentials/Functions/power%20to%20integer 1`] = `
@@ -1517,7 +1517,7 @@ We write “let ∗ : X × X → X be an operation on X” for “le
 References.
 
 * https://en.wikipedia.org/wiki/Binary_operation
-* http://mathworld.wolfram.com/BinaryOperation.html
+* https://mathworld.wolfram.com/BinaryOperation.html
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
@@ -1529,7 +1529,7 @@ exports[`render hlm library: 1.4.30.5 data/libraries/hlm/Essentials/Functions/Op
 References.
 
 * https://en.wikipedia.org/wiki/Associative_property
-* http://mathworld.wolfram.com/Associative.html
+* https://mathworld.wolfram.com/Associative.html
 * https://proofwiki.org/wiki/Definition:Associative_Operation
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
 `;
@@ -1542,7 +1542,7 @@ exports[`render hlm library: 1.4.30.6 data/libraries/hlm/Essentials/Functions/Op
 References.
 
 * https://en.wikipedia.org/wiki/Commutative_property
-* http://mathworld.wolfram.com/Commutative.html
+* https://mathworld.wolfram.com/Commutative.html
 * https://proofwiki.org/wiki/Definition:Commutative/Operation
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
 `;
@@ -1555,7 +1555,7 @@ exports[`render hlm library: 1.4.30.7 data/libraries/hlm/Essentials/Functions/Op
 References.
 
 * https://en.wikipedia.org/wiki/Distributive_property
-* http://mathworld.wolfram.com/Distributive.html
+* https://mathworld.wolfram.com/Distributive.html
 * https://proofwiki.org/wiki/Definition:Distributive_Operation/Left
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
 `;
@@ -1568,7 +1568,7 @@ exports[`render hlm library: 1.4.30.8 data/libraries/hlm/Essentials/Functions/Op
 References.
 
 * https://en.wikipedia.org/wiki/Distributive_property
-* http://mathworld.wolfram.com/Distributive.html
+* https://mathworld.wolfram.com/Distributive.html
 * https://proofwiki.org/wiki/Definition:Distributive_Operation/Right
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
 `;
@@ -1581,7 +1581,7 @@ exports[`render hlm library: 1.4.30.9 data/libraries/hlm/Essentials/Functions/Op
 References.
 
 * https://en.wikipedia.org/wiki/Distributive_property
-* http://mathworld.wolfram.com/Distributive.html
+* https://mathworld.wolfram.com/Distributive.html
 * https://proofwiki.org/wiki/Definition:Distributive_Operation
 * https://ncatlab.org/nlab/show/distributive+law"
 `;
@@ -1706,7 +1706,7 @@ In this definition, the codomain is a fixed set \`S\`. If each item is an elemen
 References.
 
 * https://en.wikipedia.org/wiki/Tuple
-* http://mathworld.wolfram.com/n-Tuple.html
+* https://mathworld.wolfram.com/n-Tuple.html
 * https://proofwiki.org/wiki/Definition:Ordered_Tuple/On_Set
 * https://ncatlab.org/nlab/show/tuple
 * https://coq.inria.fr/library/Coq.Vectors.VectorDef.html
@@ -1741,7 +1741,7 @@ Finite sequences could alternatively be defined inductively (i.e. as lists). How
 References.
 
 * https://en.wikipedia.org/wiki/Sequence
-* http://mathworld.wolfram.com/Sequence.html
+* https://mathworld.wolfram.com/Sequence.html
 * https://proofwiki.org/wiki/Definition:Finite_Sequence
 * https://ncatlab.org/nlab/show/free+monoid
 * https://coq.inria.fr/library/Coq.Init.Datatypes.html#list
@@ -1788,7 +1788,7 @@ Even though the more general definition \`$Tuples\` covers infinite sequences as
 References.
 
 * https://en.wikipedia.org/wiki/Sequence
-* http://mathworld.wolfram.com/Sequence.html
+* https://mathworld.wolfram.com/Sequence.html
 * https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
 * https://ncatlab.org/nlab/show/sequence
 * https://coq.inria.fr/library/Coq.Lists.Streams.html#Stream
@@ -1912,7 +1912,7 @@ In this library, the natural numbers start at 0, which is known to be far more c
 References.
 
 * https://en.wikipedia.org/wiki/Natural_number
-* http://mathworld.wolfram.com/NonnegativeInteger.html
+* https://mathworld.wolfram.com/NonnegativeInteger.html
 * https://proofwiki.org/wiki/Definition:Natural_Numbers
 * https://ncatlab.org/nlab/show/natural+number
 * https://coq.inria.fr/library/Coq.Init.Nat.html
@@ -2156,7 +2156,7 @@ exports[`render hlm library: 1.6.1.17.1 data/libraries/hlm/Essentials/Numbers/Na
 
 References.
 
-* http://mathworld.wolfram.com/InitialSegment.html
+* https://mathworld.wolfram.com/InitialSegment.html
 * https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based"
 `;
 
@@ -2240,7 +2240,7 @@ In some cases, the set \`$../../../Sets/\\"Truth values\\"\` of truth values may
 References.
 
 * https://en.wikipedia.org/wiki/Bit
-* http://mathworld.wolfram.com/Bit.html"
+* https://mathworld.wolfram.com/Bit.html"
 `;
 
 exports[`render hlm library: 1.6.1.18 data/libraries/hlm/Essentials/Numbers/Natural/Finiteness%20criterion%20lemma 1`] = `
@@ -2460,7 +2460,7 @@ The constraint that \`m\` is nonzero is not really necessary but added for consi
 References.
 
 * https://en.wikipedia.org/wiki/Divisor
-* http://mathworld.wolfram.com/Divisor.html
+* https://mathworld.wolfram.com/Divisor.html
 * https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers
 * (https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.comm_semiring)"
 `;
@@ -2513,7 +2513,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Parity_(mathematics)
-* http://mathworld.wolfram.com/EvenNumber.html
+* https://mathworld.wolfram.com/EvenNumber.html
 * https://coq.inria.fr/library/Coq.Init.Nat.html#even
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.even
 * https://leanprover-community.github.io/mathlib_docs/data/nat/parity.html#nat.even
@@ -2566,7 +2566,7 @@ This definition should be considered part of \`$\\"Induction principle\\"\`.
 References.
 
 * https://en.wikipedia.org/wiki/Inductive_set (but uses a 1-based definition)
-* http://mathworld.wolfram.com/InductiveSet.html
+* https://mathworld.wolfram.com/InductiveSet.html
 * https://proofwiki.org/wiki/Definition:Inductive_Set (also uses a 1-based definition)"
 `;
 
@@ -2629,7 +2629,7 @@ This is just a slight reformulation based on the definition of a property (see \
 References.
 
 * https://en.wikipedia.org/wiki/Mathematical_induction
-* http://mathworld.wolfram.com/PrincipleofMathematicalInduction.html
+* https://mathworld.wolfram.com/PrincipleofMathematicalInduction.html
 * https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Predicate"
 `;
 
@@ -2643,7 +2643,7 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Well-ordering_principle
-* http://mathworld.wolfram.com/WellOrderingPrinciple.html
+* https://mathworld.wolfram.com/WellOrderingPrinciple.html
 * https://proofwiki.org/wiki/Well-Ordering_Principle"
 `;
 
@@ -2727,7 +2727,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Factorial
-* http://mathworld.wolfram.com/Factorial.html
+* https://mathworld.wolfram.com/Factorial.html
 * https://proofwiki.org/wiki/Definition:Factorial
 * https://coq.inria.fr/library/Coq.Arith.Factorial.html#fact
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.fact
@@ -2777,7 +2777,7 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Binomial_coefficient
-* http://mathworld.wolfram.com/BinomialCoefficient.html
+* https://mathworld.wolfram.com/BinomialCoefficient.html
 * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
 * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose_eq_fact_div_fact"
@@ -2795,7 +2795,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Summation
-* http://mathworld.wolfram.com/Sum.html
+* https://mathworld.wolfram.com/Sum.html
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
@@ -2843,7 +2843,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -2905,7 +2905,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Prime_number
 * https://en.wikipedia.org/wiki/Euclid%27s_lemma
-* http://mathworld.wolfram.com/PrimeNumber.html
+* https://mathworld.wolfram.com/PrimeNumber.html
 * https://proofwiki.org/wiki/Definition:Prime_Number
 * https://ncatlab.org/nlab/show/prime+number
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#prime
@@ -2936,7 +2936,7 @@ We write “let p be a prime” for “let p ∈ ℙ.”
 References.
 
 * https://en.wikipedia.org/wiki/Prime_number
-* http://mathworld.wolfram.com/PrimeNumber.html
+* https://mathworld.wolfram.com/PrimeNumber.html
 * https://proofwiki.org/wiki/Definition:Prime_Number#Notation
 * http://oeis.org/A000040"
 `;
@@ -3004,7 +3004,7 @@ p ∈ ℙ
 References.
 
 * https://en.wikipedia.org/wiki/Euclid%27s_theorem
-* http://mathworld.wolfram.com/EuclidsTheorems.html
+* https://mathworld.wolfram.com/EuclidsTheorems.html
 * https://proofwiki.org/wiki/Euclid%27s_Theorem
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
@@ -3042,7 +3042,7 @@ Note that in addition to this definition for natural numbers, there is a compati
 References.
 
 * https://en.wikipedia.org/wiki/Coprime_integers
-* http://mathworld.wolfram.com/RelativelyPrime.html
+* https://mathworld.wolfram.com/RelativelyPrime.html
 * https://proofwiki.org/wiki/Definition:Coprime/Integers
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/gcd.html#nat.coprime"
@@ -3101,7 +3101,7 @@ In a way, the definition of cardinal numbers in HLM is very similar to the defin
 References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number
-* http://mathworld.wolfram.com/CardinalNumber.html
+* https://mathworld.wolfram.com/CardinalNumber.html
 * https://proofwiki.org/wiki/Definition:Cardinal
 * https://ncatlab.org/nlab/show/cardinal+number
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal"
@@ -3139,7 +3139,7 @@ Although these sets are not unique, the type system prevents the ambiguities tha
 References.
 
 * https://en.wikipedia.org/wiki/Homomorphism
-* http://mathworld.wolfram.com/Homomorphism.html
+* https://mathworld.wolfram.com/Homomorphism.html
 * https://proofwiki.org/wiki/Definition:Homomorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/homomorphism"
 `;
@@ -3161,7 +3161,7 @@ An isomorphism between cardinal numbers is simply a bijection between their repr
 References.
 
 * https://en.wikipedia.org/wiki/Isomorphism
-* http://mathworld.wolfram.com/Isomorphism.html
+* https://mathworld.wolfram.com/Isomorphism.html
 * https://proofwiki.org/wiki/Definition:Isomorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/isomorphism"
 `;
@@ -3180,7 +3180,7 @@ Automorphisms of cardinal numbers, i.e. self-bijections of a set, might not be a
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism"
 `;
@@ -3201,7 +3201,7 @@ Alternatively, automorphism groups could be defined more generally via category 
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group"
 `;
@@ -3276,7 +3276,7 @@ This is essentially the Schröder-Bernstein theorem together with the HLM-specif
 References.
 
 * [https://en.wikipedia.org/wiki/Schröder-Bernstein_theorem](https://en.wikipedia.org/wiki/Schr%C3%B6der-Bernstein_theorem)
-* http://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
+* https://mathworld.wolfram.com/Schroeder-BernsteinTheorem.html
 * [https://proofwiki.org/wiki/Cantor-Bernstein-Schröder_Theorem](https://proofwiki.org/wiki/Cantor-Bernstein-Schr%C3%B6der_Theorem)
 * https://leanprover-community.github.io/mathlib_docs/set_theory/schroeder_bernstein.html#function.embedding.antisymm"
 `;
@@ -3318,7 +3318,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_addition
-* http://mathworld.wolfram.com/CardinalAddition.html
+* https://mathworld.wolfram.com/CardinalAddition.html
 * https://proofwiki.org/wiki/Definition:Sum_of_Cardinals
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.add_def"
 `;
@@ -3335,7 +3335,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_multiplication
-* http://mathworld.wolfram.com/CardinalMultiplication.html
+* https://mathworld.wolfram.com/CardinalMultiplication.html
 * https://proofwiki.org/wiki/Definition:Product_of_Cardinals
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.mul_def"
 `;
@@ -3351,7 +3351,7 @@ by:
 
 References.
 
-* http://mathworld.wolfram.com/CardinalExponentiation.html
+* https://mathworld.wolfram.com/CardinalExponentiation.html
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
 * https://proofwiki.org/wiki/Definition:Exponentiation_of_Cardinals
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.power_def"
@@ -3367,7 +3367,7 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Cardinal_number#Cardinal_exponentiation
-* http://mathworld.wolfram.com/CardinalExponentiation.html"
+* https://mathworld.wolfram.com/CardinalExponentiation.html"
 `;
 
 exports[`render hlm library: 1.6.2.15.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
@@ -3386,7 +3386,7 @@ This definition is currently a stub that should be extended to arbitrary aleph n
 References.
 
 * https://en.wikipedia.org/wiki/Aleph_number
-* http://mathworld.wolfram.com/Aleph-0.html
+* https://mathworld.wolfram.com/Aleph-0.html
 * https://ncatlab.org/nlab/show/aleph
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#cardinal.aleph_zero"
 `;
@@ -3404,7 +3404,7 @@ Equality.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Cardinality_of_the_continuum
-* http://mathworld.wolfram.com/Continuum.html
+* https://mathworld.wolfram.com/Continuum.html
 * https://ncatlab.org/nlab/show/continuum
 * https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.mk_real"
 `;
@@ -3452,7 +3452,7 @@ No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Cantor%27s_theorem
-* http://mathworld.wolfram.com/CantorsTheorem.html
+* https://mathworld.wolfram.com/CantorsTheorem.html
 * https://proofwiki.org/wiki/Cantor%27s_Theorem
 * https://ncatlab.org/nlab/show/Cantor%27s+theorem
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.cantor"
@@ -3495,7 +3495,7 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Ordinal_number
-* http://mathworld.wolfram.com/OrdinalNumber.html
+* https://mathworld.wolfram.com/OrdinalNumber.html
 * https://proofwiki.org/wiki/Definition:Ordinal
 * https://ncatlab.org/nlab/show/ordinal+number
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal"
@@ -3568,7 +3568,7 @@ We write “let φ : α ↔ α be an automorphism” for “let φ ∈
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism"
 `;
@@ -3589,7 +3589,7 @@ Alternatively, automorphism groups could be defined more generally via category 
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group"
 `;
@@ -3697,7 +3697,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Ordinal_arithmetic#Addition
-* http://mathworld.wolfram.com/OrdinalAddition.html
+* https://mathworld.wolfram.com/OrdinalAddition.html
 * https://proofwiki.org/wiki/Definition:Ordinal_Addition
 * https://ncatlab.org/nlab/show/ordinal+sum
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.has_add"
@@ -3715,7 +3715,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Ordinal_arithmetic#Multiplication
-* http://mathworld.wolfram.com/OrdinalMultiplication.html
+* https://mathworld.wolfram.com/OrdinalMultiplication.html
 * https://proofwiki.org/wiki/Definition:Ordinal_Multiplication
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.type_mul"
 `;
@@ -3728,7 +3728,7 @@ exports[`render hlm library: 1.6.3.13.1 data/libraries/hlm/Essentials/Numbers/Or
 References.
 
 * https://en.wikipedia.org/wiki/Ordinal_number#Ordinals_extend_the_natural_numbers
-* http://mathworld.wolfram.com/OrdinalNumber.html
+* https://mathworld.wolfram.com/OrdinalNumber.html
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#ordinal.omega"
 `;
 
@@ -3806,7 +3806,7 @@ When defining a construction, another set can be embedded in the newly defined s
 References.
 
 * https://en.wikipedia.org/wiki/Integer
-* http://mathworld.wolfram.com/Integer.html
+* https://mathworld.wolfram.com/Integer.html
 * https://proofwiki.org/wiki/Definition:Integer
 * https://ncatlab.org/nlab/show/integer
 * https://coq.inria.fr/library/Coq.ZArith.BinInt.html (but uses a different encoding as an inductive data type with three constructors)
@@ -4065,7 +4065,7 @@ exports[`render hlm library: 1.6.4.11 data/libraries/hlm/Essentials/Numbers/Inte
 References.
 
 * https://en.wikipedia.org/wiki/Absolute_value
-* http://mathworld.wolfram.com/AbsoluteValue.html
+* https://mathworld.wolfram.com/AbsoluteValue.html
 * https://proofwiki.org/wiki/Definition:Absolute_Value
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.nat_abs"
@@ -4195,7 +4195,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Summation
-* http://mathworld.wolfram.com/Sum.html
+* https://mathworld.wolfram.com/Sum.html
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
@@ -4211,7 +4211,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -4241,7 +4241,7 @@ Equivalence.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Coprime_integers
-* http://mathworld.wolfram.com/RelativelyPrime.html
+* https://mathworld.wolfram.com/RelativelyPrime.html
 * https://proofwiki.org/wiki/Definition:Coprime/Integers
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime"
 `;
@@ -4273,7 +4273,7 @@ Note that in the constructor, we force the denominator to be positive. This is n
 References.
 
 * https://en.wikipedia.org/wiki/Rational_number
-* http://mathworld.wolfram.com/RationalNumber.html
+* https://mathworld.wolfram.com/RationalNumber.html
 * https://proofwiki.org/wiki/Definition:Rational_Number
 * https://ncatlab.org/nlab/show/rational+number
 * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Q (together with https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qeq)
@@ -4468,7 +4468,7 @@ exports[`render hlm library: 1.6.5.8 data/libraries/hlm/Essentials/Numbers/Ratio
 References.
 
 * https://en.wikipedia.org/wiki/Absolute_value
-* http://mathworld.wolfram.com/AbsoluteValue.html
+* https://mathworld.wolfram.com/AbsoluteValue.html
 * https://proofwiki.org/wiki/Definition:Absolute_Value
 * https://coq.inria.fr/library/Coq.QArith.Qabs.html
 * https://leanprover-community.github.io/mathlib_docs/data/rat/order.html#rat.abs_def"
@@ -4566,7 +4566,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Summation
-* http://mathworld.wolfram.com/Sum.html
+* https://mathworld.wolfram.com/Sum.html
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
@@ -4582,7 +4582,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -4598,7 +4598,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Limit_of_a_sequence
-* http://mathworld.wolfram.com/ConvergentSequence.html
+* https://mathworld.wolfram.com/ConvergentSequence.html
 * https://proofwiki.org/wiki/Definition:Convergent_Sequence/Normed_Division_Ring
 * https://ncatlab.org/nlab/show/convergence"
 `;
@@ -4621,7 +4621,7 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Limit_of_a_sequence
-* http://mathworld.wolfram.com/Limit.html
+* https://mathworld.wolfram.com/Limit.html
 * https://proofwiki.org/wiki/Definition:Limit_of_Sequence/Normed_Division_Ring
 * https://ncatlab.org/nlab/show/convergence"
 `;
@@ -4638,7 +4638,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Cauchy_sequence
-* http://mathworld.wolfram.com/CauchySequence.html
+* https://mathworld.wolfram.com/CauchySequence.html
 * https://proofwiki.org/wiki/Definition:Cauchy_Sequence
 * https://ncatlab.org/nlab/show/Cauchy+sequence
 * https://leanprover-community.github.io/mathlib_docs/data/real/cau_seq.html#is_cau_seq"
@@ -4708,7 +4708,7 @@ Well-definedness.  No proof.
 References.
 
 * https://en.wikipedia.org/wiki/Real_number
-* http://mathworld.wolfram.com/RealNumber.html
+* https://mathworld.wolfram.com/RealNumber.html
 * https://proofwiki.org/wiki/Definition:Real_Number
 * https://ncatlab.org/nlab/show/real+number
 * https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal
@@ -4985,7 +4985,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Summation
-* http://mathworld.wolfram.com/Sum.html
+* https://mathworld.wolfram.com/Sum.html
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
@@ -5001,7 +5001,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -5108,7 +5108,7 @@ The constructor notation is later justified by \`$\\"Actual linear combination e
 References.
 
 * https://en.wikipedia.org/wiki/Complex_numbers
-* http://mathworld.wolfram.com/ComplexNumber.html
+* https://mathworld.wolfram.com/ComplexNumber.html
 * https://proofwiki.org/wiki/Definition:Complex_Number
 * https://ncatlab.org/nlab/show/complex+number
 * https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex"
@@ -5122,7 +5122,7 @@ exports[`render hlm library: 1.6.7.2 data/libraries/hlm/Essentials/Numbers/Compl
 References.
 
 * https://en.wikipedia.org/wiki/Imaginary_unit
-* http://mathworld.wolfram.com/ImaginaryUnit.html
+* https://mathworld.wolfram.com/ImaginaryUnit.html
 * https://proofwiki.org/wiki/Definition:Imaginary_Unit
 * https://ncatlab.org/nlab/show/imaginary+unit
 * https://leanprover-community.github.io/mathlib_docs/data/complex/basic.html#complex.I"
@@ -5258,7 +5258,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Summation
-* http://mathworld.wolfram.com/Sum.html
+* https://mathworld.wolfram.com/Sum.html
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
@@ -5274,7 +5274,7 @@ Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"ind
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_Pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -5452,7 +5452,7 @@ We write “let φ : 𝐒 ↔ 𝐒 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
@@ -5466,7 +5466,7 @@ exports[`render hlm library: 2.2.4.4 data/libraries/hlm/Algebra/Pointed%20sets/H
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
@@ -5636,7 +5636,7 @@ We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
@@ -5650,7 +5650,7 @@ exports[`render hlm library: 2.3.6.4 data/libraries/hlm/Algebra/Magmas/Homomorph
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
@@ -5767,7 +5767,14 @@ exports[`render hlm library: 2.3.8.4 data/libraries/hlm/Algebra/Magmas/Free%20ma
 exports[`render hlm library: 2.3.9 data/libraries/hlm/Algebra/Magmas/identity%20element 1`] = `
 "Definition 2.3.9.  Let 𝐌 be a magma, e ∈ 𝐌. We define:
 
-  e is an identity element of 𝐌  :⇔  ∀ a ∈ 𝐌 : e • a = a • e = a"
+  e is an identity element of 𝐌  :⇔  ∀ a ∈ 𝐌 : e • a = a • e = a
+
+References.
+
+* https://en.wikipedia.org/wiki/Identity_element
+* https://mathworld.wolfram.com/IdentityElement.html
+* https://proofwiki.org/wiki/Definition:Identity_Element
+* https://ncatlab.org/nlab/show/identity+element"
 `;
 
 exports[`render hlm library: 2.3.10 data/libraries/hlm/Algebra/Magmas/identity 1`] = `
@@ -5775,7 +5782,11 @@ exports[`render hlm library: 2.3.10 data/libraries/hlm/Algebra/Magmas/identity 1
 
   1_𝐌 = m  :⇔  m is an identity element of 𝐌
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Identity_is_Unique"
 `;
 
 exports[`render hlm library: 2.4.1 data/libraries/hlm/Algebra/Semigroups/Semigroups 1`] = `
@@ -5908,7 +5919,7 @@ We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
@@ -5922,7 +5933,7 @@ exports[`render hlm library: 2.5.7.4 data/libraries/hlm/Algebra/Monoids/Homomorp
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
@@ -5931,7 +5942,11 @@ References.
 exports[`render hlm library: 2.5.7.5 data/libraries/hlm/Algebra/Monoids/Homomorphisms/identity 1`] = `
 "Definition 2.5.7.5.  Let 𝐌 be a monoid. We define:
 
-  id_𝐌 := id_(Carrier(𝐌))"
+  id_𝐌 := id_(Carrier(𝐌))
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/hom.html#monoid_hom.id"
 `;
 
 exports[`render hlm library: 2.5.7.6 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Equality%20criterion 1`] = `
@@ -5964,7 +5979,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Monoid#Submonoids
 * (https://mathworld.wolfram.com/Submonoid.html seems incorrect)
-* (https://proofwiki.org/wiki/Definition:Submonoid: ditto)
+* (https://proofwiki.org/wiki/Definition:Submonoid ditto)
 * https://ncatlab.org/nlab/show/submonoid
 * https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid.html#is_submonoid"
 `;
@@ -5976,7 +5991,11 @@ exports[`render hlm library: 2.5.8.2 data/libraries/hlm/Algebra/Monoids/Submonoi
 
 by:
 
-  [S]_[M,∗,e] := [S, ∗∣_S, e]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)"
+  [S]_[M,∗,e] := [S, ∗∣_S, e]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M with suitable conditions)
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid.html#subtype.monoid"
 `;
 
 exports[`render hlm library: 2.5.8.3 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid 1`] = `
@@ -6016,7 +6035,12 @@ exports[`render hlm library: 2.5.10 data/libraries/hlm/Algebra/Monoids/invertibl
   a is invertible  :⇔  ∃ b ∈ 𝐌 : a • b = b • a = e_𝐌
     ⇔  ∃! b ∈ 𝐌 : a • b = b • a = e_𝐌
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://mathworld.wolfram.com/Invertible.html
+* https://proofwiki.org/wiki/Definition:Invertible_Element"
 `;
 
 exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/inverse 1`] = `
@@ -6024,7 +6048,12 @@ exports[`render hlm library: 2.5.11 data/libraries/hlm/Algebra/Monoids/inverse 1
 
   a^-1 = b  :⇔  a • b = e_𝐌
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Multiplicative_inverse
+* https://mathworld.wolfram.com/MultiplicativeInverse.html"
 `;
 
 exports[`render hlm library: 2.5.12 data/libraries/hlm/Algebra/Monoids/power%20to%20natural%20number 1`] = `
@@ -6035,7 +6064,12 @@ exports[`render hlm library: 2.5.12 data/libraries/hlm/Algebra/Monoids/power%20t
 by:
 
   a^0 := e_𝐌
-  a^(x+1) := a^x • a  (x ∈ ℕ)"
+  a^(x+1) := a^x • a  (x ∈ ℕ)
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Power_of_Element/Monoid
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
 `;
 
 exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/power%20to%20integer 1`] = `
@@ -6060,7 +6094,7 @@ Usage example: \`$../../Essentials/Functions/Operations/\\"Iterated operations\\
 References.
 
 * https://en.wikipedia.org/wiki/Multiplication#Capital_pi_notation
-* http://mathworld.wolfram.com/Product.html
+* https://mathworld.wolfram.com/Product.html
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
@@ -6075,7 +6109,11 @@ We write “let 𝐆 be a group” for “let 𝐆 ∈ 𝓖𝓻𝓹.”
 
 References.
 
-* https://en.wikipedia.org/wiki/Group_(mathematics)"
+* https://en.wikipedia.org/wiki/Group_(mathematics)
+* https://mathworld.wolfram.com/Group.html
+* https://proofwiki.org/wiki/Definition:Group
+* https://ncatlab.org/nlab/show/group
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#group"
 `;
 
 exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/monoid%20with%20inverses 1`] = `
@@ -6137,7 +6175,15 @@ exports[`render hlm library: 2.6.7 data/libraries/hlm/Algebra/Groups/abelian 1`]
 
 by:
 
-  [G, ∗, e, i] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  [G, ∗, e, i] is abelian  :⇔  ∗ is commutative  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+
+References.
+
+* https://en.wikipedia.org/wiki/Abelian_group
+* https://mathworld.wolfram.com/Abelian.html
+* https://proofwiki.org/wiki/Definition:Abelian_Group
+* https://ncatlab.org/nlab/show/abelian+group
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#comm_group"
 `;
 
 exports[`render hlm library: 2.6.8 data/libraries/hlm/Algebra/Groups/power%20to%20natural%20number 1`] = `
@@ -6148,13 +6194,23 @@ exports[`render hlm library: 2.6.8 data/libraries/hlm/Algebra/Groups/power%20to%
 by:
 
   a^0 := e_𝐆
-  a^(x+1) := a^x • a  (x ∈ ℕ)"
+  a^(x+1) := a^x • a  (x ∈ ℕ)
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Power_of_Element/Monoid
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
 `;
 
 exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/power%20to%20integer 1`] = `
 "Definition 2.6.9.  Let 𝐆 be a group, a ∈ 𝐆, z ∈ ℤ. We define:
 
-  a^z := {a^z if z ≥ 0, (a^-1)^(−z) if z < 0"
+  a^z := {a^z if z ≥ 0, (a^-1)^(−z) if z < 0
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Power_of_Element/Group
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#gpow"
 `;
 
 exports[`render hlm library: 2.6.10.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
@@ -6197,7 +6253,7 @@ We write “let φ : 𝐆 ↔ 𝐆 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Group_Automorphism
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut"
@@ -6211,7 +6267,7 @@ exports[`render hlm library: 2.6.10.4 data/libraries/hlm/Algebra/Groups/Homomorp
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/mul_add.html#mul_aut.group"
@@ -6220,13 +6276,25 @@ References.
 exports[`render hlm library: 2.6.10.5 data/libraries/hlm/Algebra/Groups/Homomorphisms/Kernel 1`] = `
 "Definition 2.6.10.5.  Let 𝐆, 𝐇 be groups, φ : 𝐆 → 𝐇 be a homomorphism. We define:
 
-  Ker(φ) := {g ∈ 𝐆 : φ(g) = e_𝐇}"
+  Ker(φ) := {g ∈ 𝐆 : φ(g) = e_𝐇}
+
+References.
+
+* https://en.wikipedia.org/wiki/Kernel_(algebra)#Group_homomorphisms
+* https://mathworld.wolfram.com/GroupKernel.html
+* https://proofwiki.org/wiki/Definition:Kernel_of_Group_Homomorphism
+* https://ncatlab.org/nlab/show/kernel
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#is_group_hom.ker"
 `;
 
 exports[`render hlm library: 2.6.10.6 data/libraries/hlm/Algebra/Groups/Homomorphisms/identity 1`] = `
 "Definition 2.6.10.6.  Let 𝐆 be a group. We define:
 
-  id_𝐆 := id_(Carrier(𝐆))"
+  id_𝐆 := id_(Carrier(𝐆))
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/hom.html#monoid_hom.id"
 `;
 
 exports[`render hlm library: 2.6.10.7 data/libraries/hlm/Algebra/Groups/Homomorphisms/Equality%20criterion 1`] = `
@@ -6253,7 +6321,15 @@ No proof."
 exports[`render hlm library: 2.6.11.1 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup%20set 1`] = `
 "Definition 2.6.11.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
-  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S"
+  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S
+
+References.
+
+* https://en.wikipedia.org/wiki/Subgroup
+* https://mathworld.wolfram.com/Subgroup.html
+* https://proofwiki.org/wiki/Definition:Subgroup
+* https://ncatlab.org/nlab/show/subgroup
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#is_subgroup"
 `;
 
 exports[`render hlm library: 2.6.11.2 data/libraries/hlm/Algebra/Groups/Subgroups/subset%20group 1`] = `
@@ -6263,7 +6339,11 @@ exports[`render hlm library: 2.6.11.2 data/libraries/hlm/Algebra/Groups/Subgroup
 
 by:
 
-  [S]_[G,∗,e,i] := [S, ∗∣_S, e, i∣_S^S]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)"
+  [S]_[G,∗,e,i] := [S, ∗∣_S, e, i∣_S^S]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function with suitable conditions)
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#subtype.group"
 `;
 
 exports[`render hlm library: 2.6.11.3 data/libraries/hlm/Algebra/Groups/Subgroups/subgroup 1`] = `
@@ -6279,9 +6359,18 @@ exports[`render hlm library: 2.6.11.4 data/libraries/hlm/Algebra/Groups/Subgroup
 "Definition 2.6.11.4.  Let 𝐆 be a group, S ⊆ Carrier(𝐆). We define:
 
   S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : g • s • g^-1 ∈ S
+    ⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, h ∈ 𝐆 : h^-1 • s • h ∈ S
     ⇔  ∃ group 𝐇, homomorphism φ : 𝐆 → 𝐇 : S = Ker(φ)
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Normal_subgroup
+* https://mathworld.wolfram.com/NormalSubgroup.html
+* https://proofwiki.org/wiki/Definition:Normal_Subgroup
+* https://ncatlab.org/nlab/show/normal+subgroup
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#normal_subgroup"
 `;
 
 exports[`render hlm library: 2.6.11.5 data/libraries/hlm/Algebra/Groups/Subgroups/normal%20subgroup 1`] = `
@@ -6293,7 +6382,14 @@ exports[`render hlm library: 2.6.11.5 data/libraries/hlm/Algebra/Groups/Subgroup
 exports[`render hlm library: 2.6.11.6 data/libraries/hlm/Algebra/Groups/Subgroups/Span 1`] = `
 "Definition 2.6.11.6.  Let 𝐆 be a group, X ⊆ Carrier(𝐆). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(Carrier(𝐆)) : S is a subgroup of 𝐆 and X ⊆ S}"
+  〈X〉 := ⋂{(S) ∈ 𝒫(Carrier(𝐆)) : S is a subgroup of 𝐆 and X ⊆ S}
+
+References.
+
+* https://en.wikipedia.org/wiki/Closure_(mathematics) (see also https://en.wikipedia.org/wiki/Generating_set_of_a_group)
+* https://proofwiki.org/wiki/Definition:Generated_Subgroup
+* https://ncatlab.org/nlab/show/Moore+closure
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#group.closure"
 `;
 
 exports[`render hlm library: 2.6.11.7 data/libraries/hlm/Algebra/Groups/Subgroups/Span%20of%20element 1`] = `
@@ -6302,43 +6398,90 @@ exports[`render hlm library: 2.6.11.7 data/libraries/hlm/Algebra/Groups/Subgroup
   〈g〉 := 〈{g}〉
    = {g^z : z ∈ ℤ}
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cyclic_group
+* https://proofwiki.org/wiki/Definition:Cyclic_Group
+* https://ncatlab.org/nlab/show/cyclic+group
+* https://leanprover-community.github.io/mathlib_docs/group_theory/subgroup.html#gpowers"
 `;
 
 exports[`render hlm library: 2.6.12.1 data/libraries/hlm/Algebra/Groups/Quotients/quotient%20group 1`] = `
 "Definition 2.6.12.1.  Let 𝐆 be a group, S ⊆ Carrier(𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ Carrier(𝐆)), Q := Carrier(𝐆)∕∼. We define:
 
-  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]"
+  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]
+
+References.
+
+* https://en.wikipedia.org/wiki/Quotient_group
+* https://mathworld.wolfram.com/QuotientGroup.html
+* https://proofwiki.org/wiki/Definition:Quotient_Group
+* https://ncatlab.org/nlab/show/quotient+group
+* https://leanprover-community.github.io/mathlib_docs/group_theory/quotient_group.html#quotient_group.group"
 `;
 
 exports[`render hlm library: 2.6.13.1 data/libraries/hlm/Algebra/Groups/Examples/integers 1`] = `
 "Definition 2.6.13.1.  We define:
 
-  ℤ := [ℤ, +, 0, −]"
+  ℤ := [ℤ, +, 0, −]
+
+References.
+
+* https://en.wikipedia.org/wiki/Group_(mathematics)#First_example:_the_integers
+* https://proofwiki.org/wiki/Definition:Additive_Group_of_Integers"
 `;
 
 exports[`render hlm library: 2.6.13.2 data/libraries/hlm/Algebra/Groups/Examples/cyclic%20group 1`] = `
 "Definition 2.6.13.2.  Let n ∈ ℕ. We define:
 
-  𝐶_n := ℤ∕nℤ"
+  𝐶_n := ℤ∕nℤ
+
+References.
+
+* https://en.wikipedia.org/wiki/Cyclic_group
+* https://mathworld.wolfram.com/CyclicGroup.html
+* https://proofwiki.org/wiki/Definition:Cyclic_Group/Notation
+* https://ncatlab.org/nlab/show/cyclic+group#examples"
 `;
 
 exports[`render hlm library: 2.6.13.3 data/libraries/hlm/Algebra/Groups/Examples/symmetric%20group 1`] = `
 "Definition 2.6.13.3.  Let X be a set. We define:
 
-  𝑆_X := [X ↔ X, ∘, id_X, ((X ↔ X) → (X ↔ X), f ↦ f^-1)]"
+  𝑆_X := [X ↔ X, ∘, id_X, ((X ↔ X) → (X ↔ X), f ↦ f^-1)]
+
+References.
+
+* https://en.wikipedia.org/wiki/Symmetric_group
+* https://proofwiki.org/wiki/Definition:Symmetric_Group
+* https://ncatlab.org/nlab/show/symmetric+group"
 `;
 
 exports[`render hlm library: 2.6.13.4 data/libraries/hlm/Algebra/Groups/Examples/finite%20symmetric%20group 1`] = `
 "Definition 2.6.13.4.  Let n ∈ ℕ. We define:
 
-  𝑆_n := 𝑆_(ℕ_(<n))"
+  𝑆_n := 𝑆_(ℕ_(<n))
+
+References.
+
+* https://en.wikipedia.org/wiki/Symmetric_group
+* https://mathworld.wolfram.com/SymmetricGroup.html
+* https://proofwiki.org/wiki/Definition:Symmetric_Group/n_Letters
+* https://ncatlab.org/nlab/show/symmetric+group"
 `;
 
 exports[`render hlm library: 2.6.14.1 data/libraries/hlm/Algebra/Groups/Order/group%20order 1`] = `
 "Definition 2.6.14.1.  Let 𝐆 be a group. We define:
 
-  |𝐆| := |Carrier(𝐆)|"
+  |𝐆| := |Carrier(𝐆)|
+
+References.
+
+* https://en.wikipedia.org/wiki/Order_(group_theory)
+* https://mathworld.wolfram.com/GroupOrder.html
+* https://proofwiki.org/wiki/Definition:Order_of_Structure
+* https://ncatlab.org/nlab/show/order+of+a+group"
 `;
 
 exports[`render hlm library: 2.6.14.2 data/libraries/hlm/Algebra/Groups/Order/finite 1`] = `
@@ -6349,7 +6492,12 @@ exports[`render hlm library: 2.6.14.2 data/libraries/hlm/Algebra/Groups/Order/fi
 
   𝐆 is infinite  :⇔  𝐆 is not finite
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Finite_group
+* https://proofwiki.org/wiki/Definition:Order_of_Structure/Finite_Structure"
 `;
 
 exports[`render hlm library: 2.6.14.3 data/libraries/hlm/Algebra/Groups/Order/Groups%20with%20order 1`] = `
@@ -6357,7 +6505,11 @@ exports[`render hlm library: 2.6.14.3 data/libraries/hlm/Algebra/Groups/Order/Gr
 
   𝓖𝓻𝓹_κ := {groups 𝐆 : |𝐆| = κ}
 
-We write “let 𝐆 be a group of order κ” for “let 𝐆 ∈ 𝓖𝓻𝓹_κ.”"
+We write “let 𝐆 be a group of order κ” for “let 𝐆 ∈ 𝓖𝓻𝓹_κ.”
+
+Remarks.
+
+This is the set of all isomorphism classes of groups of order \`κ\`. (Note that all collections satisfying certain non-circularity rules are sets in HLM.)"
 `;
 
 exports[`render hlm library: 2.6.14.4 data/libraries/hlm/Algebra/Groups/Order/number%20of%20groups%20with%20order 1`] = `
@@ -6367,6 +6519,7 @@ exports[`render hlm library: 2.6.14.4 data/libraries/hlm/Algebra/Groups/Order/nu
 
 References.
 
+* https://en.wikipedia.org/wiki/Finite_group#Number_of_groups_of_a_given_order
 * http://oeis.org/A000001"
 `;
 
@@ -6379,6 +6532,7 @@ No proof.
 
 References.
 
+* https://en.wikipedia.org/wiki/Finite_group#Number_of_groups_of_a_given_order
 * http://oeis.org/A000001
 * https://www.math.auckland.ac.nz/~obrien/research/gnu.pdf"
 `;
@@ -6389,7 +6543,15 @@ exports[`render hlm library: 2.6.14.6 data/libraries/hlm/Algebra/Groups/Order/el
   |g| := |〈g〉|
    = {min(S) if S is nonempty, ℵ_0 if S is empty
 
-Equality.  No proof."
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Order_(group_theory)
+* https://mathworld.wolfram.com/GroupOrder.html
+* https://proofwiki.org/wiki/Definition:Order_of_Group_Element
+* https://ncatlab.org/nlab/show/order+of+a+group#OrderOfAnElementOfAGroup
+* https://leanprover-community.github.io/mathlib_docs/group_theory/order_of_element.html#order_of"
 `;
 
 exports[`render hlm library: 2.6.14.7 data/libraries/hlm/Algebra/Groups/Order/Lagranges%20theorem 1`] = `
@@ -6397,7 +6559,15 @@ exports[`render hlm library: 2.6.14.7 data/libraries/hlm/Algebra/Groups/Order/La
 
   |S| ∣ |𝐆|
 
-No proof."
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Lagrange%27s_theorem_(group_theory)
+* https://mathworld.wolfram.com/LagrangesGroupTheorem.html
+* https://proofwiki.org/wiki/Lagrange%27s_Theorem_(Group_Theory)
+* https://ncatlab.org/nlab/show/index+of+a+subgroup#properties
+* https://leanprover-community.github.io/mathlib_docs/group_theory/order_of_element.html#card_subgroup_dvd_card"
 `;
 
 exports[`render hlm library: 2.6.14.8 data/libraries/hlm/Algebra/Groups/Order/Lagranges%20corollary 1`] = `
@@ -6405,7 +6575,13 @@ exports[`render hlm library: 2.6.14.8 data/libraries/hlm/Algebra/Groups/Order/La
 
   |g| ∣ |𝐆|
 
-No proof."
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Lagrange%27s_theorem_(group_theory)#Applications
+* https://proofwiki.org/wiki/Order_of_Element_Divides_Order_of_Finite_Group
+* https://leanprover-community.github.io/mathlib_docs/group_theory/order_of_element.html#order_of_dvd_card_univ"
 `;
 
 exports[`render hlm library: 2.6.15 data/libraries/hlm/Algebra/Groups/iterated%20operation 1`] = `
@@ -6541,7 +6717,7 @@ We write “let φ : 𝐑 ↔ 𝐑 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut"
@@ -6555,7 +6731,7 @@ exports[`render hlm library: 2.7.9.4 data/libraries/hlm/Algebra/Semirings/Homomo
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut.group"
@@ -6813,7 +6989,7 @@ We write “let φ : 𝐑 ↔ 𝐑 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut"
@@ -6827,7 +7003,7 @@ exports[`render hlm library: 2.8.11.4 data/libraries/hlm/Algebra/Rings/Homomorph
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group
 * https://leanprover-community.github.io/mathlib_docs/data/equiv/ring.html#ring_aut.group"
@@ -7366,7 +7542,7 @@ We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism"
 `;
@@ -7379,7 +7555,7 @@ exports[`render hlm library: 2.8.27.1.10.4 data/libraries/hlm/Algebra/Rings/Modu
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group"
 `;
@@ -7661,7 +7837,7 @@ We write “let φ : 𝐌 ↔ 𝐌 be an automorphism” for “let φ�
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism
-* http://mathworld.wolfram.com/Automorphism.html
+* https://mathworld.wolfram.com/Automorphism.html
 * https://proofwiki.org/wiki/Definition:Automorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/automorphism"
 `;
@@ -7674,7 +7850,7 @@ exports[`render hlm library: 2.8.27.2.10.4 data/libraries/hlm/Algebra/Rings/Modu
 References.
 
 * https://en.wikipedia.org/wiki/Automorphism_group
-* http://mathworld.wolfram.com/AutomorphismGroup.html
+* https://mathworld.wolfram.com/AutomorphismGroup.html
 * https://proofwiki.org/wiki/Definition:Automorphism_Group
 * https://ncatlab.org/nlab/show/automorphism#automorphism_group"
 `;
@@ -7960,7 +8136,7 @@ The natural number \`u\` is required to be able to define a category of (smaller
 References.
 
 * https://en.wikipedia.org/wiki/Category_(mathematics)
-* http://mathworld.wolfram.com/Category.html
+* https://mathworld.wolfram.com/Category.html
 * https://proofwiki.org/wiki/Definition:Category
 * https://ncatlab.org/nlab/show/category"
 `;
@@ -7991,7 +8167,7 @@ We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ 
 References.
 
 * https://en.wikipedia.org/wiki/Morphism
-* http://mathworld.wolfram.com/Morphism.html
+* https://mathworld.wolfram.com/Morphism.html
 * https://proofwiki.org/wiki/Definition:Morphism
 * https://ncatlab.org/nlab/show/morphism"
 `;
@@ -8030,7 +8206,7 @@ We write “let F :  𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : �
 References.
 
 * https://en.wikipedia.org/wiki/Functor
-* http://mathworld.wolfram.com/Functor.html
+* https://mathworld.wolfram.com/Functor.html
 * https://proofwiki.org/wiki/Definition:Functor
 * https://ncatlab.org/nlab/show/functor"
 `;
@@ -8120,7 +8296,7 @@ We write “let η : F ⇒ G be a natural transformation” for “let �
 References.
 
 * https://en.wikipedia.org/wiki/Natural_transformation
-* http://mathworld.wolfram.com/NaturalTransformation.html
+* https://mathworld.wolfram.com/NaturalTransformation.html
 * https://proofwiki.org/wiki/Definition:Natural_Transformation
 * https://ncatlab.org/nlab/show/natural+transformation"
 `;
