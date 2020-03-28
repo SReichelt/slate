@@ -45,10 +45,9 @@ class PhysicalFileContents implements FileContents {
   constructor(private fileName: string, public text: string) {}
 
   addWatcher(onChange: (watcher: FileWatcher) => void): FileWatcher {
+    // This is currently racey. To fix it, we could re-read the file and compare its contents after creating the watcher.
     let watcher: FileWatcher;
-    let listener = () => {
-      onChange(watcher);
-    };
+    let listener = () => onChange(watcher);
     watcher = new PhysicalFileWatcher(this.fileName, listener);
     fs.watchFile(this.fileName, listener);
     return watcher;
