@@ -1113,26 +1113,21 @@ class SlateReferenceProvider implements vscode.ReferenceProvider {
             }
         }
         return vscode.workspace.findFiles('**/*' + fileExtension, undefined, undefined, token).then((uris: vscode.Uri[]) => {
-            metaModelCache = new Map<string, ParsedMetaModel>();
-            try {
-                for (let uri of uris) {
+            for (let uri of uris) {
+                if (token.isCancellationRequested) {
+                    break;
+                }
+                let parsedDocument = parseFile(uri, undefined, undefined, document);
+                for (let rangeInfo of parsedDocument.rangeList) {
                     if (token.isCancellationRequested) {
                         break;
                     }
-                    let parsedDocument = parseFile(uri, undefined, undefined, document);
-                    for (let rangeInfo of parsedDocument.rangeList) {
-                        if (token.isCancellationRequested) {
-                            break;
-                        }
-                        for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, targetLocation.uri)) {
-                            if (areUrisEqual(definitionLink.targetUri, targetLocation.uri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.intersection(targetLocation.range)) {
-                                result.push(new vscode.Location(uri, definitionLink.originSelectionRange || rangeInfo.linkRange || rangeInfo.nameRange || rangeInfo.range));
-                            }
+                    for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, targetLocation.uri)) {
+                        if (areUrisEqual(definitionLink.targetUri, targetLocation.uri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.intersection(targetLocation.range)) {
+                            result.push(new vscode.Location(uri, definitionLink.originSelectionRange || rangeInfo.linkRange || rangeInfo.nameRange || rangeInfo.range));
                         }
                     }
                 }
-            } finally {
-                metaModelCache = undefined;
             }
             return result;
         });
@@ -1150,26 +1145,21 @@ class SlateRenameProvider implements vscode.RenameProvider {
                 if (nameDefinitionLocation) {
                     let escapedName = escapeIdentifier(newName);
                     result.replace(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange!, escapedName);
-                    metaModelCache = new Map<string, ParsedMetaModel>();
-                    try {
-                        for (let uri of uris) {
+                    for (let uri of uris) {
+                        if (token.isCancellationRequested) {
+                            break;
+                        }
+                        let parsedDocument = parseFile(uri, undefined, undefined, document);
+                        for (let rangeInfo of parsedDocument.rangeList) {
                             if (token.isCancellationRequested) {
                                 break;
                             }
-                            let parsedDocument = parseFile(uri, undefined, undefined, document);
-                            for (let rangeInfo of parsedDocument.rangeList) {
-                                if (token.isCancellationRequested) {
-                                    break;
-                                }
-                                for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, nameDefinitionLocation.targetUri)) {
-                                    if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange!)) {
-                                        result.replace(uri, definitionLink.originNameRange, escapedName);
-                                    }
+                            for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, nameDefinitionLocation.targetUri)) {
+                                if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange!)) {
+                                    result.replace(uri, definitionLink.originNameRange, escapedName);
                                 }
                             }
                         }
-                    } finally {
-                        metaModelCache = undefined;
                     }
                     let fsPath = nameDefinitionLocation.targetUri.fsPath;
                     if (path.basename(fsPath) === nameDefinitionLocation.name + fileExtension) {
@@ -1313,7 +1303,7 @@ function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagnostics:
 }
 
 let parsedFileCache = new Map<string, ParsedDocument>();
-let metaModelCache: Map<string, ParsedMetaModel> | undefined = undefined;
+let metaModelCache = new Map<string, ParsedMetaModel>();
 
 class ErrorHandler implements FmtReader.ErrorHandler {
     constructor(private parsedDocument: ParsedDocument, private diagnostics?: vscode.Diagnostic[]) {}
@@ -1351,17 +1341,15 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
-        if (metaModelCache) {
-            let parsedMetaModel = metaModelCache.get(metaModelFileName);
-            if (parsedMetaModel) {
-                if (!parsedDocument.metaModelDocument) {
-                    parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
-                }
-                for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
-                    parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
-                }
-                return parsedMetaModel.metaModel;
+        let parsedMetaModel = metaModelCache.get(metaModelFileName);
+        if (parsedMetaModel) {
+            if (!parsedDocument.metaModelDocument) {
+                parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
             }
+            for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
+                parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
+            }
+            return parsedMetaModel.metaModel;
         }
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
@@ -1381,13 +1369,11 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         }
         let metaModel = new FmtDynamic.DynamicMetaModel(parsedMetaModelDocument.file, metaModelFileName, (otherPath: Fmt.Path) => getReferencedMetaModel(metaModelFileName, otherPath));
         parsedDocument.metaModelDocuments!.set(metaModel, parsedMetaModelDocument);
-        if (metaModelCache) {
-            metaModelCache.set(metaModelFileName, {
-                metaModel: metaModel,
-                metaModelDocument: parsedMetaModelDocument,
-                metaModelDocuments: parsedDocument.metaModelDocuments!
-            });
-        }
+        metaModelCache.set(metaModelFileName, {
+            metaModel: metaModel,
+            metaModelDocument: parsedMetaModelDocument,
+            metaModelDocuments: parsedDocument.metaModelDocuments!
+        });
         return metaModel;
     };
     let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
@@ -1440,15 +1426,10 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
         parseAllTimer = undefined;
     }
     parseAllTimer = setTimeout(() => {
-        metaModelCache = new Map<string, ParsedMetaModel>();
-        try {
-            for (let document of vscode.workspace.textDocuments) {
-                if (!condition || condition(document)) {
-                    parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
-                }
+        for (let document of vscode.workspace.textDocuments) {
+            if (!condition || condition(document)) {
+                parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
             }
-        } finally {
-            metaModelCache = undefined;
         }
     }, 500);
 }
@@ -1467,6 +1448,9 @@ function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.Diagnos
         diagnosticCollection.delete(uri);
     }
     parsedFileCache.clear();
+    for (let uri of uris) {
+        metaModelCache.delete(uri.fsPath);
+    }
     triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter);
 }
 
@@ -1485,6 +1469,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.workspace.onDidChangeTextDocument((event) => {
             let changedDocument = event.document;
             parsedFileCache.delete(changedDocument.uri.fsPath);
+            metaModelCache.delete(changedDocument.uri.fsPath);
             let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
             if (parsedDocument && !parsedDocument.hasErrors) {
                 fileAccessor.documentChanged(changedDocument);

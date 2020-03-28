@@ -21,6 +21,7 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   let config: LibraryDataProviderConfig = {
     canPreload: false,
     watchForChanges: false,
+    retryMissingFiles: false,
     checkMarkdownCode: true
   };
   let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), config, libraryName);

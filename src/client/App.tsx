@@ -150,6 +150,7 @@ class App extends React.Component<AppProps, AppState> {
     let libraryDataProviderConfig: LibraryDataProviderConfig = {
       canPreload: canPreload,
       watchForChanges: true,
+      retryMissingFiles: false,
       checkMarkdownCode: false
     };
     this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderConfig, 'Library');
@@ -350,6 +351,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.interactionHandler) {
         this.state.interactionHandler.expressionChanged(true, false);
       }
+      this.forceUpdate();
       break;
     }
   }

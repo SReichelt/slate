@@ -79,7 +79,7 @@ class LibraryDocumentProvider {
         if (!library) {
             return undefined;
         }
-        let path = library.libraryDataProvider.uriToPath(event.document.uri.toString());
+        let path = library.libraryDataProvider.uriToPath(event.document.uri.toString(), true);
         if (!path || event.hasErrors) {
             library.diagnosticCollection.delete(event.document.uri);
             return undefined;
@@ -122,6 +122,7 @@ class LibraryDocumentProvider {
             let config: LibraryDataProviderConfig = {
                 canPreload: false,
                 watchForChanges: true,
+                retryMissingFiles: true,
                 checkMarkdownCode: false
             };
             library = {

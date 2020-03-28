@@ -36,11 +36,13 @@ export const defaultReferenceSearchURLs = [
 export interface LibraryDataProviderConfig {
   canPreload: boolean;
   watchForChanges: boolean;
+  retryMissingFiles: boolean;
   checkMarkdownCode: boolean;
 }
 export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
   canPreload: false,
   watchForChanges: false,
+  retryMissingFiles: false,
   checkMarkdownCode: false
 };
 
@@ -64,6 +66,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
+  private sectionChangeCounter = 0;
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
     if (this.uri && !this.uri.endsWith('/')) {
@@ -85,6 +88,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     } else {
       return this;
     }
+  }
+
+  getSectionChangeCounter(): number {
+    return this.sectionChangeCounter;
   }
 
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor {
@@ -276,6 +283,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (this.config.watchForChanges && contents.addWatcher) {
           contents.addWatcher((watcher: FileWatcher) => {
             this.preloadedDefinitions.clear();
+            this.sectionChangeCounter++;
             watcher.close();
           });
         }
@@ -309,7 +317,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       });
   }
 
-  private fetchDefinition(name: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean): CachedPromise<LibraryDefinition> {
+  private fetchDefinition(name: string, isSection: boolean, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean): CachedPromise<LibraryDefinition> {
     let editedDefinition = this.editedDefinitions.get(name);
     if (editedDefinition) {
       return CachedPromise.resolve(editedDefinition);
@@ -324,11 +332,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
       let uri = this.uri + encodeURI(name) + fileExtension;
       if (this.config.canPreload && !fullContentsRequired) {
-        if (name === this.getLocalSectionFileName()) {
+        if (isSection) {
           result = this.preloadDefinitions(uri + '.preload', definitionName)
             .catch((error) => {
               console.log(error);
-              return this.fetchDefinition(name, definitionName, getMetaModel, true);
+              return this.fetchDefinition(name, isSection, definitionName, getMetaModel, true);
             });
           this.preloadedDefinitions.set(name, result);
         } else {
@@ -338,40 +346,46 @@ export class LibraryDataProvider implements LibraryDataAccessor {
               if (preloadedDefinition) {
                 return preloadedDefinition;
               } else {
-                return this.fetchDefinition(name, definitionName, getMetaModel, true);
+                return this.fetchDefinition(name, isSection, definitionName, getMetaModel, true);
               }
             });
         }
       } else {
-        result = this.fileAccessor.readFile(uri)
-          .then((contents: FileContents) => {
-            this.preloadedDefinitions.delete(name);
-            let libraryDefinition: LibraryDefinition | undefined = undefined;
-            if (this.config.watchForChanges && contents.addWatcher) {
-              contents.addWatcher((watcher: FileWatcher) => {
-                try {
-                  let newLibraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
-                  if (libraryDefinition) {
-                    libraryDefinition.file = newLibraryDefinition.file;
-                    libraryDefinition.definition = newLibraryDefinition.definition;
-                    let currentEditedDefinition = this.editedDefinitions.get(name);
-                    if (currentEditedDefinition) {
-                      currentEditedDefinition.file = libraryDefinition.file.clone();
-                      currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
-                    }
-                  } else {
-                    libraryDefinition = newLibraryDefinition;
-                    this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(libraryDefinition));
+        let readFileResult = this.fileAccessor.readFile(uri);
+        if (this.config.retryMissingFiles) {
+          readFileResult.catch(() => this.fullyLoadedDefinitions.delete(name));
+        }
+        result = readFileResult.then((contents: FileContents) => {
+          this.preloadedDefinitions.delete(name);
+          let libraryDefinition: LibraryDefinition | undefined = undefined;
+          if (this.config.watchForChanges && contents.addWatcher) {
+            contents.addWatcher((watcher: FileWatcher) => {
+              try {
+                let newLibraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
+                if (libraryDefinition) {
+                  libraryDefinition.file = newLibraryDefinition.file;
+                  libraryDefinition.definition = newLibraryDefinition.definition;
+                  let currentEditedDefinition = this.editedDefinitions.get(name);
+                  if (currentEditedDefinition) {
+                    currentEditedDefinition.file = libraryDefinition.file.clone();
+                    currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
                   }
-                } catch (error) {
-                  this.fullyLoadedDefinitions.delete(name);
-                  watcher.close();
+                } else {
+                  libraryDefinition = newLibraryDefinition;
+                  this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(libraryDefinition));
                 }
-              });
+              } catch (error) {
+                this.fullyLoadedDefinitions.delete(name);
+                watcher.close();
+              }
+            });
+            if (isSection) {
+              this.sectionChangeCounter++;
             }
-            libraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
-            return libraryDefinition;
-          });
+          }
+          libraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
+          return libraryDefinition;
+        });
         this.fullyLoadedDefinitions.set(name, result);
       }
     }
@@ -379,7 +393,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let result = this.fetchDefinition(name, this.childName, FmtLibrary.getMetaModel, false);
+    let result = this.fetchDefinition(name, true, this.childName, FmtLibrary.getMetaModel, false);
     if (prefetchContents) {
       result.then((libraryDefinition: LibraryDefinition) => {
         let contents = libraryDefinition.definition.contents;
@@ -449,6 +463,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
       this.editedDefinitions.set(localSectionFileName, sectionDefinition);
       this.localDefinitionModified(localSectionFileName, sectionDefinition);
+      this.sectionChangeCounter++;
       let subsectionProvider = this.getProviderForSubsection(newSubsectionRef.path);
       let metaModelPath = sectionDefinition.file.metaModelPath.clone() as Fmt.Path;
       for (let pathItem: Fmt.PathItem | undefined = metaModelPath; pathItem; pathItem = pathItem.parentPath) {
@@ -479,7 +494,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   fetchLocalItem(name: string, fullContentsRequired: boolean, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let resultPromise = this.fetchDefinition(name, name, this.logic.getMetaModel, fullContentsRequired);
+    let resultPromise = this.fetchDefinition(name, false, name, this.logic.getMetaModel, fullContentsRequired);
     if (prefetchContents) {
       let result = resultPromise.getImmediateResult();
       if (result && result.state === LibraryDefinitionState.Preloaded) {
@@ -566,6 +581,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         }
         this.editedDefinitions.set(localSectionFileName, sectionDefinition);
         this.localDefinitionModified(localSectionFileName, sectionDefinition);
+        this.sectionChangeCounter++;
         let metaModelPath = new Fmt.Path;
         metaModelPath.name = this.logic.name;
         metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
@@ -667,6 +683,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
     this.editedItemInfos.delete(name);
     this.originalItemInfos.delete(name);
+    this.sectionChangeCounter++;
     if (this.fileAccessor.unPrePublishFile) {
       let uri = this.uri + encodeURI(name) + fileExtension;
       this.fileAccessor.unPrePublishFile(uri)
@@ -888,7 +905,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.uri + encodeURI(path.name);
   }
 
-  uriToPath(uri: string): Fmt.Path | undefined {
+  uriToPath(uri: string, allowIndex: boolean = false): Fmt.Path | undefined {
     if (uri.startsWith(this.uri)) {
       uri = uri.substring(this.uri.length);
       let path: Fmt.PathItem | undefined = undefined;
@@ -908,7 +925,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (name.endsWith(fileExtension)) {
           name = name.substring(0, name.length - fileExtension.length);
         }
-        if (name === indexFileName) {
+        if (name === indexFileName && !allowIndex) {
           return undefined;
         }
         let result = new Fmt.Path;

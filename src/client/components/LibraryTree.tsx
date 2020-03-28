@@ -64,7 +64,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
           <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
             <div className={'tree'}>
               <div className={'tree-contents'}>
-                <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} templates={this.props.templates} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedItemPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} parentScrollPane={this.treePaneNode} sectionPromise={sectionPromise} itemNumber={[]} indent={0} searchWords={this.state.searchWords}/>
+                <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} templates={this.props.templates} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedItemPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} parentScrollPane={this.treePaneNode} sectionPromise={sectionPromise} itemNumber={[]} indent={0} searchWords={this.state.searchWords} key={this.props.libraryDataProvider.getSectionChangeCounter()}/>
               </div>
             </div>
           </ScrollPane>
@@ -380,7 +380,7 @@ interface LibraryTreeItemState {
   showPreview: boolean;
 }
 
-abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, StateType> extends React.Component<PropType, StateType> {
+abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, StateType = {}> extends React.Component<PropType, StateType> {
   protected htmlNode: HTMLElement | null = null;
 
   protected scrollIntoView = (): void => {
@@ -683,7 +683,8 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
       icon = getSectionIcon(this.state.opened, this.props.selectedChildPath !== undefined);
       if (this.state.opened) {
         if (this.libraryDefinitionPromise) {
-          contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber)} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} searchWords={this.props.searchWords} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} indent={this.props.indent + 1} key="inner"/>;
+          let innerLibraryDataProvider = this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo.itemNumber);
+          contents = <InnerLibraryTreeItems libraryDataProvider={innerLibraryDataProvider} sectionPromise={this.libraryDefinitionPromise} itemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} parentScrollPane={this.props.parentScrollPane} searchWords={this.props.searchWords} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} indent={this.props.indent + 1} key={`inner-${innerLibraryDataProvider.getSectionChangeCounter()}`}/>;
         }
       }
     } else {
@@ -863,10 +864,7 @@ interface LibraryTreeInsertionItemProps extends LibraryTreeItemBaseProps {
   onInsertButtonClicked: OnInsertButtonClicked;
 }
 
-interface LibraryTreeInsertionItemState {
-}
-
-class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps, LibraryTreeInsertionItemState> {
+class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps> {
   constructor(props: LibraryTreeInsertionItemProps) {
     super(props);
     this.state = {};
