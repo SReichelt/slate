@@ -283,7 +283,7 @@ interface VisibilityResult {
 function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, libraryDefinition: LibraryDefinition, definition: Fmt.Definition, searchWords: string[], onFilter: OnFilter | undefined): VisibilityResult {
   if (isSubsection) {
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
-    let resultPromise = CachedPromise.resolve(false);
+    let resultPromise = new CachedPromise(Promise.resolve(false));
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
       for (let item of definition.contents.items) {
         resultPromise = resultPromise.then((currentResult: boolean) => {
