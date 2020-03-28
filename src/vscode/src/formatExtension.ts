@@ -1332,7 +1332,7 @@ class ErrorHandler implements FmtReader.ErrorHandler {
     checkMarkdownCode = true;
 }
 
-function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument, getMetaModel?: Meta.MetaModelGetter): ParsedDocument {
+function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): ParsedDocument {
     let cachedDocument = parsedFileCache.get(uri.fsPath);
     if (cachedDocument) {
         return cachedDocument;
@@ -1349,48 +1349,54 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
     };
     let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
-    if (!getMetaModel) {
-        let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
-            let metaModelFileName = getFileNameFromPath(sourceFileName, path);
-            if (metaModelCache) {
-                let parsedMetaModel = metaModelCache.get(metaModelFileName);
-                if (parsedMetaModel) {
-                    if (!parsedDocument.metaModelDocument) {
-                        parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
-                    }
-                    for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
-                        parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
-                    }
-                    return parsedMetaModel.metaModel;
+    let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
+        let metaModelFileName = getFileNameFromPath(sourceFileName, path);
+        if (metaModelCache) {
+            let parsedMetaModel = metaModelCache.get(metaModelFileName);
+            if (parsedMetaModel) {
+                if (!parsedDocument.metaModelDocument) {
+                    parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
                 }
-            }
-            let parsedMetaModelDocument = parseFile(vscode.Uri.file(metaModelFileName), undefined, undefined, undefined, FmtMeta.getMetaModel);
-            if (!parsedDocument.metaModelDocument) {
-                parsedDocument.metaModelDocument = parsedMetaModelDocument;
-            }
-            if (parsedMetaModelDocument.file) {
-                let metaModel = new FmtDynamic.DynamicMetaModel(parsedMetaModelDocument.file, metaModelFileName, (otherPath: Fmt.Path) => getReferencedMetaModel(metaModelFileName, otherPath));
-                parsedDocument.metaModelDocuments!.set(metaModel, parsedMetaModelDocument);
-                if (metaModelCache) {
-                    metaModelCache.set(metaModelFileName, {
-                        metaModel: metaModel,
-                        metaModelDocument: parsedMetaModelDocument,
-                        metaModelDocuments: parsedDocument.metaModelDocuments!
-                    });
+                for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
+                    parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
                 }
-                return metaModel;
-            } else {
-                return new Meta.DummyMetaModel(path.name);
+                return parsedMetaModel.metaModel;
             }
+        }
+        let parsedMetaModelDocument: ParsedDocument = {
+            uri: vscode.Uri.file(metaModelFileName),
+            hasErrors: false,
+            rangeList: [],
+            rangeMap: new Map<Object, RangeInfo>()
         };
-        getMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
-    }
+        let metaModelFileContents = readRangeRaw(parsedMetaModelDocument.uri);
+        let reportMetaModelRange = (info: FmtReader.ObjectRangeInfo) => {
+            let rangeInfo = convertRangeInfo(info);
+            parsedMetaModelDocument.rangeList.push(rangeInfo);
+            parsedMetaModelDocument.rangeMap.set(info.object, rangeInfo);
+        };
+        parsedMetaModelDocument.file = FmtReader.readString(metaModelFileContents, metaModelFileName, FmtMeta.getMetaModel, reportMetaModelRange);
+        if (!parsedDocument.metaModelDocument) {
+            parsedDocument.metaModelDocument = parsedMetaModelDocument;
+        }
+        let metaModel = new FmtDynamic.DynamicMetaModel(parsedMetaModelDocument.file, metaModelFileName, (otherPath: Fmt.Path) => getReferencedMetaModel(metaModelFileName, otherPath));
+        parsedDocument.metaModelDocuments!.set(metaModel, parsedMetaModelDocument);
+        if (metaModelCache) {
+            metaModelCache.set(metaModelFileName, {
+                metaModel: metaModel,
+                metaModelDocument: parsedMetaModelDocument,
+                metaModelDocuments: parsedDocument.metaModelDocuments!
+            });
+        }
+        return metaModel;
+    };
+    let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
     let reportRange = (info: FmtReader.ObjectRangeInfo) => {
         let rangeInfo = convertRangeInfo(info);
         parsedDocument.rangeList.push(rangeInfo);
         parsedDocument.rangeMap.set(info.object, rangeInfo);
     };
-    let reader = new FmtReader.Reader(stream, errorHandler, getMetaModel, reportRange);
+    let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
     try {
         parsedDocument.file = reader.readFile();
     } catch (error) {
