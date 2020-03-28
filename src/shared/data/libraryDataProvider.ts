@@ -261,6 +261,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return definition;
   }
 
+  private createLibraryDefinition(uri: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, contents: FileContents): LibraryDefinition {
+    let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
+    return {
+      file: file,
+      definition: this.getMainDefinition(file, definitionName),
+      state: LibraryDefinitionState.Loaded
+    };
+  }
+
   private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
     return this.fileAccessor.readFile(uri)
       .then((contents: FileContents) => {
@@ -340,28 +349,27 @@ export class LibraryDataProvider implements LibraryDataAccessor {
             let libraryDefinition: LibraryDefinition | undefined = undefined;
             if (this.config.watchForChanges && contents.addWatcher) {
               contents.addWatcher((watcher: FileWatcher) => {
-                if (libraryDefinition) {
-                  try {
-                    libraryDefinition.file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
-                    libraryDefinition.definition = this.getMainDefinition(libraryDefinition.file, definitionName);
+                try {
+                  let newLibraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
+                  if (libraryDefinition) {
+                    libraryDefinition.file = newLibraryDefinition.file;
+                    libraryDefinition.definition = newLibraryDefinition.definition;
                     let currentEditedDefinition = this.editedDefinitions.get(name);
                     if (currentEditedDefinition) {
                       currentEditedDefinition.file = libraryDefinition.file.clone();
                       currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
                     }
-                  } catch (error) {
-                    this.fullyLoadedDefinitions.delete(name);
-                    watcher.close();
+                  } else {
+                    libraryDefinition = newLibraryDefinition;
+                    this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(libraryDefinition));
                   }
+                } catch (error) {
+                  this.fullyLoadedDefinitions.delete(name);
+                  watcher.close();
                 }
               });
             }
-            let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
-            libraryDefinition = {
-              file: file,
-              definition: this.getMainDefinition(file, definitionName),
-              state: LibraryDefinitionState.Loaded
-            };
+            libraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
             return libraryDefinition;
           });
         this.fullyLoadedDefinitions.set(name, result);
