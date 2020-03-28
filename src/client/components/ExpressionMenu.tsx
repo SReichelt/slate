@@ -12,6 +12,20 @@ const Loading = require('react-loading-animation');
 
 const clickDelay = 100;
 
+// Explicitly determine the main font style from the document body, as it seems to be the only way to restore the initial size
+// in a way that works in both the standalone and embedded cases.
+function getMainFontStyle(): React.CSSProperties {
+  let result: React.CSSProperties = {};
+  let bodyStyle = window.getComputedStyle(document.body);
+  if (bodyStyle.fontFamily) {
+    result.fontFamily = bodyStyle.fontFamily;
+  }
+  if (bodyStyle.fontSize) {
+    result.fontSize = bodyStyle.fontSize;
+  }
+  return result;
+}
+
 interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
@@ -64,7 +78,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         }
       };
       return (
-        <div className={className} ref={ref}>
+        <div className={className} style={getMainFontStyle()} ref={ref}>
           <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
             <tbody>
               {rows}
