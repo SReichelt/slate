@@ -160,7 +160,7 @@ interface ReferencedDefinition {
     arguments?: Fmt.ArgumentList;
 }
 
-function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, context?: Ctx.Context, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): ReferencedDefinition | null | undefined {
+function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object: Object, context: Ctx.Context | undefined, sourceDocument: vscode.TextDocument | undefined, restrictToUri: vscode.Uri | undefined, reportAllInUri: boolean): ReferencedDefinition | null | undefined {
     if (object instanceof FmtDynamic.DynamicMetaRefExpression && parsedDocument.metaModelDocuments) {
         let metaModelDocument = parsedDocument.metaModelDocuments.get(object.metaModel);
         if (metaModelDocument && (!restrictToUri || areUrisEqual(restrictToUri, metaModelDocument.uri))) {
@@ -173,6 +173,9 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
         }
     } else if (object instanceof Fmt.Path) {
         if (parsedDocument.metaModelDocument && parsedDocument.metaModelDocument.file && parsedDocument.metaModelDocument.file.definitions.length && (!restrictToUri || areUrisEqual(restrictToUri, parsedDocument.metaModelDocument.uri))) {
+            if (reportAllInUri) {
+                return null;
+            }
             let metaModelDefinition = parsedDocument.metaModelDocument.file.definitions[0];
             if (parsedDocument.file && object === parsedDocument.file.metaModelPath) {
                 return {
@@ -190,6 +193,9 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
                 if (lookup instanceof FmtMeta.MetaRefExpression_self) {
                     fileName = getFileNameFromPath(parsedDocument.uri.fsPath, object, true);
                     if (!fileName) {
+                        if (reportAllInUri) {
+                            return null;
+                        }
                         if (parsedDocument.file) {
                             let definition = findDefinitionInFile(parsedDocument.file, object, false);
                             if (definition) {
@@ -222,8 +228,11 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
                 }
                 let uri = vscode.Uri.file(fileName);
                 if (!restrictToUri || areUrisEqual(restrictToUri, uri)) {
+                    if (reportAllInUri) {
+                        return null;
+                    }
                     let referencedDocument = parseFile(uri, undefined, undefined, sourceDocument);
-                    if (referencedDocument.file) {
+                    if (referencedDocument && referencedDocument.file) {
                         let definition = findDefinitionInFile(referencedDocument.file, object, true);
                         if (definition) {
                             return {
@@ -239,6 +248,14 @@ function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object
         }
     }
     return undefined;
+}
+
+function findReferencedDefinition(parsedDocument: ParsedDocument, object: Object, context?: Ctx.Context, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): ReferencedDefinition | null | undefined {
+    return findReferencedDefinitionInternal(parsedDocument, object, context, sourceDocument, restrictToUri, false);
+}
+
+function isDefinitionReferenceToUri(parsedDocument: ParsedDocument, object: Object, context: Ctx.Context | undefined, uri: vscode.Uri, sourceDocument?: vscode.TextDocument): boolean {
+    return findReferencedDefinitionInternal(parsedDocument, object, context, sourceDocument, uri, true) !== undefined;
 }
 
 function findObjectContents(parsedDocument: ParsedDocument, object: Object, sourceDocument?: vscode.TextDocument): FmtDynamic.DynamicObjectContents | undefined {
@@ -553,7 +570,7 @@ class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 
     resolveWorkspaceSymbol(symbol: vscode.SymbolInformation, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation> {
         let parsedDocument = parseFile(symbol.location.uri);
-        if (parsedDocument.file) {
+        if (parsedDocument && parsedDocument.file) {
             let definition: Fmt.Definition | undefined = undefined;
             try {
                 if (symbol.containerName) {
@@ -1040,7 +1057,7 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
                                                     if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
                                                         try {
                                                             let fileDocument = parseFile(vscode.Uri.file(fullPath));
-                                                            if (fileDocument.file && fileDocument.file.definitions.length) {
+                                                            if (fileDocument && fileDocument.file && fileDocument.file.definitions.length) {
                                                                 let definition = fileDocument.file.definitions[0];
                                                                 if (definition.name + fileExtension === fileName) {
                                                                     let definitionRangeInfo = fileDocument.rangeMap.get(definition);
@@ -1125,19 +1142,23 @@ function findReferences(nameDefinitionLocation: DefinitionLink, returnNameRanges
         let result: vscode.Location[] = [];
         if (nameDefinitionLocation && nameDefinitionLocation.targetSelectionRange) {
             result.push(new vscode.Location(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange));
+            let preCheck = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) =>
+                isDefinitionReferenceToUri(parsedDocument, rangeInfo.object, rangeInfo.context, nameDefinitionLocation.targetUri, sourceDocument);
             for (let uri of uris) {
                 if (token.isCancellationRequested) {
                     break;
                 }
-                let parsedDocument = parseFile(uri, undefined, undefined, sourceDocument);
-                for (let rangeInfo of parsedDocument.rangeList) {
-                    if (token.isCancellationRequested) {
-                        break;
-                    }
-                    for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, sourceDocument, nameDefinitionLocation.targetUri)) {
-                        if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange)) {
-                            let range = definitionLink.originSelectionRange && !returnNameRanges ? definitionLink.originSelectionRange : definitionLink.originNameRange;
-                            result.push(new vscode.Location(uri, range));
+                let parsedDocument = parseFile(uri, undefined, undefined, sourceDocument, preCheck);
+                if (parsedDocument) {
+                    for (let rangeInfo of parsedDocument.rangeList) {
+                        if (token.isCancellationRequested) {
+                            break;
+                        }
+                        for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, sourceDocument, nameDefinitionLocation.targetUri)) {
+                            if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange)) {
+                                let range = definitionLink.originSelectionRange && !returnNameRanges ? definitionLink.originSelectionRange : definitionLink.originNameRange;
+                                result.push(new vscode.Location(uri, range));
+                            }
                         }
                     }
                 }
@@ -1317,7 +1338,9 @@ class ErrorHandler implements FmtReader.ErrorHandler {
     checkMarkdownCode = true;
 }
 
-function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument): ParsedDocument {
+type ParseFilePreCheckFn = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) => boolean;
+
+function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument, preCheck?: ParseFilePreCheckFn): ParsedDocument | undefined {
     let cachedDocument = parsedFileCache.get(uri.fsPath);
     if (cachedDocument) {
         return cachedDocument;
@@ -1325,7 +1348,6 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     if (!fileContents) {
         fileContents = readRange(uri, undefined, false, sourceDocument) || '';
     }
-    let stream = new FmtReader.StringInputStream(fileContents);
     let parsedDocument: ParsedDocument = {
         uri: uri,
         hasSyntaxErrors: false,
@@ -1372,6 +1394,24 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         return metaModel;
     };
     let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
+    if (preCheck) {
+        let preCheckCompleted = false;
+        let stream = new FmtReader.StringInputStream(fileContents);
+        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
+            if (!preCheckCompleted && preCheck(parsedDocument, info)) {
+                preCheckCompleted = true;
+            }
+        }
+        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
+        try {
+            reader.readFile();
+        } catch (error) {
+        }
+        if (!preCheckCompleted) {
+            return undefined;
+        }
+    }
+    let stream = new FmtReader.StringInputStream(fileContents);
     let reportRange = (info: FmtReader.ObjectRangeInfo) => {
         let rangeInfo = convertRangeInfo(info);
         parsedDocument.rangeList.push(rangeInfo);
@@ -1413,8 +1453,10 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         let diagnostics: vscode.Diagnostic[] = [];
         let parsedDocument = parseFile(document.uri, document.getText(), diagnostics, document);
         diagnosticCollection.set(document.uri, diagnostics);
-        parsedDocuments.set(document, parsedDocument);
-        emitParseEvent(document, parsedDocument, parseEventEmitter);
+        if (parsedDocument) {
+            parsedDocuments.set(document, parsedDocument);
+            emitParseEvent(document, parsedDocument, parseEventEmitter);
+        }
         return parsedDocument;
     } else {
         return undefined;
