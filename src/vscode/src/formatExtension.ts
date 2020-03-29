@@ -449,6 +449,14 @@ function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vsc
         }
         if (rangeInfo.range.contains(position)) {
             if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
+                let referencedDefinition: ReferencedDefinition | undefined = undefined;
+                if (rangeInfo.object instanceof Fmt.Definition) {
+                    referencedDefinition = {
+                        definition: rangeInfo.object,
+                        isMetaModel: false,
+                        parsedDocument: parsedDocument
+                    };
+                }
                 return {
                     originNameRange: rangeInfo.nameRange,
                     originObject: rangeInfo.object,
@@ -456,7 +464,8 @@ function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vsc
                     targetUri: parsedDocument.uri,
                     targetRange: rangeInfo.range,
                     targetSelectionRange: rangeInfo.nameRange,
-                    name: rangeInfo.object.name
+                    name: rangeInfo.object.name,
+                    referencedDefinition: referencedDefinition
                 };
             }
             let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, sourceDocument);
@@ -1155,7 +1164,7 @@ class SlateReferenceProvider implements vscode.ReferenceProvider {
 }
 
 class SlateRenameProvider implements vscode.RenameProvider {
-    constructor(private parsedDocuments: ParsedDocumentMap) {}
+    constructor(private parsedDocuments: ParsedDocumentMap, private onRenaming?: () => void) {}
 
     provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.WorkspaceEdit> {
         let parsedDocument = this.parsedDocuments.get(document);
@@ -1168,10 +1177,15 @@ class SlateRenameProvider implements vscode.RenameProvider {
                     for (let location of locations) {
                         result.replace(location.uri, location.range, escapedName);
                     }
-                    let fsPath = nameDefinitionLocation!.targetUri.fsPath;
-                    if (path.basename(fsPath) === nameDefinitionLocation!.name + fileExtension) {
-                        fsPath = path.join(path.dirname(fsPath), newName + fileExtension);
-                        result.renameFile(nameDefinitionLocation!.targetUri, vscode.Uri.file(fsPath));
+                    if (nameDefinitionLocation && nameDefinitionLocation.referencedDefinition) {
+                        let fsPath = nameDefinitionLocation.targetUri.fsPath;
+                        if (path.basename(fsPath) === nameDefinitionLocation.name + fileExtension) {
+                            fsPath = path.join(path.dirname(fsPath), newName + fileExtension);
+                            result.renameFile(nameDefinitionLocation.targetUri, vscode.Uri.file(fsPath));
+                        }
+                    }
+                    if (this.onRenaming) {
+                        this.onRenaming();
                     }
                     return result;
                 });
@@ -1384,19 +1398,23 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     return parsedDocument;
 }
 
+function emitParseEvent(document: vscode.TextDocument, parsedDocument: ParsedDocument, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent> | undefined): void {
+    if (parseEventEmitter) {
+        parseEventEmitter.fire({
+            document: document,
+            file: parsedDocument.file,
+            hasSyntaxErrors: parsedDocument.hasSyntaxErrors
+        });
+    }
+}
+
 function parseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter?: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>): ParsedDocument | undefined {
     if (document.languageId === languageId) {
         let diagnostics: vscode.Diagnostic[] = [];
         let parsedDocument = parseFile(document.uri, document.getText(), diagnostics, document);
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
-        if (parseEventEmitter) {
-            parseEventEmitter.fire({
-                document: document,
-                file: parsedDocument.file,
-                hasSyntaxErrors: parsedDocument.hasSyntaxErrors
-            });
-        }
+        emitParseEvent(document, parsedDocument, parseEventEmitter);
         return parsedDocument;
     } else {
         return undefined;
@@ -1406,10 +1424,11 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
 type ReparseCondition = (document: vscode.TextDocument) => boolean;
 
 let parseAllTimer: NodeJS.Timer | undefined = undefined;
+let parseAllDelay = 0;
 let reparseCompletely = false;
 let reparseConditions: ReparseCondition[] | undefined = [];
 
-function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>, recheckOnly: boolean, condition?: ReparseCondition): void {
+function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>, recheckOnly: boolean, condition?: ReparseCondition, delay: number = 500): void {
     if (!recheckOnly) {
         reparseCompletely = true;
     }
@@ -1422,11 +1441,10 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
     }
     if (parseAllTimer) {
         clearTimeout(parseAllTimer);
-        parseAllTimer = undefined;
     }
-    parseAllTimer = setTimeout(() => {
+    let parseAll = () => {
         for (let document of vscode.workspace.textDocuments) {
-            if (!reparseConditions || reparseConditions.some((reparseCondition: ReparseCondition) => reparseCondition(document))) {
+            if (document.languageId === languageId && (!reparseConditions || reparseConditions.some((reparseCondition: ReparseCondition) => reparseCondition(document)))) {
                 let fileName = document.uri.fsPath;
                 if (!reparseCompletely) {
                     let parsedDocument = parsedFileCache.get(fileName);
@@ -1434,6 +1452,7 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
                         let diagnostics: vscode.Diagnostic[] = [];
                         checkReferencedDefinitions(parsedDocument, diagnostics, document);
                         diagnosticCollection.set(document.uri, diagnostics);
+                        emitParseEvent(document, parsedDocument, parseEventEmitter);
                         continue;
                     }
                 }
@@ -1441,9 +1460,14 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
                 parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
             }
         }
+        parseAllDelay = 0;
         reparseCompletely = false;
         reparseConditions = [];
-    }, 500);
+    };
+    if (parseAllDelay < delay) {
+        parseAllDelay = delay;
+    }
+    parseAllTimer = setTimeout(parseAll, parseAllDelay);
 }
 
 function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>): void {
@@ -1519,7 +1543,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.languages.registerSignatureHelpProvider(SLATE_MODE, new SlateSignatureHelpProvider(parsedDocuments), '(', '{', ','),
         vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.'),
         vscode.languages.registerReferenceProvider(SLATE_MODE, new SlateReferenceProvider(parsedDocuments)),
-        vscode.languages.registerRenameProvider(SLATE_MODE, new SlateRenameProvider(parsedDocuments)),
+        vscode.languages.registerRenameProvider(SLATE_MODE, new SlateRenameProvider(parsedDocuments, () => triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, true, undefined, 5000))),
         vscode.languages.registerDocumentFormattingEditProvider(SLATE_MODE, new SlateDocumentFormatter)
     );
     LogicExtension.activate(context, parseEventEmitter.event, hoverEventEmitter.event, fileAccessor);
