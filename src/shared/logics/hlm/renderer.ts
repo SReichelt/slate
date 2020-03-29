@@ -1578,7 +1578,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (argumentLists) {
       let rawArg = this.utils.getRawArgument(argumentLists, param);
       if (rawArg) {
-        resultArgs.push(this.renderRegularArgument(rawArg, type, param.type.arrayDimensions));
+        resultArgs.push(this.getRegularArgumentResult(rawArg, type, param.type.arrayDimensions));
       } else {
         resultArgs.push(new Display.ErrorExpression('Undefined argument'));
       }
@@ -1588,7 +1588,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private renderRegularArgument(rawArg: Fmt.Expression, type: Fmt.Expression, remainingArrayDimensions: number): Display.ExpressionValue {
+  private getRegularArgumentResult(rawArg: Fmt.Expression, type: Fmt.Expression, remainingArrayDimensions: number): Display.ExpressionValue {
     if (remainingArrayDimensions) {
       if (rawArg instanceof Fmt.ArrayExpression) {
         let result: Display.ExpressionValue[] = [];
@@ -1599,8 +1599,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             result.push(ellipsis);
             break;
           }
-          let renderedItem = this.renderRegularArgument(item, type, remainingArrayDimensions - 1);
-          this.addSemanticLink(renderedItem, item);
+          let innerArrayDimensions = remainingArrayDimensions - 1;
+          let renderedItem = this.getRegularArgumentResult(item, type, innerArrayDimensions);
+          if (!innerArrayDimensions) {
+            this.addSemanticLink(renderedItem, item);
+          }
           result.push(renderedItem);
         }
         return result;
@@ -1608,46 +1611,51 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return new Display.ErrorExpression('Array expression expected');
       }
     } else {
-      if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-        let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_PropArg);
-        let formulaSelection: FormulaSelection = {
-          allowTruthValue: true,
-          allowEquiv: false,
-          allowCases: true
-        };
-        return this.renderFormula(arg.formula, formulaSelection);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SetArg);
-        return this.renderSetTerm(arg._set, fullSetTermSelection);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
-        return this.renderSetTerm(arg._set, fullSetTermSelection);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
-        return this.renderElementTerm(arg.element, fullElementTermSelection);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
-        let result: Display.TextExpression;
-        if (rawArg instanceof Fmt.PlaceholderExpression) {
-          result = new Display.TextExpression('');
-          result.requestTextInput = true;
-        } else {
-          let arg = rawArg as Fmt.IntegerExpression;
-          result = this.renderInteger(arg.value);
-        }
-        if (this.editHandler) {
-          this.editHandler.addIntegerEditor(result, rawArg, false);
-        }
-        return result;
-      } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
-        let definitionRef = this.renderGenericExpression(rawArg, 3);
-        if (!definitionRef) {
-          return new Display.ErrorExpression('Definition reference expected');
-        }
-        this.addSemanticLink(definitionRef, rawArg);
-        return definitionRef;
+      let renderArgument = () => this.renderRegularArgument(rawArg, type);
+      return new Display.LazyExpression(renderArgument);
+    }
+  }
+
+  private renderRegularArgument(rawArg: Fmt.Expression, type: Fmt.Expression): Display.RenderedExpression {
+    if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_PropArg);
+      let formulaSelection: FormulaSelection = {
+        allowTruthValue: true,
+        allowEquiv: false,
+        allowCases: true
+      };
+      return this.renderFormula(arg.formula, formulaSelection);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
+      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SetArg);
+      return this.renderSetTerm(arg._set, fullSetTermSelection);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
+      return this.renderSetTerm(arg._set, fullSetTermSelection);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
+      return this.renderElementTerm(arg.element, fullElementTermSelection);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
+      let result: Display.TextExpression;
+      if (rawArg instanceof Fmt.PlaceholderExpression) {
+        result = new Display.TextExpression('');
+        result.requestTextInput = true;
       } else {
-        return new Display.ErrorExpression('Unhandled parameter type');
+        let arg = rawArg as Fmt.IntegerExpression;
+        result = this.renderInteger(arg.value);
       }
+      if (this.editHandler) {
+        this.editHandler.addIntegerEditor(result, rawArg, false);
+      }
+      return result;
+    } else if (type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
+      let definitionRef = this.renderGenericExpression(rawArg, 3);
+      if (!definitionRef) {
+        return new Display.ErrorExpression('Definition reference expected');
+      }
+      this.addSemanticLink(definitionRef, rawArg);
+      return definitionRef;
+    } else {
+      return new Display.ErrorExpression('Unhandled parameter type');
     }
   }
 

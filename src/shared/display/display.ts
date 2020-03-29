@@ -49,6 +49,16 @@ export abstract class IndirectExpression extends RenderedExpression {
   }
 }
 
+export class LazyExpression extends IndirectExpression {
+  constructor(private evaluate: () => RenderedExpression) {
+    super();
+  }
+
+  protected doResolve(): RenderedExpression {
+    return this.evaluate();
+  }
+}
+
 export class PromiseExpression extends RenderedExpression {
   constructor(public promise: CachedPromise<RenderedExpression>) {
     super();

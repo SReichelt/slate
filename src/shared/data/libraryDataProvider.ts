@@ -66,6 +66,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
   private prefetchQueue: PrefetchQueueItem[] = [];
+  private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
   constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
@@ -402,7 +403,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           for (let item of contents.items) {
             if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.config.canPreload)) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
-              if (!path.parentPath && !this.preloadedDefinitions.get(path.name) && !this.fullyLoadedDefinitions.get(path.name)) {
+              if (!path.parentPath && !this.preloadedDefinitions.has(path.name) && !this.fullyLoadedDefinitions.has(path.name)) {
                 let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
                 this.prefetchQueue.push({
                   path: path,
@@ -874,12 +875,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private triggerPrefetching(): void {
-    let prefetch = () => {
-      for (let i = 0; i < 4; i++) {
-        this.prefetch();
-      }
-    };
-    setImmediate(prefetch);
+    if (!this.prefetchTimer) {
+      let prefetch = () => {
+        for (let i = 0; i < 4; i++) {
+          this.prefetch();
+        }
+        this.prefetchTimer = undefined;
+      };
+      this.prefetchTimer = setTimeout(prefetch, 0);
+    }
   }
 
   private prefetch = (): boolean => {

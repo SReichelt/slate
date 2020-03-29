@@ -69,7 +69,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private interactionBlocked = false;
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
+  private highlightPermanentlyTimer: any;
   private shrinkMathSpaces = true;
+  private previewTimer: any;
   private tooltipPosition: string;
 
   constructor(props: ExpressionProps) {
@@ -99,7 +101,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   componentDidUpdate(prevProps: ExpressionProps): void {
-    if (this.props.parent !== prevProps.parent || this.props.expression !== prevProps.expression || this.props.interactionHandler !== prevProps.interactionHandler) {
+    // Do not check for changes to props.expression here. Some expressions are generated dynamically while rendering, and thus change every time.
+    if (this.props.parent !== prevProps.parent || this.props.interactionHandler !== prevProps.interactionHandler) {
       this.cleanupDependentState();
     }
     if (this.props.interactionHandler !== prevProps.interactionHandler) {
@@ -130,6 +133,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private clearHoverAndMenu(): void {
     this.permanentlyHighlighted = false;
+    if (this.highlightPermanentlyTimer) {
+      clearTimeout(this.highlightPermanentlyTimer);
+      this.highlightPermanentlyTimer = undefined;
+    }
     this.clearOpenMenu();
     if (this.props.parent) {
       for (let expression of this.hoveredChildren) {
@@ -148,6 +155,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private cleanupDependentState(): void {
+    if (this.previewTimer) {
+      clearTimeout(this.previewTimer);
+      this.previewTimer = undefined;
+    }
     this.clearHoverAndMenu();
     this.disableInteractionBlocker();
     this.disableWindowClickListener();
@@ -242,7 +253,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               this.setState({inputError: true});
             }
           }
-          setImmediate(() => this.highlightPermanently());
+          this.triggerHighlightPermanently();
         };
         let ref = undefined;
         if (expression.requestTextInput) {
@@ -251,7 +262,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               expression.requestTextInput = false;
               htmlNode.select();
               htmlNode.focus();
-              setImmediate(() => this.highlightPermanently());
+              this.triggerHighlightPermanently();
             }
           };
         }
@@ -1280,12 +1291,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         this.props.interactionHandler.hoverChanged(hover);
       }
       if (this.isDirectlyHovered() && !this.props.interactionHandler.isBlocked()) {
+        if (this.previewTimer) {
+          clearTimeout(this.previewTimer);
+        }
         let update = () => {
           if (this.isDirectlyHovered()) {
             this.setState({showPreview: true});
           }
         };
-        setTimeout(update, 250);
+        this.previewTimer = setTimeout(update, 250);
       } else {
         this.setState((prevState: ExpressionState) => prevState.showPreview ? {showPreview: false} : null);
       }
@@ -1310,6 +1324,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     }
     return false;
+  }
+
+  private triggerHighlightPermanently(): void {
+    if (this.highlightPermanentlyTimer) {
+      clearTimeout(this.highlightPermanentlyTimer);
+    }
+    this.highlightPermanentlyTimer = setTimeout(() => this.highlightPermanently(), 0);
   }
 
   private highlightPermanently(event?: React.SyntheticEvent<HTMLElement>): void {

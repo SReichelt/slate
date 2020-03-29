@@ -22,6 +22,7 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
   rendererProps?: React.PropsWithChildren<LibraryItemProps>;
   rendererDefinitionState?: LibraryDefinitionState;
   rendererDefinition?: Fmt.Definition;
+  definitionChangeCounter = 0;
 
   componentDidMount(): void {
     if (this.props.interactionHandler) {
@@ -66,6 +67,7 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
       this.rendererProps = {...this.props};
       this.rendererDefinitionState = this.props.definition.state;
       this.rendererDefinition = this.props.definition.definition;
+      this.definitionChangeCounter++;
     }
     return this.renderer;
   }
@@ -81,7 +83,7 @@ class LibraryItem extends LibraryItemBase {
       if (expression) {
         return (
           <div className="library-item">
-            <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>
+            <Expression expression={expression} interactionHandler={this.props.interactionHandler} key={this.definitionChangeCounter}/>
           </div>
         );
       }
