@@ -1095,8 +1095,10 @@ export class HLMDefinitionChecker {
             constructorExpression.path = constructorPath;
             newCase._constructor = constructorExpression;
             if (substitutedParameters.length) {
-              newCase.parameters = substitutedParameters;
-              newParameterLists.push(substitutedParameters);
+              let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+              substitutedParameters.clone(clonedParameters);
+              newCase.parameters = clonedParameters;
+              newParameterLists.push(clonedParameters);
             }
             if ((innerDefinition.contents as FmtHLM.ObjectContents_Constructor).rewrite) {
               newCase.rewrite = new FmtHLM.MetaRefExpression_true;
