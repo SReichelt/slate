@@ -2656,11 +2656,94 @@ exports[`render hlm library: 1.6.1.40 data/libraries/hlm/Essentials/Numbers/Natu
 
 Equivalence.  No proof.
 
-Well-definedness.  No proof."
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
+* https://mathworld.wolfram.com/Minimum.html
+* https://proofwiki.org/wiki/Definition:Minimal/Ordered_Set"
 `;
 
-exports[`render hlm library: 1.6.1.41.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/indexed%20element 1`] = `
-"Definition 1.6.1.41.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
+exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natural/minimum%20of%20two%20numbers 1`] = `
+"Definition 1.6.1.41.  Let m, n ∈ ℕ. We define:
+
+  min(m, n) := min({m, n})
+   = {m if m ≤ n, n if m > n
+   = {0 if n = 0, {0 if m = 0, min(x, y) + 1 if m = x + 1 (x ∈ ℕ) if n = y + 1 (y ∈ ℕ)
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Min_Operation
+* https://coq.inria.fr/library/Coq.Init.Nat.html#min
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#min"
+`;
+
+exports[`render hlm library: 1.6.1.42 data/libraries/hlm/Essentials/Numbers/Natural/bounded 1`] = `
+"Definition 1.6.1.42.  Let M ⊆ ℕ. We define:
+
+  M is bounded  :⇔  ∃ n ∈ ℕ : ∀ m ∈ M : m ≤ n
+    ⇔  ∃ u ∈ ℕ : ∀ m ∈ M : m < u
+    ⇔  M is empty or ∃! n ∈ M : ∀ m ∈ M : m ≤ n
+
+  M is unbounded  :⇔  M is not bounded
+
+Equivalence.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Bounded_set
+* https://mathworld.wolfram.com/Bounded.html
+* https://proofwiki.org/wiki/Definition:Bounded_Above_Set
+* https://ncatlab.org/nlab/show/bounded+set"
+`;
+
+exports[`render hlm library: 1.6.1.43 data/libraries/hlm/Essentials/Numbers/Natural/Finite%20subsets%20are%20bounded 1`] = `
+"Proposition 1.6.1.43.  Let M ⊆ ℕ such that M is finite. Then:
+
+  M is bounded
+
+No proof."
+`;
+
+exports[`render hlm library: 1.6.1.44 data/libraries/hlm/Essentials/Numbers/Natural/maximum 1`] = `
+"Definition 1.6.1.44.  Let M ⊆ ℕ such that M is nonempty and M is bounded. For m ∈ M, we define:
+
+  max(M) = m  :⇔  ∀ n ∈ M : m ≥ n
+    ⇔  ∀ l ∈ M s.t. l ≥ m : l = m
+    ⇔  ∄ k ∈ M : k > m
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
+* https://mathworld.wolfram.com/Maximum.html
+* https://proofwiki.org/wiki/Definition:Maximal/Ordered_Set"
+`;
+
+exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natural/maximum%20of%20two%20numbers 1`] = `
+"Definition 1.6.1.45.  Let m, n ∈ ℕ. We define:
+
+  max(m, n) := max({m, n})
+   = {m if m ≥ n, n if m < n
+   = {m if n = 0, {n if m = 0, max(x, y) + 1 if m = x + 1 (x ∈ ℕ) if n = y + 1 (y ∈ ℕ)
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Max_Operation
+* https://coq.inria.fr/library/Coq.Init.Nat.html#max
+* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#max"
+`;
+
+exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/indexed%20element 1`] = `
+"Definition 1.6.1.46.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
 
   M[n]
 
@@ -2674,8 +2757,8 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`), and to provide a way of obtaining a sequence from a finite set of natural numbers (see \`$\\"sequence from subset\\"\`)."
 `;
 
-exports[`render hlm library: 1.6.1.41.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
-"Definition 1.6.1.41.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.46.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
+"Definition 1.6.1.46.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
 
   |M|_≤n
 
@@ -2689,10 +2772,10 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.41.3 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.6.1.41.3 (Tuple)."`;
+exports[`render hlm library: 1.6.1.46.3 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.6.1.46.3 (Tuple)."`;
 
-exports[`render hlm library: 1.6.1.41.4 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/sequence%20from%20subset 1`] = `
-"Definition 1.6.1.41.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
+exports[`render hlm library: 1.6.1.46.4 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/sequence%20from%20subset 1`] = `
+"Definition 1.6.1.46.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
 
   seq(M) := seq_(≤∣_M)(M)
    = ((M[n])_(n < α))_(M^α)
@@ -2704,8 +2787,8 @@ Remarks.
 This definition produces a sorted finite sequence from a finite subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.41.5 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence%20from%20subset 1`] = `
-"Definition 1.6.1.41.5.  Let M ⊆ ℕ such that M is infinite. We define:
+exports[`render hlm library: 1.6.1.46.5 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence%20from%20subset 1`] = `
+"Definition 1.6.1.46.5.  Let M ⊆ ℕ such that M is infinite. We define:
 
   seq_ω(M) := (M[n])_(n ∈ ℕ)
 
@@ -2714,8 +2797,8 @@ Remarks.
 This definition produces a sorted infinite sequence from an infinite subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.6.1.42 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
-"Definition 1.6.1.42.  Let n ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.47 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
+"Definition 1.6.1.47.  Let n ∈ ℕ. We define
 
   n!
 
@@ -2734,8 +2817,8 @@ References.
 * http://oeis.org/A000142"
 `;
 
-exports[`render hlm library: 1.6.1.43 data/libraries/hlm/Essentials/Numbers/Natural/Small%20factorials 1`] = `
-"Proposition 1.6.1.43.
+exports[`render hlm library: 1.6.1.48 data/libraries/hlm/Essentials/Numbers/Natural/Small%20factorials 1`] = `
+"Proposition 1.6.1.48.
 
   (n!)_(n ∈ ℕ) starts with (1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 355687428096000, 6402373705728000, 121645100408832000, 2432902008176640000, 51090942171709440000, 1124000727777607680000)
 
@@ -2746,8 +2829,8 @@ References.
 * http://oeis.org/A000142"
 `;
 
-exports[`render hlm library: 1.6.1.44 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
-"Definition 1.6.1.44.  Let n, k ∈ ℕ. We define
+exports[`render hlm library: 1.6.1.49 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
+"Definition 1.6.1.49.  Let n, k ∈ ℕ. We define
 
   (n, k)
 
@@ -2767,8 +2850,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose"
 `;
 
-exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
-"Proposition 1.6.1.45.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.50 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
+"Proposition 1.6.1.50.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
 
   (n, k) = (n!)/(k! ⋅ (n − k)!)
 
@@ -2783,8 +2866,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose_eq_fact_div_fact"
 `;
 
-exports[`render hlm library: 1.6.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
-"Definition 1.6.1.46.1.  We define:
+exports[`render hlm library: 1.6.1.51.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
+"Definition 1.6.1.51.1.  We define:
 
   ∑ := (0 + ⋅⋅⋅)
 
@@ -2799,40 +2882,40 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.1.46.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
-"Proposition 1.6.1.46.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.51.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
+"Proposition 1.6.1.51.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∑_(j < m) a_j ≤ ∑_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.6.1.46.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.51.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.51.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.4 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20constant 1`] = `
-"Proposition 1.6.1.46.4.  Let n, a ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.51.4 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20constant 1`] = `
+"Proposition 1.6.1.51.4.  Let n, a ∈ ℕ. Then:
 
   ∑_(i < n) a = n ⋅ a
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
-"Proposition 1.6.1.46.5.  Let n ∈ ℕ. Then:
+exports[`render hlm library: 1.6.1.51.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
+"Proposition 1.6.1.51.5.  Let n ∈ ℕ. Then:
 
   ∑_(i < n) i = (n, 2) = {(n ⋅ (n − 1))/2 if n ≠ 0, 0 if n = 0
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
-"Definition 1.6.1.46.6.  We define:
+exports[`render hlm library: 1.6.1.51.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
+"Definition 1.6.1.51.6.  We define:
 
   ∏ := (1 ⋅ ⋅⋅⋅)
 
@@ -2847,40 +2930,40 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.6.1.46.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
-"Proposition 1.6.1.46.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.51.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
+"Proposition 1.6.1.51.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   (∏_(j < m) a_j) ∣ (∏_(k < n) a_k)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
-"Proposition 1.6.1.46.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.6.1.51.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
+"Proposition 1.6.1.51.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∏_(j < m) a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
-"Proposition 1.6.1.46.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.51.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
+"Proposition 1.6.1.51.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ∣ (∏_(k < n) a_k)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.46.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.6.1.46.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.6.1.51.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.6.1.51.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.6.1.47.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
-"Definition 1.6.1.47.1.  Let n ∈ ℕ_(>1). We define:
+exports[`render hlm library: 1.6.1.52.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
+"Definition 1.6.1.52.1.  Let n ∈ ℕ_(>1). We define:
 
   n is prime  :⇔  ∀ m ∈ ℕ_+ s.t. m ∣ n : [m = 1 or m = n]
     ⇔  ∀ l ∈ ℕ_(>1) s.t. l ∣ n : l = n
@@ -2913,8 +2996,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime"
 `;
 
-exports[`render hlm library: 1.6.1.47.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
-"Example 1.6.1.47.2.
+exports[`render hlm library: 1.6.1.52.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
+"Example 1.6.1.52.2.
 
   2 is prime
 
@@ -2926,8 +3009,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.prime_two"
 `;
 
-exports[`render hlm library: 1.6.1.47.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
-"Definition 1.6.1.47.3.  We define:
+exports[`render hlm library: 1.6.1.52.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
+"Definition 1.6.1.52.3.  We define:
 
   ℙ := {n ∈ ℕ_(>1) : n is prime}
 
@@ -2941,8 +3024,8 @@ References.
 * http://oeis.org/A000040"
 `;
 
-exports[`render hlm library: 1.6.1.47.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Small%20primes 1`] = `
-"Proposition 1.6.1.47.4.
+exports[`render hlm library: 1.6.1.52.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Small%20primes 1`] = `
+"Proposition 1.6.1.52.4.
 
   seq_ω(ℙ) starts with (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271)
 
@@ -2954,8 +3037,8 @@ References.
 * http://oeis.org/A000040"
 `;
 
-exports[`render hlm library: 1.6.1.47.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
-"Proposition 1.6.1.47.5.  Let n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.6.1.52.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
+"Proposition 1.6.1.52.5.  Let n ∈ ℕ_(>1). Then:
 
   ∃ prime p : p ∣ n
 
@@ -2966,8 +3049,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_prime_and_dvd"
 `;
 
-exports[`render hlm library: 1.6.1.47.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
-"Theorem 1.6.1.47.6 (Euclid's theorem).
+exports[`render hlm library: 1.6.1.52.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
+"Theorem 1.6.1.52.6 (Euclid's theorem).
 
   ℙ is infinite
 
@@ -2977,7 +3060,7 @@ Proof.  Assume ℙ is finite.
 
 Let a := ∏_(i < n) f(i).
 
-1.6.1.46.8 ⇒ 1 ≤ a
+1.6.1.51.8 ⇒ 1 ≤ a
 
 Let b := a + 1.
 
@@ -2985,11 +3068,11 @@ Let b := a + 1.
 
 ⇒^1.6.1.13 b > 1
 
-⇒^1.6.1.47.5 ∃ prime p : p ∣ b
+⇒^1.6.1.52.5 ∃ prime p : p ∣ b
 
 ⇒^def p ∣ (a + 1)
 
-⇒^1.6.1.46.9 f(f^-1(p)) ∣ a
+⇒^1.6.1.51.9 f(f^-1(p)) ∣ a
 
 ⇒^1.4.26 p ∣ a
 
@@ -3009,8 +3092,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
 
-exports[`render hlm library: 1.6.1.47.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.6.1.47.7.  Let p be a prime, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
+exports[`render hlm library: 1.6.1.52.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.6.1.52.7.  Let p be a prime, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ m
   2. p ∣ m^n
@@ -3024,8 +3107,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime_pow"
 `;
 
-exports[`render hlm library: 1.6.1.48 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
-"Definition 1.6.1.48.  Let m, n ∈ ℕ. We define:
+exports[`render hlm library: 1.6.1.53 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
+"Definition 1.6.1.53.  Let m, n ∈ ℕ. We define:
 
   m and n are coprime  :⇔  ∀ a ∈ ℕ_+ s.t. a ∣ m and a ∣ n : a = 1
     ⇔  ∄ b ∈ ℕ_(>1) : [b ∣ m and b ∣ n]
@@ -3048,8 +3131,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/gcd.html#nat.coprime"
 `;
 
-exports[`render hlm library: 1.6.1.49 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
-"Proposition 1.6.1.49.  Let m, n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.6.1.54 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
+"Proposition 1.6.1.54.  Let m, n ∈ ℕ_(>1). Then:
 
   m and m ⋅ n are not coprime
 
@@ -3096,7 +3179,7 @@ HLM does not distinguish between sets and proper classes; instead there are rule
 
 When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions and theorems (see \`$finite\`, \`$\\"Cardinality of power set\\"\`).
 
-In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures (see e.g. \`$../../../Algebra/\\"Pointed sets\\"/\\"Pointed sets\\"\`, \`$../../../Algebra/Magmas/Magmas\`, \`$../../../Algebra/Groups/Groups\`). This is especially visible in the use of this definition in the category of sets \`$../../../\\"Category theory\\"/\\"Individual categories\\"/cardinals\`.
+In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures (see e.g. \`$../../../Algebra/\\"Pointed sets\\"/\\"Pointed sets\\"\`, \`$../../../Algebra/Magmas/Magmas\`, \`$../../../Algebra/Groups/Groups\`). This is especially visible in the use of this definition in the category of sets \`$../../../\\"Category theory\\"/\\"Concrete categories\\"/cardinals\`.
 
 References.
 
@@ -5080,7 +5163,7 @@ exports[`render hlm library: 1.6.6.19 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.
 
-1.6.1.47.2 ⇒ 2 is prime
+1.6.1.52.2 ⇒ 2 is prime
 
 ⇒^1.6.6.18 2√2 is irrational
 
@@ -8301,7 +8384,7 @@ References.
 * https://ncatlab.org/nlab/show/natural+transformation"
 `;
 
-exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Individual%20categories/elements 1`] = `
+exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Concrete%20categories/elements 1`] = `
 "Definition 4.8.1.  Let u ∈ ℕ, S be a set. We define:
 
   𝐄𝐥𝐞𝐦_u(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_u
@@ -8316,7 +8399,7 @@ References.
 * https://ncatlab.org/nlab/show/discrete+category#CategoricalMeaning"
 `;
 
-exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Individual%20categories/cardinals 1`] = `
+exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Concrete%20categories/cardinals 1`] = `
 "Definition 4.8.2.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐭_u := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_u
@@ -8331,7 +8414,7 @@ References.
 * https://ncatlab.org/nlab/show/Set"
 `;
 
-exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Individual%20categories/ordinals 1`] = `
+exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Concrete%20categories/ordinals 1`] = `
 "Definition 4.8.3.  Let u ∈ ℕ. We define:
 
   𝐖𝐨𝐬𝐞𝐭_u := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_u
@@ -8341,7 +8424,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers."
 `;
 
-exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Individual%20categories/pointed%20sets 1`] = `
+exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Concrete%20categories/pointed%20sets 1`] = `
 "Definition 4.8.4.  Let u ∈ ℕ. We define:
 
   𝐏𝐭𝐒𝐞𝐭_u := [𝓟𝓽𝓢𝓮𝓽, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓟𝓽𝓢𝓮𝓽), (id_𝐂)_(𝐂 ∈ 𝓟𝓽𝓢𝓮𝓽), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓟𝓽𝓢𝓮𝓽)]_u
@@ -8351,7 +8434,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of pointed sets."
 `;
 
-exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Individual%20categories/magmas 1`] = `
+exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Concrete%20categories/magmas 1`] = `
 "Definition 4.8.5.  Let u ∈ ℕ. We define:
 
   𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u
@@ -8365,7 +8448,7 @@ References.
 * https://en.wikipedia.org/wiki/Category_of_magmas"
 `;
 
-exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Individual%20categories/semigroups 1`] = `
+exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Concrete%20categories/semigroups 1`] = `
 "Definition 4.8.6.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐦𝐢𝐆𝐫𝐩_u := [𝓢𝓮𝓶𝓲𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹)]_u
@@ -8375,7 +8458,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of semigroups."
 `;
 
-exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Individual%20categories/monoids 1`] = `
+exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Concrete%20categories/monoids 1`] = `
 "Definition 4.8.7.  Let u ∈ ℕ. We define:
 
   𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u
@@ -8385,7 +8468,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of monoids."
 `;
 
-exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Individual%20categories/groups 1`] = `
+exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Concrete%20categories/groups 1`] = `
 "Definition 4.8.8.  Let u ∈ ℕ. We define:
 
   𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u
@@ -8395,7 +8478,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of groups."
 `;
 
-exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Individual%20categories/semirings 1`] = `
+exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Concrete%20categories/semirings 1`] = `
 "Definition 4.8.9.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐦𝐢𝐑𝐢𝐧𝐠_u := [𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰)]_u
@@ -8405,7 +8488,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of semirings."
 `;
 
-exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Individual%20categories/rings 1`] = `
+exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Concrete%20categories/rings 1`] = `
 "Definition 4.8.10.  Let u ∈ ℕ. We define:
 
   𝐑𝐢𝐧𝐠_u := [𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓲𝓷𝓰)]_u
@@ -8415,7 +8498,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of rings."
 `;
 
-exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Individual%20categories/left%20modules 1`] = `
+exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Concrete%20categories/left%20modules 1`] = `
 "Definition 4.8.11.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
   𝐋𝐌𝐨𝐝_u(𝐑) := [𝓛𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓛𝓜𝓸𝓭(𝐑))]_u
@@ -8425,7 +8508,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of modules."
 `;
 
-exports[`render hlm library: 4.8.12 data/libraries/hlm/Category%20theory/Individual%20categories/right%20modules 1`] = `
+exports[`render hlm library: 4.8.12 data/libraries/hlm/Category%20theory/Concrete%20categories/right%20modules 1`] = `
 "Definition 4.8.12.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
   𝐑𝐌𝐨𝐝_u(𝐑) := [𝓡𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓜𝓸𝓭(𝐑))]_u
@@ -8435,7 +8518,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of modules."
 `;
 
-exports[`render hlm library: 4.8.13 data/libraries/hlm/Category%20theory/Individual%20categories/fields 1`] = `
+exports[`render hlm library: 4.8.13 data/libraries/hlm/Category%20theory/Concrete%20categories/fields 1`] = `
 "Definition 4.8.13.  Let u ∈ ℕ. We define:
 
   𝐅𝐥𝐝_u := [𝓕𝓵𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓕𝓵𝓭), (id_𝐂)_(𝐂 ∈ 𝓕𝓵𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓕𝓵𝓭)]_u
@@ -8445,7 +8528,7 @@ Remarks.
 The objects of this category are actually isomorphism classes of fields."
 `;
 
-exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Individual%20categories/categories 1`] = `
+exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Concrete%20categories/categories 1`] = `
 "Definition 4.8.14.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (Fun(𝓐, 𝓑))_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
@@ -8460,10 +8543,10 @@ References.
 * https://ncatlab.org/nlab/show/Cat"
 `;
 
-exports[`render hlm library: 4.8.15 data/libraries/hlm/Category%20theory/Individual%20categories/functors 1`] = `
+exports[`render hlm library: 4.8.15 data/libraries/hlm/Category%20theory/Concrete%20categories/functors 1`] = `
 "Definition 4.8.15.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
-  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(u+v+1)
+  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(max(u,v)+1)
 
 References.
 
