@@ -585,8 +585,13 @@ export abstract class GenericEditHandler {
     let addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
       let result = onGetExpressions(path, outerDefinition, definition) || CachedPromise.resolve([]);
       return result.then((expressions: Fmt.Expression[]): void | CachedPromise<void> => {
-        for (let expression of expressions) {
-          rows.push(this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
+        if (expressions.length) {
+          let items = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
+          if (items.length === 1) {
+            rows.push(items[0]);
+          } else {
+            rows.push(new Menu.ExpressionMenuItemList(CachedPromise.resolve(items)));
+          }
         }
         if (definition.innerDefinitions.length) {
           let result = CachedPromise.resolve();
