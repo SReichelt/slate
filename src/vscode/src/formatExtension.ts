@@ -442,6 +442,32 @@ function getArgumentTypeOfReferencedDefinitionParameter(param: Fmt.Parameter): F
     return undefined;
 }
 
+function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vscode.Position, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): DefinitionLink | undefined {
+    for (let rangeInfo of parsedDocument.rangeList) {
+        if (token.isCancellationRequested) {
+            break;
+        }
+        if (rangeInfo.range.contains(position)) {
+            if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
+                return {
+                    originNameRange: rangeInfo.nameRange,
+                    originObject: rangeInfo.object,
+                    originSelectionRange: rangeInfo.nameRange,
+                    targetUri: parsedDocument.uri,
+                    targetRange: rangeInfo.range,
+                    targetSelectionRange: rangeInfo.nameRange,
+                    name: rangeInfo.object.name
+                };
+            }
+            let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, sourceDocument);
+            if (definitionLinks.length) {
+                return definitionLinks[0];
+            }
+        }
+    }
+    return undefined;
+}
+
 class SlateDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
@@ -1085,52 +1111,46 @@ class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
     }
 }
 
-class SlateReferenceProvider implements vscode.ReferenceProvider {
-    constructor(private parsedDocuments: ParsedDocumentMap) {}
-
-    provideReferences(document: vscode.TextDocument, position: vscode.Position, context: vscode.ReferenceContext, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Location[]> {
+function findReferences(nameDefinitionLocation: DefinitionLink, returnNameRanges: boolean, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): Thenable<vscode.Location[]> {
+    return vscode.workspace.findFiles('**/*' + fileExtension, undefined, undefined, token).then((uris: vscode.Uri[]) => {
         let result: vscode.Location[] = [];
-        let targetLocation = new vscode.Location(document.uri, position);
-        let parsedDocument = this.parsedDocuments.get(document);
-        if (parsedDocument) {
-            for (let rangeInfo of parsedDocument.rangeList) {
+        if (nameDefinitionLocation && nameDefinitionLocation.targetSelectionRange) {
+            result.push(new vscode.Location(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange));
+            for (let uri of uris) {
                 if (token.isCancellationRequested) {
                     break;
                 }
-                if (rangeInfo.range.contains(position)) {
-                    let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, document);
-                    if (definitionLinks.length) {
-                        let definitionLink = definitionLinks[0];
-                        if (definitionLink.targetSelectionRange) {
-                            targetLocation = new vscode.Location(definitionLink.targetUri, definitionLink.targetSelectionRange);
-                            if (context.includeDeclaration) {
-                                result.push(targetLocation);
-                            }
-                            break;
+                let parsedDocument = parseFile(uri, undefined, undefined, sourceDocument);
+                for (let rangeInfo of parsedDocument.rangeList) {
+                    if (token.isCancellationRequested) {
+                        break;
+                    }
+                    for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, sourceDocument, nameDefinitionLocation.targetUri)) {
+                        if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange)) {
+                            let range = definitionLink.originSelectionRange && !returnNameRanges ? definitionLink.originSelectionRange : definitionLink.originNameRange;
+                            result.push(new vscode.Location(uri, range));
                         }
                     }
                 }
             }
         }
-        return vscode.workspace.findFiles('**/*' + fileExtension, undefined, undefined, token).then((uris: vscode.Uri[]) => {
-            for (let uri of uris) {
-                if (token.isCancellationRequested) {
-                    break;
-                }
-                let parsedDocument = parseFile(uri, undefined, undefined, document);
-                for (let rangeInfo of parsedDocument.rangeList) {
-                    if (token.isCancellationRequested) {
-                        break;
-                    }
-                    for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, targetLocation.uri)) {
-                        if (areUrisEqual(definitionLink.targetUri, targetLocation.uri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.intersection(targetLocation.range)) {
-                            result.push(new vscode.Location(uri, definitionLink.originSelectionRange || rangeInfo.linkRange || rangeInfo.nameRange || rangeInfo.range));
-                        }
-                    }
-                }
+        return result;
+    });
+}
+
+
+class SlateReferenceProvider implements vscode.ReferenceProvider {
+    constructor(private parsedDocuments: ParsedDocumentMap) {}
+
+    provideReferences(document: vscode.TextDocument, position: vscode.Position, context: vscode.ReferenceContext, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Location[]> {
+        let parsedDocument = this.parsedDocuments.get(document);
+        if (parsedDocument) {
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            if (nameDefinitionLocation) {
+                return findReferences(nameDefinitionLocation, false, token, document);
             }
-            return result;
-        });
+        }
+        return undefined;
     }
 }
 
@@ -1138,76 +1158,37 @@ class SlateRenameProvider implements vscode.RenameProvider {
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.WorkspaceEdit> {
-        let nameDefinitionLocation = this.getNameDefinitionLocation(document, position, token);
-        if (nameDefinitionLocation) {
-            return vscode.workspace.findFiles('**/*' + fileExtension, undefined, undefined, token).then((uris: vscode.Uri[]) => {
-                let result = new vscode.WorkspaceEdit;
-                if (nameDefinitionLocation) {
+        let parsedDocument = this.parsedDocuments.get(document);
+        if (parsedDocument) {
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            if (nameDefinitionLocation) {
+                return findReferences(nameDefinitionLocation, true, token, document).then((locations: vscode.Location[]) => {
+                    let result = new vscode.WorkspaceEdit;
                     let escapedName = escapeIdentifier(newName);
-                    result.replace(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange!, escapedName);
-                    for (let uri of uris) {
-                        if (token.isCancellationRequested) {
-                            break;
-                        }
-                        let parsedDocument = parseFile(uri, undefined, undefined, document);
-                        for (let rangeInfo of parsedDocument.rangeList) {
-                            if (token.isCancellationRequested) {
-                                break;
-                            }
-                            for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, document, nameDefinitionLocation.targetUri)) {
-                                if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange!)) {
-                                    result.replace(uri, definitionLink.originNameRange, escapedName);
-                                }
-                            }
-                        }
+                    for (let location of locations) {
+                        result.replace(location.uri, location.range, escapedName);
                     }
-                    let fsPath = nameDefinitionLocation.targetUri.fsPath;
-                    if (path.basename(fsPath) === nameDefinitionLocation.name + fileExtension) {
+                    let fsPath = nameDefinitionLocation!.targetUri.fsPath;
+                    if (path.basename(fsPath) === nameDefinitionLocation!.name + fileExtension) {
                         fsPath = path.join(path.dirname(fsPath), newName + fileExtension);
-                        result.renameFile(nameDefinitionLocation.targetUri, vscode.Uri.file(fsPath));
+                        result.renameFile(nameDefinitionLocation!.targetUri, vscode.Uri.file(fsPath));
                     }
-                }
-                return result;
-            });
+                    return result;
+                });
+            }
         }
         return undefined;
     }
 
     prepareRename(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Range | { range: vscode.Range, placeholder: string }> {
-        let nameDefinitionLocation = this.getNameDefinitionLocation(document, position, token);
-        if (nameDefinitionLocation) {
-            return {
-                range: nameDefinitionLocation.originNameRange,
-                placeholder: nameDefinitionLocation.name
-            };
-        }
-        return undefined;
-    }
-
-    private getNameDefinitionLocation(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): DefinitionLink | undefined {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            for (let rangeInfo of parsedDocument.rangeList) {
-                if (token.isCancellationRequested) {
-                    break;
-                }
-                if (rangeInfo.range.contains(position)) {
-                    if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
-                        return {
-                            originNameRange: rangeInfo.nameRange,
-                            originObject: rangeInfo.object,
-                            originSelectionRange: rangeInfo.nameRange,
-                            targetUri: document.uri,
-                            targetRange: rangeInfo.range,
-                            targetSelectionRange: rangeInfo.nameRange,
-                            name: rangeInfo.object.name
-                        };
-                    }
-                    let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, document);
-                    if (definitionLinks.length) {
-                        return definitionLinks[0];
-                    }
-                }
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            if (nameDefinitionLocation) {
+                return {
+                    range: nameDefinitionLocation.originNameRange,
+                    placeholder: nameDefinitionLocation.name
+                };
             }
         }
         return undefined;
