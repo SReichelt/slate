@@ -19,7 +19,7 @@ import { RangeInfo, convertRangeInfo } from './utils';
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
     file?: Fmt.File;
-    hasErrors: boolean;
+    hasSyntaxErrors: boolean;
 }
 
 export class HoverEvent {
@@ -79,8 +79,12 @@ class LibraryDocumentProvider {
         if (!library) {
             return undefined;
         }
+        if (event.hasSyntaxErrors) {
+            library.diagnosticCollection.delete(event.document.uri);
+            return undefined;
+        }
         let path = library.libraryDataProvider.uriToPath(event.document.uri.toString(), true);
-        if (!path || event.hasErrors) {
+        if (!path) {
             library.diagnosticCollection.delete(event.document.uri);
             return undefined;
         }

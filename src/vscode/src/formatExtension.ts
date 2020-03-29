@@ -22,7 +22,7 @@ import * as WebviewExtension from './webviewExtension';
 interface ParsedDocument {
     uri: vscode.Uri;
     file?: Fmt.File;
-    hasErrors: boolean;
+    hasSyntaxErrors: boolean;
     rangeList: RangeInfo[];
     rangeMap: Map<Object, RangeInfo>;
     metaModelDocument?: ParsedDocument;
@@ -1309,7 +1309,7 @@ class ErrorHandler implements FmtReader.ErrorHandler {
     constructor(private parsedDocument: ParsedDocument, private diagnostics?: vscode.Diagnostic[]) {}
 
     error(msg: string, range: FmtReader.Range): void {
-        this.parsedDocument.hasErrors = true;
+        this.parsedDocument.hasSyntaxErrors = true;
         if (this.diagnostics) {
             this.diagnostics.push({
                 message: msg,
@@ -1333,7 +1333,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     let stream = new FmtReader.StringInputStream(fileContents);
     let parsedDocument: ParsedDocument = {
         uri: uri,
-        hasErrors: false,
+        hasSyntaxErrors: false,
         rangeList: [],
         rangeMap: new Map<Object, RangeInfo>(),
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
@@ -1353,7 +1353,7 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
         }
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
-            hasErrors: false,
+            hasSyntaxErrors: false,
             rangeList: [],
             rangeMap: new Map<Object, RangeInfo>()
         };
@@ -1385,8 +1385,11 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
     let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
     try {
         parsedDocument.file = reader.readFile();
+        if (diagnostics) {
+            checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
+        }
     } catch (error) {
-        parsedDocument.hasErrors = true;
+        parsedDocument.hasSyntaxErrors = true;
         if (diagnostics && !diagnostics.length) {
             let dummyPosition = new vscode.Position(0, 0);
             diagnostics.push({
@@ -1395,9 +1398,6 @@ function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.
                 severity: vscode.DiagnosticSeverity.Error
             });
         }
-    }
-    if (diagnostics) {
-        checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
     }
     parsedFileCache.set(uri.fsPath, parsedDocument);
     return parsedDocument;
@@ -1410,7 +1410,11 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
         diagnosticCollection.set(document.uri, diagnostics);
         parsedDocuments.set(document, parsedDocument);
         if (parseEventEmitter) {
-            parseEventEmitter.fire({document: document, file: parsedDocument.file, hasErrors: parsedDocument.hasErrors});
+            parseEventEmitter.fire({
+                document: document,
+                file: parsedDocument.file,
+                hasSyntaxErrors: parsedDocument.hasSyntaxErrors
+            });
         }
         return parsedDocument;
     } else {
@@ -1418,19 +1422,46 @@ function parseDocument(document: vscode.TextDocument, diagnosticCollection: vsco
     }
 }
 
-let parseAllTimer: NodeJS.Timer | undefined = undefined;
+type ReparseCondition = (document: vscode.TextDocument) => boolean;
 
-function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>, condition?: (document: vscode.TextDocument) => boolean): void {
+let parseAllTimer: NodeJS.Timer | undefined = undefined;
+let reparseCompletely = false;
+let reparseConditions: ReparseCondition[] | undefined = [];
+
+function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<LogicExtension.ParseDocumentEvent>, recheckOnly: boolean, condition?: ReparseCondition): void {
+    if (!recheckOnly) {
+        reparseCompletely = true;
+    }
+    if (condition) {
+        if (reparseConditions) {
+            reparseConditions.push(condition);
+        }
+    } else {
+        reparseConditions = undefined;
+    }
     if (parseAllTimer) {
         clearTimeout(parseAllTimer);
         parseAllTimer = undefined;
     }
     parseAllTimer = setTimeout(() => {
         for (let document of vscode.workspace.textDocuments) {
-            if (!condition || condition(document)) {
+            if (!reparseConditions || reparseConditions.some((reparseCondition: ReparseCondition) => reparseCondition(document))) {
+                let fileName = document.uri.fsPath;
+                if (!reparseCompletely) {
+                    let parsedDocument = parsedFileCache.get(fileName);
+                    if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
+                        let diagnostics: vscode.Diagnostic[] = [];
+                        checkReferencedDefinitions(parsedDocument, diagnostics, document);
+                        diagnosticCollection.set(document.uri, diagnostics);
+                        continue;
+                    }
+                }
+                parsedFileCache.delete(fileName);
                 parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
             }
         }
+        reparseCompletely = false;
+        reparseConditions = [];
     }, 500);
 }
 
@@ -1447,11 +1478,16 @@ function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.Diagnos
     for (let uri of invalidatedDiagnosticUris) {
         diagnosticCollection.delete(uri);
     }
-    parsedFileCache.clear();
+    let recheckOnly = true;
     for (let uri of uris) {
-        metaModelCache.delete(uri.fsPath);
+        let fileName = uri.fsPath;
+        if (metaModelCache.has(fileName)) {
+            parsedFileCache.delete(fileName);
+            metaModelCache.delete(fileName);
+            recheckOnly = false;
+        }
     }
-    triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter);
+    triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly);
 }
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -1468,14 +1504,19 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             let changedDocument = event.document;
-            parsedFileCache.delete(changedDocument.uri.fsPath);
-            metaModelCache.delete(changedDocument.uri.fsPath);
+            let fileName = changedDocument.uri.fsPath;
+            parsedFileCache.delete(fileName);
+            let recheckOnly = true;
+            if (metaModelCache.has(fileName)) {
+                metaModelCache.delete(fileName);
+                recheckOnly = false;
+            }
             let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
-            if (parsedDocument && !parsedDocument.hasErrors) {
+            if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
                 fileAccessor.documentChanged(changedDocument);
             }
             // TODO only reparse affected documents (maintain a list of documents to reparse)
-            triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, (document) => (document !== changedDocument));
+            triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly, (document) => (document !== changedDocument));
         })
     );
     if (vscode.workspace.onDidDeleteFiles && vscode.workspace.onDidRenameFiles) {
