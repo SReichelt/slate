@@ -2,6 +2,7 @@ import * as React from 'react';
 import './LibraryItem.css';
 import * as Fmt from '../../shared/format/format';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
+import { MRUList } from '../../shared/data/mostRecentlyUsedList';
 import * as Logic from '../../shared/logics/logic';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -13,6 +14,7 @@ export interface LibraryItemProps {
   itemInfo?: CachedPromise<LibraryItemInfo>;
   options: Logic.FullRenderedDefinitionOptions;
   interactionHandler?: ExpressionInteractionHandler;
+  mruList: MRUList;
 }
 
 export abstract class LibraryItemBase extends React.Component<LibraryItemProps> {
@@ -49,7 +51,7 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
       let logic = props.libraryDataProvider.logic;
       let logicDisplay = logic.getDisplay();
       let editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
-      return logicDisplay.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing);
+      return logicDisplay.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing, props.mruList);
     } else {
       return undefined;
     }

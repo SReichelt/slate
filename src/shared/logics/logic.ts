@@ -3,6 +3,7 @@ import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 import * as Display from '../display/display';
 import { LibraryDataProvider, LibraryDataAccessor, LibraryItemInfo } from '../data/libraryDataProvider';
+import { MRUList } from '../data/mostRecentlyUsedList';
 import CachedPromise from '../data/cachedPromise';
 
 export interface Logic {
@@ -75,7 +76,7 @@ export interface LogicRendererOptions {
 export interface LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): LogicDefinitionType;
   getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: LogicRendererOptions): LogicRenderer;
-  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: LogicRendererOptions, editing: boolean): LogicRenderer;
+  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: LogicRendererOptions, editing: boolean, mruList: MRUList): LogicRenderer;
 }
 
 export interface RenderedDefinitionOptions {

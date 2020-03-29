@@ -27,6 +27,7 @@ import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderConfig } from '../shared/data/libraryDataProvider';
+import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import Message from './components/Message';
@@ -80,6 +81,7 @@ class App extends React.Component<AppProps, AppState> {
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
+  private mruList = new MRUList;
 
   constructor(props: AppProps) {
     super(props);
@@ -417,7 +419,7 @@ class App extends React.Component<AppProps, AppState> {
               // When editing, item info may change according to user input. Need to make sure to get the correct instance -- the one where the changes happen.
               itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
             }
-            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'LibraryItem'}/>;
+            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key={'LibraryItem'}/>;
             if (editing) {
               if (!this.state.gitHubUserInfo && !config.runningLocally) {
                 result = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
@@ -440,7 +442,7 @@ class App extends React.Component<AppProps, AppState> {
         if (!config.embedded) {
           if (this.state.extraContentsVisible) {
             let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} key={'SourceCode'}/>;
+              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key={'SourceCode'}/>;
             });
             extraContents = renderPromise(extraContentsPromise, 'SourceCode');
           } else {
@@ -655,6 +657,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
     let uri = '/';
     if (state.selectedItemAbsolutePath) {
+      this.mruList.add(state.selectedItemAbsolutePath);
       uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
     let title = this.getTitle(state);

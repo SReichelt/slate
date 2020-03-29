@@ -7,6 +7,7 @@ import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferenceSearchURLs } from '../../data/libraryDataProvider';
+import { MRUList } from '../../data/mostRecentlyUsedList';
 import { GenericUtils } from './utils';
 import { GenericRenderer, RenderedVariable } from './renderer';
 import CachedPromise from '../../data/cachedPromise';
@@ -23,12 +24,12 @@ export type RenderExpressionFn = (expression: Fmt.Expression) => Display.Rendere
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
-export type GetExpressionsFn = (path: Fmt.Path, libraryDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
+export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File, protected mruList: MRUList) {}
 
   update(): CachedPromise<void> {
     this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
@@ -36,26 +37,21 @@ export abstract class GenericEditHandler {
   }
 
   protected getTypeRow(type: string | undefined, onRenderType: RenderTypeFn, info: LibraryItemInfo): Menu.ExpressionMenuRow {
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = () => {
+    let item = new Menu.ExpressionMenuItem(onRenderType(type));
+    item.action = new Menu.ImmediateExpressionMenuAction(() => {
       let newInfo = {
         ...info,
         type: type
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
-    };
-    let item = new Menu.ExpressionMenuItem;
-    item.expression = onRenderType(type);
-    item.action = action;
+    });
     item.selected = info.type === type;
     return item;
   }
 
   addTitleMenu(semanticLink: Display.SemanticLink, info: LibraryItemInfo): void {
     semanticLink.onMenuOpened = () => {
-      let menu = new Menu.ExpressionMenu;
-      menu.rows = CachedPromise.resolve([this.getTitleRow(info)]);
-      return menu;
+      return new Menu.ExpressionMenu(CachedPromise.resolve([this.getTitleRow(info)]));
     };
     semanticLink.alwaysShowMenu = true;
   }
@@ -64,17 +60,14 @@ export abstract class GenericEditHandler {
     let titleItem = new Menu.ExpressionMenuTextInput;
     titleItem.text = info.title || '';
     titleItem.expectedTextLength = 20;
-    let textAction = new Menu.ImmediateExpressionMenuAction;
-    textAction.onExecute = () => {
+    titleItem.action = new Menu.ImmediateExpressionMenuAction(() => {
       let newInfo = {
         ...info,
         title: titleItem.text ? titleItem.text : undefined
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
-    };
-    titleItem.action = textAction;
-    let titleRow = new Menu.StandardExpressionMenuRow;
-    titleRow.title = 'Title';
+    });
+    let titleRow = new Menu.StandardExpressionMenuRow('Title');
     titleRow.subMenu = titleItem;
     titleRow.selected = info.title !== undefined;
     return titleRow;
@@ -87,8 +80,7 @@ export abstract class GenericEditHandler {
   }
 
   getImmediateInsertButton(onInsert: () => void): Display.RenderedExpression {
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = onInsert;
+    let action = new Menu.ImmediateExpressionMenuAction(onInsert);
     return this.getActionInsertButton(action);
   }
 
@@ -113,9 +105,7 @@ export abstract class GenericEditHandler {
           this.getDisplayMenuAlternativesRow(display, onSetDisplay, variables, true, isPredicate, renderer)
         );
       }
-      let menu = new Menu.ExpressionMenu;
-      menu.rows = CachedPromise.resolve(rows);
-      return menu;
+      return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
     semanticLink.alwaysShowMenu = true;
   }
@@ -131,9 +121,7 @@ export abstract class GenericEditHandler {
           return row.subMenu;
         }
       }
-      let menu = new Menu.ExpressionMenu;
-      menu.rows = CachedPromise.resolve(rows);
-      return menu;
+      return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
     semanticLink.alwaysShowMenu = true;
   }
@@ -168,16 +156,13 @@ export abstract class GenericEditHandler {
   }
 
   private getDisplayMenuDefaultRow(renderedDefault: Display.RenderedExpression | undefined, onSetDisplayItem: SetDisplayItemFn, isDefault: boolean, isRemoveRow: boolean): Menu.ExpressionMenuRow {
-    let defaultAction = new Menu.ImmediateExpressionMenuAction;
-    defaultAction.onExecute = () => onSetDisplayItem(undefined);
-    let defaultRow = new Menu.StandardExpressionMenuRow;
-    defaultRow.title = isRemoveRow ? 'Remove' : 'Default';
+    let defaultAction = new Menu.ImmediateExpressionMenuAction(() => onSetDisplayItem(undefined));
+    let defaultRow = new Menu.StandardExpressionMenuRow(isRemoveRow ? 'Remove' : 'Default');
     if (isRemoveRow) {
       defaultRow.iconType = 'remove';
     }
     if (renderedDefault) {
-      let defaultItem = new Menu.ExpressionMenuItem;
-      defaultItem.expression = renderedDefault;
+      let defaultItem = new Menu.ExpressionMenuItem(renderedDefault);
       defaultItem.action = defaultAction;
       defaultItem.selected = isDefault;
       defaultRow.subMenu = defaultItem;
@@ -188,21 +173,15 @@ export abstract class GenericEditHandler {
   }
 
   private getDisplayMenuFalseRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
-    let falseRow = new Menu.StandardExpressionMenuRow;
-    falseRow.title = 'False';
-    let falseAction = new Menu.ImmediateExpressionMenuAction;
-    falseAction.onExecute = () => onSetDisplayItem(new FmtDisplay.MetaRefExpression_false);
-    falseRow.titleAction = falseAction;
+    let falseRow = new Menu.StandardExpressionMenuRow('False');
+    falseRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetDisplayItem(new FmtDisplay.MetaRefExpression_false));
     falseRow.selected = displayItem instanceof FmtDisplay.MetaRefExpression_false;
     return falseRow;
   }
 
   private getDisplayMenuTrueRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn): Menu.ExpressionMenuRow {
-    let trueRow = new Menu.StandardExpressionMenuRow;
-    trueRow.title = 'True';
-    let trueAction = new Menu.ImmediateExpressionMenuAction;
-    trueAction.onExecute = () => onSetDisplayItem(new FmtDisplay.MetaRefExpression_true);
-    trueRow.titleAction = trueAction;
+    let trueRow = new Menu.StandardExpressionMenuRow('True');
+    trueRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetDisplayItem(new FmtDisplay.MetaRefExpression_true));
     trueRow.selected = displayItem instanceof FmtDisplay.MetaRefExpression_true;
     return trueRow;
   }
@@ -216,15 +195,12 @@ export abstract class GenericEditHandler {
       integerItem.text = '';
     }
     integerItem.expectedTextLength = 4;
-    let integerAction = new Menu.ImmediateExpressionMenuAction;
-    integerAction.onExecute = () => {
+    integerItem.action = new Menu.ImmediateExpressionMenuAction(() => {
       let newDisplayItem = new Fmt.IntegerExpression;
       newDisplayItem.value = new Fmt.BN(integerItem.text, 10);
       onSetDisplayItem(newDisplayItem);
-    };
-    integerItem.action = integerAction;
-    let integerRow = new Menu.StandardExpressionMenuRow;
-    integerRow.title = 'Number';
+    });
+    let integerRow = new Menu.StandardExpressionMenuRow('Number');
     integerRow.subMenu = integerItem;
     return integerRow;
   }
@@ -238,15 +214,12 @@ export abstract class GenericEditHandler {
       textItem.text = '';
     }
     textItem.expectedTextLength = 4;
-    let textAction = new Menu.ImmediateExpressionMenuAction;
-    textAction.onExecute = () => {
+    textItem.action = new Menu.ImmediateExpressionMenuAction(() => {
       let newDisplayItem = new Fmt.StringExpression;
       newDisplayItem.value = textItem.text;
       onSetDisplayItem(newDisplayItem);
-    };
-    textItem.action = textAction;
-    let textRow = new Menu.StandardExpressionMenuRow;
-    textRow.title = title;
+    });
+    let textRow = new Menu.StandardExpressionMenuRow(title);
     textRow.subMenu = textItem;
     return textRow;
   }
@@ -254,24 +227,19 @@ export abstract class GenericEditHandler {
   private getDisplayMenuVariablesRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
     let items: Menu.ExpressionMenuItem[] = [];
     for (let variable of variables) {
-      let variableItem = new Menu.ExpressionMenuItem;
-      variableItem.expression = variable.display;
+      let variableItem = new Menu.ExpressionMenuItem(variable.display);
       if (displayItem instanceof Fmt.VariableRefExpression && displayItem.variable === variable.param) {
         variableItem.selected = true;
       }
-      let variableAction = new Menu.ImmediateExpressionMenuAction;
-      variableAction.onExecute = () => {
+      variableItem.action = new Menu.ImmediateExpressionMenuAction(() => {
         let newDisplayItem = new Fmt.VariableRefExpression;
         newDisplayItem.variable = variable.param;
         onSetDisplayItem(newDisplayItem);
-      };
-      variableItem.action = variableAction;
+      });
       items.push(variableItem);
     }
-    let variablesGroup = new Menu.ExpressionMenuItemList;
-    variablesGroup.items = CachedPromise.resolve(items);
-    let variablesRow = new Menu.StandardExpressionMenuRow;
-    variablesRow.title = 'Variable';
+    let variablesGroup = new Menu.ExpressionMenuItemList(CachedPromise.resolve(items));
+    let variablesRow = new Menu.StandardExpressionMenuRow('Variable');
     variablesRow.subMenu = variablesGroup;
     return variablesRow;
   }
@@ -284,34 +252,27 @@ export abstract class GenericEditHandler {
         rows.push(templateRow);
       }
     }
-    let templateMenu = new Menu.ExpressionMenu;
-    templateMenu.rows = CachedPromise.resolve(rows);
+    let templateMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     templateMenu.variable = true;
-    let templatesRow = new Menu.StandardExpressionMenuRow;
-    templatesRow.title = 'Template';
+    let templatesRow = new Menu.StandardExpressionMenuRow('Template');
     templatesRow.subMenu = templateMenu;
     return templatesRow;
   }
 
   private getDisplayMenuTemplateRow(template: Fmt.Definition, displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let templateRow = new Menu.StandardExpressionMenuRow;
     let title = new Display.TextExpression(template.name);
     title.styleClasses = ['source-code'];
-    templateRow.title = title;
+    let templateRow = new Menu.StandardExpressionMenuRow(title);
     if (template.parameters.length) {
-      let templateAction = new Menu.DialogExpressionMenuAction;
-      templateAction.onOpen = () => this.getTemplateDialog(template, displayItem, onSetDisplayItem, variables, isPredicate, renderer);
-      templateRow.titleAction = templateAction;
+      templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, displayItem, onSetDisplayItem, variables, isPredicate, renderer));
     } else {
-      let templateAction = new Menu.ImmediateExpressionMenuAction;
-      templateAction.onExecute = () => {
+      templateRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => {
         let newPath = new Fmt.Path;
         newPath.name = template.name;
         let newDisplayItem = new Fmt.DefinitionRefExpression;
         newDisplayItem.path = newPath;
         onSetDisplayItem(newDisplayItem);
-      };
-      templateRow.titleAction = templateAction;
+      });
     }
     templateRow.selected = displayItem instanceof Fmt.DefinitionRefExpression && displayItem.path.name === template.name;
     return templateRow;
@@ -429,11 +390,8 @@ export abstract class GenericEditHandler {
   }
 
   private getDisplayMenuNegationRow(displayItem: Fmt.Expression | undefined, onSetDisplayItem: SetDisplayItemFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let negationRow = new Menu.StandardExpressionMenuRow;
-    negationRow.title = 'With negation';
-    let negationAction = new Menu.DialogExpressionMenuAction;
-    negationAction.onOpen = () => this.getNegationDialog(displayItem, onSetDisplayItem, variables, type, isTopLevel, isPredicate, renderer);
-    negationRow.titleAction = negationAction;
+    let negationRow = new Menu.StandardExpressionMenuRow('With negation');
+    negationRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getNegationDialog(displayItem, onSetDisplayItem, variables, type, isTopLevel, isPredicate, renderer));
     negationRow.selected = displayItem instanceof FmtDisplay.MetaRefExpression_neg;
     return negationRow;
   }
@@ -477,11 +435,8 @@ export abstract class GenericEditHandler {
   }
 
   private getDisplayMenuAlternativesRow(display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let alternativesRow = new Menu.StandardExpressionMenuRow;
-    alternativesRow.title = 'Multiple alternatives';
-    let alternativesAction = new Menu.DialogExpressionMenuAction;
-    alternativesAction.onOpen = () => this.getAlternativesDialog(display, onSetDisplay, variables, isTopLevel, isPredicate, renderer);
-    alternativesRow.titleAction = alternativesAction;
+    let alternativesRow = new Menu.StandardExpressionMenuRow('Multiple alternatives');
+    alternativesRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getAlternativesDialog(display, onSetDisplay, variables, isTopLevel, isPredicate, renderer));
     alternativesRow.selected = display !== undefined && display.length > 1;
     return alternativesRow;
   }
@@ -524,12 +479,8 @@ export abstract class GenericEditHandler {
     let context = this.editAnalysis.newParameterContext.get(parameterList);
     let parameter = this.utils.createParameter(type, defaultName, context);
 
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = () => onInsertParam(parameter);
-
-    let item = new Menu.ExpressionMenuItem;
-    item.expression = onRenderParam(parameter);
-    item.action = action;
+    let item = new Menu.ExpressionMenuItem(onRenderParam(parameter));
+    item.action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
     return item;
   }
 
@@ -552,11 +503,9 @@ export abstract class GenericEditHandler {
         })
       );
     }
-    let variableList = new Menu.ExpressionMenuItemList;
-    variableList.items = variableItems;
+    let variableList = new Menu.ExpressionMenuItemList(variableItems);
     variableList.variable = true;
-    let variableRow = new Menu.StandardExpressionMenuRow;
-    variableRow.title = 'Variable';
+    let variableRow = new Menu.StandardExpressionMenuRow('Variable');
     variableRow.subMenu = variableList;
     return variableRow;
   }
@@ -564,8 +513,8 @@ export abstract class GenericEditHandler {
   protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
     let selectedDefinition = this.getSelectedDefinition(expressionEditInfo);
 
-    let action = new Menu.DialogExpressionMenuAction;
-    action.onOpen = () => {
+    let definitionRow = new Menu.StandardExpressionMenuRow('Definition');
+    definitionRow.titleAction = new Menu.DialogExpressionMenuAction(() => {
       let treeItem = new Dialog.ExpressionDialogTreeItem;
       treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
       treeItem.templates = this.templates;
@@ -615,17 +564,14 @@ export abstract class GenericEditHandler {
       ];
       dialog.onOK = () => {
         if (selectionItem.selectedItem) {
-          expressionEditInfo.onSetValue(selectionItem.selectedItem);
+          this.setValueAndAddToMRU(selectionItem.selectedItem, expressionEditInfo);
         }
       };
       dialog.onCheckOKEnabled = () => (selectionItem.selectedItem !== undefined);
       return dialog;
-    };
-
-    let definitionRow = new Menu.StandardExpressionMenuRow;
-    definitionRow.title = 'Definition';
-    definitionRow.titleAction = action;
+    });
     definitionRow.iconType = definitionTypes[0];
+    definitionRow.subMenu = new Menu.ExpressionMenu(this.getMRURows(expressionEditInfo, onGetExpressions, onRenderExpression));
     if (selectedDefinition) {
       definitionRow.selected = true;
     }
@@ -634,15 +580,53 @@ export abstract class GenericEditHandler {
 
   protected abstract getSelectedDefinition(expressionEditInfo: Edit.ExpressionEditInfo): Fmt.DefinitionRefExpression | undefined;
 
-  protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
-    let action = new Menu.ImmediateExpressionMenuAction;
-    action.onExecute = () => expressionEditInfo.onSetValue(expression);
+  private getMRURows(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): CachedPromise<Menu.ExpressionMenuRow[]> {
+    let iterator = this.mruList.iterator(this.libraryDataProvider);
+    let addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
+      let result = onGetExpressions(path, outerDefinition, definition) || CachedPromise.resolve([]);
+      return result.then((expressions: Fmt.Expression[]): void | CachedPromise<void> => {
+        for (let expression of expressions) {
+          rows.push(this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
+        }
+        if (definition.innerDefinitions.length) {
+          let result = CachedPromise.resolve();
+          for (let innerDefinition of definition.innerDefinitions) {
+            let innerPath = new Fmt.Path;
+            innerPath.name = innerDefinition.name;
+            innerPath.parentPath = path;
+            result = result.then(() => addAllDefinitions(innerPath, outerDefinition, innerDefinition, rows));
+          }
+          return result;
+        }
+      });
+    }
+    let extendRows = (rows: Menu.ExpressionMenuRow[]) =>
+      iterator.next().then((path: Fmt.Path | undefined): Menu.ExpressionMenuRow[] | CachedPromise<Menu.ExpressionMenuRow[]> => {
+        if (path) {
+          let relativePath = this.libraryDataProvider.getRelativePath(path);
+          return this.libraryDataProvider.fetchItem(relativePath, false, false)
+            .then((libraryDefinition: LibraryDefinition) => addAllDefinitions(relativePath, libraryDefinition.definition, libraryDefinition.definition, rows))
+            .catch(() => {})
+            .then(() => {
+              if (rows.length < 8) {
+                return extendRows(rows);
+              } else {
+                return rows;
+              }
+            });
+        } else {
+          return rows;
+        }
+      });
+    return extendRows([]);
+  }
 
-    let item = new Menu.ExpressionMenuItem;
-    item.expression = onRenderExpression(expression);
-    item.action = action;
+  protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
+    // TODO tooltip
+    let item = new Menu.ExpressionMenuItem(onRenderExpression(expression));
+    item.action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
     let origExpression = expressionEditInfo.expression;
-    if (origExpression) {
+    if (origExpression && !(origExpression instanceof Fmt.DefinitionRefExpression)) {
       let newExpression = expression;
       if (Object.getPrototypeOf(newExpression) === Object.getPrototypeOf(origExpression)) {
         if (newExpression instanceof Fmt.VariableRefExpression && origExpression instanceof Fmt.VariableRefExpression) {
@@ -653,6 +637,14 @@ export abstract class GenericEditHandler {
       }
     }
     return item;
+  }
+
+  private setValueAndAddToMRU(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo): void {
+    expressionEditInfo.onSetValue(expression);
+    if (expression instanceof Fmt.DefinitionRefExpression) {
+      let absolutePath = this.libraryDataProvider.getAbsolutePath(expression.path);
+      this.mruList.add(absolutePath);
+    }
   }
 
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {

@@ -4,6 +4,7 @@ import * as Logic from '../logic';
 import { HLMRenderer } from './renderer';
 import { HLMEditHandler } from './editHandler';
 import { LibraryDataProvider, LibraryDataAccessor } from '../../data/libraryDataProvider';
+import { MRUList } from '../../data/mostRecentlyUsedList';
 
 export class HLMDisplay implements Logic.LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): Logic.LogicDefinitionType {
@@ -29,8 +30,8 @@ export class HLMDisplay implements Logic.LogicDisplay {
     return new HLMRenderer(definition, libraryDataAccessor, templates, options);
   }
 
-  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean): Logic.LogicRenderer {
-    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, templates) : undefined;
+  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean, mruList: MRUList): Logic.LogicRenderer {
+    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, templates, mruList) : undefined;
     return new HLMRenderer(definition, libraryDataProvider, templates, options, editHandler);
   }
 }

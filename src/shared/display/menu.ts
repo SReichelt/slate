@@ -7,8 +7,11 @@ export abstract class ExpressionMenuBase {
 }
 
 export class ExpressionMenu extends ExpressionMenuBase {
-  rows: CachedPromise<ExpressionMenuRow[]>;
   variable: boolean = false;
+
+  constructor(public rows: CachedPromise<ExpressionMenuRow[]>) {
+    super();
+  }
 
   isSelected(): boolean {
     let rows = this.rows.getImmediateResult();
@@ -32,13 +35,19 @@ export abstract class ExpressionMenuCell extends ExpressionMenuRow {
 }
 
 export class ExpressionMenuItem extends ExpressionMenuCell {
-  expression: Display.RenderedExpression;
   action: ExpressionMenuAction;
+
+  constructor(public expression: Display.RenderedExpression) {
+    super();
+  }
 }
 
 export class ExpressionMenuItemList extends ExpressionMenuRow {
-  items: CachedPromise<ExpressionMenuItem[]>;
   variable: boolean = false;
+
+  constructor(public items: CachedPromise<ExpressionMenuItem[]>) {
+    super();
+  }
 
   isSelected(): boolean {
     if (super.isSelected()) {
@@ -53,11 +62,14 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 }
 
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
-  title: string | Display.RenderedExpression;
   titleAction?: ExpressionMenuAction;
   iconType?: any;
   subMenu?: ExpressionMenuBase;
   previewSubMenu: boolean = true;
+
+  constructor(public title: string | Display.RenderedExpression) {
+    super();
+  }
 
   isSelected(): boolean {
     return super.isSelected() || (this.subMenu !== undefined && this.subMenu.isSelected());
@@ -77,9 +89,13 @@ export abstract class ExpressionMenuAction {
 }
 
 export class ImmediateExpressionMenuAction extends ExpressionMenuAction {
-  onExecute: () => void | CachedPromise<void>;
+  constructor(public onExecute: () => void | CachedPromise<void>) {
+    super();
+  }
 }
 
 export class DialogExpressionMenuAction extends ExpressionMenuAction {
-  onOpen: () => Dialog.DialogBase;
+  constructor(public onOpen: () => Dialog.DialogBase) {
+    super();
+  }
 }

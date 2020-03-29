@@ -3,6 +3,7 @@ import * as Fmt from '../format/format';
 
 export interface LibraryDataAccessor {
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor;
+  fetchLocalSection(): CachedPromise<LibraryDefinition>;
   fetchSubsection(path: Fmt.Path): CachedPromise<LibraryDefinition>;
   fetchItem(path: Fmt.Path, fullContentsRequired: boolean): CachedPromise<LibraryDefinition>;
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo>;
