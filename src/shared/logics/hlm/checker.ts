@@ -696,7 +696,7 @@ export class HLMDefinitionChecker {
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
         let constraintArg = rawArg ? this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ConstraintArg) : undefined;
-        this.checkProof(constraintArg ? constraintArg.proof : undefined, context);
+        this.checkProof(constraintArg?.proof, context);
       } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         if (rawArg) {
           let bindingArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BindingArg);

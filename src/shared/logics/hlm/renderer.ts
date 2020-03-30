@@ -1281,7 +1281,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let indices = expression.indices ? expression.indices.map((term) => this.renderElementTerm(term, termSelection)) : undefined;
       let isDefinition = expression instanceof DefinitionVariableRefExpression;
-      let elementParameterOverrides = parameterOverrides ? parameterOverrides.elementParameterOverrides : undefined;
+      let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
       return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       let childPaths: Fmt.Path[] = [];
@@ -1450,7 +1450,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let curParams: Fmt.Parameter[] = [];
       let curArgs: Display.ExpressionValue[] = [];
       let curParameterOverrides = index === definitions.length - 1 ? parameterOverrides : undefined;
-      let curReplacementParameters = curParameterOverrides ? curParameterOverrides.replacementParameters : undefined;
+      let curReplacementParameters = curParameterOverrides?.replacementParameters;
       let curArgumentLists = argumentLists && !curReplacementParameters ? argumentLists.slice(0, index + 1) : undefined;
       this.fillArguments(curDefinition.parameters, curParameterOverrides, curArgumentLists, undefined, false, markAsDummy, curParams, curArgs);
       for (let paramIndex = 0; paramIndex < curParams.length; paramIndex++) {
@@ -1486,7 +1486,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private fillArguments(parameters: Fmt.ParameterList, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Display.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Display.ExpressionValue[]): void {
-    let replacementParameters = parameterOverrides ? parameterOverrides.replacementParameters : undefined;
+    let replacementParameters = parameterOverrides?.replacementParameters;
     if (replacementParameters) {
       indices = replacementParameters.indices;
     }
@@ -1528,7 +1528,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       resultParams.push(param);
     }
     if (parameter && (bindingArgumentList || !argumentLists)) {
-      let elementParameterOverrides: ElementParameterOverrides | undefined = parameterOverrides ? parameterOverrides.elementParameterOverrides : undefined;
+      let elementParameterOverrides: ElementParameterOverrides | undefined = parameterOverrides?.elementParameterOverrides;
       if (bindingArgumentList && !indices) {
         if (!elementParameterOverrides) {
           elementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
@@ -1566,7 +1566,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       resultParams.push(param);
     }
     let paramToDisplay = replacementParam || param;
-    let elementParameterOverrides = parameterOverrides ? parameterOverrides.elementParameterOverrides : undefined;
+    let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
     if (elementParameterOverrides) {
       let variableOverride = elementParameterOverrides.get(paramToDisplay);
       if (variableOverride) {
