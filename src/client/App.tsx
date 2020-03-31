@@ -77,6 +77,8 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
 }
 
 class App extends React.Component<AppProps, AppState> {
+  private static readonly gitHubAccessTokenStorageIdentifier = 'github_access_token';
+
   private gitHubConfig?: GitHubConfig;
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
@@ -108,7 +110,7 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       let gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined = undefined;
       try {
-        let gitHubAccessToken = window.localStorage.getItem('GitHubAccessToken');
+        let gitHubAccessToken = window.localStorage.getItem(App.gitHubAccessTokenStorageIdentifier);
         if (gitHubAccessToken) {
           gitHubAPIAccess = CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
         }
@@ -127,7 +129,7 @@ class App extends React.Component<AppProps, AppState> {
         if (gitHubQueryStringResult.token) {
           let apiAccessPromise = gitHubQueryStringResult.token.then((accessToken) => {
             try {
-              window.localStorage.setItem('GitHubAccessToken', accessToken);
+              window.localStorage.setItem(App.gitHubAccessTokenStorageIdentifier, accessToken);
             } catch (error) {
               console.log(error);
             }
@@ -338,7 +340,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.setState({gitHubUserInfo: undefined});
     try {
-      window.localStorage.removeItem('GitHubAccessToken');
+      window.localStorage.removeItem(App.gitHubAccessTokenStorageIdentifier);
     } catch (error) {
       console.log(error);
     }

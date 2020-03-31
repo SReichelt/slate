@@ -1,9 +1,10 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
-import { fetchText } from '../utils/fetch';
+import { fetchJSON } from '../utils/fetch';
 
 export function getClientID(): Promise<string> {
-  return fetchText('github-auth/client-id');
+  return fetchJSON('github-auth/client-id')
+    .then((response) => response['client_id']);
 }
 
 export function getLoginURL(clientID: string, baseURL: string, path: string): string {
@@ -54,7 +55,8 @@ export function parseQueryString(query: string): QueryStringResult {
     let parsedQuery = queryString.parse(query);
     let code = parsedQuery['code'];
     if (typeof code === 'string') {
-      result.token = fetchText(`/github-auth/auth?code=${code}`);
+      result.token = fetchJSON(`/github-auth/auth?code=${code}`)
+        .then((response) => response['access_token']);
     }
     let path = parsedQuery['path'];
     if (typeof path === 'string') {
@@ -82,12 +84,13 @@ export class APIAccess {
   constructor(private accessToken: string) {}
 
   private submitRequest(method: string, path: string, request: any = {}): Promise<Response> {
-    let url = `https://api.github.com${path}?${this.accessToken}`;
+    let url = `https://api.github.com${path}`;
     let options: RequestInit = {
       method: method,
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `token ${this.accessToken}`
       },
     };
     if (method === 'GET' || method === 'HEAD') {

@@ -14,3 +14,8 @@ export async function fetchText(input: RequestInfo, init?: RequestInit): Promise
   let response = await fetchAny(input, init);
   return await response.text();
 }
+
+export async function fetchJSON(input: RequestInfo, init?: RequestInit): Promise<any> {
+  let response = await fetchAny(input, init);
+  return await response.json();
+}
