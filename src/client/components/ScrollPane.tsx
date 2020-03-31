@@ -10,7 +10,7 @@ class ScrollPane extends React.Component<ScrollPaneProps> {
   private scrollPaneNode: HTMLElement | null = null;
 
   componentDidUpdate(prevProps: ScrollPaneProps) {
-    if (this.props.object !== prevProps.object && this.scrollPaneNode) {
+    if (this.props.object !== prevProps.object && this.scrollPaneNode && this.scrollPaneNode.scrollTo) {
       this.scrollPaneNode.scrollTo({left: 0, top: 0, behavior: 'auto'});
     }
   }
