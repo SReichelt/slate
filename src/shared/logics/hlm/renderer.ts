@@ -440,7 +440,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.associatedParameterList!.push(parameter);
         if (stateCopy.associatedDefinition) {
           let contents = stateCopy.associatedDefinition.contents;
-          if (contents instanceof FmtHLM.ObjectContents_Definition) {
+          if (contents instanceof FmtHLM.ObjectContents_Definition && this.utils.isValueParamType(parameter.type.expression)) {
             contents.display = undefined;
             contents.definitionDisplay = undefined;
             if (contents instanceof FmtHLM.ObjectContents_Constructor) {
