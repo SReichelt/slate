@@ -233,6 +233,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       }
     }
+    let dialog: React.ReactNode = null;
+    if (this.state.openDialog) {
+      if (this.state.openDialog instanceof Dialog.InsertDialog) {
+        dialog = <InsertDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+      } else if (this.state.openDialog instanceof Dialog.ExpressionDialog) {
+        dialog = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+      }
+    }
     let result: React.ReactNode = null;
     let innerClassName = '';
     let isInputControl = false;
@@ -791,11 +799,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             toolbar.push('guide');
             if (expression.searchURLs) {
               let searchURLs = expression.searchURLs;
-              let onSearch = () => {
-                for (let url of searchURLs) {
-                  window.open(url, '_blank');
-                }
-              };
+              let onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
               let searchButton: SimpleMDE.ToolbarIcon = {
                 name: 'search',
                 action: onSearch,
@@ -837,6 +841,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return (
         <div className={className + ' markdown'}>
           {markdown}
+          {dialog}
         </div>
       );
     } else if (expression instanceof Display.IndirectExpression) {
@@ -867,12 +872,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
     if (hasMenu || expression instanceof Display.PlaceholderExpression) {
       let menu: React.ReactNode = null;
-      if (this.state.openDialog) {
-        if (this.state.openDialog instanceof Dialog.InsertDialog) {
-          menu = <InsertDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
-        } else if (this.state.openDialog instanceof Dialog.ExpressionDialog) {
-          menu = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
-        }
+      if (dialog) {
+        menu = dialog;
       } else if (this.state.openMenu) {
         menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
       }
@@ -1006,6 +1007,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             {result}
           </span>
         );
+      }
+      if (dialog) {
+        result = [result, dialog];
       }
     }
     this.semanticLinks = semanticLinks;
@@ -1476,6 +1480,26 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {
     event.stopPropagation();
     event.preventDefault();
+  }
+
+  private openSearchDialog(searchURLs: string[], defaultSearchText?: string): void {
+    let searchText = defaultSearchText || '';
+    let searchTextExpression = new Display.TextExpression(searchText);
+    searchTextExpression.onTextChanged = (newText: string) => {
+      searchText = newText;
+      return true;
+    }
+    let searchTextItem = new Dialog.ExpressionDialogParameterItem;
+    searchTextItem.title = 'Search default references for';
+    searchTextItem.onGetValue = () => searchTextExpression;
+    let dialog = new Dialog.ExpressionDialog;
+    dialog.items = [searchTextItem];
+    dialog.onOK = () => {
+      for (let url of searchURLs) {
+        window.open(url + encodeURI(searchText), '_blank');
+      }
+    };
+    this.setState({openDialog: dialog});
   }
 }
 

@@ -733,8 +733,8 @@ export abstract class GenericEditHandler {
       }
     };
     if (kind === 'references') {
-      let searchQuery = encodeURI(this.definition.name);
-      markdown.searchURLs = defaultReferenceSearchURLs.map((url: string) => (url + searchQuery));
+      markdown.searchURLs = defaultReferenceSearchURLs;
+      markdown.defaultSearchText = this.definition.name;
     }
   }
 
