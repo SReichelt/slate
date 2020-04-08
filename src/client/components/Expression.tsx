@@ -278,7 +278,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (this.state.inputError) {
           inputClassName += ' input-error';
         }
-        let size = expression.text.length + 1;
+        let size = expression.inputLength ? expression.inputLength : expression.text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
         result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
         isInputControl = true;
@@ -1489,6 +1489,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       searchText = newText;
       return true;
     }
+    searchTextExpression.requestTextInput = true;
+    searchTextExpression.inputLength = 20;
     let searchTextItem = new Dialog.ExpressionDialogParameterItem;
     searchTextItem.title = 'Search default references for';
     searchTextItem.onGetValue = () => searchTextExpression;

@@ -100,6 +100,7 @@ export class InsertPlaceholderExpression extends PlaceholderExpression {
 export class TextExpression extends RenderedExpression {
   onTextChanged?: (newText: string) => boolean;
   requestTextInput: boolean = false;
+  inputLength?: number;
 
   constructor(public text: string) {
     super();
