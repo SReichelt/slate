@@ -651,7 +651,7 @@ export class HLMDefinitionChecker {
       try {
         this.checkArgumentValue(param, rawArg, context, substitutionContext);
       } catch (error) {
-        this.error(rawArg ? rawArg : argumentList, error.message);
+        this.error(rawArg ?? argumentList, error.message);
       }
     }
   }

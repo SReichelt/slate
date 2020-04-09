@@ -158,7 +158,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
     let title = InsertDialog.trimString(this.state.title);
     let result: Dialog.InsertDialogResult = {
       name: InsertDialog.trimString(this.state.name),
-      title: title ? title : undefined
+      title: title || undefined
     };
     this.props.onOK(result);
   }

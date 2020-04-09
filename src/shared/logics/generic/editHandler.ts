@@ -63,7 +63,7 @@ export abstract class GenericEditHandler {
     titleItem.action = new Menu.ImmediateExpressionMenuAction(() => {
       let newInfo = {
         ...info,
-        title: titleItem.text ? titleItem.text : undefined
+        title: titleItem.text || undefined
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
     });

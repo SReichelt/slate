@@ -117,8 +117,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private updateOptionalProps(props: ExpressionProps): void {
-    this.shrinkMathSpaces = props.shrinkMathSpaces ? props.shrinkMathSpaces : props.parent ? props.parent.shrinkMathSpaces : false;
-    this.tooltipPosition = props.tooltipPosition ? props.tooltipPosition : props.parent ? props.parent.tooltipPosition : 'bottom';
+    this.shrinkMathSpaces = props.shrinkMathSpaces || props.parent?.shrinkMathSpaces || false;
+    this.tooltipPosition = props.tooltipPosition || props.parent?.tooltipPosition || 'bottom';
   }
 
   private clearOpenMenu(): void {
@@ -278,7 +278,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (this.state.inputError) {
           inputClassName += ' input-error';
         }
-        let size = expression.inputLength ? expression.inputLength : expression.text.length + 1;
+        let size = expression.inputLength ?? expression.text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
         result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
         isInputControl = true;
@@ -646,10 +646,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               subSupResult.unshift(
                 <span className={'subsup'} key="left">
                   <span className={'subsup-sup-row'} key="sup">
-                    {leftSup ? leftSup : empty}
+                    {leftSup ?? empty}
                   </span>
                   <span className={'subsup-sub-row'} key="sub">
-                    {leftSub ? leftSub : empty}
+                    {leftSub ?? empty}
                   </span>
                 </span>
               );
@@ -658,10 +658,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               subSupResult.push(
                 <span className={'subsup'} key="right">
                   <span className={'subsup-sup-row'} key="sup">
-                    {rightSup ? rightSup : empty}
+                    {rightSup ?? empty}
                   </span>
                   <span className={'subsup-sub-row'} key="sub">
-                    {rightSub ? rightSub : empty}
+                    {rightSub ?? empty}
                   </span>
                 </span>
               );
@@ -670,21 +670,21 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             return (
               <span className={'subsup subsup-full'}>
                 <span className={'subsup-sup-row subsup-full-row'} key="sup">
-                  {leftSup || leftSub ? leftSup || empty : null}
+                  {(leftSup || leftSub) ? (leftSup ?? empty) : null}
                   <span className={'subsup-empty'} key="middle"/>
-                  {rightSup || rightSub ? rightSup || empty : null}
+                  {(rightSup || rightSub) ? (rightSup ?? empty) : null}
                 </span>
                 <span className={'subsup-body-row'} key="body">
-                  {leftSup || leftSub ? empty : null}
+                  {(leftSup || leftSub) ? empty : null}
                   <span className={'subsup-body'} key="middle">
                     {subSupResult}
                   </span>
-                  {rightSup || rightSub ? empty : null}
+                  {(rightSup || rightSub) ? empty : null}
                 </span>
                 <span className={'subsup-sub-row subsup-full-row'} key="sub">
-                  {leftSup || leftSub ? leftSub || empty : null}
+                  {(leftSup || leftSub) ? (leftSub ?? empty) : null}
                   <span className={'subsup-empty'} key="middle"/>
-                  {rightSup || rightSub ? rightSub || empty : null}
+                  {(rightSup || rightSub) ? (rightSub ?? empty) : null}
                 </span>
               </span>
             );
@@ -753,7 +753,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'radical-degree-table'}>
               <span className={'radical-degree-top-row'}>
                 <span className={'radical-degree'}>
-                  <Expression expression={expression.degree ? expression.degree : new Display.TextExpression('  ')} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/>
+                  <Expression expression={expression.degree ?? new Display.TextExpression('  ')} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/>
                 </span>
               </span>
               <span className={'radical-degree-bottom-row'}>
