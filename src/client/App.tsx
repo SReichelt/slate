@@ -155,7 +155,8 @@ class App extends React.Component<AppProps, AppState> {
       canPreload: canPreload,
       watchForChanges: true,
       retryMissingFiles: false,
-      checkMarkdownCode: false
+      checkMarkdownCode: false,
+      allowPlaceholders: config.embedded
     };
     this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderConfig, 'Library');
 
@@ -349,7 +350,9 @@ class App extends React.Component<AppProps, AppState> {
   private processEmbeddingResponseMessage(message: Embedding.ResponseMessage): void {
     switch (message.command) {
     case 'SELECT':
-      this.navigateToURI(message.uri);
+      if (message.uri) {
+        this.navigateToURI(message.uri);
+      }
       break;
     case 'UPDATE':
       if (this.state.interactionHandler) {
@@ -630,8 +633,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private navigateToURI(uri: string): void {
     let state: SelectionState = {};
-    this.updateSelectionState(state, uri);
-    this.navigate(state, false);
+    if (this.updateSelectionState(state, uri)) {
+      this.navigate(state, false);
+    }
   }
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
@@ -687,13 +691,24 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private setDocumentTitle(state: SelectionState, title: string): void {
-    document.title = title;
+    this.setDocumentTitleInternal(title);
     if (state.selectedItemInfo) {
       state.selectedItemInfo.then((info: LibraryItemInfo) => {
         if (info.title) {
-          document.title = `${appName}: ${info.title}`;
+          this.setDocumentTitleInternal(`${appName}: ${info.title}`);
         }
       });
+    }
+  }
+
+  private setDocumentTitleInternal(title: string): void {
+    document.title = title;
+    if (config.vsCodeAPI) {
+      let message: Embedding.RequestMessage = {
+        command: 'TITLE',
+        text: title
+      }
+      config.vsCodeAPI.postMessage(message);
     }
   }
 

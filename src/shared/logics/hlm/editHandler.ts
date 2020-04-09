@@ -64,7 +64,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let utils = new HLMUtils(definition, libraryDataProvider);
     super(definition, libraryDataProvider, new HLMEditAnalysis, utils, templates, mruList);
     this.utils = utils;
-    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, this.utils, true);
+    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, this.utils, true, true);
     this.update();
   }
 

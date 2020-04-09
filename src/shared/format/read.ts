@@ -86,6 +86,7 @@ export class StringInputStream implements InputStream {
 
 export interface ErrorHandler {
   error(msg: string, range: Range): void;
+  unfilledPlaceholder(range: Range): void;
   checkMarkdownCode: boolean;
 }
 
@@ -535,7 +536,9 @@ export class Reader {
         this.readChar(']');
         expression = arrayExpression;
       } else if (this.tryReadChar('?')) {
-        this.error('Unfilled placeholder', this.markEnd(expressionStart));
+        let range = this.markEnd(expressionStart);
+        let errorRange = this.getErrorRange(range);
+        this.errorHandler.unfilledPlaceholder(errorRange);
         expression = new Fmt.PlaceholderExpression(undefined);
       } else {
         let str = this.tryReadString('\'');
@@ -1007,26 +1010,30 @@ export class Reader {
     return range;
   }
 
-  private error(msg: string, range?: Range): void {
-    if (!this.atError) {
-      if (range) {
-        range = fixRange(range);
-      } else {
-        let start = this.stream.getLocation();
-        let end = start;
-        let c = this.peekChar();
-        if (c && c !== '\r' && c !== '\n') {
-          end = {
-            line: end.line,
-            col: end.col + 1
-          };
-        }
-        range = {
-          start: start,
-          end: end
+  private getErrorRange(range?: Range): Range {
+    if (range) {
+      return fixRange(range);
+    } else {
+      let start = this.stream.getLocation();
+      let end = start;
+      let c = this.peekChar();
+      if (c && c !== '\r' && c !== '\n') {
+        end = {
+          line: end.line,
+          col: end.col + 1
         };
       }
-      this.errorHandler.error(msg, range);
+      return {
+        start: start,
+        end: end
+      };
+    }
+  }
+
+  private error(msg: string, range?: Range): void {
+    if (!this.atError) {
+      let errorRange = this.getErrorRange(range);
+      this.errorHandler.error(msg, errorRange);
       this.atError = true;
     }
   }
@@ -1034,7 +1041,7 @@ export class Reader {
 
 
 export class DefaultErrorHandler implements ErrorHandler {
-  constructor(private fileName?: string, public checkMarkdownCode: boolean = false) {}
+  constructor(private fileName?: string, public checkMarkdownCode: boolean = false, private allowPlaceholders: boolean = false) {}
 
   error(msg: string, range: Range): void {
     let line = range.start.line + 1;
@@ -1049,14 +1056,21 @@ export class DefaultErrorHandler implements ErrorHandler {
     error.columnNumber = col;
     throw error;
   }
+
+  unfilledPlaceholder(range: Range): void {
+    if (!this.allowPlaceholders) {
+      this.error('Unfilled placeholder', range);
+    }
+  }
 }
 
-export function readStream(stream: InputStream, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler, checkMarkdownCode: boolean = false): Fmt.File {
-  let errorHandler = new DefaultErrorHandler(fileName, checkMarkdownCode);
+export function readStream(stream: InputStream, errorHandler: ErrorHandler, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
   let reader = new Reader(stream, errorHandler, getMetaModel, reportRange);
   return reader.readFile();
 }
 
-export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler, checkMarkdownCode: boolean = false): Fmt.File {
-  return readStream(new StringInputStream(str), fileName, getMetaModel, reportRange, checkMarkdownCode);
+export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
+  let stream = new StringInputStream(str);
+  let errorHandler = new DefaultErrorHandler(fileName);
+  return readStream(stream, errorHandler, getMetaModel, reportRange);
 }

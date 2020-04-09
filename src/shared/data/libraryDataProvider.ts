@@ -38,12 +38,14 @@ export interface LibraryDataProviderConfig {
   watchForChanges: boolean;
   retryMissingFiles: boolean;
   checkMarkdownCode: boolean;
+  allowPlaceholders: boolean;
 }
 export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
   canPreload: false,
   watchForChanges: false,
   retryMissingFiles: false,
-  checkMarkdownCode: false
+  checkMarkdownCode: false,
+  allowPlaceholders: false
 };
 
 interface PrefetchQueueItem {
@@ -270,7 +272,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private createLibraryDefinition(uri: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, contents: FileContents): LibraryDefinition {
-    let file = FmtReader.readString(contents.text, uri, getMetaModel, undefined, this.config.checkMarkdownCode);
+    let stream = new FmtReader.StringInputStream(contents.text);
+    let errorHandler = new FmtReader.DefaultErrorHandler(uri, this.config.checkMarkdownCode, this.config.allowPlaceholders);
+    let file = FmtReader.readStream(stream, errorHandler, getMetaModel);
     return {
       file: file,
       definition: this.getMainDefinition(file, definitionName),
@@ -361,12 +365,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           let libraryDefinition: LibraryDefinition | undefined = undefined;
           if (this.config.watchForChanges && contents.addWatcher) {
             contents.addWatcher((watcher: FileWatcher) => {
+              let currentEditedDefinition = this.editedDefinitions.get(name);
               try {
                 let newLibraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
                 if (libraryDefinition) {
                   libraryDefinition.file = newLibraryDefinition.file;
                   libraryDefinition.definition = newLibraryDefinition.definition;
-                  let currentEditedDefinition = this.editedDefinitions.get(name);
                   if (currentEditedDefinition) {
                     currentEditedDefinition.file = libraryDefinition.file.clone();
                     currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
@@ -377,7 +381,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
                 }
               } catch (error) {
                 this.fullyLoadedDefinitions.delete(name);
-                watcher.close();
+                if (!currentEditedDefinition) {
+                  watcher.close();
+                }
               }
             });
             if (isSection) {

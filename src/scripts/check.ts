@@ -22,7 +22,8 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
     canPreload: false,
     watchForChanges: false,
     retryMissingFiles: false,
-    checkMarkdownCode: true
+    checkMarkdownCode: true,
+    allowPlaceholders: false
   };
   let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), config, libraryName);
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
@@ -52,7 +53,7 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
 
 function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path): CachedPromise<boolean> {
   let checker = libraryDataProvider.logic.getChecker();
-  return checker.checkDefinition(definition.definition, libraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+  return checker.checkDefinition(definition.definition, libraryDataProvider, false).then((checkResult: Logic.LogicCheckResult) => {
     let result = true;
     for (let diagnostic of checkResult.diagnostics) {
       let severity = 'Unknown';

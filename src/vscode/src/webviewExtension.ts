@@ -15,17 +15,6 @@ function getBaseURI(workspaceFolder: vscode.WorkspaceFolder): string {
     return workspaceFolder.uri.toString() + '/data/';
 }
 
-function setPanelTitle(uri: string): void {
-    if (panel) {
-        let fileName = decodeURI(uri);
-        let lastSlashIndex = fileName.lastIndexOf('/');
-        if (lastSlashIndex >= 0) {
-            fileName = fileName.substring(lastSlashIndex + 1);
-        }
-        panel.title = fileName;
-    }
-}
-
 function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.RequestMessage, fileAccessor: FileAccessor): any {
     let postResponseMessage = (command: Embedding.ResponseCommand, text?: string): any => {
         if (requestMessage.index !== undefined && panel && panel.webview === webview) {
@@ -42,7 +31,7 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
     let postResponse = (text?: string) => postResponseMessage('RESPONSE', text);
     let postError = (message?: string) => postResponseMessage('ERROR', message);
     let baseURI = getBaseURI(workspaceFolder!);
-    let fileURI = baseURI + requestMessage.uri;
+    let fileURI = baseURI + (requestMessage.uri ?? '');
     switch (requestMessage.command) {
     case 'GET':
         return fileAccessor.readFile(fileURI)
@@ -91,14 +80,18 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
             return postError('Cannot revert edits');
         }
     case 'SELECT':
-        setPanelTitle(requestMessage.uri);
-        if (fileAccessor.openFile) {
+        if (requestMessage.command === 'SELECT' && fileAccessor.openFile) {
             return fileAccessor.openFile(fileURI, true)
                 .then(() => postResponse())
                 .catch((error) => postError(error.message));
         } else {
             return postResponse();
         }
+    case 'TITLE':
+        if (panel && requestMessage.text) {
+            panel.title = requestMessage.text;
+        }
+        return postResponse();
     default:
         return postError('Unsupported command');
     }
@@ -112,7 +105,6 @@ function onActiveEditorChanged(editor: vscode.TextEditor | undefined): any {
             let uri = editor.document.uri.toString();
             if (uri.startsWith(baseURI)) {
                 uri = uri.substring(baseURI.length);
-                setPanelTitle(uri);
                 let message: Embedding.ResponseMessage = {
                     command: 'SELECT',
                     uri: uri

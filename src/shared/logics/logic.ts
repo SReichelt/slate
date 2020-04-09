@@ -43,7 +43,7 @@ export function createDefinition(definitionType: LogicDefinitionTypeDescription,
 }
 
 export interface LogicChecker {
-  checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor): CachedPromise<LogicCheckResult>;
+  checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, supportPlaceholders: boolean): CachedPromise<LogicCheckResult>;
 }
 
 export interface LogicCheckResult {

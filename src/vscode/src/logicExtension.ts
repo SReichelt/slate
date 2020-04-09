@@ -91,7 +91,9 @@ class LibraryDocumentProvider {
         let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
         if (!isSection) {
             try {
-                event.file = FmtReader.readString(event.document.getText(), event.document.fileName, library.libraryDataProvider.logic.getMetaModel, reportRange);
+                let stream = new FmtReader.StringInputStream(event.document.getText());
+                let errorHandler = new FmtReader.DefaultErrorHandler(event.document.fileName, false, true);
+                event.file = FmtReader.readStream(stream, errorHandler, library.libraryDataProvider.logic.getMetaModel, reportRange);
             } catch (error) {
                 library.diagnosticCollection.delete(event.document.uri);
                 return undefined;
@@ -127,7 +129,8 @@ class LibraryDocumentProvider {
                 canPreload: false,
                 watchForChanges: true,
                 retryMissingFiles: true,
-                checkMarkdownCode: false
+                checkMarkdownCode: false,
+                allowPlaceholders: true
             };
             library = {
                 libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, config, 'Library'),
@@ -201,7 +204,7 @@ class SlateDiagnosticsProvider {
         if (libraryDocument.file.definitions.length) {
             let definition = libraryDocument.file.definitions[0];
             let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
-            checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider).then((checkResult: Logic.LogicCheckResult) => {
+            checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider, true).then((checkResult: Logic.LogicCheckResult) => {
                 let diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
                     new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);

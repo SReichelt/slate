@@ -1335,6 +1335,16 @@ class ErrorHandler implements FmtReader.ErrorHandler {
         }
     }
 
+    unfilledPlaceholder(range: FmtReader.Range): void {
+        if (this.diagnostics) {
+            this.diagnostics.push({
+                message: 'Unfilled placeholder',
+                range: convertRange(range),
+                severity: vscode.DiagnosticSeverity.Warning
+            });
+        }
+    }
+
     checkMarkdownCode = true;
 }
 
@@ -1551,19 +1561,21 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             let changedDocument = event.document;
-            let fileName = changedDocument.uri.fsPath;
-            parsedFileCache.delete(fileName);
-            let recheckOnly = true;
-            if (metaModelCache.has(fileName)) {
-                metaModelCache.delete(fileName);
-                recheckOnly = false;
+            if (changedDocument.languageId === languageId) {
+                let fileName = changedDocument.uri.fsPath;
+                parsedFileCache.delete(fileName);
+                let recheckOnly = true;
+                if (metaModelCache.has(fileName)) {
+                    metaModelCache.delete(fileName);
+                    recheckOnly = false;
+                }
+                let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
+                if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
+                    fileAccessor.documentChanged(changedDocument);
+                }
+                // TODO only reparse affected documents (maintain a list of documents to reparse)
+                triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly, (document) => (document !== changedDocument));
             }
-            let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
-            if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
-                fileAccessor.documentChanged(changedDocument);
-            }
-            // TODO only reparse affected documents (maintain a list of documents to reparse)
-            triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly, (document) => (document !== changedDocument));
         })
     );
     if (vscode.workspace.onDidDeleteFiles && vscode.workspace.onDidRenameFiles) {
