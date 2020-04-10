@@ -1312,7 +1312,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       });
       result = new Display.PromiseExpression(expressionPromise);
     } else {
-      result = this.renderSetTermInternal(expression, false);
+      result = this.renderGenericExpression(expression);
+      if (!result) {
+        result = this.renderSetTermInternal(expression, false);
+      }
       if (!result) {
         result = this.renderElementTermInternal(expression);
       }

@@ -14,12 +14,12 @@ import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderConfig } fro
 import { fileExtension } from '../../fs/format/dynamic';
 import CachedPromise from '../../shared/data/cachedPromise';
 import { languageId, SLATE_MODE } from './slate';
-import { RangeInfo, convertRangeInfo } from './utils';
+import { RangeInfo, convertRangeInfo, deleteUrisFromDiagnosticCollection } from './utils';
 
 export class ParseDocumentEvent {
     document: vscode.TextDocument;
     file?: Fmt.File;
-    hasSyntaxErrors: boolean;
+    hasErrors: boolean;
 }
 
 export class HoverEvent {
@@ -79,7 +79,7 @@ class LibraryDocumentProvider {
         if (!library) {
             return undefined;
         }
-        if (event.hasSyntaxErrors) {
+        if (event.hasErrors) {
             library.diagnosticCollection.delete(event.document.uri);
             return undefined;
         }
@@ -181,15 +181,9 @@ class LibraryDocumentProvider {
         return this.documents.get(document);
     }
 
-    invalidateUri(uri: vscode.Uri): void {
-        for (let library of this.libraries.values()) {
-            library.diagnosticCollection.delete(uri);
-        }
-    }
-
     invalidateUris(uris: vscode.Uri[]): void {
-        for (let uri of uris) {
-            this.invalidateUri(uri);
+        for (let library of this.libraries.values()) {
+            deleteUrisFromDiagnosticCollection(uris, library.diagnosticCollection);
         }
     }
 }
