@@ -534,6 +534,7 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice
 * https://mathworld.wolfram.com/AxiomofChoice.html
 * https://proofwiki.org/wiki/Axiom:Axiom_of_Choice
+* https://ncatlab.org/nlab/show/axiom+of+choice
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
@@ -5372,8 +5373,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 2.1.1 data/libraries/hlm/Algebra/Isomorphisms/element%20transport 1`] = `
-"Definition 2.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X. We define:
+exports[`render hlm library: 2.1.1.1 data/libraries/hlm/Algebra/Generic/Isomorphisms/element%20transport 1`] = `
+"Definition 2.1.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X. We define:
 
   φ[x] := φ(x)
 
@@ -5384,8 +5385,8 @@ The definitions in this section are somewhat technical. Their purpose is to impl
 Each of the definitions transports an object defined on \`X\` to \`Y\` along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
 `;
 
-exports[`render hlm library: 2.1.2 data/libraries/hlm/Algebra/Isomorphisms/function%20transport 1`] = `
-"Definition 2.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X be a function. We define
+exports[`render hlm library: 2.1.1.2 data/libraries/hlm/Algebra/Generic/Isomorphisms/function%20transport 1`] = `
+"Definition 2.1.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X be a function. We define
 
   φ[f]
 
@@ -5397,8 +5398,8 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.3 data/libraries/hlm/Algebra/Isomorphisms/inner%20operation%20transport 1`] = `
-"Definition 2.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X. We define
+exports[`render hlm library: 2.1.1.3 data/libraries/hlm/Algebra/Generic/Isomorphisms/inner%20operation%20transport 1`] = `
+"Definition 2.1.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X. We define
 
   φ[∗]
 
@@ -5410,8 +5411,8 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.4 data/libraries/hlm/Algebra/Isomorphisms/left%20operation%20transport 1`] = `
-"Definition 2.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X be an operation. We define
+exports[`render hlm library: 2.1.1.4 data/libraries/hlm/Algebra/Generic/Isomorphisms/left%20operation%20transport 1`] = `
+"Definition 2.1.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X be an operation. We define
 
   φ[∗]
 
@@ -5423,8 +5424,8 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.5 data/libraries/hlm/Algebra/Isomorphisms/right%20operation%20transport 1`] = `
-"Definition 2.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X be an operation. We define
+exports[`render hlm library: 2.1.1.5 data/libraries/hlm/Algebra/Generic/Isomorphisms/right%20operation%20transport 1`] = `
+"Definition 2.1.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X be an operation. We define
 
   φ[∗]
 
@@ -5436,8 +5437,8 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 2.1.6 data/libraries/hlm/Algebra/Isomorphisms/relation%20transport 1`] = `
-"Definition 2.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
+exports[`render hlm library: 2.1.1.6 data/libraries/hlm/Algebra/Generic/Isomorphisms/relation%20transport 1`] = `
+"Definition 2.1.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
 
   φ[≺]
 
@@ -5446,8 +5447,8 @@ by:
   φ[[p_x_1,x_2]_(x_1,x_2 ∈ X)] := [p_φ^-1(y_1),φ^-1(y_2)]_(y_1,y_2 ∈ Y)  (p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)"
 `;
 
-exports[`render hlm library: 2.1.7 data/libraries/hlm/Algebra/Isomorphisms/morphism%20transport 1`] = `
-"Definition 2.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
+exports[`render hlm library: 2.1.1.7 data/libraries/hlm/Algebra/Generic/Isomorphisms/morphism%20transport 1`] = `
+"Definition 2.1.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
 
   (φ_1, φ_2, φ_3)[∙]
 
