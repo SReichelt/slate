@@ -16,7 +16,6 @@
         "suppressImplicitAnyIndexErrors": true
     },
     "files": [
-        "src/formatExtension.ts",
-        "src/logicExtension.ts"
+        "src/extension.ts"
     ]
 }

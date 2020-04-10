@@ -2,7 +2,7 @@
 	"name": "slate",
 	"displayName": "Slate",
 	"description": "Provides syntax highlighting, navigation, auto-completion, and GUI integration for the Slate proof assistant language.",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "sreichelt",
 	"license": "MIT",
 	"author": "Sebastian Reichelt",
@@ -11,6 +11,7 @@
 	"categories": [
 		"Programming Languages"
 	],
+	"preview": true,
 	"contributes": {
 		"languages": [
 			{
@@ -63,7 +64,7 @@
 		"onLanguage:slate",
 		"onCommand:slate.showGraphicalEditor"
 	],
-	"main": "./out/vscode/src/formatExtension",
+	"main": "./out/vscode/src/extension",
 	"scripts": {
 		"clean": "rimraf out *.vsix",
 		"compile": "tsc -p ./",

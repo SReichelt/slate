@@ -4,9 +4,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as ejs from 'ejs';
-import { languageId } from './slate';
-import * as Embedding from '../../shared/data/embedding';
-import { FileAccessor, FileContents, FileWatcher } from '../../shared/data/fileAccessor';
+import { languageId } from '../slate';
+import * as Embedding from '../../../shared/data/embedding';
+import { FileAccessor, FileContents, FileWatcher } from '../../../shared/data/fileAccessor';
 
 let workspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
 let panel: vscode.WebviewPanel | undefined = undefined;
@@ -119,9 +119,9 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
     if (panel) {
         panel.reveal(vscode.ViewColumn.Two);
     } else {
-        let editor = vscode.window.activeTextEditor;
-        if (editor) {
-            workspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+        let initiallyActiveEditor = vscode.window.activeTextEditor;
+        if (initiallyActiveEditor) {
+            workspaceFolder = vscode.workspace.getWorkspaceFolder(initiallyActiveEditor.document.uri);
         }
         if (!workspaceFolder) {
             if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
@@ -152,9 +152,9 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
 
         let webview = panel.webview;
         let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
-            if (editor) {
-                onActiveEditorChanged(editor);
-                editor = undefined;
+            if (initiallyActiveEditor) {
+                onActiveEditorChanged(initiallyActiveEditor);
+                initiallyActiveEditor = undefined;
             }
             return onMessageReceived(webview, requestMessage, fileAccessor);
         };

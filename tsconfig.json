@@ -16,5 +16,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "files": ["src/shared/logics/logics.ts"]
+  "files": [
+    "src/shared/logics/logics.ts"
+  ]
 }
