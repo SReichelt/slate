@@ -10,7 +10,7 @@ Slate can be accessed online at https://sreichelt.github.io/slate/. Users can br
 
 ## VSCode extension
 
-An extension for Microsoft Visual Studio Code integrates the entire web GUI, while also letting the user edit the source code in parallel. The extension supports most VSCode features including refactoring operations.
+An [extension for Microsoft Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=sreichelt.slate) integrates the entire web GUI, while also letting the user edit the source code in parallel. The extension supports most VSCode features including refactoring operations.
 
 ## Local build
 
