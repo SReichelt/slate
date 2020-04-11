@@ -350,8 +350,9 @@ class App extends React.Component<AppProps, AppState> {
   private processEmbeddingResponseMessage(message: Embedding.ResponseMessage): void {
     switch (message.command) {
     case 'SELECT':
-      if (message.uri) {
-        this.navigateToURI(message.uri);
+      let showNavigation = !(message.uri && this.navigateToURI(message.uri));
+      if (this.state.navigationPaneVisible !== showNavigation) {
+        this.setState({navigationPaneVisible: showNavigation});
       }
       break;
     case 'UPDATE':
@@ -631,10 +632,13 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private navigateToURI(uri: string): void {
+  private navigateToURI(uri: string): boolean {
     let state: SelectionState = {};
     if (this.updateSelectionState(state, uri)) {
       this.navigate(state, false);
+      return true;
+    } else {
+      return false;
     }
   }
 
