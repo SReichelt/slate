@@ -72,23 +72,23 @@
 		"package": "vsce package -o slate.vsix"
 	},
 	"engines": {
-		"vscode": "^1.42.0"
+		"vscode": "^1.44.0"
 	},
 	"dependencies": {
 		"bn.js": "^5.1.1",
-		"ejs": "^3.0.1",
+		"ejs": "^3.0.2",
 		"markdown-escape": "^1.0.2"
 	},
 	"devDependencies": {
 		"@types/bn.js": "^4.11.6",
-		"@types/ejs": "^3.0.1",
+		"@types/ejs": "^3.0.2",
 		"@types/mocha": "^7.0.2",
-		"@types/node": "^13.9.0",
-		"@types/vscode": "^1.42.0",
+		"@types/node": "^13.11.1",
+		"@types/vscode": "^1.44.0",
 		"eslint": "^6.8.0",
 		"rimraf": "^3.0.2",
 		"typescript": "^3.8.3",
-		"vsce": "^1.74.0"
+		"vsce": "^1.75.0"
 	},
 	"__metadata": {
 		"id": "ea7b3c4b-a00f-4f95-a431-7a74aa78303c",
