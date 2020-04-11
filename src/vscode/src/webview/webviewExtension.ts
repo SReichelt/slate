@@ -111,7 +111,7 @@ function getEditorUri(editor: vscode.TextEditor | undefined): string | undefined
     return undefined;
 }
 
-function onActiveEditorChanged(editor: vscode.TextEditor | undefined): any {
+function selectEditorUri(editor: vscode.TextEditor | undefined): Thenable<boolean> | undefined {
     if (panel) {
         let message: Embedding.ResponseMessage = {
             command: 'SELECT',
@@ -119,6 +119,7 @@ function onActiveEditorChanged(editor: vscode.TextEditor | undefined): any {
         };
         return panel.webview.postMessage(message);
     }
+    return undefined;
 }
 
 function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: FileAccessor): void {
@@ -160,7 +161,7 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         let reportInitiallyActiveEditor = true;
         let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
             if (reportInitiallyActiveEditor) {
-                onActiveEditorChanged(initiallyActiveEditor);
+                selectEditorUri(initiallyActiveEditor);
                 reportInitiallyActiveEditor = false;
             }
             return onMessageReceived(webview, requestMessage, fileAccessor);
@@ -188,6 +189,11 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: FileAcc
 
     showGraphicalEditor(context, fileAccessor);
 
+    let onActiveEditorChanged = (editor: vscode.TextEditor | undefined): any => {
+        if (editor && editor.document.languageId === languageId) {
+            return selectEditorUri(editor);
+        }
+    };
     vscode.window.onDidChangeActiveTextEditor(onActiveEditorChanged, undefined, context.subscriptions);
 }
 
