@@ -97,21 +97,27 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
     }
 }
 
-function onActiveEditorChanged(editor: vscode.TextEditor | undefined): any {
-    if (panel && editor && editor.document.languageId === languageId) {
+function getEditorUri(editor: vscode.TextEditor | undefined): string | undefined {
+    if (editor && editor.document.languageId === languageId) {
         let documentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
         if (documentWorkspaceFolder && documentWorkspaceFolder === workspaceFolder) {
             let baseURI = getBaseURI(documentWorkspaceFolder);
             let uri = editor.document.uri.toString();
             if (uri.startsWith(baseURI)) {
-                uri = uri.substring(baseURI.length);
-                let message: Embedding.ResponseMessage = {
-                    command: 'SELECT',
-                    uri: uri
-                };
-                return panel.webview.postMessage(message);
+                return uri.substring(baseURI.length);
             }
         }
+    }
+    return undefined;
+}
+
+function onActiveEditorChanged(editor: vscode.TextEditor | undefined): any {
+    if (panel) {
+        let message: Embedding.ResponseMessage = {
+            command: 'SELECT',
+            uri: getEditorUri(editor)
+        };
+        return panel.webview.postMessage(message);
     }
 }
 
@@ -151,10 +157,11 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         panel.onDidDispose(() => (panel = undefined), context.subscriptions);
 
         let webview = panel.webview;
+        let reportInitiallyActiveEditor = true;
         let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
-            if (initiallyActiveEditor) {
+            if (reportInitiallyActiveEditor) {
                 onActiveEditorChanged(initiallyActiveEditor);
-                initiallyActiveEditor = undefined;
+                reportInitiallyActiveEditor = false;
             }
             return onMessageReceived(webview, requestMessage, fileAccessor);
         };
