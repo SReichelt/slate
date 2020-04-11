@@ -14,24 +14,51 @@ export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, Library
 const fileExtension = '.slate';
 const indexFileName = '_index';
 
-export const defaultReferences = [
-  'https://en.wikipedia.org/wiki/',
-  'https://mathworld.wolfram.com/',
-  'https://proofwiki.org/wiki/',
-  'https://ncatlab.org/nlab/show/',
-  'https://coq.inria.fr/library/',
-  'https://leanprover-community.github.io/mathlib_docs/',
-  'http://oeis.org/'
+export interface DefaultReference {
+  title: string;
+  urlPrefix: string;
+  searchUrlPrefix?: string;
+}
+
+export const defaultReferences: DefaultReference[] = [
+  {
+    title: 'Wikipedia',
+    urlPrefix: 'https://en.wikipedia.org/wiki/',
+    searchUrlPrefix: 'https://en.wikipedia.org/w/index.php?search='
+  },
+  {
+    title: 'Wolfram MathWorld',
+    urlPrefix: 'https://mathworld.wolfram.com/',
+    searchUrlPrefix: 'https://mathworld.wolfram.com/search/?query='
+  },
+  {
+    title: 'ProofWiki',
+    urlPrefix: 'https://proofwiki.org/wiki/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Aproofwiki.org+'
+  },
+  {
+    title: 'nLab',
+    urlPrefix: 'https://ncatlab.org/nlab/show/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Ancatlab.org+'
+  },
+  {
+    title: 'Coq standard library',
+    urlPrefix: 'https://coq.inria.fr/library/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+'
+  },
+  {
+    title: 'Lean mathlib',
+    urlPrefix: 'https://leanprover-community.github.io/mathlib_docs/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+'
+  },
+  {
+    title: 'OEIS',
+    urlPrefix: 'http://oeis.org/'
+    // Don't search OEIS by default as it is too specific.
+  }
 ];
-const defaultReferencesString = defaultReferences.map((ref) => `* ${ref}...`).reduce((prev, cur) => `${prev}\n${cur}`);
-export const defaultReferenceSearchURLs = [
-  'https://en.wikipedia.org/w/index.php?search=',
-  'https://mathworld.wolfram.com/search/?query=',
-  'https://www.google.com/search?q=site%3Aproofwiki.org+',
-  'https://www.google.com/search?q=site%3Ancatlab.org+',
-  'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+',
-  'https://www.google.com/search?q=site%3Aleanprover-community.github.io%2Fmathlib_docs+'
-];
+
+const defaultReferencesString = defaultReferences.map((ref) => `* ${ref.urlPrefix}...`).reduce((prev, cur) => `${prev}\n${cur}`);
 
 export interface LibraryDataProviderConfig {
   canPreload: boolean;

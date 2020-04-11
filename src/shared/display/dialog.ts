@@ -24,6 +24,7 @@ export class InsertDialog extends DialogBase {
 export class ExpressionDialog extends DialogBase {
   items: ExpressionDialogItem[];
   onCheckOKEnabled?: () => boolean;
+  onCheckUpdateNeeded?: () => boolean;
 }
 
 type ChangeListener = () => void;
@@ -51,6 +52,11 @@ export abstract class ExpressionDialogItem {
 
 export class ExpressionDialogInfoItem extends ExpressionDialogItem {
   info: Display.RenderedExpression;
+}
+
+export class ExpressionDialogLinkItem extends ExpressionDialogItem {
+  title: string;
+  getURL: () => string;
 }
 
 export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {

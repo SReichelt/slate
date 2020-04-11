@@ -1,4 +1,5 @@
 .dialog {
+  position: relative;
   padding: 0;
   border-radius: 2pt;
   margin: auto auto;
@@ -66,7 +67,7 @@
   text-align: right;
 }
 
-.dialog-overlay {
+*.dialog-overlay {
   z-index: 20;
   background-color: var(--dialog-overlay-color);
 }

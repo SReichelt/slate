@@ -797,18 +797,18 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
           if (!config.embedded) {
             toolbar.push('guide');
-            if (expression.searchURLs) {
-              let searchURLs = expression.searchURLs;
-              let onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
-              let searchButton: SimpleMDE.ToolbarIcon = {
-                name: 'search',
-                action: onSearch,
-                className: 'fa fa-search',
-                title: 'Search Default References (requires disabling popup blockers)'
-              };
-              toolbar.push('|', searchButton);
-              key = 'markdown-editor-with-search';
-            }
+          }
+          if (expression.searchURLs) {
+            let searchURLs = expression.searchURLs;
+            let onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
+            let searchButton: SimpleMDE.ToolbarIcon = {
+              name: 'search',
+              action: onSearch,
+              className: 'fa fa-search',
+              title: 'Search Default References (requires disabling popup blockers)'
+            };
+            toolbar.push('|', searchButton);
+            key = 'markdown-editor-with-search';
           }
           let options: SimpleMDE.Options = {
             toolbar: toolbar,
@@ -1482,7 +1482,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     event.preventDefault();
   }
 
-  private openSearchDialog(searchURLs: string[], defaultSearchText?: string): void {
+  private openSearchDialog(searchURLs: Display.MarkdownExpressionSearchURL[], defaultSearchText?: string): void {
     let searchText = defaultSearchText || '';
     let searchTextExpression = new Display.TextExpression(searchText);
     searchTextExpression.onTextChanged = (newText: string) => {
@@ -1496,11 +1496,23 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     searchTextItem.onGetValue = () => searchTextExpression;
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [searchTextItem];
-    dialog.onOK = () => {
-      for (let url of searchURLs) {
-        window.open(url + encodeURI(searchText), '_blank');
+    if (config.embedded) {
+      dialog.items.push(new Dialog.ExpressionDialogSeparatorItem);
+      for (let searchUrl of searchURLs) {
+        let linkItem = new Dialog.ExpressionDialogLinkItem;
+        linkItem.title = searchUrl.title;
+        linkItem.getURL = () => (searchUrl.searchUrlPrefix + encodeURI(searchText));
+        dialog.items.push(linkItem);
       }
-    };
+    } else {
+      dialog.onOK = () => {
+        for (let searchUrl of searchURLs) {
+          window.open(searchUrl.searchUrlPrefix + encodeURI(searchText), '_blank');
+        }
+      };
+    }
+    dialog.onCheckOKEnabled = () => (searchText.length !== 0);
+    dialog.onCheckUpdateNeeded = () => true;
     this.setState({openDialog: dialog});
   }
 }

@@ -44,7 +44,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
       }
     }
     return (
-      <StandardDialog onOK={this.props.onOK} onCancel={this.props.onCancel} okEnabled={this.state.okEnabled}>
+      <StandardDialog onOK={this.props.onOK} onCancel={this.props.onCancel} okVisible={this.props.dialog.onOK !== undefined} okEnabled={this.state.okEnabled}>
         <table className={'dialog-contents'}>
           <tbody>
             {rows}
@@ -60,6 +60,9 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
       if (this.state.okEnabled !== okEnabled) {
         this.setState({okEnabled: okEnabled});
       }
+    }
+    if (this.props.dialog.onCheckUpdateNeeded?.()) {
+      this.forceUpdate();
     }
   }
 }
@@ -119,6 +122,14 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
         <tr className={className}>
           <td className={'dialog-cell'} colSpan={2}>
             <Expression expression={this.props.item.info}/>
+          </td>
+        </tr>
+      );
+    } else if (this.props.item instanceof Dialog.ExpressionDialogLinkItem) {
+      return (
+        <tr className={className}>
+          <td className={'dialog-cell'} colSpan={2}>
+            <a href={this.props.item.getURL()} target={'_blank'}>{this.props.item.title}</a>
           </td>
         </tr>
       );

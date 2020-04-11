@@ -6,7 +6,7 @@ import * as FmtDisplay from '../../display/meta';
 import * as Display from '../../display/display';
 import * as Menu from '../../display/menu';
 import * as Dialog from '../../display/dialog';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferenceSearchURLs } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferences } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { GenericUtils } from './utils';
 import { GenericRenderer, RenderedVariable } from './renderer';
@@ -733,7 +733,15 @@ export abstract class GenericEditHandler {
       }
     };
     if (kind === 'references') {
-      markdown.searchURLs = defaultReferenceSearchURLs;
+      markdown.searchURLs = [];
+      for (let defaultReference of defaultReferences) {
+        if (defaultReference.searchUrlPrefix) {
+          markdown.searchURLs.push({
+            title: defaultReference.title,
+            searchUrlPrefix: defaultReference.searchUrlPrefix
+          });
+        }
+      }
       markdown.defaultSearchText = this.definition.name;
     }
   }

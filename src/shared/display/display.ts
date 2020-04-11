@@ -285,9 +285,14 @@ export class RadicalExpression extends RenderedExpression {
   }
 }
 
+export interface MarkdownExpressionSearchURL {
+  title: string;
+  searchUrlPrefix: string;
+}
+
 export class MarkdownExpression extends RenderedExpression {
   onTextChanged?: (newText: string) => void;
-  searchURLs?: string[];
+  searchURLs?: MarkdownExpressionSearchURL[];
   defaultSearchText?: string;
 
   constructor(public text: string) {

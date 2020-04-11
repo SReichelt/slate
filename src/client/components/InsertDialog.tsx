@@ -57,7 +57,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       </tr>
     );
     return (
-      <StandardDialog onOK={this.onOK} onCancel={this.props.onCancel} okEnabled={this.state.okEnabled}>
+      <StandardDialog onOK={this.onOK} onCancel={this.props.onCancel} okVisible={true} okEnabled={this.state.okEnabled}>
         <table className={'dialog-contents'}>
           <tbody>
             {nameRow}
