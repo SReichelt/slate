@@ -123,90 +123,27 @@ function StartPage(props: StartPageProps) {
       <div className="examples">
         {exampleContents}
       </div>
-      <h2>Background</h2>
-      <p>
-        Slate is a web-based successor to the <a href="http://hlm.sourceforge.net/">HLM</a> project.
-        The basic idea of HLM was that the user never needs to edit the source code of formalized content, but always works with nicely rendered expressions instead.
-      </p>
-      <p>
-        Using modern web technologies, Slate functions as both a website and an application.
-        One can think of it as a wiki-like collaboration tool for formalized mathematics.
-        Indeed, the primary goal is to build a large library of definitions and theorems that follow mathematical practice as closely as possible – but still have clearly defined formal semantics, making them suitable for formal verification.
-      </p>
       <h2>Current Status</h2>
       <p>
-        Slate is not yet ready to be used for any practical purpose.
-        To explore and demonstrate the editing capabilities, we have added the ability to modify non-mathematical content, including the display specifications of definitions (but user-friendliness is still to be improved).
-        Other than that, you can browse the library by clicking on sub-expressions, and view the source code of a definition or theorem by clicking on the button in the lower-right corner.
-        Hover over an expression to see the connection between the source code and the rendered version:
+        In this web GUI, it is currently possible to create simple definitions and theorems. Proof input will follow soon.
       </p>
       <p>
-        <img src="/docs/screenshots/source-code.png" width="657" height="357" alt="Screenshot of source code display"/>
-      </p>
-      <p>
-        Editing definitions and theorem statements is planned as the next step, but will take some time.
-        Meanwhile, here is a screenshot of the original desktop version:
-      </p>
-      <p>
-        <img src="/docs/screenshots/desktop/input-formula.png" width="403pt" height="210pt" alt="Screenshot of formula input in desktop version"/>
+        The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
       </p>
       <h2>Foundations</h2>
       <p>
-        In contrast to the desktop version, Slate is not tied to any particular logic.
-        We continue using the name "HLM" for the specialized logic that is implemented in Slate, but other logics can be implemented side-by-side.
-        This means that other theorem provers can potentially be integrated into Slate, reusing its rendering and editing mechanisms.
+        Slate, as an application, is built to support different logics. However, the rendering and editing concepts of Slate works particularly well for a logic that is close to mathematical practice. Therefore, only one logic (called "HLM") is currently implemented.
       </p>
       <p>
         HLM is classical and set-theoretic, and can be described as either a <a href="https://ncatlab.org/nlab/show/structural+set+theory">structural set theory</a>, or a <a href="https://en.wikipedia.org/wiki/Type_theory">type theory</a> where all references to types are made implicitly.
         It is not based on any familiar axiomatization, and avoids some of the limitations of Zermelo-Fraenkel and other set theories.
       </p>
-      <h2>Visual Studio Code Extension</h2>
       <p>
-        Although the web interface is intended to be sufficient for most users, we have additionally developed a language extension for Microsoft <a href="https://code.visualstudio.com/">Visual Studio Code</a>.
-        All applicable language features are supported. In addition, expressions are rendered (as text) according to their display specifications, both in tooltips and inline as code lenses:
-      </p>
-      <p>
-        <img src="/docs/screenshots/vscode.png" width="529pt" height="292pt" alt="Screenshot of Visual Studio Code extension"/>
-      </p>
-      <p>
-        We have not made the extension available via official channels yet, but it is included in the <a href="http://github.com/sreichelt/slate/">GitHub repository</a>.
+        Existing theorem provers can potentially be integrated into Slate, reusing its rendering and editing mechanisms.
       </p>
       <h2>Third-Party Software</h2>
       <p>
-        Slate builds upon the following third-party software packages.
-      </p>
-      <p>Generic:</p>
-      <ul>
-        <li><a href="https://nodejs.org/">Node.js</a></li>
-        <li><a href="https://www.typescriptlang.org/">TypeScript</a></li>
-        <li><a href="https://github.com/gilamran/fullstack-typescript">fullstack-typescript</a> template</li>
-        <li><a href="https://github.com/indutny/bn.js">bn.js</a></li>
-        <li><a href="https://github.com/kemitchell/markdown-escape.js">markdown-escape</a></li>
-      </ul>
-      <p>Frontend:</p>
-      <ul>
-        <li><a href="https://reactjs.org/">React</a></li>
-        <li><a href="https://github.com/tomkp/react-split-pane">react-split-pane</a></li>
-        <li><a href="https://github.com/schiehll/react-alert">react-alert</a></li>
-        <li><a href="https://github.com/nathanhoad/react-loading-animation">react-loading-animation</a></li>
-        <li><a href="https://github.com/romainberger/react-portal-tooltip">react-portal-tooltip</a></li>
-        <li><a href="https://github.com/pradel/react-responsive-modal">react-responsive-modal</a></li>
-        <li><a href="https://github.com/InsidersByte/react-markdown-renderer">react-markdown-renderer</a></li>
-        <li><a href="https://www.npmjs.com/package/react-simplemde-editor">react-simplemde-editor</a></li>
-        <li><a href="https://www.mathjax.org/">MathJax</a> (currently just the font, not the rendering engine)</li>
-      </ul>
-      <p>Backend:</p>
-      <ul>
-        <li><a href="https://expressjs.com/">Express</a></li>
-        <li><a href="https://github.com/chimurai/http-proxy-middleware">http-proxy-middleware</a></li>
-        <li><a href="https://nodemailer.com/">Nodemailer</a></li>
-      </ul>
-      <p>
-        For the full list, see <a href="https://github.com/SReichelt/slate/blob/master/package.json">package.json</a>.
-      </p>
-      <p>
-        Slate itself is licensed under the <a href="https://github.com/SReichelt/slate/blob/master/LICENSE">MIT license</a>.
-        To review the licensing terms of third-party components, please consult their respective documentation.
+        For a list of third-party software used in Slate, see <a href="docs/dependencies.html" target="_blank">here</a>.
       </p>
       <h2>Contact</h2>
       <p>
