@@ -805,7 +805,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               name: 'search',
               action: onSearch,
               className: 'fa fa-search',
-              title: 'Search Default References (requires disabling popup blockers)'
+              title: 'Search Default References'
             };
             toolbar.push('|', searchButton);
             key = 'markdown-editor-with-search';
@@ -1496,15 +1496,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     searchTextItem.onGetValue = () => searchTextExpression;
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [searchTextItem];
-    if (config.embedded) {
-      dialog.items.push(new Dialog.ExpressionDialogSeparatorItem);
-      for (let searchUrl of searchURLs) {
-        let linkItem = new Dialog.ExpressionDialogLinkItem;
-        linkItem.title = searchUrl.title;
-        linkItem.getURL = () => (searchUrl.searchUrlPrefix + encodeURI(searchText));
-        dialog.items.push(linkItem);
-      }
-    } else {
+    dialog.items.push(new Dialog.ExpressionDialogSeparatorItem);
+    for (let searchUrl of searchURLs) {
+      let linkItem = new Dialog.ExpressionDialogLinkItem;
+      linkItem.title = searchUrl.title;
+      linkItem.getURL = () => (searchUrl.searchUrlPrefix + encodeURI(searchText));
+      dialog.items.push(linkItem);
+    }
+    if (!config.embedded) {
       dialog.onOK = () => {
         for (let searchUrl of searchURLs) {
           window.open(searchUrl.searchUrlPrefix + encodeURI(searchText), '_blank');
