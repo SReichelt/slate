@@ -4483,213 +4483,6 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
   }
 }
 
-export class ObjectContents_Case extends Fmt.ObjectContents {
-  formula: Fmt.Expression;
-  value: Fmt.Expression;
-  exclusivityProof?: ObjectContents_Proof;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.formula = argumentList.getValue('formula', 0);
-    this.value = argumentList.getValue('value', 1);
-    let exclusivityProofRaw = argumentList.getOptionalValue('exclusivityProof', 2);
-    if (exclusivityProofRaw !== undefined) {
-      if (exclusivityProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(exclusivityProofRaw);
-        this.exclusivityProof = newItem;
-      } else {
-        throw new Error('exclusivityProof: Compound expression expected');
-      }
-    }
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    argumentList.length = 0;
-    argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
-    argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
-    if (this.exclusivityProof !== undefined) {
-      let exclusivityProofExpr = new Fmt.CompoundExpression;
-      this.exclusivityProof.toCompoundExpression(exclusivityProofExpr, true);
-      argumentList.add(exclusivityProofExpr, 'exclusivityProof', true);
-    }
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
-    let result = new ObjectContents_Case;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
-        changed = true;
-      }
-    }
-    if (this.value) {
-      result.value = this.value.substitute(fn, replacedParameters);
-      if (result.value !== this.value) {
-        changed = true;
-      }
-    }
-    if (this.exclusivityProof) {
-      result.exclusivityProof = new ObjectContents_Proof;
-      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    return changed;
-  }
-
-  isEquivalentTo(objectContents: ObjectContents_Case, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    if (this === objectContents && !replacedParameters.length) {
-      return true;
-    }
-    if (this.formula || objectContents.formula) {
-      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.value || objectContents.value) {
-      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.exclusivityProof || objectContents.exclusivityProof) {
-      if (!this.exclusivityProof || !objectContents.exclusivityProof || !this.exclusivityProof.isEquivalentTo(objectContents.exclusivityProof, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
-export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
-  _constructor: Fmt.Expression;
-  parameters?: Fmt.ParameterList;
-  value: Fmt.Expression;
-  rewrite?: Fmt.Expression;
-  wellDefinednessProof?: ObjectContents_Proof;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this._constructor = argumentList.getValue('constructor', 0);
-    let parametersRaw = argumentList.getOptionalValue('parameters', 1);
-    if (parametersRaw !== undefined) {
-      if (parametersRaw instanceof Fmt.ParameterExpression) {
-        this.parameters = parametersRaw.parameters;
-      } else {
-        throw new Error('parameters: Parameter expression expected');
-      }
-    }
-    this.value = argumentList.getValue('value', 2);
-    this.rewrite = argumentList.getOptionalValue('rewrite', 3);
-    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 4);
-    if (wellDefinednessProofRaw !== undefined) {
-      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(wellDefinednessProofRaw);
-        this.wellDefinednessProof = newItem;
-      } else {
-        throw new Error('wellDefinednessProof: Compound expression expected');
-      }
-    }
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    argumentList.length = 0;
-    argumentList.add(this._constructor, outputAllNames ? 'constructor' : undefined, false);
-    if (this.parameters !== undefined) {
-      let parametersExpr = new Fmt.ParameterExpression;
-      parametersExpr.parameters.push(...this.parameters);
-      argumentList.add(parametersExpr, 'parameters', true);
-    }
-    argumentList.add(this.value, 'value', false);
-    if (this.rewrite !== undefined) {
-      argumentList.add(this.rewrite, 'rewrite', true);
-    }
-    if (this.wellDefinednessProof !== undefined) {
-      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
-      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true);
-      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
-    }
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
-    let result = new ObjectContents_StructuralCase;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    if (this._constructor) {
-      result._constructor = this._constructor.substitute(fn, replacedParameters);
-      if (result._constructor !== this._constructor) {
-        changed = true;
-      }
-    }
-    if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    if (this.value) {
-      result.value = this.value.substitute(fn, replacedParameters);
-      if (result.value !== this.value) {
-        changed = true;
-      }
-    }
-    if (this.rewrite) {
-      result.rewrite = this.rewrite.substitute(fn, replacedParameters);
-      if (result.rewrite !== this.rewrite) {
-        changed = true;
-      }
-    }
-    if (this.wellDefinednessProof) {
-      result.wellDefinednessProof = new ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    return changed;
-  }
-
-  isEquivalentTo(objectContents: ObjectContents_StructuralCase, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    if (this === objectContents && !replacedParameters.length) {
-      return true;
-    }
-    if (this._constructor || objectContents._constructor) {
-      if (!this._constructor || !objectContents._constructor || !this._constructor.isEquivalentTo(objectContents._constructor, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.parameters || objectContents.parameters) {
-      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.value || objectContents.value) {
-      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.rewrite || objectContents.rewrite) {
-      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
-      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
 export class ObjectContents_Proof extends Fmt.ObjectContents {
   _from?: Fmt.BN;
   _to?: Fmt.BN;
@@ -6050,6 +5843,213 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
   }
 }
 
+export class ObjectContents_Case extends Fmt.ObjectContents {
+  formula: Fmt.Expression;
+  value: Fmt.Expression;
+  exclusivityProof?: ObjectContents_Proof;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.formula = argumentList.getValue('formula', 0);
+    this.value = argumentList.getValue('value', 1);
+    let exclusivityProofRaw = argumentList.getOptionalValue('exclusivityProof', 2);
+    if (exclusivityProofRaw !== undefined) {
+      if (exclusivityProofRaw instanceof Fmt.CompoundExpression) {
+        let newItem = new ObjectContents_Proof;
+        newItem.fromCompoundExpression(exclusivityProofRaw);
+        this.exclusivityProof = newItem;
+      } else {
+        throw new Error('exclusivityProof: Compound expression expected');
+      }
+    }
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
+    argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
+    if (this.exclusivityProof !== undefined) {
+      let exclusivityProofExpr = new Fmt.CompoundExpression;
+      this.exclusivityProof.toCompoundExpression(exclusivityProofExpr, true);
+      argumentList.add(exclusivityProofExpr, 'exclusivityProof', true);
+    }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
+    let result = new ObjectContents_Case;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.formula) {
+      result.formula = this.formula.substitute(fn, replacedParameters);
+      if (result.formula !== this.formula) {
+        changed = true;
+      }
+    }
+    if (this.value) {
+      result.value = this.value.substitute(fn, replacedParameters);
+      if (result.value !== this.value) {
+        changed = true;
+      }
+    }
+    if (this.exclusivityProof) {
+      result.exclusivityProof = new ObjectContents_Proof;
+      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_Case, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.formula || objectContents.formula) {
+      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.value || objectContents.value) {
+      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.exclusivityProof || objectContents.exclusivityProof) {
+      if (!this.exclusivityProof || !objectContents.exclusivityProof || !this.exclusivityProof.isEquivalentTo(objectContents.exclusivityProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
+  _constructor: Fmt.Expression;
+  parameters?: Fmt.ParameterList;
+  value: Fmt.Expression;
+  rewrite?: Fmt.Expression;
+  wellDefinednessProof?: ObjectContents_Proof;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this._constructor = argumentList.getValue('constructor', 0);
+    let parametersRaw = argumentList.getOptionalValue('parameters', 1);
+    if (parametersRaw !== undefined) {
+      if (parametersRaw instanceof Fmt.ParameterExpression) {
+        this.parameters = parametersRaw.parameters;
+      } else {
+        throw new Error('parameters: Parameter expression expected');
+      }
+    }
+    this.value = argumentList.getValue('value', 2);
+    this.rewrite = argumentList.getOptionalValue('rewrite', 3);
+    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 4);
+    if (wellDefinednessProofRaw !== undefined) {
+      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
+        let newItem = new ObjectContents_Proof;
+        newItem.fromCompoundExpression(wellDefinednessProofRaw);
+        this.wellDefinednessProof = newItem;
+      } else {
+        throw new Error('wellDefinednessProof: Compound expression expected');
+      }
+    }
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    argumentList.add(this._constructor, outputAllNames ? 'constructor' : undefined, false);
+    if (this.parameters !== undefined) {
+      let parametersExpr = new Fmt.ParameterExpression;
+      parametersExpr.parameters.push(...this.parameters);
+      argumentList.add(parametersExpr, 'parameters', true);
+    }
+    argumentList.add(this.value, 'value', false);
+    if (this.rewrite !== undefined) {
+      argumentList.add(this.rewrite, 'rewrite', true);
+    }
+    if (this.wellDefinednessProof !== undefined) {
+      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
+      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true);
+      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
+    }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
+    let result = new ObjectContents_StructuralCase;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this._constructor) {
+      result._constructor = this._constructor.substitute(fn, replacedParameters);
+      if (result._constructor !== this._constructor) {
+        changed = true;
+      }
+    }
+    if (this.parameters) {
+      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.value) {
+      result.value = this.value.substitute(fn, replacedParameters);
+      if (result.value !== this.value) {
+        changed = true;
+      }
+    }
+    if (this.rewrite) {
+      result.rewrite = this.rewrite.substitute(fn, replacedParameters);
+      if (result.rewrite !== this.rewrite) {
+        changed = true;
+      }
+    }
+    if (this.wellDefinednessProof) {
+      result.wellDefinednessProof = new ObjectContents_Proof;
+      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_StructuralCase, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this._constructor || objectContents._constructor) {
+      if (!this._constructor || !objectContents._constructor || !this._constructor.isEquivalentTo(objectContents._constructor, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.parameters || objectContents.parameters) {
+      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.value || objectContents.value) {
+      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.rewrite || objectContents.rewrite) {
+      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
+      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 class DefinitionContentsContext extends Ctx.DerivedContext {
   constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {
     super(parentContext);
@@ -6352,6 +6352,20 @@ export class MetaModel extends Meta.MetaModel {
               }
             }
           }
+          if (currentContext.objectContentsClass === ObjectContents_Proof) {
+            if (argument.name === 'goal' || (argument.name === undefined && argumentIndex === 3)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'steps' || (argument.name === undefined && argumentIndex === 4)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+          }
           if (currentContext.objectContentsClass === ObjectContents_Case) {
             if (argument.name === 'exclusivityProof' || (argument.name === undefined && argumentIndex === 2)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
@@ -6366,20 +6380,6 @@ export class MetaModel extends Meta.MetaModel {
             }
             if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 4)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
-            }
-          }
-          if (currentContext.objectContentsClass === ObjectContents_Proof) {
-            if (argument.name === 'goal' || (argument.name === undefined && argumentIndex === 3)) {
-              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
-              if (parametersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(parametersValue.parameters, context);
-              }
-            }
-            if (argument.name === 'steps' || (argument.name === undefined && argumentIndex === 4)) {
-              let parametersValue = previousArguments.getOptionalValue('parameters', 2);
-              if (parametersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(parametersValue.parameters, context);
-              }
             }
           }
           break;

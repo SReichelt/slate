@@ -15,6 +15,8 @@ $hlm: %MetaModel {
   lookup = %Any
 }
 
+/* Definition types with children */
+
 $Definition: %DefinitionType {
   members = #(
     properties: %ArgumentList = {},
@@ -127,8 +129,7 @@ $Predicate: %DefinitionType($Formula) {
   )
 }
 
-$Theorem: %DefinitionType {
-}
+$Theorem: %DefinitionType {}
 
 $StandardTheorem: %DefinitionType {
   superType = $Theorem,
@@ -146,9 +147,13 @@ $EquivalenceTheorem: %DefinitionType {
   )
 }
 
+/* Expression types */
+
 $Formula: %ExpressionType {}
 $SetTerm: %ExpressionType {}
 $ElementTerm: %ExpressionType {}
+
+/* Internal data types */
 
 $Bool: %ExpressionType {}
 $true: $Bool {}
@@ -160,6 +165,8 @@ $Expr: %ExpressionType {}
 
 $ParameterList: %ExpressionType {}
 $DefinitionRef: %ExpressionType {}
+
+/* Parameter types */
 
 $Prop(auto: $Bool = $false): %ParameterType($Formula) {
   argumentType = $PropArg
@@ -187,6 +194,8 @@ $SetDef(set: $SetTerm): %ParameterType($SetTerm) {
 $Def(element: $ElementTerm): %ParameterType($ElementTerm) {
   optional = %true
 }
+
+/* Argument types */
 
 $PropArg: %ExpressionType {
   members = #(
@@ -222,6 +231,8 @@ $BindingArg: %ExpressionType {
   )
 }
 
+/* Functions */
+
 $empty: %Any {}
 $previous: %Any {}
 
@@ -249,23 +260,7 @@ $setEquals(terms...: $SetTerm): $Formula {}
 $equals(terms...: $ElementTerm): $Formula {}
 $structural(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Formula)[]): $Formula {}
 
-$Case(type: %Type): %ExpressionType {
-  members = #(
-    formula: $Formula,
-    value: type,
-    exclusivityProof?: $Proof
-  )
-}
-
-$StructuralCase(type: %Type): %ExpressionType {
-  members = #(
-    constructor: $Constructor,
-    parameters: %ParameterList = #(),
-    value[parameters]: type,
-    rewrite: $Bool = $false,
-    wellDefinednessProof?: $Proof
-  )
-}
+/* Proofs */
 
 $Proof: %ExpressionType {
   members = #(
@@ -337,4 +332,24 @@ $ProveCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
 }
 $ProveByInduction(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Proof)[]): %ParameterType {
   superType = $FinalProofStep
+}
+
+/* Auxiliary types for functions and proofs */
+
+$Case(type: %Type): %ExpressionType {
+  members = #(
+    formula: $Formula,
+    value: type,
+    exclusivityProof?: $Proof
+  )
+}
+
+$StructuralCase(type: %Type): %ExpressionType {
+  members = #(
+    constructor: $Constructor,
+    parameters: %ParameterList = #(),
+    value[parameters]: type,
+    rewrite: $Bool = $false,
+    wellDefinednessProof?: $Proof
+  )
 }
