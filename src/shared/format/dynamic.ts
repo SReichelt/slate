@@ -3,11 +3,13 @@ import * as Ctx from './context';
 import * as Meta from './metaModel';
 import * as FmtMeta from './meta';
 
+export type ObjectContentsCallbackFn = (expression: Fmt.CompoundExpression, objectContents: DynamicObjectContents) => void;
+export type MemberCallbackFn = (member: Fmt.Parameter, value: Fmt.Expression) => void;
+
 export class DynamicMetaModel extends Meta.MetaModel {
   fileName: string;
   definitions: Fmt.DefinitionList;
   private getReferencedMetaModel: Meta.MetaModelGetter;
-  objectContentsMap: Map<Fmt.ArgumentList, DynamicObjectContents>;
 
   constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Meta.MetaModelGetter) {
     let definitions = file.definitions;
@@ -20,7 +22,6 @@ export class DynamicMetaModel extends Meta.MetaModel {
     this.fileName = fileName;
     this.definitions = definitions;
     this.getReferencedMetaModel = getReferencedMetaModel;
-    this.objectContentsMap = new Map<Fmt.ArgumentList, DynamicObjectContents>();
     definitionTypes.metaModel = this;
     expressionTypes.metaModel = this;
     functions.metaModel = this;
@@ -274,7 +275,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
     return {result: result, memberCount: parentMemberCount};
   }
 
-  private checkValueImpl(type: Fmt.Expression, arrayDimensions: number, value: Fmt.Expression): void {
+  private checkValueImpl(type: Fmt.Expression, arrayDimensions: number, value: Fmt.Expression, onObjectContentsCreated?: ObjectContentsCallbackFn, onMemberFound?: MemberCallbackFn): void {
     if (arrayDimensions) {
       if (!(value instanceof Fmt.ArrayExpression)) {
         throw new Error('Array expression expected');
@@ -313,14 +314,15 @@ export class DynamicMetaModel extends Meta.MetaModel {
         if (!(value instanceof Fmt.CompoundExpression)) {
           throw new Error('Compound expression expected');
         }
-        let objectContents = new DynamicObjectContents(this, metaDefinition, false);
+        let objectContents = new DynamicObjectContents(this, metaDefinition, false, onMemberFound);
+        onObjectContentsCreated?.(value, objectContents);
         objectContents.fromCompoundExpression(value);
       }
     }
   }
 
-  checkValue(type: Fmt.Type, value: Fmt.Expression): void {
-    this.checkValueImpl(type.expression, type.arrayDimensions, value);
+  checkValue(type: Fmt.Type, value: Fmt.Expression, onObjectContentsCreated?: ObjectContentsCallbackFn, onMemberFound?: MemberCallbackFn): void {
+    this.checkValueImpl(type.expression, type.arrayDimensions, value, onObjectContentsCreated, onMemberFound);
   }
 }
 
@@ -439,13 +441,12 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
 export class DynamicObjectContents extends Fmt.GenericObjectContents {
   originalArguments?: Fmt.ArgumentList;
 
-  constructor(public metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition, private isDefinition: boolean) {
+  constructor(public metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition, private isDefinition: boolean, private onMemberFound?: MemberCallbackFn) {
     super();
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.originalArguments = argumentList;
-    this.metaModel.objectContentsMap.set(argumentList, this);
     this.checkMembers(argumentList, this.metaDefinition);
     let foundMembers = new Set<Fmt.Parameter>();
     let argIndex = 0;
@@ -494,6 +495,7 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
           }
           if (value) {
             this.metaModel.checkValue(member.type, value);
+            this.onMemberFound?.(member, value);
             this.arguments.add(value, memberName);
           }
           memberIndex++;

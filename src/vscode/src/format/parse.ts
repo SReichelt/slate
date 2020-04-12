@@ -8,7 +8,7 @@ import * as FmtMeta from '../../../shared/format/meta';
 import * as FmtReader from '../../../shared/format/read';
 import { getFileNameFromPath } from '../../../fs/format/dynamic';
 import { RangeInfo, convertRange, convertRangeInfo } from '../utils';
-import { ParsedDocument } from './parsedDocument';
+import { ParsedDocument, NestedArgumentListInfo } from './parsedDocument';
 import { readRange, readRangeRaw } from './utils';
 import { checkReferencedDefinitions } from './checkReferencedDefinitions';
 
@@ -50,10 +50,14 @@ class ErrorHandler implements FmtReader.ErrorHandler {
 
 type ParseFilePreCheckFn = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) => boolean;
 
-export function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument, preCheck?: ParseFilePreCheckFn): ParsedDocument | undefined {
-    let cachedDocument = parsedFileCache.get(uri.fsPath);
-    if (cachedDocument) {
-        return cachedDocument;
+export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fileContents?: string, diagnostics?: vscode.Diagnostic[], sourceDocument?: vscode.TextDocument, preCheck?: ParseFilePreCheckFn): ParsedDocument | undefined {
+    if (!diagnostics) {
+        let cachedDocument = parsedFileCache.get(uri.fsPath);
+        if (cachedDocument) {
+            if (!needExtendedInfo || (cachedDocument.objectContentsMap && cachedDocument.nestedArgumentListsMap)) {
+                return cachedDocument;
+            }
+        }
     }
     if (!fileContents) {
         fileContents = readRange(uri, undefined, false, sourceDocument) || '';
@@ -64,7 +68,9 @@ export function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: 
         hasBrokenReferences: false,
         rangeList: [],
         rangeMap: new Map<Object, RangeInfo>(),
-        metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>()
+        metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>(),
+        objectContentsMap: needExtendedInfo ? new Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>() : undefined,
+        nestedArgumentListsMap: needExtendedInfo ? new Map<Fmt.ArgumentList, NestedArgumentListInfo>() : undefined
     };
     let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
@@ -132,7 +138,7 @@ export function parseFile(uri: vscode.Uri, fileContents?: string, diagnostics?: 
     let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
     try {
         parsedDocument.file = reader.readFile();
-        if (diagnostics) {
+        if (diagnostics || needExtendedInfo) {
             checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
         }
     } catch (error) {

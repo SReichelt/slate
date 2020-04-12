@@ -170,7 +170,7 @@ export class SlateRenameProvider implements vscode.RenameProvider {
                 isDefinitionReferenceToUri(parsedDocument, rangeInfo.object, rangeInfo.context, checkUri);
             for (let oldOriginUri of originUris) {
                 let newOriginUri = getNewUri(renamedUris, oldOriginUri);
-                let parsedDocument = parseFile(oldOriginUri, undefined, undefined, undefined, newOriginUri ? undefined : preCheck);
+                let parsedDocument = parseFile(oldOriginUri, true, undefined, undefined, undefined, newOriginUri ? undefined : preCheck);
                 if (parsedDocument) {
                     let mainDefinition = parsedDocument.file && parsedDocument.file.definitions.length ? parsedDocument.file.definitions[0] : undefined;
                     for (let rangeInfo of parsedDocument.rangeList) {

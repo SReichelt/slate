@@ -14,6 +14,13 @@ export interface ParsedDocument {
     rangeMap: Map<Object, RangeInfo>;
     metaModelDocument?: ParsedDocument;
     metaModelDocuments?: Map<FmtDynamic.DynamicMetaModel, ParsedDocument>;
+    objectContentsMap?: Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>;
+    nestedArgumentListsMap?: Map<Fmt.ArgumentList, NestedArgumentListInfo>;
+}
+
+export interface NestedArgumentListInfo {
+    targetDocument: ParsedDocument;
+    parameterExpression: Fmt.ParameterExpression;
 }
 
 export type ParsedDocumentMap = Map<vscode.TextDocument, ParsedDocument>;

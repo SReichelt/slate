@@ -31,7 +31,7 @@ function emitParseEvent(document: vscode.TextDocument, parsedDocument: ParsedDoc
 function parseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter?: vscode.EventEmitter<ParseDocumentEvent>): ParsedDocument | undefined {
     if (document.languageId === languageId) {
         let diagnostics: vscode.Diagnostic[] = [];
-        let parsedDocument = parseFile(document.uri, document.getText(), diagnostics, document);
+        let parsedDocument = parseFile(document.uri, true, document.getText(), diagnostics, document);
         diagnosticCollection.set(document.uri, diagnostics);
         if (parsedDocument) {
             parsedDocuments.set(document, parsedDocument);

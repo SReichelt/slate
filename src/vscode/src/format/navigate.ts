@@ -115,7 +115,7 @@ function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object
                         }
                         return undefined;
                     }
-                    let referencedDocument = parseFile(uri, undefined, undefined, sourceDocument);
+                    let referencedDocument = parseFile(uri, false, undefined, undefined, sourceDocument);
                     if (referencedDocument && referencedDocument.file) {
                         let definition = findDefinitionInFile(referencedDocument.file, object, true);
                         if (definition) {
@@ -145,12 +145,10 @@ export function isDefinitionReferenceToUri(parsedDocument: ParsedDocument, objec
 function findObjectContents(parsedDocument: ParsedDocument, object: Object, sourceDocument?: vscode.TextDocument): FmtDynamic.DynamicObjectContents | undefined {
     if (object instanceof Fmt.Definition && object.contents instanceof FmtDynamic.DynamicObjectContents) {
         return object.contents;
-    } else if (object instanceof Fmt.CompoundExpression && parsedDocument.metaModelDocuments) {
-        for (let metaModel of parsedDocument.metaModelDocuments.keys()) {
-            let objectContents = metaModel.objectContentsMap.get(object.arguments);
-            if (objectContents) {
-                return objectContents;
-            }
+    } else if (object instanceof Fmt.CompoundExpression) {
+        let objectContents = parsedDocument.objectContentsMap?.get(object);
+        if (objectContents) {
+            return objectContents;
         }
     }
     return undefined;
@@ -187,6 +185,22 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
                 parameters: referencedDefinition.definition.parameters,
                 arguments: referencedDefinition.arguments
             };
+        }
+    }
+    if (rangeInfo.object instanceof Fmt.CompoundExpression) {
+        let nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(rangeInfo.object.arguments);
+        if (nestedArgumentListInfo) {
+            let parameterListRangeInfo = nestedArgumentListInfo.targetDocument.rangeMap.get(nestedArgumentListInfo.parameterExpression);
+            if (parameterListRangeInfo) {
+                let signatureCode = readSignatureCode ? readRange(nestedArgumentListInfo.targetDocument.uri, parameterListRangeInfo.range, true, sourceDocument) : undefined;
+                return {
+                    signatureCode: signatureCode,
+                    parsedDocument: nestedArgumentListInfo.targetDocument,
+                    isMetaModel: false,
+                    parameters: nestedArgumentListInfo.parameterExpression.parameters,
+                    arguments: rangeInfo.object.arguments
+                };
+            }
         }
     }
     if (parsedDocument.metaModelDocuments) {

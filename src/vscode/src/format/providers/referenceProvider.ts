@@ -20,7 +20,7 @@ export function findReferences(nameDefinitionLocation: DefinitionLink, returnNam
                 if (token.isCancellationRequested) {
                     break;
                 }
-                let parsedDocument = parseFile(originUri, undefined, undefined, sourceDocument, preCheck);
+                let parsedDocument = parseFile(originUri, true, undefined, undefined, sourceDocument, preCheck);
                 if (parsedDocument) {
                     for (let rangeInfo of parsedDocument.rangeList) {
                         if (token.isCancellationRequested) {
