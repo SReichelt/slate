@@ -103,7 +103,7 @@ class LibraryItem extends LibraryItemBase {
         renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
       }
     }
-  }
+  };
 }
 
 export default LibraryItem;

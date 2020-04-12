@@ -827,9 +827,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           components: {
             code: (props: any) => {
               if (this.props.interactionHandler && typeof props.content === 'string') {
-                let result = this.props.interactionHandler.renderCode(props.content);
-                if (result !== undefined) {
-                  return result;
+                let renderedCode = this.props.interactionHandler.renderCode(props.content);
+                if (renderedCode !== undefined) {
+                  return renderedCode;
                 }
               }
               return <code>{props.content}</code>;
@@ -1317,7 +1317,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private onHoverChanged = (hover: Object[]): void => {
     let hovered = this.isHovered(hover);
     this.setState((prevState: ExpressionState) => prevState.hovered !== hovered ? {hovered: hovered} : null);
-  }
+  };
 
   private isHovered(hover: Object[]): boolean {
     if (hover.length && this.semanticLinks) {
@@ -1460,7 +1460,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         openDialog: action.onOpen()
       });
     }
-  }
+  };
 
   private onDialogOK = (result: Dialog.DialogResultBase) => {
     this.clearPermanentHighlight();
@@ -1470,12 +1470,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.interactionHandler) {
       this.props.interactionHandler.expressionChanged();
     }
-  }
+  };
 
   private onDialogClosed = () => {
     this.disableInteractionBlocker();
     this.clearPermanentHighlight();
-  }
+  };
 
   private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {
     event.stopPropagation();
@@ -1488,7 +1488,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     searchTextExpression.onTextChanged = (newText: string) => {
       searchText = newText;
       return true;
-    }
+    };
     searchTextExpression.requestTextInput = true;
     searchTextExpression.inputLength = 20;
     let searchTextItem = new Dialog.ExpressionDialogParameterItem;

@@ -64,7 +64,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
     if (this.props.dialog.onCheckUpdateNeeded?.()) {
       this.forceUpdate();
     }
-  }
+  };
 }
 
 interface ExpressionDialogItemProps {
@@ -221,13 +221,13 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     if (this.props.onItemChanged) {
       this.props.onItemChanged();
     }
-  }
+  };
 
   private onExpressionChanged = (editorUpdateRequired: boolean): void => {
     if (editorUpdateRequired) {
       this.onItemChanged();
     }
-  }
+  };
 }
 
 export default ExpressionDialog;

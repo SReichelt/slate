@@ -1,6 +1,5 @@
 // Generated from data/format/meta.slate by generateMetaDeclarations.ts.
-// tslint:disable:class-name
-// tslint:disable:variable-name
+/* eslint @typescript-eslint/class-name-casing: off */
 
 import * as Fmt from './format';
 import * as Ctx from './context';

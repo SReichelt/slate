@@ -606,7 +606,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.insertDialogLibraryDataProvider) {
       let dialog = new Dialog.InsertDialog;
       dialog.definitionType = this.state.insertDialogDefinitionType;
-      dialog.onCheckNameInUse = this.checkNameInUse; 
+      dialog.onCheckNameInUse = this.checkNameInUse;
       openDialog = (
         <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key={'InsertDialog'}/>
       );
@@ -654,13 +654,13 @@ class App extends React.Component<AppProps, AppState> {
       selectedItemDefinition: definitionPromise,
       selectedItemInfo: itemInfo ? CachedPromise.resolve(itemInfo) : undefined
     });
-  }
+  };
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
     let state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider, path);
     this.navigate(state);
-  }
+  };
 
   private navigate(state: SelectionState, notify: boolean = true): void {
     this.setNewInteractionHandler(state);
@@ -711,7 +711,7 @@ class App extends React.Component<AppProps, AppState> {
       let message: Embedding.RequestMessage = {
         command: 'TITLE',
         text: title
-      }
+      };
       config.vsCodeAPI.postMessage(message);
     }
   }
@@ -722,7 +722,7 @@ class App extends React.Component<AppProps, AppState> {
       insertDialogSection: section,
       insertDialogDefinitionType: definitionType
     });
-  }
+  };
 
   private finishInsert = (result: Dialog.InsertDialogResult): void => {
     let libraryDataProvider = this.state.insertDialogLibraryDataProvider;
@@ -770,7 +770,7 @@ class App extends React.Component<AppProps, AppState> {
           });
       }
     }
-  }
+  };
 
   private cancelInsert = (): void => {
     this.setState({
@@ -778,7 +778,7 @@ class App extends React.Component<AppProps, AppState> {
       insertDialogSection: undefined,
       insertDialogDefinitionType: undefined
     });
-  }
+  };
 
   private checkNameInUse = (name: string): boolean => {
     if (this.state.insertDialogSection) {
@@ -793,7 +793,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
     return false;
-  }
+  };
 
   private edit = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
@@ -821,7 +821,7 @@ class App extends React.Component<AppProps, AppState> {
         });
       });
     }
-  }
+  };
 
   private submit = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
@@ -860,7 +860,7 @@ class App extends React.Component<AppProps, AppState> {
         this.forceUpdate();
       }
     }
-  }
+  };
 
   private cancelEditing = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
@@ -893,20 +893,20 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           return {
-            selectedItemDefinition: oldDefinition,
+            selectedItemDefinition: oldDefinition
           };
         });
       }
     }
-  }
+  };
 
   private openLocally = (): void => {
     this.openFile(true);
-  }
+  };
 
   private openRemotely = (): void => {
     this.openFile(false);
-  }
+  };
 
   private openFile(openLocally: boolean): void {
     let libraryDataProvider = this.state.selectedItemProvider;
@@ -931,12 +931,12 @@ class App extends React.Component<AppProps, AppState> {
       let baseURL = protocol + '//' + host + '/';
       location.href = GitHub.getLoginURL(this.state.gitHubClientID, baseURL, location.pathname);
     }
-  }
+  };
 
   private logOutOfGitHub = (): void => {
     this.discardGitHubLogin();
     window.location.reload();
-  }
+  };
 }
 
 export default withAlert()(App);

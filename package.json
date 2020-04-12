@@ -66,6 +66,8 @@
     "@types/remarkable": "^1.7.4",
     "@types/request": "^2.48.4",
     "@types/utf8": "^2.1.6",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "awesome-typescript-loader": "^5.2.1",
     "babel-polyfill": "^6.26.0",
     "concurrently": "^5.1.0",

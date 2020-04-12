@@ -32,7 +32,7 @@ class SourceCodeView extends LibraryItemBase {
       }
     };
     this.timer = setTimeout(update, 500);
-  }
+  };
 }
 
 export default SourceCodeView;

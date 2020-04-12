@@ -341,7 +341,7 @@ export class HLMEditHandler extends GenericEditHandler {
       rows.push(
         this.getConnectiveRow(expressionEditInfo, onRenderFormula, formulaSelection),
         this.getQuantifierRow(expressionEditInfo, onRenderFormula),
-        this.getRelationRow(expressionEditInfo, onRenderFormula),
+        this.getRelationRow(expressionEditInfo, onRenderFormula)
       );
 
       if (formulaSelection.allowCases) {

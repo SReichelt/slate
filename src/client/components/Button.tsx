@@ -25,7 +25,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       pressed: false
     };
   }
-  
+
   componentDidMount(): void {
     this.ready = false;
     setTimeout(() => (this.ready = true), clickDelay);

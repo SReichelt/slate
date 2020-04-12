@@ -27,7 +27,7 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
       menuOpen: false
     };
   }
-  
+
   render(): React.ReactNode {
     let className = 'button menu-button';
     if (this.props.className) {

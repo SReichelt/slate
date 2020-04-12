@@ -35,7 +35,9 @@ interface LibraryTreeState {
 }
 
 class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
-  private treePaneNode: HTMLElement | null;
+  private searchInputNode: HTMLInputElement | null = null;
+  private treePaneNode: HTMLElement | null = null;
+  private focusTimer: any;
   private searchTimer: any;
 
   constructor(props: LibraryTreeProps) {
@@ -46,7 +48,20 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     };
   }
 
+  componentDidMount(): void {
+    // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
+    if (this.searchInputNode) {
+      let focusNode = () => {
+        this.searchInputNode?.focus();
+      };
+      this.focusTimer = setTimeout(focusNode, 100);
+    }
+  }
+
   componentWillUnmount(): void {
+    if (this.focusTimer) {
+      clearTimeout(this.focusTimer);
+    }
     if (this.searchTimer) {
       clearTimeout(this.searchTimer);
       this.searchTimer = undefined;
@@ -58,7 +73,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     return (
       <div className={'tree-container'}>
         <div className={'tree-search-area'}>
-          <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true}/>
+          <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true} ref={(node) => (this.searchInputNode = node)}/>
         </div>
         <div className={'tree-area'}>
           <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
@@ -85,7 +100,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
       clearTimeout(this.searchTimer);
     }
     this.searchTimer = setTimeout(updateSearchWords, 20);
-  }
+  };
 }
 
 export interface LibraryItemListEntry {
@@ -101,7 +116,7 @@ interface LibraryItemListProps extends LibraryTreeProps {
 }
 
 export class LibraryItemList extends React.Component<LibraryItemListProps> {
-  private treePaneNode: HTMLElement | null;
+  private treePaneNode: HTMLElement | null = null;
 
   render(): React.ReactNode {
     return (
@@ -390,7 +405,7 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
         inline: 'nearest'
       });
     }
-  }
+  };
 
   protected getTreeItemContents(icon: React.ReactNode, specialIcon: React.ReactNode, display: React.ReactNode): React.ReactNode {
     let columns: React.ReactNodeArray = [
@@ -808,7 +823,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.libraryDefinitionPromise, this.props.itemInfo);
       }
     }
-  }
+  };
 
   private mouseEntered = (): void => {
     this.hovered = true;
@@ -821,26 +836,26 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
       clearTimeout(this.previewTimer);
     }
     this.previewTimer = setTimeout(show, 250);
-  }
+  };
 
   private mouseLeft = (): void => {
     this.hovered = false;
     this.setState({showPreview: false});
-  }
+  };
 
   private onScroll = () => {
     if (this.state.showPreview) {
       this.refreshTooltip = true;
       this.setState({showPreview: false});
     }
-  }
+  };
 
   private onExpressionChanged = () => {
     if (this.updateTimer) {
       clearTimeout(this.updateTimer);
     }
     this.updateTimer = setTimeout(() => this.forceUpdate(), 200);
-  }
+  };
 
   private checkVisibleSiblings(visibleSiblings: Set<LibraryTreeItem>): void {
     let check = () => {

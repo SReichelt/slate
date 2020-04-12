@@ -1,0 +1,88 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "@typescript-eslint/class-name-casing": "error",
+        "@typescript-eslint/indent": [
+            "off",
+            4
+        ],
+        "@typescript-eslint/interface-name-prefix": "warn",
+        "@typescript-eslint/member-delimiter-style": [
+            "warn",
+            {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": false
+                }
+            }
+        ],
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/quotes": [
+            "warn",
+            "single",
+            {
+                "allowTemplateLiterals": true
+            }
+        ],
+        "@typescript-eslint/semi": [
+            "warn",
+            "always"
+        ],
+        "@typescript-eslint/type-annotation-spacing": "warn",
+        "camelcase": "off",
+        "comma-dangle": "warn",
+        "curly": "warn",
+        "default-case": "off",
+        "dot-notation": "off",
+        "eol-last": "warn",
+        "eqeqeq": [
+            "warn",
+            "smart"
+        ],
+        "guard-for-in": "warn",
+        "id-blacklist": [
+            "warn",
+            "any",
+            "number",
+            "string",
+            "boolean"
+        ],
+        "id-match": "warn",
+        "no-bitwise": "warn",
+        "no-caller": "warn",
+        "no-debugger": "warn",
+        "no-empty": "off",
+        "no-eval": "warn",
+        "no-fallthrough": "warn",
+        "no-new-wrappers": "warn",
+        "no-redeclare": "warn",
+        "no-shadow": [
+            "warn",
+            {
+                "hoist": "all"
+            }
+        ],
+        "no-trailing-spaces": "warn",
+        "no-underscore-dangle": "off",
+        "no-unused-expressions": "off",  // currently conflicts with new TypeScript operators
+        "no-unused-labels": "warn",
+        "radix": "warn"
+    }
+}

@@ -19,6 +19,9 @@ interface InsertDialogState {
 }
 
 class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState> {
+  private nameInputNode: HTMLInputElement | null = null;
+  private focusTimer: any;
+
   constructor(props: InsertDialogProps) {
     super(props);
 
@@ -27,6 +30,22 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       name: '',
       title: ''
     };
+  }
+
+  componentDidMount(): void {
+    // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
+    if (this.nameInputNode) {
+      let focusNode = () => {
+        this.nameInputNode?.focus();
+      };
+      this.focusTimer = setTimeout(focusNode, 100);
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.focusTimer) {
+      clearTimeout(this.focusTimer);
+    }
   }
 
   render(): React.ReactNode {
@@ -51,7 +70,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         <td className={'dialog-cell'}>Name:</td>
         <td className={'dialog-cell'}>
           <ValidationMessage error={this.state.nameError}>
-            <input type={'text'} className={nameClassName} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true}/>
+            <input type={'text'} className={nameClassName} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true} ref={(node) => (this.nameInputNode = node)}/>
           </ValidationMessage>
         </td>
       </tr>
@@ -76,7 +95,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       nameError: nameError,
       okEnabled: !(nameError || this.checkTitle(prevState.title))
     }));
-  }
+  };
 
   private onBlurName = (event: React.ChangeEvent<HTMLInputElement>): void => {
     let newName = event.target.value;
@@ -88,7 +107,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         okEnabled: !(prevState.nameError || titleError)
       }));
     }
-  }
+  };
 
   private onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>): void => {
     let newTitle = event.target.value;
@@ -98,7 +117,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       titleError: titleError,
       okEnabled: !(prevState.nameError || titleError)
     }));
-  }
+  };
 
   private checkName(name: string): Error | undefined {
     if (!name) {
@@ -161,7 +180,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       title: title || undefined
     };
     this.props.onOK(result);
-  }
+  };
 }
 
 export default InsertDialog;

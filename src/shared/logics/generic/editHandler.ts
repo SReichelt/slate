@@ -594,17 +594,17 @@ export abstract class GenericEditHandler {
           }
         }
         if (definition.innerDefinitions.length) {
-          let result = CachedPromise.resolve();
+          let currentResult = CachedPromise.resolve();
           for (let innerDefinition of definition.innerDefinitions) {
             let innerPath = new Fmt.Path;
             innerPath.name = innerDefinition.name;
             innerPath.parentPath = path;
-            result = result.then(() => addAllDefinitions(innerPath, outerDefinition, innerDefinition, rows));
+            currentResult = currentResult.then(() => addAllDefinitions(innerPath, outerDefinition, innerDefinition, rows));
           }
-          return result;
+          return currentResult;
         }
       });
-    }
+    };
     let extendRows = (rows: Menu.ExpressionMenuRow[]) =>
       iterator.next().then((path: Fmt.Path | undefined): Menu.ExpressionMenuRow[] | CachedPromise<Menu.ExpressionMenuRow[]> => {
         if (path) {

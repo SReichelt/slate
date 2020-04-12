@@ -1245,11 +1245,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     if (rows.length === 1) {
       return this.renderTemplate('SingleCase', {
-                                   'case': rows[0],
+                                   'case': rows[0]
                                  });
     } else {
       return this.renderTemplate('Cases', {
-                                   'cases': rows,
+                                   'cases': rows
                                  });
     }
   }
@@ -1718,7 +1718,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           rows.push([this.editHandler.getConstructorInsertButton(definition.innerDefinitions)]);
         }
         let construction = this.renderTemplate('Construction', {
-                                                 'constructors': rows,
+                                                 'constructors': rows
                                                });
         return this.renderTemplate('ConstructionDefinition', {
                                      'left': definitionRef,

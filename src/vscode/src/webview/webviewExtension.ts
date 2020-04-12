@@ -8,7 +8,7 @@ import { languageId } from '../slate';
 import * as Embedding from '../../../shared/data/embedding';
 import { FileAccessor, FileContents, FileWatcher } from '../../../shared/data/fileAccessor';
 
-let workspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
+let currentWorkspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
 let panel: vscode.WebviewPanel | undefined = undefined;
 
 function getBaseURI(workspaceFolder: vscode.WorkspaceFolder): string {
@@ -30,7 +30,7 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
     };
     let postResponse = (text?: string) => postResponseMessage('RESPONSE', text);
     let postError = (message?: string) => postResponseMessage('ERROR', message);
-    let baseURI = getBaseURI(workspaceFolder!);
+    let baseURI = getBaseURI(currentWorkspaceFolder!);
     let fileURI = baseURI + (requestMessage.uri ?? '');
     switch (requestMessage.command) {
     case 'GET':
@@ -100,7 +100,7 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
 function getEditorUri(editor: vscode.TextEditor | undefined): string | undefined {
     if (editor && editor.document.languageId === languageId) {
         let documentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-        if (documentWorkspaceFolder && documentWorkspaceFolder === workspaceFolder) {
+        if (documentWorkspaceFolder && documentWorkspaceFolder === currentWorkspaceFolder) {
             let baseURI = getBaseURI(documentWorkspaceFolder);
             let uri = editor.document.uri.toString();
             if (uri.startsWith(baseURI)) {
@@ -128,11 +128,11 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
     } else {
         let initiallyActiveEditor = vscode.window.activeTextEditor;
         if (initiallyActiveEditor) {
-            workspaceFolder = vscode.workspace.getWorkspaceFolder(initiallyActiveEditor.document.uri);
+            currentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(initiallyActiveEditor.document.uri);
         }
-        if (!workspaceFolder) {
+        if (!currentWorkspaceFolder) {
             if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
-                workspaceFolder = vscode.workspace.workspaceFolders[0];
+                currentWorkspaceFolder = vscode.workspace.workspaceFolders[0];
             } else {
                 return;
             }
