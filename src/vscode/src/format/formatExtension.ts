@@ -173,7 +173,20 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
     );
     if (vscode.workspace.onWillRenameFiles !== undefined) {
         context.subscriptions.push(
-            vscode.workspace.onWillRenameFiles((event) => event.waitUntil(renameProvider.updateFileReferences(event.files)))
+            vscode.workspace.onWillRenameFiles((event) => {
+                if (parseAllTimer) {
+                    if (reparseConditions) {
+                        clearTimeout(parseAllTimer);
+                        reparseConditions = [];
+                    } else {
+                        // The file is probably being renamed as part of a symbol rename operation.
+                        // In that case, we need to avoid updating the references twice, as that causes garbage.
+                        // Unfortunately, there does not seem to be any official way to determine the cause of the rename operation.
+                        return;
+                    }
+                }
+                event.waitUntil(renameProvider.updateFileReferences(event.files));
+            })
         );
     }
     onInitialized(parseEventEmitter.event, hoverEventEmitter.event);

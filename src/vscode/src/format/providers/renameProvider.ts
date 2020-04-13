@@ -165,57 +165,59 @@ export class SlateRenameProvider implements vscode.RenameProvider {
     updateFileReferences(renamedUris: ReadonlyArray<RenamedUri>): Thenable<vscode.WorkspaceEdit> {
         return vscode.workspace.findFiles(`**/*${fileExtension}`).then((originUris: vscode.Uri[]) => {
             let result = new vscode.WorkspaceEdit;
-            let checkUri = (uri: vscode.Uri) => (getNewUri(renamedUris, uri) !== undefined);
-            let preCheck = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) =>
-                isDefinitionReferenceToUri(parsedDocument, rangeInfo.object, rangeInfo.context, checkUri);
-            for (let oldOriginUri of originUris) {
-                let newOriginUri = getNewUri(renamedUris, oldOriginUri);
-                let parsedDocument = parseFile(oldOriginUri, true, undefined, undefined, undefined, newOriginUri ? undefined : preCheck);
-                if (parsedDocument) {
-                    let mainDefinition = parsedDocument.file && parsedDocument.file.definitions.length ? parsedDocument.file.definitions[0] : undefined;
-                    for (let rangeInfo of parsedDocument.rangeList) {
-                        if (mainDefinition && rangeInfo.object === mainDefinition && rangeInfo.nameRange && newOriginUri) {
-                            let context = rangeInfo.context;
-                            if (context && context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
-                                let metaModelDefinition = context.metaModel.definitions[0];
-                                if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-                                    if (metaModelDefinition.contents.lookup instanceof FmtMeta.MetaRefExpression_Any) {
-                                        let changedName = getChangedName(oldOriginUri, newOriginUri);
-                                        if (changedName) {
-                                            let [oldOriginName, newOriginName] = changedName;
-                                            if (mainDefinition.name === oldOriginName) {
-                                                result.replace(oldOriginUri, rangeInfo.nameRange, escapeIdentifier(newOriginName));
+            if (originUris.some((oldOriginUri: vscode.Uri) => (getNewUri(renamedUris, oldOriginUri) !== undefined))) {
+                let checkUri = (uri: vscode.Uri) => (getNewUri(renamedUris, uri) !== undefined);
+                let preCheck = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) =>
+                    isDefinitionReferenceToUri(parsedDocument, rangeInfo.object, rangeInfo.context, checkUri);
+                for (let oldOriginUri of originUris) {
+                    let newOriginUri = getNewUri(renamedUris, oldOriginUri);
+                    let parsedDocument = parseFile(oldOriginUri, true, undefined, undefined, undefined, newOriginUri ? undefined : preCheck);
+                    if (parsedDocument) {
+                        let mainDefinition = parsedDocument.file && parsedDocument.file.definitions.length ? parsedDocument.file.definitions[0] : undefined;
+                        for (let rangeInfo of parsedDocument.rangeList) {
+                            if (mainDefinition && rangeInfo.object === mainDefinition && rangeInfo.nameRange && newOriginUri) {
+                                let context = rangeInfo.context;
+                                if (context && context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
+                                    let metaModelDefinition = context.metaModel.definitions[0];
+                                    if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
+                                        if (metaModelDefinition.contents.lookup instanceof FmtMeta.MetaRefExpression_Any) {
+                                            let changedName = getChangedName(oldOriginUri, newOriginUri);
+                                            if (changedName) {
+                                                let [oldOriginName, newOriginName] = changedName;
+                                                if (mainDefinition.name === oldOriginName) {
+                                                    result.replace(oldOriginUri, rangeInfo.nameRange, escapeIdentifier(newOriginName));
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        if (rangeInfo.object instanceof Fmt.Path && !(rangeInfo.object.parentPath instanceof Fmt.Path) && rangeInfo.linkRange) {
-                            let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, undefined, newOriginUri ? undefined : checkUri);
-                            if (referencedDefinition) {
-                                let oldTargetUri = referencedDefinition.parsedDocument.uri;
-                                let newTargetUri = getNewUri(renamedUris, oldTargetUri);
-                                let oldPath = new Fmt.Path;
-                                oldPath.name = rangeInfo.object.name;
-                                oldPath.parentPath = rangeInfo.object.parentPath?.clone();
-                                let newPath = oldPath.clone() as Fmt.Path;
-                                if (newTargetUri) {
-                                    changePathTarget(newPath, oldOriginUri, oldTargetUri, newTargetUri);
-                                }
-                                if (newOriginUri) {
-                                    changePathOrigin(newPath, oldOriginUri, newOriginUri);
-                                }
-                                if (!newPath.isEquivalentTo(oldPath)) {
-                                    result.replace(oldOriginUri, rangeInfo.linkRange, newPath.toString());
+                            if (rangeInfo.object instanceof Fmt.Path && !(rangeInfo.object.parentPath instanceof Fmt.Path) && rangeInfo.linkRange) {
+                                let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, undefined, newOriginUri ? undefined : checkUri);
+                                if (referencedDefinition) {
+                                    let oldTargetUri = referencedDefinition.parsedDocument.uri;
+                                    let newTargetUri = getNewUri(renamedUris, oldTargetUri);
+                                    let oldPath = new Fmt.Path;
+                                    oldPath.name = rangeInfo.object.name;
+                                    oldPath.parentPath = rangeInfo.object.parentPath?.clone();
+                                    let newPath = oldPath.clone() as Fmt.Path;
+                                    if (newTargetUri) {
+                                        changePathTarget(newPath, oldOriginUri, oldTargetUri, newTargetUri);
+                                    }
+                                    if (newOriginUri) {
+                                        changePathOrigin(newPath, oldOriginUri, newOriginUri);
+                                    }
+                                    if (!newPath.isEquivalentTo(oldPath)) {
+                                        result.replace(oldOriginUri, rangeInfo.linkRange, newPath.toString());
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (result.size && this.onRenaming) {
-                this.onRenaming();
+                if (result.size && this.onRenaming) {
+                    this.onRenaming();
+                }
             }
             return result;
         });

@@ -728,12 +728,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
     let name = editedLibraryDefinition.definition.name;
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
-      throw new Error('Trying to submit definition that is not being edited');
+      return CachedPromise.reject(new Error('Trying to submit definition that is not being edited'));
     }
     if (editedLibraryDefinition.definition.documentation) {
       for (let item of editedLibraryDefinition.definition.documentation.items) {
         if (item.text === defaultReferencesString) {
-          throw new Error('References must be adapted before submitting.');
+          return CachedPromise.reject(new Error('References must be adapted before submitting.'));
         }
       }
     }
@@ -935,7 +935,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     } else {
       return false;
     }
-  }
+  };
 
   pathToURI(path: Fmt.Path): string {
     let parentProvider = this.getProviderForSection(path.parentPath);

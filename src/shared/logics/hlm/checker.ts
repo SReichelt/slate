@@ -477,17 +477,18 @@ export class HLMDefinitionChecker {
         ...context,
         currentRecheckFn: (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => {
           let substituted = this.utils.substituteExpression(expression, originalExpression, substitutedExpression);
+          let restrictions = originalExpression instanceof Fmt.PlaceholderExpression ? context.editData!.restrictions : new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>();
           let recheckContext: HLMCheckerContext = {
             ...context,
             editData: {
-              restrictions: context.editData!.restrictions
+              restrictions: restrictions
             }
-          };  
+          };
           checkFn(substituted, recheckContext);
           let lastSetsToCheckLength = 0;
           let checkRestrictions = () => {
             let setsToCheck: Fmt.Expression[][] = [];
-            for (let [placeholder, restriction] of recheckContext.editData!.restrictions) {
+            for (let [placeholder, restriction] of restrictions) {
               if (!placeholder.isTemporary) {
                 let sets = restriction.compatibleSets.concat(restriction.declaredSets);
                 if (sets.length > 1) {
@@ -627,7 +628,7 @@ export class HLMDefinitionChecker {
 
   private checkLastArgumentList(context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let argumentList = substitutionContext.argumentLists![substitutionContext.argumentLists!.length - 1];
-    let parameterList = substitutionContext.parameterLists![substitutionContext.parameterLists!.length - 1]; 
+    let parameterList = substitutionContext.parameterLists![substitutionContext.parameterLists!.length - 1];
     for (let param of parameterList) {
       this.checkArgument(argumentList, param, context, substitutionContext);
     }
