@@ -391,13 +391,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       return CachedPromise.resolve(editedDefinition);
     }
     let result = this.fullyLoadedDefinitions.get(name);
-    if (!result) {
-      if (!fullContentsRequired) {
-        let preloadedDefinition = this.preloadedDefinitions.get(name);
-        if (preloadedDefinition) {
-          return preloadedDefinition;
-        }
+    if (!fullContentsRequired && !result?.isResolved()) {
+      let preloadedDefinition = this.preloadedDefinitions.get(name);
+      if (preloadedDefinition) {
+        return preloadedDefinition;
       }
+    }
+    if (!result) {
       let uri = this.uri + encodeURI(name) + fileExtension;
       if (this.config.canPreload && !fullContentsRequired) {
         if (isSection) {
