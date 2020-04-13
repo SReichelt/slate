@@ -55,9 +55,9 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
 test('render hlm library', async () => {
   jest.setTimeout(10000);
   let fileAccessor = new PhysicalFileAccessor();
-  let templateFileName = 'data/display/templates.slate';
-  let templateFile = await fileAccessor.readFile(templateFileName);
-  let templates = await FmtReader.readString(templateFile.text, templateFileName, FmtDisplay.getMetaModel);
+  let templateFileReference = fileAccessor.openFile('data/display/templates.slate', false);
+  let templateFileContents = await templateFileReference.read();
+  let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtDisplay.getMetaModel);
   let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', defaultLibraryDataProviderConfig, 'Library');
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });
