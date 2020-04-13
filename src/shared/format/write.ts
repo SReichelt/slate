@@ -28,7 +28,7 @@ interface IndentInfo {
 export class Writer {
   private lineLength = 0;
 
-  constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
+  constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private skipHiddenParameters: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
 
   writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
     this.writeRange(file, false, false, false, false, () => {
@@ -176,6 +176,9 @@ export class Writer {
     }
     let index = 0;
     for (let parameter of parameters) {
+      if (this.skipHiddenParameters && parameter.name.startsWith('_')) {
+        continue;
+      }
       if (index) {
         this.write(',');
         if (!multiLine) {

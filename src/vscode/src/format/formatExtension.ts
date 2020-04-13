@@ -76,7 +76,7 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
                 }
                 if (!reparseCompletely) {
                     let parsedDocument = parsedFileCache.get(fileName);
-                    if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
+                    if (parsedDocument && !parsedDocument.hasSyntaxErrors && !parsedDocument.hasUnfilledPlaceholders) {
                         let diagnostics: vscode.Diagnostic[] = [];
                         checkReferencedDefinitions(parsedDocument, diagnostics, document);
                         diagnosticCollection.set(document.uri, diagnostics);

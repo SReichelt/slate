@@ -9,6 +9,7 @@ export interface ParsedDocument {
     uri: vscode.Uri;
     file?: Fmt.File;
     hasSyntaxErrors: boolean;
+    hasUnfilledPlaceholders: boolean;
     hasBrokenReferences: boolean;
     rangeList: RangeInfo[];
     rangeMap: Map<Object, RangeInfo>;

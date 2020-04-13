@@ -1731,7 +1731,7 @@ exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/Finit
 
   S^∗ :=: {(𝐚)_(S^n) | n ∈ ℕ, 𝐚 is a/an n-tuple on S}
 
-  (𝐚)_(S^m) = (𝐛)_(S^n)  :⇔  m = n and 𝐚 = 𝐛  (m ∈ ℕ, 𝐚 is a/an m-tuple on S, n ∈ ℕ, 𝐛 is a/an n-tuple on S)
+  (𝐚)_(S^m) = (𝐛)_(S^n)  :⇔    m = n and 𝐚 = (b_j)_(j < m) if 𝐛 = (b_k)_(k < n) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<n))  (m ∈ ℕ, 𝐚 is a/an m-tuple on S, n ∈ ℕ, 𝐛 is a/an n-tuple on S)
 
 We write “let 𝒂 be a finite sequence on S” for “let 𝒂 ∈ S^∗.”
 
@@ -1811,7 +1811,7 @@ exports[`render hlm library: 1.5.8 data/libraries/hlm/Essentials/Sequences/Ordin
 
   S^⋆ :=: {(𝐚)_(S^α) | α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S}
 
-  (𝐚)_(S^α) = (𝐛)_(S^β)  :⇔  α = β and 𝐚 = 𝐛  (α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S, β ∈ 𝓞𝓻𝓭, 𝐛 is a/an β-tuple on S)
+  (𝐚)_(S^α) = (𝐛)_(S^β)  :⇔  α = β and 𝐚 = (b_j)_(j < α) if 𝐛 = (b_k)_(k < β) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<β))  (α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S, β ∈ 𝓞𝓻𝓭, 𝐛 is a/an β-tuple on S)
 
 S^∗ ⊆: S^⋆ via
 (𝐚)_(S^n) = (𝐚)_(S^n)
@@ -7574,7 +7574,7 @@ exports[`render hlm library: 2.8.25.7 data/libraries/hlm/Algebra/Rings/Polynomia
   p − q := p + (−q)"
 `;
 
-exports[`render hlm library: 2.8.25.8 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20scalar 1`] = `
+exports[`render hlm library: 2.8.25.8 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20left%20scalar 1`] = `
 "Definition 2.8.25.8.  Let 𝐑 be a ring, X be a variable, a ∈ 𝐑, p ∈ 𝐑[X]. We define
 
   a ⋅ p
@@ -7585,8 +7585,19 @@ by:
   a ⋅ (qX+b) := [(a ⋅ q)X+(a ⋅ b)]  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.9 data/libraries/hlm/Algebra/Rings/Polynomials/product 1`] = `
-"Definition 2.8.25.9.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.9 data/libraries/hlm/Algebra/Rings/Polynomials/product%20with%20right%20scalar 1`] = `
+"Definition 2.8.25.9.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑. We define
+
+  p ⋅ a
+
+by:
+
+  (0)_(𝐑[X]) ⋅ a := (0)_(𝐑[X])
+  (qX+b) ⋅ a := [(q ⋅ a)X+(b ⋅ a)]  (q ∈ 𝐑[X], b ∈ 𝐑 with suitable conditions)"
+`;
+
+exports[`render hlm library: 2.8.25.10 data/libraries/hlm/Algebra/Rings/Polynomials/product 1`] = `
+"Definition 2.8.25.10.  Let 𝐑 be a ring, X be a variable, p, q ∈ 𝐑[X]. We define
 
   p ⋅ q
 
@@ -7596,8 +7607,8 @@ by:
   (rX+a) ⋅ q := [(r ⋅ q)X+0_𝐑] + a ⋅ q  (r ∈ 𝐑[X], a ∈ 𝐑 with suitable conditions)"
 `;
 
-exports[`render hlm library: 2.8.25.10 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
-"Definition 2.8.25.10.  Let 𝐑 be a ring, X be a variable. We define:
+exports[`render hlm library: 2.8.25.11 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
+"Definition 2.8.25.11.  Let 𝐑 be a ring, X be a variable. We define:
 
   𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, 1_𝐑]
 
@@ -7609,8 +7620,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.comm_semiring"
 `;
 
-exports[`render hlm library: 2.8.25.11 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
-"Definition 2.8.25.11.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑 such that ∀ r ∈ 𝐑 : a ⋅ r = r ⋅ a. We define
+exports[`render hlm library: 2.8.25.12 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
+"Definition 2.8.25.12.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X], a ∈ 𝐑 such that ∀ r ∈ 𝐑 : a ⋅ r = r ⋅ a. We define
 
   p(a)
 
@@ -7625,8 +7636,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.eval"
 `;
 
-exports[`render hlm library: 2.8.25.12 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
-"Definition 2.8.25.12.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
+exports[`render hlm library: 2.8.25.13 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
+"Definition 2.8.25.13.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X]. We define
 
   dim(p)
 
@@ -7642,8 +7653,8 @@ This is mostly a helper definition to define the degree (see \`$degree\`). Howev
 It is called “dimension” because for a field \`𝐅\`, the set of polynomials over \`𝐅\` with “dimension” \`d\` form a \`d\`-dimensional vector space over \`𝐅\`."
 `;
 
-exports[`render hlm library: 2.8.25.13 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
-"Definition 2.8.25.13.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X] ∖ {(0)_(𝐑[X])}. We define:
+exports[`render hlm library: 2.8.25.14 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
+"Definition 2.8.25.14.  Let 𝐑 be a ring, X be a variable, p ∈ 𝐑[X] ∖ {(0)_(𝐑[X])}. We define:
 
   deg(p) := dim(p) − 1
 
@@ -7824,9 +7835,9 @@ No proof."
 exports[`render hlm library: 2.8.28.1.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Left%20modules 1`] = `
 "Definition 2.8.28.1.1.  Let 𝐑 be a ring. We define:
 
-  𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : (𝐑) × M → M is an operation such that ⊙ is left-distributive over ⊕ and [∀ a, b ∈ 𝐑, x ∈ M : (a + b) ⊙ x = (a ⊙ x) ⊕ (b ⊙ x)] and [∀ x ∈ M : 0_𝐑 ⊙ x = 0] and [∀ a ∈ 𝐑 : a ⊙ 0 = 0] and [∀ a ∈ 𝐑, x ∈ M : (−a) ⊙ x = a ⊙ ⊖(x) = ⊖(a ⊙ x)] and [∀ a, b ∈ 𝐑, x ∈ M : (a ⋅ b) ⊙ x = a ⊙ (b ⊙ x)] and [∀ x ∈ M : 1_𝐑 ⊙ x = x]}
+  𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙]_𝐑 | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : (𝐑) × M → M is an operation such that ⊙ is left-distributive over ⊕ and [∀ a, b ∈ 𝐑, x ∈ M : (a + b) ⊙ x = (a ⊙ x) ⊕ (b ⊙ x)] and [∀ x ∈ M : 0_𝐑 ⊙ x = 0] and [∀ a ∈ 𝐑 : a ⊙ 0 = 0] and [∀ a ∈ 𝐑, x ∈ M : (−a) ⊙ x = a ⊙ ⊖(x) = ⊖(a ⊙ x)] and [∀ a, b ∈ 𝐑, x ∈ M : (a ⋅ b) ⊙ x = a ⊙ (b ⊙ x)] and [∀ x ∈ M : 1_𝐑 ⊙ x = x]}
 
-  [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : (𝐑) × N → N is an operation with suitable conditions)
+  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : (𝐑) × N → N is an operation with suitable conditions)
 
 We write “let 𝐌 be a left 𝐑-module” for “let 𝐌 ∈ 𝓛𝓜𝓸𝓭(𝐑).”
 
@@ -7846,7 +7857,7 @@ exports[`render hlm library: 2.8.28.1.2 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  ([M, ⊕, 0, ⊖, ⊙]) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
+  ([M, ⊕, 0, ⊖, ⊙]_𝐑) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
 
 We write “let x ∈ 𝐌” for “let x ∈ (𝐌).”
 
@@ -7858,7 +7869,7 @@ This definition retrieves a representative carrier set from a module (which is a
 exports[`render hlm library: 2.8.28.1.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/sum 1`] = `
 "Definition 2.8.28.1.3.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x, y ∈ 𝐌. We define:
 
-  x + y := x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
+  x + y := x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.1.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/zero 1`] = `
@@ -7868,7 +7879,7 @@ exports[`render hlm library: 2.8.28.1.4 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  0_[M,⊕,0,⊖,⊙] := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
+  0_([M,⊕,0,⊖,⊙]_𝐑) := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.1.5 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/additive%20inverse 1`] = `
@@ -7894,7 +7905,7 @@ exports[`render hlm library: 2.8.28.1.7 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  [[M, ⊕, 0, ⊖, ⊙], +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
+  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
 
 Remarks.
 
@@ -7904,7 +7915,7 @@ Addition of module elements as a group."
 exports[`render hlm library: 2.8.28.1.8 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/product 1`] = `
 "Definition 2.8.28.1.8.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, a ∈ 𝐑, x ∈ 𝐌. We define:
 
-  a ⋅ x := a ⊙ x if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
+  a ⋅ x := a ⊙ x if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.1.9 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/iterated%20sum 1`] = `
@@ -8055,7 +8066,7 @@ exports[`render hlm library: 2.8.28.1.11.2 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [S]_[M,⊕,0,⊖,⊙] := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_((𝐑)×S)]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
+  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_((𝐑)×S)]_𝐑  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation with suitable conditions)
 
 References.
 
@@ -8227,12 +8238,50 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/linear_algebra/basis.html#is_basis.repr"
 `;
 
+exports[`render hlm library: 2.8.28.1.13.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/ideal%20module 1`] = `
+"Definition 2.8.28.1.13.1.  Let 𝐑 be a ring, I ⊆ (𝐑) such that I is a left ideal of 𝐑. We define
+
+  [I]_𝐑
+
+by:
+
+  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(R×I)]_𝐑  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
+* https://proofwiki.org/wiki/Left_Ideal_is_Left_Module_over_Ring
+* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#ideal (defined as submodule)"
+`;
+
+exports[`render hlm library: 2.8.28.1.13.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/polynomial%20module 1`] = `
+"Definition 2.8.28.1.13.2.  Let 𝐑 be a ring, X be a variable. We define:
+
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
+* https://proofwiki.org/wiki/Definition:Module_Structure_of_Polynomial_Ring
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.module"
+`;
+
+exports[`render hlm library: 2.8.28.1.13.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/matrix%20module 1`] = `
+"Definition 2.8.28.1.13.3.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+
+  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/matrix/basic.html#matrix.module"
+`;
+
 exports[`render hlm library: 2.8.28.2.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Right%20modules 1`] = `
 "Definition 2.8.28.2.1.  Let 𝐑 be a ring. We define:
 
-  𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙] | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : M × (𝐑) → M is an operation such that ⊙ is right-distributive over ⊕ and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a + b) = (x ⊙ a) ⊕ (x ⊙ b)] and [∀ x ∈ M : x ⊙ 0_𝐑 = 0] and [∀ a ∈ 𝐑 : 0 ⊙ a = 0] and [∀ a ∈ 𝐑, x ∈ M : x ⊙ (−a) = ⊖(x) ⊙ a = ⊖(x ⊙ a)] and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a ⋅ b) = (x ⊙ a) ⊙ b] and [∀ x ∈ M : x ⊙ 1_𝐑 = x]}
+  𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙]_𝐑 | M is a set, ⊕ : M × M → M is a commutative associative operation on M, 0 ∈ M such that [∀ x ∈ M : x ⊕ 0 = 0 ⊕ x = x], ⊖ : M → M is a function such that [∀ x ∈ M : x ⊕ ⊖(x) = ⊖(x) ⊕ x = 0], ⊙ : M × (𝐑) → M is an operation such that ⊙ is right-distributive over ⊕ and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a + b) = (x ⊙ a) ⊕ (x ⊙ b)] and [∀ x ∈ M : x ⊙ 0_𝐑 = 0] and [∀ a ∈ 𝐑 : 0 ⊙ a = 0] and [∀ a ∈ 𝐑, x ∈ M : x ⊙ (−a) = ⊖(x) ⊙ a = ⊖(x ⊙ a)] and [∀ x ∈ M, a, b ∈ 𝐑 : x ⊙ (a ⋅ b) = (x ⊙ a) ⊙ b] and [∀ x ∈ M : x ⊙ 1_𝐑 = x]}
 
-  [M, ⊕, 0, ⊖, ⊙] = [N, ⋆, 𝟢, ∼, ∗]  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × (𝐑) → N is an operation with suitable conditions)
+  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × (𝐑) → N is an operation with suitable conditions)
 
 We write “let 𝐌 be a right 𝐑-module” for “let 𝐌 ∈ 𝓡𝓜𝓸𝓭(𝐑).”
 
@@ -8251,7 +8300,7 @@ exports[`render hlm library: 2.8.28.2.2 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  ([M, ⊕, 0, ⊖, ⊙]) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)
+  ([M, ⊕, 0, ⊖, ⊙]_𝐑) := M  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)
 
 We write “let x ∈ 𝐌” for “let x ∈ (𝐌).”
 
@@ -8263,7 +8312,7 @@ This definition retrieves a representative carrier set from a module (which is a
 exports[`render hlm library: 2.8.28.2.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/sum 1`] = `
 "Definition 2.8.28.2.3.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x, y ∈ 𝐌. We define:
 
-  x + y := x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
+  x + y := x ⊕ y if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.2.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/zero 1`] = `
@@ -8273,7 +8322,7 @@ exports[`render hlm library: 2.8.28.2.4 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  0_[M,⊕,0,⊖,⊙] := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
+  0_([M,⊕,0,⊖,⊙]_𝐑) := 0  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.2.5 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/additive%20inverse 1`] = `
@@ -8299,7 +8348,7 @@ exports[`render hlm library: 2.8.28.2.7 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  [[M, ⊕, 0, ⊖, ⊙], +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)
+  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)
 
 Remarks.
 
@@ -8309,7 +8358,7 @@ Addition of module elements as a group."
 exports[`render hlm library: 2.8.28.2.8 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/product 1`] = `
 "Definition 2.8.28.2.8.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌, a ∈ 𝐑. We define:
 
-  x ⋅ a := x ⊙ a if 𝐌 = [M, ⊕, 0, ⊖, ⊙] (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
+  x ⋅ a := x ⊙ a if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.2.9 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/iterated%20sum 1`] = `
@@ -8451,7 +8500,7 @@ exports[`render hlm library: 2.8.28.2.11.2 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [S]_[M,⊕,0,⊖,⊙] := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_(S×(𝐑))]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
+  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_(S×(𝐑))]_𝐑  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation with suitable conditions)"
 `;
 
 exports[`render hlm library: 2.8.28.2.11.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Submodules/submodule 1`] = `
@@ -8604,6 +8653,38 @@ References.
 
 * https://en.wikipedia.org/wiki/Basis_(linear_algebra)#Coordinates
 * https://proofwiki.org/wiki/Definition:Coordinate_System/Coordinate"
+`;
+
+exports[`render hlm library: 2.8.28.2.13.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Examples/ideal%20module 1`] = `
+"Definition 2.8.28.2.13.1.  Let 𝐑 be a ring, I ⊆ (𝐑) such that I is a right ideal of 𝐑. We define
+
+  [I]_𝐑
+
+by:
+
+  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(I×R)]_𝐑  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R with suitable conditions)
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
+* https://proofwiki.org/wiki/Right_Ideal_is_Right_Module_over_Ring"
+`;
+
+exports[`render hlm library: 2.8.28.2.13.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Examples/polynomial%20module 1`] = `
+"Definition 2.8.28.2.13.2.  Let 𝐑 be a ring, X be a variable. We define:
+
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑
+
+References.
+
+* https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
+* https://proofwiki.org/wiki/Definition:Module_Structure_of_Polynomial_Ring"
+`;
+
+exports[`render hlm library: 2.8.28.2.13.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Examples/matrix%20module 1`] = `
+"Definition 2.8.28.2.13.3.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
+
+  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑"
 `;
 
 exports[`render hlm library: 2.9.1 data/libraries/hlm/Algebra/Fields/Fields 1`] = `
@@ -8764,7 +8845,10 @@ References.
 exports[`render hlm library: 3.1.4.1 data/libraries/hlm/Linear%20algebra/Vector%20spaces/Examples/column%20vector%20space 1`] = `
 "Definition 3.1.4.1.  Let 𝐅 be a field, n ∈ ℕ. We define:
 
-  𝐅^n := [𝐅^n, +, 0_(𝐅^(1×n)), −, ⋅]
+  𝐅^n := [𝐅^n, +, 0_(𝐅^(1×n)), −, ⋅]_𝐅
+   = 𝐅^(1×n)
+
+Equality.  No proof.
 
 References.
 
@@ -8861,12 +8945,30 @@ References.
 * https://proofwiki.org/wiki/Definition:Composition_of_Morphisms"
 `;
 
-exports[`render hlm library: 4.6.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
-"Definition 4.6.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
+exports[`render hlm library: 4.6 data/libraries/hlm/Category%20theory/Isomorphisms 1`] = `
+"Definition 4.6.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
+
+  Iso(𝐗, 𝐘) := {f : 𝐗 → 𝐘 : ∃ g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
+   = {f : 𝐗 → 𝐘 : ∃! g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
+
+We write “let F : 𝐗 ↔ 𝐘 be an isomorphism” for “let F ∈ Iso(𝐗, 𝐘).”
+
+Equality.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Isomorphism#Category_theoretic_view
+* https://mathworld.wolfram.com/Isomorphism.html
+* https://proofwiki.org/wiki/Definition:Isomorphism_(Category_Theory)
+* https://ncatlab.org/nlab/show/isomorphism"
+`;
+
+exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Functors/Functors 1`] = `
+"Definition 4.7.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
   Fun(𝓒, 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) | 𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, [∀ 𝐗 ∈ 𝓒 : d_𝐗,𝐗,id_𝐗 = id_(𝐃_𝐗)], [∀ 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 : d_𝐗,𝐙,g∘f = d_𝐘,𝐙,g ∘ d_𝐗,𝐘,f]}
 
-  (𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) = (𝓒 → 𝓓, 𝐗 ↦ 𝐃'_𝐗, (f : 𝐘 → 𝐙) ↦ d'_𝐘,𝐙,f)  :⇔  [∀ 𝐗 ∈ 𝓒 : 𝐃_𝐗 = 𝐃'_𝐗] and ∀ 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 : d_𝐘,𝐙,f = d'_𝐘,𝐙,f  (𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, 𝐃'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d'_𝐘,𝐙,f : 𝐃'_𝐘 → 𝐃'_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙 with suitable conditions)
+  (𝓒 → 𝓓, 𝐗 ↦ 𝐃_𝐗, (f : 𝐘 → 𝐙) ↦ d_𝐘,𝐙,f) = (𝓒 → 𝓓, 𝐗 ↦ 𝐃'_𝐗, (f : 𝐘 → 𝐙) ↦ d'_𝐘,𝐙,f)  :⇔  ∃ i_𝐗 : 𝐃_𝐗 ↔ 𝐃'_𝐗 f.e. 𝐗 ∈ 𝓒 : ∀ 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 : i_𝐙 ∘ d_𝐘,𝐙,f = d'_𝐘,𝐙,f ∘ i_𝐘  (𝐃_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d_𝐘,𝐙,f : 𝐃_𝐘 → 𝐃_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙, 𝐃'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, d'_𝐘,𝐙,f : 𝐃'_𝐘 → 𝐃'_𝐙 is a morphism for each 𝐘, 𝐙 ∈ 𝓒 and f : 𝐘 → 𝐙 with suitable conditions)
 
 We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ Fun(𝓒, 𝓓).”
 
@@ -8881,8 +8983,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/functor.html#category_theory.functor"
 `;
 
-exports[`render hlm library: 4.6.2 data/libraries/hlm/Category%20theory/Functors/object%20value 1`] = `
-"Definition 4.6.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
+exports[`render hlm library: 4.7.2 data/libraries/hlm/Category%20theory/Functors/object%20value 1`] = `
+"Definition 4.7.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐗 ∈ 𝓒. We define
 
   F(𝐗)
 
@@ -8891,8 +8993,8 @@ by:
   (𝓒 → 𝓓, 𝐀 ↦ 𝐃_𝐀, (f : 𝐁 → 𝐂) ↦ d_𝐁,𝐂,f)(𝐗) := 𝐃_𝐗  (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, d_𝐁,𝐂,f : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and f : 𝐁 → 𝐂 with suitable conditions)"
 `;
 
-exports[`render hlm library: 4.6.3 data/libraries/hlm/Category%20theory/Functors/morphism%20value 1`] = `
-"Definition 4.6.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
+exports[`render hlm library: 4.7.3 data/libraries/hlm/Category%20theory/Functors/morphism%20value 1`] = `
+"Definition 4.7.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor, 𝐘, 𝐙 ∈ 𝓒, f : 𝐘 → 𝐙 be a morphism. We define
 
   F(f)
 
@@ -8901,8 +9003,8 @@ by:
   (𝓒 → 𝓓, 𝐀 ↦ 𝐃_𝐀, (g : 𝐁 → 𝐂) ↦ d_𝐁,𝐂,g)(f) := d_𝐘,𝐙,f  (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, d_𝐁,𝐂,g : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and g : 𝐁 → 𝐂 with suitable conditions)"
 `;
 
-exports[`render hlm library: 4.6.4 data/libraries/hlm/Category%20theory/Functors/identity 1`] = `
-"Definition 4.6.4.  Let u ∈ ℕ, 𝓒 be a/an u-small category. We define:
+exports[`render hlm library: 4.7.4 data/libraries/hlm/Category%20theory/Functors/identity 1`] = `
+"Definition 4.7.4.  Let u ∈ ℕ, 𝓒 be a/an u-small category. We define:
 
   id_𝓒 :  𝓒 → 𝓒, 𝐗 ↦ 𝐗, (f : 𝐘 → 𝐙) ↦ f
 
@@ -8913,8 +9015,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/functor.html#category_theory.functor.id"
 `;
 
-exports[`render hlm library: 4.6.5 data/libraries/hlm/Category%20theory/Functors/composition 1`] = `
-"Definition 4.6.5.  Let u, v, w ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, 𝓔 be a/an w-small category, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
+exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Functors/composition 1`] = `
+"Definition 4.7.5.  Let u, v, w ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, 𝓔 be a/an w-small category, F : 𝓒 → 𝓓, G : 𝓓 → 𝓔 be functors. We define:
 
   G ∘ F :  𝓒 → 𝓔, 𝐗 ↦ G(F(𝐗)), (f : 𝐘 → 𝐙) ↦ G(F(f))
 
@@ -8924,8 +9026,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/functor.html#category_theory.functor.comp"
 `;
 
-exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
-"Definition 4.7.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
+exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Natural%20transformations/Infranatural%20transformations 1`] = `
+"Definition 4.8.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
 
   Infranat(F, G) :=: {(n_𝐗)_(𝐗 ∈ 𝓒) | n_𝐗 : F(𝐗) → G(𝐗) is a morphism for each 𝐗 ∈ 𝓒}
 
@@ -8942,8 +9044,8 @@ References.
 * https://en.wikipedia.org/wiki/Natural_transformation#Definition: infranatural transformation"
 `;
 
-exports[`render hlm library: 4.7.2 data/libraries/hlm/Category%20theory/Natural%20transformations/component 1`] = `
-"Definition 4.7.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
+exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Natural%20transformations/component 1`] = `
+"Definition 4.8.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors, η : F ⇀ G be an infranatural transformation, 𝐗 ∈ 𝓒. We define
 
   η_𝐗
 
@@ -8956,8 +9058,8 @@ References.
 https://leanprover-community.github.io/mathlib_docs/category_theory/natural_transformation.html#category_theory.nat_trans.app"
 `;
 
-exports[`render hlm library: 4.7.3 data/libraries/hlm/Category%20theory/Natural%20transformations/identity 1`] = `
-"Definition 4.7.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor. We define:
+exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Natural%20transformations/identity 1`] = `
+"Definition 4.8.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F : 𝓒 → 𝓓 be a functor. We define:
 
   id_F := (id_(F(𝐗)))_(𝐗 ∈ 𝓒)
    = (F(id_𝐗))_(𝐗 ∈ 𝓒)
@@ -8970,8 +9072,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/natural_transformation.html#category_theory.nat_trans.id"
 `;
 
-exports[`render hlm library: 4.7.4 data/libraries/hlm/Category%20theory/Natural%20transformations/vertical%20composition 1`] = `
-"Definition 4.7.4.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
+exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Natural%20transformations/vertical%20composition 1`] = `
+"Definition 4.8.4.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G, H : 𝓒 → 𝓓 be functors, η : F ⇀ G, ε : G ⇀ H be infranatural transformations. We define:
 
   ε ∘ η := (ε_𝐗 ∘ η_𝐗)_(𝐗 ∈ 𝓒)
 
@@ -8981,8 +9083,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/natural_transformation.html#category_theory.nat_trans.vcomp"
 `;
 
-exports[`render hlm library: 4.7.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
-"Definition 4.7.5.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
+exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
+"Definition 4.8.5.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
 
   Nat(F, G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
 
@@ -8997,8 +9099,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/natural_transformation.html#category_theory.nat_trans"
 `;
 
-exports[`render hlm library: 4.8.1 data/libraries/hlm/Category%20theory/Concrete%20categories/elements 1`] = `
-"Definition 4.8.1.  Let u ∈ ℕ, S be a set. We define:
+exports[`render hlm library: 4.9.1 data/libraries/hlm/Category%20theory/Concrete%20categories/elements 1`] = `
+"Definition 4.9.1.  Let u ∈ ℕ, S be a set. We define:
 
   𝐃𝐢𝐬_u(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_u
 
@@ -9016,8 +9118,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/discrete_category.html#category_theory.discrete_category"
 `;
 
-exports[`render hlm library: 4.8.2 data/libraries/hlm/Category%20theory/Concrete%20categories/cardinals 1`] = `
-"Definition 4.8.2.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.2 data/libraries/hlm/Category%20theory/Concrete%20categories/cardinals 1`] = `
+"Definition 4.9.2.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐭_u := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_u
 
@@ -9033,8 +9135,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/types.html#category_theory.types"
 `;
 
-exports[`render hlm library: 4.8.3 data/libraries/hlm/Category%20theory/Concrete%20categories/ordinals 1`] = `
-"Definition 4.8.3.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.3 data/libraries/hlm/Category%20theory/Concrete%20categories/ordinals 1`] = `
+"Definition 4.9.3.  Let u ∈ ℕ. We define:
 
   𝐖𝐨𝐬𝐞𝐭_u := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_u
 
@@ -9043,8 +9145,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of well-ordered sets, i.e. ordinal numbers."
 `;
 
-exports[`render hlm library: 4.8.4 data/libraries/hlm/Category%20theory/Concrete%20categories/pointed%20sets 1`] = `
-"Definition 4.8.4.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.4 data/libraries/hlm/Category%20theory/Concrete%20categories/pointed%20sets 1`] = `
+"Definition 4.9.4.  Let u ∈ ℕ. We define:
 
   𝐏𝐭𝐒𝐞𝐭_u := [𝓟𝓽𝓢𝓮𝓽, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓟𝓽𝓢𝓮𝓽), (id_𝐂)_(𝐂 ∈ 𝓟𝓽𝓢𝓮𝓽), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓟𝓽𝓢𝓮𝓽)]_u
 
@@ -9059,8 +9161,8 @@ References.
 * https://proofwiki.org/wiki/Category:Category_of_Pointed_Sets"
 `;
 
-exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Concrete%20categories/magmas 1`] = `
-"Definition 4.8.5.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.5 data/libraries/hlm/Category%20theory/Concrete%20categories/magmas 1`] = `
+"Definition 4.9.5.  Let u ∈ ℕ. We define:
 
   𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u
 
@@ -9073,8 +9175,8 @@ References.
 * https://en.wikipedia.org/wiki/Category_of_magmas"
 `;
 
-exports[`render hlm library: 4.8.6 data/libraries/hlm/Category%20theory/Concrete%20categories/semigroups 1`] = `
-"Definition 4.8.6.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.6 data/libraries/hlm/Category%20theory/Concrete%20categories/semigroups 1`] = `
+"Definition 4.9.6.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐦𝐢𝐆𝐫𝐩_u := [𝓢𝓮𝓶𝓲𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹)]_u
 
@@ -9083,8 +9185,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of semigroups."
 `;
 
-exports[`render hlm library: 4.8.7 data/libraries/hlm/Category%20theory/Concrete%20categories/monoids 1`] = `
-"Definition 4.8.7.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.7 data/libraries/hlm/Category%20theory/Concrete%20categories/monoids 1`] = `
+"Definition 4.9.7.  Let u ∈ ℕ. We define:
 
   𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u
 
@@ -9098,8 +9200,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/algebra/category/Mon/basic.html#Mon"
 `;
 
-exports[`render hlm library: 4.8.8 data/libraries/hlm/Category%20theory/Concrete%20categories/groups 1`] = `
-"Definition 4.8.8.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.8 data/libraries/hlm/Category%20theory/Concrete%20categories/groups 1`] = `
+"Definition 4.9.8.  Let u ∈ ℕ. We define:
 
   𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u
 
@@ -9115,8 +9217,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/algebra/category/Group/basic.html#Group"
 `;
 
-exports[`render hlm library: 4.8.9 data/libraries/hlm/Category%20theory/Concrete%20categories/semirings 1`] = `
-"Definition 4.8.9.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.9 data/libraries/hlm/Category%20theory/Concrete%20categories/semirings 1`] = `
+"Definition 4.9.9.  Let u ∈ ℕ. We define:
 
   𝐒𝐞𝐦𝐢𝐑𝐢𝐧𝐠_u := [𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰)]_u
 
@@ -9125,8 +9227,8 @@ Remarks.
 The objects of this category are actually isomorphism classes of semirings."
 `;
 
-exports[`render hlm library: 4.8.10 data/libraries/hlm/Category%20theory/Concrete%20categories/rings 1`] = `
-"Definition 4.8.10.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.10 data/libraries/hlm/Category%20theory/Concrete%20categories/rings 1`] = `
+"Definition 4.9.10.  Let u ∈ ℕ. We define:
 
   𝐑𝐢𝐧𝐠_u := [𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓲𝓷𝓰)]_u
 
@@ -9140,8 +9242,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Category_of_Rings_with_Unity"
 `;
 
-exports[`render hlm library: 4.8.11 data/libraries/hlm/Category%20theory/Concrete%20categories/left%20modules 1`] = `
-"Definition 4.8.11.  Let u ∈ ℕ, 𝐑 be a ring. We define:
+exports[`render hlm library: 4.9.11 data/libraries/hlm/Category%20theory/Concrete%20categories/left%20modules 1`] = `
+"Definition 4.9.11.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
   𝐋𝐌𝐨𝐝_u(𝐑) := [𝓛𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓛𝓜𝓸𝓭(𝐑))]_u
 
@@ -9157,8 +9259,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/algebra/category/Module/basic.html#Module.category_theory.category"
 `;
 
-exports[`render hlm library: 4.8.12 data/libraries/hlm/Category%20theory/Concrete%20categories/right%20modules 1`] = `
-"Definition 4.8.12.  Let u ∈ ℕ, 𝐑 be a ring. We define:
+exports[`render hlm library: 4.9.12 data/libraries/hlm/Category%20theory/Concrete%20categories/right%20modules 1`] = `
+"Definition 4.9.12.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
   𝐑𝐌𝐨𝐝_u(𝐑) := [𝓡𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓜𝓸𝓭(𝐑))]_u
 
@@ -9173,8 +9275,8 @@ References.
 * https://ncatlab.org/nlab/show/Mod"
 `;
 
-exports[`render hlm library: 4.8.13 data/libraries/hlm/Category%20theory/Concrete%20categories/fields 1`] = `
-"Definition 4.8.13.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.13 data/libraries/hlm/Category%20theory/Concrete%20categories/fields 1`] = `
+"Definition 4.9.13.  Let u ∈ ℕ. We define:
 
   𝐅𝐥𝐝_u := [𝓕𝓵𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓕𝓵𝓭), (id_𝐂)_(𝐂 ∈ 𝓕𝓵𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓕𝓵𝓭)]_u
 
@@ -9188,8 +9290,8 @@ References.
 * https://ncatlab.org/nlab/show/field#category"
 `;
 
-exports[`render hlm library: 4.8.14 data/libraries/hlm/Category%20theory/Concrete%20categories/categories 1`] = `
-"Definition 4.8.14.  Let u ∈ ℕ. We define:
+exports[`render hlm library: 4.9.14 data/libraries/hlm/Category%20theory/Concrete%20categories/categories 1`] = `
+"Definition 4.9.14.  Let u ∈ ℕ. We define:
 
   𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (Fun(𝓐, 𝓑))_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
 
@@ -9205,8 +9307,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/category/Cat.html#category_theory.Cat"
 `;
 
-exports[`render hlm library: 4.8.15 data/libraries/hlm/Category%20theory/Concrete%20categories/functors 1`] = `
-"Definition 4.8.15.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
+exports[`render hlm library: 4.9.15 data/libraries/hlm/Category%20theory/Concrete%20categories/functors 1`] = `
+"Definition 4.9.15.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
   𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(max(u,v)+1)
 
@@ -9218,8 +9320,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/category_theory/functor_category.html#category_theory.functor.category"
 `;
 
-exports[`render hlm library: 4.9.1 data/libraries/hlm/Category%20theory/Yoneda/hom-functor 1`] = `
-"Definition 4.9.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝐀 ∈ 𝓒. We define:
+exports[`render hlm library: 4.10.1 data/libraries/hlm/Category%20theory/Yoneda/hom-functor 1`] = `
+"Definition 4.10.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝐀 ∈ 𝓒. We define:
 
   Hom_v(𝐀, −) :  𝓒 → 𝐒𝐞𝐭_v, 𝐗 ↦ |Hom(𝐀, 𝐗)|, (f : 𝐘 → 𝐙) ↦ (Hom(𝐀, 𝐘) → Hom(𝐀, 𝐙), g ↦ f ∘ g)
 
@@ -9230,8 +9332,8 @@ References.
 * https://ncatlab.org/nlab/show/hom-functor"
 `;
 
-exports[`render hlm library: 4.9.2 data/libraries/hlm/Category%20theory/Yoneda/yoneda%20equivalence 1`] = `
-"Definition 4.9.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. We define:
+exports[`render hlm library: 4.10.2 data/libraries/hlm/Category%20theory/Yoneda/yoneda%20equivalence 1`] = `
+"Definition 4.10.2.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. We define:
 
   yoneda(F, 𝐀) :  Nat(Hom_v(𝐀, −), F) → (F(𝐀)), η ↦ η_𝐀(id_𝐀)
 
@@ -9242,8 +9344,8 @@ References.
 * https://ncatlab.org/nlab/show/Yoneda+lemma"
 `;
 
-exports[`render hlm library: 4.9.3 data/libraries/hlm/Category%20theory/Yoneda/Yoneda%20lemma%20bijection 1`] = `
-"Theorem 4.9.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. Then:
+exports[`render hlm library: 4.10.3 data/libraries/hlm/Category%20theory/Yoneda/Yoneda%20lemma%20bijection 1`] = `
+"Theorem 4.10.3.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, F : 𝓒 → 𝐒𝐞𝐭_v be a functor, 𝐀 ∈ 𝓒. Then:
 
   yoneda(F, 𝐀) is bijective and (yoneda(F, 𝐀))^-1 = ((F(𝐀)) → Nat(Hom_v(𝐀, −), F), x ↦ (Hom(𝐀, 𝐗) → (F(𝐗)), f ↦ F(f)(x))_(𝐗 ∈ 𝓒))
 

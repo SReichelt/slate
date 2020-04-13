@@ -941,7 +941,7 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
 
 function writeToString(doWrite: (writer: FmtWriter.Writer) => void): string {
   let stream = new FmtWriter.StringOutputStream;
-  let writer = new FmtWriter.Writer(stream, true, '', '');
+  let writer = new FmtWriter.Writer(stream, true, true, '', '');
   doWrite(writer);
   return stream.str;
 }

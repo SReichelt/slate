@@ -785,7 +785,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         let uri = this.uri + encodeURI(name) + fileExtension;
         let contents = FmtWriter.writeString(editedLibraryDefinition.file, true);
         if (createNew) {
-          this.fileAccessor.writeFile!(uri, contents, true, false)
+          this.fileAccessor.prePublishFile(uri, contents, true, false)
             .then(() => {
               if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
                 editedLibraryDefinition.state = LibraryDefinitionState.Editing;

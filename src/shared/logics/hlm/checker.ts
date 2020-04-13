@@ -32,7 +32,6 @@ interface HLMCheckerContext {
   previousSetTerm?: Fmt.Expression;
   parentBindingParameters: Fmt.Parameter[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
-  inTypeCast: boolean;
   inAutoArgument: boolean;
   editData?: HLMCheckerEditData;
   currentRecheckFn?: HLMCheckerRecheckFn;
@@ -61,7 +60,6 @@ interface HLMCheckerPlaceholderRestriction {
 }
 
 interface HLMCheckerPlaceholderRestrictionState {
-  recordRestrictions: boolean;
   newRestrictions?: Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>;
   exactValueRequried: boolean;
   context: HLMCheckerContext;
@@ -90,7 +88,6 @@ export class HLMDefinitionChecker {
   private rootContext: HLMCheckerContext = {
     parentBindingParameters: [],
     parentStructuralCases: [],
-    inTypeCast: false,
     inAutoArgument: false
   };
   private result: Logic.LogicCheckResult = {
@@ -400,10 +397,10 @@ export class HLMDefinitionChecker {
     if (subset) {
       let typeSearchParameters: HLMTypeSearchParameters = {
         followDefinitions: true,
+        followSupersets: true,
         followEmbeddings: true,
-        resolveConstructionArguments: false,
-        extractStructuralCasesFromConstructionArguments: false,
-        inTypeCast: false
+        resolveFixedSubterms: false,
+        extractStructuralCasesFromFixedSubterms: false
       };
       let checkSubset = this.utils.getFinalSuperset(subset, typeSearchParameters)
         .then((superset: Fmt.Expression) => {
@@ -854,11 +851,7 @@ export class HLMDefinitionChecker {
     } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
       this.checkElementTerm(term.term, context);
       this.checkSetTerm(term._set, context);
-      let typeCastContext: HLMCheckerContext = {
-        ...context,
-        inTypeCast: true
-      };
-      this.checkCompatibility(term, [term._set], [term.term], typeCastContext);
+      this.checkCompatibility(term, [term._set], [term.term], context);
       this.checkProof(term.proof, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
       this.checkElementTerm(term.term, context);
@@ -1120,10 +1113,10 @@ export class HLMDefinitionChecker {
     this.checkSetTerm(construction, this.getAutoFillContext(context));
     let typeSearchParameters: HLMTypeSearchParameters = {
       followDefinitions: true,
+      followSupersets: true,
       followEmbeddings: false,
-      resolveConstructionArguments: false,
-      extractStructuralCasesFromConstructionArguments: false,
-      inTypeCast: false
+      resolveFixedSubterms: false,
+      extractStructuralCasesFromFixedSubterms: false
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
       .then((finalSet: Fmt.Expression) => {
@@ -1290,16 +1283,16 @@ export class HLMDefinitionChecker {
         };
         let typeSearchParameters: HLMTypeSearchParameters = {
           followDefinitions: true,
+          followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings,
-          resolveConstructionArguments: nextStatus.followedEmbeddings,
-          extractStructuralCasesFromConstructionArguments: nextStatus.followedEmbeddings,
-          inTypeCast: context.inTypeCast
+          resolveFixedSubterms: nextStatus.followedEmbeddings,
+          extractStructuralCasesFromFixedSubterms: nextStatus.followedEmbeddings
         };
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
           for (let index = 0; index < setTerms.length; index++) {
             let term = setTerms[index];
             for (let structuralCaseRef of context.parentStructuralCases) {
-              term = this.utils.buildSingleStructuralCaseSetTerm(structuralCaseRef.term, structuralCaseRef.construction, structuralCaseRef._constructor, structuralCaseRef.parameters, term);
+              term = this.utils.buildSingleStructuralCaseTerm(structuralCaseRef.term, structuralCaseRef.construction, structuralCaseRef._constructor, structuralCaseRef.parameters, term, HLMExpressionType.SetTerm);
             }
             setTerms[index] = term;
           }
@@ -1351,34 +1344,70 @@ export class HLMDefinitionChecker {
 
   private checkSetTermEquivalence(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
     let state: HLMCheckerPlaceholderRestrictionState = {
-      recordRestrictions: true,
       exactValueRequried: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
       context: context
     };
-    let handlePlaceholders: Fmt.ExpressionUnificationFn = undefined;
-    if (context.editData) {
-      handlePlaceholders = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
-        if (replacedParameters.length) {
-          return false;
+    let unificationFn: Fmt.ExpressionUnificationFn = undefined;
+    let defaultUnificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
+      // Make structural cases commute. I.e. when finding a nested structural case term on the right, also check other nesting possibilities.
+      // Of course, this only works for inner cases that do not depend on parameters of outer cases.
+      if (rightExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && rightExpression.cases.length === 1) {
+        let structuralCase = rightExpression.cases[0];
+        let innerExpression = structuralCase.value;
+        if (innerExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && innerExpression.cases.length === 1) {
+          let clonedExpression = rightExpression.clone() as FmtHLM.MetaRefExpression_setStructuralCases;
+          let clonedCase = clonedExpression.cases[0];
+          let currentInnerExpression = clonedCase.value;
+          while (currentInnerExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && currentInnerExpression.cases.length === 1) {
+            // Cut out the current inner expression.
+            let nextInnerExpression = currentInnerExpression.cases[0].value;
+            clonedCase.value = nextInnerExpression;
+            // Attach it to the front.
+            currentInnerExpression.cases[0].value = clonedExpression;
+            clonedExpression = currentInnerExpression;
+            // Check it.
+            let innerUnificationFn = (innerLeftExpression: Fmt.Expression, innerRightExpression: Fmt.Expression, innerReplacedParameters: Fmt.ReplacedParameter[]): boolean => {
+              // Avoid infinite recursion.
+              if (unificationFn && innerLeftExpression !== leftExpression) {
+                return unificationFn(innerLeftExpression, innerRightExpression, innerReplacedParameters);
+              }
+              return false;
+            };
+            if (leftExpression.isEquivalentTo(clonedExpression, innerUnificationFn, replacedParameters)) {
+              return true;
+            }
+            currentInnerExpression = nextInnerExpression;
+          }
         }
+      }
+      return false;
+    };
+    unificationFn = defaultUnificationFn;
+    if (context.editData) {
+      // Handle placeholders.
+      unificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
         if (leftExpression instanceof FmtHLM.MetaRefExpression_enumeration && leftExpression.terms && leftExpression.terms.length === 1) {
           let leftElement = leftExpression.terms[0];
           if (leftElement instanceof Fmt.PlaceholderExpression) {
-            this.addDeclaredSetRestriction(state, leftElement, rightExpression);
+            if (!replacedParameters.length) {
+              this.addDeclaredSetRestriction(state, leftElement, rightExpression);
+            }
             return true;
           }
         }
         if (rightExpression instanceof FmtHLM.MetaRefExpression_enumeration && rightExpression.terms && rightExpression.terms.length === 1) {
           let rightElement = rightExpression.terms[0];
           if (rightElement instanceof Fmt.PlaceholderExpression) {
-            this.addDeclaredSetRestriction(state, rightElement, leftExpression);
+            if (!replacedParameters.length) {
+              this.addDeclaredSetRestriction(state, rightElement, leftExpression);
+            }
             return true;
           }
         }
         let recheck = false;
         let isRoot = leftExpression === left && rightExpression === right;
         while (leftExpression instanceof Fmt.PlaceholderExpression) {
-          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, rightExpression);
+          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
           if (newLeftExpression) {
             leftExpression = newLeftExpression;
             recheck = true;
@@ -1387,7 +1416,7 @@ export class HLMDefinitionChecker {
           }
         }
         while (rightExpression instanceof Fmt.PlaceholderExpression) {
-          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, leftExpression);
+          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
           if (newRightExpression) {
             rightExpression = newRightExpression;
             recheck = true;
@@ -1399,31 +1428,14 @@ export class HLMDefinitionChecker {
           state.exactValueRequried = true;
         }
         if (recheck) {
-          return leftExpression.isEquivalentTo(rightExpression, handlePlaceholders, replacedParameters);
+          return leftExpression.isEquivalentTo(rightExpression, unificationFn, replacedParameters);
         } else {
-          // If placeholders are in play, sometimes we end up with structural cases on one side only.
-          // In that case, we need to look inside the structural cases, but the restrictions would need to be modified to incorporate the case parameters.
-          // Therefore at the moment, we don't record the restrictions at all.
-          if ((leftExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases || leftExpression instanceof FmtHLM.MetaRefExpression_structuralCases) && leftExpression.cases.length === 1) {
-            let recordRestrictions = state.recordRestrictions;
-            if (leftExpression.cases[0].value.isEquivalentTo(rightExpression, handlePlaceholders, replacedParameters)) {
-              return true;
-            }
-            state.recordRestrictions = recordRestrictions;
-          }
-          if ((rightExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases || rightExpression instanceof FmtHLM.MetaRefExpression_structuralCases) && rightExpression.cases.length === 1) {
-            let recordRestrictions = state.recordRestrictions;
-            if (leftExpression.isEquivalentTo(rightExpression.cases[0].value, handlePlaceholders, replacedParameters)) {
-              return true;
-            }
-            state.recordRestrictions = recordRestrictions;
-          }
-          return false;
+          return defaultUnificationFn(leftExpression, rightExpression, replacedParameters);
         }
       };
     }
 
-    if (left.isEquivalentTo(right, handlePlaceholders)) {
+    if (left.isEquivalentTo(right, unificationFn)) {
       if (context.editData && state.newRestrictions) {
         context.editData.restrictions = state.newRestrictions;
       }
@@ -1433,7 +1445,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private addCompatibleTermRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, expression: Fmt.Expression): Fmt.Expression | undefined {
+  private addCompatibleTermRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, expression: Fmt.Expression | undefined): Fmt.Expression | undefined {
     if (placeholder.placeholderType === undefined) {
       return undefined;
     }
@@ -1442,7 +1454,7 @@ export class HLMDefinitionChecker {
     if (restriction && restriction.exactValue) {
       return restriction.exactValue;
     }
-    if (!state.recordRestrictions) {
+    if (!expression) {
       return undefined;
     }
     let addToCompatibleSets = placeholder.placeholderType === HLMExpressionType.SetTerm && !(restriction && HLMDefinitionChecker.containsEquivalentItem(restriction.compatibleSets, expression));
@@ -1483,7 +1495,7 @@ export class HLMDefinitionChecker {
   }
 
   private addDeclaredSetRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, declaredSet: Fmt.Expression): void {
-    if (placeholder.placeholderType === undefined || !state.recordRestrictions) {
+    if (placeholder.placeholderType === undefined) {
       return;
     }
     let currentRestrictions = state.newRestrictions || state.context.editData!.restrictions;

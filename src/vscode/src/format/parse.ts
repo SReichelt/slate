@@ -36,6 +36,7 @@ class ErrorHandler implements FmtReader.ErrorHandler {
     }
 
     unfilledPlaceholder(range: FmtReader.Range): void {
+        this.parsedDocument.hasUnfilledPlaceholders = true;
         if (this.diagnostics) {
             this.diagnostics.push({
                 message: 'Unfilled placeholder',
@@ -59,12 +60,15 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             }
         }
     }
+
     if (!fileContents) {
         fileContents = readRange(uri, undefined, false, sourceDocument) || '';
     }
+
     let parsedDocument: ParsedDocument = {
         uri: uri,
         hasSyntaxErrors: false,
+        hasUnfilledPlaceholders: false,
         hasBrokenReferences: false,
         rangeList: [],
         rangeMap: new Map<Object, RangeInfo>(),
@@ -72,7 +76,9 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
         objectContentsMap: needExtendedInfo ? new Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>() : undefined,
         nestedArgumentListsMap: needExtendedInfo ? new Map<Fmt.ArgumentList, NestedArgumentListInfo>() : undefined
     };
+
     let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
+
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
         let parsedMetaModel = metaModelCache.get(metaModelFileName);
@@ -80,14 +86,15 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             if (!parsedDocument.metaModelDocument) {
                 parsedDocument.metaModelDocument = parsedMetaModel.metaModelDocument;
             }
-            for (let [metaModel, metaModelDocument] of parsedMetaModel.metaModelDocuments) {
-                parsedDocument.metaModelDocuments!.set(metaModel, metaModelDocument);
+            for (let [referencedMetaModel, referencedMetaModelDocument] of parsedMetaModel.metaModelDocuments) {
+                parsedDocument.metaModelDocuments!.set(referencedMetaModel, referencedMetaModelDocument);
             }
             return parsedMetaModel.metaModel;
         }
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
             hasSyntaxErrors: false,
+            hasUnfilledPlaceholders: false,
             hasBrokenReferences: false,
             rangeList: [],
             rangeMap: new Map<Object, RangeInfo>()
@@ -111,7 +118,9 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
         });
         return metaModel;
     };
+
     let getDocumentMetaModel = (path: Fmt.Path) => getReferencedMetaModel(uri.fsPath, path);
+
     if (preCheck) {
         let preCheckCompleted = false;
         let stream = new FmtReader.StringInputStream(fileContents);
@@ -119,7 +128,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             if (!preCheckCompleted && preCheck(parsedDocument, info)) {
                 preCheckCompleted = true;
             }
-        }
+        };
         let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
         try {
             reader.readFile();
@@ -129,29 +138,34 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             return undefined;
         }
     }
-    let stream = new FmtReader.StringInputStream(fileContents);
-    let reportRange = (info: FmtReader.ObjectRangeInfo) => {
-        let rangeInfo = convertRangeInfo(info);
-        parsedDocument.rangeList.push(rangeInfo);
-        parsedDocument.rangeMap.set(info.object, rangeInfo);
-    };
-    let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
-    try {
-        parsedDocument.file = reader.readFile();
-        if (diagnostics || needExtendedInfo) {
-            checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
-        }
-    } catch (error) {
-        parsedDocument.hasSyntaxErrors = true;
-        if (diagnostics && !diagnostics.length) {
-            let dummyPosition = new vscode.Position(0, 0);
-            diagnostics.push({
-                message: error.message,
-                range: new vscode.Range(dummyPosition, dummyPosition),
-                severity: vscode.DiagnosticSeverity.Error
-            });
+
+    {
+        let stream = new FmtReader.StringInputStream(fileContents);
+        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
+            let rangeInfo = convertRangeInfo(info);
+            parsedDocument.rangeList.push(rangeInfo);
+            parsedDocument.rangeMap.set(info.object, rangeInfo);
+        };
+        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
+        try {
+            parsedDocument.file = reader.readFile();
+            if (diagnostics || needExtendedInfo) {
+                checkReferencedDefinitions(parsedDocument, diagnostics, sourceDocument);
+            }
+        } catch (error) {
+            parsedDocument.hasSyntaxErrors = true;
+            if (diagnostics && !diagnostics.length) {
+                let dummyPosition = new vscode.Position(0, 0);
+                diagnostics.push({
+                    message: error.message,
+                    range: new vscode.Range(dummyPosition, dummyPosition),
+                    severity: vscode.DiagnosticSeverity.Error
+                });
+            }
         }
     }
+
     parsedFileCache.set(uri.fsPath, parsedDocument);
+
     return parsedDocument;
 }

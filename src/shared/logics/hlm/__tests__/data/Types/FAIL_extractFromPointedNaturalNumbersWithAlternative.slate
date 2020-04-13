@@ -3,9 +3,18 @@
 /**
  * @expectedError Type mismatch
  */
-$FAIL_extractFromPointedNaturalNumbersWithAlternative: %StandardTheorem {
-  claim = %equals(
-    $../Essentials/"Pointed set base point"(i = {$../Essentials/"pointed natural numbers with alternative"}),
-    $../Essentials/"Natural numbers".zero
+$FAIL_extractFromPointedNaturalNumbersWithAlternative(
+  S: %Set,
+  x: %Element(S)
+): %StandardTheorem {
+  claim = %and(
+    %equals(
+      $../Essentials/"Pointed set base point"(i = {$../Essentials/"pointed natural numbers with alternative"}),
+      $../Essentials/"Natural numbers".zero
+    ),
+    %equals(
+      $../Essentials/"Pointed set base point"(i = {$../Essentials/"pointed natural numbers with alternative"}),
+      x
+    )
   )
 }
