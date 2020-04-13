@@ -1,5 +1,5 @@
 import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
-import { FileAccessor, FileContents, WriteFileResult, FileWatcher } from './fileAccessor';
+import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as Meta from '../format/metaModel';
@@ -63,17 +63,21 @@ const defaultReferencesString = defaultReferences.map((ref) => `* ${ref.urlPrefi
 export interface LibraryDataProviderConfig {
   canPreload: boolean;
   watchForChanges: boolean;
-  retryMissingFiles: boolean;
   checkMarkdownCode: boolean;
   allowPlaceholders: boolean;
 }
 export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
   canPreload: false,
   watchForChanges: false,
-  retryMissingFiles: false,
   checkMarkdownCode: false,
   allowPlaceholders: false
 };
+
+interface WatchedFile {
+  fileReference: FileReference;
+  fileWatcher?: FileWatcher;
+  libraryDefinition?: LibraryDefinition;
+}
 
 interface PrefetchQueueItem {
   path: Fmt.Path;
@@ -298,29 +302,31 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return definition;
   }
 
-  private createLibraryDefinition(uri: string, definitionName: string, getMetaModel: Meta.MetaModelGetter, contents: FileContents): LibraryDefinition {
-    let stream = new FmtReader.StringInputStream(contents.text);
-    let errorHandler = new FmtReader.DefaultErrorHandler(uri, this.config.checkMarkdownCode, this.config.allowPlaceholders);
+  private createLibraryDefinition(fileReference: FileReference, definitionName: string, getMetaModel: Meta.MetaModelGetter, contents: string): LibraryDefinition {
+    let stream = new FmtReader.StringInputStream(contents);
+    let errorHandler = new FmtReader.DefaultErrorHandler(fileReference.fileName, this.config.checkMarkdownCode, this.config.allowPlaceholders);
     let file = FmtReader.readStream(stream, errorHandler, getMetaModel);
     return {
       file: file,
       definition: this.getMainDefinition(file, definitionName),
-      state: LibraryDefinitionState.Loaded
+      state: LibraryDefinitionState.Loaded,
+      fileReference: fileReference
     };
   }
 
   private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
-    return this.fileAccessor.readFile(uri)
-      .then((contents: FileContents) => {
-        if (this.config.watchForChanges && contents.addWatcher) {
-          contents.addWatcher((watcher: FileWatcher) => {
-            this.preloadedDefinitions.clear();
-            this.sectionChangeCounter++;
-            watcher.close();
-          });
-        }
-        let stream = new FmtReader.StringInputStream(contents.text);
-        let errorHandler = new FmtReader.DefaultErrorHandler(uri);
+    let fileReference = this.fileAccessor.openFile(uri, false);
+    if (this.config.watchForChanges && fileReference.watch) {
+      let watcher = fileReference.watch(() => {
+        this.preloadedDefinitions.clear();
+        this.sectionChangeCounter++;
+        watcher.close();
+      });
+    }
+    return fileReference.read()
+      .then((contents: string) => {
+        let stream = new FmtReader.StringInputStream(contents);
+        let errorHandler = new FmtReader.DefaultErrorHandler(fileReference.fileName);
         let sectionReader = new FmtReader.Reader(stream, errorHandler, FmtLibrary.getMetaModel);
         let sectionFileName = sectionReader.readIdentifier();
         if (sectionFileName !== this.getLocalSectionFileName()) {
@@ -347,6 +353,36 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           state: LibraryDefinitionState.Preloaded
         };
       });
+  }
+
+  private watchFile(name: string, isSection: boolean, definitionName: string, getMetaModel: Meta.MetaModelGetter, watchedFile: WatchedFile): void {
+    if (this.config.watchForChanges && watchedFile.fileReference.watch) {
+      watchedFile.fileWatcher = watchedFile.fileReference.watch((newContents: string) => {
+        let currentEditedDefinition = this.editedDefinitions.get(name);
+        try {
+          let newLibraryDefinition = this.createLibraryDefinition(watchedFile.fileReference, definitionName, getMetaModel, newContents);
+          if (watchedFile.libraryDefinition) {
+            watchedFile.libraryDefinition.file = newLibraryDefinition.file;
+            watchedFile.libraryDefinition.definition = newLibraryDefinition.definition;
+            if (currentEditedDefinition) {
+              currentEditedDefinition.file = watchedFile.libraryDefinition.file.clone();
+              currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
+            }
+          } else {
+            this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(newLibraryDefinition));
+            watchedFile.libraryDefinition = newLibraryDefinition;
+          }
+        } catch (error) {
+          this.fullyLoadedDefinitions.delete(name);
+          if (!currentEditedDefinition) {
+            watchedFile.fileWatcher?.close();
+          }
+        }
+        if (isSection) {
+          this.sectionChangeCounter++;
+        }
+      });
+    }
   }
 
   private fetchDefinition(name: string, isSection: boolean, definitionName: string, getMetaModel: Meta.MetaModelGetter, fullContentsRequired: boolean): CachedPromise<LibraryDefinition> {
@@ -383,41 +419,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
             });
         }
       } else {
-        let readFileResult = this.fileAccessor.readFile(uri);
-        if (this.config.retryMissingFiles) {
-          readFileResult.catch(() => this.fullyLoadedDefinitions.delete(name));
-        }
-        result = readFileResult.then((contents: FileContents) => {
+        let fileReference = this.fileAccessor.openFile(uri, false);
+        let watchedFile: WatchedFile = {fileReference: fileReference};
+        this.watchFile(name, isSection, definitionName, getMetaModel, watchedFile);
+        result = fileReference.read().then((contents: string) => {
           this.preloadedDefinitions.delete(name);
-          let libraryDefinition: LibraryDefinition | undefined = undefined;
-          if (this.config.watchForChanges && contents.addWatcher) {
-            contents.addWatcher((watcher: FileWatcher) => {
-              let currentEditedDefinition = this.editedDefinitions.get(name);
-              try {
-                let newLibraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
-                if (libraryDefinition) {
-                  libraryDefinition.file = newLibraryDefinition.file;
-                  libraryDefinition.definition = newLibraryDefinition.definition;
-                  if (currentEditedDefinition) {
-                    currentEditedDefinition.file = libraryDefinition.file.clone();
-                    currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
-                  }
-                } else {
-                  libraryDefinition = newLibraryDefinition;
-                  this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(libraryDefinition));
-                }
-              } catch (error) {
-                this.fullyLoadedDefinitions.delete(name);
-                if (!currentEditedDefinition) {
-                  watcher.close();
-                }
-              }
-            });
-            if (isSection) {
-              this.sectionChangeCounter++;
-            }
-          }
-          libraryDefinition = this.createLibraryDefinition(uri, definitionName, getMetaModel, contents);
+          let libraryDefinition = this.createLibraryDefinition(fileReference, definitionName, getMetaModel, contents);
+          watchedFile.libraryDefinition = libraryDefinition;
           return libraryDefinition;
         });
         this.fullyLoadedDefinitions.set(name, result);
@@ -524,7 +532,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     definition.contents = contents;
     file.definitions.push(definition);
     let name = this.getLocalSectionFileName();
-    return this.createLocalDefinition(name, file, definition);
+    return this.createLocalDefinition(name, true, file, definition, FmtLibrary.getMetaModel);
   }
 
   fetchLocalItem(name: string, fullContentsRequired: boolean, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
@@ -638,18 +646,26 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     definition.documentation = new Fmt.DocumentationComment;
     definition.documentation.items = [references];
     file.definitions.push(definition);
-    return this.createLocalDefinition(name, file, definition);
+    return this.createLocalDefinition(name, false, file, definition, this.logic.getMetaModel);
   }
 
-  private createLocalDefinition(name: string, file: Fmt.File, definition: Fmt.Definition): LibraryDefinition {
+  private createLocalDefinition(name: string, isSection: boolean, file: Fmt.File, definition: Fmt.Definition, getMetaModel: Meta.MetaModelGetter): LibraryDefinition {
+    let uri = this.uri + encodeURI(name) + fileExtension;
+    let fileReference = this.fileAccessor.openFile(uri, true);
     let libraryDefinition: LibraryDefinition = {
       file: file,
       definition: definition,
       state: LibraryDefinitionState.EditingNew,
-      modified: false
+      modified: false,
+      fileReference: fileReference
     };
     this.editedDefinitions.set(name, libraryDefinition);
-    this.prePublishLocalDefinition(name, libraryDefinition, true);
+    let watchedFile: WatchedFile = {
+      fileReference: fileReference,
+      libraryDefinition: libraryDefinition
+    };
+    this.watchFile(name, isSection, definition.name, getMetaModel, watchedFile);
+    this.prePublishLocalDefinition(libraryDefinition);
     return libraryDefinition;
   }
 
@@ -660,7 +676,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       file: clonedFile,
       definition: this.getMainDefinition(clonedFile, name),
       state: LibraryDefinitionState.Editing,
-      modified: false
+      modified: false,
+      fileReference: libraryDefinition.fileReference
     };
     this.editedDefinitions.set(name, clonedLibraryDefinition);
     this.editedItemInfos.set(name, itemInfo);
@@ -678,7 +695,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       throw new Error('Trying to modify definition that is not being edited');
     }
     editedLibraryDefinition.modified = true;
-    this.prePublishLocalDefinition(name, editedLibraryDefinition, false);
+    this.prePublishLocalDefinition(editedLibraryDefinition);
   }
 
   cancelEditing(editedLibraryDefinition: LibraryDefinition): void {
@@ -718,11 +735,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     this.editedItemInfos.delete(name);
     this.originalItemInfos.delete(name);
     this.sectionChangeCounter++;
-    if (this.fileAccessor.unPrePublishFile) {
-      let uri = this.uri + encodeURI(name) + fileExtension;
-      this.fileAccessor.unPrePublishFile(uri)
-        .catch(() => {});
-    }
+    this.unPrePublishLocalDefinition(editedLibraryDefinition);
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
@@ -738,19 +751,18 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
     }
     let prevState = editedLibraryDefinition.state;
-    let createNew = prevState === LibraryDefinitionState.EditingNew;
     editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
     let localSectionFileName = this.getLocalSectionFileName();
     let sectionDefinition = this.editedDefinitions.get(localSectionFileName);
     if (sectionDefinition) {
       return this.submitLocalSection(localSectionFileName, sectionDefinition)
-        .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, createNew, false))
+        .then(() => this.submitLocalDefinition(name, editedLibraryDefinition, false))
         .catch((error) => {
           editedLibraryDefinition.state = prevState;
           return CachedPromise.reject(error);
         });
     }
-    return this.submitLocalDefinition(name, editedLibraryDefinition, createNew, false)
+    return this.submitLocalDefinition(name, editedLibraryDefinition, false)
       .catch((error) => {
         editedLibraryDefinition.state = prevState;
         return CachedPromise.reject(error);
@@ -765,47 +777,47 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let parentSectionDefinition = this.parent.editedDefinitions.get(parentSectionFileName);
       if (parentSectionDefinition) {
         return this.parent.submitLocalSection(parentSectionFileName, parentSectionDefinition)
-          .then(() => this.submitLocalDefinition(localSectionFileName, sectionDefinition, true, true))
+          .then(() => this.submitLocalDefinition(localSectionFileName, sectionDefinition, true))
           .catch((error) => {
             sectionDefinition.state = prevState;
             return CachedPromise.reject(error);
           });
       }
     }
-    return this.submitLocalDefinition(localSectionFileName, sectionDefinition, false, true)
+    return this.submitLocalDefinition(localSectionFileName, sectionDefinition, true)
       .catch((error) => {
         sectionDefinition.state = prevState;
         return CachedPromise.reject(error);
       });
   }
 
-  private prePublishLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, createNew: boolean): void {
-    if (this.fileAccessor.prePublishFile) {
+  private prePublishLocalDefinition(editedLibraryDefinition: LibraryDefinition): void {
+    if (editedLibraryDefinition.fileReference && editedLibraryDefinition.fileReference.prePublish) {
       try {
-        let uri = this.uri + encodeURI(name) + fileExtension;
         let contents = FmtWriter.writeString(editedLibraryDefinition.file, true);
-        if (createNew) {
-          this.fileAccessor.prePublishFile(uri, contents, true, false)
-            .then(() => {
-              if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
-                editedLibraryDefinition.state = LibraryDefinitionState.Editing;
-              }
-            })
-            .catch(() => {});
-        } else {
-          this.fileAccessor.prePublishFile(uri, contents, false, false)
-            .catch(() => {});
-        }
+        editedLibraryDefinition.fileReference.prePublish(contents, false)
+          .then(() => {
+            if (editedLibraryDefinition.state === LibraryDefinitionState.EditingNew) {
+              editedLibraryDefinition.state = LibraryDefinitionState.Editing;
+            }
+          })
+          .catch(() => {});
       } catch (error) {
       }
     }
   }
 
-  private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+  private unPrePublishLocalDefinition(editedLibraryDefinition: LibraryDefinition): void {
+    if (editedLibraryDefinition.fileReference && editedLibraryDefinition.fileReference.unPrePublish) {
+      editedLibraryDefinition.fileReference.unPrePublish()
+        .catch(() => {});
+    }
+  }
+
+  private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     try {
-      let uri = this.uri + encodeURI(name) + fileExtension;
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
-      return this.fileAccessor.writeFile!(uri, contents, createNew, isPartOfGroup)
+      return editedLibraryDefinition.fileReference!.write!(contents, isPartOfGroup)
         .then((result: WriteFileResult) => {
           editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
           let fullyLoadedDefinitionPromise = this.fullyLoadedDefinitions.get(name);
@@ -829,9 +841,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
-  openLocalItem(name: string, openLocally: boolean): CachedPromise<void> {
+  viewLocalItem(name: string, openLocally: boolean): CachedPromise<void> {
     let uri = this.uri + encodeURI(name) + fileExtension;
-    return this.fileAccessor.openFile!(uri, openLocally);
+    return this.fileAccessor.openFile(uri, false).view!(openLocally);
   }
 
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo> {

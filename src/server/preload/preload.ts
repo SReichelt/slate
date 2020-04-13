@@ -1,4 +1,4 @@
-import { FileAccessor, FileContents, FileWatcher } from '../../shared/data/fileAccessor';
+import { FileAccessor, FileWatcher } from '../../shared/data/fileAccessor';
 import * as Fmt from '../../shared/format/format';
 import * as Meta from '../../shared/format/metaModel';
 import * as FmtReader from '../../shared/format/read';
@@ -13,15 +13,17 @@ export class LibraryPreloader {
   constructor(private fileAccessor: FileAccessor) {}
 
   private readFile(indexURI: string, uri: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {
-    return this.fileAccessor.readFile(uri).then((contents: FileContents) => {
-      if (contents.addWatcher) {
-        this.watchers.add(contents.addWatcher((watcher: FileWatcher) => {
-          this.preloadedSections.delete(indexURI);
-          watcher.close();
-          this.watchers.delete(watcher);
-        }));
-      }
-      return FmtReader.readString(contents.text, uri, getMetaModel);
+    let fileReference = this.fileAccessor.openFile(uri, false);
+    if (fileReference.watch) {
+      let watcher = fileReference.watch(() => {
+        this.preloadedSections.delete(indexURI);
+        watcher.close();
+        this.watchers.delete(watcher);
+      });
+      this.watchers.add(watcher);
+    }
+    return fileReference.read().then((contents: string) => {
+      return FmtReader.readString(contents, uri, getMetaModel);
     });
   }
 

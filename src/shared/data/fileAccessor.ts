@@ -1,21 +1,24 @@
 import CachedPromise from './cachedPromise';
 
 export interface FileAccessor {
-  readFile(uri: string): CachedPromise<FileContents>;
-  writeFile?(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult>;
-  prePublishFile?(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult>;
-  unPrePublishFile?(uri: string): CachedPromise<void>;
-  openFile?(uri: string, openLocally: boolean): CachedPromise<void>;
+  openFile(uri: string, createNew: boolean): FileReference;
 }
 
-export interface FileContents {
-  text: string;
-  addWatcher?(onChange: (watcher: FileWatcher) => void): FileWatcher;
+export interface FileReference {
+   // Can match uri, but can also be a physical file name.
+  readonly fileName: string;
+
+  read(): CachedPromise<string>;
+  write?(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult>;
+  prePublish?(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult>;
+  unPrePublish?(): CachedPromise<void>;
+  watch?(onChange: (newContents: string) => void): FileWatcher;
+  view?(openLocally: boolean): CachedPromise<void>;
+}
+
+export interface WriteFileResult {
 }
 
 export interface FileWatcher {
   close(): void;
-}
-
-export interface WriteFileResult {
 }

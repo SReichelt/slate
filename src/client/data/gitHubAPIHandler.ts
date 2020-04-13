@@ -91,7 +91,7 @@ export class APIAccess {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `token ${this.accessToken}`
-      },
+      }
     };
     if (method === 'GET' || method === 'HEAD') {
       for (let key of Object.keys(request)) {
@@ -187,7 +187,7 @@ export class APIAccess {
     return utf8.decode(atob(result.content));
   }
 
-  async writeFile(repository: Repository, path: string, text: string, createNew: boolean, isPartOfGroup: boolean): Promise<PullRequestState | undefined> {
+  async writeFile(repository: Repository, path: string, contents: string, createNew: boolean, isPartOfGroup: boolean): Promise<PullRequestState | undefined> {
     await this.ensureWriteAccess(repository);
 
     let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
@@ -202,7 +202,7 @@ export class APIAccess {
 
     let putParameters = {
       message: 'Contribution via web app',
-      content: btoa(utf8.encode(text)),
+      content: btoa(utf8.encode(contents)),
       branch: repository.branch,
       sha: originalSHA
     };

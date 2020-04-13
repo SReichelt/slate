@@ -1,35 +1,21 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import { FileAccessor, FileContents, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
+import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class PhysicalFileAccessor implements FileAccessor {
   constructor(private basePath?: string) {}
 
-  readFile(uri: string): CachedPromise<FileContents> {
-    let fileName = this.getFileName(uri);
-    let contents = util.promisify(fs.readFile)(fileName, 'utf8')
-      .then((text) => new PhysicalFileContents(fileName, text));
-    return new CachedPromise(contents);
-  }
-
-  writeFile(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    let fileName = this.getFileName(uri);
-    if (createNew) {
-      this.makeDirectories(fileName);
-    }
-    let result = util.promisify(fs.writeFile)(fileName, text, 'utf8')
-      .then(() => ({}));
-    return new CachedPromise(result);
-  }
-
-  private getFileName(uri: string): string {
+  openFile(uri: string, createNew: boolean): FileReference {
     let fileName = decodeURI(uri);
     if (this.basePath) {
       fileName = path.join(this.basePath, fileName);
     }
-    return fileName;
+    if (createNew) {
+      this.makeDirectories(fileName);
+    }
+    return new PhysicalFileReference(fileName);
   }
 
   private makeDirectories(fileName: string): void {
@@ -41,21 +27,33 @@ export class PhysicalFileAccessor implements FileAccessor {
   }
 }
 
-class PhysicalFileContents implements FileContents {
-  constructor(private fileName: string, public text: string) {}
+class PhysicalFileReference implements FileReference {
+  constructor(public fileName: string) {}
 
-  addWatcher(onChange: (watcher: FileWatcher) => void): FileWatcher {
-    // This is currently racey. To fix it, we could re-read the file and compare its contents after creating the watcher.
-    let watcher: FileWatcher;
-    let listener = () => onChange(watcher);
-    watcher = new PhysicalFileWatcher(this.fileName, listener);
+  read(): CachedPromise<string> {
+    let contents = util.promisify(fs.readFile)(this.fileName, 'utf8');
+    return new CachedPromise(contents);
+  }
+
+  write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+    let result = util.promisify(fs.writeFile)(this.fileName, contents, 'utf8')
+      .then(() => ({}));
+    return new CachedPromise(result);
+  }
+
+  watch(onChange: (newContents: string) => void): FileWatcher {
+    let listener = () => fs.readFile(this.fileName, 'utf8', (error, data) => {
+      if (!error) {
+        onChange(data);
+      }
+    });
     fs.watchFile(this.fileName, listener);
-    return watcher;
+    return new PhysicalFileWatcher(this.fileName, listener);
   }
 }
 
 class PhysicalFileWatcher implements FileWatcher {
-  constructor(private fileName: string, private listener?: () => void) {}
+  constructor(private fileName: string, private listener: (() => void) | undefined) {}
 
   close(): void {
     if (this.listener) {

@@ -1,5 +1,5 @@
-import { WebFileAccessor } from './webFileAccessor';
-import { FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
+import { FileAccessor, WriteFileResult, FileReference } from '../../shared/data/fileAccessor';
+import { WebFileReference } from './webFileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
 
@@ -13,38 +13,46 @@ export interface GitHubConfig {
   apiAccess?: GitHub.APIAccess;
 }
 
-export class GitHubFileAccessor extends WebFileAccessor {
-  constructor(private config: CachedPromise<GitHubConfig>) {
-    super();
+export class GitHubFileAccessor implements FileAccessor {
+  constructor(private config: CachedPromise<GitHubConfig>) {}
+
+  openFile(uri: string, createNew: boolean): FileReference {
+    return new GitHubFileReference(this.config, uri, createNew);
+  }
+}
+
+export class GitHubFileReference extends WebFileReference {
+  constructor(private config: CachedPromise<GitHubConfig>, uri: string, private createNew: boolean) {
+    super(uri);
   }
 
-  readFile(uri: string): CachedPromise<FileContents> {
+  read(): CachedPromise<string> {
     return this.config.then((config) => {
       for (let target of config.targets) {
-        if (uri.startsWith(target.uriPrefix)) {
-          if (uri.endsWith('.preload')) {
+        if (this.uri.startsWith(target.uriPrefix)) {
+          if (this.uri.endsWith('.preload')) {
             if (target.repository.hasLocalChanges) {
               return CachedPromise.reject();
             }
             break;
           }
-          let path = uri.substring(target.uriPrefix.length);
-          uri = GitHub.getDownloadURL(target.repository, path);
+          let path = this.uri.substring(target.uriPrefix.length);
+          this.uri = GitHub.getDownloadURL(target.repository, path);
           break;
         }
       }
 
-      return super.readFile(uri);
+      return super.read();
     });
   }
 
-  writeFile(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+  write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     return this.config.then((config) => {
       if (config.apiAccess) {
         for (let target of config.targets) {
-          if (uri.startsWith(target.uriPrefix)) {
-            let path = uri.substring(target.uriPrefix.length);
-            let result = config.apiAccess.writeFile(target.repository, path, text, createNew, isPartOfGroup)
+          if (this.uri.startsWith(target.uriPrefix)) {
+            let path = this.uri.substring(target.uriPrefix.length);
+            let result = config.apiAccess.writeFile(target.repository, path, contents, this.createNew, isPartOfGroup)
               .then((pullRequestState) => {
                 let writeFileResult = new GitHubWriteFileResult;
                 writeFileResult.pullRequestState = pullRequestState;
@@ -55,16 +63,16 @@ export class GitHubFileAccessor extends WebFileAccessor {
         }
       }
 
-      return super.writeFile(uri, text, createNew, isPartOfGroup);
+      return super.write(contents, isPartOfGroup);
     });
   }
 
-  openFile(uri: string, openLocally: boolean): CachedPromise<void> {
+  view(openLocally: boolean): CachedPromise<void> {
     return this.config.then((config) => {
       if (!openLocally) {
         for (let target of config.targets) {
-          if (uri.startsWith(target.uriPrefix)) {
-            let path = uri.substring(target.uriPrefix.length);
+          if (this.uri.startsWith(target.uriPrefix)) {
+            let path = this.uri.substring(target.uriPrefix.length);
             let infoURL = GitHub.getInfoURL(target.repository, path);
             window.open(infoURL, '_blank');
             return;
@@ -72,7 +80,7 @@ export class GitHubFileAccessor extends WebFileAccessor {
         }
       }
 
-      return super.openFile(uri, openLocally);
+      return super.view(openLocally);
     });
   }
 }

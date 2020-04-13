@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as ejs from 'ejs';
 import { languageId } from '../slate';
 import * as Embedding from '../../../shared/data/embedding';
-import { FileAccessor, FileContents, FileWatcher } from '../../../shared/data/fileAccessor';
+import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
 
 let currentWorkspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
 let panel: vscode.WebviewPanel | undefined = undefined;
@@ -30,58 +30,58 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
     };
     let postResponse = (text?: string) => postResponseMessage('RESPONSE', text);
     let postError = (message?: string) => postResponseMessage('ERROR', message);
-    let baseURI = getBaseURI(currentWorkspaceFolder!);
-    let fileURI = baseURI + (requestMessage.uri ?? '');
+    let fileReference: FileReference | undefined = undefined;
+    if (requestMessage.uri) {
+        let baseURI = getBaseURI(currentWorkspaceFolder!);
+        fileReference = fileAccessor.openFile(baseURI + requestMessage.uri, requestMessage.command === 'CREATE');
+        if (fileReference.watch) {
+            let watcher = fileReference.watch((newContents: string) => {
+                if (panel && panel.webview === webview) {
+                    let updateMessage: Embedding.ResponseMessage = {
+                        command: 'UPDATE',
+                        uri: requestMessage.uri,
+                        text: newContents
+                    };
+                    webview.postMessage(updateMessage);
+                } else {
+                    watcher.close();
+                }
+            });
+        }
+    }
     switch (requestMessage.command) {
     case 'GET':
-        return fileAccessor.readFile(fileURI)
-            .then((contents: FileContents) => {
-                if (contents.addWatcher) {
-                    contents.addWatcher((watcher: FileWatcher) => {
-                        if (panel && panel.webview === webview) {
-                            let updateMessage: Embedding.ResponseMessage = {
-                                command: 'UPDATE',
-                                uri: requestMessage.uri,
-                                text: contents.text
-                            };
-                            webview.postMessage(updateMessage);
-                        } else {
-                            watcher.close();
-                        }
-                    });
-                }
-                return postResponse(contents.text);
-            })
+        return fileReference?.read()
+            .then((contents: string) => postResponse(contents))
             .catch((error) => postError(error.message));
     case 'CREATE':
     case 'PUT':
-        if (fileAccessor.writeFile && requestMessage.text) {
-            let createNew = (requestMessage.command === 'CREATE');
-            return fileAccessor.writeFile(fileURI, requestMessage.text, createNew, false)
+        if (fileReference?.write && requestMessage.text) {
+            return fileReference.write(requestMessage.text, false)
                 .then(() => postResponse())
                 .catch((error) => postError(error.message));
         } else {
             return postError('No write access');
         }
     case 'EDIT':
-        if (fileAccessor.prePublishFile && requestMessage.text) {
-            return fileAccessor.prePublishFile(fileURI, requestMessage.text, false, false)
+        if (fileReference?.prePublish && requestMessage.text) {
+            return fileReference.prePublish(requestMessage.text, false)
                 .then(() => postResponse())
                 .catch((error) => postError(error.message));
         } else {
             return postError('No write access');
         }
     case 'REVERT':
-        if (fileAccessor.unPrePublishFile) {
-            return fileAccessor.unPrePublishFile(fileURI)
+        if (fileReference?.unPrePublish) {
+            return fileReference.unPrePublish()
                 .then(() => postResponse())
                 .catch((error) => postError(error.message));
         } else {
             return postError('Cannot revert edits');
         }
     case 'SELECT':
-        if (requestMessage.command === 'SELECT' && fileAccessor.openFile) {
-            return fileAccessor.openFile(fileURI, true)
+        if (fileReference?.view) {
+            return fileReference.view(true)
                 .then(() => postResponse())
                 .catch((error) => postError(error.message));
         } else {

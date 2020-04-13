@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as FmtReader from '../../../shared/format/read';
 import * as FmtDisplay from '../../../shared/display/meta';
-import { FileAccessor, FileContents } from '../../../shared/data/fileAccessor';
+import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
 import { fileExtension } from '../../../fs/format/dynamic';
 import { SLATE_MODE } from '../slate';
 import { ParseDocumentEvent, HoverEvent } from '../events';
@@ -43,23 +43,21 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
 
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
         let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/display/templates' + fileExtension;
-        fileAccessor.readFile(templatesUri)
-            .then((contents: FileContents) => {
-                let onChange = () => {
-                    try {
-                        let templates = FmtReader.readString(contents.text, templatesUri, FmtDisplay.getMetaModel);
-                        codeLensProvider.templates = templates;
-                        hoverProvider.templates = templates;
-                    } catch (error) {
-                    }
-                    changeCodeLensesEventEmitter.fire();
-                };
-                if (contents.addWatcher) {
-                    let watcher = contents.addWatcher(onChange);
-                    context.subscriptions.push({ dispose() { watcher.close(); } });
-                }
-                onChange();
-            });
+        let templateFileReference = fileAccessor.openFile(templatesUri, false);
+        let onChange = (newContents: string) => {
+            try {
+                let templates = FmtReader.readString(newContents, templatesUri, FmtDisplay.getMetaModel);
+                codeLensProvider.templates = templates;
+                hoverProvider.templates = templates;
+            } catch (error) {
+            }
+            changeCodeLensesEventEmitter.fire();
+        };
+        if (templateFileReference.watch) {
+            let watcher = templateFileReference.watch(onChange);
+            context.subscriptions.push({ dispose() { watcher.close(); } });
+        }
+        templateFileReference.read().then(onChange);
     }
 }
 

@@ -1,5 +1,6 @@
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
+import { FileReference } from './fileAccessor';
 
 export interface LibraryDataAccessor {
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor;
@@ -18,6 +19,7 @@ export interface LibraryDefinition {
   definition: Fmt.Definition;
   state: LibraryDefinitionState;
   modified?: boolean;
+  fileReference?: FileReference;
 }
 
 export enum LibraryDefinitionState {

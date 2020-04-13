@@ -21,7 +21,7 @@ import * as Dialog from '../shared/display/dialog';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/data/embedding';
-import { FileAccessor, FileContents, WriteFileResult } from '../shared/data/fileAccessor';
+import { FileAccessor, FileReference, WriteFileResult } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
@@ -154,7 +154,6 @@ class App extends React.Component<AppProps, AppState> {
     let libraryDataProviderConfig: LibraryDataProviderConfig = {
       canPreload: canPreload,
       watchForChanges: true,
-      retryMissingFiles: false,
       checkMarkdownCode: false,
       allowPlaceholders: config.embedded
     };
@@ -263,10 +262,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    let templateUri = 'display/templates.slate';
-    this.fileAccessor.readFile(templateUri)
-      .then((contents: FileContents) => {
-        let templates = FmtReader.readString(contents.text, templateUri, FmtDisplay.getMetaModel);
+    let templateFile = this.fileAccessor.openFile('display/templates.slate', false);
+    templateFile.read()
+      .then((contents: string) => {
+        let templates = FmtReader.readString(contents, templateFile.fileName, FmtDisplay.getMetaModel);
         this.setState({
           templates: templates,
           rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, undefined, this.linkClicked)
@@ -676,7 +675,7 @@ class App extends React.Component<AppProps, AppState> {
         let libraryDataProvider = state.selectedItemProvider;
         let path = state.selectedItemLocalPath;
         if (libraryDataProvider && path) {
-          libraryDataProvider.openLocalItem(path.name, true)
+          libraryDataProvider.viewLocalItem(path.name, true)
             .catch(() => {});
         }
       } else {
@@ -901,18 +900,18 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private openLocally = (): void => {
-    this.openFile(true);
+    this.viewFile(true);
   };
 
   private openRemotely = (): void => {
-    this.openFile(false);
+    this.viewFile(false);
   };
 
-  private openFile(openLocally: boolean): void {
+  private viewFile(openLocally: boolean): void {
     let libraryDataProvider = this.state.selectedItemProvider;
     let path = this.state.selectedItemLocalPath;
     if (libraryDataProvider && path) {
-      libraryDataProvider.openLocalItem(path.name, openLocally)
+      libraryDataProvider.viewLocalItem(path.name, openLocally)
         .catch((error) => {
           this.props.alert.error('Error opening file: ' + error.message);
         });

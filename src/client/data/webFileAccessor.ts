@@ -1,21 +1,26 @@
 import { fetchAny, fetchVoid, fetchText } from '../utils/fetch';
-import { FileAccessor, FileContents, WriteFileResult } from '../../shared/data/fileAccessor';
-import { StandardFileContents } from '../../shared/data/fileAccessorImpl';
+import { FileAccessor, FileReference, WriteFileResult } from '../../shared/data/fileAccessor';
+import { StandardFileReference } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 export class WebFileAccessor implements FileAccessor {
-  readFile(uri: string): CachedPromise<FileContents> {
-    let contents = fetchText(uri)
-      .then((text) => new StandardFileContents(text));
+  openFile(uri: string): FileReference {
+    return new WebFileReference(uri);
+  }
+}
+
+export class WebFileReference extends StandardFileReference {
+  read(): CachedPromise<string> {
+    let contents = fetchText(this.uri);
     return new CachedPromise(contents);
   }
 
-  writeFile(uri: string, text: string, createNew: boolean, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+  write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     let options: RequestInit = {
       method: 'PUT',
-      body: text
+      body: contents
     };
-    let result = fetchAny(uri, options)
+    let result = fetchAny(this.uri, options)
       .then((response) => {
         let writeFileResult = new WebWriteFileResult;
         writeFileResult.writtenDirectly = (response.status === 200);
@@ -24,11 +29,11 @@ export class WebFileAccessor implements FileAccessor {
     return new CachedPromise(result);
   }
 
-  openFile(uri: string, openLocally: boolean): CachedPromise<void> {
+  view(openLocally: boolean): CachedPromise<void> {
     let options: RequestInit = {
       method: 'REPORT'
     };
-    let result = fetchVoid(uri, options);
+    let result = fetchVoid(this.uri, options);
     return new CachedPromise(result);
   }
 }

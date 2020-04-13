@@ -506,7 +506,7 @@ export class HLMUtils extends GenericUtils {
       if (!resolveParameters.followDefinitions) {
         return CachedPromise.resolve(undefined);
       }
-      // TODO resolve construction arguments
+      // TODO resolve construction arguments?
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression[] | undefined => {
         if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
           return definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));

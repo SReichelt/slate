@@ -110,7 +110,6 @@ export class LibraryDocumentProvider {
             let config: LibraryDataProviderConfig = {
                 canPreload: false,
                 watchForChanges: true,
-                retryMissingFiles: true,
                 checkMarkdownCode: false,
                 allowPlaceholders: true
             };
