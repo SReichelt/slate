@@ -58,11 +58,11 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
   linkClicked(semanticLink: Display.SemanticLink): void {
   }
 
-  hasPreview(semanticLink: Display.SemanticLink): boolean {
+  hasToolTip(semanticLink: Display.SemanticLink): boolean {
     return false;
   }
 
-  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode {
+  getToolTipContents(semanticLink: Display.SemanticLink): React.ReactNode {
     return undefined;
   }
 
@@ -116,11 +116,11 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     }
   }
 
-  hasPreview(semanticLink: Display.SemanticLink): boolean {
+  hasToolTip(semanticLink: Display.SemanticLink): boolean {
     return semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression;
   }
 
-  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode {
+  getToolTipContents(semanticLink: Display.SemanticLink): React.ReactNode {
     let path = this.getPath(semanticLink);
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);

@@ -287,9 +287,9 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       {
-        let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+        let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
           let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || type instanceof FmtHLM.MetaRefExpression_MacroOperator || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor)) {
+          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList) || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor)) {
             return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true);
           } else {
             return undefined;
@@ -635,9 +635,9 @@ export class HLMEditHandler extends GenericEditHandler {
     let resultPaths = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition);
     let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let resultPath of resultPaths) {
-      let expression = new Fmt.DefinitionRefExpression;
-      expression.path = resultPath;
       result = result.then((currentResult: Fmt.Expression[]) => {
+        let expression = new Fmt.DefinitionRefExpression;
+        expression.path = resultPath;
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
             .then((checkResult: Logic.LogicCheckResultWithExpression) => {

@@ -33,15 +33,15 @@ export interface ExpressionInteractionHandler {
   hoverChanged(hover: Display.SemanticLink[]): void;
   getURI(semanticLink: Display.SemanticLink): string | undefined;
   linkClicked(semanticLink: Display.SemanticLink): void;
-  hasPreview(semanticLink: Display.SemanticLink): boolean;
-  getPreviewContents(semanticLink: Display.SemanticLink): React.ReactNode;
+  hasToolTip(semanticLink: Display.SemanticLink): boolean;
+  getToolTipContents(semanticLink: Display.SemanticLink): React.ReactNode;
   enterBlocker(): void;
   leaveBlocker(): void;
   isBlocked(): boolean;
   renderCode(code: string): React.ReactNode;
 }
 
-let previewContents: React.ReactNode = null;
+let toolTipContents: React.ReactNode = null;
 
 interface ExpressionProps {
   expression: Display.RenderedExpression;
@@ -49,12 +49,12 @@ interface ExpressionProps {
   shrinkMathSpaces?: boolean;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
-  tooltipPosition?: string;
+  toolTipPosition?: string;
 }
 
 interface ExpressionState {
   hovered: boolean;
-  showPreview: boolean;
+  showToolTip: boolean;
   clicking: boolean;
   inputError: boolean;
   openMenu?: Menu.ExpressionMenu;
@@ -71,15 +71,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private permanentlyHighlighted = false;
   private highlightPermanentlyTimer: any;
   private shrinkMathSpaces = true;
-  private previewTimer: any;
-  private tooltipPosition: string;
+  private toolTipTimer: any;
+  private toolTipPosition: string;
 
   constructor(props: ExpressionProps) {
     super(props);
 
     this.state = {
       hovered: false,
-      showPreview: false,
+      showToolTip: false,
       clicking: false,
       inputError: false
     };
@@ -118,7 +118,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private updateOptionalProps(props: ExpressionProps): void {
     this.shrinkMathSpaces = props.shrinkMathSpaces || props.parent?.shrinkMathSpaces || false;
-    this.tooltipPosition = props.tooltipPosition || props.parent?.tooltipPosition || 'bottom';
+    this.toolTipPosition = props.toolTipPosition || props.parent?.toolTipPosition || 'bottom';
   }
 
   private clearOpenMenu(): void {
@@ -155,9 +155,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private cleanupDependentState(): void {
-    if (this.previewTimer) {
-      clearTimeout(this.previewTimer);
-      this.previewTimer = undefined;
+    if (this.toolTipTimer) {
+      clearTimeout(this.toolTipTimer);
+      this.toolTipTimer = undefined;
     }
     this.clearHoverAndMenu();
     this.disableInteractionBlocker();
@@ -979,27 +979,27 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             </span>
           );
         }
-        if (uriLink && this.props.interactionHandler.hasPreview(uriLink) && this.htmlNode) {
-          let showPreview = false;
-          if (this.state.showPreview) {
-            previewContents = this.props.interactionHandler.getPreviewContents(uriLink);
-            if (previewContents) {
-              showPreview = true;
+        if (uriLink && this.props.interactionHandler.hasToolTip(uriLink) && this.htmlNode) {
+          let showToolTip = false;
+          if (this.state.showToolTip) {
+            toolTipContents = this.props.interactionHandler.getToolTipContents(uriLink);
+            if (toolTipContents) {
+              showToolTip = true;
             }
             if (uri) {
-              previewContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{previewContents}</a>;
+              toolTipContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{toolTipContents}</a>;
             }
           }
-          let previewStyle = {
+          let toolTipStyle = {
             style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
             arrowStyle: {'color': 'var(--tooltip-background-color)'}
           };
-          let preview = (
-            <ToolTip active={showPreview} position={this.tooltipPosition} arrow="center" parent={this.htmlNode} style={previewStyle} key="preview">
-              <div className={'preview'}>{previewContents}</div>
+          let toolTip = (
+            <ToolTip active={showToolTip} position={this.toolTipPosition} arrow="center" parent={this.htmlNode} style={toolTipStyle} key="tooltip">
+              <div className={'tooltip'}>{toolTipContents}</div>
             </ToolTip>
           );
-          result = [result, preview];
+          result = [result, toolTip];
         }
       } else {
         result = (
@@ -1294,18 +1294,20 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         this.props.interactionHandler.hoverChanged(hover);
       }
-      if (this.isDirectlyHovered() && !this.props.interactionHandler.isBlocked()) {
-        if (this.previewTimer) {
-          clearTimeout(this.previewTimer);
+      if (this.toolTipTimer) {
+        clearTimeout(this.toolTipTimer);
+      }
+      if (this.isDirectlyHovered()) {
+        if (!this.props.interactionHandler.isBlocked()) {
+          let update = () => {
+            if (this.isDirectlyHovered()) {
+              this.setState({showToolTip: true});
+            }
+          };
+          this.toolTipTimer = setTimeout(update, 250);
         }
-        let update = () => {
-          if (this.isDirectlyHovered()) {
-            this.setState({showPreview: true});
-          }
-        };
-        this.previewTimer = setTimeout(update, 250);
       } else {
-        this.setState((prevState: ExpressionState) => prevState.showPreview ? {showPreview: false} : null);
+        this.setState((prevState: ExpressionState) => prevState.showToolTip ? {showToolTip: false} : null);
       }
     }
   }

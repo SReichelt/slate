@@ -16,7 +16,7 @@ class SourceCodeView extends LibraryItemBase {
       outerIndent: ''
     };
     writer.writeDefinition(this.props.definition.definition, indent);
-    return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} tooltipPosition="top"/>;
+    return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} toolTipPosition="top"/>;
   }
 
   protected onExpressionChanged = () => {

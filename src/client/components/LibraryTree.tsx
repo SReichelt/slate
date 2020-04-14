@@ -20,6 +20,10 @@ export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
 export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, definitionType: Logic.LogicDefinitionTypeDescription | undefined) => void;
 
+interface ScrollPaneReference {
+  htmlNode: HTMLElement | null;
+}
+
 interface LibraryTreeProps {
   libraryDataProvider: LibraryDataProvider;
   templates?: Fmt.File;
@@ -36,7 +40,7 @@ interface LibraryTreeState {
 
 class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
   private searchInputNode: HTMLInputElement | null = null;
-  private treePaneNode: HTMLElement | null = null;
+  private scrollPaneReference: ScrollPaneReference = {htmlNode: null};
   private focusTimer: any;
   private searchTimer: any;
 
@@ -76,10 +80,10 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
           <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true} ref={(node) => (this.searchInputNode = node)}/>
         </div>
         <div className={'tree-area'}>
-          <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
+          <ScrollPane onRef={(htmlNode) => (this.scrollPaneReference.htmlNode = htmlNode)}>
             <div className={'tree'}>
               <div className={'tree-contents'}>
-                <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} templates={this.props.templates} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedItemPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} parentScrollPane={this.treePaneNode} sectionPromise={sectionPromise} itemNumber={[]} indent={0} searchWords={this.state.searchWords} key={this.props.libraryDataProvider.getSectionChangeCounter()}/>
+                <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} templates={this.props.templates} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedItemPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} parentScrollPane={this.scrollPaneReference} sectionPromise={sectionPromise} itemNumber={[]} indent={0} searchWords={this.state.searchWords} key={this.props.libraryDataProvider.getSectionChangeCounter()}/>
               </div>
             </div>
           </ScrollPane>
@@ -116,16 +120,16 @@ interface LibraryItemListProps extends LibraryTreeProps {
 }
 
 export class LibraryItemList extends React.Component<LibraryItemListProps> {
-  private treePaneNode: HTMLElement | null = null;
+  private scrollPaneReference: ScrollPaneReference = {htmlNode: null};
 
   render(): React.ReactNode {
     return (
-      <ScrollPane onRef={(htmlNode) => (this.treePaneNode = htmlNode)}>
+      <ScrollPane onRef={(htmlNode) => (this.scrollPaneReference.htmlNode = htmlNode)}>
         <div className={'tree'}>
           <div className={'tree-contents'}>
             {this.props.items.map((entry: LibraryItemListEntry) => {
               let selected = FmtUtils.arePathsEqual(entry.absolutePath, this.props.selectedItemPath);
-              return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} parentScrollPane={this.treePaneNode} searchWords={[]} onFilter={this.props.onFilter} autoOpen={false} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
+              return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} parentScrollPane={this.scrollPaneReference} searchWords={[]} onFilter={this.props.onFilter} autoOpen={false} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
             })}
           </div>
         </div>
@@ -135,7 +139,7 @@ export class LibraryItemList extends React.Component<LibraryItemListProps> {
 }
 
 interface InnerLibraryTreeProps extends LibraryTreeProps {
-  parentScrollPane: HTMLElement | null;
+  parentScrollPane: ScrollPaneReference;
   sectionPromise?: CachedPromise<LibraryDefinition>;
   libraryDefinition?: LibraryDefinition;
   innerDefinitions?: Fmt.Definition[];
@@ -361,11 +365,11 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
   }
 }
 
-let previewContents: React.ReactNode = null;
+let toolTipContents: React.ReactNode = null;
 
 interface LibraryTreeItemBaseProps {
   libraryDataProvider: LibraryDataProvider;
-  parentScrollPane: HTMLElement | null;
+  parentScrollPane: ScrollPaneReference;
   indent: number;
 }
 
@@ -392,7 +396,7 @@ interface LibraryTreeItemState {
   filtering: boolean;
   filtered: boolean;
   opened: boolean;
-  showPreview: boolean;
+  showToolTip: boolean;
 }
 
 abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, StateType = {}> extends React.Component<PropType, StateType> {
@@ -431,8 +435,8 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
 
   // Calculate visible dimensions for tooltip.
   getBoundingClientRect(): ClientRect {
-    if (this.props.parentScrollPane && this.htmlNode) {
-      let parentRect = this.props.parentScrollPane.getBoundingClientRect();
+    if (this.props.parentScrollPane.htmlNode && this.htmlNode) {
+      let parentRect = this.props.parentScrollPane.htmlNode.getBoundingClientRect();
       let itemRect = this.htmlNode.getBoundingClientRect();
       if (parentRect.width > 0) {
         return {
@@ -462,9 +466,9 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
   private libraryDefinitionPromise?: CachedPromise<LibraryDefinition>;
   private clicked: boolean = false;
   private hovered: boolean = false;
-  private refreshTooltip: boolean = false;
+  private refreshToolTip: boolean = false;
   private updateTimer: any;
-  private previewTimer: any;
+  private toolTipTimer: any;
   private scrollTimer: any;
   private siblingsTimer: any;
 
@@ -476,17 +480,13 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
       opened: false,
       filtering: false,
       filtered: false,
-      showPreview: false
+      showToolTip: false
     };
   }
 
   componentDidMount(): void {
-    if (this.props.visibleSiblings) {
-      this.props.visibleSiblings.add(this);
-    }
-    if (this.props.parentScrollPane) {
-      this.props.parentScrollPane.addEventListener('scroll', this.onScroll);
-    }
+    this.props.visibleSiblings?.add(this);
+    this.props.parentScrollPane.htmlNode?.addEventListener('scroll', this.onScroll);
     this.updateItem(this.props);
     this.updateSelection(this.props);
     if (this.props.interactionHandler && this.props.selected) {
@@ -495,20 +495,16 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
   }
 
   componentWillUnmount(): void {
-    if (this.props.visibleSiblings) {
-      this.props.visibleSiblings.delete(this);
-    }
-    if (this.props.parentScrollPane) {
-      this.props.parentScrollPane.removeEventListener('scroll', this.onScroll);
-    }
+    this.props.visibleSiblings?.delete(this);
+    this.props.parentScrollPane.htmlNode?.removeEventListener('scroll', this.onScroll);
     this.libraryDefinitionPromise = undefined;
     if (this.updateTimer) {
       clearTimeout(this.updateTimer);
       this.updateTimer = undefined;
     }
-    if (this.previewTimer) {
-      clearTimeout(this.previewTimer);
-      this.previewTimer = undefined;
+    if (this.toolTipTimer) {
+      clearTimeout(this.toolTipTimer);
+      this.toolTipTimer = undefined;
     }
     if (this.scrollTimer) {
       clearTimeout(this.scrollTimer);
@@ -525,20 +521,14 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
 
   componentDidUpdate(prevProps: LibraryTreeItemProps): void {
     if (this.props.visibleSiblings !== prevProps.visibleSiblings) {
-      if (prevProps.visibleSiblings) {
-        prevProps.visibleSiblings.delete(this);
-      }
-      if (this.props.visibleSiblings && !this.state.filtered) {
-        this.props.visibleSiblings.add(this);
+      prevProps.visibleSiblings?.delete(this);
+      if (!this.state.filtered) {
+        this.props.visibleSiblings?.add(this);
       }
     }
     if (this.props.parentScrollPane !== prevProps.parentScrollPane) {
-      if (prevProps.parentScrollPane) {
-        prevProps.parentScrollPane.removeEventListener('scroll', this.onScroll);
-      }
-      if (this.props.parentScrollPane) {
-        this.props.parentScrollPane.addEventListener('scroll', this.onScroll);
-      }
+      prevProps.parentScrollPane.htmlNode?.removeEventListener('scroll', this.onScroll);
+      this.props.parentScrollPane.htmlNode?.addEventListener('scroll', this.onScroll);
     }
     if (this.props.isSubsection !== prevProps.isSubsection
         || this.props.libraryDefinition !== prevProps.libraryDefinition
@@ -731,11 +721,11 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
               display = summaryExpression;
             }
           }
-          if (this.refreshTooltip) {
-            this.refreshTooltip = false;
-          } else if (display && this.props.parentScrollPane && !this.props.selected) {
-            let showPreview = false;
-            if (this.state.showPreview) {
+          if (this.refreshToolTip) {
+            this.refreshToolTip = false;
+          } else if (display && this.props.parentScrollPane.htmlNode && !this.props.selected) {
+            let showToolTip = false;
+            if (this.state.showToolTip) {
               rendererOptions.maxListLength = 20;
               let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
                 includeLabel: false,
@@ -744,20 +734,20 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
               };
               let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
               if (renderedDefinition) {
-                previewContents = <Expression expression={renderedDefinition}/>;
-                showPreview = true;
+                toolTipContents = <Expression expression={renderedDefinition}/>;
+                showToolTip = true;
               }
             }
-            let previewStyle = {
+            let toolTipStyle = {
               style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
               arrowStyle: {'color': 'var(--tooltip-background-color)'}
             };
-            let preview = (
-              <ToolTip active={showPreview} position="right" arrow="center" parent={this} style={previewStyle} key="preview">
-                <div className={'preview'}>{previewContents}</div>
+            let toolTip = (
+              <ToolTip active={showToolTip} position="right" arrow="center" parent={this} style={toolTipStyle} key="tooltip">
+                <div className={'tooltip'}>{toolTipContents}</div>
               </ToolTip>
             );
-            display = [display, preview];
+            display = [display, toolTip];
           }
         }
       }
@@ -829,24 +819,24 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     this.hovered = true;
     let show = () => {
       if (this.hovered) {
-        this.setState({showPreview: true});
+        this.setState({showToolTip: true});
       }
     };
-    if (this.previewTimer) {
-      clearTimeout(this.previewTimer);
+    if (this.toolTipTimer) {
+      clearTimeout(this.toolTipTimer);
     }
-    this.previewTimer = setTimeout(show, 250);
+    this.toolTipTimer = setTimeout(show, 250);
   };
 
   private mouseLeft = (): void => {
     this.hovered = false;
-    this.setState({showPreview: false});
+    this.setState({showToolTip: false});
   };
 
   private onScroll = () => {
-    if (this.state.showPreview) {
-      this.refreshTooltip = true;
-      this.setState({showPreview: false});
+    if (this.state.showToolTip) {
+      this.refreshToolTip = true;
+      this.setState({showToolTip: false});
     }
   };
 

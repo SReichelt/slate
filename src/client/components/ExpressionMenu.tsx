@@ -9,6 +9,7 @@ import CachedPromise from '../../shared/data/cachedPromise';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 const Loading = require('react-loading-animation');
+const ToolTip = require('react-portal-tooltip').default;
 
 const clickDelay = 100;
 
@@ -336,6 +337,8 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
   }
 }
 
+let toolTipContents: React.ReactNode = null;
+
 interface ExpressionMenuItemProps {
   item: Menu.ExpressionMenuItem;
   colSpan?: number;
@@ -352,6 +355,7 @@ interface ExpressionMenuItemState {
 
 class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, ExpressionMenuItemState> {
   private ready = false;
+  private htmlNode: HTMLElement | null = null;
 
   constructor(props: ExpressionMenuItemProps) {
     super(props);
@@ -406,9 +410,33 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
       }
       event.stopPropagation();
     };
+    let toolTip: React.ReactNode = null;
+    if (this.props.interactionHandler && expression.semanticLinks && this.htmlNode) {
+      let showToolTip = false;
+      if (this.state.hovered) {
+        for (let semanticLink of expression.semanticLinks) {
+          let newToolTipContents = this.props.interactionHandler.getToolTipContents(semanticLink);
+          if (newToolTipContents) {
+            toolTipContents = newToolTipContents;
+            showToolTip = true;
+            break;
+          }
+        }
+      }
+      let toolTipStyle = {
+        style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
+        arrowStyle: {'color': 'var(--tooltip-background-color)'}
+      };
+      toolTip = (
+        <ToolTip active={showToolTip} position="right" arrow="center" parent={this.htmlNode} style={toolTipStyle} key="tooltip">
+          <div className={'tooltip'}>{toolTipContents}</div>
+        </ToolTip>
+      );
+    }
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
-        <Expression expression={expression} tooltipPosition={'right'}/>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.htmlNode = node)}>
+        <Expression expression={expression}/>
+        {toolTip}
       </td>
     );
   }

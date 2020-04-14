@@ -671,7 +671,7 @@ div.display-math {
   right: -0.3pt;
 }
 
-.preview>a {
+.tooltip>a {
   text-decoration: initial;
   color: unset;
 }

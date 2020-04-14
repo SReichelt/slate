@@ -24,7 +24,7 @@ export type RenderExpressionFn = (expression: Fmt.Expression) => Display.Rendere
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
-export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => CachedPromise<Fmt.Expression[]> | undefined;
+export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   static lastInsertedParameter?: Fmt.Parameter;
@@ -520,7 +520,7 @@ export abstract class GenericEditHandler {
       treeItem.templates = this.templates;
       treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => {
         let relativePath = this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
-        let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition);
+        let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition, false);
         if (expressionsPromise) {
           return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
         } else {
@@ -540,7 +540,7 @@ export abstract class GenericEditHandler {
         }
         libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
           let definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);
-          let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition);
+          let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition, false);
           if (expressionsPromise) {
             expressionsPromise.then((expressions: Fmt.Expression[]) => {
               selectionItem.items = expressions;
@@ -583,7 +583,7 @@ export abstract class GenericEditHandler {
   private getMRURows(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): CachedPromise<Menu.ExpressionMenuRow[]> {
     let iterator = this.mruList.iterator(this.libraryDataProvider);
     let addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
-      let result = onGetExpressions(path, outerDefinition, definition) || CachedPromise.resolve([]);
+      let result = onGetExpressions(path, outerDefinition, definition, true) || CachedPromise.resolve([]);
       return result.then((expressions: Fmt.Expression[]): void | CachedPromise<void> => {
         if (expressions.length) {
           let items = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
@@ -627,8 +627,11 @@ export abstract class GenericEditHandler {
   }
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
-    // TODO tooltip
-    let item = new Menu.ExpressionMenuItem(onRenderExpression(expression));
+    let renderedExpression = onRenderExpression(expression);
+    if (!renderedExpression.semanticLinks) {
+      renderedExpression.semanticLinks = [new Display.SemanticLink(expression)];
+    }
+    let item = new Menu.ExpressionMenuItem(renderedExpression);
     item.action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
     let origExpression = expressionEditInfo.expression;
     if (origExpression && !(origExpression instanceof Fmt.DefinitionRefExpression)) {
