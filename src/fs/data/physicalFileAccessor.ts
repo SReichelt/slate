@@ -28,6 +28,8 @@ export class PhysicalFileAccessor implements FileAccessor {
 }
 
 class PhysicalFileReference implements FileReference {
+  private writingFile = false;
+
   constructor(public fileName: string) {}
 
   read(): CachedPromise<string> {
@@ -36,17 +38,29 @@ class PhysicalFileReference implements FileReference {
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+    this.writingFile = true;
     let result = util.promisify(fs.writeFile)(this.fileName, contents, 'utf8')
-      .then(() => ({}));
+      .then(() => {
+        this.writingFile = false;
+        return {};
+      })
+      .catch((error) => {
+        this.writingFile = false;
+        throw error;
+      });
     return new CachedPromise(result);
   }
 
   watch(onChange: (newContents: string) => void): FileWatcher {
-    let listener = () => fs.readFile(this.fileName, 'utf8', (error, data) => {
-      if (!error) {
-        onChange(data);
+    let listener = () => {
+      if (!this.writingFile) {
+        fs.readFile(this.fileName, 'utf8', (error, data) => {
+          if (!error) {
+            onChange(data);
+          }
+        });
       }
-    });
+    };
     fs.watchFile(this.fileName, listener);
     return new PhysicalFileWatcher(this.fileName, listener);
   }
