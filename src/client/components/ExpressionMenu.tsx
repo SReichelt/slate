@@ -4,12 +4,12 @@ import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import renderPromise from './PromiseHelper';
 import Expression, { ExpressionInteractionHandler } from './Expression';
+import ExpressionToolTip from './ExpressionToolTip';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 import CachedPromise from '../../shared/data/cachedPromise';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 const Loading = require('react-loading-animation');
-const ToolTip = require('react-portal-tooltip').default;
 
 const clickDelay = 100;
 
@@ -337,8 +337,6 @@ class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, Expressi
   }
 }
 
-let toolTipContents: React.ReactNode = null;
-
 interface ExpressionMenuItemProps {
   item: Menu.ExpressionMenuItem;
   colSpan?: number;
@@ -412,26 +410,18 @@ class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps, Expres
     };
     let toolTip: React.ReactNode = null;
     if (this.props.interactionHandler && expression.semanticLinks && this.htmlNode) {
-      let showToolTip = false;
-      if (this.state.hovered) {
-        for (let semanticLink of expression.semanticLinks) {
-          let newToolTipContents = this.props.interactionHandler.getToolTipContents(semanticLink);
-          if (newToolTipContents) {
-            toolTipContents = newToolTipContents;
-            showToolTip = true;
-            break;
+      let interactionHandler = this.props.interactionHandler;
+      let semanticLinks = expression.semanticLinks;
+      let getToolTipContents = () => {
+        for (let semanticLink of semanticLinks) {
+          let toolTipContents = interactionHandler.getToolTipContents(semanticLink);
+          if (toolTipContents) {
+            return toolTipContents;
           }
         }
-      }
-      let toolTipStyle = {
-        style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
-        arrowStyle: {'color': 'var(--tooltip-background-color)'}
+        return null;
       };
-      toolTip = (
-        <ToolTip active={showToolTip} position="right" arrow="center" parent={this.htmlNode} style={toolTipStyle} key="tooltip">
-          <div className={'tooltip'}>{toolTipContents}</div>
-        </ToolTip>
-      );
+      toolTip = <ExpressionToolTip active={this.state.hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
     }
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.htmlNode = node)}>

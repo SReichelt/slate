@@ -952,6 +952,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let result = this.renderSetTermInternal(term.term, markParametersAsDummy);
       if (result) {
         result = new Display.DecoratedExpression(result);
+        this.addSemanticLink(result, term.term);
       }
       return result;
     } else {
@@ -1005,6 +1006,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let result = this.renderElementTermInternal(term.term);
       if (result) {
         result = new Display.DecoratedExpression(result);
+        this.addSemanticLink(result, term.term);
       }
       return result;
     } else {

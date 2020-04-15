@@ -4,6 +4,7 @@ import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
+import ExpressionToolTip, { ExpressionToolTipPosition } from './ExpressionToolTip';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
@@ -16,7 +17,6 @@ import 'easymde/dist/easymde.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
 
-const ToolTip = require('react-portal-tooltip').default;
 const RemarkableReactRenderer = require('remarkable-react').default;
 const Remarkable = require('remarkable').Remarkable;
 const linkify = require('remarkable/linkify').linkify;
@@ -41,15 +41,13 @@ export interface ExpressionInteractionHandler {
   renderCode(code: string): React.ReactNode;
 }
 
-let toolTipContents: React.ReactNode = null;
-
 interface ExpressionProps {
   expression: Display.RenderedExpression;
   addInnerParens?: boolean;
   shrinkMathSpaces?: boolean;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
-  toolTipPosition?: string;
+  toolTipPosition?: ExpressionToolTipPosition;
 }
 
 interface ExpressionState {
@@ -71,8 +69,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private permanentlyHighlighted = false;
   private highlightPermanentlyTimer: any;
   private shrinkMathSpaces = true;
-  private toolTipTimer: any;
-  private toolTipPosition: string;
+  private toolTipPosition: ExpressionToolTipPosition;
 
   constructor(props: ExpressionProps) {
     super(props);
@@ -155,10 +152,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private cleanupDependentState(): void {
-    if (this.toolTipTimer) {
-      clearTimeout(this.toolTipTimer);
-      this.toolTipTimer = undefined;
-    }
     this.clearHoverAndMenu();
     this.disableInteractionBlocker();
     this.disableWindowClickListener();
@@ -980,25 +973,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           );
         }
         if (uriLink && this.props.interactionHandler.hasToolTip(uriLink) && this.htmlNode) {
-          let showToolTip = false;
-          if (this.state.showToolTip) {
-            toolTipContents = this.props.interactionHandler.getToolTipContents(uriLink);
-            if (toolTipContents) {
-              showToolTip = true;
-            }
+          let interactionHandler = this.props.interactionHandler;
+          let getToolTipContents = () => {
+            let toolTipContents = interactionHandler.getToolTipContents(uriLink!);
             if (uri) {
               toolTipContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{toolTipContents}</a>;
             }
-          }
-          let toolTipStyle = {
-            style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
-            arrowStyle: {'color': 'var(--tooltip-background-color)'}
+            return toolTipContents;
           };
-          let toolTip = (
-            <ToolTip active={showToolTip} position={this.toolTipPosition} arrow="center" parent={this.htmlNode} style={toolTipStyle} key="tooltip">
-              <div className={'tooltip'}>{toolTipContents}</div>
-            </ToolTip>
-          );
+          let toolTip = <ExpressionToolTip active={this.state.showToolTip} position={this.toolTipPosition} parent={this.htmlNode} getContents={getToolTipContents} delay={250} key="tooltip"/>;
           result = [result, toolTip];
         }
       } else {
@@ -1294,17 +1277,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         this.props.interactionHandler.hoverChanged(hover);
       }
-      if (this.toolTipTimer) {
-        clearTimeout(this.toolTipTimer);
-      }
       if (this.isDirectlyHovered()) {
         if (!this.props.interactionHandler.isBlocked()) {
-          let update = () => {
-            if (this.isDirectlyHovered()) {
-              this.setState({showToolTip: true});
-            }
-          };
-          this.toolTipTimer = setTimeout(update, 250);
+          this.setState({showToolTip: true});
         }
       } else {
         this.setState((prevState: ExpressionState) => prevState.showToolTip ? {showToolTip: false} : null);

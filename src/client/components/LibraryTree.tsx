@@ -7,6 +7,7 @@ import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinit
 import * as Logic from '../../shared/logics/logic';
 import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
+import ExpressionToolTip from './ExpressionToolTip';
 import CachedPromise from '../../shared/data/cachedPromise';
 import renderPromise from './PromiseHelper';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
@@ -14,7 +15,6 @@ import Button from './Button';
 import MenuButton from './MenuButton';
 
 const Loading = require('react-loading-animation');
-const ToolTip = require('react-portal-tooltip').default;
 
 export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
@@ -365,8 +365,6 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
   }
 }
 
-let toolTipContents: React.ReactNode = null;
-
 interface LibraryTreeItemBaseProps {
   libraryDataProvider: LibraryDataProvider;
   parentScrollPane: ScrollPaneReference;
@@ -465,10 +463,8 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
 class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryTreeItemState> {
   private libraryDefinitionPromise?: CachedPromise<LibraryDefinition>;
   private clicked: boolean = false;
-  private hovered: boolean = false;
   private refreshToolTip: boolean = false;
   private updateTimer: any;
-  private toolTipTimer: any;
   private scrollTimer: any;
   private siblingsTimer: any;
 
@@ -501,10 +497,6 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     if (this.updateTimer) {
       clearTimeout(this.updateTimer);
       this.updateTimer = undefined;
-    }
-    if (this.toolTipTimer) {
-      clearTimeout(this.toolTipTimer);
-      this.toolTipTimer = undefined;
     }
     if (this.scrollTimer) {
       clearTimeout(this.scrollTimer);
@@ -724,8 +716,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           if (this.refreshToolTip) {
             this.refreshToolTip = false;
           } else if (display && this.props.parentScrollPane.htmlNode && !this.props.selected) {
-            let showToolTip = false;
-            if (this.state.showToolTip) {
+            let getToolTipContents = () => {
               rendererOptions.maxListLength = 20;
               let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
                 includeLabel: false,
@@ -734,19 +725,11 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
               };
               let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
               if (renderedDefinition) {
-                toolTipContents = <Expression expression={renderedDefinition}/>;
-                showToolTip = true;
+                return <Expression expression={renderedDefinition}/>;
               }
-            }
-            let toolTipStyle = {
-              style: {'color': 'var(--tooltip-foreground-color)', 'backgroundColor': 'var(--tooltip-background-color)'},
-              arrowStyle: {'color': 'var(--tooltip-background-color)'}
+              return null;
             };
-            let toolTip = (
-              <ToolTip active={showToolTip} position="right" arrow="center" parent={this} style={toolTipStyle} key="tooltip">
-                <div className={'tooltip'}>{toolTipContents}</div>
-              </ToolTip>
-            );
+            let toolTip = <ExpressionToolTip active={this.state.showToolTip} position="right" parent={this} getContents={getToolTipContents} delay={250} key="tooltip"/>;
             display = [display, toolTip];
           }
         }
@@ -782,16 +765,18 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
     }
     let treeItemContents = this.getTreeItemContents(icon, specialIcon, display);
     let treeItem: React.ReactNode;
+    let mouseEntered = () => this.setState({showToolTip: true});
+    let mouseLeft = () => this.setState({showToolTip: false});
     if (this.state.clickable) {
       let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
       treeItem = (
-        <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+        <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={mouseEntered} onMouseLeave={mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           {treeItemContents}
         </a>
       );
     } else {
       treeItem = (
-        <div className={className} onMouseEnter={this.mouseEntered} onMouseLeave={this.mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+        <div className={className} onMouseEnter={mouseEntered} onMouseLeave={mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           {treeItemContents}
         </div>
       );
@@ -813,24 +798,6 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
         this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.libraryDefinitionPromise, this.props.itemInfo);
       }
     }
-  };
-
-  private mouseEntered = (): void => {
-    this.hovered = true;
-    let show = () => {
-      if (this.hovered) {
-        this.setState({showToolTip: true});
-      }
-    };
-    if (this.toolTipTimer) {
-      clearTimeout(this.toolTipTimer);
-    }
-    this.toolTipTimer = setTimeout(show, 250);
-  };
-
-  private mouseLeft = (): void => {
-    this.hovered = false;
-    this.setState({showToolTip: false});
   };
 
   private onScroll = () => {
