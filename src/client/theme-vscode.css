@@ -18,6 +18,8 @@
   --button-hover-background-color: var(--vscode-button-hoverBackground);
   --button-selected-background-color: var(--vscode-editorGutter-addedBackground);
   --button-pressed-background-color: var(--vscode-progressBar-background);
+  --special-button-background-color: var(--button-background-color);
+  --special-button-border-color: var(--button-border-color);
   --expression-hover-background-color: var(--vscode-editorGutter-modifiedBackground);
   --expression-selected-background-color: var(--vscode-inputValidation-infoBorder);
   --expression-pressed-background-color: var(--button-pressed-background-color);
@@ -67,6 +69,8 @@
   --dialog-overlay-color: var(--vscode-editorUnnecessaryCode-opacity);
   --tooltip-foreground-color: var(--vscode-editorHoverWidget-foreground);
   --tooltip-background-color: var(--vscode-editorHoverWidget-background);
+  --permanent-tooltip-foreground-color: var(--vscode-editor-foreground);
+  --permanent-tooltip-background-color: var(--vscode-editorMarkerNavigationInfo-background);
   --source-code-font-family: var(--vscode-editor-font-family);
   --source-code-font-weight: var(--vscode-editor-font-weight);
   --source-code-font-size: var(--vscode-editor-font-size);

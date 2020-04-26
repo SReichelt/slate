@@ -3,12 +3,15 @@ import './App.css';
 import SplitPane from 'react-split-pane';
 import { withAlert, AlertManager } from 'react-alert';
 import ScrollPane from './components/ScrollPane';
-import StartPage from './components/StartPage';
+import StartPage from './extras/StartPage';
+import { TutorialState, addTutorial } from './extras/Tutorial';
+import { startTutorial } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import Button from './components/Button';
 import MenuButton from './components/MenuButton';
+import Message from './components/Message';
 import InsertDialog from './components/InsertDialog';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import renderPromise from './components/PromiseHelper';
@@ -21,7 +24,7 @@ import * as Dialog from '../shared/display/dialog';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/data/embedding';
-import { FileAccessor, FileReference, WriteFileResult } from '../shared/data/fileAccessor';
+import { FileAccessor, WriteFileResult } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
@@ -30,7 +33,6 @@ import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, Library
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
-import Message from './components/Message';
 
 const Loading = require('react-loading-animation');
 
@@ -74,10 +76,18 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
   editedDefinitions?: LibraryItemListEntry[];
+  tutorialState?: TutorialState;
 }
 
 class App extends React.Component<AppProps, AppState> {
   private static readonly gitHubAccessTokenStorageIdentifier = 'github_access_token';
+
+  private static readonly renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+    includeProofs: true,
+    includeLabel: true,
+    includeExtras: true,
+    includeRemarks: true
+  };
 
   private gitHubConfig?: GitHubConfig;
   private fileAccessor: FileAccessor;
@@ -144,7 +154,8 @@ class App extends React.Component<AppProps, AppState> {
         canPreload = true;
       } else {
         this.initializeGitHubConfig(state, gitHubAPIAccess);
-        // When running locally, preloading always returns local files. If the user has logged in to GitHub, we don't want to bypass that.
+        // When running locally, preloading always returns local files. If the user has logged in to GitHub, we want to load from GitHub instead.
+        // When not running locally, preloading is possible as long as there are no local modifications. (See GitHubFileAccessor.)
         canPreload = !config.runningLocally;
       }
     }
@@ -373,7 +384,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let navigationPane: React.ReactNode = null;
     if (this.state.navigationPaneVisible) {
-      let editListPane = <div className={'app-pane-placeholder'} key={'EditList'}/>;
+      let editListPane = <div className={'app-pane-placeholder'} key="edit-list"/>;
       if (this.state.editedDefinitions) {
         let editList: React.ReactNode;
         if (this.state.editedDefinitions.length) {
@@ -388,15 +399,18 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
         editListPane = (
-          <div className={'app-pane'} key={'EditList'}>
+          <div className={'app-pane'} key="edit-list">
             {editList}
           </div>
         );
       }
+      // TODO react to double-click in embedded mode by
+      //      1. opening permanently in vscode
+      //      2. hiding the navigation pane
       navigationPane = (
-        <SplitPane split={'horizontal'} size={this.state.editedDefinitions ? undefined : 0} resizerStyle={this.state.editedDefinitions ? undefined : {'height': 0, 'margin': 0}} key={'Nav'}>
+        <SplitPane split={'horizontal'} size={this.state.editedDefinitions ? undefined : 0} resizerStyle={this.state.editedDefinitions ? undefined : {'height': 0, 'margin': 0}} key="nav">
           {editListPane}
-          <div className={'app-pane'} key={'Tree'}>
+          <div className={'app-pane'} key="tree">
             <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
           </div>
         </SplitPane>
@@ -409,35 +423,30 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedItemProvider) {
       let definitionPromise = this.state.selectedItemDefinition;
       if (definitionPromise) {
-        const renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-          includeProofs: true,
-          includeLabel: true,
-          includeExtras: true,
-          includeRemarks: true
-        };
-
         let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
           if (this.state.selectedItemProvider && this.state.templates) {
             let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
             let itemInfo = this.state.selectedItemInfo;
             if (editing && this.state.selectedItemLocalPath) {
-              // When editing, item info may change according to user input. Need to make sure to get the correct instance -- the one where the changes happen.
+              // When editing, item info may change according to user input. Need to make sure to get the correct instance - the one where the changes happen.
               itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
             }
-            let result: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key={'LibraryItem'}/>;
+            let mainContentsResult: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="library-item"/>;
             if (editing) {
-              if (!this.state.gitHubUserInfo && !config.runningLocally) {
-                result = [<Message type={'info'} key={'Message'}>You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
+              if (this.state.tutorialState) {
+                mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Cancel)} Exit tutorial</Button></Message>, mainContentsResult];
+              } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
+                mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
               } else if (this.state.selectedItemRepository) {
                 let repository = this.state.selectedItemRepository;
                 if (!repository.hasWriteAccess) {
-                  result = [<Message type={'info'} key={'Message'}>For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, result];
+                  mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
                 } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
-                  result = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, result];
+                  mainContentsResult = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContentsResult];
                 }
               }
             }
-            return result;
+            return mainContentsResult;
           } else {
             return null;
           }
@@ -447,22 +456,25 @@ class App extends React.Component<AppProps, AppState> {
         if (!config.embedded) {
           if (this.state.extraContentsVisible) {
             let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key={'SourceCode'}/>;
+              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
             });
-            extraContents = renderPromise(extraContentsPromise, 'SourceCode');
+            extraContents = renderPromise(extraContentsPromise, 'source');
           } else {
-            extraContents = <div key={'SourceCode'}/>;
+            extraContents = <div key="source"/>;
           }
         }
       }
-    } else if (!config.embedded) {
-      mainContents = <StartPage libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onLinkClicked={this.linkClicked} key={'StartPage'}/>;
-      if (this.state.selectedItemRepository) {
-        let repository = this.state.selectedItemRepository;
-        if (repository.hasPullRequest) {
-          mainContents = [<Message type={'info'} key={'Message'}>Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
-        } else if (repository.hasLocalChanges) {
-          mainContents = [<Message type={'info'} key={'Message'}>Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+    } else {
+      let localContent = config.embedded || (config.runningLocally && !this.state.gitHubUserInfo);
+      if (!localContent) {
+        mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} key="start-page"/>;
+        if (this.state.selectedItemRepository) {
+          let repository = this.state.selectedItemRepository;
+          if (repository.hasPullRequest) {
+            mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+          } else if (repository.hasLocalChanges) {
+            mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+          }
         }
       }
     }
@@ -470,7 +482,7 @@ class App extends React.Component<AppProps, AppState> {
     let leftButtons: React.ReactNode[] = [];
     if (config.embedded) {
       leftButtons.push(
-        <Button toolTipText={'Table of Contents'} selected={this.state.navigationPaneVisible} onClick={() => this.setState((prevState) => ({navigationPaneVisible: !prevState.navigationPaneVisible}))} key={'ViewSource'}>
+        <Button toolTipText={'Table of Contents'} selected={this.state.navigationPaneVisible} onClick={() => this.setState((prevState) => ({navigationPaneVisible: !prevState.navigationPaneVisible}))} key="view-source">
           {getButtonIcon(ButtonType.TableOfContents)}
         </Button>
       );
@@ -479,7 +491,7 @@ class App extends React.Component<AppProps, AppState> {
       let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
         let userID: React.ReactNode[] = [];
         if (userInfo.avatarUrl) {
-          userID.push(<img src={userInfo.avatarUrl} key={'Avatar'}/>);
+          userID.push(<img src={userInfo.avatarUrl} key="avatar"/>);
         }
         if (userInfo.login) {
           if (userID.length) {
@@ -489,21 +501,21 @@ class App extends React.Component<AppProps, AppState> {
         }
         let userMenu: React.ReactNode[] = [
           (
-            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key={'LogOut'}>
+            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key="logout">
               {getButtonIcon(ButtonType.LogOut)}
             </Button>
           )
         ];
         return (
-          <MenuButton menu={userMenu} menuOnTop={true} openOnHover={true} key={'UserMenu'}>
+          <MenuButton menu={userMenu} menuOnTop={true} openOnHover={true} key="user-menu">
             {userID}
           </MenuButton>
         );
       });
-      leftButtons.push(renderPromise(loginInfoPromise, 'UserInfo'));
+      leftButtons.push(renderPromise(loginInfoPromise, 'user-info'));
     } else if (this.state.gitHubClientID) {
       leftButtons.push(
-        <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key={'LogIn'}>
+        <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key="login">
           {getButtonIcon(ButtonType.LogIn)}
         </Button>
       );
@@ -513,7 +525,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedItemDefinition) {
       let definition = this.state.selectedItemDefinition.getImmediateResult();
       if (definition && definition.state === LibraryDefinitionState.Submitting) {
-        rightButtons.push(<div className={'submitting'} key={'Submitting'}><Loading width={'1em'} height={'1em'}/></div>);
+        rightButtons.push(<div className={'submitting'} key="submitting"><Loading width={'1em'} height={'1em'}/></div>);
         rightButtons.push(' ');
       } else if (definition && (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
         let willSubmit: boolean | undefined;
@@ -524,34 +536,34 @@ class App extends React.Component<AppProps, AppState> {
           willSubmit = !config.runningLocally;
         }
         rightButtons.push(
-          <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key={'Submit'}>
+          <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key="submit">
             {getButtonIcon(willSubmit ? ButtonType.Submit : ButtonType.Save)}
           </Button>
         );
         rightButtons.push(
-          <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key={'Cancel'}>
+          <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key="cancel">
             {getButtonIcon(ButtonType.Cancel)}
           </Button>
         );
         rightButtons.push(' ');
       } else {
         let editButtonPromise = this.state.selectedItemDefinition.then(() => (
-          <Button toolTipText={'Edit'} onClick={this.edit} key={'Edit'}>
+          <Button toolTipText={'Edit'} onClick={this.edit} key="edit">
             {getButtonIcon(ButtonType.Edit)}
           </Button>
         ));
-        rightButtons.push(renderPromise(editButtonPromise, 'EditButton'));
+        rightButtons.push(renderPromise(editButtonPromise, 'edit'));
         if (!config.embedded) {
           if (config.runningLocally) {
             rightButtons.push(
-              <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key={'OpenLocally'}>
+              <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key="open-locally">
                 {getButtonIcon(ButtonType.OpenInVSCode)}
               </Button>
             );
           }
           if (this.fileAccessor instanceof GitHubFileAccessor) {
             rightButtons.push(
-              <Button toolTipText={'View in GitHub'} onClick={this.openRemotely} key={'ViewInGitHub'}>
+              <Button toolTipText={'View in GitHub'} onClick={this.openRemotely} key="view-in-github">
                 {getButtonIcon(ButtonType.ViewInGitHub)}
               </Button>
             );
@@ -561,14 +573,14 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (extraContents) {
       rightButtons.push(
-        <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key={'ViewSource'}>
+        <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key="view-source">
           {getButtonIcon(ButtonType.ViewSource)}
         </Button>
       );
     }
 
     let contentsPane = (
-      <div className={'bottom-toolbar-container'} key={'MainContents'}>
+      <div className={'bottom-toolbar-container'} key="main-contents">
         <div className={'app-pane'}>
           <ScrollPane object={this.state.selectedItemDefinition}>
             <div className={'app-contents'}>
@@ -588,7 +600,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (extraContents && this.state.extraContentsVisible) {
       contentsPane = (
-        <SplitPane split={'horizontal'} defaultSize={defaultItemHeight} key={'Contents'}>
+        <SplitPane split={'horizontal'} defaultSize={defaultItemHeight} key="contents">
           {contentsPane}
           <div className={'app-pane'}>
             <ScrollPane object={this.state.selectedItemDefinition}>
@@ -607,14 +619,15 @@ class App extends React.Component<AppProps, AppState> {
       dialog.definitionType = this.state.insertDialogDefinitionType;
       dialog.onCheckNameInUse = this.checkNameInUse;
       openDialog = (
-        <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key={'InsertDialog'}/>
+        <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key="insert-dialog"/>
       );
     }
 
+    let result: React.ReactNode;
     if (navigationPane) {
-      return (
+      result = (
         <div className={'app'}>
-          <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3} key={'Main'}>
+          <SplitPane split={this.state.verticalLayout ? 'horizontal' : 'vertical'} minSize={windowSize / 5} maxSize={windowSize * 4 / 5} defaultSize={windowSize / 3} key="main">
             {navigationPane}
             {contentsPane}
           </SplitPane>
@@ -622,13 +635,25 @@ class App extends React.Component<AppProps, AppState> {
         </div>
       );
     } else {
-      return (
+      result = (
         <div className={'app'}>
           {contentsPane}
           {openDialog}
         </div>
       );
     }
+
+    if (this.state.tutorialState) {
+      result = addTutorial(result, this.state.tutorialState);
+    }
+
+    return result;
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return {
+      error: error.message
+    };
   }
 
   private navigateToURI(uri: string): boolean {
@@ -665,7 +690,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setNewInteractionHandler(state);
     this.setState(state);
     let uri = '/';
-    if (state.selectedItemAbsolutePath) {
+    if (state.selectedItemAbsolutePath && state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
       this.mruList.add(state.selectedItemAbsolutePath);
       uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
@@ -742,6 +767,9 @@ class App extends React.Component<AppProps, AppState> {
               selectedItemDefinition: CachedPromise.resolve(libraryDefinition),
               selectedItemInfo: itemInfoPromise
             });
+            if (config.embedded) {
+              this.setState({navigationPaneVisible: false});
+            }
             return itemInfoPromise.then((itemInfo: LibraryItemInfo) => {
               let editedDefinition: LibraryItemListEntry = {
                 libraryDataProvider: libraryDataProvider!,
@@ -828,34 +856,29 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryDataProvider && definitionPromise) {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
-        libraryDataProvider.submitLocalItem(definition)
-          .then((writeFileResult: WriteFileResult) => {
-            this.setState((prevState) => {
-              if (prevState.editedDefinitions) {
-                let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
-                if (index >= 0) {
-                  return {
-                    editedDefinitions: prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1))
-                  };
+        if (this.state.tutorialState) {
+          this.removeEditedDefinition(definition);
+          definition.state = LibraryDefinitionState.Loaded;
+        } else {
+          libraryDataProvider.submitLocalItem(definition)
+            .then((writeFileResult: WriteFileResult) => {
+              this.removeEditedDefinition(definition!);
+              if (writeFileResult instanceof GitHubWriteFileResult) {
+                if (writeFileResult.pullRequestState !== undefined) {
+                  let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
+                  this.props.alert.info(`GitHub pull request ${action} successfully.`);
+                }
+              } else if (writeFileResult instanceof WebWriteFileResult) {
+                if (!writeFileResult.writtenDirectly) {
+                  this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version as long as the application remains open.');
                 }
               }
-              return {};
+            })
+            .catch((error) => {
+              this.props.alert.error('Error submitting changes: ' + error.message);
+              this.forceUpdate();
             });
-            if (writeFileResult instanceof GitHubWriteFileResult) {
-              if (writeFileResult.pullRequestState !== undefined) {
-                let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
-                this.props.alert.info(`GitHub pull request ${action} successfully.`);
-              }
-            } else if (writeFileResult instanceof WebWriteFileResult) {
-              if (!writeFileResult.writtenDirectly) {
-                this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version as long as the application remains open.');
-              }
-            }
-          })
-          .catch((error) => {
-            this.props.alert.error('Error submitting changes: ' + error.message);
-            this.forceUpdate();
-          });
+        }
         this.forceUpdate();
       }
     }
@@ -868,7 +891,7 @@ class App extends React.Component<AppProps, AppState> {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
         libraryDataProvider.cancelEditing(definition);
-        let oldDefinition: CachedPromise<LibraryDefinition> | undefined = undefined;
+        this.removeEditedDefinition(definition);
         if (definition.state === LibraryDefinitionState.EditingNew) {
           this.navigate({
             selectedItemAbsolutePath: undefined,
@@ -879,25 +902,26 @@ class App extends React.Component<AppProps, AppState> {
             interactionHandler: undefined
           });
         } else {
-          oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
+          let oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
+          this.setState({selectedItemDefinition: oldDefinition});
         }
-        this.setState((prevState) => {
-          if (prevState.editedDefinitions) {
-            let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
-            if (index >= 0) {
-              return {
-                selectedItemDefinition: oldDefinition,
-                editedDefinitions: prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1))
-              };
-            }
-          }
-          return {
-            selectedItemDefinition: oldDefinition
-          };
-        });
       }
     }
   };
+
+  private removeEditedDefinition(definition: LibraryDefinition): void {
+    this.setState((prevState) => {
+      if (prevState.editedDefinitions) {
+        let index = prevState.editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
+        if (index >= 0) {
+          return {
+            editedDefinitions: prevState.editedDefinitions.slice(0, index).concat(prevState.editedDefinitions.slice(index + 1))
+          };
+        }
+      }
+      return {};
+    });
+  }
 
   private openLocally = (): void => {
     this.viewFile(true);
@@ -935,6 +959,15 @@ class App extends React.Component<AppProps, AppState> {
   private logOutOfGitHub = (): void => {
     this.discardGitHubLogin();
     window.location.reload();
+  };
+
+  private startTutorial = (withTouchWarning: boolean): void => {
+    let onChangeTutorialState = (newTutorialState: TutorialState | undefined) => this.setState({tutorialState: newTutorialState});
+    startTutorial(onChangeTutorialState, withTouchWarning);
+  };
+
+  private endTutorial = (): void => {
+    this.setState({tutorialState: undefined});
   };
 }
 

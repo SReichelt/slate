@@ -9,7 +9,7 @@ function ValidationMessage(props: React.PropsWithChildren<ValidationMessageProps
   return (
     <div className={'validation-message-container'}>
       {props.children}
-      {props.error ? <div className={'validation-message'} key={'validation-message'}>{props.error.message}.</div> : null}
+      {props.error ? <div className={'validation-message'} key="validation-message">{props.error.message}.</div> : null}
     </div>
   );
 }

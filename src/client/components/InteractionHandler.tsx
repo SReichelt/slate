@@ -87,6 +87,20 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 }
 
 export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerImpl {
+  private static readonly toolTipRenderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+    includeProofs: false,
+    maxListLength: 20,
+    includeLabel: false,
+    includeExtras: true,
+    includeRemarks: false
+  };
+  private static readonly codeRenderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
+    includeProofs: true,
+    includeLabel: true,
+    includeExtras: true,
+    includeRemarks: true
+  };
+
   constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<LibraryDefinition>, private onLinkClicked?: OnLinkClicked) {
     super();
   }
@@ -128,15 +142,8 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
 
       // Render library item directly instead of creating a component, so that tooltip is not even displayed if it returns null.
       let render = definitionPromise.then((definition: LibraryDefinition) => {
-        let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-          includeProofs: false,
-          maxListLength: 20,
-          includeLabel: false,
-          includeExtras: true,
-          includeRemarks: false
-        };
-        let renderer = parentProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, parentProvider, this.templates, renderedDefinitionOptions);
-        let expression = renderer.renderDefinition(undefined, renderedDefinitionOptions);
+        let renderer = parentProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, parentProvider, this.templates, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
+        let expression = renderer.renderDefinition(undefined, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
         if (expression) {
           return <Expression expression={expression}/>;
         } else {
@@ -178,13 +185,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
         let context = new Ctx.DummyContext(metaModel);
         let expression = reader.readExpression(false, metaModel.functions, context);
         let renderedExpressionPromise = this.definition.then((definition: LibraryDefinition) => {
-          let renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-            includeProofs: true,
-            includeLabel: true,
-            includeExtras: true,
-            includeRemarks: true
-          };
-          let renderer = logic.getDisplay().getDefinitionRenderer(definition.definition, this.libraryDataProvider, this.templates, renderedDefinitionOptions);
+          let renderer = logic.getDisplay().getDefinitionRenderer(definition.definition, this.libraryDataProvider, this.templates, LibraryItemInteractionHandler.codeRenderedDefinitionOptions);
           return renderer.renderExpression(expression);
         });
         let renderedExpression = new Display.PromiseExpression(renderedExpressionPromise);

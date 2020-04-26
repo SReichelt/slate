@@ -13,6 +13,7 @@ import renderPromise from './PromiseHelper';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
 import Button from './Button';
 import MenuButton from './MenuButton';
+import scrollIntoView from 'scroll-into-view-if-needed';
 
 const Loading = require('react-loading-animation');
 
@@ -20,37 +21,14 @@ export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
 export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, definitionType: Logic.LogicDefinitionTypeDescription | undefined) => void;
 
-interface ScrollPaneReference {
-  htmlNode: HTMLElement | null;
+interface SearchInputProps {
+  onSearch: (searchText: string) => void;
 }
 
-interface LibraryTreeProps {
-  libraryDataProvider: LibraryDataProvider;
-  templates?: Fmt.File;
-  onFilter?: OnFilter;
-  selectedItemPath?: Fmt.Path;
-  interactionHandler?: ExpressionInteractionHandler;
-  onItemClicked?: OnItemClicked;
-  onInsertButtonClicked?: OnInsertButtonClicked;
-}
-
-interface LibraryTreeState {
-  searchWords: string[];
-}
-
-class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
+export class SearchInput extends React.Component<SearchInputProps> {
   private searchInputNode: HTMLInputElement | null = null;
-  private scrollPaneReference: ScrollPaneReference = {htmlNode: null};
   private focusTimer: any;
   private searchTimer: any;
-
-  constructor(props: LibraryTreeProps) {
-    super(props);
-
-    this.state = {
-      searchWords: []
-    };
-  }
 
   componentDidMount(): void {
     // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
@@ -73,11 +51,53 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
   }
 
   render(): React.ReactNode {
+    return <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true} ref={(node) => (this.searchInputNode = node)}/>;
+  }
+
+  private onChangeSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let searchText = event.target.value;
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+    }
+    this.searchTimer = setTimeout(() => this.props.onSearch(searchText), 20);
+  };
+}
+
+interface ScrollPaneReference {
+  htmlNode: HTMLElement | null;
+}
+
+interface LibraryTreeProps {
+  libraryDataProvider: LibraryDataProvider;
+  templates?: Fmt.File;
+  onFilter?: OnFilter;
+  selectedItemPath?: Fmt.Path;
+  interactionHandler?: ExpressionInteractionHandler;
+  onItemClicked?: OnItemClicked;
+  onInsertButtonClicked?: OnInsertButtonClicked;
+}
+
+interface LibraryTreeState {
+  searchWords: string[];
+}
+
+class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
+  private scrollPaneReference: ScrollPaneReference = {htmlNode: null};
+
+  constructor(props: LibraryTreeProps) {
+    super(props);
+
+    this.state = {
+      searchWords: []
+    };
+  }
+
+  render(): React.ReactNode {
     let sectionPromise = this.props.libraryDataProvider.fetchLocalSection();
     return (
       <div className={'tree-container'}>
         <div className={'tree-search-area'}>
-          <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true} ref={(node) => (this.searchInputNode = node)}/>
+          <SearchInput onSearch={this.onSearch}/>
         </div>
         <div className={'tree-area'}>
           <ScrollPane onRef={(htmlNode) => (this.scrollPaneReference.htmlNode = htmlNode)}>
@@ -92,18 +112,11 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     );
   }
 
-  private onChangeSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let searchText = event.target.value;
-    let updateSearchWords = () => {
-      let searchWords = searchText.toLowerCase().split(' ').filter((word: string) => (word.length > 2));
-      if (!areSearchWordsEqual(this.state.searchWords, searchWords)) {
-        this.setState({searchWords: searchWords});
-      }
-    };
-    if (this.searchTimer) {
-      clearTimeout(this.searchTimer);
+  private onSearch = (searchText: string) => {
+    let searchWords = searchText.toLowerCase().split(' ').filter((word: string) => (word.length > 2));
+    if (!areSearchWordsEqual(this.state.searchWords, searchWords)) {
+      this.setState({searchWords: searchWords});
     }
-    this.searchTimer = setTimeout(updateSearchWords, 20);
   };
 }
 
@@ -264,7 +277,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
   return <>{treeItems}</>;
 }
 
-class InnerLibraryTreeItems extends React.Component<InnerLibraryTreeProps> {
+export class InnerLibraryTreeItems extends React.Component<InnerLibraryTreeProps> {
   private visibleItems?: Set<LibraryTreeItem>;
 
   render(): React.ReactNode {
@@ -302,7 +315,8 @@ interface VisibilityResult {
 function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, libraryDefinition: LibraryDefinition, definition: Fmt.Definition, searchWords: string[], onFilter: OnFilter | undefined): VisibilityResult {
   if (isSubsection) {
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
-    let resultPromise = new CachedPromise(Promise.resolve(false));
+    let asyncPromise = new Promise((resolve) => setTimeout(resolve, 0));
+    let resultPromise = new CachedPromise(asyncPromise.then(() => false));
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
       for (let item of definition.contents.items) {
         resultPromise = resultPromise.then((currentResult: boolean) => {
@@ -402,7 +416,8 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
 
   protected scrollIntoView = (): void => {
     if (this.htmlNode) {
-      this.htmlNode.scrollIntoView({
+      scrollIntoView(this.htmlNode, {
+        scrollMode: 'if-needed',
         block: 'nearest',
         inline: 'nearest'
       });
@@ -411,7 +426,9 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
 
   protected getTreeItemContents(icon: React.ReactNode, specialIcon: React.ReactNode, display: React.ReactNode): React.ReactNode {
     let columns: React.ReactNodeArray = [
-      <div className={'tree-item-display'} key="display">{display}</div>
+      <div className={'tree-item-display'} key="display">
+        <span key="display-span">{display}</span>
+      </div>
     ];
     if (specialIcon && !this.props.indent) {
       icon = specialIcon;
@@ -460,7 +477,13 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
   }
 }
 
-class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryTreeItemState> {
+export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryTreeItemState> {
+  private static readonly renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+    includeLabel: false,
+    includeExtras: true,
+    includeRemarks: false
+  };
+
   private libraryDefinitionPromise?: CachedPromise<LibraryDefinition>;
   private clicked: boolean = false;
   private refreshToolTip: boolean = false;
@@ -718,12 +741,7 @@ class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, LibraryT
           } else if (display && this.props.parentScrollPane.htmlNode && !this.props.selected) {
             let getToolTipContents = () => {
               rendererOptions.maxListLength = 20;
-              let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
-                includeLabel: false,
-                includeExtras: true,
-                includeRemarks: false
-              };
-              let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
+              let renderedDefinition = renderer.renderDefinition(undefined, LibraryTreeItem.renderedDefinitionOptions);
               if (renderedDefinition) {
                 return <Expression expression={renderedDefinition}/>;
               }
@@ -836,7 +854,7 @@ interface LibraryTreeInsertionItemProps extends LibraryTreeItemBaseProps {
   onInsertButtonClicked: OnInsertButtonClicked;
 }
 
-class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps> {
+export class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeInsertionItemProps> {
   constructor(props: LibraryTreeInsertionItemProps) {
     super(props);
     this.state = {};

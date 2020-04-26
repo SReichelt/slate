@@ -97,7 +97,7 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
         menuClassName += ' ' + this.props.menuClassName;
       }
       let menu = (
-        <div className={menuClassName} title={''} key="Menu" ref={ref}>
+        <div className={menuClassName} title={''} key="menu" ref={ref}>
           {this.props.menu}
         </div>
       );

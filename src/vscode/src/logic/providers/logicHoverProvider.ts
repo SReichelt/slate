@@ -10,6 +10,12 @@ import { LibraryDocumentProvider } from '../data';
 import CachedPromise from '../../../../shared/data/cachedPromise';
 
 export class SlateLogicHoverProvider {
+    private static readonly renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+        includeLabel: false,
+        includeExtras: true,
+        includeRemarks: false
+    };
+
     public templates?: Fmt.File;
 
     constructor(private libraryDocumentProvider: LibraryDocumentProvider) {}
@@ -26,12 +32,7 @@ export class SlateLogicHoverProvider {
                     maxListLength: 20
                 };
                 let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, targetDataProvider, templates, rendererOptions);
-                let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
-                    includeLabel: false,
-                    includeExtras: true,
-                    includeRemarks: false
-                };
-                let renderedDefinition = renderer.renderDefinition(undefined, renderedDefinitionOptions);
+                let renderedDefinition = renderer.renderDefinition(undefined, SlateLogicHoverProvider.renderedDefinitionOptions);
                 return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
             });
             event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {

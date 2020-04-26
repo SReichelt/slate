@@ -117,6 +117,21 @@
   color: var(--item-minor-foreground-color);
 }
 
-.tree-item-insert-button {
+.button.tree-item-insert-button {
   font-size: smaller;
+  margin: 0.125em;
+  padding: 0.125em;
+}
+
+.button.tree-item-insert-button svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.button.tree-item-insert-button .button svg {
+  position: unset;
 }

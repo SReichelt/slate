@@ -9,7 +9,7 @@ interface ButtonProps {
   enabled?: boolean;
   selected?: boolean;
   isMenuItem?: boolean;
-  onClick?: () => void;
+  onClick?: (wasTouched: boolean) => void;
 }
 
 interface ButtonState {
@@ -40,34 +40,52 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onMouseDown = undefined;
     let onMouseUp = undefined;
     let onMouseLeave = undefined;
+    let onTouchStart = undefined;
+    let onTouchEnd = undefined;
+    let onTouchCancel = undefined;
     if (this.props.enabled === undefined || this.props.enabled) {
       className += ' hoverable';
       if (this.props.onClick) {
         let propsOnClick = this.props.onClick;
-        onClick = (event: React.MouseEvent<HTMLElement>) => {
+        onClick = (event: React.SyntheticEvent<HTMLElement>) => {
           event.stopPropagation();
           event.preventDefault();
           if (this.ready && !this.props.isMenuItem) {
-            propsOnClick();
+            propsOnClick(false);
           }
         };
       }
-      onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+      onMouseDown = (event: React.SyntheticEvent<HTMLElement>) => {
         event.stopPropagation();
         event.preventDefault();
         this.setState({pressed: true});
         this.ready = true;
       };
-      onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
+      onMouseUp = (event: React.SyntheticEvent<HTMLElement>) => {
         if (this.props.isMenuItem && this.ready && this.props.onClick) {
-          this.props.onClick();
+          this.props.onClick(false);
         } else {
           event.stopPropagation();
         }
         event.preventDefault();
         this.setState({pressed: false});
       };
-      onMouseLeave = (event: React.MouseEvent<HTMLElement>) => {
+      onMouseLeave = (event: React.SyntheticEvent<HTMLElement>) => {
+        this.setState({pressed: false});
+      };
+      onTouchStart = onMouseDown;
+      onTouchEnd = (event: React.SyntheticEvent<HTMLElement>) => {
+        if (!this.props.isMenuItem) {
+          event.stopPropagation();
+        }
+        event.preventDefault();
+        if (this.ready && this.props.onClick) {
+          this.props.onClick(true);
+        }
+      };
+      onTouchCancel = (event: React.SyntheticEvent<HTMLElement>) => {
+        event.stopPropagation();
+        event.preventDefault();
         this.setState({pressed: false});
       };
     } else {
@@ -80,7 +98,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       className += ' selected';
     }
     return (
-      <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}>
+      <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchCancel={onTouchCancel}>
         {this.props.children}
       </div>
     );

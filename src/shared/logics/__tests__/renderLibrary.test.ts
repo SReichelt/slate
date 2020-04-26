@@ -35,16 +35,17 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
   }
 }
 
+const renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
+  includeLabel: true,
+  includeExtras: true,
+  includeRemarks: true
+};
+
 async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, itemInfo: LibraryItemInfo, definition: LibraryDefinition, uri: string) {
   let rendererOptions: Logic.LogicRendererOptions = {
     includeProofs: true
   };
   let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
-  let renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
-    includeLabel: true,
-    includeExtras: true,
-    includeRemarks: true
-  };
   let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
   if (renderedDefinition) {
     let renderedText = renderAsText(renderedDefinition, false, false);

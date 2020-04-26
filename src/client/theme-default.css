@@ -21,6 +21,8 @@
   --button-hover-background-color: var(--hover-background-color);
   --button-selected-background-color: var(--selected-background-color);
   --button-pressed-background-color: var(--pressed-background-color);
+  --special-button-background-color: #a4ffa1;
+  --special-button-border-color: #4ca549;
   --light-hover-background-color: #fdefbd;
   --light-selected-background-color: #f8e8a0;
   --expression-hover-background-color: var(--hover-background-color);
@@ -72,6 +74,8 @@
   --dialog-overlay-color: #00000080;
   --tooltip-foreground-color: black;
   --tooltip-background-color: #fff4d0;
+  --permanent-tooltip-foreground-color: black;
+  --permanent-tooltip-background-color: #caffc8;
   --source-code-font-family: 'Courier New', 'Courier', monospace;
   --source-code-font-weight: normal;
   --source-code-font-size: initial;

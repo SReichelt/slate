@@ -60,9 +60,13 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
 
   protected getRenderer(): Logic.LogicRenderer | undefined {
     if (!this.rendererProps
-        || Object.keys(this.props).some((key: string) => (this.props as any)[key] !== (this.rendererProps as any)[key])
+        || this.props.libraryDataProvider !== this.rendererProps.libraryDataProvider
+        || this.props.definition !== this.rendererProps.definition
         || this.props.definition.state !== this.rendererDefinitionState
-        || this.props.definition.definition !== this.rendererDefinition) {
+        || this.props.definition.definition !== this.rendererDefinition
+        || this.props.templates !== this.rendererProps.templates
+        || this.props.options !== this.rendererProps.options
+        || this.props.mruList !== this.rendererProps.mruList) {
       this.renderer = this.createRenderer(this.props);
       this.rendererProps = {...this.props};
       this.rendererDefinitionState = this.props.definition.state;

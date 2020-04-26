@@ -136,7 +136,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
     } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
       let title: any = this.props.item.title;
       if (title instanceof Display.RenderedExpression) {
-        title = <Expression expression={title} key={'title'}/>;
+        title = <Expression expression={title} key="title"/>;
       }
       title = [title, ':'];
       return (

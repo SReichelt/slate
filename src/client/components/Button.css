@@ -36,26 +36,11 @@
   border: solid 1px var(--button-border-color);
   border-radius: 2px;
   min-width: 1em;
-  padding: 0.125em;
-  margin: 0.125em;
   position: relative;
 }
 
 .button svg {
   vertical-align: middle;
-}
-
-.button.standalone svg {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-}
-
-.button.standalone .button svg {
-  position: unset;
 }
 
 .button img {

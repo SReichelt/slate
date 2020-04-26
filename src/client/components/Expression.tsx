@@ -4,7 +4,7 @@ import * as Display from '../../shared/display/display';
 import * as Menu from '../../shared/display/menu';
 import * as Dialog from '../../shared/display/dialog';
 import renderPromise from './PromiseHelper';
-import ExpressionToolTip, { ExpressionToolTipPosition } from './ExpressionToolTip';
+import ExpressionToolTip, { ToolTipPosition } from './ExpressionToolTip';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
@@ -47,7 +47,7 @@ interface ExpressionProps {
   shrinkMathSpaces?: boolean;
   parent?: Expression;
   interactionHandler?: ExpressionInteractionHandler;
-  toolTipPosition?: ExpressionToolTipPosition;
+  toolTipPosition?: ToolTipPosition;
 }
 
 interface ExpressionState {
@@ -69,7 +69,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private permanentlyHighlighted = false;
   private highlightPermanentlyTimer: any;
   private shrinkMathSpaces = true;
-  private toolTipPosition: ExpressionToolTipPosition;
+  private toolTipPosition: ToolTipPosition;
 
   constructor(props: ExpressionProps) {
     super(props);
@@ -868,7 +868,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (dialog) {
         menu = dialog;
       } else if (this.state.openMenu) {
-        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key={'menu'} interactionHandler={this.props.interactionHandler}/>;
+        menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key="menu" interactionHandler={this.props.interactionHandler}/>;
       }
       let interactive = hasMenu;
       let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
@@ -923,11 +923,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         cells = <span className={'menu-placeholder-cell'}>{result}</span>;
       } else if (hasVisibleMenu) {
         cells = [
-          <span className={'menu-cell'} key={'content'}>{result}</span>,
-          <span className={'menu-dropdown-cell'} key={'dropdown'}>&nbsp;▼&nbsp;</span>
+          <span className={'menu-cell'} key="content">{result}</span>,
+          <span className={'menu-dropdown-cell'} key="dropdown">&nbsp;▼&nbsp;</span>
         ];
       } else {
-        cells = <span className={'menu-cell'} key={'content'}>{result}</span>;
+        cells = <span className={'menu-cell'} key="content">{result}</span>;
       }
       result = (
         <span className={'menu-container' + outerClassNameSuffix}>

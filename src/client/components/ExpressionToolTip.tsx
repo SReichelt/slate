@@ -3,18 +3,21 @@ import './ExpressionToolTip.css';
 
 const ToolTip = require('react-portal-tooltip').default;
 
-export type ExpressionToolTipPosition = 'left' | 'top' | 'right' | 'bottom';
+export type ToolTipPosition = 'left' | 'top' | 'right' | 'bottom';
 
-interface ExpressionToolTipParent {
+export interface ToolTipParent {
   getBoundingClientRect(): ClientRect;
 }
 
-interface ExpressionToolTipProps {
-  position: ExpressionToolTipPosition;
-  parent: ExpressionToolTipParent;
-  delay?: number;
+interface ToolTipProps {
   active: boolean;
+  parent: ToolTipParent;
+  position: ToolTipPosition;
   getContents: () => React.ReactNode;
+}
+
+interface ExpressionToolTipProps extends ToolTipProps {
+  delay?: number;
 }
 
 interface ExpressionToolTipState {
@@ -97,8 +100,60 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
       }
     }
     return (
-      <ToolTip active={visible} position={this.props.position} arrow="center" parent={this.props.parent} style={ExpressionToolTip.toolTipStyle}>
+      <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow="center" style={ExpressionToolTip.toolTipStyle}>
         <div className={'tooltip'}>{ExpressionToolTip.currentContents}</div>
+      </ToolTip>
+    );
+  }
+}
+
+interface PermanentToolTipProps extends ToolTipProps {
+  group: string;
+  refreshInterval?: number;
+}
+
+export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
+  private contents: React.ReactNode = null;
+  private refreshTimer: any;
+
+  private static readonly toolTipStyle = {
+    style: {'color': 'var(--permanent-tooltip-foreground-color)', 'backgroundColor': 'var(--permanent-tooltip-background-color)'},
+    arrowStyle: {'color': 'var(--permanent-tooltip-background-color)'}
+  };
+
+  componentDidMount(): void {
+    this.updateTimer();
+  }
+
+  componentDidUpdate(prevProps: PermanentToolTipProps): void {
+    this.updateTimer();
+  }
+
+  private updateTimer(): void {
+    this.stopTimer();
+    if (this.props.refreshInterval) {
+      this.refreshTimer = setInterval(() => this.forceUpdate(), this.props.refreshInterval);
+    }
+  }
+
+  componentWillUnmount() {
+    this.stopTimer();
+  }
+
+  private stopTimer(): void {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
+  }
+
+  render(): React.ReactNode {
+    if (this.props.active) {
+      this.contents = this.props.getContents();
+    }
+    return (
+      <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow="center" group={this.props.group} style={PermanentToolTip.toolTipStyle}>
+        <div className={'tooltip'}>{this.contents}</div>
       </ToolTip>
     );
   }

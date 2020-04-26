@@ -2,6 +2,18 @@
   text-align: justify;
 }
 
+.tutorial-button-container {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.button.standalone.tutorial-button {
+  padding: 6pt 10pt;
+  background-color: var(--special-button-background-color);
+  border-color: var(--special-button-border-color);
+  font-weight: bold;
+}
+
 .examples {
   display: flex;
   flex-wrap: wrap;

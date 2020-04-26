@@ -5,15 +5,18 @@ import * as Display from '../../shared/display/display';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
-import Expression, { ExpressionInteractionHandler } from './Expression';
-import { OnLinkClicked } from './InteractionHandler';
+import Button from '../components/Button';
+import Expression, { ExpressionInteractionHandler } from '../components/Expression';
+import { OnLinkClicked } from '../components/InteractionHandler';
 
 const Loading = require('react-loading-animation');
 
 interface StartPageProps {
+  isLoggedIn: boolean;
   libraryDataProvider?: LibraryDataProvider;
   templates?: Fmt.File;
   interactionHandler?: ExpressionInteractionHandler;
+  onStartTutorial: (withTouchWarning: boolean) => void;
   onLinkClicked: OnLinkClicked;
 }
 
@@ -90,6 +93,11 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
 }
 
 function StartPage(props: StartPageProps) {
+  if (props.isLoggedIn) {
+    // Once we display high scores, latest additions, etc., we will still want to display those here.
+    return <div className="start-page"/>;
+  }
+
   let exampleContents: React.ReactNode = null;
 
   if (props.libraryDataProvider && props.templates) {
@@ -115,35 +123,45 @@ function StartPage(props: StartPageProps) {
       <h1>The Slate Interactive Theorem Prover</h1>
       <p>
         Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics.
+        It is optimized for being easy to learn.
       </p>
+      <div className="tutorial-button-container">
+        <Button className="tutorial-button standalone" onClick={props.onStartTutorial} key="tutorial-button">
+          Start the five-minute interactive tutorial
+        </Button>
+      </div>
+      <h2>Examples</h2>
       <p>
-        Its unique rendering concept makes formalized definitions and theorems intuitively understandable without detailed explanation.
-        So please just follow these links to some examples in the library – and then hover over the expressions therein to start exploring:
+        Perhaps you are more interested in seeing specific pieces of formalized mathematics. In this web GUI, you will usually see <em>rendered</em> formal definitions and theorems, such as:
       </p>
       <div className="examples">
         {exampleContents}
       </div>
+      <p>
+        To explore the library, hover over any expression to see its definition (if applicable), and jump to that definition by clicking.
+      </p>
       <h2>Current Status</h2>
       <p>
-        In this web GUI, it is currently possible to create simple definitions and theorems. Proof input will follow soon.
+        Graphical input of simple definitions and theorem statements is mostly implemented. Proof input will follow soon.
       </p>
       <p>
         The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
+        In particular, it supports side-by-side textual and graphical editing, combining the best of both worlds.
       </p>
       <h2>Foundations</h2>
       <p>
         Slate, as an application, is built to support different logics. However, the rendering and editing concepts of Slate works particularly well for a logic that is close to mathematical practice. Therefore, only one logic (called "HLM") is currently implemented.
       </p>
       <p>
-        HLM is classical and set-theoretic, and can be described as either a <a href="https://ncatlab.org/nlab/show/structural+set+theory">structural set theory</a>, or a <a href="https://en.wikipedia.org/wiki/Type_theory">type theory</a> where all references to types are made implicitly.
-        It is not based on any familiar axiomatization, and avoids some of the limitations of Zermelo-Fraenkel and other set theories.
+        HLM is based on classical logic and has a set-theoretic flavor. It can be viewed as a <a href="https://ncatlab.org/nlab/show/structural+set+theory">structural set theory</a> but is conceptually closer to a <a href="https://en.wikipedia.org/wiki/Type_theory#Dependent_types">dependent type theory</a>.
+        In fact, a reasonably direct translation to the theorem provers <a href="https://coq.inria.fr/">Coq</a> and <a href="https://leanprover.github.io/">Lean</a> exists.
       </p>
       <p>
         Existing theorem provers can potentially be integrated into Slate, reusing its rendering and editing mechanisms.
       </p>
       <h2>Third-Party Software</h2>
       <p>
-        For a list of third-party software used in Slate, see <a href="docs/dependencies.html" target="_blank">here</a>.
+        For a list of third-party software used in Slate, see <a href="docs/dependencies.html">here</a>.
       </p>
       <h2>Contact</h2>
       <p>

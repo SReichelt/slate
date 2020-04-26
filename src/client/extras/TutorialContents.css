@@ -1,0 +1,13 @@
+.large-tooltip {
+  padding: 1ex;
+}
+
+.tutorial-tooltip-button-row {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.button.tutorial-tooltip-button.standalone {
+  margin-left: 4pt;
+  margin-right: 4pt;
+}

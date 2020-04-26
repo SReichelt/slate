@@ -58,7 +58,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
           <td className={'dialog-cell'}>Title:</td>
           <td className={'dialog-cell'}>
             <ValidationMessage error={this.state.titleError}>
-              <input type={'text'} className={titleClassName} value={this.state.title} onChange={this.onChangeTitle}/>
+              <input type={'text'} className={titleClassName} value={this.state.title} onChange={this.onChangeTitle} key="title"/>
             </ValidationMessage>
           </td>
         </tr>
@@ -70,7 +70,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         <td className={'dialog-cell'}>Name:</td>
         <td className={'dialog-cell'}>
           <ValidationMessage error={this.state.nameError}>
-            <input type={'text'} className={nameClassName} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true} ref={(node) => (this.nameInputNode = node)}/>
+            <input type={'text'} className={nameClassName} value={this.state.name} onChange={this.onChangeName} onBlur={this.onBlurName} autoFocus={true} ref={(node) => (this.nameInputNode = node)} key="name"/>
           </ValidationMessage>
         </td>
       </tr>
