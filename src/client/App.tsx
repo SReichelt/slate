@@ -690,8 +690,10 @@ class App extends React.Component<AppProps, AppState> {
     this.setNewInteractionHandler(state);
     this.setState(state);
     let uri = '/';
-    if (state.selectedItemAbsolutePath && state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
-      this.mruList.add(state.selectedItemAbsolutePath);
+    if (state.selectedItemAbsolutePath) {
+      if (state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
+        this.mruList.add(state.selectedItemAbsolutePath);
+      }
       uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
     let title = this.getTitle(state);
