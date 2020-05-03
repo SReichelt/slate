@@ -782,10 +782,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             this.props.interactionHandler.expressionChanged(false);
           }
         };
-        if ('ontouchstart' in window) {
+        /*if ('ontouchstart' in window) {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
-        } else {
+        } else*/ {
           let key = 'markdown-editor';
           let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
           if (!config.embedded) {
@@ -871,13 +871,38 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         menu = <ExpressionMenu menu={this.state.openMenu} onItemClicked={this.onMenuItemClicked} key="menu" interactionHandler={this.props.interactionHandler}/>;
       }
       let interactive = hasMenu;
-      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
-      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
-      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
+      let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.menuClicked(onMenuOpened!, event)) : undefined;
+      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
+      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
+      let onTouchStart = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
+      let onTouchCancel = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
+      let onTouchEnd = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       if (expression instanceof Display.InsertPlaceholderExpression && expression.action && !hasMenu) {
-        onMouseDown = (event: React.MouseEvent<HTMLElement>) => { this.setState({clicking: true}); this.stopPropagation(event); };
-        onMouseUp = (event: React.MouseEvent<HTMLElement>) => { this.setState({clicking: false}); this.stopPropagation(event); };
-        onClick = (event: React.MouseEvent<HTMLElement>) => this.actionClicked(expression.action!, event);
+        onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+          if (event.button < 1) {
+            this.setState({clicking: true});
+            this.stopPropagation(event);
+          }
+        };
+        onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
+          if (event.button < 1) {
+            this.setState({clicking: false});
+            this.stopPropagation(event);
+          }
+        };
+        onClick = (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.actionClicked(expression.action!, event));
+        onTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+          this.setState({clicking: true});
+          this.stopPropagation(event);
+        };
+        onTouchCancel = (event: React.TouchEvent<HTMLElement>) => {
+          this.setState({clicking: false});
+          this.stopPropagation(event);
+        };
+        onTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
+          this.setState({clicking: false});
+          this.actionClicked(expression.action!, event);
+        };
         interactive = true;
         if (!semanticLinks) {
           semanticLinks = [new Display.SemanticLink(expression, false, false)];
@@ -931,7 +956,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       result = (
         <span className={'menu-container' + outerClassNameSuffix}>
-          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} onTouchStart={onTouchStart} onTouchCancel={onTouchCancel} onTouchEnd={onTouchEnd} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}
             </span>
@@ -961,13 +986,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
              However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
              So we do this anyway, but only in production mode, to prevent warnings from React. */
           result = (
-            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </a>
           );
         } else {
           result = (
-            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => this.linkClicked(uriLink, event)} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </span>
           );
@@ -977,7 +1002,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           let getToolTipContents = () => {
             let toolTipContents = interactionHandler.getToolTipContents(uriLink!);
             if (uri) {
-              toolTipContents = <a href={uri} onClick={(event) => this.linkClicked(uriLink, event)}>{toolTipContents}</a>;
+              toolTipContents = <a href={uri} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))}>{toolTipContents}</a>;
             }
             return toolTipContents;
           };
@@ -1359,62 +1384,56 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
   }
 
-  private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.MouseEvent<HTMLElement>): void {
-    if (event.button < 1) {
-      this.setState({clicking: false});
-      this.stopPropagation(event);
-      if (this.props.interactionHandler && !this.props.interactionHandler.isBlocked() && semanticLink) {
-        this.props.interactionHandler.linkClicked(semanticLink);
-      }
+  private linkClicked(semanticLink: Display.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
+    this.setState({clicking: false});
+    this.stopPropagation(event);
+    if (this.props.interactionHandler && !this.props.interactionHandler.isBlocked() && semanticLink) {
+      this.props.interactionHandler.linkClicked(semanticLink);
     }
   }
 
-  private actionClicked(action: Menu.ExpressionMenuAction, event: React.MouseEvent<HTMLElement>): void {
-    if (event.button < 1) {
+  private actionClicked(action: Menu.ExpressionMenuAction, event: React.SyntheticEvent<HTMLElement>): void {
+    if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
+      return;
+    }
+    this.setState({clicking: false});
+    this.stopPropagation(event);
+    if (action instanceof Menu.ImmediateExpressionMenuAction) {
+      let result = action.onExecute();
+      if (!(result instanceof CachedPromise)) {
+        result = CachedPromise.resolve();
+      }
+      result.then(() => {
+        if (this.props.interactionHandler) {
+          this.props.interactionHandler.expressionChanged();
+        }
+      });
+    } else if (action instanceof Menu.DialogExpressionMenuAction) {
+      this.enableInteractionBlocker();
+      this.setState({
+        openDialog: action.onOpen()
+      });
+    }
+  }
+
+  private menuClicked(onMenuOpened: () => Menu.ExpressionMenu, event: React.SyntheticEvent<HTMLElement>): void {
+    if (this.state.openMenu) {
+      this.disableInteractionBlocker();
+      if (!this.permanentlyHighlighted) {
+        this.disableWindowClickListener();
+      }
+      this.setState({openMenu: undefined});
+      this.addToHoveredChildren();
+    } else {
       if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
         return;
       }
-      this.setState({clicking: false});
-      this.stopPropagation(event);
-      if (action instanceof Menu.ImmediateExpressionMenuAction) {
-        let result = action.onExecute();
-        if (!(result instanceof CachedPromise)) {
-          result = CachedPromise.resolve();
-        }
-        result.then(() => {
-          if (this.props.interactionHandler) {
-            this.props.interactionHandler.expressionChanged();
-          }
-        });
-      } else if (action instanceof Menu.DialogExpressionMenuAction) {
-        this.enableInteractionBlocker();
-        this.setState({
-          openDialog: action.onOpen()
-        });
-      }
+      this.enableInteractionBlocker();
+      this.clearHoverAndMenuRecursively();
+      this.setState({openMenu: onMenuOpened()});
+      this.enableWindowClickListener();
     }
-  }
-
-  private menuClicked(onMenuOpened: () => Menu.ExpressionMenu, event: React.MouseEvent<HTMLElement>): void {
-    if (event.button < 1) {
-      if (this.state.openMenu) {
-        this.disableInteractionBlocker();
-        if (!this.permanentlyHighlighted) {
-          this.disableWindowClickListener();
-        }
-        this.setState({openMenu: undefined});
-        this.addToHoveredChildren();
-      } else {
-        if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
-          return;
-        }
-        this.enableInteractionBlocker();
-        this.clearHoverAndMenuRecursively();
-        this.setState({openMenu: onMenuOpened()});
-        this.enableWindowClickListener();
-      }
-      this.stopPropagation(event);
-    }
+    this.stopPropagation(event);
   }
 
   private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {

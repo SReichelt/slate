@@ -23,6 +23,7 @@ export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, s
 
 interface SearchInputProps {
   onSearch: (searchText: string) => void;
+  autoFocus?: boolean;
 }
 
 export class SearchInput extends React.Component<SearchInputProps> {
@@ -32,7 +33,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
 
   componentDidMount(): void {
     // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
-    if (this.searchInputNode) {
+    if (this.searchInputNode && this.props.autoFocus) {
       let focusNode = () => {
         this.searchInputNode?.focus();
       };
@@ -51,7 +52,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
   }
 
   render(): React.ReactNode {
-    return <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={true} ref={(node) => (this.searchInputNode = node)}/>;
+    return <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={this.props.autoFocus} ref={(node) => (this.searchInputNode = node)}/>;
   }
 
   private onChangeSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +76,7 @@ interface LibraryTreeProps {
   interactionHandler?: ExpressionInteractionHandler;
   onItemClicked?: OnItemClicked;
   onInsertButtonClicked?: OnInsertButtonClicked;
+  autoFocusSearchInput?: boolean;
 }
 
 interface LibraryTreeState {
@@ -97,7 +99,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
     return (
       <div className={'tree-container'}>
         <div className={'tree-search-area'}>
-          <SearchInput onSearch={this.onSearch}/>
+          <SearchInput onSearch={this.onSearch} autoFocus={this.props.autoFocusSearchInput}/>
         </div>
         <div className={'tree-area'}>
           <ScrollPane onRef={(htmlNode) => (this.scrollPaneReference.htmlNode = htmlNode)}>

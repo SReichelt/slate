@@ -206,7 +206,7 @@ class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
         <tr className={className}>
           <td className={'dialog-cell'} colSpan={2}>
             <div className={'dialog-group'}>
-              <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked}/>
+              <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked} autoFocusSearchInput={true}/>
             </div>
           </td>
         </tr>
