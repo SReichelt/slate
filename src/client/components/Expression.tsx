@@ -782,10 +782,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             this.props.interactionHandler.expressionChanged(false);
           }
         };
-        /*if ('ontouchstart' in window) {
+        if ('ontouchstart' in window) {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
-        } else*/ {
+        } else {
           let key = 'markdown-editor';
           let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
           if (!config.embedded) {
