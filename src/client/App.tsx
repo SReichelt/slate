@@ -860,7 +860,7 @@ class App extends React.Component<AppProps, AppState> {
       if (definition) {
         if (this.state.tutorialState) {
           this.removeEditedDefinition(definition);
-          definition.state = LibraryDefinitionState.Loaded;
+          libraryDataProvider.replaceLocalItem(definition);
         } else {
           libraryDataProvider.submitLocalItem(definition)
             .then((writeFileResult: WriteFileResult) => {

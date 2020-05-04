@@ -819,26 +819,37 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
       return editedLibraryDefinition.fileReference!.write!(contents, isPartOfGroup)
         .then((result: WriteFileResult) => {
-          editedLibraryDefinition.state = LibraryDefinitionState.Loaded;
-          let fullyLoadedDefinitionPromise = this.fullyLoadedDefinitions.get(name);
-          if (fullyLoadedDefinitionPromise) {
-            let fullyLoadedDefinition = fullyLoadedDefinitionPromise.getImmediateResult();
-            if (fullyLoadedDefinition) {
-              fullyLoadedDefinition.file = editedLibraryDefinition.file;
-              fullyLoadedDefinition.definition = editedLibraryDefinition.definition;
-            } else {
-              this.fullyLoadedDefinitions.delete(name);
-            }
-          }
-          this.preloadedDefinitions.delete(name);
-          this.editedDefinitions.delete(name);
-          this.editedItemInfos.delete(name);
-          this.originalItemInfos.delete(name);
+          this.replaceLocalDefinition(name, editedLibraryDefinition);
           return result;
         });
     } catch (error) {
       return CachedPromise.reject(error);
     }
+  }
+
+  replaceLocalItem(newLibraryDefinition: LibraryDefinition): void {
+    let name = newLibraryDefinition.definition.name;
+    this.replaceLocalDefinition(name, newLibraryDefinition);
+  }
+
+  private replaceLocalDefinition(name: string, newLibraryDefinition: LibraryDefinition): void {
+    newLibraryDefinition.state = LibraryDefinitionState.Loaded;
+    let fullyLoadedDefinitionPromise = this.fullyLoadedDefinitions.get(name);
+    if (fullyLoadedDefinitionPromise) {
+      let fullyLoadedDefinition = fullyLoadedDefinitionPromise.getImmediateResult();
+      if (fullyLoadedDefinition) {
+        fullyLoadedDefinition.file = newLibraryDefinition.file;
+        fullyLoadedDefinition.definition = newLibraryDefinition.definition;
+      } else {
+        this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(newLibraryDefinition));
+      }
+    } else {
+      this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(newLibraryDefinition));
+    }
+    this.preloadedDefinitions.delete(name);
+    this.editedDefinitions.delete(name);
+    this.editedItemInfos.delete(name);
+    this.originalItemInfos.delete(name);
   }
 
   viewLocalItem(name: string, openLocally: boolean): CachedPromise<void> {
