@@ -740,7 +740,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
           }
           if (this.refreshToolTip) {
             this.refreshToolTip = false;
-          } else if (display && this.props.parentScrollPane.htmlNode && !this.props.selected) {
+          } else if (display && this.props.parentScrollPane.htmlNode) {
             let getToolTipContents = () => {
               rendererOptions.maxListLength = 20;
               let renderedDefinition = renderer.renderDefinition(undefined, LibraryTreeItem.renderedDefinitionOptions);
@@ -816,6 +816,10 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
         this.setState((prevState) => ({opened: !prevState.opened}));
       } else if (this.props.onItemClicked && this.libraryDefinitionPromise) {
         this.props.onItemClicked(this.props.libraryDataProvider, this.props.path, this.libraryDefinitionPromise, this.props.itemInfo);
+      }
+      if (this.state.showToolTip) {
+        this.refreshToolTip = true;
+        this.setState({showToolTip: false});
       }
     }
   };
