@@ -68,15 +68,21 @@
 
 .open-menu-title-cell-icon {
   display: inline-block;
-  vertical-align: middle;
+  width: 1em;
+  min-width: 1em;
   padding-right: 2pt;
+  vertical-align: middle;
 }
 
 .open-menu-title-cell-icon svg {
-  position: initial;
-  width: initial;
-  height: initial;
-  vertical-align: middle;
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .open-menu-arrow {
