@@ -13,9 +13,12 @@ export class HLMEditAnalysis extends Edit.EditAnalysis {
     } else if (contents instanceof FmtHLM.ObjectContents_EqualityDefinition
                || contents instanceof FmtHLM.ObjectContents_SetOperator
                || contents instanceof FmtHLM.ObjectContents_ExplicitOperator
-               || contents instanceof FmtHLM.ObjectContents_ImplicitOperator
                || contents instanceof FmtHLM.ObjectContents_Predicate) {
       this.analyzeExpressions(contents.definition, 1, undefined, context);
+    } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
+      this.analyzeParameter(contents.parameter, context);
+      let parameterContext = context.metaModel.getParameterContext(contents.parameter, context);
+      this.analyzeExpressions(contents.definition, 1, undefined, parameterContext);
     } else if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
       this.analyzeExpression(contents.claim, false, (value) => (contents.claim = value!), undefined, context);
     } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
