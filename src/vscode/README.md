@@ -26,10 +26,8 @@ At the moment, some features look for certain files in predefined locations insi
 
 Then open the workspace `Slate.code-workspace` in Visual Studio Code, and start editing `.slate` files in the `data/libraries/hlm` subdirectory.
 
-If the "Loading..." message in the Slate view does not disappear, try closing the view and reopening it via the editor toolbar, possibly several times. This is an open [Visual Studio Code bug](https://github.com/microsoft/vscode/issues/89038).
-
 To let Slate adapt references when moving files or directories, consider increasing the `files.participants.timeout` setting in Visual Studio Code.
 
 ## Download
 
-The most up-to-date version of the Slate VSCode extension can always be downloaded from https://slate-prover.herokuapp.com/public/download/slate.vsix. This version is guaranteed to match the online version of the theorem prover.
+Continuously updated builds of the Slate VSCode extension are available at https://slate-prover.herokuapp.com/public/download/slate.vsix. That file is guaranteed to match the online theorem prover.

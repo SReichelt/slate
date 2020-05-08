@@ -10,6 +10,7 @@ import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
 
 let currentWorkspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
 let panel: vscode.WebviewPanel | undefined = undefined;
+let startCheckTimer: NodeJS.Timeout | undefined = undefined;
 
 function getBaseURI(workspaceFolder: vscode.WorkspaceFolder): string {
     return workspaceFolder.uri.toString() + '/data/';
@@ -155,18 +156,34 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
                 localResourceRoots: [webViewURI]
             }
         );
-        panel.onDidDispose(() => (panel = undefined), context.subscriptions);
+
+        let onDidDispose = () => {
+            panel = undefined;
+            if (startCheckTimer) {
+                clearTimeout(startCheckTimer);
+                startCheckTimer = undefined;
+            }
+        };
+        panel.onDidDispose(onDidDispose, context.subscriptions);
 
         let webview = panel.webview;
-        let reportInitiallyActiveEditor = true;
+        let initialMessageReceived = false;
         let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
-            if (reportInitiallyActiveEditor) {
+            if (!initialMessageReceived) {
                 selectEditorUri(initiallyActiveEditor);
-                reportInitiallyActiveEditor = false;
+                initialMessageReceived = true;
             }
             return onMessageReceived(webview, requestMessage, fileAccessor);
         };
         webview.onDidReceiveMessage(onDidReceiveMessage, undefined, context.subscriptions);
+
+        // Work around https://github.com/microsoft/vscode/issues/89038.
+        let checkSuccessfulStart = () => {
+            if (panel && !initialMessageReceived) {
+                panel.dispose();
+                showGraphicalEditor(context, fileAccessor);
+            }
+        };
 
         let baseURL = webview.asWebviewUri(webViewURI);
 
@@ -177,6 +194,7 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         indexTemplatePromise.then((indexTemplate: string) => {
             if (panel) {
                 webview.html = indexTemplate;
+                startCheckTimer = setTimeout(checkSuccessfulStart, 5000);
             }
         });
     }
