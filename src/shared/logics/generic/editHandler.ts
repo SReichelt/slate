@@ -628,9 +628,6 @@ export abstract class GenericEditHandler {
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
     let renderedExpression = onRenderExpression(expression);
-    if (!renderedExpression.semanticLinks) {
-      renderedExpression.semanticLinks = [new Display.SemanticLink(expression)];
-    }
     let item = new Menu.ExpressionMenuItem(renderedExpression);
     item.action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
     let origExpression = expressionEditInfo.expression;

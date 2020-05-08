@@ -249,7 +249,14 @@ export class HLMEditHandler extends GenericEditHandler {
             return undefined;
           }
         };
-        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], onGetExpressions, onRenderTerm));
+        let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
+          let renderedExpression = onRenderTerm(term);
+          if (!renderedExpression.semanticLinks) {
+            renderedExpression.semanticLinks = [new Display.SemanticLink(term)];
+          }
+          return renderedExpression;
+        };
+        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], onGetExpressions, onRenderTermWithSemanticLink));
       }
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
@@ -295,7 +302,14 @@ export class HLMEditHandler extends GenericEditHandler {
             return undefined;
           }
         };
-        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], onGetExpressions, onRenderTerm));
+        let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
+          let renderedExpression = onRenderTerm(term);
+          if (!renderedExpression.semanticLinks) {
+            renderedExpression.semanticLinks = [new Display.SemanticLink(term)];
+          }
+          return renderedExpression;
+        };
+        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], onGetExpressions, onRenderTermWithSemanticLink));
       }
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
@@ -358,7 +372,17 @@ export class HLMEditHandler extends GenericEditHandler {
             return undefined;
           }
         };
-        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], onGetExpressions, onRenderFormula));
+        let onRenderFormulaWithSemanticLink = (formula: Fmt.Expression) => {
+          let renderedExpression = onRenderFormula(formula);
+          if (!renderedExpression.semanticLinks) {
+            while (formula instanceof FmtHLM.MetaRefExpression_not) {
+              formula = formula.formula;
+            }
+            renderedExpression.semanticLinks = [new Display.SemanticLink(formula)];
+          }
+          return renderedExpression;
+        };
+        rows.push(this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], onGetExpressions, onRenderFormulaWithSemanticLink));
       }
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
