@@ -170,6 +170,10 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         let initialMessageReceived = false;
         let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
             if (!initialMessageReceived) {
+                if (startCheckTimer) {
+                    clearTimeout(startCheckTimer);
+                    startCheckTimer = undefined;
+                }
                 selectEditorUri(initiallyActiveEditor);
                 initialMessageReceived = true;
             }
@@ -181,6 +185,7 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         let checkSuccessfulStart = () => {
             if (panel && !initialMessageReceived) {
                 panel.dispose();
+                panel = undefined;
                 showGraphicalEditor(context, fileAccessor);
             }
         };
