@@ -2072,10 +2072,11 @@ class TutorialStates {
           contents: (
             <div className={'large-tooltip'}>
               <p>Thank you for following the tutorial.</p>
-              <p>Now you are ready to make your first contribution to the library.</p>
-              <p>However, if you would like to experiment a little without submitting your changes, you can continue in tutorial mode for now and exit later.</p>
+              <p>As you have seen, Slate is designed to be learned intuitively, by exploring the user interface. As a next step, we recommend taking a look at the contents of the library and making small contributions.</p>
+              <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
+              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Visual Studio Code extension</a>.</p>
               <div className={'tutorial-tooltip-button-row'}>
-                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experimenting)}>
+                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
                   Continue in tutorial mode
                 </Button>
                 <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined)}>
@@ -2091,7 +2092,7 @@ class TutorialStates {
     ]
   };
 
-  experimenting: TutorialState = {
+  experiment: TutorialState = {
     manipulationEntries: []
   };
 }

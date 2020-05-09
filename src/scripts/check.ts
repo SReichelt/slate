@@ -36,7 +36,7 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
       let ref = item.ref as Fmt.DefinitionRefExpression;
       promise = promise.then((currentResult: boolean) =>
         libraryDataProvider.fetchItem(ref.path, true)
-          .then((itemDefinition: LibraryDefinition) => checkItem(itemDefinition, libraryDataProvider, ref.path))
+          .then((itemDefinition: LibraryDefinition) => checkItem(itemDefinition, libraryDataProvider))
           .then((itemResult: boolean) => currentResult && itemResult));
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
@@ -50,28 +50,31 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
   return promise;
 }
 
-function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider, itemPath: Fmt.Path): CachedPromise<boolean> {
+function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
   let checker = libraryDataProvider.logic.getChecker();
   return checker.checkDefinition(definition.definition, libraryDataProvider, false).then((checkResult: Logic.LogicCheckResult) => {
     let result = true;
     for (let diagnostic of checkResult.diagnostics) {
-      let severity = 'Unknown';
+      let message = diagnostic.message;
       switch (diagnostic.severity) {
       case Logic.DiagnosticSeverity.Error:
-        severity = 'Error';
+        message = `Error: ${message}`;
         result = false;
         break;
       case Logic.DiagnosticSeverity.Warning:
-        severity = 'Warning';
+        message = `Warning: ${message}`;
         break;
       case Logic.DiagnosticSeverity.Information:
-        severity = 'Information';
+        message = `Information: ${message}`;
         break;
       case Logic.DiagnosticSeverity.Hint:
-        severity = 'Hint';
+        message = `Hint: ${message}`;
         break;
       }
-      console.error(`${libraryDataProvider.pathToURI(itemPath)}: ${severity}: ${diagnostic.message}`);
+      if (definition.fileReference) {
+        message = `${definition.fileReference.fileName}: ${message}`;
+      }
+      console.error(message);
     }
     return result;
   });

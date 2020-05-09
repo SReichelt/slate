@@ -149,7 +149,10 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
         panel = vscode.window.createWebviewPanel(
             'slate',
             'Slate',
-            vscode.ViewColumn.Two,
+            {
+                viewColumn: vscode.ViewColumn.Two,
+                preserveFocus: true
+            },
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
