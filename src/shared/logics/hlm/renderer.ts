@@ -1260,7 +1260,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (parameters.length) {
       let extractedConstraints: Fmt.Parameter[] = [];
       let extractedParameters = this.renderUtils.extractConstraints(parameters, extractedConstraints);
-      if (!extractedParameters.length) {
+      if (extractedConstraints.length <= 1 || !extractedParameters.length) {
         extractedConstraints = [];
         extractedParameters = parameters;
       }
@@ -1436,6 +1436,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       } else if (display.path.name === 'NounProperty'
                  || display.path.name === 'NounRelation'
+                 || display.path.name === 'Structure'
                  || display.path.name === 'Feature') {
         abbr = display.path.arguments.getValue('singular');
       }

@@ -277,12 +277,21 @@ $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String =
   )
 }
 
-$NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+$NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a', preposition: %String = 'of'): %Template {
   display = $RelationalProperty(
     operands = operands,
     property = singular,
     article = article,
-    preposition = 'of'
+    preposition = preposition
+  )
+}
+
+$Structure(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+  display = $Verb(
+    symbol = [%neg('forms', 'does not form'), ' ', article, ' ', singular],
+    operand = $Tuple(
+      items = operands
+    )
   )
 }
 
