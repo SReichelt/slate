@@ -515,6 +515,7 @@ div.display-math {
 }
 
 .var.charcorner-tr.charcorner-large+.space-start::before, .var.charcorner-tr+sup::before {
+  content: ' ';
   font-size: initial;
 }
 
