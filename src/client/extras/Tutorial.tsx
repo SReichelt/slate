@@ -11,6 +11,7 @@ export interface TutorialToolTip {
 export interface TutorialManipulationEntry {
   type?: any;
   key?: any;
+  constraint?: (props: any) => boolean;
   children?: TutorialManipulationEntry[];
   toolTip?: TutorialToolTip;
   manipulateProps?: (props: any) => any;
@@ -20,12 +21,25 @@ export interface TutorialManipulationEntry {
 
 type NodeManipulationFn = (node: React.ReactNode) => React.ReactNode;
 
-function applyTutorialManipulationEntries(node: React.ReactNode, entries: TutorialManipulationEntry[]): React.ReactNode {
+function applyTutorialManipulationEntries(node: React.ReactNode, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
   let visitor = (element: React.ReactElement) => {
     for (let entry of entries) {
       if ((entry.type === undefined || element.type === entry.type)
-          && (entry.key === undefined || element.key === entry.key || element.key === entry.key.toString())) {
-        return createTutorialManipulator(entry);
+          && (entry.key === undefined || element.key === entry.key || element.key === entry.key.toString())
+          && (entry.constraint === undefined || entry.constraint(element.props))) {
+        let entryName = '?';
+        if (entry.type !== undefined) {
+          if (typeof entry.type === 'string') {
+            entryName = entry.type;
+          } else if (typeof entry.type.name === 'string') {
+            entryName = entry.type.name;
+          }
+        }
+        if (entry.key !== undefined) {
+          entryName = `${entryName} key="${entry.key}"`;
+        }
+        console.log(`${indent}Found ${entryName}.`);
+        return createTutorialManipulator(entry, indent + '  ');
       }
     }
     return undefined;
@@ -33,11 +47,11 @@ function applyTutorialManipulationEntries(node: React.ReactNode, entries: Tutori
   return traverseReactComponents(node, visitor);
 }
 
-function createTutorialManipulator(entry: TutorialManipulationEntry): ReactElementManipulator {
+function createTutorialManipulator(entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
   let traverseChildren: NodeManipulationFn | undefined = undefined;
   if (entry.children && entry.children.length) {
     let children = entry.children;
-    traverseChildren = (node: React.ReactNode) => applyTutorialManipulationEntries(node, children);
+    traverseChildren = (node: React.ReactNode) => applyTutorialManipulationEntries(node, children, indent);
   }
 
   let manipulateContents = traverseChildren;

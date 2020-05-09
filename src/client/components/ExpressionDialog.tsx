@@ -76,7 +76,7 @@ interface ExpressionDialogItemProps {
   onItemChanged?: () => void;
 }
 
-class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
+export class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
   componentDidMount(): void {
     this.props.item.registerChangeListener(this.onItemChanged);
     if (this.props.interactionHandler) {

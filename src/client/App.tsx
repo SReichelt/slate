@@ -434,7 +434,7 @@ class App extends React.Component<AppProps, AppState> {
             let mainContentsResult: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="library-item"/>;
             if (editing) {
               if (this.state.tutorialState) {
-                mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Cancel)} Exit tutorial</Button></Message>, mainContentsResult];
+                mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
               } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
                 mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
               } else if (this.state.selectedItemRepository) {
@@ -580,15 +580,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let contentsPane = (
-      <div className={'bottom-toolbar-container'} key="main-contents">
+      <div className={'bottom-toolbar-container'} key="main-contents-with-toolbar">
         <div className={'app-pane'}>
           <ScrollPane object={this.state.selectedItemDefinition}>
-            <div className={'app-contents'}>
+            <div className={'app-contents'} key="main-contents">
               {mainContents}
             </div>
           </ScrollPane>
         </div>
-        <div className={'bottom-toolbar'}>
+        <div className={'bottom-toolbar'} key="toolbar">
           <div className={'left'}>
             {leftButtons}
           </div>
@@ -604,7 +604,7 @@ class App extends React.Component<AppProps, AppState> {
           {contentsPane}
           <div className={'app-pane'}>
             <ScrollPane object={this.state.selectedItemDefinition}>
-              <div className={'app-contents'}>
+              <div className={'app-contents'} key="extra-contents">
                 {extraContents}
               </div>
             </ScrollPane>

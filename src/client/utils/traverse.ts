@@ -60,22 +60,29 @@ function getManipulatedProps(nodeObject: any, fallbackKey: number | undefined, i
   return result;
 }
 
+function attachElementAction(nodeObject: any, elementAction: (reactElement: React.ReactElement, htmlElement: HTMLElement) => void): any {
+  if (nodeObject.type === undefined || nodeObject.props === undefined) {
+    throw new Error('Cannot attach element action to non-element node');
+  }
+  let newContentProps = {...nodeObject.props};
+  let additionalRef = (ref: any) => {
+    if (ref !== null) {
+      elementAction(nodeObject, ref);
+    }
+  };
+  assignProps(newContentProps, nodeObject, undefined, additionalRef);
+  return React.createElement(nodeObject.type, newContentProps);
+}
+
 let wrappedClassComponents = new Map<any, any>();
 let wrappedFunctionComponents = new Map<any, any>();
 
-function getManipulatedContents(contents: any, props: any): React.ReactNode {
+function getManipulatedContents(contents: any, props: any): any {
   if (props._manipulateContents) {
     contents = props._manipulateContents(contents);
   }
   if (props._elementAction) {
-    let newContentProps = {...contents.props};
-    let additionalRef = (ref: any) => {
-      if (ref !== null) {
-        props._elementAction(contents, ref);
-      }
-    };
-    assignProps(newContentProps, contents, undefined, additionalRef);
-    contents = React.createElement(contents.type, newContentProps);
+    contents = attachElementAction(contents, props._elementAction);
   }
   return contents;
 }
@@ -174,10 +181,11 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
           throw new Error('Trying to attach component action to non-component node');
         }
         if (manipulator.manipulateContents) {
+          let contents = manipulator.manipulateContents(node);
           if (manipulator.elementAction) {
-            throw new Error('Cannot attach element action to manipulated non-component node');
+            contents = attachElementAction(contents, manipulator.elementAction);
           }
-          return manipulator.manipulateContents(node);
+          return contents;
         }
       }
 

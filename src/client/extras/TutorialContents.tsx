@@ -5,7 +5,9 @@ import { ButtonType, getButtonIcon } from '../utils/icons';
 import config from '../utils/config';
 
 import * as Fmt from '../../shared/format/format';
+import * as FmtHLM from '../../shared/logics/hlm/meta';
 import * as Logic from '../../shared/logics/logic';
+import * as Menu from '../../shared/display/menu';
 
 import StartPage from './StartPage';
 import Button from '../components/Button';
@@ -16,14 +18,20 @@ import InsertDialog from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem } from '../components/ExpressionMenu';
+import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
 
 type TutorialStateFn = (newTutorialState: TutorialState | undefined) => void;
 
-function inject(fn: (...args: any) => any, action: () => void) {
+function inject(fn: (...args: any) => any, action: (...args: any) => void) {
   return (...args: any) => {
-    action();
-    return fn(...args);
+    let result = fn(...args);
+    action(...args);
+    return result;
   };
+}
+
+function createContentConstraint(constraint: (definition: Fmt.Definition) => boolean): (props: any) => boolean {
+  return (props) => constraint(props.definition.definition);
 }
 
 function createContentAction(action: (definition: Fmt.Definition) => void): (component: React.Component<any, any>) => void {
@@ -42,34 +50,44 @@ function createDummyEvent(target: HTMLElement) {
 class TutorialStates {
   constructor(private changeState: TutorialStateFn, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
-  private automateClick() {
+  private automateClick(delay: number = 200) {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done) {
         done = true;
-        while (reactElement.props.children && reactElement.props.children.length && !reactElement.props.onMouseDown && !reactElement.props.onMouseUp && !reactElement.props.onClick) {
-          reactElement = reactElement.props.children[0];
+        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseDown && !reactElement.props.onMouseUp && !reactElement.props.onClick) {
+          if (Array.isArray(reactElement.props.children)) {
+            if (reactElement.props.children.length) {
+              reactElement = reactElement.props.children[0];
+            } else {
+              break;
+            }
+          } else {
+            reactElement = reactElement.props.children;
+          }
         }
-        let simulateClick = () => {
-          if (reactElement.props.onMouseDown) {
-            let mouseDownEvent = createDummyEvent(htmlElement);
-            reactElement.props.onMouseDown(mouseDownEvent);
-          }
-          if (reactElement.props.onMouseUp) {
-            let mouseUpEvent = createDummyEvent(htmlElement);
-            reactElement.props.onMouseUp(mouseUpEvent);
-          }
-          if (reactElement.props.onClick) {
-            let clickEvent = createDummyEvent(htmlElement);
-            reactElement.props.onClick(clickEvent);
-          }
-        };
-        setTimeout(simulateClick, 200);
+        if (reactElement.props) {
+          let simulateClick = () => {
+            if (reactElement.props.onMouseDown) {
+              let mouseDownEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseDown(mouseDownEvent);
+            }
+            if (reactElement.props.onMouseUp) {
+              let mouseUpEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseUp(mouseUpEvent);
+            }
+            if (reactElement.props.onClick) {
+              let clickEvent = createDummyEvent(htmlElement);
+              reactElement.props.onClick(clickEvent);
+            }
+          };
+          setTimeout(simulateClick, delay);
+        }
       }
     };
   }
 
-  private automateTextInput(text: string) {
+  private automateTextInput(text: string, delay: number = 200) {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
@@ -78,12 +96,14 @@ class TutorialStates {
           htmlElement.value = text;
           reactElement.props.onChange(createDummyEvent(htmlElement));
         };
-        setTimeout(simulateTextInput, 200);
+        setTimeout(simulateTextInput, delay);
       }
     };
   }
 
-  initialState: TutorialState = {
+  // Introduction.
+
+  introduction: TutorialState = {
     manipulationEntries: [
       {
         type: StartPage,
@@ -104,11 +124,11 @@ class TutorialStates {
                   <p>No prior experience with interactive theorem proving is required.</p>
                   {this.withTouchWarning ? <p><strong>Note:</strong> Using a mouse is recommended (though not required) because editing possibilities are easier to discover using hover effects.</p> : null}
                   <div className={'tutorial-tooltip-button-row'}>
-                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.searchFunctionsState1)}>
+                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.searchFunctions_enterSearchText)}>
                       {getButtonIcon(ButtonType.OK)} Start
                     </Button>
                     {config.development ? (
-                       <Button className={'tutorial-tooltip-button standalone'} onClick={() => { this.runAutomatically = true; this.changeState(this.searchFunctionsState1); }}>
+                       <Button className={'tutorial-tooltip-button standalone'} onClick={() => { this.runAutomatically = true; this.changeState(this.searchFunctions_enterSearchText); }}>
                          {getButtonIcon(ButtonType.Submit)} Run automatically
                        </Button>
                      ) : null}
@@ -127,7 +147,9 @@ class TutorialStates {
     ]
   };
 
-  searchFunctionsState1: TutorialState = {
+  // Search for "Functions".
+
+  searchFunctions_enterSearchText: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -141,7 +163,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onSearch: inject(props.onSearch, () => this.changeState(this.searchFunctionsState2))
+              onSearch: inject(props.onSearch, () => this.changeState(this.searchFunctions_openEssentials))
             }),
             elementAction: this.automateTextInput('functions')
           }
@@ -150,7 +172,7 @@ class TutorialStates {
     ]
   };
 
-  searchFunctionsState2: TutorialState = {
+  searchFunctions_openEssentials: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -182,7 +204,7 @@ class TutorialStates {
                 ],
                 componentAction: (component) => {
                   if (component.state.opened) {
-                    this.changeState(this.searchFunctionsState3);
+                    this.changeState(this.searchFunctions_openFunctions);
                   }
                 }
               }
@@ -193,7 +215,7 @@ class TutorialStates {
     ]
   };
 
-  searchFunctionsState3: TutorialState = {
+  searchFunctions_openFunctions: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -232,7 +254,7 @@ class TutorialStates {
                         ],
                         componentAction: (component) => {
                           if (component.state.opened) {
-                            this.changeState(this.searchFunctionsState4);
+                            this.changeState(this.insertOperator_openInsertMenu);
                           }
                         }
                       }
@@ -247,7 +269,7 @@ class TutorialStates {
     ]
   };
 
-  searchFunctionsState4: TutorialState = {
+  insertOperator_openInsertMenu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -299,7 +321,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       if (component.state.menuOpen) {
-                                        this.changeState(this.insertOperatorState);
+                                        this.changeState(this.insertOperator_menu_newOperator);
                                       }
                                     },
                                     elementAction: this.automateClick()
@@ -321,7 +343,9 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorState: TutorialState = {
+  // Insert operator.
+
+  insertOperator_menu_newOperator: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -360,7 +384,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.insertOperatorDialogState))
+                                          onClick: inject(props.onClick, () => this.changeState(this.insertOperator_dialog_enterName))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -383,7 +407,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorDialogState: TutorialState = {
+  insertOperator_dialog_enterName: TutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -432,14 +456,14 @@ class TutorialStates {
         ],
         componentAction: (component) => {
           if (component.state.name) {
-            this.changeState(this.closeInsertOperatorDialogState);
+            this.changeState(this.insertOperator_dialog_ok);
           }
         }
       }
     ]
   };
 
-  closeInsertOperatorDialogState: TutorialState = {
+  insertOperator_dialog_ok: TutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -493,16 +517,19 @@ class TutorialStates {
         ],
         manipulateProps: (props) => ({
           ...props,
-          onOK: inject(props.onOK, () => this.changeState(this.insertSetParameterState1))
+          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_XY_openInsertMenu))
         })
       }
     ]
   };
 
-  insertSetParameterState1: TutorialState = {
+  // Insert parameters X and Y.
+
+  insertOperatorParameters_XY_openInsertMenu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 0)),
         children: [
           {
             type: Expression,
@@ -524,7 +551,7 @@ class TutorialStates {
                         },
                         componentAction: (component) => {
                           if (component.state.openMenu) {
-                            this.changeState(this.insertSetParameterState2);
+                            this.changeState(this.insertOperatorParameters_XY_menu_set);
                           }
                         },
                         elementAction: this.automateClick()
@@ -540,10 +567,11 @@ class TutorialStates {
     ]
   };
 
-  insertSetParameterState2: TutorialState = {
+  insertOperatorParameters_XY_menu_set: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 0)),
         children: [
           {
             type: Expression,
@@ -575,7 +603,7 @@ class TutorialStates {
                                     },
                                     manipulateProps: (props) => ({
                                       ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.nameSetParametersState))
+                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_XY_enterNames))
                                     }),
                                     elementAction: this.automateClick()
                                   }
@@ -596,10 +624,12 @@ class TutorialStates {
     ]
   };
 
-  nameSetParametersState: TutorialState = {
+  insertOperatorParameters_XY_enterNames: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Set)),
         children: [
           {
             type: Expression,
@@ -640,18 +670,23 @@ class TutorialStates {
           }
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
-          if (definition.parameters.length === 2) {
-            this.changeState(this.insertFunctionParameterState1);
+          if (definition.parameters.length >= 2) {
+            this.changeState(this.insertOperatorParameters_f_openInsertMenu);
           }
         })
       }
     ]
   };
 
-  insertFunctionParameterState1: TutorialState = {
+  // Insert parameter f.
+
+  insertOperatorParameters_f_openInsertMenu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
+                                                             && definition.parameters[0].name === 'X'
+                                                             && definition.parameters[1].name === 'Y')),
         children: [
           {
             type: Expression,
@@ -687,7 +722,7 @@ class TutorialStates {
                             },
                             componentAction: (component) => {
                               if (component.state.openMenu) {
-                                this.changeState(this.insertFunctionParameterState2);
+                                this.changeState(this.insertOperatorParameters_f_menu_element);
                               }
                             },
                             elementAction: this.automateClick()
@@ -705,10 +740,11 @@ class TutorialStates {
     ]
   };
 
-  insertFunctionParameterState2: TutorialState = {
+  insertOperatorParameters_f_menu_element: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 2)),
         children: [
           {
             type: Expression,
@@ -744,7 +780,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(undefined))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_enterName))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -766,9 +802,1301 @@ class TutorialStates {
       }
     ]
   };
+
+  insertOperatorParameters_f_enterName: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('f')
+                                  }
+                                ],
+                                toolTip: {
+                                  contents: <p>Name this parameter "f".</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        componentAction: createContentAction((definition: Fmt.Definition) => {
+          if (definition.parameters[2].name === 'f') {
+            this.changeState(this.insertOperatorParameters_f_set_openPlaceholderMenu);
+          }
+        })
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                // Keep tooltip at name input; otherwise the name input will be recreated while typing.
+                                type: Expression,
+                                key: 0,
+                                toolTip: {
+                                  contents: null,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              },
+                              {
+                                type: Expression,
+                                key: 4,
+                                toolTip: {
+                                  contents: <p>We need to fill this placeholder.</p>,
+                                  position: 'bottom',
+                                  index: 1
+                                },
+                                componentAction: (component) => {
+                                  if (component.state.openMenu) {
+                                    this.changeState(this.insertOperatorParameters_f_set_menu_definition);
+                                  }
+                                },
+                                elementAction: this.automateClick()
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_menu_definition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        children: [
+                                          {
+                                            type: 'div',
+                                            key: 'title',
+                                            toolTip: {
+                                              contents: <p>Click here to select a definition from the library.</p>,
+                                              position: 'left',
+                                              index: 1
+                                            },
+                                            elementAction: this.automateClick()
+                                          }
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
+                                            this.changeState(action instanceof Menu.DialogExpressionMenuAction
+                                                              ? this.insertOperatorParameters_f_set_dialog_selectFunctions
+                                                              : this.insertOperatorParameters_f_set_arg_X);
+                                          })
+                                        })
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_dialog_selectFunctions: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                type: InnerLibraryTreeItems,
+                                                children: [
+                                                  {
+                                                    type: LibraryTreeItem,
+                                                    key: 'Essentials',
+                                                    children: [
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Functions',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'Functions',
+                                                                    children: [
+                                                                      {
+                                                                        key: 'item',
+                                                                        children: [
+                                                                          {
+                                                                            key: 'display-span',
+                                                                            toolTip: {
+                                                                              contents: <p>Click here to select the set of functions.</p>,
+                                                                              position: 'right',
+                                                                              index: 1
+                                                                            }
+                                                                          }
+                                                                        ],
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ],
+                                                                    componentAction: (component) => {
+                                                                      if (component.props.selected) {
+                                                                        this.changeState(this.insertOperatorParameters_f_set_dialog_ok);
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ],
+                                            toolTip: {
+                                              contents: <p>This tree shows only the definitions in the library that can be used at the given location.</p>,
+                                              position: 'top',
+                                              index: 0
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: StandardDialog,
+                                        children: [
+                                          {
+                                            type: Button,
+                                            key: 'ok',
+                                            toolTip: {
+                                              contents: <p>Click here.</p>,
+                                              position: 'top',
+                                              index: 0
+                                            },
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg_X))
+                                            }),
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_arg_X: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Select X here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.insertOperatorParameters_f_set_arg_X_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_arg_X_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 0,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.insertOperatorParameters_f_set_arg_Y);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_arg_Y: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    toolTip: {
+                                      contents: <p>Select Y here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.insertOperatorParameters_f_set_arg_Y_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_f_set_arg_Y_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 1,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.insertOperatorParameters_n_openInsertMenu);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert parameter n.
+
+  insertOperatorParameters_n_openInsertMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            toolTip: {
+                              contents: <p>Our last parameter will be a natural number.</p>,
+                              position: 'bottom',
+                              index: 0
+                            },
+                            componentAction: (component) => {
+                              if (component.state.openMenu) {
+                                this.changeState(this.insertOperatorParameters_n_menu_element);
+                              }
+                            },
+                            elementAction: this.automateClick()
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_menu_element: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        toolTip: {
+                                          contents: <p>Click here.</p>,
+                                          position: 'right',
+                                          index: 1
+                                        },
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_enterName))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_enterName: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('n')
+                                  }
+                                ],
+                                toolTip: {
+                                  contents: <p>Name this parameter "n".</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        componentAction: createContentAction((definition: Fmt.Definition) => {
+          if (definition.parameters[3].name === 'n') {
+            this.changeState(this.insertOperatorParameters_n_set_openPlaceholderMenu);
+          }
+        })
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_set_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                // Keep tooltip at name input; otherwise the name input will be recreated while typing.
+                                type: Expression,
+                                key: 0,
+                                toolTip: {
+                                  contents: null,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              },
+                              {
+                                type: Expression,
+                                key: 4,
+                                toolTip: {
+                                  contents: <p>Click here.</p>,
+                                  position: 'bottom',
+                                  index: 1
+                                },
+                                componentAction: (component) => {
+                                  if (component.state.openMenu) {
+                                    this.changeState(this.insertOperatorParameters_n_set_menu_definition);
+                                  }
+                                },
+                                elementAction: this.automateClick()
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_set_menu_definition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        children: [
+                                          {
+                                            type: 'div',
+                                            key: 'title',
+                                            toolTip: {
+                                              contents: <p>Click here to search for the set of natural numbers.</p>,
+                                              position: 'left',
+                                              index: 1
+                                            },
+                                            elementAction: this.automateClick()
+                                          }
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_set_dialog_searchNaturalNumbers))
+                                        })
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_set_dialog_searchNaturalNumbers: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: <p>Type "natural numbers" here, which will further filter the tree.</p>,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                },
+                                                manipulateProps: (props) => ({
+                                                  ...props,
+                                                  onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers))
+                                                }),
+                                                elementAction: this.automateTextInput('natural numbers')
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_set_dialog_selectNaturalNumbers: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: null,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                }
+                                              },
+                                              {
+                                                type: InnerLibraryTreeItems,
+                                                children: [
+                                                  {
+                                                    type: LibraryTreeItem,
+                                                    key: 'Essentials',
+                                                    children: [
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Numbers',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'Natural',
+                                                                    children: [
+                                                                      {
+                                                                        type: InnerLibraryTreeItems,
+                                                                        children: [
+                                                                          {
+                                                                            type: LibraryTreeItem,
+                                                                            key: 'Natural numbers',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'item',
+                                                                                children: [
+                                                                                  {
+                                                                                    key: 'display-span',
+                                                                                    toolTip: {
+                                                                                      contents: <p>Click here to select the set of natural numbers.</p>,
+                                                                                      position: 'right',
+                                                                                      index: 1
+                                                                                    }
+                                                                                  }
+                                                                                ],
+                                                                                elementAction: this.automateClick()
+                                                                              }
+                                                                            ],
+                                                                            componentAction: (component) => {
+                                                                              if (component.props.selected) {
+                                                                                this.changeState(this.insertOperatorParameters_n_set_dialog_ok);
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_n_set_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: StandardDialog,
+                                        children: [
+                                          {
+                                            type: Button,
+                                            key: 'ok',
+                                            toolTip: {
+                                              contents: <p>Click here.</p>,
+                                              position: 'top',
+                                              index: 0
+                                            },
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))
+                                            }),
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // The end.
+
+  tutorialCompleted: TutorialState = {
+    manipulationEntries: [
+      {
+        type: 'div',
+        key: 'toolbar',
+        toolTip: {
+          contents: (
+            <div className={'large-tooltip'}>
+              <p>Thank you for following the tutorial.</p>
+              <p>Now you are ready to make your first contribution to the library.</p>
+              <p>However, if you would like to experiment a little without submitting your changes, you can continue in tutorial mode for now and exit later.</p>
+              <div className={'tutorial-tooltip-button-row'}>
+                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experimenting)}>
+                  Continue in tutorial mode
+                </Button>
+                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined)}>
+                  {getButtonIcon(ButtonType.Close)} Exit tutorial
+                </Button>
+              </div>
+            </div>
+          ),
+          position: 'top',
+          index: 0
+        }
+      }
+    ]
+  };
+
+  experimenting: TutorialState = {
+    manipulationEntries: []
+  };
 }
 
 export function startTutorial(onChangeTutorialState: TutorialStateFn, withTouchWarning: boolean): void {
   let tutorialStates = new TutorialStates(onChangeTutorialState, withTouchWarning);
-  onChangeTutorialState(tutorialStates.initialState);
+  onChangeTutorialState(tutorialStates.introduction);
 }

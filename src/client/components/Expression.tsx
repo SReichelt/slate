@@ -273,7 +273,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         let size = expression.inputLength ?? expression.text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput}/>;
+        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
         isInputControl = true;
       } else {
         let text = expression.text;
@@ -1459,9 +1459,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   };
 
   private onDialogOK = (result: Dialog.DialogResultBase) => {
+    let dialog = this.state.openDialog;
     this.clearPermanentHighlight();
-    if (this.state.openDialog && this.state.openDialog.onOK) {
-      this.state.openDialog.onOK(result);
+    if (dialog && dialog.onOK) {
+      dialog.onOK(result);
     }
     if (this.props.interactionHandler) {
       this.props.interactionHandler.expressionChanged();
