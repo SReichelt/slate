@@ -117,10 +117,17 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     if (this.props.separatedBelow) {
       className += ' separated-below';
     }
+    if (!this.props.item.visible) {
+      return (
+        <tr className={className}>
+          <td className={'dialog-cell'} colSpan={2}/>
+        </tr>
+      );
+    }
     if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
       return (
         <tr className={className}>
-          <td className={'dialog-cell'} colSpan={2}>
+          <td className={'dialog-cell dialog-info-cell'} colSpan={2}>
             <Expression expression={this.props.item.info}/>
           </td>
         </tr>
@@ -149,50 +156,63 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
           </td>
         </tr>
       );
-    } else if (this.props.item instanceof Dialog.ExpressionDialogSelectionItem) {
+    } else if (this.props.item instanceof Dialog.ExpressionDialogListItem) {
       let contents: React.ReactNode = null;
-      let selectionItem = this.props.item;
-      if (selectionItem.items.length) {
-        contents = (
-          <fieldset className={'dialog-group'}>
-            <div className={'dialog-radio-button-group'}>
-              {selectionItem.items.map((item: any, index: number) => {
-                if (selectionItem.items.length > 1) {
-                  // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
-                  // In addition, the "checked" status fails to update unless we change the key of the selected item.
-                  // I haven't figured out why.
-                  let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-                    if (event.target.value === `item${index}` && selectionItem !== item) {
-                      selectionItem.selectedItem = item;
-                      selectionItem.changed();
-                    }
-                  };
-                  let onClick = () => {
-                    if (selectionItem !== item) {
-                      selectionItem.selectedItem = item;
-                      selectionItem.changed();
-                    }
-                  };
-                  let selected = selectionItem.selectedItem === item;
-                  return (
-                    <div key={selected ? -index : index}>
-                      <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
-                      <label htmlFor={`radio${index}`} onClick={onClick}>
+      let listItem = this.props.item;
+      if (listItem.items.length) {
+        if (listItem instanceof Dialog.ExpressionDialogSelectionItem) {
+          let selectionItem = listItem;
+          contents = (
+            <fieldset className={'dialog-group'}>
+              <div className={'dialog-radio-button-group'}>
+                {selectionItem.items.map((item: any, index: number) => {
+                  if (selectionItem.items.length > 1) {
+                    // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
+                    // In addition, the "checked" status fails to update unless we change the key of the selected item.
+                    // I haven't figured out why.
+                    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                      if (event.target.value === `item${index}` && selectionItem !== item) {
+                        selectionItem.selectedItem = item;
+                        selectionItem.changed();
+                      }
+                    };
+                    let onClick = () => {
+                      if (selectionItem !== item) {
+                        selectionItem.selectedItem = item;
+                        selectionItem.changed();
+                      }
+                    };
+                    let selected = selectionItem.selectedItem === item;
+                    return (
+                      <div key={selected ? -index : index}>
+                        <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
+                        <label htmlFor={`radio${index}`} onClick={onClick}>
+                          <Expression expression={selectionItem.onRenderItem(item)}/>
+                        </label>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={index}>
                         <Expression expression={selectionItem.onRenderItem(item)}/>
-                      </label>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={index}>
-                      <Expression expression={selectionItem.onRenderItem(item)}/>
-                    </div>
-                  );
-                }
-              })}
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            </fieldset>
+          );
+        } else {
+          contents = (
+            <div className={'dialog-group'}>
+              {listItem.items.map((item: any, index: number) => (
+                <div key={index}>
+                  <Expression expression={listItem.onRenderItem(item)}/>
+                </div>
+              ))}
             </div>
-          </fieldset>
-        );
+          );
+        }
       }
       return (
         <tr className={className}>

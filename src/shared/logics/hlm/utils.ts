@@ -1377,4 +1377,17 @@ export class HLMUtils extends GenericUtils {
     elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
     return this.createParameter(elementType, defaultName, context);
   }
+
+  markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Set<Fmt.Parameter>): void {
+    for (let param of params) {
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+        this.markUnreferencedParametersAsAuto(type.parameters, referencedParams);
+      } else if (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element) {
+        if (!referencedParams.has(param)) {
+          type.auto = new FmtHLM.MetaRefExpression_true;
+        }
+      }
+    }
+  }
 }

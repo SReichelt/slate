@@ -875,7 +875,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let innerDefinition = definitions[definitions.length - 1];
     let contents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
     let definitionRef = this.renderDefinitionRef(definitions);
-    let onSetDisplay = (display: Fmt.Expression[] | undefined) => (contents.display = display);
+    let onSetDisplay = (display: Fmt.Expression[] | undefined) => {
+      if (display) {
+        for (let displayItem of display) {
+          let referencedParams = this.utils.findReferencedParameters(displayItem);
+          for (let definition of definitions) {
+            this.utils.markUnreferencedParametersAsAuto(definition.parameters, referencedParams);
+          }
+        }
+      }
+      contents.display = display;
+    };
     let onGetDefault = () => this.renderDefaultDefinitionRef(definitions);
     let onGetVariables = () => {
       let variables: RenderedVariable[] = [];
@@ -2846,25 +2856,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Display.RenderedExpression[]): void {
     for (let param of parameters) {
       let paramType = param.type.expression;
-      let renderedVariable: Display.RenderedExpression;
-      let auto = false;
-      if (paramType instanceof FmtHLM.MetaRefExpression_Prop
-          || paramType instanceof FmtHLM.MetaRefExpression_Set
-          || paramType instanceof FmtHLM.MetaRefExpression_Subset
-          || paramType instanceof FmtHLM.MetaRefExpression_Element) {
-        renderedVariable = this.renderVariable(param, indices);
-        auto = paramType.auto instanceof FmtHLM.MetaRefExpression_true;
+      if (this.utils.isValueParamType(paramType)) {
+        let renderedVariable = this.renderVariable(param, indices);
+        variables.push({
+          param: param,
+          display: renderedVariable,
+          canAutoFill: true
+        });
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
-        renderedVariable = this.renderVariable(param);
-      } else {
-        continue;
-      }
-      variables.push({
-        param: param,
-        display: renderedVariable,
-        required: !auto
-      });
-      if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
+        let renderedVariable = this.renderVariable(param);
+        variables.push({
+          param: param,
+          display: renderedVariable,
+          canAutoFill: false
+        });
         let newIndices: Display.RenderedExpression[] = indices ? indices.slice() : [];
         newIndices.push(renderedVariable);
         this.addRenderedVariables(paramType.parameters, variables, newIndices);

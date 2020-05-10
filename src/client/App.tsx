@@ -77,7 +77,6 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   extraContentsVisible: boolean;
   error?: string;
   templates?: Fmt.File;
-  rootInteractionHandler?: LibraryItemInteractionHandler;
   editedDefinitions?: LibraryItemListEntry[];
   showStartPage: boolean;
   tutorialState?: TutorialState;
@@ -289,10 +288,7 @@ class App extends React.Component<AppProps, AppState> {
     templateFile.read()
       .then((contents: string) => {
         let templates = FmtReader.readString(contents, templateFile.fileName, FmtDisplay.getMetaModel);
-        this.setState({
-          templates: templates,
-          rootInteractionHandler: new LibraryItemInteractionHandler(this.libraryDataProvider, templates, undefined, this.linkClicked)
-        });
+        this.setState({templates: templates});
         if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
           this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
         }
@@ -444,6 +440,7 @@ class App extends React.Component<AppProps, AppState> {
             itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
           }
           let mainContentsResult: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="library-item"/>;
+
           if (editing) {
             if (this.state.tutorialState) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
@@ -479,16 +476,17 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.showStartPage) {
         let createInteractionHandler = (libraryDataProvider: LibraryDataProvider) => this.createInteractionHandler(libraryDataProvider, this.state.templates, undefined);
         mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} createInteractionHandler={createInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} onDocLinkClicked={this.docLinkClicked} key="start-page"/>;
-        if (this.state.selectedItemRepository) {
-          let repository = this.state.selectedItemRepository;
-          if (repository.hasPullRequest) {
-            mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
-          } else if (repository.hasLocalChanges) {
-            mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
-          }
-        }
       } else {
         mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
+      }
+
+      let repository = this.state.selectedItemRepository;
+      if (repository) {
+        if (repository.hasPullRequest) {
+          mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+        } else if (repository.hasLocalChanges) {
+          mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+        }
       }
     }
 

@@ -121,4 +121,14 @@ export class GenericUtils {
     }
     return parameter;
   }
+
+  findReferencedParameters(expression: Fmt.Expression): Set<Fmt.Parameter> {
+    let result = new Set<Fmt.Parameter>();
+    expression.traverse((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.VariableRefExpression) {
+        result.add(subExpression.variable);
+      }
+    });
+    return result;
+  }
 }

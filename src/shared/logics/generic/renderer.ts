@@ -1,13 +1,13 @@
 import * as Fmt from '../../format/format';
 import * as Display from '../../display/display';
 import * as Logic from '../logic';
-import { GenericEditHandler } from './editHandler';
+import { GenericEditHandler, SetDisplayFn } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
   display: Display.RenderedExpression;
-  required: boolean;
+  canAutoFill: boolean;
 }
 
 export abstract class GenericRenderer {
@@ -103,7 +103,7 @@ export abstract class GenericRenderer {
     return semanticLink;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression[] | undefined, onSetDisplay: (display: Fmt.Expression[] | undefined) => void, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
+  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
     let semanticLink = new Display.SemanticLink(linkedObject, true);
     if (this.editHandler) {
       this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, isPredicate, this);

@@ -43,6 +43,10 @@
   padding-right: 1em;
 }
 
+.dialog-info-cell {
+  max-width: 17em;
+}
+
 .dialog-group {
   border: solid 1px var(--dialog-group-border-color);
   margin: 0;

@@ -30,6 +30,7 @@ export class ExpressionDialog extends DialogBase {
 type ChangeListener = () => void;
 
 export abstract class ExpressionDialogItem {
+  visible: boolean = true;
   private listeners: ChangeListener[] = [];
 
   registerChangeListener(listener: ChangeListener): void {
@@ -67,9 +68,12 @@ export class ExpressionDialogParameterItem extends ExpressionDialogItem {
   onGetValue: () => Display.RenderedExpression;
 }
 
-export class ExpressionDialogSelectionItem<T> extends ExpressionDialogItem {
+export class ExpressionDialogListItem<T> extends ExpressionDialogItem {
   items: T[];
   onRenderItem: (item: T) => Display.RenderedExpression;
+}
+
+export class ExpressionDialogSelectionItem<T> extends ExpressionDialogListItem<T> {
   selectedItem?: T;
 }
 

@@ -7,6 +7,14 @@
   text-align: left;
 }
 
+.expr.info-text {
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  font-style: normal;
+  line-height: initial;
+}
+
 .expr.hover, .expr.hover span {
   background-color: var(--expression-hover-background-color);
 }
