@@ -4,6 +4,7 @@ import SplitPane from 'react-split-pane';
 import { withAlert, AlertManager } from 'react-alert';
 import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
+import DocPage from './extras/DocPage';
 import { TutorialState, addTutorial } from './extras/Tutorial';
 import { startTutorial } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
@@ -38,6 +39,7 @@ const Loading = require('react-loading-animation');
 
 const libraries = require('../../data/libraries/libraries.json');
 
+const docsURIPrefix = 'docs/';
 const librariesURIPrefix = 'libraries/';
 
 const appName = 'Slate';
@@ -48,6 +50,7 @@ interface AppProps {
 }
 
 interface SelectionState {
+  selectedDocURI?: string;
   selectedItemRepository?: GitHub.Repository;
   selectedItemAbsolutePath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
@@ -187,15 +190,21 @@ class App extends React.Component<AppProps, AppState> {
     if (uri.startsWith('/')) {
       uri = uri.substring(1);
     }
-    let path = this.libraryDataProvider.uriToPath(uri);
-    if (path) {
-      this.fillSelectionState(state, this.libraryDataProvider, path);
+    if (uri.startsWith(docsURIPrefix)) {
+      state.selectedDocURI = uri;
       return true;
+    } else {
+      let path = this.libraryDataProvider.uriToPath(uri);
+      if (path) {
+        this.fillSelectionState(state, this.libraryDataProvider, path);
+        return true;
+      }
     }
     return false;
   }
 
   private fillSelectionState(state: SelectionState, libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void {
+    state.selectedDocURI = undefined;
     state.selectedItemAbsolutePath = libraryDataProvider.getAbsolutePath(path);
     if (path.parentPath) {
       state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(state.selectedItemAbsolutePath.parentPath);
@@ -226,6 +235,7 @@ class App extends React.Component<AppProps, AppState> {
       window.onpopstate = () => {
         // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
         let state: SelectionState = {
+          selectedDocURI: undefined,
           selectedItemAbsolutePath: undefined,
           selectedItemProvider: undefined,
           selectedItemLocalPath: undefined,
@@ -422,9 +432,10 @@ class App extends React.Component<AppProps, AppState> {
     let mainContents: React.ReactNode = null;
     let extraContents: React.ReactNode = null;
 
-    let definitionPromise = this.state.selectedItemDefinition;
-    if (definitionPromise) {
-      let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+    if (this.state.selectedDocURI) {
+      mainContents = <DocPage uri={this.state.selectedDocURI} onDocLinkClicked={this.docLinkClicked}/>;
+    } else if (this.state.selectedItemDefinition) {
+      let mainContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition) => {
         if (this.state.selectedItemProvider && this.state.templates) {
           let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
           let itemInfo = this.state.selectedItemInfo;
@@ -456,7 +467,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (!config.embedded) {
         if (this.state.extraContentsVisible) {
-          let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+          let extraContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition) => {
             return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
           });
           extraContents = renderPromise(extraContentsPromise, 'source');
@@ -464,19 +475,21 @@ class App extends React.Component<AppProps, AppState> {
           extraContents = <div key="source"/>;
         }
       }
-    } else if (this.state.showStartPage) {
-      let createInteractionHandler = (libraryDataProvider: LibraryDataProvider) => this.createInteractionHandler(libraryDataProvider, this.state.templates, undefined);
-      mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} createInteractionHandler={createInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} key="start-page"/>;
-      if (this.state.selectedItemRepository) {
-        let repository = this.state.selectedItemRepository;
-        if (repository.hasPullRequest) {
-          mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
-        } else if (repository.hasLocalChanges) {
-          mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+    } else if (!config.embedded) {
+      if (this.state.showStartPage) {
+        let createInteractionHandler = (libraryDataProvider: LibraryDataProvider) => this.createInteractionHandler(libraryDataProvider, this.state.templates, undefined);
+        mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} createInteractionHandler={createInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} onDocLinkClicked={this.docLinkClicked} key="start-page"/>;
+        if (this.state.selectedItemRepository) {
+          let repository = this.state.selectedItemRepository;
+          if (repository.hasPullRequest) {
+            mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+          } else if (repository.hasLocalChanges) {
+            mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+          }
         }
+      } else {
+        mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
       }
-    } else {
-      mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
     }
 
     let leftButtons: React.ReactNode[] = [];
@@ -672,6 +685,7 @@ class App extends React.Component<AppProps, AppState> {
       definitionPromise = libraryDataProvider.fetchLocalItem(path.name, true);
     }
     this.navigate({
+      selectedDocURI: undefined,
       selectedItemAbsolutePath: libraryDataProvider.getAbsolutePath(path),
       selectedItemProvider: libraryDataProvider,
       selectedItemLocalPath: path,
@@ -686,15 +700,25 @@ class App extends React.Component<AppProps, AppState> {
     this.navigate(state);
   };
 
+  private docLinkClicked = (uri: string): void => {
+    this.navigate({
+      selectedDocURI: uri
+    });
+  };
+
   private navigate(state: SelectionState, notify: boolean = true): void {
     this.setNewInteractionHandler(state);
     this.setState(state);
     let uri = '/';
-    if (state.selectedItemAbsolutePath) {
-      if (state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
-        this.mruList.add(state.selectedItemAbsolutePath);
+    if (state.selectedDocURI) {
+      uri = state.selectedDocURI;
+    } else {
+      if (state.selectedItemAbsolutePath) {
+        if (state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
+          this.mruList.add(state.selectedItemAbsolutePath);
+        }
+        uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
       }
-      uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
     }
     let title = this.getTitle(state);
     if (notify) {
@@ -763,6 +787,7 @@ class App extends React.Component<AppProps, AppState> {
             let absolutePath = libraryDataProvider!.getAbsolutePath(localPath);
             let itemInfoPromise = libraryDataProvider!.getLocalItemInfo(result.name);
             this.navigate({
+              selectedDocURI: undefined,
               selectedItemAbsolutePath: absolutePath,
               selectedItemProvider: libraryDataProvider,
               selectedItemLocalPath: localPath,
@@ -901,6 +926,7 @@ class App extends React.Component<AppProps, AppState> {
         if (definition.state === LibraryDefinitionState.EditingNew) {
           this.setState({showStartPage: false});
           this.navigate({
+            selectedDocURI: undefined,
             selectedItemAbsolutePath: undefined,
             selectedItemProvider: undefined,
             selectedItemLocalPath: undefined,

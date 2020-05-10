@@ -59,12 +59,7 @@ span.expr.interactive.link span.expr.interactive {
   font-weight: normal;
 }
 
-p {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.paragraph+.paragraph, .paragraph+.list, .list+.list, p+p, p+ul, p+ol, ul+ul, ul+ol, ol+ul, ol+ol {
+.paragraph+.paragraph, .paragraph+.list, .list+.list {
   margin-top: 1ex;
 }
 

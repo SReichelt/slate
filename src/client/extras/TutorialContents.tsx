@@ -517,15 +517,15 @@ class TutorialStates {
         ],
         manipulateProps: (props) => ({
           ...props,
-          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_XY_openInsertMenu))
+          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_ST_openInsertMenu))
         })
       }
     ]
   };
 
-  // Insert parameters X and Y.
+  // Insert parameters S and T.
 
-  insertOperatorParameters_XY_openInsertMenu: TutorialState = {
+  insertOperatorParameters_ST_openInsertMenu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -551,7 +551,7 @@ class TutorialStates {
                         },
                         componentAction: (component) => {
                           if (component.state.openMenu) {
-                            this.changeState(this.insertOperatorParameters_XY_menu_set);
+                            this.changeState(this.insertOperatorParameters_ST_menu_set);
                           }
                         },
                         elementAction: this.automateClick()
@@ -567,7 +567,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_XY_menu_set: TutorialState = {
+  insertOperatorParameters_ST_menu_set: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -603,7 +603,7 @@ class TutorialStates {
                                     },
                                     manipulateProps: (props) => ({
                                       ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_XY_enterNames))
+                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_enterNames))
                                     }),
                                     elementAction: this.automateClick()
                                   }
@@ -624,7 +624,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_XY_enterNames: TutorialState = {
+  insertOperatorParameters_ST_enterNames: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -651,11 +651,11 @@ class TutorialStates {
                             children: [
                               {
                                 type: 'input',
-                                elementAction: this.automateTextInput('X,')
+                                elementAction: this.automateTextInput('S,')
                               }
                             ],
                             toolTip: {
-                              contents: <p>Type "X,Y" to insert two parameters at once.</p>,
+                              contents: <p>Type "S,T" to insert two parameters at once.</p>,
                               position: 'bottom',
                               index: 0
                             }
@@ -685,8 +685,8 @@ class TutorialStates {
       {
         type: LibraryItem,
         constraint: createContentConstraint((definition) => (definition.parameters.length === 2
-                                                             && definition.parameters[0].name === 'X'
-                                                             && definition.parameters[1].name === 'Y')),
+                                                             && definition.parameters[0].name === 'S'
+                                                             && definition.parameters[1].name === 'T')),
         children: [
           {
             type: Expression,
@@ -979,7 +979,7 @@ class TutorialStates {
                                           onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
                                             this.changeState(action instanceof Menu.DialogExpressionMenuAction
                                                               ? this.insertOperatorParameters_f_set_dialog_selectFunctions
-                                                              : this.insertOperatorParameters_f_set_arg_X);
+                                                              : this.insertOperatorParameters_f_set_arg_S);
                                           })
                                         })
                                       }
@@ -1164,7 +1164,7 @@ class TutorialStates {
                                             },
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg_X))
+                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg_S))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -1189,7 +1189,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_X: TutorialState = {
+  insertOperatorParameters_f_set_arg_S: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1224,13 +1224,13 @@ class TutorialStates {
                                     type: Expression,
                                     key: 0,
                                     toolTip: {
-                                      contents: <p>Select X here.</p>,
+                                      contents: <p>Select S here.</p>,
                                       position: 'bottom',
                                       index: 0
                                     },
                                     componentAction: (component) => {
                                       if (component.state.openMenu) {
-                                        this.changeState(this.insertOperatorParameters_f_set_arg_X_menu_variable);
+                                        this.changeState(this.insertOperatorParameters_f_set_arg_S_menu_variable);
                                       }
                                     },
                                     elementAction: this.automateClick()
@@ -1252,7 +1252,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_X_menu_variable: TutorialState = {
+  insertOperatorParameters_f_set_arg_S_menu_variable: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1303,7 +1303,7 @@ class TutorialStates {
                                                     manipulateProps: (props) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_f_set_arg_Y);
+                                                        this.changeState(this.insertOperatorParameters_f_set_arg_T);
                                                       })
                                                     }),
                                                     elementAction: this.automateClick()
@@ -1333,7 +1333,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_Y: TutorialState = {
+  insertOperatorParameters_f_set_arg_T: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1368,13 +1368,13 @@ class TutorialStates {
                                     type: Expression,
                                     key: 4,
                                     toolTip: {
-                                      contents: <p>Select Y here.</p>,
+                                      contents: <p>Select T here.</p>,
                                       position: 'bottom',
                                       index: 0
                                     },
                                     componentAction: (component) => {
                                       if (component.state.openMenu) {
-                                        this.changeState(this.insertOperatorParameters_f_set_arg_Y_menu_variable);
+                                        this.changeState(this.insertOperatorParameters_f_set_arg_T_menu_variable);
                                       }
                                     },
                                     elementAction: this.automateClick()
@@ -1396,7 +1396,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_Y_menu_variable: TutorialState = {
+  insertOperatorParameters_f_set_arg_T_menu_variable: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2036,6 +2036,387 @@ class TutorialStates {
                                             },
                                             manipulateProps: (props) => ({
                                               ...props,
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_openPlaceholderMenu))
+                                            }),
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert composition term.
+
+  fillOperatorDefinition_composition_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                toolTip: {
+                                  contents: <p>Now we need to fill our new definition.<br/>In general, expressions in Slate are entered hierarchically. So we need to think about the outermost symbol, which in our case will be function composition.</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                },
+                                componentAction: (component) => {
+                                  if (component.state.openMenu) {
+                                    this.changeState(this.fillOperatorDefinition_composition_menu_definition);
+                                  }
+                                },
+                                elementAction: this.automateClick()
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_menu_definition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        children: [
+                                          {
+                                            type: 'div',
+                                            key: 'title',
+                                            toolTip: {
+                                              contents: <p>Click here to search for the definition of function composition.</p>,
+                                              position: 'left',
+                                              index: 1
+                                            },
+                                            elementAction: this.automateClick()
+                                          }
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_dialog_searchFunctionComposition))
+                                        })
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_dialog_searchFunctionComposition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: <p>Type "composition".</p>,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                },
+                                                manipulateProps: (props) => ({
+                                                  ...props,
+                                                  onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition))
+                                                }),
+                                                elementAction: this.automateTextInput('composition')
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_dialog_selectFunctionComposition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: null,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                }
+                                              },
+                                              {
+                                                type: InnerLibraryTreeItems,
+                                                children: [
+                                                  {
+                                                    type: LibraryTreeItem,
+                                                    key: 'Essentials',
+                                                    children: [
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Functions',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'composition',
+                                                                    children: [
+                                                                      {
+                                                                        key: 'item',
+                                                                        children: [
+                                                                          {
+                                                                            key: 'display-span',
+                                                                            toolTip: {
+                                                                              contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.<br/>Moreover, you can browse the library at any time without losing your unsubmitted input.</p>,
+                                                                              position: 'right',
+                                                                              index: 1
+                                                                            }
+                                                                          }
+                                                                        ],
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ],
+                                                                    componentAction: (component) => {
+                                                                      if (component.props.selected) {
+                                                                        this.changeState(this.fillOperatorDefinition_composition_dialog_ok);
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: StandardDialog,
+                                        children: [
+                                          {
+                                            type: Button,
+                                            key: 'ok',
+                                            toolTip: {
+                                              contents: <p>Click here.</p>,
+                                              position: 'top',
+                                              index: 0
+                                            },
+                                            manipulateProps: (props) => ({
+                                              ...props,
                                               onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))
                                             }),
                                             elementAction: this.automateClick()
@@ -2074,7 +2455,7 @@ class TutorialStates {
               <p>Thank you for following the tutorial.</p>
               <p>As you have seen, Slate is designed to be learned intuitively, by exploring the user interface. As a next step, we recommend taking a look at the contents of the library and making small contributions.</p>
               <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
-              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Visual Studio Code extension</a>.</p>
+              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>.</p>
               <div className={'tutorial-tooltip-button-row'}>
                 <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
                   Continue in tutorial mode

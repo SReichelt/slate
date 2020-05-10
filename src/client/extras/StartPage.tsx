@@ -8,6 +8,7 @@ import { HLMRenderer } from '../../shared/logics/hlm/renderer';
 import Button from '../components/Button';
 import Expression, { ExpressionInteractionHandler } from '../components/Expression';
 import { OnLinkClicked } from '../components/InteractionHandler';
+import DocLink, { OnDocLinkClicked } from './DocLink';
 
 const Loading = require('react-loading-animation');
 
@@ -18,6 +19,7 @@ interface StartPageProps {
   createInteractionHandler: (libraryDataProvider: LibraryDataProvider) => ExpressionInteractionHandler | undefined;
   onStartTutorial: (withTouchWarning: boolean) => void;
   onLinkClicked: OnLinkClicked;
+  onDocLinkClicked: OnDocLinkClicked;
 }
 
 function fillPathItem(names: string[], pathItem: Fmt.NamedPathItem): void {
@@ -124,7 +126,7 @@ function StartPage(props: StartPageProps) {
     <div className="start-page">
       <h1>The Slate Interactive Theorem Prover</h1>
       <p>
-        Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics.
+        Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant" target="_blank">interactive theorem prover</a> with a focus on abstract mathematics.
         It is optimized for being easy to learn.
       </p>
       <div className="tutorial-button-container">
@@ -147,7 +149,7 @@ function StartPage(props: StartPageProps) {
         Graphical input of simple definitions and theorem statements is mostly implemented. Proof input will follow soon.
       </p>
       <p>
-        The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
+        The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
         In particular, it supports side-by-side textual and graphical editing, combining the best of both worlds.
       </p>
       <h2>Foundations</h2>
@@ -155,15 +157,15 @@ function StartPage(props: StartPageProps) {
         Slate, as an application, is built to support different logics. However, the rendering and editing concepts of Slate works particularly well for a logic that is close to mathematical practice. Therefore, only one logic (called "HLM") is currently implemented.
       </p>
       <p>
-        HLM is based on classical logic and has a set-theoretic flavor. It can be viewed as a <a href="https://ncatlab.org/nlab/show/structural+set+theory">structural set theory</a> but is conceptually closer to a <a href="https://en.wikipedia.org/wiki/Type_theory#Dependent_types">dependent type theory</a>.
-        In fact, a reasonably direct translation to the theorem provers <a href="https://coq.inria.fr/">Coq</a> and <a href="https://leanprover.github.io/">Lean</a> exists.
+        HLM is based on classical logic and has a set-theoretic flavor. It can be viewed as a <a href="https://ncatlab.org/nlab/show/structural+set+theory" target="_blank">structural set theory</a> but is conceptually closer to a <a href="https://en.wikipedia.org/wiki/Type_theory#Dependent_types" target="_blank">dependent type theory</a>.
+        In fact, a reasonably direct translation to the theorem provers <a href="https://coq.inria.fr/" target="_blank">Coq</a> and <a href="https://leanprover.github.io/" target="_blank">Lean</a> exists.
       </p>
       <p>
         Existing theorem provers can potentially be integrated into Slate, reusing its rendering and editing mechanisms.
       </p>
       <h2>Third-Party Software</h2>
       <p>
-        For a list of third-party software used in Slate, see <a href="docs/dependencies.html">here</a>.
+        For a list of third-party software used in Slate, see <DocLink href="docs/dependencies" onDocLinkClicked={props.onDocLinkClicked}>here</DocLink>.
       </p>
       <h2>Contact</h2>
       <p>

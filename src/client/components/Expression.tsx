@@ -813,7 +813,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       } else {
         let md = new Remarkable({
-          linkTarget: '_blank'
+          linkTarget: '_blank',
+          typographer: true
         });
         md.use(linkify);
         md.renderer = new RemarkableReactRenderer({

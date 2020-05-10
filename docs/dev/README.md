@@ -9,7 +9,7 @@ This document describes how to build and run Slate locally, and how to deploy it
    * Microsoft [Visual Studio Code](https://code.visualstudio.com/Download)
    * [Node.js](https://nodejs.org/)
    * Google [Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/Home)
-   * [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/)
+   * [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 2. Make sure the programs `git`, `code`, and `npm` can be started from the command line, i.e. are accessible via the `PATH` environment variable.
 3. In a terminal, in a directory of your choice, run
    ```
