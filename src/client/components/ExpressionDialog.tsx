@@ -178,14 +178,14 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
                     <div key={selected ? -index : index}>
                       <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
                       <label htmlFor={`radio${index}`} onClick={onClick}>
-                        <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+                        <Expression expression={selectionItem.onRenderItem(item)}/>
                       </label>
                     </div>
                   );
                 } else {
                   return (
                     <div key={index}>
-                      <Expression expression={selectionItem.onRenderItem(item)} interactionHandler={this.props.interactionHandler}/>
+                      <Expression expression={selectionItem.onRenderItem(item)}/>
                     </div>
                   );
                 }

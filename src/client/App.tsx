@@ -76,6 +76,7 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   templates?: Fmt.File;
   rootInteractionHandler?: LibraryItemInteractionHandler;
   editedDefinitions?: LibraryItemListEntry[];
+  showStartPage: boolean;
   tutorialState?: TutorialState;
 }
 
@@ -101,7 +102,8 @@ class App extends React.Component<AppProps, AppState> {
     let state: AppState = {
       verticalLayout: !config.embedded && window.innerHeight > window.innerWidth,
       navigationPaneVisible: true,
-      extraContentsVisible: false
+      extraContentsVisible: false,
+      showStartPage: !(config.embedded || config.runningLocally)
     };
 
     let canPreload = false;
@@ -212,7 +214,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createInteractionHandler(libraryDataProvider: LibraryDataProvider | undefined, templates: Fmt.File | undefined, selectedItemDefinition: CachedPromise<LibraryDefinition> | undefined): LibraryItemInteractionHandler | undefined {
-    if (libraryDataProvider && selectedItemDefinition && templates) {
+    if (libraryDataProvider && templates) {
       return new LibraryItemInteractionHandler(libraryDataProvider, templates, selectedItemDefinition, this.linkClicked);
     } else {
       return undefined;
@@ -420,63 +422,61 @@ class App extends React.Component<AppProps, AppState> {
     let mainContents: React.ReactNode = null;
     let extraContents: React.ReactNode = null;
 
-    if (this.state.selectedItemProvider) {
-      let definitionPromise = this.state.selectedItemDefinition;
-      if (definitionPromise) {
-        let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-          if (this.state.selectedItemProvider && this.state.templates) {
-            let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
-            let itemInfo = this.state.selectedItemInfo;
-            if (editing && this.state.selectedItemLocalPath) {
-              // When editing, item info may change according to user input. Need to make sure to get the correct instance - the one where the changes happen.
-              itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
-            }
-            let mainContentsResult: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="library-item"/>;
-            if (editing) {
-              if (this.state.tutorialState) {
-                mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
-              } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
-                mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
-              } else if (this.state.selectedItemRepository) {
-                let repository = this.state.selectedItemRepository;
-                if (!repository.hasWriteAccess) {
-                  mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
-                } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
-                  mainContentsResult = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContentsResult];
-                }
+    let definitionPromise = this.state.selectedItemDefinition;
+    if (definitionPromise) {
+      let mainContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+        if (this.state.selectedItemProvider && this.state.templates) {
+          let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
+          let itemInfo = this.state.selectedItemInfo;
+          if (editing && this.state.selectedItemLocalPath) {
+            // When editing, item info may change according to user input. Need to make sure to get the correct instance - the one where the changes happen.
+            itemInfo = this.state.selectedItemProvider.getLocalItemInfo(this.state.selectedItemLocalPath.name);
+          }
+          let mainContentsResult: React.ReactNode = <LibraryItem libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} itemInfo={itemInfo} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="library-item"/>;
+          if (editing) {
+            if (this.state.tutorialState) {
+              mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
+            } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
+              mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
+            } else if (this.state.selectedItemRepository) {
+              let repository = this.state.selectedItemRepository;
+              if (!repository.hasWriteAccess) {
+                mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
+              } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
+                mainContentsResult = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContentsResult];
               }
             }
-            return mainContentsResult;
-          } else {
-            return null;
           }
-        });
-        mainContents = renderPromise(mainContentsPromise);
+          return mainContentsResult;
+        } else {
+          return null;
+        }
+      });
+      mainContents = renderPromise(mainContentsPromise);
 
-        if (!config.embedded) {
-          if (this.state.extraContentsVisible) {
-            let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
-              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
-            });
-            extraContents = renderPromise(extraContentsPromise, 'source');
-          } else {
-            extraContents = <div key="source"/>;
-          }
+      if (!config.embedded) {
+        if (this.state.extraContentsVisible) {
+          let extraContentsPromise = definitionPromise.then((definition: LibraryDefinition) => {
+            return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
+          });
+          extraContents = renderPromise(extraContentsPromise, 'source');
+        } else {
+          extraContents = <div key="source"/>;
+        }
+      }
+    } else if (this.state.showStartPage) {
+      let createInteractionHandler = (libraryDataProvider: LibraryDataProvider) => this.createInteractionHandler(libraryDataProvider, this.state.templates, undefined);
+      mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} createInteractionHandler={createInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} key="start-page"/>;
+      if (this.state.selectedItemRepository) {
+        let repository = this.state.selectedItemRepository;
+        if (repository.hasPullRequest) {
+          mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+        } else if (repository.hasLocalChanges) {
+          mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
         }
       }
     } else {
-      let localContent = config.embedded || (config.runningLocally && !this.state.gitHubUserInfo);
-      if (!localContent) {
-        mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} interactionHandler={this.state.rootInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} key="start-page"/>;
-        if (this.state.selectedItemRepository) {
-          let repository = this.state.selectedItemRepository;
-          if (repository.hasPullRequest) {
-            mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
-          } else if (repository.hasLocalChanges) {
-            mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
-          }
-        }
-      }
+      mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
     }
 
     let leftButtons: React.ReactNode[] = [];
@@ -855,6 +855,7 @@ class App extends React.Component<AppProps, AppState> {
   private submit = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
     let definitionPromise = this.state.selectedItemDefinition;
+    let absolutePath = this.state.selectedItemAbsolutePath;
     if (libraryDataProvider && definitionPromise) {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
@@ -874,6 +875,9 @@ class App extends React.Component<AppProps, AppState> {
                 if (!writeFileResult.writtenDirectly) {
                   this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version as long as the application remains open.');
                 }
+              }
+              if (absolutePath) {
+                this.mruList.add(absolutePath);
               }
             })
             .catch((error) => {
@@ -895,9 +899,10 @@ class App extends React.Component<AppProps, AppState> {
         libraryDataProvider.cancelEditing(definition);
         this.removeEditedDefinition(definition);
         if (definition.state === LibraryDefinitionState.EditingNew) {
+          this.setState({showStartPage: false});
           this.navigate({
             selectedItemAbsolutePath: undefined,
-            selectedItemProvider: libraryDataProvider,
+            selectedItemProvider: undefined,
             selectedItemLocalPath: undefined,
             selectedItemDefinition: undefined,
             selectedItemInfo: undefined,
