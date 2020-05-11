@@ -12,7 +12,7 @@ import * as Menu from '../../shared/display/menu';
 import StartPage from './StartPage';
 import Button from '../components/Button';
 import MenuButton from '../components/MenuButton';
-import LibraryTree, { SearchInput, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeInsertionItem } from '../components/LibraryTree';
+import LibraryTree, { SearchInput, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeInsertionItem, LibraryItemList } from '../components/LibraryTree';
 import StandardDialog from '../components/StandardDialog';
 import InsertDialog from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
@@ -561,6 +561,19 @@ class TutorialStates {
                 ]
               }
             ]
+          }
+        ]
+      },
+      {
+        type: LibraryItemList,
+        children: [
+          {
+            type: LibraryTreeItem,
+            toolTip: {
+              contents: <p>This is the list of unsubmitted changes. While editing an item, you can browse the library and then return to the edited item by clicking on it.</p>,
+              position: 'bottom',
+              index: 1
+            }
           }
         ]
       }
@@ -2029,11 +2042,6 @@ class TutorialStates {
                                           {
                                             type: Button,
                                             key: 'ok',
-                                            toolTip: {
-                                              contents: <p>Click here.</p>,
-                                              position: 'top',
-                                              index: 0
-                                            },
                                             manipulateProps: (props) => ({
                                               ...props,
                                               onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_openPlaceholderMenu))
@@ -2327,7 +2335,7 @@ class TutorialStates {
                                                                           {
                                                                             key: 'display-span',
                                                                             toolTip: {
-                                                                              contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.<br/>Moreover, you can browse the library at any time without losing your unsubmitted input.</p>,
+                                                                              contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.</p>,
                                                                               position: 'right',
                                                                               index: 1
                                                                             }
@@ -2410,11 +2418,6 @@ class TutorialStates {
                                           {
                                             type: Button,
                                             key: 'ok',
-                                            toolTip: {
-                                              contents: <p>Click here.</p>,
-                                              position: 'top',
-                                              index: 0
-                                            },
                                             manipulateProps: (props) => ({
                                               ...props,
                                               onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))

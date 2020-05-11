@@ -510,7 +510,7 @@ div.display-math {
   font-style: italic;
 }
 
-.var.charcorner-tr:last-child::after, .var.charcorner-tr+*::before {
+.var.charcorner-tr:last-child::after, .var.charcorner-tr+*:not(.subsup)::before {
   content: ' ';
   font-family: 'TeX-Var', serif;
   font-style: italic;

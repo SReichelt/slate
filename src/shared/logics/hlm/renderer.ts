@@ -2854,14 +2854,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Display.RenderedExpression[]): void {
-    for (let param of parameters) {
+    let remainingParameters = [...parameters];
+    while (remainingParameters.length) {
+      let param = remainingParameters.shift()!;
       let paramType = param.type.expression;
       if (this.utils.isValueParamType(paramType)) {
         let renderedVariable = this.renderVariable(param, indices);
         variables.push({
           param: param,
           display: renderedVariable,
-          canAutoFill: true
+          canAutoFill: this.utils.canAutoFillParameter(param, remainingParameters)
         });
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
         let renderedVariable = this.renderVariable(param);

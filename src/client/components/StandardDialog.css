@@ -32,11 +32,12 @@
 }
 
 .dialog-cell {
-  padding: 2pt;
+  padding: 3pt;
 }
 
 .dialog-cell:first-child {
   padding-left: 1em;
+  width: 3em;
 }
 
 .dialog-cell:last-child {
@@ -44,6 +45,7 @@
 }
 
 .dialog-info-cell {
+  min-width: 12em;
   max-width: 17em;
 }
 

@@ -312,7 +312,12 @@ export abstract class GenericEditHandler {
       messageItem.visible = false;
       messageItem.info = new Display.EmptyExpression;
     }
-    let okEnabled = this.checkValidity(newDisplayItem, variables, messageItem);
+    let requiredArgumentsFilled = this.checkRequiredArguments(template, newDisplayItem);
+    previewItem.visible = requiredArgumentsFilled;
+    let okEnabled = requiredArgumentsFilled;
+    if (messageItem && !this.checkReferencedParameters(newDisplayItem, variables, messageItem)) {
+      okEnabled = false;
+    }
     let paramIndex = 0;
     let previousParamNames: string[] = [];
     for (let param of template.parameters) {
@@ -324,8 +329,13 @@ export abstract class GenericEditHandler {
         let value = newDisplayItem.path.arguments.getOptionalValue(param.name, paramIndex);
         let onSetParamDisplay = (newValue: Fmt.Expression | undefined) => {
           newDisplayItem.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
+          requiredArgumentsFilled = this.checkRequiredArguments(template, newDisplayItem);
+          previewItem.visible = requiredArgumentsFilled;
           previewItem.changed();
-          okEnabled = this.checkValidity(newDisplayItem, variables, messageItem);
+          okEnabled = requiredArgumentsFilled;
+          if (messageItem && !this.checkReferencedParameters(newDisplayItem, variables, messageItem)) {
+            okEnabled = false;
+          }
         };
         let canRemove = param.optional && value !== undefined;
         return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamDisplay, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
@@ -412,31 +422,37 @@ export abstract class GenericEditHandler {
     return listItem;
   }
 
-  private checkValidity(displayItem: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem | undefined): boolean {
-    if (messageItem) {
-      let referencedParams = this.utils.findReferencedParameters(displayItem);
-      let missingVariables: RenderedVariable[] = [];
-      let autoVariables: RenderedVariable[] = [];
-      for (let variable of variables) {
-        if (!referencedParams.has(variable.param)) {
-          if (variable.canAutoFill) {
-            autoVariables.push(variable);
-          } else {
-            missingVariables.push(variable);
-          }
+  private checkReferencedParameters(displayItem: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem): boolean {
+    let referencedParams = this.utils.findReferencedParameters(displayItem);
+    let missingVariables: RenderedVariable[] = [];
+    let autoVariables: RenderedVariable[] = [];
+    for (let variable of variables) {
+      if (!referencedParams.has(variable.param)) {
+        if (variable.canAutoFill) {
+          autoVariables.push(variable);
+        } else {
+          missingVariables.push(variable);
         }
       }
-      if (missingVariables.length) {
-        this.setMessageItem(missingVariables, 'must be included', messageItem);
+    }
+    if (missingVariables.length) {
+      this.setMessageItem(missingVariables, 'must be included', messageItem);
+      return false;
+    } else if (autoVariables.length) {
+      this.setMessageItem(autoVariables, 'will be inferred automatically if possible', messageItem);
+    } else {
+      messageItem.info = new Display.EmptyExpression;
+      messageItem.visible = false;
+    }
+    return true;
+  }
+
+  private checkRequiredArguments(template: Fmt.Definition, displayItem: Fmt.DefinitionRefExpression): boolean {
+    for (let param of template.parameters) {
+      if (!param.optional && !param.defaultValue && !displayItem.path.arguments.getOptionalValue(param.name)) {
         return false;
-      } else if (autoVariables.length) {
-        this.setMessageItem(autoVariables, 'will be filled automatically if possible', messageItem);
-      } else {
-        messageItem.info = new Display.EmptyExpression;
-        messageItem.visible = false;
       }
     }
-    // TODO disable OK if required arguments are missing
     return true;
   }
 

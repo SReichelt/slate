@@ -126,13 +126,18 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
   }
 
   componentDidUpdate(prevProps: PermanentToolTipProps): void {
-    this.updateTimer();
+    if (this.props.refreshInterval !== prevProps.refreshInterval) {
+      this.updateTimer();
+    }
   }
 
   private updateTimer(): void {
     this.stopTimer();
     if (this.props.refreshInterval) {
-      this.refreshTimer = setInterval(() => this.forceUpdate(), this.props.refreshInterval);
+      let refresh = () => {
+        this.forceUpdate();
+      };
+      this.refreshTimer = setInterval(refresh, this.props.refreshInterval);
     }
   }
 

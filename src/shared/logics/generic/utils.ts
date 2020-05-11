@@ -122,6 +122,16 @@ export class GenericUtils {
     return parameter;
   }
 
+  referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
+    let result = false;
+    expression.traverse((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param) {
+        result = true;
+      }
+    });
+    return result;
+  }
+
   findReferencedParameters(expression: Fmt.Expression): Set<Fmt.Parameter> {
     let result = new Set<Fmt.Parameter>();
     expression.traverse((subExpression: Fmt.Expression) => {

@@ -1378,6 +1378,25 @@ export class HLMUtils extends GenericUtils {
     return this.createParameter(elementType, defaultName, context);
   }
 
+  canAutoFillParameter(param: Fmt.Parameter, dependentParams: Fmt.Parameter[]): boolean {
+    for (let dependentParam of dependentParams) {
+      let type = dependentParam.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+        if (this.referencesParameter(type._set, param)) {
+          return true;
+        }
+        if (this.canAutoFillParameter(param, type.parameters)) {
+          return true;
+        }
+      } else if (this.isValueParamType(type)) {
+        if (this.referencesParameter(type, param)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Set<Fmt.Parameter>): void {
     for (let param of params) {
       let type = param.type.expression;
