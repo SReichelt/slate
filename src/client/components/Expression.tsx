@@ -165,7 +165,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  private disableWindowClickListener(): void {
+  // Called externally as a hack to enable links in tooltips.
+  disableWindowClickListener(): void {
     if (this.windowClickListener) {
       window.removeEventListener('mousedown', this.windowClickListener);
       this.windowClickListener = undefined;
@@ -598,10 +599,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Display.SubSupExpression) {
       let renderWithLineHeight = (lineHeight?: number) => {
         let subSupResult: React.ReactNode[] = [<Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
-        let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-        let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+        let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sub"/> : null;
+        let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sup"/> : null;
+        let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSub"/> : null;
+        let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSup"/> : null;
         if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
           if (expression.sub) {
             subSupResult.push(<sub key="sub">{renderPromise(expression.sub.getLineHeight().then((subLineHeight: number) => subLineHeight ? sub : <sub>{sub}</sub>), undefined, () => sub)}</sub>);

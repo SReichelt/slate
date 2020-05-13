@@ -2,6 +2,7 @@ import * as React from 'react';
 import './TutorialContents.css';
 import { TutorialState } from './Tutorial';
 import { ButtonType, getButtonIcon } from '../utils/icons';
+import DocLink, { OnDocLinkClicked } from './DocLink';
 import config from '../utils/config';
 
 import * as Fmt from '../../shared/format/format';
@@ -48,7 +49,7 @@ function createDummyEvent(target: HTMLElement) {
 }
 
 class TutorialStates {
-  constructor(private changeState: TutorialStateFn, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
+  constructor(private changeState: TutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
   private automateClick(delay: number = 200) {
     let done = false;
@@ -140,6 +141,11 @@ class TutorialStates {
               ),
               position: 'bottom',
               index: 0
+            },
+            elementAction: () => {
+              if (this.runAutomatically) {
+                this.changeState(this.searchFunctions_enterSearchText);
+              }
             }
           }
         ]
@@ -902,22 +908,12 @@ class TutorialStates {
                             key: 5,
                             children: [
                               {
-                                // Keep tooltip at name input; otherwise the name input will be recreated while typing.
-                                type: Expression,
-                                key: 0,
-                                toolTip: {
-                                  contents: null,
-                                  position: 'bottom',
-                                  index: 0
-                                }
-                              },
-                              {
                                 type: Expression,
                                 key: 4,
                                 toolTip: {
                                   contents: <p>We need to fill this placeholder.</p>,
                                   position: 'bottom',
-                                  index: 1
+                                  index: 0
                                 },
                                 componentAction: (component) => {
                                   if (component.state.openMenu) {
@@ -982,7 +978,7 @@ class TutorialStates {
                                             toolTip: {
                                               contents: <p>Click here to select a definition from the library.</p>,
                                               position: 'left',
-                                              index: 1
+                                              index: 0
                                             },
                                             elementAction: this.automateClick()
                                           }
@@ -992,7 +988,7 @@ class TutorialStates {
                                           onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
                                             this.changeState(action instanceof Menu.DialogExpressionMenuAction
                                                               ? this.insertOperatorParameters_f_set_dialog_selectFunctions
-                                                              : this.insertOperatorParameters_f_set_arg_S);
+                                                              : this.insertOperatorParameters_f_set_arg1);
                                           })
                                         })
                                       }
@@ -1047,53 +1043,58 @@ class TutorialStates {
                                     type: ExpressionDialog,
                                     children: [
                                       {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: StandardDialog,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                type: InnerLibraryTreeItems,
+                                                type: LibraryTree,
                                                 children: [
                                                   {
-                                                    type: LibraryTreeItem,
-                                                    key: 'Essentials',
+                                                    type: InnerLibraryTreeItems,
                                                     children: [
                                                       {
-                                                        type: InnerLibraryTreeItems,
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
                                                         children: [
                                                           {
-                                                            type: LibraryTreeItem,
-                                                            key: 'Functions',
+                                                            type: InnerLibraryTreeItems,
                                                             children: [
                                                               {
-                                                                type: InnerLibraryTreeItems,
+                                                                type: LibraryTreeItem,
+                                                                key: 'Functions',
                                                                 children: [
                                                                   {
-                                                                    type: LibraryTreeItem,
-                                                                    key: 'Functions',
+                                                                    type: InnerLibraryTreeItems,
                                                                     children: [
                                                                       {
-                                                                        key: 'item',
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'Functions',
                                                                         children: [
                                                                           {
-                                                                            key: 'display-span',
-                                                                            toolTip: {
-                                                                              contents: <p>Click here to select the set of functions.</p>,
-                                                                              position: 'right',
-                                                                              index: 1
-                                                                            }
+                                                                            key: 'item',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'display-span',
+                                                                                toolTip: {
+                                                                                  contents: <p>Click here to select the set of functions.</p>,
+                                                                                  position: 'right',
+                                                                                  index: 1
+                                                                                }
+                                                                              }
+                                                                            ],
+                                                                            elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        elementAction: this.automateClick()
+                                                                        componentAction: (component) => {
+                                                                          if (component.props.selected) {
+                                                                            this.changeState(this.insertOperatorParameters_f_set_dialog_ok);
+                                                                          }
+                                                                        }
                                                                       }
-                                                                    ],
-                                                                    componentAction: (component) => {
-                                                                      if (component.props.selected) {
-                                                                        this.changeState(this.insertOperatorParameters_f_set_dialog_ok);
-                                                                      }
-                                                                    }
+                                                                    ]
                                                                   }
                                                                 ]
                                                               }
@@ -1103,14 +1104,14 @@ class TutorialStates {
                                                       }
                                                     ]
                                                   }
-                                                ]
+                                                ],
+                                                toolTip: {
+                                                  contents: <p>This tree shows only the definitions in the library that can be used at the given location.</p>,
+                                                  position: 'top',
+                                                  index: 0
+                                                }
                                               }
-                                            ],
-                                            toolTip: {
-                                              contents: <p>This tree shows only the definitions in the library that can be used at the given location.</p>,
-                                              position: 'top',
-                                              index: 0
-                                            }
+                                            ]
                                           }
                                         ]
                                       }
@@ -1168,16 +1169,79 @@ class TutorialStates {
                                         type: StandardDialog,
                                         children: [
                                           {
+                                            type: ExpressionDialogItem,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                // Keep tooltips at tree, otherwise the entire tree will be rebuilt.
+                                                type: LibraryTree,
+                                                children: [
+                                                  {
+                                                    type: InnerLibraryTreeItems,
+                                                    children: [
+                                                      {
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
+                                                        children: [
+                                                          {
+                                                            type: InnerLibraryTreeItems,
+                                                            children: [
+                                                              {
+                                                                type: LibraryTreeItem,
+                                                                key: 'Functions',
+                                                                children: [
+                                                                  {
+                                                                    type: InnerLibraryTreeItems,
+                                                                    children: [
+                                                                      {
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'Functions',
+                                                                        children: [
+                                                                          {
+                                                                            key: 'item',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'display-span',
+                                                                                toolTip: {
+                                                                                  contents: null,
+                                                                                  position: 'right',
+                                                                                  index: 1
+                                                                                }
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ],
+                                                toolTip: {
+                                                  contents: null,
+                                                  position: 'top',
+                                                  index: 0
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          {
                                             type: Button,
                                             key: 'ok',
                                             toolTip: {
                                               contents: <p>Click here.</p>,
                                               position: 'top',
-                                              index: 0
+                                              index: 1
                                             },
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg_S))
+                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg1))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -1202,7 +1266,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_S: TutorialState = {
+  insertOperatorParameters_f_set_arg1: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1243,7 +1307,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       if (component.state.openMenu) {
-                                        this.changeState(this.insertOperatorParameters_f_set_arg_S_menu_variable);
+                                        this.changeState(this.insertOperatorParameters_f_set_arg1_menu_variable);
                                       }
                                     },
                                     elementAction: this.automateClick()
@@ -1265,7 +1329,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_S_menu_variable: TutorialState = {
+  insertOperatorParameters_f_set_arg1_menu_variable: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1316,7 +1380,7 @@ class TutorialStates {
                                                     manipulateProps: (props) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_f_set_arg_T);
+                                                        this.changeState(this.insertOperatorParameters_f_set_arg2);
                                                       })
                                                     }),
                                                     elementAction: this.automateClick()
@@ -1346,7 +1410,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_T: TutorialState = {
+  insertOperatorParameters_f_set_arg2: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1387,7 +1451,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       if (component.state.openMenu) {
-                                        this.changeState(this.insertOperatorParameters_f_set_arg_T_menu_variable);
+                                        this.changeState(this.insertOperatorParameters_f_set_arg2_menu_variable);
                                       }
                                     },
                                     elementAction: this.automateClick()
@@ -1409,7 +1473,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg_T_menu_variable: TutorialState = {
+  insertOperatorParameters_f_set_arg2_menu_variable: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1460,6 +1524,595 @@ class TutorialStates {
                                                     manipulateProps: (props) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.insertOperatorParameters_g_openInsertMenu);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert parameter g.
+
+  insertOperatorParameters_g_openInsertMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
+                                                             && definition.parameters[0].name === 'S')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            toolTip: {
+                              contents: <p>Add another function, but this will be a function from S to S.</p>,
+                              position: 'bottom',
+                              index: 0
+                            },
+                            componentAction: (component) => {
+                              if (component.state.openMenu) {
+                                this.changeState(this.insertOperatorParameters_g_menu_element);
+                              }
+                            },
+                            elementAction: this.automateClick()
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_menu_element: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        toolTip: {
+                                          contents: <p>Click here.</p>,
+                                          position: 'right',
+                                          index: 0
+                                        },
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_enterName))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_enterName: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('g')
+                                  }
+                                ],
+                                toolTip: {
+                                  contents: <p>Name this parameter "g".</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        componentAction: createContentAction((definition: Fmt.Definition) => {
+          if (definition.parameters[3].name === 'g') {
+            this.changeState(this.insertOperatorParameters_g_set_openPlaceholderMenu);
+          }
+        })
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                toolTip: {
+                                  contents: <p>Click here.</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                },
+                                componentAction: (component) => {
+                                  if (component.state.openMenu) {
+                                    this.changeState(this.insertOperatorParameters_g_set_menu_mruEntry);
+                                  }
+                                },
+                                elementAction: this.automateClick()
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_menu_mruEntry: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 9,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuItem,
+                                            key: 'content',
+                                            toolTip: {
+                                              contents: <p>The set of functions should appear here as the most recently used definition.</p>,
+                                              position: 'bottom',
+                                              index: 0
+                                            },
+                                            elementAction: this.automateClick()
+                                          }
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => {
+                                            this.changeState(this.insertOperatorParameters_g_set_arg1);
+                                          })
+                                        })
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_arg1: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 7,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Select S here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.insertOperatorParameters_g_set_arg1_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_arg1_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 7,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 0,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.insertOperatorParameters_g_set_arg2);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_arg2: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 7,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    toolTip: {
+                                      contents: <p>Select S here as well.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.insertOperatorParameters_g_set_arg2_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertOperatorParameters_g_set_arg2_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
+                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 7,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 0,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
                                                         this.changeState(this.insertOperatorParameters_n_openInsertMenu);
                                                       })
                                                     }),
@@ -1496,7 +2149,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
         children: [
           {
             type: Expression,
@@ -1514,7 +2167,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             toolTip: {
                               contents: <p>Our last parameter will be a natural number.</p>,
                               position: 'bottom',
@@ -1544,7 +2197,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
         children: [
           {
             type: Expression,
@@ -1562,7 +2215,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: ExpressionMenu,
@@ -1607,8 +2260,8 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
+                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1626,7 +2279,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: Expression,
@@ -1655,7 +2308,7 @@ class TutorialStates {
           }
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
-          if (definition.parameters[3].name === 'n') {
+          if (definition.parameters[4].name === 'n') {
             this.changeState(this.insertOperatorParameters_n_set_openPlaceholderMenu);
           }
         })
@@ -1667,8 +2320,8 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
+                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1686,7 +2339,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 // Keep tooltip at name input; otherwise the name input will be recreated while typing.
@@ -1732,7 +2385,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
         children: [
           {
             type: Expression,
@@ -1750,7 +2403,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: Expression,
@@ -1802,7 +2455,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
         children: [
           {
             type: Expression,
@@ -1820,7 +2473,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: Expression,
@@ -1830,24 +2483,29 @@ class TutorialStates {
                                     type: ExpressionDialog,
                                     children: [
                                       {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: StandardDialog,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                type: SearchInput,
-                                                toolTip: {
-                                                  contents: <p>Type "natural numbers" here, which will further filter the tree.</p>,
-                                                  position: 'bottom',
-                                                  index: 0
-                                                },
-                                                manipulateProps: (props) => ({
-                                                  ...props,
-                                                  onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers))
-                                                }),
-                                                elementAction: this.automateTextInput('natural numbers')
+                                                type: LibraryTree,
+                                                children: [
+                                                  {
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: <p>Type "natural numbers" here, which will further filter the tree.</p>,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    },
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers))
+                                                    }),
+                                                    elementAction: this.automateTextInput('natural numbers')
+                                                  }
+                                                ]
                                               }
                                             ]
                                           }
@@ -1876,7 +2534,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
         children: [
           {
             type: Expression,
@@ -1894,7 +2552,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: Expression,
@@ -1904,69 +2562,74 @@ class TutorialStates {
                                     type: ExpressionDialog,
                                     children: [
                                       {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: StandardDialog,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-                                                type: SearchInput,
-                                                toolTip: {
-                                                  contents: null,
-                                                  position: 'bottom',
-                                                  index: 0
-                                                }
-                                              },
-                                              {
-                                                type: InnerLibraryTreeItems,
+                                                type: LibraryTree,
                                                 children: [
                                                   {
-                                                    type: LibraryTreeItem,
-                                                    key: 'Essentials',
+                                                    // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: null,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    }
+                                                  },
+                                                  {
+                                                    type: InnerLibraryTreeItems,
                                                     children: [
                                                       {
-                                                        type: InnerLibraryTreeItems,
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
                                                         children: [
                                                           {
-                                                            type: LibraryTreeItem,
-                                                            key: 'Numbers',
+                                                            type: InnerLibraryTreeItems,
                                                             children: [
                                                               {
-                                                                type: InnerLibraryTreeItems,
+                                                                type: LibraryTreeItem,
+                                                                key: 'Numbers',
                                                                 children: [
                                                                   {
-                                                                    type: LibraryTreeItem,
-                                                                    key: 'Natural',
+                                                                    type: InnerLibraryTreeItems,
                                                                     children: [
                                                                       {
-                                                                        type: InnerLibraryTreeItems,
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'Natural',
                                                                         children: [
                                                                           {
-                                                                            type: LibraryTreeItem,
-                                                                            key: 'Natural numbers',
+                                                                            type: InnerLibraryTreeItems,
                                                                             children: [
                                                                               {
-                                                                                key: 'item',
+                                                                                type: LibraryTreeItem,
+                                                                                key: 'Natural numbers',
                                                                                 children: [
                                                                                   {
-                                                                                    key: 'display-span',
-                                                                                    toolTip: {
-                                                                                      contents: <p>Click here to select the set of natural numbers.</p>,
-                                                                                      position: 'right',
-                                                                                      index: 1
-                                                                                    }
+                                                                                    key: 'item',
+                                                                                    children: [
+                                                                                      {
+                                                                                        key: 'display-span',
+                                                                                        toolTip: {
+                                                                                          contents: <p>Click here to select the set of natural numbers.</p>,
+                                                                                          position: 'right',
+                                                                                          index: 1
+                                                                                        }
+                                                                                      }
+                                                                                    ],
+                                                                                    elementAction: this.automateClick()
                                                                                   }
                                                                                 ],
-                                                                                elementAction: this.automateClick()
+                                                                                componentAction: (component) => {
+                                                                                  if (component.props.selected) {
+                                                                                    this.changeState(this.insertOperatorParameters_n_set_dialog_ok);
+                                                                                  }
+                                                                                }
                                                                               }
-                                                                            ],
-                                                                            componentAction: (component) => {
-                                                                              if (component.props.selected) {
-                                                                                this.changeState(this.insertOperatorParameters_n_set_dialog_ok);
-                                                                              }
-                                                                            }
+                                                                            ]
                                                                           }
                                                                         ]
                                                                       }
@@ -2009,7 +2672,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4)),
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
         children: [
           {
             type: Expression,
@@ -2027,7 +2690,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             children: [
                               {
                                 type: Expression,
@@ -2039,6 +2702,83 @@ class TutorialStates {
                                       {
                                         type: StandardDialog,
                                         children: [
+                                          {
+                                            type: ExpressionDialogItem,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                // Keep tooltips at tree, otherwise the entire tree will be rebuilt.
+                                                type: LibraryTree,
+                                                children: [
+                                                  {
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: null,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    }
+                                                  },
+                                                  {
+                                                    type: InnerLibraryTreeItems,
+                                                    children: [
+                                                      {
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
+                                                        children: [
+                                                          {
+                                                            type: InnerLibraryTreeItems,
+                                                            children: [
+                                                              {
+                                                                type: LibraryTreeItem,
+                                                                key: 'Numbers',
+                                                                children: [
+                                                                  {
+                                                                    type: InnerLibraryTreeItems,
+                                                                    children: [
+                                                                      {
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'Natural',
+                                                                        children: [
+                                                                          {
+                                                                            type: InnerLibraryTreeItems,
+                                                                            children: [
+                                                                              {
+                                                                                type: LibraryTreeItem,
+                                                                                key: 'Natural numbers',
+                                                                                children: [
+                                                                                  {
+                                                                                    key: 'item',
+                                                                                    children: [
+                                                                                      {
+                                                                                        key: 'display-span',
+                                                                                        toolTip: {
+                                                                                          contents: null,
+                                                                                          position: 'right',
+                                                                                          index: 1
+                                                                                        }
+                                                                                      }
+                                                                                    ]
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
                                           {
                                             type: Button,
                                             key: 'ok',
@@ -2097,7 +2837,7 @@ class TutorialStates {
                               {
                                 type: Expression,
                                 toolTip: {
-                                  contents: <p>Now we need to fill our new definition.<br/>In general, expressions in Slate are entered hierarchically. So we need to think about the outermost symbol, which in our case will be function composition.</p>,
+                                  contents: <p>Now we need to fill our new definition.<br/>In general, expressions in Slate are entered hierarchically. So we need to consider the outermost symbol, which in our case will be function composition.</p>,
                                   position: 'bottom',
                                   index: 0
                                 },
@@ -2221,24 +2961,29 @@ class TutorialStates {
                                     type: ExpressionDialog,
                                     children: [
                                       {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: StandardDialog,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                type: SearchInput,
-                                                toolTip: {
-                                                  contents: <p>Type "composition".</p>,
-                                                  position: 'bottom',
-                                                  index: 0
-                                                },
-                                                manipulateProps: (props) => ({
-                                                  ...props,
-                                                  onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition))
-                                                }),
-                                                elementAction: this.automateTextInput('composition')
+                                                type: LibraryTree,
+                                                children: [
+                                                  {
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: <p>Type "composition".</p>,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    },
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition))
+                                                    }),
+                                                    elementAction: this.automateTextInput('composition')
+                                                  }
+                                                ]
                                               }
                                             ]
                                           }
@@ -2293,62 +3038,67 @@ class TutorialStates {
                                     type: ExpressionDialog,
                                     children: [
                                       {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: StandardDialog,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-                                                type: SearchInput,
-                                                toolTip: {
-                                                  contents: null,
-                                                  position: 'bottom',
-                                                  index: 0
-                                                }
-                                              },
-                                              {
-                                                type: InnerLibraryTreeItems,
+                                                type: LibraryTree,
                                                 children: [
                                                   {
-                                                    type: LibraryTreeItem,
-                                                    key: 'Essentials',
+                                                    // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: null,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    }
+                                                  },
+                                                  {
+                                                    type: InnerLibraryTreeItems,
                                                     children: [
                                                       {
-                                                        type: InnerLibraryTreeItems,
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
                                                         children: [
                                                           {
-                                                            type: LibraryTreeItem,
-                                                            key: 'Functions',
+                                                            type: InnerLibraryTreeItems,
                                                             children: [
                                                               {
-                                                                type: InnerLibraryTreeItems,
+                                                                type: LibraryTreeItem,
+                                                                key: 'Functions',
                                                                 children: [
                                                                   {
-                                                                    type: LibraryTreeItem,
-                                                                    key: 'composition',
+                                                                    type: InnerLibraryTreeItems,
                                                                     children: [
                                                                       {
-                                                                        key: 'item',
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'composition',
                                                                         children: [
                                                                           {
-                                                                            key: 'display-span',
-                                                                            toolTip: {
-                                                                              contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.</p>,
-                                                                              position: 'right',
-                                                                              index: 1
-                                                                            }
+                                                                            key: 'item',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'display-span',
+                                                                                toolTip: {
+                                                                                  contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.</p>,
+                                                                                  position: 'right',
+                                                                                  index: 1
+                                                                                }
+                                                                              }
+                                                                            ],
+                                                                            elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        elementAction: this.automateClick()
+                                                                        componentAction: (component) => {
+                                                                          if (component.props.selected) {
+                                                                            this.changeState(this.fillOperatorDefinition_composition_dialog_ok);
+                                                                          }
+                                                                        }
                                                                       }
-                                                                    ],
-                                                                    componentAction: (component) => {
-                                                                      if (component.props.selected) {
-                                                                        this.changeState(this.fillOperatorDefinition_composition_dialog_ok);
-                                                                      }
-                                                                    }
+                                                                    ]
                                                                   }
                                                                 ]
                                                               }
@@ -2416,13 +3166,985 @@ class TutorialStates {
                                         type: StandardDialog,
                                         children: [
                                           {
+                                            type: ExpressionDialogItem,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                // Keep tooltips at tree, otherwise the entire tree will be rebuilt.
+                                                type: LibraryTree,
+                                                children: [
+                                                  {
+                                                    type: SearchInput,
+                                                    toolTip: {
+                                                      contents: null,
+                                                      position: 'bottom',
+                                                      index: 0
+                                                    }
+                                                  },
+                                                  {
+                                                    type: InnerLibraryTreeItems,
+                                                    children: [
+                                                      {
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
+                                                        children: [
+                                                          {
+                                                            type: InnerLibraryTreeItems,
+                                                            children: [
+                                                              {
+                                                                type: LibraryTreeItem,
+                                                                key: 'Functions',
+                                                                children: [
+                                                                  {
+                                                                    type: InnerLibraryTreeItems,
+                                                                    children: [
+                                                                      {
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'composition',
+                                                                        children: [
+                                                                          {
+                                                                            key: 'item',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'display-span',
+                                                                                toolTip: {
+                                                                                  contents: null,
+                                                                                  position: 'right',
+                                                                                  index: 1
+                                                                                }
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
                                             type: Button,
                                             key: 'ok',
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu))
                                             }),
                                             elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select f.
+
+  fillOperatorDefinition_composition_arg1_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Select f here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.fillOperatorDefinition_composition_arg1_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg1_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 0,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ],
+                                                toolTip: {
+                                                  contents: <p>Note how only f and g can be selected. This is because all input is restricted to well-typed terms.<br/><DocLink href="docs/hlm/types" onDocLinkClicked={this.onDocLinkClicked}>Read more about the type system.</DocLink></p>,
+                                                  position: 'right',
+                                                  index: 0
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ],
+                                    componentAction: (component) => (component as Expression).disableWindowClickListener()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select g.
+
+  fillOperatorDefinition_composition_arg2_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    toolTip: {
+                                      contents: <p>Select g here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.fillOperatorDefinition_composition_arg2_menu_variable);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 0,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    key: 0,
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => {
+                                                        this.changeState(this.fillOperatorDefinition_composition_arg2_openReselectionMenu);
+                                                      })
+                                                    }),
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_openReselectionMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    toolTip: {
+                                      contents: <p>It turns out we actually wanted to write "g<sup>n</sup>". This can be fixed easily by clicking here again.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    componentAction: (component) => {
+                                      if (component.state.openMenu) {
+                                        this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu_definition);
+                                      }
+                                    },
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_arg2_menu_definition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 2,
+                                            children: [
+                                              {
+                                                type: 'div',
+                                                key: 'title',
+                                                toolTip: {
+                                                  contents: <p>Click here to search for the definition of the power of a function.</p>,
+                                                  position: 'left',
+                                                  index: 1
+                                                },
+                                                elementAction: this.automateClick()
+                                              }
+                                            ],
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_searchFunctionPower))
+                                            })
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_dialog_searchFunctionPower: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 0,
+                                                children: [
+                                                  {
+                                                    type: LibraryTree,
+                                                    children: [
+                                                      {
+                                                        type: SearchInput,
+                                                        toolTip: {
+                                                          contents: <p>Type "power".</p>,
+                                                          position: 'bottom',
+                                                          index: 0
+                                                        },
+                                                        manipulateProps: (props) => ({
+                                                          ...props,
+                                                          onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower))
+                                                        }),
+                                                        elementAction: this.automateTextInput('power')
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 0,
+                                                children: [
+                                                  {
+                                                    type: LibraryTree,
+                                                    children: [
+                                                      {
+                                                        // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                        type: SearchInput,
+                                                        toolTip: {
+                                                          contents: null,
+                                                          position: 'bottom',
+                                                          index: 0
+                                                        }
+                                                      },
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Essentials',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'Functions',
+                                                                    children: [
+                                                                      {
+                                                                        type: InnerLibraryTreeItems,
+                                                                        children: [
+                                                                          {
+                                                                            type: LibraryTreeItem,
+                                                                            key: 'power to natural number',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'item',
+                                                                                children: [
+                                                                                  {
+                                                                                    key: 'display-span',
+                                                                                    toolTip: {
+                                                                                      contents: <p>Click here.<br/>In fact, the definition below would also work. View the tooltips to see the difference.</p>,
+                                                                                      position: 'right',
+                                                                                      index: 1
+                                                                                    }
+                                                                                  }
+                                                                                ],
+                                                                                elementAction: this.automateClick()
+                                                                              }
+                                                                            ],
+                                                                            componentAction: (component) => {
+                                                                              if (component.props.selected) {
+                                                                                this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_ok);
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 0,
+                                                children: [
+                                                  {
+                                                    // Keep tooltips at tree, otherwise the entire tree will be rebuilt.
+                                                    type: LibraryTree,
+                                                    children: [
+                                                      {
+                                                        type: SearchInput,
+                                                        toolTip: {
+                                                          contents: null,
+                                                          position: 'bottom',
+                                                          index: 0
+                                                        }
+                                                      },
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Essentials',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'Functions',
+                                                                    children: [
+                                                                      {
+                                                                        type: InnerLibraryTreeItems,
+                                                                        children: [
+                                                                          {
+                                                                            type: LibraryTreeItem,
+                                                                            key: 'power to natural number',
+                                                                            children: [
+                                                                              {
+                                                                                key: 'item',
+                                                                                children: [
+                                                                                  {
+                                                                                    key: 'display-span',
+                                                                                    toolTip: {
+                                                                                      contents: null,
+                                                                                      position: 'right',
+                                                                                      index: 1
+                                                                                    }
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                type: Button,
+                                                key: 'ok',
+                                                manipulateProps: (props) => ({
+                                                  ...props,
+                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu))
+                                                }),
+                                                elementAction: this.automateClick()
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select n.
+
+  fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: Expression,
+                                        key: 'sup',
+                                        toolTip: {
+                                          contents: <p>Select n here.</p>,
+                                          position: 'bottom',
+                                          index: 0
+                                        },
+                                        componentAction: (component) => {
+                                          if (component.state.openMenu) {
+                                            this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu_variable);
+                                          }
+                                        },
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillOperatorDefinition_composition_arg2_arg2_menu_variable: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    children: [
+                                      {
+                                        type: Expression,
+                                        key: 'sup',
+                                        children: [
+                                          {
+                                            type: ExpressionMenu,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                key: 0,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuRow,
+                                                    children: [
+                                                      {
+                                                        type: ExpressionMenuItem,
+                                                        key: 0,
+                                                        manipulateProps: (props) => ({
+                                                          ...props,
+                                                          onItemClicked: inject(props.onItemClicked, () => {
+                                                            this.changeState(this.tutorialCompleted);
+                                                          })
+                                                        }),
+                                                        elementAction: this.automateClick()
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
                                           }
                                         ]
                                       }
@@ -2481,7 +4203,7 @@ class TutorialStates {
   };
 }
 
-export function startTutorial(onChangeTutorialState: TutorialStateFn, withTouchWarning: boolean): void {
-  let tutorialStates = new TutorialStates(onChangeTutorialState, withTouchWarning);
+export function startTutorial(onChangeTutorialState: TutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
+  let tutorialStates = new TutorialStates(onChangeTutorialState, onDocLinkClicked, withTouchWarning);
   onChangeTutorialState(tutorialStates.introduction);
 }
