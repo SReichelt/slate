@@ -1,37 +1,19 @@
 import * as Fmt from '../../format/format';
 
-function collectVariableRefs(expression: Fmt.Expression, refs: Fmt.Parameter[]): void {
-  if (expression instanceof Fmt.VariableRefExpression) {
-    refs.push(expression.variable);
-    if (expression.indices) {
-      for (let item of expression.indices) {
-        collectVariableRefs(item, refs);
-      }
+export function collectVariableRefs(expression: Fmt.Expression): Fmt.Parameter[] {
+  let result: Fmt.Parameter[] = [];
+  expression.traverse((subExpression: Fmt.Expression) => {
+    if (subExpression instanceof Fmt.VariableRefExpression) {
+      result.push(subExpression.variable);
     }
-  } else if (expression instanceof Fmt.ArrayExpression) {
-    for (let item of expression.items) {
-      collectVariableRefs(item, refs);
-    }
-  } else if (expression instanceof Fmt.CompoundExpression) {
-    for (let arg of expression.arguments) {
-      collectVariableRefs(arg.value, refs);
-    }
-  } else if (expression instanceof Fmt.DefinitionRefExpression) {
-    for (let pathItem: Fmt.PathItem | undefined = expression.path; pathItem; pathItem = pathItem.parentPath) {
-      if (pathItem instanceof Fmt.Path) {
-        for (let arg of pathItem.arguments) {
-          collectVariableRefs(arg.value, refs);
-        }
-      }
-    }
-  }
+  });
+  return result;
 }
 
 function getMatchPenalty(expression: Fmt.Expression, argumentLists?: (Fmt.ArgumentList | undefined)[]): number {
   let penalty = 0;
   if (argumentLists) {
-    let refs: Fmt.Parameter[] = [];
-    collectVariableRefs(expression, refs);
+    let refs = collectVariableRefs(expression);
     if (refs.length) {
       let refIndex = 0;
       for (let argumentList of argumentLists) {
@@ -83,8 +65,7 @@ export function findBestMatch(items: Fmt.Expression[], argumentLists?: (Fmt.Argu
 }
 
 export function reorderArguments(argumentList: Fmt.ArgumentList, expression: Fmt.Expression): void {
-  let refs: Fmt.Parameter[] = [];
-  collectVariableRefs(expression, refs);
+  let refs = collectVariableRefs(expression);
   let lastArgIndex = argumentList.length;
   for (let refIndex = refs.length - 1; refIndex >= 0; refIndex--) {
     let ref = refs[refIndex];

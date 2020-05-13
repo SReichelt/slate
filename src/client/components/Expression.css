@@ -518,12 +518,12 @@ div.display-math {
 }
 
 .var.charcorner-tr.charcorner-large+.space-start::before, .var.charcorner-tr+sup::before {
-  content: ' ';
-  font-size: initial;
+  content: ' '!important;
+  font-size: initial!important;
 }
 
 .var.charcorner-tr+sub::before {
-  content: '';
+  content: ''!important;
 }
 
 .thousands-separator {

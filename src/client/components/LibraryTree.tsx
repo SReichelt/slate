@@ -317,8 +317,7 @@ interface VisibilityResult {
 function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, libraryDefinition: LibraryDefinition, definition: Fmt.Definition, searchWords: string[], onFilter: OnFilter | undefined): VisibilityResult {
   if (isSubsection) {
     let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
-    let asyncPromise = new Promise((resolve) => setTimeout(resolve, 0));
-    let resultPromise = new CachedPromise(asyncPromise.then(() => false));
+    let resultPromise = CachedPromise.resolve(false);
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
       for (let item of definition.contents.items) {
         resultPromise = resultPromise.then((currentResult: boolean) => {
@@ -353,7 +352,8 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
       selectable: CachedPromise.resolve(false)
     };
   } else if (onFilter) {
-    let ensureDelayPromise = new CachedPromise(Promise.resolve());
+    let asyncPromise = new Promise((resolve) => setTimeout(resolve, 0));
+    let ensureDelayPromise = new CachedPromise(asyncPromise.then(() => false));
     let ownResultPromise = ensureDelayPromise.then(() =>
       onFilter(libraryDataProvider, path, libraryDefinition, definition));
     let resultPromise = ownResultPromise;

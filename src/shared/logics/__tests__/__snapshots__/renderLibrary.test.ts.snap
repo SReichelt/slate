@@ -198,7 +198,7 @@ References.
 * https://en.wikipedia.org/wiki/Countable_set
 * https://mathworld.wolfram.com/CountablyInfinite.html
 * https://proofwiki.org/wiki/Definition:Countably_Infinite_Set
-* https://ncatlab.org/nlab/show/countable+set (called “denumerable” here)"
+* https://ncatlab.org/nlab/show/countable+set (called \\"denumerable\\" here)"
 `;
 
 exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
@@ -343,9 +343,9 @@ For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' ⊎ T
 
 Remarks.
 
-In contrast to the definition of set union, the disjoint union of sets is a “construction,” which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two “constructors.”
+In contrast to the definition of set union, the disjoint union of sets is a \\"construction,\\" which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two \\"constructors.\\"
 
-Note that the set and its constructors are introduced at the same time, hence the non-standard notation “:=:”. The notation on both sides can be specified freely.
+Note that the set and its constructors are introduced at the same time, hence the non-standard notation \\":=:\\". The notation on both sides can be specified freely.
 
 A construction always includes definitions of equality for each constructor. In this case, those definitions are what one might expect. (Different constructors are never considered equal.)
 
@@ -369,7 +369,7 @@ For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' × T'
 
 Remarks.
 
-The Cartesian product is, again, a “construction.” Note that HLM does not have any built-in notion of “tuple” – it is actually defined here as a constructor, with the usual notation.
+The Cartesian product is, again, a \\"construction.\\" Note that HLM does not have any built-in notion of \\"tuple\\" – it is actually defined here as a constructor, with the usual notation.
 
 References.
 
@@ -516,9 +516,9 @@ This is the simplest formulation of the axiom of choice that can be formalized i
 
 It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../\\"Generalized cartesian product\\"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
 
-HLM actually does not have “axioms” as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
-* The simplest solution is to add “assume AC” as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
-* A preferred method is to replace this with “assume \`S\` has a choice function” for a suitable \`S\`.
+HLM actually does not have \\"axioms\\" as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
+* The simplest solution is to add \\"assume AC\\" as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
+* A preferred method is to replace this with \\"assume \`S\` has a choice function\\" for a suitable \`S\`.
 * Better yet, build the result explicitly from a given choice function.
 
 Hopefully this will not be too inconvenient. It does have a few advantages:
@@ -568,7 +568,7 @@ by:
 
 Remarks.
 
-“\`s\` is \`p\`” is shorthand for “\`s\` has property \`p\`.”"
+\\"\`s\` is \`p\`\\" is shorthand for \\"\`s\` has property \`p\`.\\""
 `;
 
 exports[`render hlm library: 1.2.3 data/libraries/hlm/Essentials/Properties/predicate 1`] = `
@@ -693,7 +693,7 @@ exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapp
 
 Remarks.
 
-In this library, “mapping” and “function” are not synonymous but interchangeable, via a definition that transforms a mapping to a function (see \`$../Functions/\\"mapping as function\\"\`). The difference is not fundamental but a matter of convenience.
+In this library, \\"mapping\\" and \\"function\\" are not synonymous but interchangeable, via a definition that transforms a mapping to a function (see \`$../Functions/\\"mapping as function\\"\`). The difference is not fundamental but a matter of convenience.
 
 References.
 
@@ -967,7 +967,7 @@ exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/Equi
 
 Remarks.
 
-This definition uses the “construction” concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
+This definition uses the \\"construction\\" concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
 
 A more traditional definition where equivalence classes are subsets of \`S\` is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
 
@@ -1123,7 +1123,7 @@ We write “let f :  X → Y, x ↦ y_x” for “let f := (X�
 
 Remarks.
 
-This definition uses a feature of the HLM logic called “bindings.” It is equivalent to the usual set-theoretic definition, which is called “mapping” in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
+This definition uses a feature of the HLM logic called \\"bindings.\\" It is equivalent to the usual set-theoretic definition, which is called \\"mapping\\" in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
 
 The major advantage of the definition using bindings is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
 
@@ -1773,7 +1773,7 @@ We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”
 
 Remarks.
 
-This is a slightly generalized notion of “tuple” where the length \`α\` can be an arbitrary ordinal number. If \`α\` is a natural number, it matches the common definition.
+This is a slightly generalized notion of \\"tuple\\" where the length \`α\` can be an arbitrary ordinal number. If \`α\` is a natural number, it matches the common definition.
 
 We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit \`S\` from the constructor.
 
@@ -1855,7 +1855,7 @@ We write “let 𝐚 be a sequence on S” for “let 𝐚 ∈ S^ω.”
 
 Remarks.
 
-We omit the word “infinite” because infinite sequences are used much more frequently than finite ones.
+We omit the word \\"infinite\\" because infinite sequences are used much more frequently than finite ones.
 
 We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily destruct a sequence into its elements, and the ability to omit \`S\` from the constructor.
 
@@ -1981,7 +1981,7 @@ exports[`render hlm library: 1.6.1.1 data/libraries/hlm/Essentials/Numbers/Natur
 
 Remarks.
 
-The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the “successor” constructor, but we could just as well write “S(\`n\`)”. The notation is justified by \`$\\"Addition of one yields successor\\"\`.
+The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the \\"successor\\" constructor, but we could just as well write \\"S(\`n\`)\\". The notation is justified by \`$\\"Addition of one yields successor\\"\`.
 
 In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
 
@@ -2022,7 +2022,7 @@ by:
 
 Remarks.
 
-Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the “+” symbols appearing in this definition are part of the notation of the successor constructor.
+Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the \\"+\\" symbols appearing in this definition are part of the notation of the successor constructor.
 
 References.
 
@@ -3249,7 +3249,7 @@ Remarks.
 
 In HLM, cardinal numbers have a very simple definition as a construction with one constructor, which can be conveniently equipped with a notation that matches mathematical practice.
 
-Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the “deconstruction” of cardinal numbers into sets are automatically well-defined.
+Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the \\"deconstruction\\" of cardinal numbers into sets are automatically well-defined.
 
 HLM does not distinguish between sets and proper classes; instead there are rules preventing certain circularities. Thus, the set of cardinals can be treated like any other set in most situations.
 
@@ -3392,7 +3392,7 @@ exports[`render hlm library: 1.6.2.6 data/libraries/hlm/Essentials/Numbers/Cardi
 
 Remarks.
 
-Note that without the axiom of choice, this is not equivalent to the negation of “greater or equal”."
+Note that without the axiom of choice, this is not equivalent to the negation of \\"greater or equal\\"."
 `;
 
 exports[`render hlm library: 1.6.2.7.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
@@ -5455,7 +5455,7 @@ exports[`render hlm library: 2.1.1.1 data/libraries/hlm/Algebra/Generic/Isomorph
 
 Remarks.
 
-The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of “isomorphism” that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
+The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of \\"isomorphism\\" that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
 
 Each of the definitions transports an object defined on \`X\` to \`Y\` along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
 `;
@@ -7863,7 +7863,7 @@ Remarks.
 
 This is mostly a helper definition to define the degree (see \`$degree\`). However, in many cases this definition may actually be more useful than the degree itself.
 
-It is called “dimension” because for a field \`𝐅\`, the set of polynomials over \`𝐅\` with “dimension” \`d\` form a \`d\`-dimensional vector space over \`𝐅\`."
+It is called \\"dimension\\" because for a field \`𝐅\`, the set of polynomials over \`𝐅\` with \\"dimension\\" \`d\` form a \`d\`-dimensional vector space over \`𝐅\`."
 `;
 
 exports[`render hlm library: 2.8.26.14 data/libraries/hlm/Algebra/Rings/Polynomials/degree 1`] = `
@@ -9129,7 +9129,7 @@ This definition of categories includes the additional requirement that all categ
 
 For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
 
-The natural number \`u\` is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, \`u\` can be regarded as a “universe size” that is relevant only in the context of category theory. (The “universes” that are implicit in other contexts are already large enough.)
+The natural number \`u\` is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, \`u\` can be regarded as a \\"universe size\\" that is relevant only in the context of category theory. (The \\"universes\\" that are implicit in other contexts are already large enough.)
 
 References.
 

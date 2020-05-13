@@ -1407,6 +1407,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderSpecificDisplayExpression(display: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Display.RenderedExpression {
     if (omitArguments > 1 && display instanceof Fmt.DefinitionRefExpression) {
+      // TODO make this code generic, by adding appropriate info to template definitions
       let abbr: Fmt.Expression | undefined = undefined;
       if (display.path.name === 'Operator'
           || display.path.name === 'AssociativeOperator'

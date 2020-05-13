@@ -12,7 +12,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
 import { HLMDefinitionChecker } from './checker';
-import { findBestMatch, reorderArguments } from '../generic/displayMatching';
+import { findBestMatch, reorderArguments, collectVariableRefs } from '../generic/displayMatching';
 import CachedPromise from '../../data/cachedPromise';
 
 export interface ParameterSelection {
@@ -244,7 +244,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
           let type = definition.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true);
+            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.SetTerm);
           } else {
             return undefined;
           }
@@ -297,7 +297,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
           let type = definition.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList) || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor)) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true);
+            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
           } else {
             return undefined;
           }
@@ -366,7 +366,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
           let type = definition.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false)
+            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false, HLMExpressionType.Formula)
               .then(addNegations);
           } else {
             return undefined;
@@ -655,46 +655,52 @@ export class HLMEditHandler extends GenericEditHandler {
     return undefined;
   }
 
-  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkType: boolean): CachedPromise<Fmt.Expression[]> {
-    let resultPaths = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition);
-    let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-    for (let resultPath of resultPaths) {
-      result = result.then((currentResult: Fmt.Expression[]) => {
+  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkType: boolean, expressionType: HLMExpressionType): CachedPromise<Fmt.Expression[]> {
+    let checkResultPath = (prevResultPromise: CachedPromise<Fmt.Expression | undefined> | undefined, resultPath: Fmt.Path) => {
+      if (!prevResultPromise) {
+        prevResultPromise = CachedPromise.resolve(undefined);
+      }
+      return prevResultPromise.then((prevResult: Fmt.Expression | undefined) => {
+        if (prevResult) {
+          return prevResult;
+        }
         let expression = new Fmt.DefinitionRefExpression;
         expression.path = resultPath;
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-            .then((checkResult: Logic.LogicCheckResultWithExpression) => {
-              if (checkResult.hasErrors) {
-                return currentResult;
-              } else {
-                return currentResult.concat(checkResult.expression);
-              }
-            })
-            .catch(() => currentResult);
+            .then((checkResult: Logic.LogicCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
+            .catch(() => undefined);
         } else {
-          return currentResult.concat(expression);
+          return expression;
         }
       });
+    };
+    let preFillExpression = expressionEditInfo.expression instanceof Fmt.PlaceholderExpression ? undefined : expressionEditInfo.expression;
+    let resultExpressionPromises = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition, checkResultPath, preFillExpression, expressionType);
+    let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let resultExpressionPromise of resultExpressionPromises) {
+      result = result.then((currentResult: Fmt.Expression[]) =>
+        resultExpressionPromise.then((resultExpression: Fmt.Expression | undefined) =>
+          resultExpression ? currentResult.concat(resultExpression) : currentResult));
     }
     return result;
   }
 
-  private createPathsWithArguments(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition): Fmt.Path[] {
+  private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T[] {
     let displayItems: Fmt.Expression[] | undefined = undefined;
     let displayExpressions: (Fmt.Expression | undefined)[] = [undefined];
     if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
-      let display = definition.contents.display;
-      if (display && display.length > 1) {
-        displayItems = display;
-        displayExpressions = display;
+      displayItems = definition.contents.display;
+      if (displayItems) {
+        displayExpressions = displayItems;
       }
     }
-    let result: Fmt.Path[] = [];
+    let result: T[] = [];
     for (let displayExpression of displayExpressions) {
       let parentPaths: (Fmt.PathItem | undefined)[] = [];
       if (path.parentPath instanceof Fmt.Path) {
-        parentPaths = this.createPathsWithArguments(expressionEditInfo, path.parentPath, outerDefinition, outerDefinition);
+        let checkParentPath = (prevResult: Fmt.Path | undefined, parentPath: Fmt.Path) => prevResult || parentPath;
+        parentPaths = this.createPathsWithArguments(expressionEditInfo, path.parentPath, outerDefinition, outerDefinition, checkParentPath);
       } else {
         parentPaths = [path.parentPath];
       }
@@ -705,7 +711,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, expressionEditInfo.context);
         this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createPlaceholder, createElementParameter);
         resultPath.parentPath = parentPath;
-        if (displayExpression) {
+        if (displayExpression && displayItems && displayItems.length > 1) {
           reorderArguments(resultPath.arguments, displayExpression);
           if (displayItems && result.length) {
             // Ignore items that cannot be distinguished by argument order.
@@ -718,10 +724,83 @@ export class HLMEditHandler extends GenericEditHandler {
             }
           }
         }
-        result.push(resultPath);
+        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, displayExpression, preFillExpression, preFillExpressionType));
       }
     }
     return result;
+  }
+
+  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, displayExpression: Fmt.Expression | undefined, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
+    let currentResultItem: T | undefined = undefined;
+    if (preFillExpression) {
+      let visibleParameters = displayExpression ? collectVariableRefs(displayExpression) : definition.parameters;
+      for (let param of visibleParameters) {
+        let type = param.type.expression;
+        let newResultPath: Fmt.Path | undefined = undefined;
+        switch (preFillExpressionType) {
+        case HLMExpressionType.Formula:
+          if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+            newResultPath = resultPath.clone() as Fmt.Path;
+            let resultArg = this.findResultPathArgument(newResultPath, param);
+            if (resultArg instanceof Fmt.CompoundExpression) {
+              let newArg = new FmtHLM.ObjectContents_PropArg;
+              newArg.formula = preFillExpression;
+              newArg.toCompoundExpression(resultArg, false);
+            }
+          }
+          break;
+        case HLMExpressionType.SetTerm:
+          if (type instanceof FmtHLM.MetaRefExpression_Set) {
+            newResultPath = resultPath.clone() as Fmt.Path;
+            let resultArg = this.findResultPathArgument(newResultPath, param);
+            if (resultArg instanceof Fmt.CompoundExpression) {
+              let newArg = new FmtHLM.ObjectContents_SetArg;
+              newArg._set = preFillExpression;
+              newArg.toCompoundExpression(resultArg, false);
+            }
+          } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+            newResultPath = resultPath.clone() as Fmt.Path;
+            let resultArg = this.findResultPathArgument(newResultPath, param);
+            if (resultArg instanceof Fmt.CompoundExpression) {
+              let newArg = new FmtHLM.ObjectContents_SubsetArg;
+              newArg._set = preFillExpression;
+              newArg.toCompoundExpression(resultArg, false);
+            }
+          }
+          break;
+        case HLMExpressionType.ElementTerm:
+          if (type instanceof FmtHLM.MetaRefExpression_Element) {
+            newResultPath = resultPath.clone() as Fmt.Path;
+            let resultArg = this.findResultPathArgument(newResultPath, param);
+            if (resultArg instanceof Fmt.CompoundExpression) {
+              let newArg = new FmtHLM.ObjectContents_ElementArg;
+              newArg.element = preFillExpression;
+              newArg.toCompoundExpression(resultArg, false);
+            }
+          }
+          break;
+        }
+        if (newResultPath) {
+          currentResultItem = checkResultPath(currentResultItem, newResultPath);
+        }
+      }
+    }
+    return checkResultPath(currentResultItem, resultPath);
+  }
+
+  private findResultPathArgument(resultPath: Fmt.Path, param: Fmt.Parameter): Fmt.Expression | undefined {
+    let parentBinding = this.utils.getParentBinding(param);
+    if (parentBinding) {
+      let rawBindingArg = this.findResultPathArgument(resultPath, parentBinding);
+      if (rawBindingArg) {
+        let bindingArg = this.utils.convertArgument(rawBindingArg, FmtHLM.ObjectContents_BindingArg);
+        return this.utils.getRawArgument([bindingArg.arguments], param);
+      } else {
+        return undefined;
+      }
+    } else {
+      return this.utils.getRawArgument([resultPath.arguments], param);
+    }
   }
 
   getConstructorInsertButton(definitions: Fmt.DefinitionList): Display.RenderedExpression {
