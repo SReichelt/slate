@@ -13,6 +13,60 @@ function makeDirectories(fileName: string): void {
   }
 }
 
+function saveLocally(request: express.Request, response: express.Response, localPath: string): void {
+  let requestPath = decodeURI(request.url);
+  let fileName = path.join(localPath, requestPath);
+  try {
+    makeDirectories(fileName);
+    let stream = fs.createWriteStream(fileName);
+    stream.on('error', (error: any) => {
+      console.error(error);
+      response.sendStatus(400);
+    });
+    stream.on('close', () => response.sendStatus(200));
+    request.pipe(stream);
+  } catch (error) {
+    console.error(error);
+    response.sendStatus(400);
+  }
+}
+
+function submitByMail(request: express.Request, response: express.Response, mailTransporter: nodemailer.Transporter | undefined): void {
+  if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
+    let requestPath = decodeURI(request.url);
+    let mail: any = {
+      from: config.MAIL_FROM,
+      to: config.MAIL_TO,
+      subject: 'Slate submission: ' + requestPath,
+      text: requestPath,
+      attachments: [{
+        filename: path.basename(requestPath),
+        contentType: 'text/plain',
+        contentTransferEncoding: 'quoted-printable',
+        content: request
+      }]
+    };
+    mailTransporter.sendMail(mail, (error) => {
+      if (error) {
+        console.error(error);
+        response.sendStatus(503);
+      } else {
+        response.sendStatus(202);
+      }
+    });
+  } else {
+    response.sendStatus(501);
+  }
+}
+
+function openInVSCode(request: express.Request, response: express.Response, localPath: string): void {
+  let requestPath = decodeURI(request.url);
+  let fileName = path.join(localPath, requestPath);
+  // Use exec instead of spawn to make this work on Windows.
+  exec(`code "${fileName}"`);
+  response.sendStatus(200);
+}
+
 export function apiRouter(rootPath: string): express.Router {
   let router = express.Router();
   let dataPath = path.join(rootPath, 'data');
@@ -27,59 +81,17 @@ export function apiRouter(rootPath: string): express.Router {
   let mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
 
   router.put('/libraries/*', (request, response) => {
-    let requestPath = decodeURI(request.url);
-    console.log(`Received PUT request for: ${requestPath}`);
+    console.log(`Received PUT request for: ${request.url}`);
     if (config.IS_PRODUCTION) {
-      if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
-        let mail: any = {
-          from: config.MAIL_FROM,
-          to: config.MAIL_TO,
-          subject: 'Slate submission: ' + requestPath,
-          text: requestPath,
-          attachments: [{
-            filename: path.basename(requestPath),
-            contentType: 'text/plain',
-            contentTransferEncoding: 'quoted-printable',
-            content: request
-          }]
-        };
-        mailTransporter.sendMail(mail, (error: any) => {
-          if (error) {
-            console.error(error);
-            response.sendStatus(503);
-          } else {
-            response.sendStatus(202);
-          }
-        });
-      } else {
-        response.sendStatus(501);
-      }
+      submitByMail(request, response, mailTransporter);
     } else {
-      try {
-        let fileName = path.join(dataPath, requestPath);
-        makeDirectories(fileName);
-        let stream = fs.createWriteStream(fileName);
-        stream.on('error', (error: any) => {
-          console.error(error);
-          response.sendStatus(400);
-        });
-        stream.on('close', () => response.sendStatus(200));
-        request.pipe(stream);
-      } catch (error) {
-        console.error(error);
-        response.sendStatus(400);
-      }
+      saveLocally(request, response, dataPath);
     }
   });
 
   if (!config.IS_PRODUCTION) {
-    router.report('/libraries/*', (request, response) => {
-      let requestPath = decodeURI(request.url);
-      let fileName = path.join(dataPath, requestPath);
-      // Use exec instead of spawn to make this work on Windows.
-      exec(`code "${fileName}"`);
-      response.sendStatus(200);
-    });
+    router.report('/docs/*', (request, response) => openInVSCode(request, response, rootPath));
+    router.report('/libraries/*', (request, response) => openInVSCode(request, response, dataPath));
   }
 
   return router;

@@ -13,7 +13,7 @@ interface DocPageProps {
   onDocLinkClicked: OnDocLinkClicked;
 }
 
-const markdownSuffix = '.md';
+export const markdownSuffix = '.md';
 
 const DocPage = React.memo((props: DocPageProps) => {
   let baseUriEnd = props.uri.lastIndexOf('/');

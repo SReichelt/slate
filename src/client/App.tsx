@@ -4,7 +4,7 @@ import SplitPane from 'react-split-pane';
 import { withAlert, AlertManager } from 'react-alert';
 import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
-import DocPage from './extras/DocPage';
+import DocPage, { markdownSuffix } from './extras/DocPage';
 import { TutorialState, addTutorial } from './extras/Tutorial';
 import { startTutorial } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
@@ -25,7 +25,7 @@ import * as Dialog from '../shared/display/dialog';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/data/embedding';
-import { FileAccessor, WriteFileResult } from '../shared/data/fileAccessor';
+import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
@@ -96,6 +96,7 @@ class App extends React.Component<AppProps, AppState> {
   private fileAccessor: FileAccessor;
   private logic: Logic.Logic;
   private libraryDataProvider: LibraryDataProvider;
+  private templateFileWatcher?: FileWatcher;
   private mruList = new MRUList;
 
   constructor(props: AppProps) {
@@ -284,14 +285,16 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let templateFile = this.fileAccessor.openFile('display/templates.slate', false);
+    let setTemplates = (contents: string) => {
+      let templates = FmtReader.readString(contents, templateFile.fileName, FmtDisplay.getMetaModel);
+      this.setState({templates: templates});
+      if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
+        this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
+      }
+    };
+    this.templateFileWatcher = templateFile.watch?.(setTemplates);
     templateFile.read()
-      .then((contents: string) => {
-        let templates = FmtReader.readString(contents, templateFile.fileName, FmtDisplay.getMetaModel);
-        this.setState({templates: templates});
-        if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-          this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
-        }
-      })
+      .then(setTemplates)
       .catch((error) => {
         this.setState({error: error.message});
         console.error(error);
@@ -303,6 +306,7 @@ class App extends React.Component<AppProps, AppState> {
     window.onpopstate = null;
     window.onbeforeunload = null;
     window.onmessage = null;
+    this.templateFileWatcher?.close();
   }
 
   private initializeGitHubConfig(state: AppState, gitHubAPIAccess: CachedPromise<GitHub.APIAccess> | undefined): void {
@@ -520,7 +524,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let rightButtons: React.ReactNode[] = [];
-    if (this.state.selectedItemDefinition) {
+    if (this.state.selectedDocURI) {
+      if (!config.embedded && config.runningLocally) {
+        rightButtons.push(
+          <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openDocPageLocally} key="open-locally">
+            {getButtonIcon(ButtonType.OpenInVSCode)}
+          </Button>
+        );
+      }
+    } else if (this.state.selectedItemDefinition) {
       let definition = this.state.selectedItemDefinition.getImmediateResult();
       if (definition && definition.state === LibraryDefinitionState.Submitting) {
         rightButtons.push(<div className={'submitting'} key="submitting"><Loading width={'1em'} height={'1em'}/></div>);
@@ -956,6 +968,17 @@ class App extends React.Component<AppProps, AppState> {
         });
     }
   }
+
+  private openDocPageLocally = (): void  => {
+    if (this.state.selectedDocURI) {
+      let uri = this.state.selectedDocURI + markdownSuffix;
+      this.fileAccessor.openFile(uri, false)
+        .view!(true)
+        .catch((error) => {
+          this.props.alert.error('Error opening file: ' + error.message);
+        });
+    }
+  };
 
   private logInWithGitHub = (): void => {
     if (this.state.gitHubClientID) {
