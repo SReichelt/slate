@@ -50,7 +50,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
   }
   return (
     <Modal open={true} onClose={props.onCancel} showCloseIcon={false} classNames={modalClassNames} animationDuration={0} key="dialog">
-      <form onSubmit={onOK}>
+      <form onSubmit={onOK} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
         {props.children}
         <div className={'dialog-button-row'} key="buttons">
           {buttons}

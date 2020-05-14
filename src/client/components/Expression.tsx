@@ -274,7 +274,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         let size = expression.inputLength ?? expression.text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
+        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onMouseUp={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
         isInputControl = true;
       } else {
         let text = expression.text;
@@ -876,9 +876,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.menuClicked(onMenuOpened!, event)) : undefined;
       let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
       let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
-      let onTouchStart = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.menuClicked(onMenuOpened!, event) : undefined;
-      let onTouchCancel = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
-      let onTouchEnd = hasMenu ? (event: React.TouchEvent<HTMLElement>) => this.stopPropagation(event) : undefined;
       if (expression instanceof Display.InsertPlaceholderExpression && expression.action && !hasMenu) {
         onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
           if (event.button < 1) {
@@ -893,18 +890,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         onClick = (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.actionClicked(expression.action!, event));
-        onTouchStart = (event: React.TouchEvent<HTMLElement>) => {
-          this.setState({clicking: true});
-          this.stopPropagation(event);
-        };
-        onTouchCancel = (event: React.TouchEvent<HTMLElement>) => {
-          this.setState({clicking: false});
-          this.stopPropagation(event);
-        };
-        onTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
-          this.setState({clicking: false});
-          this.actionClicked(expression.action!, event);
-        };
         interactive = true;
         if (!semanticLinks) {
           semanticLinks = [new Display.SemanticLink(expression, false, false)];
@@ -957,8 +942,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         cells = <span className={'menu-cell'} key="content">{result}</span>;
       }
       result = (
-        <span className={'menu-container' + outerClassNameSuffix}>
-          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} onTouchStart={onTouchStart} onTouchCancel={onTouchCancel} onTouchEnd={onTouchEnd} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+        <span className={'menu-container' + outerClassNameSuffix} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
+          <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
             <span className={'menu-row'}>
               {cells}
             </span>

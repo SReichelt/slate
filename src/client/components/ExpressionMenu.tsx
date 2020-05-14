@@ -79,8 +79,8 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         }
       };
       return (
-        <div className={className} style={getMainFontStyle()} ref={ref}>
-          <table className={'open-menu-table'} onMouseDown={(event) => event.stopPropagation()}>
+        <div className={className} style={getMainFontStyle()} onMouseDown={(event) => event.stopPropagation()} onMouseUp={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()} ref={ref}>
+          <table className={'open-menu-table'}>
             <tbody>
               {rows}
             </tbody>
@@ -225,6 +225,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
               this.props.onItemClicked(titleAction!);
             }
             event.stopPropagation();
+            event.preventDefault();
           };
           if (titleAction instanceof Menu.DialogExpressionMenuAction) {
             title = [title, '...'];
@@ -270,7 +271,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
         if (standardRow.subMenu instanceof Menu.ExpressionMenu && subMenuRows.length > 1) {
           hasSubMenu = true;
           title = (
-            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} onTouchEnd={onClick} key="title">
+            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} key="title">
               {title}
               <span key="arrow">&nbsp;&nbsp;&nbsp;&nbsp;<span className={'open-menu-arrow'}>&nbsp;▶&nbsp;</span></span>
             </div>
@@ -282,7 +283,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             title = [title, subMenu];
           }
         } else {
-          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} onTouchEnd={onClick}>{title}</div>;
+          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>{title}</div>;
         }
         let colSpan = contentCell ? 1 : 2;
         let cells: React.ReactNode = <th colSpan={colSpan} className={titleCellClassName} key="title">{title}</th>;
@@ -407,6 +408,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
         this.props.onItemClicked(this.props.item.action);
       }
       event.stopPropagation();
+      event.preventDefault();
     };
     let toolTip: React.ReactNode = null;
     if (this.props.interactionHandler && expression.semanticLinks && this.htmlNode) {
@@ -424,7 +426,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
       toolTip = <ExpressionToolTip active={this.state.hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
     }
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} onTouchEnd={onClick} ref={(node) => (this.htmlNode = node)}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.htmlNode = node)}>
         <Expression expression={expression}/>
         {toolTip}
       </td>
@@ -511,7 +513,7 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
       }
     };
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} onTouchEnd={onClick}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
         <form onSubmit={onSubmit}>
           <input type={'text'} value={this.state.text} size={this.props.item.expectedTextLength} onChange={onChange} onFocus={onFocus} onBlur={onBlur} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
         </form>
