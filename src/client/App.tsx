@@ -884,6 +884,9 @@ class App extends React.Component<AppProps, AppState> {
         if (this.state.tutorialState) {
           this.removeEditedDefinition(definition);
           libraryDataProvider.replaceLocalItem(definition);
+          if (absolutePath) {
+            this.mruList.add(absolutePath);
+          }
         } else {
           libraryDataProvider.submitLocalItem(definition)
             .then((writeFileResult: WriteFileResult) => {
