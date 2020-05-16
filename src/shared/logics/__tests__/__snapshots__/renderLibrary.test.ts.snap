@@ -1460,7 +1460,7 @@ exports[`render hlm library: 1.4.27 data/libraries/hlm/Essentials/Functions/powe
 by:
 
   f^0 := id_X
-  f^(x+1) :=   f ∘ f^x  (x ∈ ℕ)
+  f^(x+1) := f ∘ f^x  (x ∈ ℕ)
 
 References.
 
@@ -1767,7 +1767,7 @@ exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Sequences/Tuple
 
   S^α :=: {(a_k)_(k < α) | a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α)}
 
-  (a_k)_(k < α) = (b_k)_(k < α)  :⇔    ∀ k ∈ 𝓞𝓻𝓭_(<α) : a_k = b_k  (a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α), b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α))
+  (a_k)_(k < α) = (b_k)_(k < α)  :⇔  ∀ k ∈ 𝓞𝓻𝓭_(<α) : a_k = b_k  (a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α), b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α))
 
 We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”
 
@@ -3644,7 +3644,7 @@ exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordin
 
   𝓞𝓻𝓭 :=: {[S, ⪯] | S is a set, ⪯ is a well-order on S}
 
-  [S, ⪯] = [T, ⊑]  :⇔    ∃ φ : S ↔ T : φ[⪯] = ⊑  (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
+  [S, ⪯] = [T, ⊑]  :⇔  ∃ φ : S ↔ T : φ[⪯] = ⊑  (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
 
 ℕ ⊆: 𝓞𝓻𝓭 via
 n = [ℕ_(<n), ≤∣_(ℕ_(<n))]

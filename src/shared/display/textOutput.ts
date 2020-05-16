@@ -183,10 +183,8 @@ function renderList(items: CachedPromise<string>[], separator: string, secondary
   let text = CachedPromise.resolve('');
   let index = 0;
   for (let item of items) {
-    if (secondarySeparator !== undefined && index > 1) {
-      separator = secondarySeparator;
-    }
-    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedItem ? resolvedText + separator + resolvedItem : resolvedText : resolvedItem));
+    let currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
+    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedItem ? resolvedText + currentSeparator + resolvedItem : resolvedText : resolvedItem));
     index++;
   }
   return text;
