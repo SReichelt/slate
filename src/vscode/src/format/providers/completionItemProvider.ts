@@ -17,6 +17,8 @@ import { parseFile } from '../parse';
 import { appendDocumentation } from '../documentation';
 
 export class SlateCompletionItemProvider implements vscode.CompletionItemProvider {
+    private static readonly knownDocumentationItemKinds = ['param', 'example', 'remarks', 'references'];
+
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
@@ -24,32 +26,30 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         if (parsedDocument) {
             let result: vscode.CompletionItem[] = [];
             let variableNames = new Set<string>();
-            for (let rangeInfo of parsedDocument.rangeList) {
-                if (token.isCancellationRequested) {
-                    break;
-                }
+            let rangeList = parsedDocument.rangeList;
+            for (let rangeInfoIndex = 0; rangeInfoIndex < rangeList.length; rangeInfoIndex++) {
+                let rangeInfo = rangeList[rangeInfoIndex];
                 if (rangeInfo.range.contains(position)) {
-                    let finished = this.appendCompletionItems(document, parsedDocument, position, rangeInfo, variableNames, context, result);
+                    if (token.isCancellationRequested) {
+                        break;
+                    }
+                    let finished = this.appendCompletionItems(document, parsedDocument, position, rangeInfo, rangeInfoIndex, variableNames, context, result);
                     if (finished || (rangeInfo.object instanceof Fmt.Expression && !(rangeInfo.object instanceof Fmt.VariableRefExpression))) {
                         break;
                     }
                 }
             }
-            let index = 0;
-            for (let item of result) {
-                let sortText = index.toString();
-                while (sortText.length < 10) {
-                    sortText = '0' + sortText;
-                }
-                item.sortText = sortText;
-                index++;
-            }
+            this.setSortTexts(result);
             return result;
         }
         return undefined;
     }
 
-    private appendCompletionItems(document: vscode.TextDocument, parsedDocument: ParsedDocument, position: vscode.Position, rangeInfo: RangeInfo, variableNames: Set<string>, context: vscode.CompletionContext, result: vscode.CompletionItem[]): boolean {
+    private appendCompletionItems(document: vscode.TextDocument, parsedDocument: ParsedDocument, position: vscode.Position, rangeInfo: RangeInfo, rangeInfoIndex: number, variableNames: Set<string>, context: vscode.CompletionContext, result: vscode.CompletionItem[]): boolean {
+        if (rangeInfo.object instanceof Fmt.DocumentationComment || rangeInfo.object instanceof Fmt.DocumentationItem) {
+            this.appendDocumentationItems(parsedDocument, rangeInfoIndex, context, result);
+            return true;
+        }
         let isEmptyExpression = rangeInfo.object instanceof FmtReader.EmptyExpression || (rangeInfo.object instanceof Fmt.ArrayExpression && !rangeInfo.object.items.length && position.isAfter(rangeInfo.range.start) && position.isBefore(rangeInfo.range.end));
         let signatureInfo: SignatureInfo | undefined = undefined;
         if (!(rangeInfo.linkRange && rangeInfo.linkRange.contains(position))) {
@@ -76,7 +76,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         }
         if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || signatureInfo) {
             if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || rangeInfo.object instanceof Fmt.VariableRefExpression) {
-                this.appendVariables(document, parsedDocument, rangeInfo, variableNames, result);
+                this.prependVariables(document, parsedDocument, rangeInfo, variableNames, result);
             }
         }
         if (isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
@@ -381,7 +381,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         }
     }
 
-    private appendVariables(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, variableNames: Set<string>, result: vscode.CompletionItem[]): void {
+    private prependVariables(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, variableNames: Set<string>, result: vscode.CompletionItem[]): void {
         if (rangeInfo.context) {
             let variables = rangeInfo.context.getVariables();
             for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
@@ -392,12 +392,12 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 } else {
                     variableNames.add(param.name);
                 }
-                this.appendVariable(document, parsedDocument, rangeInfo, param, result);
+                this.prependVariable(document, parsedDocument, rangeInfo, param, result);
             }
         }
     }
 
-    private appendVariable(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, param: Fmt.Parameter, result: vscode.CompletionItem[]): void {
+    private prependVariable(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, param: Fmt.Parameter, result: vscode.CompletionItem[]): void {
         let paramRangeInfo = parsedDocument.rangeMap.get(param);
         if (paramRangeInfo && paramRangeInfo.nameRange) {
             let paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
@@ -415,6 +415,57 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                     kind: vscode.CompletionItemKind.Variable
                 });
             }
+        }
+    }
+
+    private appendDocumentationItems(parsedDocument: ParsedDocument, rangeInfoIndex: number, context: vscode.CompletionContext, result: vscode.CompletionItem[]): void {
+        if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || context.triggerCharacter === '@') {
+            let prefix = context.triggerKind === vscode.CompletionTriggerKind.Invoke ? '@' : '';
+            for (let kind of SlateCompletionItemProvider.knownDocumentationItemKinds) {
+                this.appendDocumentationItem(parsedDocument, rangeInfoIndex, prefix, kind, result);
+            }
+        }
+    }
+
+    private appendDocumentationItem(parsedDocument: ParsedDocument, rangeInfoIndex: number, prefix: string, kind: string, result: vscode.CompletionItem[]): void {
+        let itemCode = prefix + kind + ' ';
+        if (kind === 'param') {
+            let rangeList = parsedDocument.rangeList;
+            let documentationComment: Fmt.DocumentationComment | undefined = undefined;
+            for (let currentIndex = rangeInfoIndex; currentIndex < rangeList.length; currentIndex++) {
+                let currentRangeInfo = rangeList[currentIndex];
+                if (currentRangeInfo.object instanceof Fmt.DocumentationComment) {
+                    documentationComment = currentRangeInfo.object;
+                } else if (currentRangeInfo.object instanceof Fmt.Definition) {
+                    if (documentationComment && currentRangeInfo.object.documentation === documentationComment) {
+                        for (let param of currentRangeInfo.object.parameters) {
+                            result.push({
+                                label: itemCode + escapeIdentifier(param.name) + ' ',
+                                kind: vscode.CompletionItemKind.Keyword
+                            });
+                        }
+                    }
+                    break;
+                }
+            }
+        } else {
+            result.push({
+                label: itemCode,
+                kind: vscode.CompletionItemKind.Keyword
+            });
+        }
+    }
+
+    private setSortTexts(items: vscode.CompletionItem[]): void {
+        // Make VSCode keep the order of items by using the indices as sort texts.
+        let index = 0;
+        for (let item of items) {
+            let sortText = index.toString();
+            while (sortText.length < 10) {
+                sortText = '0' + sortText;
+            }
+            item.sortText = sortText;
+            index++;
         }
     }
 }

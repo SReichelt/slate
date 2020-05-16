@@ -112,6 +112,11 @@ export class EmptyExpression extends Fmt.Expression {
   }
 }
 
+interface RawDocumentationComment {
+  items: RawDocumentationItem[];
+  range: Range;
+}
+
 interface RawDocumentationItem {
   kind?: string;
   parameterName?: string;
@@ -211,8 +216,8 @@ export class Reader {
   readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): void {
     let definitionsStart = this.markStart();
     for (;;) {
-      let documentationItems = this.skipWhitespace();
-      let definition = this.tryReadDefinition(documentationItems, metaDefinitions, context);
+      let documentationComment = this.skipWhitespace();
+      let definition = this.tryReadDefinition(documentationComment, metaDefinitions, context);
       if (definition) {
         definitions.push(definition);
       } else {
@@ -222,7 +227,7 @@ export class Reader {
     this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
-  tryReadDefinition(documentationItems: RawDocumentationItem[] | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Definition | undefined {
+  tryReadDefinition(documentationComment: RawDocumentationComment | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Definition | undefined {
     let definitionStart = this.markStart();
     if (!this.tryReadChar('$')) {
       return undefined;
@@ -236,9 +241,9 @@ export class Reader {
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     definition.type = this.readType(metaDefinitions, typeContext);
     let signatureRange = this.markEnd(definitionStart);
-    if (documentationItems) {
+    if (documentationComment) {
       definition.documentation = new Fmt.DocumentationComment;
-      definition.documentation.items = documentationItems.map((item) => {
+      definition.documentation.items = documentationComment.items.map((item) => {
         let result = new Fmt.DocumentationItem;
         result.kind = item.kind;
         if (item.parameterName) {
@@ -261,6 +266,14 @@ export class Reader {
         }
         return result;
       });
+      if (this.reportRange !== undefined) {
+        this.reportRange({
+          object: definition.documentation,
+          context: context,
+          metaDefinitions: metaDefinitions,
+          range: documentationComment.range
+        });
+      }
     }
     this.readChar('{');
     let metaInnerDefinitionTypes: Fmt.MetaDefinitionFactory | undefined = undefined;
@@ -658,8 +671,8 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
-  private skipWhitespace(allowComments: boolean = true): RawDocumentationItem[] | undefined {
-    let result: RawDocumentationItem[] | undefined = undefined;
+  private skipWhitespace(allowComments: boolean = true): RawDocumentationComment | undefined {
+    let result: RawDocumentationComment | undefined = undefined;
     let c = this.stream.peekChar();
     if (isWhitespaceCharacter(c) || (allowComments && c === '/')) {
       this.markedEnd = this.stream.getLocation();
@@ -677,12 +690,11 @@ export class Reader {
             break;
           case '*':
             this.stream.readChar();
-            let isDocumentationComment = false;
+            let documentationItems: RawDocumentationItem[] | undefined = undefined;
             c = this.stream.peekChar();
             if (c === '*') {
               this.stream.readChar();
-              isDocumentationComment = true;
-              result = [];
+              documentationItems = [];
             }
             let atLineStart = false;
             let afterAsterisk = true;
@@ -734,7 +746,7 @@ export class Reader {
                 atLineStart = false;
                 afterAsterisk = false;
               }
-              if (isDocumentationComment && c) {
+              if (documentationItems && c) {
                 if (c !== '`') {
                   atMarkdownStart = false;
                 }
@@ -756,7 +768,7 @@ export class Reader {
                     if (!itemEnd) {
                       itemEnd = this.stream.getLocation();
                     }
-                    result!.push({
+                    documentationItems.push({
                       kind: kind,
                       parameterName: name,
                       text: text.trimRight(),
@@ -872,26 +884,35 @@ export class Reader {
                 }
               }
             }
-            if (isDocumentationComment && (kind || text)) {
-              if (!itemStart) {
-                itemStart = this.stream.getLocation();
+            if (documentationItems) {
+              if (kind || text) {
+                if (!itemStart) {
+                  itemStart = this.stream.getLocation();
+                }
+                if (!itemEnd) {
+                  itemEnd = this.stream.getLocation();
+                }
+                documentationItems.push({
+                  kind: kind,
+                  parameterName: name,
+                  text: text.trimRight(),
+                  range: {
+                    start: itemStart,
+                    end: itemEnd
+                  },
+                  nameRange: nameStart && nameEnd ? {
+                    start: nameStart,
+                    end: nameEnd
+                  } : undefined
+                });
               }
-              if (!itemEnd) {
-                itemEnd = this.stream.getLocation();
-              }
-              result!.push({
-                kind: kind,
-                parameterName: name,
-                text: text.trimRight(),
+              result = {
+                items: documentationItems,
                 range: {
-                  start: itemStart,
-                  end: itemEnd
-                },
-                nameRange: nameStart && nameEnd ? {
-                  start: nameStart,
-                  end: nameEnd
-                } : undefined
-              });
+                  start: commentStart,
+                  end: this.stream.getLocation()
+                }
+              };
             }
             break;
           default:

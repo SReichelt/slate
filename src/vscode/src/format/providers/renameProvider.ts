@@ -123,9 +123,9 @@ export class SlateRenameProvider implements vscode.RenameProvider {
     provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string, token: vscode.CancellationToken): vscode.ProviderResult<vscode.WorkspaceEdit> {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, document);
             if (nameDefinitionLocation) {
-                return findReferences(nameDefinitionLocation, true, token, document).then((locations: vscode.Location[]) => {
+                return findReferences(nameDefinitionLocation, true, true, token, document).then((locations: vscode.Location[]) => {
                     let result = new vscode.WorkspaceEdit;
                     let escapedName = escapeIdentifier(newName);
                     for (let location of locations) {
@@ -151,7 +151,7 @@ export class SlateRenameProvider implements vscode.RenameProvider {
     prepareRename(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Range | { range: vscode.Range, placeholder: string }> {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, document);
             if (nameDefinitionLocation) {
                 return {
                     range: nameDefinitionLocation.originNameRange,

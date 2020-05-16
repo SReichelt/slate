@@ -353,11 +353,8 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
     return result;
 }
 
-export function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vscode.Position, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): DefinitionLink | undefined {
+export function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vscode.Position, sourceDocument?: vscode.TextDocument): DefinitionLink | undefined {
     for (let rangeInfo of parsedDocument.rangeList) {
-        if (token.isCancellationRequested) {
-            break;
-        }
         if (rangeInfo.range.contains(position)) {
             if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
                 let referencedDefinition: ReferencedDefinition | undefined = undefined;

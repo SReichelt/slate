@@ -8,11 +8,13 @@ import { DefinitionLink, getDefinitionLinks, isDefinitionReferenceToUri, getName
 import { areUrisEqual } from '../../utils';
 import { parseFile } from '../parse';
 
-export function findReferences(nameDefinitionLocation: DefinitionLink, returnNameRanges: boolean, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): Thenable<vscode.Location[]> {
+export function findReferences(nameDefinitionLocation: DefinitionLink, includeDeclaration: boolean, returnNameRanges: boolean, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): Thenable<vscode.Location[]> {
     return vscode.workspace.findFiles(`**/*${fileExtension}`, undefined, undefined, token).then((originUris: vscode.Uri[]) => {
         let result: vscode.Location[] = [];
         if (nameDefinitionLocation && nameDefinitionLocation.targetSelectionRange) {
-            result.push(new vscode.Location(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange));
+            if (includeDeclaration) {
+                result.push(new vscode.Location(nameDefinitionLocation.targetUri, nameDefinitionLocation.targetSelectionRange));
+            }
             let checkUri = (uri: vscode.Uri) => areUrisEqual(nameDefinitionLocation.targetUri, uri);
             let preCheck = (parsedDocument: ParsedDocument, rangeInfo: FmtReader.ObjectRangeInfo) =>
                 isDefinitionReferenceToUri(parsedDocument, rangeInfo.object, rangeInfo.context, checkUri, sourceDocument);
@@ -46,9 +48,9 @@ export class SlateReferenceProvider implements vscode.ReferenceProvider {
     provideReferences(document: vscode.TextDocument, position: vscode.Position, context: vscode.ReferenceContext, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Location[]> {
         let parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, token, document);
+            let nameDefinitionLocation = getNameDefinitionLocation(parsedDocument, position, document);
             if (nameDefinitionLocation) {
-                return findReferences(nameDefinitionLocation, false, token, document);
+                return findReferences(nameDefinitionLocation, context.includeDeclaration, false, token, document);
             }
         }
         return undefined;

@@ -113,7 +113,35 @@ function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.Diagnos
     triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly);
 }
 
+function configureLanguage(context: vscode.ExtensionContext): void {
+    context.subscriptions.push(
+        vscode.languages.setLanguageConfiguration(languageId, {
+            onEnterRules: [
+                {
+                    beforeText: /^\s*\/\*\*([^\*]|\*(?!\/))*$/,
+                    afterText: /^\s*\*\/$/,
+                    action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: ' * ' }
+                },
+                {
+                    beforeText: /^\s*\/\*\*([^\*]|\*(?!\/))*$/,
+                    action: { indentAction: vscode.IndentAction.None, appendText: ' * ' }
+                },
+                {
+                    beforeText: /^(\ \ )*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+                    action: { indentAction: vscode.IndentAction.None, appendText: '* ' }
+                },
+                {
+                    beforeText: /^(\ \ )*\ \*\/\s*$/,
+                    action: { indentAction: vscode.IndentAction.None, removeText: 1 }
+                }
+            ]
+        })
+    );
+}
+
 export function activate(context: vscode.ExtensionContext, fileAccessor: WorkspaceFileAccessor, onInitialized: (parseEvent: vscode.Event<ParseDocumentEvent>, hoverEvent: vscode.Event<HoverEvent>) => void): void {
+    configureLanguage(context);
+
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
     let parseEventEmitter = new vscode.EventEmitter<ParseDocumentEvent>();
@@ -166,7 +194,7 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
         vscode.languages.registerHoverProvider(SLATE_MODE, definitionProvider),
         vscode.languages.registerDocumentHighlightProvider(SLATE_MODE, new SlateHighlightProvider(parsedDocuments)),
         vscode.languages.registerSignatureHelpProvider(SLATE_MODE, new SlateSignatureHelpProvider(parsedDocuments), '(', '{', ','),
-        vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.', '(', ' ', '\n'),
+        vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.', '(', ' ', '\n', '@'),
         vscode.languages.registerReferenceProvider(SLATE_MODE, new SlateReferenceProvider(parsedDocuments)),
         vscode.languages.registerRenameProvider(SLATE_MODE, renameProvider),
         vscode.languages.registerDocumentFormattingEditProvider(SLATE_MODE, new SlateDocumentFormatter)
