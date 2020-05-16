@@ -166,7 +166,7 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
         vscode.languages.registerHoverProvider(SLATE_MODE, definitionProvider),
         vscode.languages.registerDocumentHighlightProvider(SLATE_MODE, new SlateHighlightProvider(parsedDocuments)),
         vscode.languages.registerSignatureHelpProvider(SLATE_MODE, new SlateSignatureHelpProvider(parsedDocuments), '(', '{', ','),
-        vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.'),
+        vscode.languages.registerCompletionItemProvider(SLATE_MODE, new SlateCompletionItemProvider(parsedDocuments), '%', '$', '/', '.', '(', ' ', '\n'),
         vscode.languages.registerReferenceProvider(SLATE_MODE, new SlateReferenceProvider(parsedDocuments)),
         vscode.languages.registerRenameProvider(SLATE_MODE, renameProvider),
         vscode.languages.registerDocumentFormattingEditProvider(SLATE_MODE, new SlateDocumentFormatter)

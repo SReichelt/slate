@@ -1,9 +1,11 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as Fmt from '../../../../shared/format/format';
 import { ParsedDocumentMap } from '../parsedDocument';
 import { DefinitionLink, getDefinitionLinks } from '../navigate';
 import { readRange } from '../utils';
+import { appendDocumentation } from '../documentation';
 import { HoverEvent } from '../../events';
 import CachedPromise from '../../../../shared/data/cachedPromise';
 
@@ -40,19 +42,13 @@ export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscod
                 this.hoverEventEmitter.fire(hoverEvent);
                 intermediateHoverTexts = hoverEvent.hoverTexts;
             }
+            let targetObject = definitionLink.targetObject;
             return intermediateHoverTexts.then((finalHoverTexts: vscode.MarkdownString[]) => {
                 if (referencedDefinition && referencedDefinition.definition.documentation) {
                     let hoverText = new vscode.MarkdownString;
-                    for (let item of referencedDefinition.definition.documentation.items) {
-                        if (item.kind) {
-                            hoverText.appendMarkdown(`_@${item.kind}_`);
-                            if (item.parameter) {
-                                hoverText.appendMarkdown(` \`${item.parameter.name}\``);
-                            }
-                            hoverText.appendMarkdown(' —\n');
-                        }
-                        hoverText.appendMarkdown(item.text + '\n\n');
-                    }
+                    let includeAll = (targetObject === referencedDefinition.definition);
+                    let specificParameter = targetObject instanceof Fmt.Parameter ? targetObject : undefined;
+                    appendDocumentation(referencedDefinition.definition.documentation, includeAll, specificParameter, hoverText);
                     finalHoverTexts.push(hoverText);
                 }
                 if (finalHoverTexts.length) {

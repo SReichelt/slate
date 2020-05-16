@@ -265,6 +265,7 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
 export interface DefinitionLink extends vscode.DefinitionLink {
     originNameRange: vscode.Range;
     originObject: Object;
+    targetObject: Object;
     name: string;
     referencedDefinition?: ReferencedDefinition;
 }
@@ -281,6 +282,7 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
                     originObject: rangeInfo.object,
                     originSelectionRange: rangeInfo.linkRange,
                     targetUri: signatureInfo.parsedDocument.uri,
+                    targetObject: signatureInfo.referencedDefinition.definition,
                     targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
                     targetSelectionRange: targetRangeInfo.nameRange,
                     name: signatureInfo.referencedDefinition.definition.name,
@@ -305,9 +307,11 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
                                         originObject: rangeInfo.object,
                                         originSelectionRange: argRangeInfo.nameRange,
                                         targetUri: signatureInfo.parsedDocument.uri,
+                                        targetObject: param,
                                         targetRange: targetRangeInfo.range,
                                         targetSelectionRange: targetRangeInfo.nameRange,
-                                        name: arg.name
+                                        name: arg.name,
+                                        referencedDefinition: signatureInfo.referencedDefinition
                                     });
                                     if (position) {
                                         return result;
@@ -335,6 +339,7 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
                     originObject: rangeInfo.object,
                     originSelectionRange: rangeInfo.nameRange,
                     targetUri: parsedDocument.uri,
+                    targetObject: variable,
                     targetRange: targetRangeInfo.range,
                     targetSelectionRange: targetRangeInfo.nameRange,
                     name: variable.name
@@ -368,6 +373,7 @@ export function getNameDefinitionLocation(parsedDocument: ParsedDocument, positi
                     originObject: rangeInfo.object,
                     originSelectionRange: rangeInfo.nameRange,
                     targetUri: parsedDocument.uri,
+                    targetObject: rangeInfo.object,
                     targetRange: rangeInfo.range,
                     targetSelectionRange: rangeInfo.nameRange,
                     name: rangeInfo.object.name,
