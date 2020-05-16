@@ -515,7 +515,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               break;
             case '{':
               openParen = '{';
-              if (optionalParenRight && optionalParenMaxLevel !== undefined && optionalParenMaxLevel >= 0) {
+              if (optionalParenRight) {
                 closeParen = '∣';
               }
               if (lineHeight) {

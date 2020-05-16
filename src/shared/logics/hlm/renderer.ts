@@ -1819,6 +1819,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                          });
         }
         let rightItem = new Display.InnerParenExpression(renderRightSide(definition));
+        rightItem.left = true;
+        rightItem.right = false;
         rightItem.maxLevel = parenLevel;
         let row = [leftItem, rightItem];
         if (first && currentCase.caseParameters) {

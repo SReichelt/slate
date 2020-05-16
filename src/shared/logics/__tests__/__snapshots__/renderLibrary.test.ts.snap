@@ -985,7 +985,7 @@ References.
 exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succession 1`] = `
 "Definition 1.3.30 (Succession).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
 
-  ⪯ ≪ ⊑ := [{{s_a ⪯ s_b if a = l(s_a) (s_a ∈ S), false if a = r(t_a) (t_a ∈ T) if b = l(s_b) (s_b ∈ S), {true if a = l(s_a) (s_a ∈ S), t_a ⊑ t_b if a = r(t_a) (t_a ∈ T) if b = r(t_b) (t_b ∈ T)]_(a,b ∈ S ⊎ T)
+  ⪯ ≪ ⊑ := [{[{s_a ⪯ s_b if a = l(s_a) (s_a ∈ S), false if a = r(t_a) (t_a ∈ T)] if b = l(s_b) (s_b ∈ S), [{true if a = l(s_a) (s_a ∈ S), t_a ⊑ t_b if a = r(t_a) (t_a ∈ T)] if b = r(t_b) (t_b ∈ T)]_(a,b ∈ S ⊎ T)
 
 Remarks.
 
@@ -1806,7 +1806,7 @@ exports[`render hlm library: 1.5.4 data/libraries/hlm/Essentials/Sequences/Finit
 
   S^∗ :=: {(𝐚)_(S^n) | n ∈ ℕ, 𝐚 is a/an n-tuple on S}
 
-  (𝐚)_(S^m) = (𝐛)_(S^n)  :⇔    m = n and 𝐚 = (b_j)_(j < m) if 𝐛 = (b_k)_(k < n) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<n))  (m ∈ ℕ, 𝐚 is a/an m-tuple on S, n ∈ ℕ, 𝐛 is a/an n-tuple on S)
+  (𝐚)_(S^m) = (𝐛)_(S^n)  :⇔  m = n and 𝐚 = (b_j)_(j < m) if 𝐛 = (b_k)_(k < n) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<n))  (m ∈ ℕ, 𝐚 is a/an m-tuple on S, n ∈ ℕ, 𝐛 is a/an n-tuple on S)
 
 We write “let 𝒂 be a finite sequence on S” for “let 𝒂 ∈ S^∗.”
 
@@ -2068,7 +2068,7 @@ exports[`render hlm library: 1.6.1.6 data/libraries/hlm/Essentials/Numbers/Natur
 
   0 + n = n
 
-Proof.  We show that {0 if n = (0), ((0 + x)+1) if n = (x+1) (x ∈ ℕ) = n:
+Proof.  We show that ({0 if n = (0), ((0 + x)+1) if n = (x+1) (x ∈ ℕ)) = n:
 
 1. We show that 0 = 0: Trivial.
 2. Let x ∈ ℕ. Then ((0 + x)+1) = (x+1):
@@ -2092,7 +2092,7 @@ exports[`render hlm library: 1.6.1.7 data/libraries/hlm/Essentials/Numbers/Natur
 
   (m+1) + n = ((m + n)+1)
 
-Proof.  We show that {(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1) (x ∈ ℕ) = ((m + n)+1):
+Proof.  We show that ({(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1) (x ∈ ℕ)) = ((m + n)+1):
 
 1. We show that (m+1) = (m+1): Trivial.
 2. Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
@@ -2746,7 +2746,7 @@ exports[`render hlm library: 1.6.1.41 data/libraries/hlm/Essentials/Numbers/Natu
 
   min(m, n) := min({m, n})
    = {m if m ≤ n, n if m > n
-   = {0 if n = 0, {0 if m = 0, min(x, y) + 1 if m = x + 1 (x ∈ ℕ) if n = y + 1 (y ∈ ℕ)
+   = {0 if n = 0, ({0 if m = 0, min(x, y) + 1 if m = x + 1 (x ∈ ℕ)) if n = y + 1 (y ∈ ℕ)
 
 Equality.  No proof.
 
@@ -2807,7 +2807,7 @@ exports[`render hlm library: 1.6.1.45 data/libraries/hlm/Essentials/Numbers/Natu
 
   max(m, n) := max({m, n})
    = {m if m ≥ n, n if m < n
-   = {m if n = 0, {n if m = 0, max(x, y) + 1 if m = x + 1 (x ∈ ℕ) if n = y + 1 (y ∈ ℕ)
+   = {m if n = 0, ({n if m = 0, max(x, y) + 1 if m = x + 1 (x ∈ ℕ)) if n = y + 1 (y ∈ ℕ)
 
 Equality.  No proof.
 
@@ -9698,7 +9698,7 @@ References.
 exports[`render hlm library: 5.4.3 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/rewritable 1`] = `
 "Definition 5.4.3.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite, ℜ ⊆ 𝓡𝓮𝔀𝓻(𝓣_V), L, R ∈ 𝓣_V. We define:
 
-  L →_ℜ R  :⇔  (L → R) ∈ ℜ or {false if R = (z) (z ∈ V), {false if L = (y) (y ∈ V), ∀ v ∈ Fresh(V) : M_v →_ℜ N_v if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), false if L = M N (M, N ∈ 𝓣_V) if R = λz. N_z (N_z ∈ 𝓣_(V ∪ {z}) for each z ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : N_a[a := b] = N_b]), {false if L = (y) (y ∈ V), false if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), [M →_ℜ O and N = P] or [M = O and N →_ℜ P] if L = M N (M, N ∈ 𝓣_V) if R = O P (O, P ∈ 𝓣_V)
+  L →_ℜ R  :⇔  (L → R) ∈ ℜ or {false if R = (z) (z ∈ V), [{false if L = (y) (y ∈ V), ∀ v ∈ Fresh(V) : M_v →_ℜ N_v if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), false if L = M N (M, N ∈ 𝓣_V)] if R = λz. N_z (N_z ∈ 𝓣_(V ∪ {z}) for each z ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : N_a[a := b] = N_b]), [{false if L = (y) (y ∈ V), false if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), [M →_ℜ O and N = P] or [M = O and N →_ℜ P] if L = M N (M, N ∈ 𝓣_V)] if R = O P (O, P ∈ 𝓣_V)
 
 Remarks.
 
