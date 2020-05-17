@@ -2947,9 +2947,9 @@ exports[`render hlm library: 1.6.1.51.1 data/libraries/hlm/Essentials/Numbers/Na
 
   ∑ := [0 + ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -2995,9 +2995,9 @@ exports[`render hlm library: 1.6.1.51.6 data/libraries/hlm/Essentials/Numbers/Na
 
   ∏ := [1 ⋅ ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -4348,9 +4348,9 @@ exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/In
 
   ∑ := [0 + ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -4364,9 +4364,9 @@ exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/In
 
   ∏ := [1 ⋅ ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -4721,9 +4721,9 @@ exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Ra
 
   ∑ := [0 + ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -4737,9 +4737,9 @@ exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Ra
 
   ∏ := [1 ⋅ ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -5148,9 +5148,9 @@ exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Re
 
   ∑ := [0 + ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -5164,9 +5164,9 @@ exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Re
 
   ∏ := [1 ⋅ ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -5421,9 +5421,9 @@ exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Co
 
   ∑ := [0 + ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -5437,9 +5437,9 @@ exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Co
 
   ∏ := [1 ⋅ ⋅⋅⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, i = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -6333,9 +6333,9 @@ by:
 
   ∏_[M,∗,e] := [e ∗ ⋅⋅⋅]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
 
-Remarks.
+Example.
 
-Usage example: \`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐌 = {𝐌})}, ⨂ = {$\\"iterated operation\\"(𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐌 = {𝐌})}, ⨂ = {$\\"iterated operation\\"(𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -6870,9 +6870,9 @@ by:
 
   ∏_[G,∗,e,i] := [e ∗ ⋅⋅⋅]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
 
-Remarks.
+Example.
 
-Usage example: \`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐆 = {𝐆})}, ⨂ = {$\\"iterated operation\\"(𝐆 = {𝐆})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐆 = {𝐆})}, ⨂ = {$\\"iterated operation\\"(𝐆 = {𝐆})}, n = {n}, i = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -7171,9 +7171,9 @@ exports[`render hlm library: 2.7.15.1 data/libraries/hlm/Algebra/Semirings/Itera
 
   ∑_𝐑 := ∏_[𝐑,+]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -7187,9 +7187,9 @@ exports[`render hlm library: 2.7.15.2 data/libraries/hlm/Algebra/Semirings/Itera
 
   ∏_𝐑 := ∏_[𝐑,⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -7668,9 +7668,9 @@ exports[`render hlm library: 2.8.25.1 data/libraries/hlm/Algebra/Rings/Iterated%
 
   ∑_𝐑 := ∏_[𝐑,+]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -7684,9 +7684,9 @@ exports[`render hlm library: 2.8.25.2 data/libraries/hlm/Algebra/Rings/Iterated%
 
   ∏_𝐑 := ∏_[𝐑,⋅]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, i = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -8153,9 +8153,9 @@ exports[`render hlm library: 2.8.29.1.10 data/libraries/hlm/Algebra/Rings/Module
 
   ∑_𝐌 := ∏_[𝐌,+]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 
@@ -8612,9 +8612,9 @@ exports[`render hlm library: 2.8.29.2.10 data/libraries/hlm/Algebra/Rings/Module
 
   ∑_𝐌 := ∏_[𝐌,+]
 
-Remarks.
+Example.
 
-Usage example: \`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`.
+\`$../../../../Essentials/Functions/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, i = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i]}}})\`
 
 References.
 

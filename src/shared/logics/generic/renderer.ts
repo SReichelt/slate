@@ -119,7 +119,7 @@ export abstract class GenericRenderer {
   }
 
   protected addDefinitionRemarks(paragraphs: Notation.RenderedExpression[]): void {
-    let allKinds = ['remarks', 'references'];
+    const allKinds = ['example', 'remarks', 'references'];
     for (let kind of allKinds) {
       this.addDefinitionRemarksOfKind(paragraphs, allKinds, kind);
     }
@@ -127,19 +127,21 @@ export abstract class GenericRenderer {
 
   private addDefinitionRemarksOfKind(paragraphs: Notation.RenderedExpression[], allKinds: string[], kind: string): void {
     let definition = this.definition;
-    let text = '';
+    let texts: string[] = [];
     if (definition.documentation) {
       for (let item of definition.documentation.items) {
         if (item.kind === kind) {
-          if (text) {
-            text += '\n\n';
-          }
-          text += item.text;
+          texts.push(item.text);
         }
       }
     }
-    if (text || this.editHandler) {
-      paragraphs.push(this.renderSubHeading(kind.charAt(0).toUpperCase() + kind.slice(1)));
+    if (this.editHandler ? kind !== 'example' : texts.length) {
+      let heading = kind.charAt(0).toUpperCase() + kind.slice(1);
+      if (heading === 'Example' && texts.length > 1) {
+        heading = 'Examples';
+      }
+      paragraphs.push(this.renderSubHeading(heading));
+      let text = texts.join(kind === 'example' ? ', ' : '\n\n');
       let markdown = new Notation.MarkdownExpression(text);
       if (this.editHandler) {
         this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
