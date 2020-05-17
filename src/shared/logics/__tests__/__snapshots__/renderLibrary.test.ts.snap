@@ -5305,7 +5305,7 @@ exports[`render hlm library: 1.6.7.3 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+(i_a)𝒊) + (r_b+(i_b)𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
+  (r_a+i_a𝒊) + (r_b+i_b𝒊) := ((r_a + r_b)+(i_a + i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
 
 References.
 
@@ -5335,7 +5335,7 @@ exports[`render hlm library: 1.6.7.6 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  −(r_a+(i_a)𝒊) := ((−r_a)+(−i_a)𝒊)  (r_a, i_a ∈ ℝ)"
+  −(r_a+i_a𝒊) := ((−r_a)+(−i_a)𝒊)  (r_a, i_a ∈ ℝ)"
 `;
 
 exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Complex/difference 1`] = `
@@ -5345,7 +5345,7 @@ exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_b+(i_b)𝒊) − (r_a+(i_a)𝒊) := ((r_b − r_a)+(i_b − i_a)𝒊)  (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
+  (r_b+i_b𝒊) − (r_a+i_a𝒊) := ((r_b − r_a)+(i_b − i_a)𝒊)  (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
    = b + (−a)
 
 Equality.  No proof."
@@ -5358,7 +5358,7 @@ exports[`render hlm library: 1.6.7.8 data/libraries/hlm/Essentials/Numbers/Compl
 
 by:
 
-  (r_a+(i_a)𝒊) ⋅ (r_b+(i_b)𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
+  (r_a+i_a𝒊) ⋅ (r_b+i_b𝒊) := ((r_a ⋅ r_b − i_a ⋅ i_b)+(r_a ⋅ i_b + i_a ⋅ r_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
 
 References.
 

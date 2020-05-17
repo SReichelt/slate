@@ -720,6 +720,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         innerClassName += ' noover';
       }
+      if (!under) {
+        innerClassName += ' nounder';
+      }
       result = rows;
     } else if (expression instanceof Notation.FractionExpression) {
       innerClassName += ' fraction';

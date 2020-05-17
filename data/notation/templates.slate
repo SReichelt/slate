@@ -42,7 +42,7 @@ $Parens(body: %Expr, style: %String): %Template {}
  *                 * -1: Relations, both built-in and user-defined.
  *                 * 0: Separation of function domain and codomain (→).
  *                 * 1: Addition and subtraction.
- *                 * 2: Multiplication. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
+ *                 * 2: Multiplication and function composition. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
  *                 * 3: Exponentiation, or more precisely all expressions with superscripts or subscripts. In most cases, `maxLevel` should be less than this number, i.e. inner expressions with superscripts or subscripts do not require parentheses.
  *
  * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if the content surrounding the `$InnerParens` instance is sufficiently bounded on the left.
@@ -69,7 +69,7 @@ $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %
  *                 * -1: Relations, both built-in and user-defined.
  *                 * 0: Separation of function domain and codomain (→).
  *                 * 1: Addition and subtraction.
- *                 * 2: Multiplication. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
+ *                 * 2: Multiplication and function composition. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
  *                 * 3: Exponentiation, or more precisely all expressions with superscripts or subscripts. In most cases, `maxLevel` should be less than this number, i.e. inner expressions with superscripts or subscripts do not require parentheses.
  *
  * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if inner expression is sufficiently bounded on the left.
@@ -116,10 +116,11 @@ $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): 
  * @param body The main expression.
  * @param over An expression to be added above `body`.
  * @param under An expression to be added below `body`.
- * @param style Set to 'shallow' to reduce space between the expressions. This typically depends on the contents of `body`. Currently it does not work correctly if both `over` and `under` are given.
+ * @param style Set to 'shallow' to reduce vertical space. The contents of `body` typically dictate whether this is appropriate.
  *
  * @example `$OverUnder(body = a, over = b, style = 'shallow')`
  * @example `$OverUnder(body = a, under = c, style = 'shallow')`
+ * @example `$OverUnder(body = a, over = b, under = c, style = 'shallow')`
  * @example `$OverUnder(body = A, over = b, under = c)`
  */
 $OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template {}
@@ -272,6 +273,7 @@ $Vector(items: %Expr[]): %Template {
  *
  * @example `$Function(function = f, arguments = [x])`
  * @example `$Function(function = f, arguments = [a, b, c])`
+ * @example `$Function(function = f, arguments = [x], style = '[]')`
  */
 $Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLevel: %Int = 2): %Template {
   notation = $OuterParens(
@@ -326,7 +328,7 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
  * A binary operator (although it can be used with more than two operands if the operator is associative).
  *
  * @param symbol The operator symbol.
- * @param operands The list of operands. If more than two operands are given, the operator symbol is rendered between each pair of operands.
+ * @param operands The list of operands. If more than two operands are given, the operator symbol is displayed between each pair of operands.
  * @param space The space to use between the operator symbol and its operands. The default is U+2009. For multiplication, use U+200A.
  * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$Operator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation.
  * @param maxParenLevel If an operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around this operand. By default, parentheses are added around all operands that also contain operators, but not around operands with subscripts or superscripts.
@@ -357,100 +359,130 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
   )
 }
 
-$UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 3, maxParenLevel?: %Int): %Template {
+/**
+ * A unary operator in prefix notation, i.e. the operator symbol is written in front of the operand.
+ *
+ * @param symbol The operator symbol.
+ * @param operand The operand.
+ * @param space An optional space to use between the operator symbol and its operand.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$PrefixUnaryOperator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation. Set to 3 for operators that bind strongly.
+ * @param maxParenLevel If the operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are added around all composite operands.
+ *
+ * @example `$PrefixUnaryOperator(symbol = ≀, operand = a)`
+ */
+$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
   notation = $OuterParens(
-    body = [$InnerParens(
-      body = operand,
-      maxLevel = maxParenLevel,
-      right = %false
-    ), space, symbol],
-    minLevel = minParenLevel,
-    left = %false
-  )
-}
-
-$PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
-  notation = $OuterParens(
-    body = [symbol, space, $InnerParens(
-      body = operand,
-      maxLevel = maxParenLevel
-    )],
+    body = [
+      $InnerParens(
+        body = symbol,
+        maxLevel = 2
+      ),
+      space,
+      $InnerParens(
+        body = operand,
+        maxLevel = maxParenLevel
+      )
+    ],
     minLevel = minParenLevel
   )
 }
 
-$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
-  notation = $Operator(
-    symbol = symbol,
-    operands = operands,
-    space = space,
-    minParenLevel = parenLevel,
-    maxParenLevel = parenLevel
+/**
+ * A unary operator in postfix notation, i.e. the operator symbol is written after the operand.
+ *
+ * @param symbol The operator symbol.
+ * @param operand The operand.
+ * @param space An optional space to use between operand and the operator symbol.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$PostfixUnaryOperator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation. Set to 3 for operators that bind strongly.
+ * @param maxParenLevel If the operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are added around all composite operands.
+ *
+ * @example `$PostfixUnaryOperator(symbol = ≀, operand = a)`
+ */
+$PostfixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 0, maxParenLevel?: %Int): %Template {
+  notation = $OuterParens(
+    body = [
+      $InnerParens(
+        body = operand,
+        maxLevel = maxParenLevel
+      ),
+      space,
+      $InnerParens(
+        body = symbol,
+        maxLevel = 2
+      )
+    ],
+    minLevel = minParenLevel
   )
 }
 
-$Verb(symbol: %Expr, operand: %Expr, parenLevel: %Int = -1): %Template {
-  notation = $UnaryOperator(
-    symbol = symbol,
-    operand = operand,
-    space = ' ',
-    minParenLevel = parenLevel,
-    maxParenLevel = parenLevel
-  )
-}
-
-$TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Template {
-  notation = $Relation(
-    symbol = symbol,
-    operands = operands,
-    space = ' ',
-    parenLevel = parenLevel
-  )
-}
-
-$BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -2): %Template {
-  notation = $Operator(
-    symbol = symbol,
-    operands = operands,
-    space = space,
-    minParenLevel = parenLevel,
-    maxParenLevel = parenLevel
-  )
-}
-
-$UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
+/**
+ * A unary operator in prefix notation where the symbol can be regarded as a function. 
+ * Often, the symbol is a word. 
+ * This is equivalent to `$PrefixUnaryOperator` except for the default space and parentheses.
+ *
+ * @param symbol The operator symbol.
+ * @param operand The operand.
+ * @param space The space to use between the operator symbol and its operand.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$FunctionLikeOperator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation.
+ * @param maxParenLevel If the operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are added around all operands containing operators, but not around operands with subscripts or superscripts.
+ *
+ * @example `$FunctionLikeOperator(symbol = 'calc', operand = a)`
+ */
+$FunctionLikeOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   notation = $PrefixUnaryOperator(
     symbol = symbol,
     operand = operand,
     space = space,
-    minParenLevel = parenLevel,
-    maxParenLevel = parenLevel
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
   )
 }
 
-$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
-  notation = $OuterParens(
-    body = $Style(
-      body = [
-        $OverUnder(
-          body = symbol,
-          over = over,
-          under = under,
-          style = style
-        ),
-        space,
-        $InnerParens(
-          body = operand,
-          maxLevel = maxParenLevel
-        )
-      ],
-      styleClass = 'nowrap'
+/**
+ * A unary operator in prefix notation where the symbol is decorated with additional expressions above and/or below. 
+ * Often, the symbol is a word.
+ *
+ * @param symbol The operator symbol.
+ * @param operand The operand.
+ * @param over An expression to be added above the symbol.
+ * @param under An expression to be added below the symbol.
+ * @param style For most symbols, this can be set to 'shallow' to reduce vertical space between the symbol and the expressions above and below (see `$OverUnder`).
+ * @param space The space to use between the operator symbol and its operand.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$OverUnderOperator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation.
+ * @param maxParenLevel If the operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are added around all operands containing operators, but not around operands with subscripts or superscripts.
+ *
+ * @example `$OverUnderOperator(symbol = 'calc', operand = a, under = b, style = 'shallow')`
+ * @example `$OverUnderOperator(symbol = 'calc', operand = a, over = c, under = b, style = 'shallow')`
+ */
+$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+  notation = $FunctionLikeOperator(
+    symbol = $OverUnder(
+      body = symbol,
+      over = over,
+      under = under,
+      style = style
     ),
-    minLevel = minParenLevel
+    operand = operand,
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
   )
 }
 
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
+/**
+ * A unary operator in prefix notation where the symbol is magnified and decorated with additional expressions above and/or below.
+ *
+ * @param symbol The operator symbol.
+ * @param operand The operand.
+ * @param over An expression to be added above the symbol.
+ * @param under An expression to be added below the symbol.
+ * @param space The space to use between the operator symbol and its operand.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$LargeOperator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation.
+ * @param maxParenLevel If the operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are added around all operands containing operators, but not around operands with subscripts or superscripts.
+ *
+ * @example `$LargeOperator(symbol = '⨂', operand = a, over = c, under = b)`
+ */
+$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   notation = $OverUnderOperator(
     symbol = $Style(
       body = symbol,
@@ -465,33 +497,60 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
   )
 }
 
-$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
+/**
+ * A binary relation (although it can be used with more than two operands if the relation is transitive).
+ *
+ * @param symbol The relation symbol.
+ * @param operands The list of operands. If more than two operands are given, the relation symbol is displayed between each pair of operands.
+ * @param space The space to use between the relation symbol and its operands.
+ * @param parenLevel The parentheses level of the relation (see `$InnerParens`). Usually should be left at the default.
+ *
+ * @example `$Relation(symbol = ≺, operands = [a, b])`
+ */
+$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
   notation = $Operator(
     symbol = symbol,
     operands = operands,
     space = space,
-    minParenLevel = minParenLevel,
-    maxParenLevel = maxParenLevel
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
   )
 }
 
-$Quantification(symbol: %Expr, parameters: %Expr, formula: %Expr, parenLevel: %Int = -2): %Template {
-  notation = $OuterParens(
-    body = [symbol, ' ', parameters, ' : ', $InnerParens(
-      body = formula,
-      maxLevel = parenLevel,
-      right = %false
-    )],
-    minLevel = parenLevel,
-    left = %false
+/**
+ * A unary relation written in text form.
+ *
+ * @param symbol The name of the relation, usually a verb.
+ * @param operand The operand.
+ * @param parenLevel The parentheses level of the relation (see `$InnerParens`). Usually should be left at the default.
+ *
+ * @example `$Verb(symbol = %neg('wobbles', 'does not wobble'), operand = a)`
+ */
+$Verb(symbol: %Expr, operand: %Expr, parenLevel: %Int = -1): %Template {
+  notation = $PostfixUnaryOperator(
+    symbol = symbol,
+    operand = operand,
+    space = ' ',
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
   )
 }
 
-$PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %Template {
-  notation = $OuterParens(
-    body = [symbol, ' ', parameters],
-    minLevel = parenLevel,
-    left = %false
+/**
+ * A binary relation written in text form.
+ *
+ * @param symbol The name of the relation, usually a verb.
+ * @param operands The list of operands, usually a subject and an object.
+ * @param parenLevel The parentheses level of the relation (see `$InnerParens`). Usually should be left at the default.
+ *
+ * @example `$TextualRelation(symbol = %neg('wobbles', 'does not wobble'), operands = [a, b])`
+ */
+$TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Template {
+  notation = $Relation(
+    symbol = symbol,
+    operands = operands,
+    space = ' ',
+    parenLevel = parenLevel
   )
 }
 
@@ -503,6 +562,8 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
  * @param operand The operand of the property (`a` above).
  * @param property The property (`b` above).
  * @param article An article to be prepended to `b`. Used by `$NounProperty` which is defined as a special case of `$Property`.
+ *
+ * @example `$Property(operand = a, property = 'nice')`
  */
 $Property(operand: %Expr, property: %Expr, article?: %String): %Template {
   notation = $Verb(
@@ -511,6 +572,18 @@ $Property(operand: %Expr, property: %Expr, article?: %String): %Template {
   )
 }
 
+/**
+ * A property of the form "`a` is `b` regarding `c`", where `b` is usually an adjective.
+ *
+ * Use `$NounRelation` for the case where `b` is a noun.
+ *
+ * @param operands The operands of the property (`a` and `c` above).
+ * @param property The property (`b` above).
+ * @param article An article to be prepended to `b`. Used by `$NounRelation` which is defined as a special case of `$RelationalProperty`.
+ * @param preposition The preposition between the adjective and the right operand.
+ *
+ * @example `$RelationalProperty(operands = [a, c], property = 'nicer', preposition = 'than')`
+ */
 $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, preposition: %String): %Template {
   notation = $TextualRelation(
     symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property, ' ', preposition],
@@ -525,6 +598,8 @@ $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, prepo
  * @param singular The singular form of the noun (`b` above).
  * @param plural The plural form of the noun.
  * @param article Either "a" or "an", depending on whether the noun starts with a vowel.
+ *
+ * @example `$NounProperty(operand = a, singular = 'foo', plural = 'foos')`
  */
 $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   notation = $Property(
@@ -534,6 +609,17 @@ $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String =
   )
 }
 
+/**
+ * A property of the form "`a` is a `b` regarding `c`", where `b` is a noun.
+ *
+ * @param operands The operands of the property (`a` and `c` above).
+ * @param singular The singular form of the noun (`b` above).
+ * @param plural The plural form of the noun.
+ * @param article Either "a" or "an", depending on whether the noun starts with a vowel.
+ * @param preposition The preposition between the noun and the right operand.
+ *
+ * @example `$NounRelation(operands = [a, c], singular = 'foo', plural = 'foos')`
+ */
 $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a', preposition: %String = 'of'): %Template {
   notation = $RelationalProperty(
     operands = operands,
@@ -543,6 +629,33 @@ $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %Strin
   )
 }
 
+/**
+ * A property of the form "`a` has a `b`", where `b` is a noun.
+ *
+ * @param operand The operand of the property (`a` above).
+ * @param singular The singular form of the noun (`b` above).
+ * @param plural The plural form of the noun.
+ * @param article Either "a" or "an", depending on whether the noun starts with a vowel.
+ *
+ * @example `$Feature(operand = a, singular = 'foo', plural = 'foos')`
+ */
+$Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+  notation = $Verb(
+    symbol = [%neg('has', 'does not have'), ' ', article, ' ', singular],
+    operand = operand
+  )
+}
+
+/**
+ * A property asserting that a tuple forms a specific structure.
+ *
+ * @param operands The fields of the tuple.
+ * @param singular The singular form of the structure name.
+ * @param plural The plural form of the structure name.
+ * @param article Either "a" or "an", depending on whether the name starts with a vowel.
+ *
+ * @example `$Structure(operands = [a, b, c], singular = 'foo', plural = 'foos')`
+ */
 $Structure(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   notation = $Verb(
     symbol = [%neg('forms', 'does not form'), ' ', article, ' ', singular],
@@ -552,13 +665,14 @@ $Structure(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String =
   )
 }
 
-$Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
-  notation = $Verb(
-    symbol = [%neg('has', 'does not have'), ' ', article, ' ', singular],
-    operand = operand
-  )
-}
-
+/**
+ * A symmetrical relation between two or more operands, expressed as a property of the form "`a` and `b` are `c`".
+ *
+ * @param operands The operands of the property (`a` and `b` above).
+ * @param property The property (`c` above).
+ *
+ * @example `$MultiProperty(operands = [a, b], property = 'similar')`
+ */
 $MultiProperty(operands: %Expr[], property: %Expr): %Template {
   notation = $Verb(
     symbol = [%neg('are', 'are not'), ' ', property],
@@ -573,6 +687,14 @@ $MultiProperty(operands: %Expr[], property: %Expr): %Template {
   )
 }
 
+/**
+ * A word that is parameterized by an argument. Can be used at locations where usually a single word would be expected.
+ *
+ * @param word The parameterized word.
+ * @param argument The argument which is prepended to the word.
+ *
+ * @example `$DependentWord(word = 'like', argument = a)`
+ */
 $DependentWord(word: %Expr, argument: %Expr): %Template {
   notation = [
     $InnerParens(
@@ -582,6 +704,131 @@ $DependentWord(word: %Expr, argument: %Expr): %Template {
     '-',
     word
   ]
+}
+
+/**
+ * A boolean operator, usually written in text form.
+ *
+ * @param symbol The name of the operator.
+ * @param operands The list of operands, usually two or more formulas.
+ * @param parenLevel The parentheses level of the operator (see `$InnerParens`). Usually should be left at the default.
+ *
+ * @example `$BooleanOperator(symbol = 'and/or', operands = [a, b])`
+ */
+$BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -2): %Template {
+  notation = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
+  )
+}
+
+/**
+ * A unary boolean operator in prefix notation, usually written in text form.
+ *
+ * @param symbol The name of the operator.
+ * @param operand The operand, usually a formula.
+ * @param parenLevel The parentheses level of the operator (see `$InnerParens`). Usually should be left at the default.
+ *
+ * @example `$UnaryBooleanOperator(symbol = 'just', operand = a)`
+ */
+$UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
+  notation = $PrefixUnaryOperator(
+    symbol = symbol,
+    operand = operand,
+    space = space,
+    minParenLevel = parenLevel,
+    maxParenLevel = parenLevel
+  )
+}
+
+$Negation(operand: %Expr): %Template {
+  notation = $UnaryBooleanOperator(
+    symbol = 'not',
+    operand = operand
+  )
+}
+
+$True: %Template {
+  notation = 'true'
+}
+
+$False: %Template {
+  notation = 'false'
+}
+
+$Conjunction(operands: %Expr[]): %Template {
+  notation = $BooleanOperator(
+    symbol = 'and',
+    operands = operands
+  )
+}
+
+$Disjunction(operands: %Expr[]): %Template {
+  notation = $BooleanOperator(
+    symbol = 'or',
+    operands = operands
+  )
+}
+
+$Quantification(symbol: %String, parameters: %Expr, formula: %Expr, parenLevel: %Int = -2): %Template {
+  notation = $OuterParens(
+    body = [symbol, ' ', parameters, ' : ', $InnerParens(
+      body = formula,
+      maxLevel = parenLevel,
+      right = %false
+    )],
+    minLevel = parenLevel,
+    left = %false
+  )
+}
+
+$PlainQuantification(symbol: %String, parameters: %Expr, parenLevel: %Int = -2): %Template {
+  notation = $OuterParens(
+    body = [symbol, ' ', parameters],
+    minLevel = parenLevel,
+    left = %false
+  )
+}
+
+$UniversalQuantification(parameters: %Expr, formula: %Expr): %Template {
+  notation = $Quantification(
+    symbol = '∀',
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$ExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
+  notation = $Quantification(
+    symbol = %neg('∃', '∄'),
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$PlainExistentialQuantification(parameters: %Expr): %Template {
+  notation = $PlainQuantification(
+    symbol = %neg('∃', '∄'),
+    parameters = parameters
+  )
+}
+
+$UniqueExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
+  notation = $Quantification(
+    symbol = '∃!',
+    parameters = parameters,
+    formula = formula
+  )
+}
+
+$PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
+  notation = $PlainQuantification(
+    symbol = '∃!',
+    parameters = parameters
+  )
 }
 
 $SubsetParameter(subset: %Expr, superset: %Expr): %Template {
@@ -689,6 +936,16 @@ $EmbeddingDefinition(subset: %Expr, superset: %Expr): %Template {
   )
 }
 
+$FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
+  notation = $Operator(
+    symbol = symbol,
+    operands = operands,
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
+  )
+}
+
 $FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLevel: %Int = 0): %Template {
   notation = $Operator(
     symbol = $DefinitionColon,
@@ -747,73 +1004,6 @@ $Construction(constructors: %Expr[,]): %Template {
   )
 }
 
-$Negation(operand: %Expr): %Template {
-  notation = $UnaryBooleanOperator(
-    symbol = 'not',
-    operand = operand
-  )
-}
-
-$True: %Template {
-  notation = 'true'
-}
-
-$False: %Template {
-  notation = 'false'
-}
-
-$Conjunction(operands: %Expr[]): %Template {
-  notation = $BooleanOperator(
-    symbol = 'and',
-    operands = operands
-  )
-}
-
-$Disjunction(operands: %Expr[]): %Template {
-  notation = $BooleanOperator(
-    symbol = 'or',
-    operands = operands
-  )
-}
-
-$UniversalQuantification(parameters: %Expr, formula: %Expr): %Template {
-  notation = $Quantification(
-    symbol = '∀',
-    parameters = parameters,
-    formula = formula
-  )
-}
-
-$ExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
-  notation = $Quantification(
-    symbol = %neg('∃', '∄'),
-    parameters = parameters,
-    formula = formula
-  )
-}
-
-$PlainExistentialQuantification(parameters: %Expr): %Template {
-  notation = $PlainQuantification(
-    symbol = %neg('∃', '∄'),
-    parameters = parameters
-  )
-}
-
-$UniqueExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
-  notation = $Quantification(
-    symbol = '∃!',
-    parameters = parameters,
-    formula = formula
-  )
-}
-
-$PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
-  notation = $PlainQuantification(
-    symbol = '∃!',
-    parameters = parameters
-  )
-}
-
 $SingleCase(case: %Expr[]): %Template {
   notation = $OuterParens(
     body = $Table(
@@ -836,26 +1026,6 @@ $Cases(cases: %Expr[,]): %Template {
     ),
     left = %false,
     right = %true
-  )
-}
-
-$BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
-  notation = $Parens(
-    body = $Table(
-      items = [[top], [bottom]],
-      style = 'binom'
-    ),
-    style = '()'
-  )
-}
-
-$Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
-  notation = $SubSup(
-    body = set,
-    sub = $PrefixUnaryOperator(
-      symbol = symbol,
-      operand = limit
-    )
   )
 }
 
@@ -883,6 +1053,51 @@ $SourceProofStep(result: %Expr, source: %Expr): %Template {
   ]
 }
 
+/**
+ * Notation used for a subset that can be described using a relation symbol with an argument.
+ *
+ * @param set The superset.
+ * @param symbol The relation symbol to use in the subscript.
+ * @param limit The argument on the right side of the relation symbol.
+ *
+ * @example `$Segment(set = A, symbol = ≺, limit = b)`
+ */
+$Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
+  notation = $SubSup(
+    body = set,
+    sub = $PrefixUnaryOperator(
+      symbol = symbol,
+      operand = limit
+    )
+  )
+}
+
+/**
+ * A binomial coefficient.
+ *
+ * @param top The number of elements to choose from.
+ * @param bottom The number of elements to choose.
+ *
+ * @example `$BinomialCoefficient(top = a, bottom = b)`
+ */
+$BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
+  notation = $Parens(
+    body = $Table(
+      items = [[top], [bottom]],
+      style = 'binom'
+    ),
+    style = '()'
+  )
+}
+
+/**
+ * The standard notation for lambda abstraction.
+ *
+ * @param variable The bound variable, possibly including a type.
+ * @param term The term on the right side of the dot.
+ *
+ * @example `$LambdaAbstraction(variable = a, term = b)`
+ */
 $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
   notation = $OuterParens(
     body = [
@@ -901,6 +1116,14 @@ $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
   )
 }
 
+/**
+ * The standard notation for lambda application, which can be regarded as function application but is usually written without parentheses.
+ *
+ * @param function The left term of the lambda application.
+ * @param argument The right term of the lambda application.
+ *
+ * @example `$LambdaApplication(function = a, argument = b)`
+ */
 $LambdaApplication(function: %Expr, argument: %Expr): %Template {
   notation = $OuterParens(
     body = [
@@ -918,6 +1141,15 @@ $LambdaApplication(function: %Expr, argument: %Expr): %Template {
   )
 }
 
+/**
+ * The standard notation for substitution in lambda terms.
+ *
+ * @param term The term that the substitution is applied to.
+ * @param variable The variable being substituted.
+ * @param replacement The term that is substituted for the variable.
+ *
+ * @example `$LambdaSubstitution(term = a, variable = b, replacement = c)`
+ */
 $LambdaSubstitution(term: %Expr, variable: %Expr, replacement: %Expr): %Template {
   notation = $Function(
     function = term,
@@ -925,7 +1157,6 @@ $LambdaSubstitution(term: %Expr, variable: %Expr, replacement: %Expr): %Template
       left = variable,
       right = replacement
     )],
-    style = '[]',
-    maxParenLevel = 4
+    style = '[]'
   )
 }

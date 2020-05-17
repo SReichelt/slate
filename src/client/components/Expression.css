@@ -235,19 +235,17 @@ div.display-math {
   height: 0.3em;
 }
 
-.overunder.shallow>.overunder-body-row>.overunder-body {
+.overunder.shallow>.overunder-body-row>.overunder-body, .overunder.shallow>.overunder-body-row>.overunder-body * {
+  line-height: 80%;
+}
+
+.overunder.shallow.nounder>.overunder-body-row>.overunder-body, .overunder.shallow.nounder>.overunder-body-row>.overunder-body * {
+  line-height: 100%;
+}
+
+.overunder.shallow.nounder>.overunder-body-row>.overunder-body, .overunder.shallow.nounder>.overunder-over-row>.overunder-over {
   position: relative;
   top: -0.4em;
-}
-
-.overunder.noover.shallow>.overunder-body-row>.overunder-body {
-  position: initial;
-  top: initial;
-  line-height: 80%;
-}
-
-.overunder.noover.shallow>.overunder-body-row>.overunder-body * {
-  line-height: 80%;
 }
 
 .paren-large {
