@@ -26,6 +26,7 @@ TBD
 ## Why does this not lead to problems?
 
 * Short answer: Lean translation.
+  * Equality in HLM mapped to equivalence relation in Lean.
 * Longer answer: If a structure contains an "arbitrary set" parameter, this essentially introduces a type variable wherever an element of the structure is deconstructed. This type variable can only be eliminated by expressions that preserve isomorphism.
 
 ## What practical effects does this have?
@@ -36,10 +37,16 @@ I.e.: What should be done differently in the presence of isomorphism=equality?
 * A subgroup is simply a subset of the carrier with certain properties.
   * Can be treated as a group: "Forgetful" operation.
 * Convention: Use equality instead of asking whether an isomorphism exists.
+* Category theory:
+  * Definition of a category does not necessary need to be modified.
+  * However, all commonly used categories are skeletal.
+  * For skeletal categories, isomorphism and equivalence are the same.
+  * We want this, so that categories are equal iff they are equivalent (as opposed to isomorphic).
+  * Could define "precategories" without the skeletality requirement if necessary.
 
 ## Are there any specific benefits?
 
-* Major simplification when dealing with something "up to isomorphism".
+* Major simplification when dealing with things "up to isomorphism".
   * E.g. counting all non-isomorphic groups of order n.
 * Rewriting can be used to prove properties.
   * E.g. if group G has property p and H is isomorphic to G, simply substitute H for G to show that H has property p as well.

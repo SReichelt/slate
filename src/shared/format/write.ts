@@ -365,6 +365,7 @@ export class Writer {
       } else if (expression instanceof Fmt.StringExpression) {
         this.writeString(expression.value, '\'', true);
       } else if (expression instanceof Fmt.VariableRefExpression) {
+        // TODO disallow references to shadowed variables
         this.writeIdentifier(expression.variable.name, expression, true);
         this.writeOptionalExpressionList(expression.indices, indent, true);
       } else if (expression instanceof Fmt.MetaRefExpression) {

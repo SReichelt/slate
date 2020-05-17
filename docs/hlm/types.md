@@ -7,5 +7,6 @@ TBD
 * Similar to sets in Lean.
   * Experimentatal translation: [hlm-defs.lean](experimental/lean/hlm-defs.lean)
 * Constructions (inductive data types) to build new types.
-* Equality definition.
-  * Isomorphic structures are equal: [equality.md](equality.md)
+  * Equality definition.
+    * Isomorphic structures are equal: [equality.md](equality.md)
+  * Embeddings.
