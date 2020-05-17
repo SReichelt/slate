@@ -1,8 +1,10 @@
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import { FileReference } from './fileAccessor';
+import * as Logic from '../logics/logic';
 
 export interface LibraryDataAccessor {
+  readonly logic: Logic.Logic;
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor;
   fetchLocalSection(): CachedPromise<LibraryDefinition>;
   fetchSubsection(path: Fmt.Path): CachedPromise<LibraryDefinition>;

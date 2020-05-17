@@ -6,10 +6,11 @@ import * as FmtNotation from '../../notation/meta';
 import * as Notation from '../../notation/notation';
 import * as Menu from '../../notation/menu';
 import * as Dialog from '../../notation/dialog';
+import { readCode } from '../../format/utils';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, defaultReferences } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { GenericUtils } from './utils';
-import { GenericRenderer, RenderedVariable } from './renderer';
+import { GenericRenderer, RenderedVariable, RenderedTemplateArguments } from './renderer';
 import CachedPromise from '../../data/cachedPromise';
 
 export type RenderTypeFn = (type: string | undefined) => Notation.RenderedExpression;
@@ -264,6 +265,7 @@ export abstract class GenericEditHandler {
     title.styleClasses = ['source-code'];
     let templateRow = new Menu.StandardExpressionMenuRow(title);
     templateRow.info = this.getDocumentation(template);
+    templateRow.examples = this.getExamples(template, renderer);
     if (template.parameters.length) {
       templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, renderer));
     } else {
@@ -392,7 +394,40 @@ export abstract class GenericEditHandler {
     }
   }
 
-  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], renderedTemplateArguments: Notation.RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
+  private getExamples(definition: Fmt.Definition, renderer: GenericRenderer): Notation.RenderedExpression[] | undefined {
+    if (definition.documentation) {
+      let result: Notation.RenderedExpression[] = [];
+      for (let documentationItem of definition.documentation.items) {
+        if (documentationItem.kind === 'example') {
+          let example = new Notation.MarkdownExpression(documentationItem.text);
+          example.onRenderCode = (code: string) => {
+            try {
+              let expression = readCode(code, FmtNotation.metaModel);
+              let config: Notation.RenderedTemplateConfig = {
+                getArgFn: (name: string) => {
+                  let variable = new Notation.TextExpression(name);
+                  variable.styleClasses = ['var', 'dummy'];
+                  return variable;
+                },
+                negationCount: 0,
+                forceInnerNegations: 0
+              };
+              return renderer.renderUserDefinedExpression(expression, config);
+            } catch (error) {
+              return new Notation.ErrorExpression(error.message);
+            }
+          };
+          result.push(example);
+        }
+      }
+      if (result.length) {
+        return result;
+      }
+    }
+    return undefined;
+  }
+
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
     if (arrayDimensions) {
       if (value instanceof Fmt.ArrayExpression) {
         let items: Notation.RenderedExpression[] = [];
@@ -449,7 +484,7 @@ export abstract class GenericEditHandler {
     }
   }
 
-  private createTemplateDialogPreviewItem(notationItem: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: Notation.RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
+  private createTemplateDialogPreviewItem(notationItem: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
     // TODO add preview in different contexts, to validate parentheses
     let listItem = new Dialog.ExpressionDialogListItem<number | undefined>();
     listItem.items = includeNegation ? [0, 1] : [undefined];
@@ -583,8 +618,8 @@ export abstract class GenericEditHandler {
     return dialog;
   }
 
-  private getRenderedTemplateArguments(variables: RenderedVariable[]): Notation.RenderedTemplateArguments {
-    let renderedTemplateArguments: Notation.RenderedTemplateArguments = {};
+  private getRenderedTemplateArguments(variables: RenderedVariable[]): RenderedTemplateArguments {
+    let renderedTemplateArguments: RenderedTemplateArguments = {};
     for (let variable of variables) {
       renderedTemplateArguments[variable.param.name] = variable.notation;
     }

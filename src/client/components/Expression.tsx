@@ -39,7 +39,6 @@ export interface ExpressionInteractionHandler {
   enterBlocker(): void;
   leaveBlocker(): void;
   isBlocked(): boolean;
-  renderCode(code: string): React.ReactNode;
 }
 
 interface ExpressionProps {
@@ -812,14 +811,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             spellChecker: false,
             autoDownloadFontAwesome: false,
             previewRender: (markdownPlaintext: string) => {
-              ReactDOM.render(this.renderMarkdown(markdownPlaintext), previewElement);
+              ReactDOM.render(this.renderMarkdown(markdownPlaintext, expression.onRenderCode), previewElement);
               return previewElement.innerHTML;
             }
           };
           markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
         }
       } else {
-        markdown = this.renderMarkdown(expression.text);
+        markdown = this.renderMarkdown(expression.text, expression.onRenderCode);
       }
       return (
         <div className={className + ' markdown'}>
@@ -1239,25 +1238,26 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return String.fromCodePoint(cpOffset + 0x30);
   }
 
-  private renderMarkdown(text: string): React.ReactElement {
+  private renderMarkdown(text: string, renderCode?: (code: string) => Notation.RenderedExpression): React.ReactElement {
     let md = new Remarkable({
       linkTarget: '_blank',
       typographer: true
     });
     md.use(linkify);
-    md.renderer = new RemarkableReactRenderer({
-      components: {
-        code: (props: any) => {
-          if (this.props.interactionHandler && typeof props.content === 'string') {
-            let renderedCode = this.props.interactionHandler.renderCode(props.content);
-            if (renderedCode !== undefined) {
-              return renderedCode;
+    let options = undefined;
+    if (renderCode) {
+      options = {
+        components: {
+          code: (props: any) => {
+            if (typeof props.content === 'string') {
+              return <Expression expression={renderCode(props.content)} interactionHandler={this.props.interactionHandler}/>;
             }
+            return <code>{props.content}</code>;
           }
-          return <code>{props.content}</code>;
         }
-      }
-    });
+      };
+    }
+    md.renderer = new RemarkableReactRenderer(options);
     return md.render(text);
   }
 

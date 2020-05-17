@@ -3,11 +3,16 @@ import * as Notation from '../../notation/notation';
 import * as Logic from '../logic';
 import { GenericEditHandler, SetNotationFn } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
+import { readCode } from '../../format/utils';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
   notation: Notation.RenderedExpression;
   canAutoFill: boolean;
+}
+
+export interface RenderedTemplateArguments {
+  [name: string]: Notation.ExpressionValue;
 }
 
 export abstract class GenericRenderer {
@@ -19,7 +24,7 @@ export abstract class GenericRenderer {
     this.variableNameEditHandler = editHandler;
   }
 
-  renderTemplate(templateName: string, args: Notation.RenderedTemplateArguments = {}, negationCount: number = 0): Notation.RenderedExpression {
+  renderTemplate(templateName: string, args: RenderedTemplateArguments = {}, negationCount: number = 0): Notation.RenderedExpression {
     let template: Fmt.Definition;
     try {
       template = this.templates.definitions.getDefinition(templateName);
@@ -30,14 +35,18 @@ export abstract class GenericRenderer {
     return new Notation.TemplateInstanceExpression(template, config, this.templates);
   }
 
-  renderNotationExpression(notation: Fmt.Expression, args: Notation.RenderedTemplateArguments = {}, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
+  renderNotationExpression(notation: Fmt.Expression, args: RenderedTemplateArguments = {}, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
     let config = this.getRenderedTemplateConfig(args, negationCount, forceInnerNegations);
+    return this.renderUserDefinedExpression(notation, config);
+  }
+
+  renderUserDefinedExpression(notation: Fmt.Expression, config: Notation.RenderedTemplateConfig): Notation.RenderedExpression {
     return new Notation.UserDefinedExpression(notation, config, this.templates);
   }
 
-  private getRenderedTemplateConfig(args: Notation.RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
+  private getRenderedTemplateConfig(args: RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
     return {
-      args: args,
+      getArgFn: (name: string) => args[name],
       negationCount: negationCount,
       forceInnerNegations: forceInnerNegations,
       negationFallbackFn: this.renderNegation.bind(this)
@@ -143,10 +152,21 @@ export abstract class GenericRenderer {
       paragraphs.push(this.renderSubHeading(heading));
       let text = texts.join(kind === 'example' ? ', ' : '\n\n');
       let markdown = new Notation.MarkdownExpression(text);
+      markdown.onRenderCode = (code: string) => {
+        try {
+          let metaModel = this.libraryDataAccessor.logic.getMetaModel();
+          let expression = readCode(code, metaModel);
+          return this.renderExpression(expression);
+        } catch (error) {
+          return new Notation.ErrorExpression(error.message);
+        }
+      };
       if (this.editHandler) {
         this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
       }
       paragraphs.push(markdown);
     }
   }
+
+  abstract renderExpression(expression: Fmt.Expression): Notation.RenderedExpression;
 }

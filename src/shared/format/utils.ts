@@ -1,4 +1,7 @@
 import * as Fmt from './format';
+import * as Meta from './metaModel';
+import * as Ctx from './context';
+import * as FmtReader from './read';
 
 export function getOuterPath(path: Fmt.Path): Fmt.Path {
   while (path.parentPath instanceof Fmt.Path) {
@@ -36,4 +39,12 @@ export function getInnerDefinition(outerDefinition: Fmt.Definition, path: Fmt.Pa
   } else {
     return outerDefinition;
   }
+}
+
+export function readCode(code: string, metaModel: Meta.MetaModel): Fmt.Expression {
+  let stream = new FmtReader.StringInputStream(code);
+  let errorHandler = new FmtReader.DefaultErrorHandler;
+  let reader = new FmtReader.Reader(stream, errorHandler, () => metaModel);
+  let context = new Ctx.DummyContext(metaModel);
+  return reader.readExpression(false, metaModel.functions, context);
 }

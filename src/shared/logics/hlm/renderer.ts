@@ -2,7 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as FmtNotation from '../../notation/meta';
 import * as Logic from '../logic';
-import { GenericRenderer, RenderedVariable } from '../generic/renderer';
+import { GenericRenderer, RenderedVariable, RenderedTemplateArguments } from '../generic/renderer';
 import { findBestMatch } from '../generic/notationMatching';
 import * as Notation from '../../notation/notation';
 import { HLMExpressionType } from './hlm';
@@ -788,7 +788,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.started = true;
   }
 
-  private applyName(name: Fmt.Expression, args: Notation.RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Notation.RenderedExpression[]): string | undefined {
+  private applyName(name: Fmt.Expression, args: RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Notation.RenderedExpression[]): string | undefined {
     result.length = 0;
     let expression = this.renderNotationExpression(name, args);
     while (expression instanceof Notation.IndirectExpression) {
@@ -1461,8 +1461,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderNotationExpression(notation, args, negationCount);
   }
 
-  private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], parameterOverrides?: ParameterOverrides, markAsDummy: boolean = false): Notation.RenderedTemplateArguments {
-    let args: Notation.RenderedTemplateArguments = {};
+  private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], parameterOverrides?: ParameterOverrides, markAsDummy: boolean = false): RenderedTemplateArguments {
+    let args: RenderedTemplateArguments = {};
     let index = 0;
     for (let curDefinition of definitions) {
       let curParams: Fmt.Parameter[] = [];
@@ -2494,7 +2494,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else {
           resultToNotation = this.readOnlyRenderer.renderFormula(result, fullFormulaSelection);
         }
-        let args: Notation.RenderedTemplateArguments = {
+        let args: RenderedTemplateArguments = {
           'result': resultToNotation
         };
         if (source) {

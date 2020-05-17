@@ -291,6 +291,7 @@ export interface MarkdownExpressionSearchURL {
 }
 
 export class MarkdownExpression extends RenderedExpression {
+  onRenderCode?: (code: string) => RenderedExpression;
   onTextChanged?: (newText: string) => void;
   searchURLs?: MarkdownExpressionSearchURL[];
   defaultSearchText?: string;
@@ -306,16 +307,14 @@ export class MarkdownExpression extends RenderedExpression {
 
 export type ExpressionValue = any; // depending on type: constant or RenderedExpression or RenderedExpression[] or RenderedExpression[][] or ...
 
-export interface RenderedTemplateArguments {
-  [name: string]: ExpressionValue;
-}
-
+export type GetArgFn = (name: string) => ExpressionValue | undefined;
+export type NegationFallbackFn = (expression: RenderedExpression) => RenderedExpression;
 
 export interface RenderedTemplateConfig {
-  args: RenderedTemplateArguments;
+  getArgFn: GetArgFn;
   negationCount: number;
   forceInnerNegations: number;
-  negationFallbackFn?: (expression: RenderedExpression) => RenderedExpression;
+  negationFallbackFn?: NegationFallbackFn;
 }
 
 export abstract class ExpressionWithArgs extends IndirectExpression {
@@ -367,7 +366,7 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   }
 
   protected getOptionalArg(name: string): ExpressionValue | undefined {
-    return this.config.args[name];
+    return this.config.getArgFn(name);
   }
 
   protected getArg(name: string): ExpressionValue {
@@ -451,17 +450,13 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       result.push(arg);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       let referencedTemplate = this.allTemplates.definitions.getDefinition(expression.path.name);
-      let config: RenderedTemplateConfig = {
-        args: {},
-        negationCount: 0,
-        forceInnerNegations: 0
-      };
+      let args = new Map<string, RenderedExpression>();
       for (let argument of expression.path.arguments) {
         if (argument.name) {
           let arg: ExpressionValue[] = [];
           this.translateExpression(argument.value, loopData, arg);
           if (arg.length === 1) {
-            config.args[argument.name] = arg[0];
+            args.set(argument.name, arg[0]);
           } else {
             throw new Error(`Error evaluating argument "${argument.name}"`);
           }
@@ -469,6 +464,11 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           throw new Error('Arguments must be named');
         }
       }
+      let config: RenderedTemplateConfig = {
+        getArgFn: (name: string) => args.get(name),
+        negationCount: 0,
+        forceInnerNegations: 0
+      };
       if (expression === this.notation && this.config.negationCount && this.negationsSatisfied === undefined) {
         config.negationCount = this.config.negationCount;
         config.negationFallbackFn = this.config.negationFallbackFn;

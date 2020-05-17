@@ -116,11 +116,11 @@ $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): 
  * @param body The main expression.
  * @param over An expression to be added above `body`.
  * @param under An expression to be added below `body`.
- * @param style Set to 'shallow' to reduce space between the expressions. This typically depends on the contents of `body`.
+ * @param style Set to 'shallow' to reduce space between the expressions. This typically depends on the contents of `body`. Currently it does not work correctly if both `over` and `under` are given.
  *
- * @example `$OverUnder(body = a, over = b)`
- * @example `$OverUnder(body = a, under = c)`
- * @example `$OverUnder(body = a, over = b, under = c)`
+ * @example `$OverUnder(body = a, over = b, style = 'shallow')`
+ * @example `$OverUnder(body = a, under = c, style = 'shallow')`
+ * @example `$OverUnder(body = A, over = b, under = c)`
  */
 $OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template {}
 

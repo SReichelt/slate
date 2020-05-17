@@ -99,6 +99,18 @@
   padding: 2pt;
 }
 
+.open-menu-example-table {
+  width: 100%;
+}
+
+.open-menu-example-row>.open-menu-main-cell {
+  width: 100%;
+}
+
+.open-menu-example-row>.open-menu-example-cell {
+  border-left: solid 1px var(--menu-separator-color);
+}
+
 .open-menu-item input {
   font-family: 'TeX', serif;
   font-size: initial;

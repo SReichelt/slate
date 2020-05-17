@@ -89,6 +89,7 @@ span.expr.interactive.link span.expr.interactive {
 .list.custom {
   display: table;
   padding-left: 0;
+  border-collapse: collapse;
 }
 
 .list.custom>* {
@@ -143,6 +144,7 @@ div.display-math {
   display: inline-table;
   vertical-align: middle;
   white-space: nowrap;
+  border-collapse: collapse;
 }
 
 .subsup-full {
@@ -210,6 +212,7 @@ div.display-math {
   text-align: center;
   white-space: nowrap;
   line-height: 100%;
+  border-collapse: collapse;
 }
 
 .overunder.noover {
@@ -267,6 +270,7 @@ div.display-math {
 
 .paren-round, .paren-square, .paren-curly, .paren-angle {
   display: inline-table;
+  border-collapse: collapse;
 }
 
 .paren-round-row, .paren-square-row, .paren-curly-row, .paren-angle-row {
@@ -344,6 +348,7 @@ div.display-math {
 .table {
   display: inline-table;
   vertical-align: middle;
+  border-collapse: collapse;
 }
 
 .table.inline, .table.single-case {
@@ -426,6 +431,7 @@ div.display-math {
   text-align: center;
   vertical-align: 50%;
   white-space: nowrap;
+  border-collapse: collapse;
 }
 
 .fraction-numerator-row, .fraction-denominator-row {
@@ -449,6 +455,7 @@ div.display-math {
   margin-top: 0.1em;
   margin-bottom: 0.2em;
   white-space: nowrap;
+  border-collapse: collapse;
 }
 
 .radical-row {

@@ -99,6 +99,7 @@ interface ExpressionMenuRowProps {
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
   onEnter?: (openSubMenu?: boolean) => void;
   onLeave?: () => void;
+  embedded?: boolean;
   hoveredExternally?: boolean;
   subMenuOpen?: boolean;
   interactionHandler?: ExpressionInteractionHandler;
@@ -206,7 +207,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
                 <td className={'open-menu-content-cell'} key="content">
                   <table className={'open-menu-content-cell-table'}>
                     <tbody>
-                      <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} subMenuOpen={false} interactionHandler={this.props.interactionHandler}/>
+                      <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} embedded={true} interactionHandler={this.props.interactionHandler}/>
                     </tbody>
                   </table>
                 </td>
@@ -246,6 +247,23 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
           if (icon) {
             title = [<span className={'open-menu-title-cell-icon'} key="icon">{icon}</span>, title];
           }
+        }
+        if (standardRow.examples && !this.props.embedded) {
+          let exampleCells = standardRow.examples.map((example: Notation.RenderedExpression, index: number) => (
+            <td className={'open-menu-example-cell'} key={index}>
+              <Expression expression={example} interactionHandler={this.props.interactionHandler}/>
+            </td>
+          ));
+          title = (
+            <table className={'open-menu-example-table'} key="title">
+              <tbody>
+                <tr className={'open-menu-example-row'}>
+                  <td className={'open-menu-main-cell'} key="title">{title}</td>
+                  {exampleCells}
+                </tr>
+              </tbody>
+            </table>
+          );
         }
         if (standardRow.info && this.titleNode) {
           let info = standardRow.info;
