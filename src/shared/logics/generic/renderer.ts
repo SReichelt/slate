@@ -1,12 +1,12 @@
 import * as Fmt from '../../format/format';
-import * as Display from '../../display/display';
+import * as Notation from '../../notation/notation';
 import * as Logic from '../logic';
-import { GenericEditHandler, SetDisplayFn } from './editHandler';
+import { GenericEditHandler, SetNotationFn } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 
 export interface RenderedVariable {
   param: Fmt.Parameter;
-  display: Display.RenderedExpression;
+  notation: Notation.RenderedExpression;
   canAutoFill: boolean;
 }
 
@@ -19,23 +19,23 @@ export abstract class GenericRenderer {
     this.variableNameEditHandler = editHandler;
   }
 
-  renderTemplate(templateName: string, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0): Display.RenderedExpression {
+  renderTemplate(templateName: string, args: Notation.RenderedTemplateArguments = {}, negationCount: number = 0): Notation.RenderedExpression {
     let template: Fmt.Definition;
     try {
       template = this.templates.definitions.getDefinition(templateName);
     } catch (error) {
-      return new Display.ErrorExpression(error.message);
+      return new Notation.ErrorExpression(error.message);
     }
     let config = this.getRenderedTemplateConfig(args, negationCount);
-    return new Display.TemplateInstanceExpression(template, config, this.templates);
+    return new Notation.TemplateInstanceExpression(template, config, this.templates);
   }
 
-  renderDisplayExpression(display: Fmt.Expression, args: Display.RenderedTemplateArguments = {}, negationCount: number = 0, forceInnerNegations: number = 0): Display.RenderedExpression {
+  renderNotationExpression(notation: Fmt.Expression, args: Notation.RenderedTemplateArguments = {}, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
     let config = this.getRenderedTemplateConfig(args, negationCount, forceInnerNegations);
-    return new Display.UserDefinedExpression(display, config, this.templates);
+    return new Notation.UserDefinedExpression(notation, config, this.templates);
   }
 
-  private getRenderedTemplateConfig(args: Display.RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Display.RenderedTemplateConfig {
+  private getRenderedTemplateConfig(args: Notation.RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
     return {
       args: args,
       negationCount: negationCount,
@@ -44,9 +44,9 @@ export abstract class GenericRenderer {
     };
   }
 
-  renderVariable(param: Fmt.Parameter, indices?: Display.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList): Display.RenderedExpression {
+  renderVariable(param: Fmt.Parameter, indices?: Notation.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList): Notation.RenderedExpression {
     let name = param.name;
-    let suffixes: Display.RenderedExpression[] | undefined = undefined;
+    let suffixes: Notation.RenderedExpression[] | undefined = undefined;
     let underscorePos = name.indexOf('_');
     if (underscorePos > 0) {
       let rest = name.substring(underscorePos + 1);
@@ -54,19 +54,19 @@ export abstract class GenericRenderer {
       suffixes = [];
       underscorePos = rest.indexOf('_');
       while (underscorePos > 0) {
-        suffixes.push(new Display.TextExpression(rest.substring(0, underscorePos)));
+        suffixes.push(new Notation.TextExpression(rest.substring(0, underscorePos)));
         rest = rest.substring(underscorePos + 1);
         underscorePos = rest.indexOf('_');
       }
-      suffixes.push(new Display.TextExpression(rest));
+      suffixes.push(new Notation.TextExpression(rest));
     }
-    let text = new Display.TextExpression(name);
+    let text = new Notation.TextExpression(name);
     if (isDefinition && this.variableNameEditHandler) {
       this.variableNameEditHandler.addVariableNameEditor(text, param, parameterList);
     }
-    let result: Display.RenderedExpression = text;
+    let result: Notation.RenderedExpression = text;
     if (suffixes) {
-      let subExpression = new Display.SubSupExpression(result);
+      let subExpression = new Notation.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': suffixes});
       result = subExpression;
     }
@@ -74,27 +74,27 @@ export abstract class GenericRenderer {
     if (isDummy) {
       result.styleClasses.push('dummy');
     }
-    result.semanticLinks = [new Display.SemanticLink(param, isDefinition)];
+    result.semanticLinks = [new Notation.SemanticLink(param, isDefinition)];
     if (indices) {
-      let subExpression = new Display.SubSupExpression(result);
+      let subExpression = new Notation.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': indices});
       result = subExpression;
     }
     return result;
   }
 
-  protected renderNegation(expression: Display.RenderedExpression): Display.RenderedExpression {
+  protected renderNegation(expression: Notation.RenderedExpression): Notation.RenderedExpression {
     return this.renderTemplate('Negation', {'operand': expression});
   }
 
-  protected renderInteger(value: Fmt.BN): Display.TextExpression {
-    let result = new Display.TextExpression(value.toString());
+  protected renderInteger(value: Fmt.BN): Notation.TextExpression {
+    let result = new Notation.TextExpression(value.toString());
     result.styleClasses = ['integer'];
     return result;
   }
 
-  protected addSemanticLink(expression: Display.RenderedExpression, linkedObject: Object): Display.SemanticLink {
-    let semanticLink = new Display.SemanticLink(linkedObject);
+  protected addSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object): Notation.SemanticLink {
+    let semanticLink = new Notation.SemanticLink(linkedObject);
     if (expression.semanticLinks) {
       expression.semanticLinks.unshift(semanticLink);
     } else {
@@ -103,29 +103,29 @@ export abstract class GenericRenderer {
     return semanticLink;
   }
 
-  protected setDefinitionSemanticLink(expression: Display.RenderedExpression, linkedObject: Object, display: Fmt.Expression[] | undefined, onSetDisplay: SetDisplayFn, onGetDefault: () => Display.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Display.SemanticLink {
-    let semanticLink = new Display.SemanticLink(linkedObject, true);
+  protected setDefinitionSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object, notation: Fmt.Expression[] | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Notation.SemanticLink {
+    let semanticLink = new Notation.SemanticLink(linkedObject, true);
     if (this.editHandler) {
-      this.editHandler.addDisplayMenu(semanticLink, display, onSetDisplay, onGetDefault, onGetVariables, isPredicate, this);
+      this.editHandler.addNotationMenu(semanticLink, notation, onSetNotation, onGetDefault, onGetVariables, isPredicate, this);
     }
     expression.semanticLinks = [semanticLink];
     return semanticLink;
   }
 
-  protected renderSubHeading(heading: string): Display.RenderedExpression {
-    let subHeading = new Display.TextExpression(`${heading}.`);
+  protected renderSubHeading(heading: string): Notation.RenderedExpression {
+    let subHeading = new Notation.TextExpression(`${heading}.`);
     subHeading.styleClasses = ['sub-heading'];
     return subHeading;
   }
 
-  protected addDefinitionRemarks(paragraphs: Display.RenderedExpression[]): void {
+  protected addDefinitionRemarks(paragraphs: Notation.RenderedExpression[]): void {
     let allKinds = ['remarks', 'references'];
     for (let kind of allKinds) {
       this.addDefinitionRemarksOfKind(paragraphs, allKinds, kind);
     }
   }
 
-  private addDefinitionRemarksOfKind(paragraphs: Display.RenderedExpression[], allKinds: string[], kind: string): void {
+  private addDefinitionRemarksOfKind(paragraphs: Notation.RenderedExpression[], allKinds: string[], kind: string): void {
     let definition = this.definition;
     let text = '';
     if (definition.documentation) {
@@ -140,7 +140,7 @@ export abstract class GenericRenderer {
     }
     if (text || this.editHandler) {
       paragraphs.push(this.renderSubHeading(kind.charAt(0).toUpperCase() + kind.slice(1)));
-      let markdown = new Display.MarkdownExpression(text);
+      let markdown = new Notation.MarkdownExpression(text);
       if (this.editHandler) {
         this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
       }

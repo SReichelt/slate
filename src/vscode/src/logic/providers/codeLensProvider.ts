@@ -3,8 +3,8 @@
 import * as vscode from 'vscode';
 import * as Fmt from '../../../../shared/format/format';
 import * as FmtLibrary from '../../../../shared/logics/library';
-import * as Display from '../../../../shared/display/display';
-import { renderAsText } from '../../../../shared/display/textOutput';
+import * as Notation from '../../../../shared/notation/notation';
+import { renderAsText } from '../../../../shared/notation/textOutput';
 import * as Logic from '../../../../shared/logics/logic';
 import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
 import { LibraryDocumentProvider } from '../data';
@@ -42,12 +42,12 @@ export class SlateCodeLensProvider implements vscode.CodeLensProvider {
                             let expression = item.then((definition: LibraryDefinition) => {
                                 let renderer = libraryDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
                                 try {
-                                    return renderer.renderDefinitionSummary() || new Display.EmptyExpression;
+                                    return renderer.renderDefinitionSummary() || new Notation.EmptyExpression;
                                 } catch (error) {
-                                    return new Display.ErrorExpression(error.message);
+                                    return new Notation.ErrorExpression(error.message);
                                 }
                             });
-                            return new Display.PromiseExpression(expression);
+                            return new Notation.PromiseExpression(expression);
                         }));
                     }
                 }

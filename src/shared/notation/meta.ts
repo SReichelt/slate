@@ -1,4 +1,4 @@
-// Generated from data/display/display.slate by generateMetaDeclarations.ts.
+// Generated from data/notation/notation.slate by generateMetaDeclarations.ts.
 /* eslint @typescript-eslint/class-name-casing: off */
 
 import * as Fmt from '../format/format';
@@ -6,16 +6,16 @@ import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 
 export class ObjectContents_Template extends Fmt.ObjectContents {
-  display?: Fmt.Expression;
+  notation?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.display = argumentList.getOptionalValue('display', 0);
+    this.notation = argumentList.getOptionalValue('notation', 0);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
-    if (this.display !== undefined) {
-      argumentList.add(this.display, 'display', true);
+    if (this.notation !== undefined) {
+      argumentList.add(this.notation, 'notation', true);
     }
   }
 
@@ -27,9 +27,9 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
-    if (this.display) {
-      result.display = this.display.substitute(fn, replacedParameters);
-      if (result.display !== this.display) {
+    if (this.notation) {
+      result.notation = this.notation.substitute(fn, replacedParameters);
+      if (result.notation !== this.notation) {
         changed = true;
       }
     }
@@ -40,8 +40,8 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.display || objectContents.display) {
-      if (!this.display || !objectContents.display || !this.display.isEquivalentTo(objectContents.display, fn, replacedParameters)) {
+    if (this.notation || objectContents.notation) {
+      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
         return false;
       }
     }
@@ -660,7 +660,7 @@ const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'fals
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {
-    super('display',
+    super('notation',
           new Fmt.StandardMetaDefinitionFactory(definitionTypes),
           new Fmt.StandardMetaDefinitionFactory(expressionTypes),
           new Fmt.StandardMetaDefinitionFactory(functions));
@@ -718,8 +718,8 @@ export class MetaModel extends Meta.MetaModel {
 export const metaModel = new MetaModel;
 
 export function getMetaModel(path?: Fmt.Path): MetaModel {
-  if (path && path.name !== 'display') {
-    throw new Error('File of type "display" expected');
+  if (path && path.name !== 'notation') {
+    throw new Error('File of type "notation" expected');
   }
   return metaModel;
 }

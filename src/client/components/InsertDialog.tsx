@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as Dialog from '../../shared/display/dialog';
+import * as Dialog from '../../shared/notation/dialog';
 import * as Logic from '../../shared/logics/logic';
 import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';

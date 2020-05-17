@@ -1,6 +1,6 @@
 import * as Fmt from '../format/format';
 import * as Logic from '../logics/logic';
-import * as Display from './display';
+import * as Notation from './notation';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo } from '../data/libraryDataProvider';
 import CachedPromise from '../data/cachedPromise';
 
@@ -52,7 +52,7 @@ export abstract class ExpressionDialogItem {
 }
 
 export class ExpressionDialogInfoItem extends ExpressionDialogItem {
-  info: Display.RenderedExpression;
+  info: Notation.RenderedExpression;
 }
 
 export class ExpressionDialogLinkItem extends ExpressionDialogItem {
@@ -64,13 +64,13 @@ export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
 }
 
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
-  title: string | Display.RenderedExpression;
-  onGetValue: () => Display.RenderedExpression;
+  title: string | Notation.RenderedExpression;
+  onGetValue: () => Notation.RenderedExpression;
 }
 
 export class ExpressionDialogListItem<T> extends ExpressionDialogItem {
   items: T[];
-  onRenderItem: (item: T) => Display.RenderedExpression;
+  onRenderItem: (item: T) => Notation.RenderedExpression;
 }
 
 export class ExpressionDialogSelectionItem<T> extends ExpressionDialogListItem<T> {

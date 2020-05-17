@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Fmt from '../../shared/format/format';
 import * as FmtReader from '../../shared/format/read';
 import * as Ctx from '../../shared/format/context';
-import * as Display from '../../shared/display/display';
+import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -44,25 +44,25 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
     }
   }
 
-  hoverChanged(hover: Display.SemanticLink[]): void {
+  hoverChanged(hover: Notation.SemanticLink[]): void {
     let objects = hover.map((semanticLink) => semanticLink.linkedObject);
     for (let handler of this.hoverChangeListeners) {
       handler(objects);
     }
   }
 
-  getURI(semanticLink: Display.SemanticLink): string | undefined {
+  getURI(semanticLink: Notation.SemanticLink): string | undefined {
     return undefined;
   }
 
-  linkClicked(semanticLink: Display.SemanticLink): void {
+  linkClicked(semanticLink: Notation.SemanticLink): void {
   }
 
-  hasToolTip(semanticLink: Display.SemanticLink): boolean {
+  hasToolTip(semanticLink: Notation.SemanticLink): boolean {
     return false;
   }
 
-  getToolTipContents(semanticLink: Display.SemanticLink): React.ReactNode {
+  getToolTipContents(semanticLink: Notation.SemanticLink): React.ReactNode {
     return undefined;
   }
 
@@ -112,7 +112,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     super.expressionChanged(editorUpdateRequired);
   }
 
-  getURI(semanticLink: Display.SemanticLink): string | undefined {
+  getURI(semanticLink: Notation.SemanticLink): string | undefined {
     let path = this.getPath(semanticLink);
     if (path) {
       return this.libraryDataProvider.pathToURI(path);
@@ -121,7 +121,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     }
   }
 
-  linkClicked(semanticLink: Display.SemanticLink): void {
+  linkClicked(semanticLink: Notation.SemanticLink): void {
     if (this.onLinkClicked) {
       let path = this.getPath(semanticLink);
       if (path) {
@@ -130,11 +130,11 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     }
   }
 
-  hasToolTip(semanticLink: Display.SemanticLink): boolean {
+  hasToolTip(semanticLink: Notation.SemanticLink): boolean {
     return semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression;
   }
 
-  getToolTipContents(semanticLink: Display.SemanticLink): React.ReactNode {
+  getToolTipContents(semanticLink: Notation.SemanticLink): React.ReactNode {
     let path = this.getPath(semanticLink);
     if (path) {
       let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
@@ -156,7 +156,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     }
   }
 
-  private getPath(semanticLink: Display.SemanticLink): Fmt.Path | undefined {
+  private getPath(semanticLink: Notation.SemanticLink): Fmt.Path | undefined {
     if (semanticLink.isMathematical && semanticLink.linkedObject instanceof Fmt.DefinitionRefExpression) {
       let path = semanticLink.linkedObject.path;
       while (path.parentPath instanceof Fmt.Path) {
@@ -188,7 +188,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
           let renderer = logic.getDisplay().getDefinitionRenderer(definition.definition, this.libraryDataProvider, this.templates, LibraryItemInteractionHandler.codeRenderedDefinitionOptions);
           return renderer.renderExpression(expression);
         });
-        let renderedExpression = new Display.PromiseExpression(renderedExpressionPromise);
+        let renderedExpression = new Notation.PromiseExpression(renderedExpressionPromise);
         return <Expression expression={renderedExpression} interactionHandler={this}/>;
       } catch (error) {
         return <span className="error">Error: {error.message}</span>;

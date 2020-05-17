@@ -8,7 +8,7 @@ import config from '../utils/config';
 import * as Fmt from '../../shared/format/format';
 import * as FmtHLM from '../../shared/logics/hlm/meta';
 import * as Logic from '../../shared/logics/logic';
-import * as Menu from '../../shared/display/menu';
+import * as Menu from '../../shared/notation/menu';
 
 import StartPage from './StartPage';
 import Button from '../components/Button';

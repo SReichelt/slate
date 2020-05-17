@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './StartPage.css';
 import * as Fmt from '../../shared/format/format';
-import * as Display from '../../shared/display/display';
+import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
@@ -90,7 +90,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
     let definitionRenderer = new HLMRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
-  let expression = new Display.PromiseExpression(expressionPromise);
+  let expression = new Notation.PromiseExpression(expressionPromise);
   let interactionHandler = props.createInteractionHandler(libraryDataProvider);
   let result = <Expression expression={expression} interactionHandler={interactionHandler}/>;
   return wrapExample(result, examplePath, props);

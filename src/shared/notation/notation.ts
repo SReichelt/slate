@@ -1,5 +1,5 @@
 import * as Fmt from '../format/format';
-import * as FmtDisplay from './meta';
+import * as FmtNotation from './meta';
 import * as Menu from './menu';
 import CachedPromise from '../data/cachedPromise';
 
@@ -409,13 +409,13 @@ interface LoopData {
 }
 
 export class UserDefinedExpression extends ExpressionWithArgs {
-  constructor(private display: Fmt.Expression, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
+  constructor(private notation: Fmt.Expression, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
     super(config);
   }
 
   protected doResolveExpressionWithArgs(): RenderedExpression {
     let result: ExpressionValue[] = [];
-    this.translateExpression(this.display, undefined, result);
+    this.translateExpression(this.notation, undefined, result);
     let row = this.toRenderedExpressionList(result);
     if (row.length === 1) {
       return row[0];
@@ -469,22 +469,22 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           throw new Error('Arguments must be named');
         }
       }
-      if (expression === this.display && this.config.negationCount && this.negationsSatisfied === undefined) {
+      if (expression === this.notation && this.config.negationCount && this.negationsSatisfied === undefined) {
         config.negationCount = this.config.negationCount;
         config.negationFallbackFn = this.config.negationFallbackFn;
         this.negationsSatisfied = this.config.negationCount;
       }
       result.push(new TemplateInstanceExpression(referencedTemplate, config, this.allTemplates));
     } else if (expression instanceof Fmt.MetaRefExpression) {
-      if (expression instanceof FmtDisplay.MetaRefExpression_true) {
+      if (expression instanceof FmtNotation.MetaRefExpression_true) {
         result.push(true);
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_false) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_false) {
         result.push(false);
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_not) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_not) {
         let arg: ExpressionValue[] = [];
         this.translateExpression(expression.condition, loopData, arg);
         result.push(!arg.some((value) => value));
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_opt) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_opt) {
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
         let arg = this.getOptionalArg(param);
@@ -499,7 +499,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
             this.translateExpression(arg, undefined, result);
           }
         }
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_add) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_add) {
         let value = 0;
         for (let argument of expression.items) {
           let arg: ExpressionValue[] = [];
@@ -509,7 +509,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           }
         }
         result.push(value);
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_for) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_for) {
         let part: ExpressionValue[] = loopData ? result : [];
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
@@ -554,11 +554,11 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         if (!loopData) {
           result.push(part);
         }
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_first) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_first) {
         result.push(loopData && loopData.firstIteration);
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_last) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_last) {
         result.push(loopData && loopData.lastIteration);
-      } else if (expression instanceof FmtDisplay.MetaRefExpression_neg) {
+      } else if (expression instanceof FmtNotation.MetaRefExpression_neg) {
         let index = 0;
         if (this.forcedInnerNegations < this.config.forceInnerNegations) {
           this.forcedInnerNegations++;
@@ -667,10 +667,10 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       expression = new RadicalExpression(this.getExpressionArg('radicand'), this.getOptionalExpressionArg('degree'));
       break;
     default:
-      if (this.template.contents instanceof FmtDisplay.ObjectContents_Template) {
-        let display = this.template.contents.display;
-        if (display) {
-          expression = new UserDefinedExpression(display, this.config, this.allTemplates);
+      if (this.template.contents instanceof FmtNotation.ObjectContents_Template) {
+        let notation = this.template.contents.notation;
+        if (notation) {
+          expression = new UserDefinedExpression(notation, this.config, this.allTemplates);
           this.negationsSatisfied = this.config.negationCount;
         }
       }

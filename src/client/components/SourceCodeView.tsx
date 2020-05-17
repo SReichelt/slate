@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as FmtWriter from '../../shared/format/write';
-import * as SourceCodeDisplay from '../../shared/display/sourceCodeDisplay';
+import * as SourceCodeDisplay from '../../shared/notation/sourceCodeDisplay';
 import Expression from './Expression';
 import { LibraryItemBase } from './LibraryItem';
 

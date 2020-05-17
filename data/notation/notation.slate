@@ -1,6 +1,6 @@
 %../format/meta%
 
-$display: %MetaModel {
+$notation: %MetaModel {
   definitionTypes = [$Template],
   expressionTypes = [$Bool, $Int, $String, $Expr],
   functions = [$true, $false, $not, $opt, $add, $for, $first, $last, $neg, %Any],
@@ -9,7 +9,7 @@ $display: %MetaModel {
 
 $Template: %DefinitionType($Expr) {
   members = #(
-    display?: $Expr
+    notation?: $Expr
   )
 }
 

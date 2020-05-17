@@ -19,9 +19,9 @@ import renderPromise from './components/PromiseHelper';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
-import * as FmtDisplay from '../shared/display/meta';
+import * as FmtNotation from '../shared/notation/meta';
 import * as FmtLibrary from '../shared/logics/library';
-import * as Dialog from '../shared/display/dialog';
+import * as Dialog from '../shared/notation/dialog';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/data/embedding';
@@ -284,9 +284,9 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    let templateFile = this.fileAccessor.openFile('display/templates.slate', false);
+    let templateFile = this.fileAccessor.openFile('notation/templates.slate', false);
     let setTemplates = (contents: string) => {
-      let templates = FmtReader.readString(contents, templateFile.fileName, FmtDisplay.getMetaModel);
+      let templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
       this.setState({templates: templates});
       if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
         this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});

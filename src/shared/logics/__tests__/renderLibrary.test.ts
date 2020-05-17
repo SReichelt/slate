@@ -3,10 +3,10 @@ import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, formatItemNumb
 import * as Fmt from '../../format/format';
 import * as FmtReader from '../../format/read';
 import * as FmtLibrary from '../library';
-import * as FmtDisplay from '../../display/meta';
+import * as FmtNotation from '../../notation/meta';
 import * as Logic from '../logic';
 import * as Logics from '../logics';
-import { renderAsText } from '../../display/textOutput';
+import { renderAsText } from '../../notation/textOutput';
 import CachedPromise from '../../data/cachedPromise';
 
 async function checkSection(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, sectionItemInfo: LibraryItemInfo) {
@@ -56,9 +56,9 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
 test('render hlm library', async () => {
   jest.setTimeout(10000);
   let fileAccessor = new PhysicalFileAccessor();
-  let templateFileReference = fileAccessor.openFile('data/display/templates.slate', false);
+  let templateFileReference = fileAccessor.openFile('data/notation/templates.slate', false);
   let templateFileContents = await templateFileReference.read();
-  let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtDisplay.getMetaModel);
+  let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
   let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', defaultLibraryDataProviderConfig, 'Library');
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });

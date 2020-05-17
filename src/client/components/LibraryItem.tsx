@@ -50,9 +50,9 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
   private createRenderer(props: LibraryItemProps): Logic.LogicRenderer | undefined {
     if (props.libraryDataProvider && props.templates) {
       let logic = props.libraryDataProvider.logic;
-      let logicDisplay = logic.getDisplay();
+      let logicNotation = logic.getDisplay();
       let editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
-      return logicDisplay.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing, props.mruList);
+      return logicNotation.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing, props.mruList);
     } else {
       return undefined;
     }

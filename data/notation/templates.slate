@@ -1,4 +1,4 @@
-%display%
+%notation%
 
 /**
  * Applies a special style class to a rendered expression.
@@ -149,7 +149,7 @@ $Radical(radicand: %Expr, degree?: %Expr): %Template {}
  * The colon to use for ":=" and ":⇔". Used internally by other templates.
  */
 $DefinitionColon: %Template {
-  display = $Style(
+  notation = $Style(
     body = ':',
     styleClass = 'def-colon'
   )
@@ -160,7 +160,7 @@ $DefinitionColon: %Template {
  */
 $BottomEllipsis: %Template {
   /* Not using unicode character '…' because it has too much space in TeX font. */
-  display = '...'
+  notation = '...'
 }
 
 /**
@@ -168,7 +168,7 @@ $BottomEllipsis: %Template {
  */
 $MiddleEllipsis: %Template {
   /* Not using unicode character '⋯' because it has too much space in TeX font. */
-  display = '⋅⋅⋅'
+  notation = '⋅⋅⋅'
 }
 
 /**
@@ -180,7 +180,7 @@ $MiddleEllipsis: %Template {
  * @example `$Group(items = [a, b, c])`
  */
 $Group(items: %Expr[], separator: %String = ', '): %Template {
-  display = %for(
+  notation = %for(
     param = items,
     dimension = 0,
     item = items,
@@ -199,7 +199,7 @@ $Group(items: %Expr[], separator: %String = ', '): %Template {
  * @example `$Tuple(items = [a, b, c], style = '[]')`
  */
 $Tuple(items: %Expr[], separator: %String = ', ', style: %String = '()'): %Template {
-  display = $Parens(
+  notation = $Parens(
     body = $Group(
       items = items,
       separator = separator
@@ -219,7 +219,7 @@ $Tuple(items: %Expr[], separator: %String = ', ', style: %String = '()'): %Tem
  * @example `$VerticalTuple(items = [a, b, c], style = '[]')`
  */
 $VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
-  display = $Style(
+  notation = $Style(
     body = $Parens(
       body = $Table(
         items = %for(items, 0, [[items]]),
@@ -239,7 +239,7 @@ $VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
  * @example `$Matrix(items = [[a, b], [c, d]])`
  */
 $Matrix(items: %Expr[,]): %Template {
-  display = $Parens(
+  notation = $Parens(
     body = $Table(
       items = items,
       style = 'matrix'
@@ -256,7 +256,7 @@ $Matrix(items: %Expr[,]): %Template {
  * @example `$Vector(items = [a, b])`
  */
 $Vector(items: %Expr[]): %Template {
-  display = $Matrix(
+  notation = $Matrix(
     items = %for(items, 0, [[items]])
   )
 }
@@ -273,7 +273,7 @@ $Vector(items: %Expr[]): %Template {
  * @example `$Function(function = f, arguments = [a, b, c])`
  */
 $Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLevel: %Int = 2): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [
       $InnerParens(
         body = function,
@@ -298,7 +298,7 @@ $Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLe
  * @example `$ConstructorName(name = 'construct')`
  */
 $ConstructorName(name: %String): %Template {
-  display = $Style(
+  notation = $Style(
     body = name,
     styleClass = 'ctor'
   )
@@ -313,7 +313,7 @@ $ConstructorName(name: %String): %Template {
  * @example `$Constructor(name = 'construct', arguments = [a, b, c])`
  */
 $Constructor(name: %String, arguments: %Expr[]): %Template {
-  display = $Function(
+  notation = $Function(
     function = $ConstructorName(
       name = name
     ),
@@ -333,7 +333,7 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
  * @example `$Operator(symbol = ∗, operands = [a, b])`
  */
 $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = %for(
       param = operands,
       dimension = 0,
@@ -357,7 +357,7 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
 }
 
 $UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 3, maxParenLevel?: %Int): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [$InnerParens(
       body = operand,
       maxLevel = maxParenLevel,
@@ -369,7 +369,7 @@ $UnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel
 }
 
 $PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [symbol, space, $InnerParens(
       body = operand,
       maxLevel = maxParenLevel
@@ -379,7 +379,7 @@ $PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minPare
 }
 
 $Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -1): %Template {
-  display = $Operator(
+  notation = $Operator(
     symbol = symbol,
     operands = operands,
     space = space,
@@ -389,7 +389,7 @@ $Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: 
 }
 
 $Verb(symbol: %Expr, operand: %Expr, parenLevel: %Int = -1): %Template {
-  display = $UnaryOperator(
+  notation = $UnaryOperator(
     symbol = symbol,
     operand = operand,
     space = ' ',
@@ -399,7 +399,7 @@ $Verb(symbol: %Expr, operand: %Expr, parenLevel: %Int = -1): %Template {
 }
 
 $TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = symbol,
     operands = operands,
     space = ' ',
@@ -408,7 +408,7 @@ $TextualRelation(symbol: %Expr, operands: %Expr[], parenLevel: %Int = -1): %Temp
 }
 
 $BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLevel: %Int = -2): %Template {
-  display = $Operator(
+  notation = $Operator(
     symbol = symbol,
     operands = operands,
     space = space,
@@ -418,7 +418,7 @@ $BooleanOperator(symbol: %Expr, operands: %Expr[], space: %String = ' ', parenLe
 }
 
 $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', parenLevel: %Int = -2): %Template {
-  display = $PrefixUnaryOperator(
+  notation = $PrefixUnaryOperator(
     symbol = symbol,
     operand = operand,
     space = space,
@@ -428,7 +428,7 @@ $UnaryBooleanOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', paren
 }
 
 $OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = $Style(
       body = [
         $OverUnder(
@@ -450,7 +450,7 @@ $OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, s
 }
 
 $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 3): %Template {
-  display = $OverUnderOperator(
+  notation = $OverUnderOperator(
     symbol = $Style(
       body = symbol,
       styleClass = 'largesym'
@@ -465,7 +465,7 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
 }
 
 $FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
-  display = $Operator(
+  notation = $Operator(
     symbol = symbol,
     operands = operands,
     space = space,
@@ -475,7 +475,7 @@ $FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = '�
 }
 
 $Quantification(symbol: %Expr, parameters: %Expr, formula: %Expr, parenLevel: %Int = -2): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [symbol, ' ', parameters, ' : ', $InnerParens(
       body = formula,
       maxLevel = parenLevel,
@@ -487,7 +487,7 @@ $Quantification(symbol: %Expr, parameters: %Expr, formula: %Expr, parenLevel: %I
 }
 
 $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [symbol, ' ', parameters],
     minLevel = parenLevel,
     left = %false
@@ -503,14 +503,14 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
  * @param article An article to be prepended to `b`. Used by `$NounProperty` which is defined as a special case of `$Property`.
  */
 $Property(operand: %Expr, property: %Expr, article?: %String): %Template {
-  display = $Verb(
+  notation = $Verb(
     symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property],
     operand = operand
   )
 }
 
 $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, preposition: %String): %Template {
-  display = $TextualRelation(
+  notation = $TextualRelation(
     symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property, ' ', preposition],
     operands = operands
   )
@@ -525,7 +525,7 @@ $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, prepo
  * @param article Either "a" or "an", depending on whether the noun starts with a vowel.
  */
 $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
-  display = $Property(
+  notation = $Property(
     operand = operand,
     property = singular,
     article = article
@@ -533,7 +533,7 @@ $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String =
 }
 
 $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a', preposition: %String = 'of'): %Template {
-  display = $RelationalProperty(
+  notation = $RelationalProperty(
     operands = operands,
     property = singular,
     article = article,
@@ -542,7 +542,7 @@ $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %Strin
 }
 
 $Structure(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
-  display = $Verb(
+  notation = $Verb(
     symbol = [%neg('forms', 'does not form'), ' ', article, ' ', singular],
     operand = $Tuple(
       items = operands
@@ -551,14 +551,14 @@ $Structure(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String =
 }
 
 $Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
-  display = $Verb(
+  notation = $Verb(
     symbol = [%neg('has', 'does not have'), ' ', article, ' ', singular],
     operand = operand
   )
 }
 
 $MultiProperty(operands: %Expr[], property: %Expr): %Template {
-  display = $Verb(
+  notation = $Verb(
     symbol = [%neg('are', 'are not'), ' ', property],
     operand = [
       %for(
@@ -572,7 +572,7 @@ $MultiProperty(operands: %Expr[], property: %Expr): %Template {
 }
 
 $DependentWord(word: %Expr, argument: %Expr): %Template {
-  display = [
+  notation = [
     $InnerParens(
       body = argument,
       maxLevel = 2
@@ -583,7 +583,7 @@ $DependentWord(word: %Expr, argument: %Expr): %Template {
 }
 
 $SubsetParameter(subset: %Expr, superset: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = '⊆',
     operands = [subset, superset],
     space = ' '
@@ -591,7 +591,7 @@ $SubsetParameter(subset: %Expr, superset: %Expr): %Template {
 }
 
 $ElementParameter(element: %Expr, set: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = '∈',
     operands = [element, set],
     space = ' '
@@ -599,7 +599,7 @@ $ElementParameter(element: %Expr, set: %Expr): %Template {
 }
 
 $VariableDefinition(left: %Expr, right: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = [$DefinitionColon, '='],
     operands = [left, right],
     space = ' '
@@ -607,34 +607,34 @@ $VariableDefinition(left: %Expr, right: %Expr): %Template {
 }
 
 $MultiEqualityRelation(operands: %Expr[]): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = %neg('=', '≠'),
     operands = operands
   )
 }
 
 $EqualityRelation(left: %Expr, right: %Expr): %Template {
-  display = $MultiEqualityRelation(
+  notation = $MultiEqualityRelation(
     operands = [left, right]
   )
 }
 
 $EqualityDefinition(left: %Expr, right: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = [$DefinitionColon, '='],
     operands = [left, right]
   )
 }
 
 $ConstructionDefinition(left: %Expr, right: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = [$DefinitionColon, '=', $DefinitionColon],
     operands = [left, right]
   )
 }
 
 $MultiEquivalenceRelation(operands: %Expr[]): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = %neg('⇔', '⇎'),
     operands = operands,
     space = '  ',
@@ -643,13 +643,13 @@ $MultiEquivalenceRelation(operands: %Expr[]): %Template {
 }
 
 $EquivalenceRelation(left: %Expr, right: %Expr): %Template {
-  display = $MultiEquivalenceRelation(
+  notation = $MultiEquivalenceRelation(
     operands = [left, right]
   )
 }
 
 $EquivalenceDefinition(left: %Expr, right: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = [$DefinitionColon, '⇔'],
     operands = [left, right],
     space = '  ',
@@ -658,7 +658,7 @@ $EquivalenceDefinition(left: %Expr, right: %Expr): %Template {
 }
 
 $ImplicationRelation(left: %Expr, right: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = %neg('⇒', '⇏'),
     operands = [left, right],
     space = '  ',
@@ -667,28 +667,28 @@ $ImplicationRelation(left: %Expr, right: %Expr): %Template {
 }
 
 $ElementRelation(element: %Expr, set: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = %neg('∈', '∉'),
     operands = [element, set]
   )
 }
 
 $SubsetRelation(subset: %Expr, superset: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = %neg('⊆', '⊈'),
     operands = [subset, superset]
   )
 }
 
 $EmbeddingDefinition(subset: %Expr, superset: %Expr): %Template {
-  display = $Relation(
+  notation = $Relation(
     symbol = ['⊆', $DefinitionColon],
     operands = [subset, superset]
   )
 }
 
 $FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLevel: %Int = 0): %Template {
-  display = $Operator(
+  notation = $Operator(
     symbol = $DefinitionColon,
     operands = [function, body],
     space = space,
@@ -698,7 +698,7 @@ $FunctionPrefix(function: %Expr, body: %Expr, space: %String = ' ', minParenLe
 }
 
 $FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 0): %Template {
-  display = $FunctionPrefix(
+  notation = $FunctionPrefix(
     function = function,
     body = $FunctionOperator(
       symbol = symbol,
@@ -712,18 +712,18 @@ $FunctionDefinition(function: %Expr, symbol: %Expr = '→', operands: %Expr[], s
 }
 
 $Binding(variable: %Expr, value: %Expr): %Template {
-  display = [variable, '↦', value]
+  notation = [variable, '↦', value]
 }
 
 $Set(body: %Expr): %Template {
-  display = $Parens(
+  notation = $Parens(
     body = body,
     style = '{}'
   )
 }
 
 $Enumeration(items: %Expr[]): %Template {
-  display = $Set(
+  notation = $Set(
     body = $Group(
       items = items
     )
@@ -731,13 +731,13 @@ $Enumeration(items: %Expr[]): %Template {
 }
 
 $SetBuilder(element: %Expr, constraint: %Expr): %Template {
-  display = $Set(
+  notation = $Set(
     body = [element, ' : ', constraint]
   )
 }
 
 $Construction(constructors: %Expr[,]): %Template {
-  display = $Set(
+  notation = $Set(
     body = $Table(
       items = constructors,
       style = 'construction'
@@ -746,36 +746,36 @@ $Construction(constructors: %Expr[,]): %Template {
 }
 
 $Negation(operand: %Expr): %Template {
-  display = $UnaryBooleanOperator(
+  notation = $UnaryBooleanOperator(
     symbol = 'not',
     operand = operand
   )
 }
 
 $True: %Template {
-  display = 'true'
+  notation = 'true'
 }
 
 $False: %Template {
-  display = 'false'
+  notation = 'false'
 }
 
 $Conjunction(operands: %Expr[]): %Template {
-  display = $BooleanOperator(
+  notation = $BooleanOperator(
     symbol = 'and',
     operands = operands
   )
 }
 
 $Disjunction(operands: %Expr[]): %Template {
-  display = $BooleanOperator(
+  notation = $BooleanOperator(
     symbol = 'or',
     operands = operands
   )
 }
 
 $UniversalQuantification(parameters: %Expr, formula: %Expr): %Template {
-  display = $Quantification(
+  notation = $Quantification(
     symbol = '∀',
     parameters = parameters,
     formula = formula
@@ -783,7 +783,7 @@ $UniversalQuantification(parameters: %Expr, formula: %Expr): %Template {
 }
 
 $ExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
-  display = $Quantification(
+  notation = $Quantification(
     symbol = %neg('∃', '∄'),
     parameters = parameters,
     formula = formula
@@ -791,14 +791,14 @@ $ExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
 }
 
 $PlainExistentialQuantification(parameters: %Expr): %Template {
-  display = $PlainQuantification(
+  notation = $PlainQuantification(
     symbol = %neg('∃', '∄'),
     parameters = parameters
   )
 }
 
 $UniqueExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
-  display = $Quantification(
+  notation = $Quantification(
     symbol = '∃!',
     parameters = parameters,
     formula = formula
@@ -806,14 +806,14 @@ $UniqueExistentialQuantification(parameters: %Expr, formula: %Expr): %Template {
 }
 
 $PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
-  display = $PlainQuantification(
+  notation = $PlainQuantification(
     symbol = '∃!',
     parameters = parameters
   )
 }
 
 $SingleCase(case: %Expr[]): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = $Table(
       items = [case],
       style = 'single-case'
@@ -824,7 +824,7 @@ $SingleCase(case: %Expr[]): %Template {
 }
 
 $Cases(cases: %Expr[,]): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = $Parens(
       body = $Table(
         items = cases,
@@ -838,7 +838,7 @@ $Cases(cases: %Expr[,]): %Template {
 }
 
 $BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
-  display = $Parens(
+  notation = $Parens(
     body = $Table(
       items = [[top], [bottom]],
       style = 'binom'
@@ -848,7 +848,7 @@ $BinomialCoefficient(top: %Expr, bottom: %Expr): %Template {
 }
 
 $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
-  display = $SubSup(
+  notation = $SubSup(
     body = set,
     sub = $PrefixUnaryOperator(
       symbol = symbol,
@@ -858,7 +858,7 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
 }
 
 $DependentProofStep(result: %Expr, source?: %Expr): %Template {
-  display = [
+  notation = [
     %opt(
       source,
       $OverUnder(
@@ -874,7 +874,7 @@ $DependentProofStep(result: %Expr, source?: %Expr): %Template {
 }
 
 $SourceProofStep(result: %Expr, source: %Expr): %Template {
-  display = [
+  notation = [
     source,
     ' ⇒ ',
     result
@@ -882,7 +882,7 @@ $SourceProofStep(result: %Expr, source: %Expr): %Template {
 }
 
 $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [
       'λ',
       $InnerParens(
@@ -900,7 +900,7 @@ $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
 }
 
 $LambdaApplication(function: %Expr, argument: %Expr): %Template {
-  display = $OuterParens(
+  notation = $OuterParens(
     body = [
       $InnerParens(
         body = function,
@@ -917,7 +917,7 @@ $LambdaApplication(function: %Expr, argument: %Expr): %Template {
 }
 
 $LambdaSubstitution(term: %Expr, variable: %Expr, replacement: %Expr): %Template {
-  display = $Function(
+  notation = $Function(
     function = term,
     arguments = [$EqualityDefinition(
       left = variable,

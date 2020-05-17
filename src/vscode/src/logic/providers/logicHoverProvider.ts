@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as Fmt from '../../../../shared/format/format';
-import { renderAsText } from '../../../../shared/display/textOutput';
+import { renderAsText } from '../../../../shared/notation/textOutput';
 import * as Logic from '../../../../shared/logics/logic';
 import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
 import { HoverEvent } from '../../events';

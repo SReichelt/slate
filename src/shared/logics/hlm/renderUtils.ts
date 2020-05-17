@@ -1,6 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
-import * as FmtDisplay from '../../display/meta';
+import * as FmtNotation from '../../notation/meta';
 import { HLMUtils } from './utils';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -106,25 +106,25 @@ export class HLMRenderUtils {
       if (constraint instanceof Fmt.DefinitionRefExpression
           && definition
           && definition.contents instanceof FmtHLM.ObjectContents_Definition
-          && definition.contents.display
-          && definition.contents.display.length) {
-        let display = definition.contents.display[0];
-        if (display instanceof Fmt.DefinitionRefExpression) {
-          if (display.path.name === 'Property'
-              || display.path.name === 'NounProperty'
-              || display.path.name === 'Feature') {
-            let operand = display.path.arguments.getValue('operand');
+          && definition.contents.notation
+          && definition.contents.notation.length) {
+        let notation = definition.contents.notation[0];
+        if (notation instanceof Fmt.DefinitionRefExpression) {
+          if (notation.path.name === 'Property'
+              || notation.path.name === 'NounProperty'
+              || notation.path.name === 'Feature') {
+            let operand = notation.path.arguments.getValue('operand');
             if (operand instanceof Fmt.VariableRefExpression) {
               let operandArg = constraint.path.arguments.getValue(operand.variable.name);
               if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
                 let operandArgValue = operandArg.arguments[0].value;
                 if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
                   return {
-                    property: this.getDisplayArgument(display, 'property', negationCount),
-                    singular: this.getDisplayArgument(display, 'singular', negationCount),
-                    plural: this.getDisplayArgument(display, 'plural', negationCount),
-                    article: this.getDisplayArgument(display, 'article', negationCount),
-                    isFeature: display.path.name === 'Feature',
+                    property: this.getNotationArgument(notation, 'property', negationCount),
+                    singular: this.getNotationArgument(notation, 'singular', negationCount),
+                    plural: this.getNotationArgument(notation, 'plural', negationCount),
+                    article: this.getNotationArgument(notation, 'article', negationCount),
+                    isFeature: notation.path.name === 'Feature',
                     definitionRef: constraint,
                     extracted: true
                   };
@@ -138,9 +138,9 @@ export class HLMRenderUtils {
     return undefined;
   }
 
-  private getDisplayArgument(display: Fmt.DefinitionRefExpression, paramName: string, negationCount: number): string | undefined {
-    let value = display.path.arguments.getOptionalValue(paramName);
-    if (value instanceof FmtDisplay.MetaRefExpression_neg) {
+  private getNotationArgument(notation: Fmt.DefinitionRefExpression, paramName: string, negationCount: number): string | undefined {
+    let value = notation.path.arguments.getOptionalValue(paramName);
+    if (value instanceof FmtNotation.MetaRefExpression_neg) {
       if (negationCount < value.items.length) {
         value = value.items[negationCount];
         negationCount = 0;

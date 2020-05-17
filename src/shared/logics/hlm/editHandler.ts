@@ -2,9 +2,9 @@ import * as Fmt from '../../format/format';
 import * as Edit from '../../format/edit';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
-import * as Display from '../../display/display';
-import * as Menu from '../../display/menu';
-import * as Dialog from '../../display/dialog';
+import * as Notation from '../../notation/notation';
+import * as Menu from '../../notation/menu';
+import * as Dialog from '../../notation/dialog';
 import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
@@ -12,7 +12,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
 import { HLMDefinitionChecker } from './checker';
-import { findBestMatch, reorderArguments, collectVariableRefs } from '../generic/displayMatching';
+import { findBestMatch, reorderArguments, collectVariableRefs } from '../generic/notationMatching';
 import CachedPromise from '../../data/cachedPromise';
 
 export interface ParameterSelection {
@@ -103,7 +103,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.editAnalysis.expressionEditInfo.get(expression) === undefined;
   }
 
-  addTypeMenu(semanticLink: Display.SemanticLink, onRenderType: RenderTypeFn, info: LibraryItemInfo): void {
+  addTypeMenu(semanticLink: Notation.SemanticLink, onRenderType: RenderTypeFn, info: LibraryItemInfo): void {
     semanticLink.onMenuOpened = () => {
       let rows = [this.getTypeRow(undefined, onRenderType, info)];
       let contents = this.definition.contents;
@@ -126,7 +126,7 @@ export class HLMEditHandler extends GenericEditHandler {
     semanticLink.alwaysShowMenu = true;
   }
 
-  addParameterMenu(semanticLink: Display.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
+  addParameterMenu(semanticLink: Notation.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
@@ -202,14 +202,14 @@ export class HLMEditHandler extends GenericEditHandler {
     return paramClone;
   }
 
-  addSetTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
+  addSetTermMenu(semanticLink: Notation.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
       this.addSetTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
   }
 
-  private addSetTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
+  private addSetTermMenuWithEditInfo(semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
@@ -252,7 +252,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
           let renderedExpression = onRenderTerm(term);
           if (!renderedExpression.semanticLinks) {
-            renderedExpression.semanticLinks = [new Display.SemanticLink(term)];
+            renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
           }
           return renderedExpression;
         };
@@ -263,14 +263,14 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
-  addElementTermMenu(semanticLink: Display.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  addElementTermMenu(semanticLink: Notation.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
       this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
     }
   }
 
-  private addElementTermMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  private addElementTermMenuWithEditInfo(semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
@@ -305,7 +305,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
           let renderedExpression = onRenderTerm(term);
           if (!renderedExpression.semanticLinks) {
-            renderedExpression.semanticLinks = [new Display.SemanticLink(term)];
+            renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
           }
           return renderedExpression;
         };
@@ -316,14 +316,14 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
-  addFormulaMenu(semanticLink: Display.SemanticLink, formula: Fmt.Expression, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
+  addFormulaMenu(semanticLink: Notation.SemanticLink, formula: Fmt.Expression, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(formula);
     if (expressionEditInfo) {
       this.addFormulaMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderFormula, formulaSelection);
     }
   }
 
-  private addFormulaMenuWithEditInfo(semanticLink: Display.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
+  private addFormulaMenuWithEditInfo(semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
@@ -378,7 +378,7 @@ export class HLMEditHandler extends GenericEditHandler {
             while (formula instanceof FmtHLM.MetaRefExpression_not) {
               formula = formula.formula;
             }
-            renderedExpression.semanticLinks = [new Display.SemanticLink(formula)];
+            renderedExpression.semanticLinks = [new Notation.SemanticLink(formula)];
           }
           return renderedExpression;
         };
@@ -687,16 +687,16 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T[] {
-    let displayItems: Fmt.Expression[] | undefined = undefined;
-    let displayExpressions: (Fmt.Expression | undefined)[] = [undefined];
+    let notationItems: Fmt.Expression[] | undefined = undefined;
+    let notationExpressions: (Fmt.Expression | undefined)[] = [undefined];
     if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
-      displayItems = definition.contents.display;
-      if (displayItems) {
-        displayExpressions = displayItems;
+      notationItems = definition.contents.notation;
+      if (notationItems) {
+        notationExpressions = notationItems;
       }
     }
     let result: T[] = [];
-    for (let displayExpression of displayExpressions) {
+    for (let notationExpression of notationExpressions) {
       let parentPaths: (Fmt.PathItem | undefined)[] = [];
       if (path.parentPath instanceof Fmt.Path) {
         let checkParentPath = (prevResult: Fmt.Path | undefined, parentPath: Fmt.Path) => prevResult || parentPath;
@@ -711,29 +711,29 @@ export class HLMEditHandler extends GenericEditHandler {
         let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, expressionEditInfo.context);
         this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createPlaceholder, createElementParameter);
         resultPath.parentPath = parentPath;
-        if (displayExpression && displayItems && displayItems.length > 1) {
-          reorderArguments(resultPath.arguments, displayExpression);
-          if (displayItems && result.length) {
+        if (notationExpression && notationItems && notationItems.length > 1) {
+          reorderArguments(resultPath.arguments, notationExpression);
+          if (notationItems && result.length) {
             // Ignore items that cannot be distinguished by argument order.
             let argumentLists: Fmt.ArgumentList[] = [resultPath.arguments];
             if (parentPath instanceof Fmt.Path) {
               argumentLists.unshift(parentPath.arguments);
             }
-            if (findBestMatch(displayItems, argumentLists) !== displayExpression) {
+            if (findBestMatch(notationItems, argumentLists) !== notationExpression) {
               continue;
             }
           }
         }
-        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, displayExpression, preFillExpression, preFillExpressionType));
+        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, notationExpression, preFillExpression, preFillExpressionType));
       }
     }
     return result;
   }
 
-  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, displayExpression: Fmt.Expression | undefined, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
+  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, notationExpression: Fmt.Expression | undefined, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
     let currentResultItem: T | undefined = undefined;
     if (preFillExpression) {
-      let visibleParameters = displayExpression ? collectVariableRefs(displayExpression) : definition.parameters;
+      let visibleParameters = notationExpression ? collectVariableRefs(notationExpression) : definition.parameters;
       for (let param of visibleParameters) {
         let type = param.type.expression;
         let newResultPath: Fmt.Path | undefined = undefined;
@@ -803,7 +803,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  getConstructorInsertButton(definitions: Fmt.DefinitionList): Display.RenderedExpression {
+  getConstructorInsertButton(definitions: Fmt.DefinitionList): Notation.RenderedExpression {
     let action = new Menu.DialogExpressionMenuAction(() => {
       let dialog = new Dialog.InsertDialog;
       let definitionType: Logic.LogicDefinitionTypeDescription = {
@@ -823,9 +823,9 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getActionInsertButton(action);
   }
 
-  getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Display.RenderedExpression {
-    let insertButton = new Display.InsertPlaceholderExpression;
-    let semanticLink = new Display.SemanticLink(insertButton, false, false);
+  getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Notation.RenderedExpression {
+    let insertButton = new Notation.InsertPlaceholderExpression;
+    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     semanticLink.onMenuOpened = () => {
       return new Menu.ExpressionMenu(CachedPromise.resolve([this.getEmbeddingRow(definitionContents, onRenderEmbedding)]));
     };
@@ -850,9 +850,9 @@ export class HLMEditHandler extends GenericEditHandler {
     return row;
   }
 
-  getElementTermInsertButton(parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): Display.RenderedExpression {
-    let insertButton = new Display.InsertPlaceholderExpression;
-    let semanticLink = new Display.SemanticLink(insertButton, false, false);
+  getElementTermInsertButton(parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): Notation.RenderedExpression {
+    let insertButton = new Notation.InsertPlaceholderExpression;
+    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
     if (parentExpressionEditInfo) {
       let expressionEditInfo: Edit.ExpressionEditInfo = {
@@ -866,21 +866,21 @@ export class HLMEditHandler extends GenericEditHandler {
     return insertButton;
   }
 
-  addElementTermInsertButton(items: Display.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  addElementTermInsertButton(items: Notation.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let insertButton = this.getElementTermInsertButton(parentExpression, onInsertTerm, onRenderTerm, termSelection);
     if (items.length) {
       let lastItemWithButton = [
         items[items.length - 1],
-        new Display.TextExpression(' '),
+        new Notation.TextExpression(' '),
         insertButton
       ];
-      items[items.length - 1] = new Display.RowExpression(lastItemWithButton);
+      items[items.length - 1] = new Notation.RowExpression(lastItemWithButton);
     } else {
       items.push(insertButton);
     }
   }
 
-  addEnumerationInsertButton(items: Display.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  addEnumerationInsertButton(items: Notation.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let onInsertTerm = (expression: Fmt.Expression) => {
       if (term.terms) {
         term.terms.push(expression);
@@ -891,7 +891,7 @@ export class HLMEditHandler extends GenericEditHandler {
     this.addElementTermInsertButton(items, term, onInsertTerm, onRenderTerm, termSelection);
   }
 
-  addImplicitDefinitionMenu(semanticLink: Display.SemanticLink, onRenderExplicitIntro: Logic.RenderFn, onRenderImplicitIntro: RenderParameterFn): void {
+  addImplicitDefinitionMenu(semanticLink: Notation.SemanticLink, onRenderExplicitIntro: Logic.RenderFn, onRenderImplicitIntro: RenderParameterFn): void {
     semanticLink.onMenuOpened = () => {
       return new Menu.ExpressionMenu(CachedPromise.resolve([
         this.getExplicitDefinitionRow(onRenderExplicitIntro),
@@ -909,8 +909,8 @@ export class HLMEditHandler extends GenericEditHandler {
       let explicitOperatorContents = new FmtHLM.ObjectContents_ExplicitOperator;
       explicitOperatorContents.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
       explicitOperatorContents.properties = originalContents.properties;
-      explicitOperatorContents.display = originalContents.display;
-      explicitOperatorContents.definitionDisplay = originalContents.definitionDisplay;
+      explicitOperatorContents.notation = originalContents.notation;
+      explicitOperatorContents.definitionNotation = originalContents.definitionNotation;
       this.definition.contents = explicitOperatorContents;
     });
     let row = new Menu.StandardExpressionMenuRow('Explicit');
@@ -931,8 +931,8 @@ export class HLMEditHandler extends GenericEditHandler {
       implicitOperatorContents.parameter = parameter;
       implicitOperatorContents.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)];
       implicitOperatorContents.properties = originalContents.properties;
-      implicitOperatorContents.display = originalContents.display;
-      implicitOperatorContents.definitionDisplay = originalContents.definitionDisplay;
+      implicitOperatorContents.notation = originalContents.notation;
+      implicitOperatorContents.definitionNotation = originalContents.definitionNotation;
       this.definition.contents = implicitOperatorContents;
       GenericEditHandler.lastInsertedParameter = parameter;
     });
@@ -943,7 +943,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return row;
   }
 
-  addTheoremTypeMenu(semanticLink: Display.SemanticLink, onRenderStandardIntro: Logic.RenderFn, onRenderEquivalenceIntro: Logic.RenderFn): void {
+  addTheoremTypeMenu(semanticLink: Notation.SemanticLink, onRenderStandardIntro: Logic.RenderFn, onRenderEquivalenceIntro: Logic.RenderFn): void {
     semanticLink.onMenuOpened = () => {
       return new Menu.ExpressionMenu(CachedPromise.resolve([
         this.getStandardTheoremRow(onRenderStandardIntro),
@@ -1001,7 +1001,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  getCaseInsertButton(term: FmtHLM.MetaRefExpression_cases): Display.RenderedExpression {
+  getCaseInsertButton(term: FmtHLM.MetaRefExpression_cases): Notation.RenderedExpression {
     let onInsert = () => {
       let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
       if (expressionEditInfo) {

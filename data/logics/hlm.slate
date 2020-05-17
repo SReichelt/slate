@@ -20,18 +20,18 @@ $hlm: %MetaModel {
 $Definition: %DefinitionType {
   members = #(
     properties: %ArgumentList = {},
-    display?: $../display/display/Expr[],
-    definitionDisplay?: $DefinitionDisplay
+    notation?: $../notation/notation/Expr[],
+    definitionNotation?: $DefinitionNotation
   )
 }
 
-$DefinitionDisplay: %ExpressionType {
+$DefinitionNotation: %ExpressionType {
   members = #(
     parameter: %SingleParameter($Expr),
-    display[parameter]?: $../display/display/Expr[],
-    singularName?: $../display/display/Expr,
-    pluralName?: $../display/display/Expr,
-    nameOptional: $../display/display/Bool = $../display/display/false
+    notation[parameter]?: $../notation/notation/Expr[],
+    singularName?: $../notation/notation/Expr,
+    pluralName?: $../notation/notation/Expr,
+    nameOptional: $../notation/notation/Bool = $../notation/notation/false
   )
 }
 

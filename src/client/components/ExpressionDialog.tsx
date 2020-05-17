@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as Display from '../../shared/display/display';
-import * as Dialog from '../../shared/display/dialog';
+import * as Notation from '../../shared/notation/notation';
+import * as Dialog from '../../shared/notation/dialog';
 import StandardDialog from './StandardDialog';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import LibraryTree from './LibraryTree';
@@ -142,7 +142,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
       let title: any = this.props.item.title;
-      if (title instanceof Display.RenderedExpression) {
+      if (title instanceof Notation.RenderedExpression) {
         title = <Expression expression={title} key="title"/>;
       }
       title = [title, ':'];

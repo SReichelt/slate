@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './ExpressionMenu.css';
-import * as Display from '../../shared/display/display';
-import * as Menu from '../../shared/display/menu';
+import * as Notation from '../../shared/notation/notation';
+import * as Menu from '../../shared/notation/menu';
 import renderPromise from './PromiseHelper';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
@@ -214,7 +214,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
           }
         }
         let title: any = standardRow.title;
-        if (title instanceof Display.RenderedExpression) {
+        if (title instanceof Notation.RenderedExpression) {
           title = <Expression expression={title} key="title"/>;
         }
         let titleCellClassName = 'open-menu-title-cell';

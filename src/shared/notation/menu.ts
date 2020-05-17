@@ -1,4 +1,4 @@
-import * as Display from './display';
+import * as Notation from './notation';
 import * as Dialog from './dialog';
 import CachedPromise from '../data/cachedPromise';
 
@@ -37,7 +37,7 @@ export abstract class ExpressionMenuCell extends ExpressionMenuRow {
 export class ExpressionMenuItem extends ExpressionMenuCell {
   action: ExpressionMenuAction;
 
-  constructor(public expression: Display.RenderedExpression) {
+  constructor(public expression: Notation.RenderedExpression) {
     super();
   }
 }
@@ -67,7 +67,7 @@ export class StandardExpressionMenuRow extends ExpressionMenuRow {
   subMenu?: ExpressionMenuBase;
   previewSubMenu: boolean = true;
 
-  constructor(public title: string | Display.RenderedExpression) {
+  constructor(public title: string | Notation.RenderedExpression) {
     super();
   }
 
