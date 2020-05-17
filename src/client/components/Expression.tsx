@@ -214,7 +214,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     if ((optionalParenLeft || optionalParenRight)
         && optionalParenMaxLevel === undefined
-        && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression)) {
+        && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
       return this.renderExpression(new Notation.ParenExpression(expression, optionalParenStyle), className, semanticLinks);
     }
     let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;

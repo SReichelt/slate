@@ -12,7 +12,7 @@ export function renderAsText(expression: Notation.RenderedExpression, outputMark
   }
   if ((optionalParenLeft || optionalParenRight)
       && optionalParenMaxLevel === undefined
-      && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression)) {
+      && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
     return renderAsText(new Notation.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine, indent);
   }
   if (expression instanceof Notation.EmptyExpression) {

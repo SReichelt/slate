@@ -463,7 +463,7 @@ export abstract class GenericEditHandler {
             return insertButton;
           }
         } else {
-          // TODO (low priority) add proper support for multi-dimensional arrays
+          // TODO add proper support for multi-dimensional arrays
           if (group) {
             return group;
           } else {
