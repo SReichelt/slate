@@ -1,7 +1,7 @@
 %notation%
 
 /**
- * Applies a special style class to a rendered expression.
+ * Applies a special style class to a rendered expression.  
  * The effect of this style class is defined in a CSS file.
  *
  * @param body The expression to decorate.
@@ -24,15 +24,15 @@ $Style(body: %Expr, styleClass: %String): %Template {}
 $Parens(body: %Expr, style: %String): %Template {}
 
 /**
- * Ensures that parentheses are added around the given expression if necessary.
- * Should be used to decorate arguments of the current symbol or template, i.e. its "inner expressions".
- * Parentheses are added if the inner expression is itself decorated using `$OuterParens`.
+ * Ensures that parentheses are added around the given expression if necessary.  
+ * Should be used to decorate arguments of the current symbol or template, i.e. its "inner expressions". 
+ * Parentheses are added if the inner expression is itself decorated using `$OuterParens`. 
  * The parentheses style is determined by the type of the inner expression.
  *
  * @param body The inner expression.
  *
  * @param maxLevel Determines when parentheses are required:
- *                 * If `maxLevel` is set in `$InnerParens` and `minLevel` is set in the corresponding `$OuterParens` instance, parentheses are added if `minLevel` <= `maxLevel`.
+ *                 * If `maxLevel` is set in `$InnerParens` and `minLevel` is set in the corresponding `$OuterParens` instance, parentheses are added if `minLevel` <= `maxLevel`.  
  *                   In terms of operator precedence, parentheses are omitted if the inner expression binds more strongly than `maxLevel`.
  *                 * Otherwise, parentheses are always added.
  *
@@ -51,15 +51,15 @@ $Parens(body: %Expr, style: %String): %Template {}
 $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
 
 /**
- * Ensures that parentheses are added around the given expression if necessary.
- * Should be used to decorate the entire current symbol or template.
- * Parentheses are added if the expression is instantiated at a location decorated with `$InnerParens`.
+ * Ensures that parentheses are added around the given expression if necessary.  
+ * Should be used to decorate the entire current symbol or template.  
+ * Parentheses are added if the expression is instantiated at a location decorated with `$InnerParens`.  
  * The parentheses style is determined by the type of the expression.
  *
  * @param body The inner expression, i.e. the symbol or template being defined.
  *
  * @param minLevel Determines when parentheses are required:
- *                 * If `minLevel` is set in `$OuterParens` and `maxLevel` is set in the corresponding `$InnerParens` instance, parentheses are added if `minLevel` <= `maxLevel`.
+ *                 * If `minLevel` is set in `$OuterParens` and `maxLevel` is set in the corresponding `$InnerParens` instance, parentheses are added if `minLevel` <= `maxLevel`.  
  *                   In terms of operator precedence, parentheses are omitted if the outer expression binds less strongly than `minLevel`.
  *                 * Otherwise, parentheses are always added.
  *
@@ -210,6 +210,7 @@ $Tuple(items: %Expr[], separator: %String = ', ', style: %String = '()'): %Tem
 
 /**
  * A group of expressions arranged vertically and surrounded by parentheses. Used to display the objects and morphisms of individual categories in a readable fashion.
+ *
  * For vectors, use `$Vector` instead.
  *
  * @param items The list of expressions.
@@ -496,6 +497,7 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
 
 /**
  * A property of the form "`a` is `b`", where `b` is usually an adjective.
+ *
  * Use `$NounProperty` for the case where `b` is a noun.
  *
  * @param operand The operand of the property (`a` above).

@@ -3,6 +3,7 @@ import * as Notation from '../../shared/notation/notation';
 import * as Dialog from '../../shared/notation/dialog';
 import StandardDialog from './StandardDialog';
 import Expression, { ExpressionInteractionHandler } from './Expression';
+import ExpressionToolTip from './ExpressionToolTip';
 import LibraryTree from './LibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 
@@ -28,6 +29,12 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
   }
 
   render(): React.ReactNode {
+    let className = 'dialog-contents';
+    if (this.props.dialog.styleClasses) {
+      for (let styleClass of this.props.dialog.styleClasses) {
+        className += ' ' + styleClass;
+      }
+    }
     let rows = [];
     let index = 0;
     let separated = false;
@@ -45,7 +52,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
     }
     return (
       <StandardDialog onOK={this.props.onOK} onCancel={this.props.onCancel} okVisible={this.props.dialog.onOK !== undefined} okEnabled={this.state.okEnabled}>
-        <table className={'dialog-contents'}>
+        <table className={className}>
           <tbody>
             {rows}
           </tbody>
@@ -76,7 +83,21 @@ interface ExpressionDialogItemProps {
   onItemChanged?: () => void;
 }
 
-export class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps> {
+interface ExpressionDialogItemState {
+  titleHovered: boolean;
+}
+
+export class ExpressionDialogItem extends React.Component<ExpressionDialogItemProps, ExpressionDialogItemState> {
+  private titleNode: HTMLElement | null = null;
+
+  constructor(props: ExpressionDialogItemProps) {
+    super(props);
+
+    this.state = {
+      titleHovered: false
+    };
+  }
+
   componentDidMount(): void {
     this.props.item.registerChangeListener(this.onItemChanged);
     if (this.props.interactionHandler) {
@@ -146,12 +167,17 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
         title = <Expression expression={title} key="title"/>;
       }
       title = [title, ':'];
+      if (this.props.item.info && this.titleNode) {
+        let info = this.props.item.info;
+        let getToolTipContents = () => <Expression expression={info}/>;
+        title = [title, <ExpressionToolTip active={this.state.titleHovered} position="top" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
+      }
       return (
         <tr className={className}>
-          <th className={'dialog-cell'}>
+          <th className={'dialog-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
             {title}
           </th>
-          <td className={'dialog-cell'}>
+          <td className={'dialog-cell'} key="value">
             <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
           </td>
         </tr>

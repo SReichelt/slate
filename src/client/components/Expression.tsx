@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import './Expression.css';
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -804,34 +805,21 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             toolbar.push('|', searchButton);
             key = 'markdown-editor-with-search';
           }
+          let previewElement = document.createElement('div');
           let options: SimpleMDE.Options = {
             toolbar: toolbar,
             status: false,
             spellChecker: false,
-            autoDownloadFontAwesome: false
+            autoDownloadFontAwesome: false,
+            previewRender: (markdownPlaintext: string) => {
+              ReactDOM.render(this.renderMarkdown(markdownPlaintext), previewElement);
+              return previewElement.innerHTML;
+            }
           };
           markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
         }
       } else {
-        let md = new Remarkable({
-          linkTarget: '_blank',
-          typographer: true
-        });
-        md.use(linkify);
-        md.renderer = new RemarkableReactRenderer({
-          components: {
-            code: (props: any) => {
-              if (this.props.interactionHandler && typeof props.content === 'string') {
-                let renderedCode = this.props.interactionHandler.renderCode(props.content);
-                if (renderedCode !== undefined) {
-                  return renderedCode;
-                }
-              }
-              return <code>{props.content}</code>;
-            }
-          }
-        });
-        markdown = md.render(expression.text);
+        markdown = this.renderMarkdown(expression.text);
       }
       return (
         <div className={className + ' markdown'}>
@@ -969,9 +957,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         }
         if (uri && !(config.development || config.embedded)) {
-          /* This causes nested anchors, which, strictly speaking, are illegal.
-             However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
-             So we do this anyway, but only in production mode, to prevent warnings from React. */
+          // This causes nested anchors, which, strictly speaking, are illegal.
+          // However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+          // So we do this anyway, but only in production mode, to prevent warnings from React.
           result = (
             <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
@@ -1249,6 +1237,28 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private convertDigitMathToRegular(cpOffset: number): string {
     return String.fromCodePoint(cpOffset + 0x30);
+  }
+
+  private renderMarkdown(text: string): React.ReactElement {
+    let md = new Remarkable({
+      linkTarget: '_blank',
+      typographer: true
+    });
+    md.use(linkify);
+    md.renderer = new RemarkableReactRenderer({
+      components: {
+        code: (props: any) => {
+          if (this.props.interactionHandler && typeof props.content === 'string') {
+            let renderedCode = this.props.interactionHandler.renderCode(props.content);
+            if (renderedCode !== undefined) {
+              return renderedCode;
+            }
+          }
+          return <code>{props.content}</code>;
+        }
+      }
+    });
+    return md.render(text);
   }
 
   private addToHoveredChildren(expression: Expression = this): void {

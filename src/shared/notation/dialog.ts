@@ -22,6 +22,7 @@ export class InsertDialog extends DialogBase {
 }
 
 export class ExpressionDialog extends DialogBase {
+  styleClasses?: string[];
   items: ExpressionDialogItem[];
   onCheckOKEnabled?: () => boolean;
   onCheckUpdateNeeded?: () => boolean;
@@ -65,6 +66,7 @@ export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
 
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
   title: string | Notation.RenderedExpression;
+  info?: Notation.RenderedExpression;
   onGetValue: () => Notation.RenderedExpression;
 }
 

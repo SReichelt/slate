@@ -37,8 +37,8 @@ export function getInfoURL(repository: Repository, path: string): string {
 export function getDownloadURL(repository: Repository, path: string): string {
   let owner = repository.owner;
   if (repository.parentOwner && !repository.hasLocalChanges) {
-    /* If the repository has just been fast-forwarded, serve content from the parent repository instead.
-       Since raw.githubusercontent.com does not update immediately, we might receive outdated files otherwise. */
+    // If the repository has just been fast-forwarded, serve content from the parent repository instead.
+    // Since raw.githubusercontent.com does not update immediately, we might receive outdated files otherwise.
     owner = repository.parentOwner;
   }
   return `https://raw.githubusercontent.com/${owner}/${repository.name}/${repository.branch}${path}`;

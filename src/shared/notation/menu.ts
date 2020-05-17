@@ -64,6 +64,7 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
 export class StandardExpressionMenuRow extends ExpressionMenuRow {
   titleAction?: ExpressionMenuAction;
   iconType?: any;
+  info?: Notation.RenderedExpression;
   subMenu?: ExpressionMenuBase;
   previewSubMenu: boolean = true;
 

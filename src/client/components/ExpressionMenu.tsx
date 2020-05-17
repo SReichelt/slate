@@ -116,6 +116,7 @@ interface ExpressionMenuInputRefHolder {
 export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, ExpressionMenuRowState> {
   private inputRefHolder: ExpressionMenuInputRefHolder = {};
   private ready = false;
+  private titleNode: HTMLElement | null = null;
 
   constructor(props: ExpressionMenuRowProps) {
     super(props);
@@ -243,11 +244,13 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             icon = getDefinitionIcon(standardRow.iconType);
           }
           if (icon) {
-            title = [
-              <span className={'open-menu-title-cell-icon'} key="icon">{icon}</span>,
-              title
-            ];
+            title = [<span className={'open-menu-title-cell-icon'} key="icon">{icon}</span>, title];
           }
+        }
+        if (standardRow.info && this.titleNode) {
+          let info = standardRow.info;
+          let getToolTipContents = () => <Expression expression={info}/>;
+          title = [title, <ExpressionToolTip active={this.state.titleHovered} position="right" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
         }
         if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {
           titleCellClassName += ' hover';
@@ -271,7 +274,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
         if (standardRow.subMenu instanceof Menu.ExpressionMenu && subMenuRows.length > 1) {
           hasSubMenu = true;
           title = (
-            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} key="title">
+            <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.titleNode = node)} key="title">
               {title}
               <span key="arrow">&nbsp;&nbsp;&nbsp;&nbsp;<span className={'open-menu-arrow'}>&nbsp;▶&nbsp;</span></span>
             </div>
@@ -283,7 +286,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             title = [title, subMenu];
           }
         } else {
-          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>{title}</div>;
+          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.titleNode = node)}>{title}</div>;
         }
         let colSpan = contentCell ? 1 : 2;
         let cells: React.ReactNode = <th colSpan={colSpan} className={titleCellClassName} key="title">{title}</th>;

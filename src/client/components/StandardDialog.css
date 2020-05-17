@@ -23,16 +23,24 @@
   border-top: solid 1px var(--dialog-separator-color);
 }
 
-.dialog-row.separated-above>* {
+.dialog-cell {
+  padding: 3pt;
+}
+
+.dialog-cell:empty {
+  padding: 0;
+}
+
+.dialog-row.separated-above>.dialog-cell {
+  padding-top: 1ex;
+}
+
+.dialog-row.separated-above:first-child>.dialog-cell {
   padding-top: 1em;
 }
 
-.dialog-row.separated-below>* {
-  padding-bottom: 1em;
-}
-
-.dialog-cell {
-  padding: 3pt;
+.dialog-row.separated-below>.dialog-cell {
+  padding-bottom: 1ex;
 }
 
 .dialog-cell:first-child {
@@ -49,11 +57,25 @@
   max-width: 17em;
 }
 
+.wide .dialog-info-cell {
+  min-width: 30em;
+  max-width: 30em;
+  width: 30em;
+}
+
+.dialog-info-cell .dialog-info-cell>.paragraph {
+  display: inline-block;
+}
+
 .dialog-group {
   border: solid 1px var(--dialog-group-border-color);
   margin: 0;
   padding: 0;
   width: 17em;
+}
+
+.wide .dialog-group {
+  width: 30em;
 }
 
 .dialog-radio-button-group {

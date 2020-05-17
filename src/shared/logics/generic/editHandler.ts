@@ -263,6 +263,7 @@ export abstract class GenericEditHandler {
     let title = new Notation.TextExpression(template.name);
     title.styleClasses = ['source-code'];
     let templateRow = new Menu.StandardExpressionMenuRow(title);
+    templateRow.info = this.getDocumentation(template);
     if (template.parameters.length) {
       templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, renderer));
     } else {
@@ -280,11 +281,17 @@ export abstract class GenericEditHandler {
 
   private getTemplateDialog(template: Fmt.Definition, notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
+    let title: Notation.RenderedExpression = new Notation.TextExpression(template.name);
+    title.styleClasses = ['source-code'];
+    if (template.documentation) {
+      let paragraphs: Notation.RenderedExpression[] = [title];
+      this.addDocumentation(template.documentation, undefined, paragraphs);
+      title = new Notation.ParagraphExpression(paragraphs);
+    }
     let titleItem = new Dialog.ExpressionDialogInfoItem;
-    titleItem.info = new Notation.TextExpression(template.name);
-    titleItem.info.styleClasses = ['source-code'];
-    // TODO display comment
+    titleItem.info = title;
     let dialog = new Dialog.ExpressionDialog;
+    dialog.styleClasses = ['wide'];
     dialog.items = [
       titleItem,
       new Dialog.ExpressionDialogSeparatorItem
@@ -340,7 +347,7 @@ export abstract class GenericEditHandler {
         let canRemove = param.optional && value !== undefined;
         return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
-      // TODO tooltip
+      paramItem.info = this.getDocumentation(template, param);
       dialog.items.push(paramItem);
       previousParamNames.push(param.name);
       paramIndex++;
@@ -355,6 +362,34 @@ export abstract class GenericEditHandler {
     dialog.onCheckOKEnabled = () => okEnabled;
     dialog.onOK = () => onSetNotationItem(newNotationItem);
     return dialog;
+  }
+
+  private getDocumentation(definition: Fmt.Definition, param?: Fmt.Parameter): Notation.RenderedExpression | undefined {
+    if (definition.documentation) {
+      let paragraphs: Notation.RenderedExpression[] = [];
+      this.addDocumentation(definition.documentation, param, paragraphs);
+      if (paragraphs.length) {
+        return new Notation.ParagraphExpression(paragraphs);
+      }
+    }
+    return undefined;
+  }
+
+  private addDocumentation(documentation: Fmt.DocumentationComment, param: Fmt.Parameter | undefined, paragraphs: Notation.RenderedExpression[]): void {
+    for (let documentationItem of documentation.items) {
+      if (param) {
+        if (documentationItem.parameter !== param) {
+          continue;
+        }
+      } else {
+        if (documentationItem.kind) {
+          break;
+        }
+      }
+      let paragraph = new Notation.MarkdownExpression(documentationItem.text);
+      paragraph.styleClasses = ['info-text'];
+      paragraphs.push(paragraph);
+    }
   }
 
   private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], renderedTemplateArguments: Notation.RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
