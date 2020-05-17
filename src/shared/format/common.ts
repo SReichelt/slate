@@ -26,6 +26,8 @@ export function isSpecialCharacter(c: string): boolean {
     || c === ']'
     || c === '{'
     || c === '}'
+    || c === '<'
+    || c === '>'
     || c === '.'
     || c === ','
     || c === ':'

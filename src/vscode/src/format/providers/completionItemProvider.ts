@@ -52,27 +52,30 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         }
         let isEmptyExpression = rangeInfo.object instanceof FmtReader.EmptyExpression || (rangeInfo.object instanceof Fmt.ArrayExpression && !rangeInfo.object.items.length && position.isAfter(rangeInfo.range.start) && position.isBefore(rangeInfo.range.end));
         let signatureInfo: SignatureInfo | undefined = undefined;
+        let argNameRange: vscode.Range | null | undefined = undefined;
         if (!(rangeInfo.linkRange && rangeInfo.linkRange.contains(position))) {
             signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, document);
             if (signatureInfo?.isMetaModel && context.triggerKind !== vscode.CompletionTriggerKind.Invoke && context.triggerCharacter !== '\n') {
                 signatureInfo = undefined;
             }
             if (signatureInfo && signatureInfo.parameters) {
-                let argNameRange: vscode.Range | undefined = undefined;
                 let filledParameters = new Set<Fmt.Parameter>();
                 if (signatureInfo.arguments) {
                     argNameRange = this.determineArgNameRangeAndFilledParameters(parsedDocument, position, signatureInfo.parameters, signatureInfo.arguments, filledParameters);
-                    if (argNameRange) {
+                    if (argNameRange === null) {
                         signatureInfo = undefined;
                     }
                 }
                 if (signatureInfo && signatureInfo.parameters) {
-                    this.appendArguments(document, rangeInfo, signatureInfo, signatureInfo.parameters, filledParameters, argNameRange, result);
+                    this.appendArguments(document, rangeInfo, signatureInfo, signatureInfo.parameters, filledParameters, argNameRange ?? undefined, result);
                     if (rangeInfo.object instanceof Fmt.MetaRefExpression || rangeInfo.object instanceof Fmt.CompoundExpression) {
                         isEmptyExpression = true;
                     }
                 }
             }
+        }
+        if ((context.triggerCharacter === '(' || context.triggerCharacter === ' ' || context.triggerCharacter === '\n') && argNameRange !== null) {
+            return false;
         }
         if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || signatureInfo) {
             if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || rangeInfo.object instanceof Fmt.VariableRefExpression) {
@@ -292,7 +295,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         });
     }
 
-    private determineArgNameRangeAndFilledParameters(parsedDocument: ParsedDocument, position: vscode.Position, params: Fmt.Parameter[], args: Fmt.Argument[], filledParameters: Set<Fmt.Parameter>): vscode.Range | undefined {
+    private determineArgNameRangeAndFilledParameters(parsedDocument: ParsedDocument, position: vscode.Position, params: Fmt.Parameter[], args: Fmt.Argument[], filledParameters: Set<Fmt.Parameter>): vscode.Range | null | undefined {
         let argIndex = 0;
         for (let arg of args) {
             let argRangeInfo = parsedDocument.rangeMap.get(arg);
@@ -302,7 +305,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                         // Looks like a variable, but could turn into an argument name.
                         return argRangeInfo.range;
                     } else {
-                        return undefined;
+                        return null;
                     }
                 }
                 if (arg.name || argRangeInfo.range.end.isBefore(position)) {
