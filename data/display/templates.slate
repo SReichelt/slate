@@ -1,15 +1,153 @@
 %display%
 
+/**
+ * Applies a special style class to a rendered expression.
+ * The effect of this style class is defined in a CSS file.
+ *
+ * @param body The expression to decorate.
+ * @param styleClass The name of the style class as it appears in CSS.
+ */
 $Style(body: %Expr, styleClass: %String): %Template {}
-$Table(items: %Expr[,], style: %String): %Template {}
+
+/**
+ * Adds parentheses around an expression.
+ *
+ * @param body The inner expression.
+ * @param style One of '()', '||', '[]', '{}', '{', or '<>'.
+ *
+ * @example `$Parens(body = a, style = '()')`
+ * @example `$Parens(body = a, style = '||')`
+ * @example `$Parens(body = a, style = '[]')`
+ * @example `$Parens(body = a, style = '{}')`
+ * @example `$Parens(body = a, style = '<>')`
+ */
 $Parens(body: %Expr, style: %String): %Template {}
+
+/**
+ * Ensures that parentheses are added around the given expression if necessary.
+ * Should be used to decorate arguments of the current symbol or template, i.e. its "inner expressions".
+ * Parentheses are added if the inner expression is itself decorated using `$OuterParens`.
+ * The parentheses style is determined by the type of the inner expression.
+ *
+ * @param body The inner expression.
+ *
+ * @param maxLevel Determines when parentheses are required:
+ *                 * If `maxLevel` is set in `$InnerParens` and `minLevel` is set in the corresponding `$OuterParens` instance, parentheses are added if `minLevel` <= `maxLevel`.
+ *                   In terms of operator precedence, parentheses are omitted if the inner expression binds more strongly than `maxLevel`.
+ *                 * Otherwise, parentheses are always added.
+ *
+ *                 Parentheses levels currently in use are:
+ *                 * -3: Implication and equivalence.
+ *                 * -2: Boolean operators and quantification.
+ *                 * -1: Relations, both built-in and user-defined.
+ *                 * 0: Separation of function domain and codomain (→).
+ *                 * 1: Addition and subtraction.
+ *                 * 2: Multiplication. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
+ *                 * 3: Exponentiation, or more precisely all expressions with superscripts or subscripts. In most cases, `maxLevel` should be less than this number, i.e. inner expressions with superscripts or subscripts do not require parentheses.
+ *
+ * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if the content surrounding the `$InnerParens` instance is sufficiently bounded on the left.
+ * @param right Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `right` can be set to false if the content surrounding the `$InnerParens` instance is sufficiently bounded on the right.
+ */
 $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+
+/**
+ * Ensures that parentheses are added around the given expression if necessary.
+ * Should be used to decorate the entire current symbol or template.
+ * Parentheses are added if the expression is instantiated at a location decorated with `$InnerParens`.
+ * The parentheses style is determined by the type of the expression.
+ *
+ * @param body The inner expression, i.e. the symbol or template being defined.
+ *
+ * @param minLevel Determines when parentheses are required:
+ *                 * If `minLevel` is set in `$OuterParens` and `maxLevel` is set in the corresponding `$InnerParens` instance, parentheses are added if `minLevel` <= `maxLevel`.
+ *                   In terms of operator precedence, parentheses are omitted if the outer expression binds less strongly than `minLevel`.
+ *                 * Otherwise, parentheses are always added.
+ *
+ *                 Parentheses levels currently in use are:
+ *                 * -3: Implication and equivalence.
+ *                 * -2: Boolean operators and quantification.
+ *                 * -1: Relations, both built-in and user-defined.
+ *                 * 0: Separation of function domain and codomain (→).
+ *                 * 1: Addition and subtraction.
+ *                 * 2: Multiplication. Also used for the Cartesian product, so that no parentheses are added around A × B in A × B → C.
+ *                 * 3: Exponentiation, or more precisely all expressions with superscripts or subscripts. In most cases, `maxLevel` should be less than this number, i.e. inner expressions with superscripts or subscripts do not require parentheses.
+ *
+ * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if inner expression is sufficiently bounded on the left.
+ * @param right Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `right` can be set to false if the inner expression is sufficiently bounded on the right.
+ */
 $OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+
+/**
+ * Arranges a two-dimensional array of expressions as a table.
+ *
+ * @param items A two-dimensional array of expressions, where each inner array represents a row. Rows do not necessarily need to have the same length.
+ * @param style Determines how the items are arranged. Currently supported values are:
+ *              * 'matrix': Standard table with horizontally centered cells that are spaced apart. Also used for vectors.
+ *              * 'aligned': The first column is right-aligned, the other columns are left-aligned. No horizontal space is added between columns.
+ *              * 'cases': Several left-aligned columns with large horizontal spacing. Used to render cases with conditions.
+ *              * 'single-case': Very similar to 'cases', but omits extra padding around the entire table because a single case is displayed in an "inline" fashion.
+ *              * 'vertical-tuple': Used to display large tuples in a vertical format (see `$VerticalTuple`), in particular the objects and morphisms of individual categories. In contrast to 'matrix', cells are left-aligned.
+ *              * 'binom': Binomial coefficient, similar to a matrix but with less spacing.
+ *              * 'construction': Used to define the contents of a construction. Includes a vertical line between the first two columns.
+ *
+ * @example `$Table(items = [[a, b], [c, d]], style = 'matrix')`
+ */
+$Table(items: %Expr[,], style: %String): %Template {}
+
+/**
+ * Adds a subscript and/or superscript to an expression. More generally, subscripts and superscripts can be added at all four corners.
+ *
+ * @param body The main expression. `$SubSup` implicitly decorates `body` with `$InnerParens`, i.e. parentheses are added whenever the contents of `body` are decorated with `$OuterParens`, regardless of the level.
+ * @param sub A subscript to be added after `body`.
+ * @param sup A superscript to be added after `body`.
+ * @param preSub A subscript to be added before `body`.
+ * @param preSup A superscript to be added before `body`.
+ *
+ * @example `$SubSup(body = a, sub = b)`
+ * @example `$SubSup(body = a, sup = c)`
+ * @example `$SubSup(body = a, sub = b, sup = c)`
+ * @example `$SubSup(body = a, sub = b, sup = c, preSub = d, preSup = e)`
+ */
 $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): %Template {}
+
+/**
+ * Adds expressions above and/or below a main expression.
+ *
+ * @param body The main expression.
+ * @param over An expression to be added above `body`.
+ * @param under An expression to be added below `body`.
+ * @param style Set to 'shallow' to reduce space between the expressions. This typically depends on the contents of `body`.
+ *
+ * @example `$OverUnder(body = a, over = b)`
+ * @example `$OverUnder(body = a, under = c)`
+ * @example `$OverUnder(body = a, over = b, under = c)`
+ */
 $OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template {}
+
+/**
+ * A fraction that is layed out vertically.
+ *
+ * @param numerator The expression at the top.
+ * @param denominator The expression at the bottom.
+ *
+ * @example `$Fraction(numerator = a, denominator = b)`
+ */
 $Fraction(numerator: %Expr, denominator: %Expr): %Template {}
+
+/**
+ * A radical symbol with optional degree.
+ *
+ * @param radicand The expression under the radical symbol.
+ * @param degree An optional expression to be placed on the left of the radical symbol.
+ *
+ * @example `$Radical(radicand = a)`
+ * @example `$Radical(radicand = a, degree = b)`
+ */
 $Radical(radicand: %Expr, degree?: %Expr): %Template {}
 
+/**
+ * The colon to use for ":=" and ":⇔". Used internally by other templates.
+ */
 $DefinitionColon: %Template {
   display = $Style(
     body = ':',
@@ -17,17 +155,31 @@ $DefinitionColon: %Template {
   )
 }
 
+/**
+ * An horizontal ellipsis that is aligned to the bottom of the expression.
+ */
 $BottomEllipsis: %Template {
   /* Not using unicode character '…' because it has too much space in TeX font. */
   display = '...'
 }
 
+/**
+ * An horizontal ellipsis that is aligned to the middle of the expression.
+ */
 $MiddleEllipsis: %Template {
   /* Not using unicode character '⋯' because it has too much space in TeX font. */
   display = '⋅⋅⋅'
 }
 
-$Group(items: %Expr[], separator: %Expr = ', '): %Template {
+/**
+ * A group of expressions separated by a character. Used e.g. for `$Tuple` and `$Enumeration`.
+ *
+ * @param items The list of expressions.
+ * @param separator The separator character, optionally including a following space.
+ *
+ * @example `$Group(items = [a, b, c])`
+ */
+$Group(items: %Expr[], separator: %String = ', '): %Template {
   display = %for(
     param = items,
     dimension = 0,
@@ -36,7 +188,17 @@ $Group(items: %Expr[], separator: %Expr = ', '): %Template {
   )
 }
 
-$Tuple(items: %Expr[], separator: %Expr = ', ', style: %String = '()'): %Template {
+/**
+ * A group of expressions separated by a character and surrounded by parentheses.
+ *
+ * @param items The list of expressions.
+ * @param separator The separator character, optionally including a following space.
+ * @param style The parentheses style to use (see `$Parens`).
+ *
+ * @example `$Tuple(items = [a, b, c])`
+ * @example `$Tuple(items = [a, b, c], style = '[]')`
+ */
+$Tuple(items: %Expr[], separator: %String = ', ', style: %String = '()'): %Template {
   display = $Parens(
     body = $Group(
       items = items,
@@ -46,6 +208,16 @@ $Tuple(items: %Expr[], separator: %Expr = ', ', style: %String = '()'): %Templ
   )
 }
 
+/**
+ * A group of expressions arranged vertically and surrounded by parentheses. Used to display the objects and morphisms of individual categories in a readable fashion.
+ * For vectors, use `$Vector` instead.
+ *
+ * @param items The list of expressions.
+ * @param style The parentheses style to use (see `$Parens`).
+ *
+ * @example `$VerticalTuple(items = [a, b, c])`
+ * @example `$VerticalTuple(items = [a, b, c], style = '[]')`
+ */
 $VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
   display = $Style(
     body = $Parens(
@@ -59,10 +231,47 @@ $VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
   )
 }
 
-$Constraint(left: %Expr, right: %Expr): %Template {
-  display = [left, ' : ', right]
+/**
+ * A two-dimensional array of expressions, arranged as a matrix, surrounded by brackets.
+ *
+ * @param items A two-dimensional array of expressions, where each inner array represents a row.
+ *
+ * @example `$Matrix(items = [[a, b], [c, d]])`
+ */
+$Matrix(items: %Expr[,]): %Template {
+  display = $Parens(
+    body = $Table(
+      items = items,
+      style = 'matrix'
+    ),
+    style = '[]'
+  )
 }
 
+/**
+ * A vector, i.e. a single-column matrix.
+ *
+ * @param items The vector elements.
+ *
+ * @example `$Vector(items = [a, b])`
+ */
+$Vector(items: %Expr[]): %Template {
+  display = $Matrix(
+    items = %for(items, 0, [[items]])
+  )
+}
+
+/**
+ * The standard notation for function application. Often used to define functions as well.
+ *
+ * @param function The function.
+ * @param arguments The list of function arguments.
+ * @param style The parentheses style to use (see `$Parens`).
+ * @param maxParenLevel Parentheses are displayed around `function` if its outer parentheses level is at most `maxParenLevel` (see `$OuterParens`). By default, parentheses are displayed if `function` contains an operator but not if it contains a subscript or superscript.
+ *
+ * @example `$Function(function = f, arguments = [x])`
+ * @example `$Function(function = f, arguments = [a, b, c])`
+ */
 $Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = [
@@ -81,6 +290,13 @@ $Function(function: %Expr, arguments: %Expr[], style: %String = '()', maxParenLe
   )
 }
 
+/**
+ * The standard notation for a constructor name.
+ *
+ * @param name The constructor name.
+ *
+ * @example `$ConstructorName(name = 'construct')`
+ */
 $ConstructorName(name: %String): %Template {
   display = $Style(
     body = name,
@@ -88,6 +304,14 @@ $ConstructorName(name: %String): %Template {
   )
 }
 
+/**
+ * The standard notation for a constructor with arguments.
+ *
+ * @param name The constructor name.
+ * @param arguments The list of constructor arguments.
+ *
+ * @example `$Constructor(name = 'construct', arguments = [a, b, c])`
+ */
 $Constructor(name: %String, arguments: %Expr[]): %Template {
   display = $Function(
     function = $ConstructorName(
@@ -97,6 +321,17 @@ $Constructor(name: %String, arguments: %Expr[]): %Template {
   )
 }
 
+/**
+ * A binary operator (although it can be used with more than two operands if the operator is associative).
+ *
+ * @param symbol The operator symbol.
+ * @param operands The list of operands. If more than two operands are given, the operator symbol is rendered between each pair of operands.
+ * @param space The space to use between the operator symbol and its operands. The default is U+2009. For multiplication, use U+200A.
+ * @param minParenLevel If this operator is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$Operator` expression. By default, parentheses are added whenever this operator appears inside another operator, but not if it appears inside a relation.
+ * @param maxParenLevel If an operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around this operand. By default, parentheses are added around all operands that also contain operators, but not around operands with subscripts or superscripts.
+ *
+ * @example `$Operator(symbol = ∗, operands = [a, b])`
+ */
 $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   display = $OuterParens(
     body = %for(
@@ -108,7 +343,14 @@ $Operator(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
         left = %not(%first),
         right = %not(%last)
       ),
-      separator = [space, symbol, space]
+      separator = [
+        space,
+        $InnerParens(
+          body = symbol,
+          maxLevel = 2
+        ),
+        space
+      ]
     ),
     minLevel = minParenLevel
   )
@@ -234,13 +476,10 @@ $FunctionOperator(symbol: %Expr = '→', operands: %Expr[], space: %String = '�
 
 $Quantification(symbol: %Expr, parameters: %Expr, formula: %Expr, parenLevel: %Int = -2): %Template {
   display = $OuterParens(
-    body = [symbol, ' ', $Constraint(
-      left = parameters,
-      right = $InnerParens(
-        body = formula,
-        maxLevel = parenLevel,
-        right = %false
-      )
+    body = [symbol, ' ', parameters, ' : ', $InnerParens(
+      body = formula,
+      maxLevel = parenLevel,
+      right = %false
     )],
     minLevel = parenLevel,
     left = %false
@@ -255,6 +494,14 @@ $PlainQuantification(symbol: %Expr, parameters: %Expr, parenLevel: %Int = -2): %
   )
 }
 
+/**
+ * A property of the form "`a` is `b`", where `b` is usually an adjective.
+ * Use `$NounProperty` for the case where `b` is a noun.
+ *
+ * @param operand The operand of the property (`a` above).
+ * @param property The property (`b` above).
+ * @param article An article to be prepended to `b`. Used by `$NounProperty` which is defined as a special case of `$Property`.
+ */
 $Property(operand: %Expr, property: %Expr, article?: %String): %Template {
   display = $Verb(
     symbol = [%neg('is', 'is not'), %opt(article, [' ', article]), ' ', property],
@@ -269,6 +516,14 @@ $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, prepo
   )
 }
 
+/**
+ * A property of the form "`a` is a `b`", where `b` is a noun.
+ *
+ * @param operand The operand of the property (`a` above).
+ * @param singular The singular form of the noun (`b` above).
+ * @param plural The plural form of the noun.
+ * @param article Either "a" or "an", depending on whether the noun starts with a vowel.
+ */
 $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
   display = $Property(
     operand = operand,
@@ -460,32 +715,33 @@ $Binding(variable: %Expr, value: %Expr): %Template {
   display = [variable, '↦', value]
 }
 
-$Enumeration(items: %Expr[]): %Template {
+$Set(body: %Expr): %Template {
   display = $Parens(
+    body = body,
+    style = '{}'
+  )
+}
+
+$Enumeration(items: %Expr[]): %Template {
+  display = $Set(
     body = $Group(
       items = items
-    ),
-    style = '{}'
+    )
   )
 }
 
 $SetBuilder(element: %Expr, constraint: %Expr): %Template {
-  display = $Parens(
-    body = $Constraint(
-      left = element,
-      right = constraint
-    ),
-    style = '{}'
+  display = $Set(
+    body = [element, ' : ', constraint]
   )
 }
 
 $Construction(constructors: %Expr[,]): %Template {
-  display = $Parens(
+  display = $Set(
     body = $Table(
       items = constructors,
       style = 'construction'
-    ),
-    style = '{}'
+    )
   )
 }
 
@@ -562,7 +818,8 @@ $SingleCase(case: %Expr[]): %Template {
       items = [case],
       style = 'single-case'
     ),
-    minLevel = 0
+    left = %false,
+    right = %true
   )
 }
 
@@ -575,7 +832,8 @@ $Cases(cases: %Expr[,]): %Template {
       ),
       style = '{'
     ),
-    minLevel = 0
+    left = %false,
+    right = %true
   )
 }
 

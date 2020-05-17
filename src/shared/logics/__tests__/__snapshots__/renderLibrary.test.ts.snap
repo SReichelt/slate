@@ -204,7 +204,7 @@ References.
 exports[`render hlm library: 1.1.8 data/libraries/hlm/Essentials/Sets/Intersection 1`] = `
 "Definition 1.1.8.  Let U be a set, S, T ⊆ U. We define:
 
-  S ∩ T := {x ∈ U : x ∈ S and x ∈ T}
+  S ∩ T := {x ∈ U : x ∈ S and x ∈ T}
 
 Remarks.
 
@@ -261,7 +261,7 @@ References.
 exports[`render hlm library: 1.1.12 data/libraries/hlm/Essentials/Sets/Union 1`] = `
 "Definition 1.1.12.  Let U be a set, S, T ⊆ U. We define:
 
-  S ∪ T := {x ∈ U : x ∈ S or x ∈ T}
+  S ∪ T := {x ∈ U : x ∈ S or x ∈ T}
 
 Remarks.
 
@@ -317,8 +317,8 @@ References.
 exports[`render hlm library: 1.1.16 data/libraries/hlm/Essentials/Sets/Relative%20complement 1`] = `
 "Definition 1.1.16.  Let U be a set, S, T ⊆ U. We define:
 
-  S ∖ T := {x ∈ U : x ∈ S and x ∉ T}
-   = {x ∈ S : x ∉ T}
+  S ∖ T := {x ∈ U : x ∈ S and x ∉ T}
+   = {x ∈ S : x ∉ T}
 
 Equality.  No proof.
 
@@ -406,7 +406,7 @@ References.
 exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
 "Definition 1.1.20.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
 
-  ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
+  ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
 
 Remarks.
 
@@ -431,7 +431,7 @@ References.
 exports[`render hlm library: 1.1.22 data/libraries/hlm/Essentials/Sets/Generalized%20union 1`] = `
 "Definition 1.1.22.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
 
-  ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
+  ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
 
 References.
 
@@ -490,7 +490,7 @@ References.
 exports[`render hlm library: 1.1.26.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
 "Definition 1.1.26.1.  Let S be a set. We define:
 
-  𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
+  𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
 We write “let f be a choice function on S” for “let f ∈ 𝓒𝓱𝓸𝓲𝓬𝓮(S).”
 
@@ -1018,7 +1018,7 @@ References.
 exports[`render hlm library: 1.3.32.1 data/libraries/hlm/Essentials/Relations/Closures/closure 1`] = `
 "Definition 1.3.32.1.  Let S be a set, ≺ be a relation on S, p be a property on 𝓡𝓮𝓵(S). We define:
 
-  cl_p(≺) := ⋀{⊂ ∈ 𝓡𝓮𝓵(S) : [≺ ⇒ ⊂] and ⊂ is p}
+  cl_p(≺) := ⋀{⊂ ∈ 𝓡𝓮𝓵(S) : [≺ ⇒ ⊂] and ⊂ is p}
 
 Remarks.
 
@@ -1170,7 +1170,7 @@ This is a macro to convert an operator taking an element of \`X\` and returning 
 exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Image 1`] = `
 "Definition 1.4.4.  Let X, Y be sets, f : X → Y be a function, S ⊆ X. We define:
 
-  f(S) := {f(x) : x ∈ S}
+  f(S) := {f(x) : x ∈ S}
 
 References.
 
@@ -1182,7 +1182,7 @@ References.
 exports[`render hlm library: 1.4.5 data/libraries/hlm/Essentials/Functions/Preimage 1`] = `
 "Definition 1.4.5.  Let X, Y be sets, f : X → Y be a function, S ⊆ Y. We define:
 
-  f^-1(S) := {x ∈ X : f(x) ∈ S}
+  f^-1(S) := {x ∈ X : f(x) ∈ S}
 
 References.
 
@@ -1393,7 +1393,7 @@ No proof."
 exports[`render hlm library: 1.4.22 data/libraries/hlm/Essentials/Functions/Bijections 1`] = `
 "Definition 1.4.22.  Let X, Y be sets. We define:
 
-  (X ↔ Y) := {f : X → Y : f is bijective}
+  (X ↔ Y) := {f : X → Y : f is bijective}
 
 We write “let f : X ↔ Y be a bijection” for “let f ∈ (X ↔ Y).”
 
@@ -1937,7 +1937,7 @@ by:
 `;
 
 exports[`render hlm library: 1.5.13 data/libraries/hlm/Essentials/Sequences/index%20in%20well-ordered%20set 1`] = `
-"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
+"Definition 1.5.13.  Let S be a set, ⪯ be a well-order on S, α := [S, ⪯], s ∈ S, T := {t ∈ S ∖ {s} : t ⪯ s}. We define:
 
   idx_⪯(s) := [T, ⪯∣_T]
 
@@ -2228,7 +2228,7 @@ References.
 exports[`render hlm library: 1.6.1.17.1 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.1.17.1.  Let n ∈ ℕ. We define:
 
-  ℕ_(<n) := {m ∈ ℕ : m < n}
+  ℕ_(<n) := {m ∈ ℕ : m < n}
 
 References.
 
@@ -2239,7 +2239,7 @@ References.
 exports[`render hlm library: 1.6.1.17.2 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.1.17.2.  Let n ∈ ℕ. We define:
 
-  ℕ_(≤n) := {m ∈ ℕ : m ≤ n}
+  ℕ_(≤n) := {m ∈ ℕ : m ≤ n}
    = ℕ_(<(n+1))
 
 Equality.  No proof."
@@ -2248,7 +2248,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.1.17.3 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.1.17.3.  Let n ∈ ℕ. We define:
 
-  ℕ_(≥n) := {m ∈ ℕ : m ≥ n}
+  ℕ_(≥n) := {m ∈ ℕ : m ≥ n}
    = ℕ ∖ ℕ_(<n)
 
 Equality.  No proof."
@@ -2257,7 +2257,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.1.17.4 data/libraries/hlm/Essentials/Numbers/Natural/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.1.17.4.  Let n ∈ ℕ. We define:
 
-  ℕ_(>n) := {m ∈ ℕ : m > n}
+  ℕ_(>n) := {m ∈ ℕ : m > n}
    = ℕ ∖ ℕ_(≤n)
    = ℕ_(≥(n+1))
 
@@ -2268,11 +2268,11 @@ exports[`render hlm library: 1.6.1.17.5 data/libraries/hlm/Essentials/Numbers/Na
 "Definition 1.6.1.17.5.  We define:
 
   ℕ_+ := ℕ_(>0)
-   = {m ∈ ℕ : m > 0}
-   = {n ∈ ℕ : n ≠ 0}
+   = {m ∈ ℕ : m > 0}
+   = {n ∈ ℕ : n ≠ 0}
    = ℕ ∖ {0}
-   = {a ∈ ℕ : ∃ b ∈ ℕ : b + 1 = a}
-   = {c ∈ ℕ : ∃! d ∈ ℕ : d + 1 = c}
+   = {a ∈ ℕ : ∃ b ∈ ℕ : b + 1 = a}
+   = {c ∈ ℕ : ∃! d ∈ ℕ : d + 1 = c}
 
 Equality.  No proof.
 
@@ -2544,7 +2544,7 @@ References.
 exports[`render hlm library: 1.6.1.29 data/libraries/hlm/Essentials/Numbers/Natural/Divisors 1`] = `
 "Definition 1.6.1.29.  Let n ∈ ℕ. We define:
 
-  Div_ℕ(n) := {m ∈ ℕ_+ : m ∣ n}
+  Div_ℕ(n) := {m ∈ ℕ_+ : m ∣ n}
 
 Remarks.
 
@@ -3088,7 +3088,7 @@ References.
 exports[`render hlm library: 1.6.1.52.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
 "Definition 1.6.1.52.3.  We define:
 
-  ℙ := {n ∈ ℕ_(>1) : n is prime}
+  ℙ := {n ∈ ℕ_(>1) : n is prime}
 
 We write “let p be a prime” for “let p ∈ ℙ.”
 
@@ -3306,7 +3306,7 @@ References.
 exports[`render hlm library: 1.6.2.4.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Isomorphisms 1`] = `
 "Definition 1.6.2.4.2.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
 
-  Iso(κ, μ) := {φ : κ → μ : φ is bijective}
+  Iso(κ, μ) := {φ : κ → μ : φ is bijective}
    = ((κ) ↔ (μ))
 
 We write “let φ : κ ↔ μ be an isomorphism” for “let φ ∈ Iso(κ, μ).”
@@ -3398,25 +3398,25 @@ Note that without the axiom of choice, this is not equivalent to the negation of
 exports[`render hlm library: 1.6.2.7.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.2.7.1.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓒𝓻𝓭_(<κ) := {μ ∈ 𝓒𝓻𝓭 : μ < κ}"
+  𝓒𝓻𝓭_(<κ) := {μ ∈ 𝓒𝓻𝓭 : μ < κ}"
 `;
 
 exports[`render hlm library: 1.6.2.7.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.2.7.2.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓒𝓻𝓭_(≤κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≤ κ}"
+  𝓒𝓻𝓭_(≤κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≤ κ}"
 `;
 
 exports[`render hlm library: 1.6.2.7.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.2.7.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓒𝓻𝓭_(≥κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≥ κ}"
+  𝓒𝓻𝓭_(≥κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≥ κ}"
 `;
 
 exports[`render hlm library: 1.6.2.7.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.2.7.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
+  𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
 `;
 
 exports[`render hlm library: 1.6.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
@@ -3689,7 +3689,7 @@ This definition can be used to access underlying well-ordering of a given ordina
 exports[`render hlm library: 1.6.3.4.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Homomorphisms 1`] = `
 "Definition 1.6.3.4.1.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  Hom(α, β) := {f : (α) → (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
+  Hom(α, β) := {f : (α) → (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
 
 We write “let φ : α → β be a homomorphism” for “let φ ∈ Hom(α, β).”
 
@@ -3703,8 +3703,8 @@ References.
 exports[`render hlm library: 1.6.3.4.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
 "Definition 1.6.3.4.2.  Let α, β ∈ 𝓞𝓻𝓭. We define:
 
-  Iso(α, β) := {homomorphisms φ : α → β : φ is bijective}
-   = {f : (α) ↔ (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
+  Iso(α, β) := {homomorphisms φ : α → β : φ is bijective}
+   = {f : (α) ↔ (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
 
 We write “let φ : α ↔ β be an isomorphism” for “let φ ∈ Iso(α, β).”
 
@@ -3795,25 +3795,25 @@ References.
 exports[`render hlm library: 1.6.3.8.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.3.8.1.  Let α ∈ 𝓞𝓻𝓭. We define:
 
-  𝓞𝓻𝓭_(<α) := {β ∈ 𝓞𝓻𝓭 : β < α}"
+  𝓞𝓻𝓭_(<α) := {β ∈ 𝓞𝓻𝓭 : β < α}"
 `;
 
 exports[`render hlm library: 1.6.3.8.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.3.8.2.  Let α ∈ 𝓞𝓻𝓭. We define:
 
-  𝓞𝓻𝓭_(≤α) := {β ∈ 𝓞𝓻𝓭 : β ≤ α}"
+  𝓞𝓻𝓭_(≤α) := {β ∈ 𝓞𝓻𝓭 : β ≤ α}"
 `;
 
 exports[`render hlm library: 1.6.3.8.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.3.8.3.  Let α ∈ 𝓞𝓻𝓭. We define:
 
-  𝓞𝓻𝓭_(≥α) := {β ∈ 𝓞𝓻𝓭 : β ≥ α}"
+  𝓞𝓻𝓭_(≥α) := {β ∈ 𝓞𝓻𝓭 : β ≥ α}"
 `;
 
 exports[`render hlm library: 1.6.3.8.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.3.8.4.  Let α ∈ 𝓞𝓻𝓭. We define:
 
-  𝓞𝓻𝓭_(>α) := {β ∈ 𝓞𝓻𝓭 : β > α}"
+  𝓞𝓻𝓭_(>α) := {β ∈ 𝓞𝓻𝓭 : β > α}"
 `;
 
 exports[`render hlm library: 1.6.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
@@ -4108,13 +4108,13 @@ References.
 exports[`render hlm library: 1.6.4.10.1 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.4.10.1.  Let a ∈ ℤ. We define:
 
-  ℤ_(<a) := {b ∈ ℤ : b < a}"
+  ℤ_(<a) := {b ∈ ℤ : b < a}"
 `;
 
 exports[`render hlm library: 1.6.4.10.2 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.4.10.2.  Let a ∈ ℤ. We define:
 
-  ℤ_(≤a) := {b ∈ ℤ : b ≤ a}
+  ℤ_(≤a) := {b ∈ ℤ : b ≤ a}
    = ℤ_(<(a+1))
 
 Equality.  No proof."
@@ -4123,7 +4123,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.4.10.3 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.4.10.3.  Let a ∈ ℤ. We define:
 
-  ℤ_(≥a) := {b ∈ ℤ : b ≥ a}
+  ℤ_(≥a) := {b ∈ ℤ : b ≥ a}
    = ℤ ∖ ℤ_(<a)
 
 Equality.  No proof."
@@ -4132,7 +4132,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.4.10.4 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.4.10.4.  Let a ∈ ℤ. We define:
 
-  ℤ_(>a) := {b ∈ ℤ : b > a}
+  ℤ_(>a) := {b ∈ ℤ : b > a}
    = ℤ ∖ ℤ_(≤a)
    = ℤ_(≥(a+1))
 
@@ -4142,7 +4142,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.4.10.5 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Hole 1`] = `
 "Definition 1.6.4.10.5.  Let a ∈ ℤ. We define:
 
-  ℤ_(≠a) := {b ∈ ℤ : b ≠ a}
+  ℤ_(≠a) := {b ∈ ℤ : b ≠ a}
    = ℤ_(<a) ∪ ℤ_(>a)
 
 Equality.  No proof."
@@ -4152,7 +4152,7 @@ exports[`render hlm library: 1.6.4.10.6 data/libraries/hlm/Essentials/Numbers/In
 "Definition 1.6.4.10.6.  We define:
 
   ℤ_− := ℤ_(<0)
-   = {a ∈ ℤ : a < 0}
+   = {a ∈ ℤ : a < 0}
 
 Equality.  No proof."
 `;
@@ -4161,7 +4161,7 @@ exports[`render hlm library: 1.6.4.10.7 data/libraries/hlm/Essentials/Numbers/In
 "Definition 1.6.4.10.7.  We define:
 
   ℤ_0^− := ℤ_(≤0)
-   = {a ∈ ℤ : a ≤ 0}
+   = {a ∈ ℤ : a ≤ 0}
 
 Equality.  No proof."
 `;
@@ -4170,7 +4170,7 @@ exports[`render hlm library: 1.6.4.10.8 data/libraries/hlm/Essentials/Numbers/In
 "Definition 1.6.4.10.8.  We define:
 
   ℤ_0^+ := ℤ_(≥0)
-   = {a ∈ ℤ : a ≥ 0}
+   = {a ∈ ℤ : a ≥ 0}
    = ℕ
 
 Equality.  No proof.
@@ -4184,7 +4184,7 @@ exports[`render hlm library: 1.6.4.10.9 data/libraries/hlm/Essentials/Numbers/In
 "Definition 1.6.4.10.9.  We define:
 
   ℤ_+ := ℤ_(>0)
-   = {a ∈ ℤ : a > 0}
+   = {a ∈ ℤ : a > 0}
    = ℕ_+
 
 Equality.  No proof.
@@ -4198,7 +4198,7 @@ exports[`render hlm library: 1.6.4.10.10 data/libraries/hlm/Essentials/Numbers/I
 "Definition 1.6.4.10.10.  We define:
 
   ℤ_± := ℤ_(≠0)
-   = {a ∈ ℤ : a ≠ 0}
+   = {a ∈ ℤ : a ≠ 0}
    = ℤ_− ∪ ℤ_+
 
 Equality.  No proof."
@@ -4207,13 +4207,13 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.4.10.11 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Interval 1`] = `
 "Definition 1.6.4.10.11.  Let a, b ∈ ℤ. We define:
 
-  {a, ..., b} := {c ∈ ℤ : a ≤ c and c ≤ b}"
+  {a, ..., b} := {c ∈ ℤ : a ≤ c and c ≤ b}"
 `;
 
 exports[`render hlm library: 1.6.4.10.12 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
 "Definition 1.6.4.10.12.  Let n ∈ ℕ. We define:
 
-  nℤ := {n ⋅ z : z ∈ ℤ}"
+  nℤ := {n ⋅ z : z ∈ ℤ}"
 `;
 
 exports[`render hlm library: 1.6.4.11 data/libraries/hlm/Essentials/Numbers/Integer/absolute 1`] = `
@@ -4287,7 +4287,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 1.6.4.16 data/libraries/hlm/Essentials/Numbers/Integer/Divisors 1`] = `
 "Definition 1.6.4.16.  Let b ∈ ℤ. We define:
 
-  Div_ℤ(b) := {a ∈ ℤ_± : a ∣ b}"
+  Div_ℤ(b) := {a ∈ ℤ_± : a ∣ b}"
 `;
 
 exports[`render hlm library: 1.6.4.17 data/libraries/hlm/Essentials/Numbers/Integer/quotient 1`] = `
@@ -4534,19 +4534,19 @@ References.
 exports[`render hlm library: 1.6.5.7.1 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.5.7.1.  Let a ∈ ℚ. We define:
 
-  ℚ_(<a) := {b ∈ ℚ : b < a}"
+  ℚ_(<a) := {b ∈ ℚ : b < a}"
 `;
 
 exports[`render hlm library: 1.6.5.7.2 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.5.7.2.  Let a ∈ ℚ. We define:
 
-  ℚ_(≤a) := {b ∈ ℚ : b ≤ a}"
+  ℚ_(≤a) := {b ∈ ℚ : b ≤ a}"
 `;
 
 exports[`render hlm library: 1.6.5.7.3 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.5.7.3.  Let a ∈ ℚ. We define:
 
-  ℚ_(≥a) := {b ∈ ℚ : b ≥ a}
+  ℚ_(≥a) := {b ∈ ℚ : b ≥ a}
    = ℚ ∖ ℚ_(<a)
 
 Equality.  No proof."
@@ -4555,7 +4555,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.5.7.4 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.5.7.4.  Let a ∈ ℚ. We define:
 
-  ℚ_(>a) := {b ∈ ℚ : b > a}
+  ℚ_(>a) := {b ∈ ℚ : b > a}
    = ℚ ∖ ℚ_(≤a)
 
 Equality.  No proof."
@@ -4564,7 +4564,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.5.7.5 data/libraries/hlm/Essentials/Numbers/Rational/Subsets/Hole 1`] = `
 "Definition 1.6.5.7.5.  Let a ∈ ℚ. We define:
 
-  ℚ_(≠a) := {b ∈ ℚ : b ≠ a}
+  ℚ_(≠a) := {b ∈ ℚ : b ≠ a}
    = ℚ_(<a) ∪ ℚ_(>a)
 
 Equality.  No proof."
@@ -4574,7 +4574,7 @@ exports[`render hlm library: 1.6.5.7.6 data/libraries/hlm/Essentials/Numbers/Rat
 "Definition 1.6.5.7.6.  We define:
 
   ℚ_− := ℚ_(<0)
-   = {a ∈ ℚ : a < 0}
+   = {a ∈ ℚ : a < 0}
 
 Equality.  No proof."
 `;
@@ -4583,7 +4583,7 @@ exports[`render hlm library: 1.6.5.7.7 data/libraries/hlm/Essentials/Numbers/Rat
 "Definition 1.6.5.7.7.  We define:
 
   ℚ_0^− := ℚ_(≤0)
-   = {a ∈ ℚ : a ≤ 0}
+   = {a ∈ ℚ : a ≤ 0}
 
 Equality.  No proof.
 
@@ -4596,7 +4596,7 @@ exports[`render hlm library: 1.6.5.7.8 data/libraries/hlm/Essentials/Numbers/Rat
 "Definition 1.6.5.7.8.  We define:
 
   ℚ_0^+ := ℚ_(≥0)
-   = {a ∈ ℚ : a ≥ 0}
+   = {a ∈ ℚ : a ≥ 0}
 
 Equality.  No proof."
 `;
@@ -4605,7 +4605,7 @@ exports[`render hlm library: 1.6.5.7.9 data/libraries/hlm/Essentials/Numbers/Rat
 "Definition 1.6.5.7.9.  We define:
 
   ℚ_+ := ℚ_(>0)
-   = {a ∈ ℚ : a > 0}
+   = {a ∈ ℚ : a > 0}
 
 Equality.  No proof."
 `;
@@ -4614,7 +4614,7 @@ exports[`render hlm library: 1.6.5.7.10 data/libraries/hlm/Essentials/Numbers/Ra
 "Definition 1.6.5.7.10.  We define:
 
   ℚ_± := ℚ_(≠0)
-   = {a ∈ ℚ : a ≠ 0}
+   = {a ∈ ℚ : a ≠ 0}
    = ℚ_− ∪ ℚ_+
 
 Equality.  No proof."
@@ -4962,19 +4962,19 @@ References.
 exports[`render hlm library: 1.6.6.7.1 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(less) 1`] = `
 "Definition 1.6.6.7.1.  Let a ∈ ℝ. We define:
 
-  ℝ_(<a) := {b ∈ ℝ : b < a}"
+  ℝ_(<a) := {b ∈ ℝ : b < a}"
 `;
 
 exports[`render hlm library: 1.6.6.7.2 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(less%20or%20equal) 1`] = `
 "Definition 1.6.6.7.2.  Let a ∈ ℝ. We define:
 
-  ℝ_(≤a) := {b ∈ ℝ : b ≤ a}"
+  ℝ_(≤a) := {b ∈ ℝ : b ≤ a}"
 `;
 
 exports[`render hlm library: 1.6.6.7.3 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(greater%20or%20equal) 1`] = `
 "Definition 1.6.6.7.3.  Let a ∈ ℝ. We define:
 
-  ℝ_(≥a) := {b ∈ ℝ : b ≥ a}
+  ℝ_(≥a) := {b ∈ ℝ : b ≥ a}
    = ℝ ∖ ℝ_(<a)
 
 Equality.  No proof."
@@ -4983,7 +4983,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.6.7.4 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Segment%20(greater) 1`] = `
 "Definition 1.6.6.7.4.  Let a ∈ ℝ. We define:
 
-  ℝ_(>a) := {b ∈ ℝ : b > a}
+  ℝ_(>a) := {b ∈ ℝ : b > a}
    = ℝ ∖ ℝ_(≤a)
 
 Equality.  No proof."
@@ -4992,7 +4992,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.6.7.5 data/libraries/hlm/Essentials/Numbers/Real/Subsets/Hole 1`] = `
 "Definition 1.6.6.7.5.  Let a ∈ ℝ. We define:
 
-  ℝ_(≠a) := {b ∈ ℝ : b ≠ a}
+  ℝ_(≠a) := {b ∈ ℝ : b ≠ a}
    = ℝ_(<a) ∪ ℝ_(>a)
 
 Equality.  No proof."
@@ -5002,7 +5002,7 @@ exports[`render hlm library: 1.6.6.7.6 data/libraries/hlm/Essentials/Numbers/Rea
 "Definition 1.6.6.7.6.  We define:
 
   ℝ_− := ℝ_(<0)
-   = {a ∈ ℝ : a < 0}
+   = {a ∈ ℝ : a < 0}
 
 Equality.  No proof."
 `;
@@ -5011,7 +5011,7 @@ exports[`render hlm library: 1.6.6.7.7 data/libraries/hlm/Essentials/Numbers/Rea
 "Definition 1.6.6.7.7.  We define:
 
   ℝ_0^− := ℝ_(≤0)
-   = {a ∈ ℝ : a ≤ 0}
+   = {a ∈ ℝ : a ≤ 0}
 
 Equality.  No proof."
 `;
@@ -5020,7 +5020,7 @@ exports[`render hlm library: 1.6.6.7.8 data/libraries/hlm/Essentials/Numbers/Rea
 "Definition 1.6.6.7.8.  We define:
 
   ℝ_0^+ := ℝ_(≥0)
-   = {a ∈ ℝ : a ≥ 0}
+   = {a ∈ ℝ : a ≥ 0}
 
 Equality.  No proof."
 `;
@@ -5029,7 +5029,7 @@ exports[`render hlm library: 1.6.6.7.9 data/libraries/hlm/Essentials/Numbers/Rea
 "Definition 1.6.6.7.9.  We define:
 
   ℝ_+ := ℝ_(>0)
-   = {a ∈ ℝ : a > 0}
+   = {a ∈ ℝ : a > 0}
 
 Equality.  No proof."
 `;
@@ -5038,7 +5038,7 @@ exports[`render hlm library: 1.6.6.7.10 data/libraries/hlm/Essentials/Numbers/Re
 "Definition 1.6.6.7.10.  We define:
 
   ℝ_± := ℝ_(≠0)
-   = {a ∈ ℝ : a ≠ 0}
+   = {a ∈ ℝ : a ≠ 0}
    = ℝ_− ∪ ℝ_+
 
 Equality.  No proof."
@@ -5396,14 +5396,14 @@ This proposition justifies the notation used for the constructor. Note that the 
 exports[`render hlm library: 1.6.7.12.1 data/libraries/hlm/Essentials/Numbers/Complex/Subsets/Hole 1`] = `
 "Definition 1.6.7.12.1.  Let a ∈ ℂ. We define:
 
-  ℂ_(≠a) := {b ∈ ℂ : b ≠ a}"
+  ℂ_(≠a) := {b ∈ ℂ : b ≠ a}"
 `;
 
 exports[`render hlm library: 1.6.7.12.2 data/libraries/hlm/Essentials/Numbers/Complex/Subsets/Nonzero%20numbers 1`] = `
 "Definition 1.6.7.12.2.  We define:
 
   ℂ^× := ℂ_(≠0)
-   = {a ∈ ℂ : a ≠ 0}
+   = {a ∈ ℂ : a ≠ 0}
 
 Equality.  No proof."
 `;
@@ -5584,7 +5584,7 @@ by:
 exports[`render hlm library: 2.2.4.1 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.2.4.1.  Let 𝐒, 𝐓 be pointed sets. We define:
 
-  Hom(𝐒, 𝐓) := {f : (𝐒) → (𝐓) : f(base(𝐒)) = base(𝐓)}
+  Hom(𝐒, 𝐓) := {f : (𝐒) → (𝐓) : f(base(𝐒)) = base(𝐓)}
 
 We write “let φ : 𝐒 → 𝐓 be a homomorphism” for “let φ ∈ Hom(𝐒, 𝐓).”
 
@@ -5598,8 +5598,8 @@ References.
 exports[`render hlm library: 2.2.4.2 data/libraries/hlm/Algebra/Pointed%20sets/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.2.4.2.  Let 𝐒, 𝐓 be pointed sets. We define:
 
-  Iso(𝐒, 𝐓) := {homomorphisms φ : 𝐒 → 𝐓 : φ is bijective}
-   = {f : (𝐒) ↔ (𝐓) : f(base(𝐒)) = base(𝐓)}
+  Iso(𝐒, 𝐓) := {homomorphisms φ : 𝐒 → 𝐓 : φ is bijective}
+   = {f : (𝐒) ↔ (𝐓) : f(base(𝐒)) = base(𝐓)}
 
 We write “let φ : 𝐒 ↔ 𝐓 be an isomorphism” for “let φ ∈ Iso(𝐒, 𝐓).”
 
@@ -5768,7 +5768,7 @@ References.
 exports[`render hlm library: 2.3.6.1 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.3.6.1.  Let 𝐌, 𝐍 be magmas. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -5782,8 +5782,8 @@ References.
 exports[`render hlm library: 2.3.6.2 data/libraries/hlm/Algebra/Magmas/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.3.6.2.  Let 𝐌, 𝐍 be magmas. We define:
 
-  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -6007,8 +6007,8 @@ References.
 exports[`render hlm library: 2.4.2 data/libraries/hlm/Algebra/Semigroups/Semigroups 1`] = `
 "Definition 2.4.2.  We define:
 
-  𝓢𝓮𝓶𝓲𝓖𝓻𝓹 := {magmas [M, ∗] : (M, ∗) forms a semigroup}
-   = {magmas 𝐒 : 𝐒 is associative}
+  𝓢𝓮𝓶𝓲𝓖𝓻𝓹 := {magmas [M, ∗] : (M, ∗) forms a semigroup}
+   = {magmas 𝐒 : 𝐒 is associative}
 
 We write “let 𝐒 be a semigroup” for “let 𝐒 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹.”
 
@@ -6130,7 +6130,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.5.9.1 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.5.9.1.  Let 𝐌, 𝐍 be monoids. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -6145,8 +6145,8 @@ References.
 exports[`render hlm library: 2.5.9.2 data/libraries/hlm/Algebra/Monoids/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.5.9.2.  Let 𝐌, 𝐍 be monoids. We define:
 
-  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : (𝐌) ↔ (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -6493,8 +6493,8 @@ References.
 exports[`render hlm library: 2.6.12.1 data/libraries/hlm/Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.6.12.1.  Let 𝐆, 𝐇 be groups. We define:
 
-  Hom(𝐆, 𝐇) := {f : (𝐆) → (𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(e_𝐆) = e_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
-   = {f : (𝐆) → (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+  Hom(𝐆, 𝐇) := {f : (𝐆) → (𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(e_𝐆) = e_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
+   = {f : (𝐆) → (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ ∈ Hom(𝐆, 𝐇).”
 
@@ -6512,8 +6512,8 @@ References.
 exports[`render hlm library: 2.6.12.2 data/libraries/hlm/Algebra/Groups/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.6.12.2.  Let 𝐆, 𝐇 be groups. We define:
 
-  Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
-   = {f : (𝐆) ↔ (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+  Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
+   = {f : (𝐆) ↔ (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ ∈ Iso(𝐆, 𝐇).”
 
@@ -6659,7 +6659,7 @@ exports[`render hlm library: 2.6.13.5 data/libraries/hlm/Algebra/Groups/Subgroup
 exports[`render hlm library: 2.6.13.6 data/libraries/hlm/Algebra/Groups/Subgroups/Span 1`] = `
 "Definition 2.6.13.6.  Let 𝐆 be a group, X ⊆ (𝐆). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐆) : S is a subgroup of 𝐆 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫(𝐆) : S is a subgroup of 𝐆 and X ⊆ S}
 
 References.
 
@@ -6673,7 +6673,7 @@ exports[`render hlm library: 2.6.13.7 data/libraries/hlm/Algebra/Groups/Subgroup
 "Definition 2.6.13.7.  Let 𝐆 be a group, g ∈ 𝐆. We define:
 
   〈g〉 := 〈{g}〉
-   = {g^z : z ∈ ℤ}
+   = {g^z : z ∈ ℤ}
 
 Equality.  No proof.
 
@@ -6780,7 +6780,7 @@ References.
 exports[`render hlm library: 2.6.16.3 data/libraries/hlm/Algebra/Groups/Order/Groups%20with%20order 1`] = `
 "Definition 2.6.16.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
 
-  𝓖𝓻𝓹_κ := {groups 𝐆 : |𝐆| = κ}
+  𝓖𝓻𝓹_κ := {groups 𝐆 : |𝐆| = κ}
 
 We write “let 𝐆 be a group of order κ” for “let 𝐆 ∈ 𝓖𝓻𝓹_κ.”
 
@@ -6815,7 +6815,7 @@ References.
 `;
 
 exports[`render hlm library: 2.6.16.6 data/libraries/hlm/Algebra/Groups/Order/element%20order 1`] = `
-"Definition 2.6.16.6.  Let 𝐆 be a group, g ∈ 𝐆, S := {n ∈ ℕ_+ : g^n = e_𝐆}. We define:
+"Definition 2.6.16.6.  Let 𝐆 be a group, g ∈ 𝐆, S := {n ∈ ℕ_+ : g^n = e_𝐆}. We define:
 
   |g| := |〈g〉|
    = {min(S) if S is nonempty, ℵ_0 if S is empty
@@ -7000,7 +7000,7 @@ References.
 exports[`render hlm library: 2.7.10.1 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.7.10.1.  Let 𝐑, 𝐒 be semirings. We define:
 
-  Hom(𝐑, 𝐒) := {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c, d ∈ 𝐑 : f(c ⋅ d) = f(c) ⋅ f(d)] and f(1_𝐑) = 1_𝐒}
+  Hom(𝐑, 𝐒) := {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c, d ∈ 𝐑 : f(c ⋅ d) = f(c) ⋅ f(d)] and f(1_𝐑) = 1_𝐒}
 
 We write “let φ : 𝐑 → 𝐒 be a homomorphism” for “let φ ∈ Hom(𝐑, 𝐒).”
 
@@ -7016,8 +7016,8 @@ References.
 exports[`render hlm library: 2.7.10.2 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.7.10.2.  Let 𝐑, 𝐒 be semirings. We define:
 
-  Iso(𝐑, 𝐒) := {homomorphisms φ : 𝐑 → 𝐒 : φ is bijective}
-   = {f : (𝐑) ↔ (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c, d ∈ 𝐑 : f(c ⋅ d) = f(c) ⋅ f(d)] and f(1_𝐑) = 1_𝐒}
+  Iso(𝐑, 𝐒) := {homomorphisms φ : 𝐑 → 𝐒 : φ is bijective}
+   = {f : (𝐑) ↔ (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c, d ∈ 𝐑 : f(c ⋅ d) = f(c) ⋅ f(d)] and f(1_𝐑) = 1_𝐒}
 
 We write “let φ : 𝐑 ↔ 𝐒 be an isomorphism” for “let φ ∈ Iso(𝐑, 𝐒).”
 
@@ -7361,8 +7361,8 @@ References.
 exports[`render hlm library: 2.8.13.1 data/libraries/hlm/Algebra/Rings/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.8.13.1.  Let 𝐑, 𝐒 be rings. We define:
 
-  Hom(𝐑, 𝐒) := {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c ∈ 𝐑 : f(−c) = −f(c)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
-   = {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+  Hom(𝐑, 𝐒) := {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and f(0_𝐑) = 0_𝐒 and [∀ c ∈ 𝐑 : f(−c) = −f(c)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+   = {f : (𝐑) → (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
 
 We write “let φ : 𝐑 → 𝐒 be a homomorphism” for “let φ ∈ Hom(𝐑, 𝐒).”
 
@@ -7380,8 +7380,8 @@ References.
 exports[`render hlm library: 2.8.13.2 data/libraries/hlm/Algebra/Rings/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.8.13.2.  Let 𝐑, 𝐒 be rings. We define:
 
-  Iso(𝐑, 𝐒) := {homomorphisms φ : 𝐑 → 𝐒 : φ is bijective}
-   = {f : (𝐑) ↔ (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
+  Iso(𝐑, 𝐒) := {homomorphisms φ : 𝐑 → 𝐒 : φ is bijective}
+   = {f : (𝐑) ↔ (𝐒) : [∀ a, b ∈ 𝐑 : f(a + b) = f(a) + f(b)] and [∀ d, e ∈ 𝐑 : f(d ⋅ e) = f(d) ⋅ f(e)] and f(1_𝐑) = 1_𝐒}
 
 We write “let φ : 𝐑 ↔ 𝐒 be an isomorphism” for “let φ ∈ Iso(𝐑, 𝐒).”
 
@@ -7511,7 +7511,7 @@ References.
 exports[`render hlm library: 2.8.16 data/libraries/hlm/Algebra/Rings/Units 1`] = `
 "Definition 2.8.16.  Let 𝐑 be a ring. We define:
 
-  𝐑^× := {a ∈ 𝐑 : a is a unit}
+  𝐑^× := {a ∈ 𝐑 : a is a unit}
 
 References.
 
@@ -8167,8 +8167,8 @@ References.
 exports[`render hlm library: 2.8.29.1.11.1 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.8.29.1.11.1.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(a ⋅ w) = a ⋅ f(w)}
-   = {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(a ⋅ w) = a ⋅ f(w)}
+   = {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -8185,8 +8185,8 @@ References.
 exports[`render hlm library: 2.8.29.1.11.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.8.29.1.11.2.  Let 𝐑 be a ring, 𝐌, 𝐍 be left 𝐑-modules. We define:
 
-  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(a ⋅ x + b ⋅ y) = a ⋅ f(x) + b ⋅ f(y)}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -8315,7 +8315,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.8.29.1.12.4 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Submodules/Span 1`] = `
 "Definition 2.8.29.1.12.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, X ⊆ (𝐌). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
 
 Remarks.
 
@@ -8331,7 +8331,7 @@ exports[`render hlm library: 2.8.29.1.12.5 data/libraries/hlm/Algebra/Rings/Modu
 "Definition 2.8.29.1.12.5.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x ∈ 𝐌. We define:
 
   〈x〉 := 〈{x}〉
-   = {a ⋅ x : a ∈ 𝐑}
+   = {a ⋅ x : a ∈ 𝐑}
 
 Equality.  No proof."
 `;
@@ -8351,7 +8351,7 @@ The main point of defining sequences of module elements is to define when such a
 exports[`render hlm library: 2.8.29.1.13.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Coordinates/Coordinates 1`] = `
 "Definition 2.8.29.1.13.2.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, 𝒙 be an element sequence on 𝐌, α := |𝒙|. We define:
 
-  Coord_𝒙 := {(a_k)_(k < α) ∈ (𝐑)^α : ∃ S ⊆ 𝓞𝓻𝓭_(<α) : [S is finite and ∀ j ∈ 𝓞𝓻𝓭_(<α) ∖ S : a_j = 0_𝐑]}
+  Coord_𝒙 := {(a_k)_(k < α) ∈ (𝐑)^α : ∃ S ⊆ 𝓞𝓻𝓭_(<α) : [S is finite and ∀ j ∈ 𝓞𝓻𝓭_(<α) ∖ S : a_j = 0_𝐑]}
 
 We write “let 𝐚 be a coordinate sequence for 𝒙” for “let 𝐚 ∈ Coord_𝒙.”
 
@@ -8403,8 +8403,8 @@ exports[`render hlm library: 2.8.29.1.13.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
-   = {𝐚 ⋅ 𝒙 : 𝐚 is a coordinate sequence for 𝒙}
+  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
+   = {𝐚 ⋅ 𝒙 : 𝐚 is a coordinate sequence for 𝒙}
 
 Equality.  No proof.
 
@@ -8449,7 +8449,7 @@ References.
 exports[`render hlm library: 2.8.29.1.13.8 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Coordinates/Bases 1`] = `
 "Definition 2.8.29.1.13.8.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module. We define:
 
-  Ba(𝐌) := {𝒙 ∈ 𝐌^⋆ : 𝒙 is a basis}
+  Ba(𝐌) := {𝒙 ∈ 𝐌^⋆ : 𝒙 is a basis}
 
 We write “let 𝒙 be a basis of 𝐌” for “let 𝒙 ∈ Ba(𝐌).”"
 `;
@@ -8626,8 +8626,8 @@ References.
 exports[`render hlm library: 2.8.29.2.11.1 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.8.29.2.11.1.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(w ⋅ a) = f(w) ⋅ a}
-   = {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ x, y ∈ 𝐌 : f(x + y) = f(x) + f(y)] and f(0_𝐌) = 0_𝐍 and [∀ z ∈ 𝐌 : f(−z) = −f(z)] and ∀ a ∈ 𝐑, w ∈ 𝐌 : f(w ⋅ a) = f(w) ⋅ a}
+   = {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -8644,8 +8644,8 @@ References.
 exports[`render hlm library: 2.8.29.2.11.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Isomorphisms 1`] = `
 "Definition 2.8.29.2.11.2.  Let 𝐑 be a ring, 𝐌, 𝐍 be right 𝐑-modules. We define:
 
-  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
+  Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
+   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐑, x, y ∈ 𝐌 : f(x ⋅ a + y ⋅ b) = f(x) ⋅ a + f(y) ⋅ b}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -8761,7 +8761,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.8.29.2.12.4 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Submodules/Span 1`] = `
 "Definition 2.8.29.2.12.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, X ⊆ (𝐌). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
 
 Remarks.
 
@@ -8777,7 +8777,7 @@ exports[`render hlm library: 2.8.29.2.12.5 data/libraries/hlm/Algebra/Rings/Modu
 "Definition 2.8.29.2.12.5.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌. We define:
 
   〈x〉 := 〈{x}〉
-   = {x ⋅ a : a ∈ 𝐑}
+   = {x ⋅ a : a ∈ 𝐑}
 
 Equality.  No proof."
 `;
@@ -8797,7 +8797,7 @@ The main point of defining sequences of module elements is to define when such a
 exports[`render hlm library: 2.8.29.2.13.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Coordinates/Coordinates 1`] = `
 "Definition 2.8.29.2.13.2.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, 𝒙 be an element sequence on 𝐌, α := |𝒙|. We define:
 
-  Coord_𝒙 := {(a_k)_(k < α) ∈ (𝐑)^α : ∃ S ⊆ 𝓞𝓻𝓭_(<α) : [S is finite and ∀ j ∈ 𝓞𝓻𝓭_(<α) ∖ S : a_j = 0_𝐑]}
+  Coord_𝒙 := {(a_k)_(k < α) ∈ (𝐑)^α : ∃ S ⊆ 𝓞𝓻𝓭_(<α) : [S is finite and ∀ j ∈ 𝓞𝓻𝓭_(<α) ∖ S : a_j = 0_𝐑]}
 
 We write “let 𝐚 be a coordinate sequence for 𝒙” for “let 𝐚 ∈ Coord_𝒙.”
 
@@ -8847,8 +8847,8 @@ exports[`render hlm library: 2.8.29.2.13.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
-   = {𝒙 ⋅ 𝐚 : 𝐚 is a coordinate sequence for 𝒙}
+  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
+   = {𝒙 ⋅ 𝐚 : 𝐚 is a coordinate sequence for 𝒙}
 
 Equality.  No proof."
 `;
@@ -8883,7 +8883,7 @@ References.
 exports[`render hlm library: 2.8.29.2.13.8 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Coordinates/Bases 1`] = `
 "Definition 2.8.29.2.13.8.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module. We define:
 
-  Ba(𝐌) := {𝒙 ∈ 𝐌^⋆ : 𝒙 is a basis}
+  Ba(𝐌) := {𝒙 ∈ 𝐌^⋆ : 𝒙 is a basis}
 
 We write “let 𝒙 be a basis of 𝐌” for “let 𝒙 ∈ Ba(𝐌).”"
 `;
@@ -8936,7 +8936,7 @@ exports[`render hlm library: 2.8.29.2.14.3 data/libraries/hlm/Algebra/Rings/Modu
 exports[`render hlm library: 2.9.1 data/libraries/hlm/Algebra/Fields/Fields 1`] = `
 "Definition 2.9.1.  We define:
 
-  𝓕𝓵𝓭 := {rings 𝐑 : 𝐑 is commutative and 𝐑^× = (𝐑) ∖ {0_𝐑}}
+  𝓕𝓵𝓭 := {rings 𝐑 : 𝐑 is commutative and 𝐑^× = (𝐑) ∖ {0_𝐑}}
 
 We write “let 𝐅 be a field” for “let 𝐅 ∈ 𝓕𝓵𝓭.”
 
@@ -9194,8 +9194,8 @@ References.
 exports[`render hlm library: 4.6 data/libraries/hlm/Category%20theory/Isomorphisms 1`] = `
 "Definition 4.6.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
 
-  Iso(𝐗, 𝐘) := {f : 𝐗 → 𝐘 : ∃ g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
-   = {f : 𝐗 → 𝐘 : ∃! g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
+  Iso(𝐗, 𝐘) := {f : 𝐗 → 𝐘 : ∃ g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
+   = {f : 𝐗 → 𝐘 : ∃! g : 𝐘 → 𝐗 : [g ∘ f = id_𝐗 and f ∘ g = id_𝐘]}
 
 We write “let F : 𝐗 ↔ 𝐘 be an isomorphism” for “let F ∈ Iso(𝐗, 𝐘).”
 
@@ -9332,7 +9332,7 @@ References.
 exports[`render hlm library: 4.8.5 data/libraries/hlm/Category%20theory/Natural%20transformations/Natural%20transformations 1`] = `
 "Definition 4.8.5.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category, F, G : 𝓒 → 𝓓 be functors. We define:
 
-  Nat(F, G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
+  Nat(F, G) := {η : F ⇀ G : ∀ 𝐗, 𝐘 ∈ 𝓒, f : 𝐗 → 𝐘 : η_𝐘 ∘ F(f) = G(f) ∘ η_𝐗}
 
 We write “let η : F ⇒ G be a natural transformation” for “let η ∈ Nat(F, G).”
 
@@ -9708,7 +9708,7 @@ This definition checks whether a rewrite rule matches a pair of terms. It consid
 exports[`render hlm library: 5.4.4 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/beta%20reduction 1`] = `
 "Definition 5.4.4 (β reduction).  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
 
-  β_V := {(λz. M_z) N → M_y[y := N] : M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), N ∈ 𝓣_V, y ∈ Fresh(V)}
+  β_V := {(λz. M_z) N → M_y[y := N] : M_x ∈ 𝓣_(V ∪ {x}) for each x ∈ Fresh(V), N ∈ 𝓣_V, y ∈ Fresh(V)}
 
 References.
 
@@ -9719,7 +9719,7 @@ References.
 exports[`render hlm library: 5.4.5 data/libraries/hlm/Formal%20systems/Untyped%20lambda%20calculus/eta%20conversion 1`] = `
 "Definition 5.4.5 (η conversion).  Let V ⊆ 𝓥𝓪𝓻 such that V is finite. We define:
 
-  η_V := {λz. M z → M : M ∈ 𝓣_V}
+  η_V := {λz. M z → M : M ∈ 𝓣_V}
 
 References.
 
