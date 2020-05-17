@@ -5,7 +5,7 @@ $hlm: %MetaModel {
   expressionTypes = [$Expr, $Bool, $Nat, $ParameterList, $DefinitionRef,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binding,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $ResolveDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false,
                $empty, $previous,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
@@ -306,7 +306,7 @@ $Extend(term: $ElementTerm): %ParameterType($Formula) {
 $Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$ResolveDef(result: $Formula): %ParameterType($Formula) {
+$UnfoldDef(result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $UseTheorem(theorem: $Theorem, result: $Formula): %ParameterType($Formula) {

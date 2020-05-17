@@ -19,13 +19,13 @@ export interface HLMSubstitutionContext {
   substitutedBindingParameters?: Fmt.Parameter[];
 }
 
-export interface HLMResolveParameters {
+export interface HLMUnfoldParameters {
   followDefinitions: boolean;
-  resolveFixedSubterms: boolean;
+  unfoldFixedSubterms: boolean;
   extractStructuralCasesFromFixedSubterms: boolean;
 }
 
-export interface HLMTypeSearchParameters extends HLMResolveParameters {
+export interface HLMTypeSearchParameters extends HLMUnfoldParameters {
   followSupersets: boolean;
   followEmbeddings: boolean;
 }
@@ -34,7 +34,7 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
   followDefinitions: false,
   followSupersets: false,
   followEmbeddings: false,
-  resolveFixedSubterms: false,
+  unfoldFixedSubterms: false,
   extractStructuralCasesFromFixedSubterms: false
 };
 
@@ -412,7 +412,7 @@ export class HLMUtils extends GenericUtils {
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       return type.statement;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-               || type instanceof FmtHLM.MetaRefExpression_ResolveDef
+               || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
       return type.result;
@@ -492,21 +492,21 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getNextElementTerms(term: Fmt.Expression, resolveParameters: HLMResolveParameters): CachedPromise<Fmt.Expression[] | undefined> {
+  getNextElementTerms(term: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
     if (term instanceof Fmt.VariableRefExpression) {
       let type = term.variable.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        return this.getNextIndices(term, HLMExpressionType.ElementTerm, resolveParameters);
+        return this.getNextIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
         return CachedPromise.resolve([this.substituteIndices(type.element, term)]);
       } else {
         return CachedPromise.reject(new Error('Element variable expected'));
       }
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      if (!resolveParameters.followDefinitions) {
+      if (!unfoldParameters.followDefinitions) {
         return CachedPromise.resolve(undefined);
       }
-      // TODO resolve construction arguments?
+      // TODO unfold construction arguments?
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression[] | undefined => {
         if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
           return definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
@@ -523,8 +523,8 @@ export class HLMUtils extends GenericUtils {
     return CachedPromise.resolve(undefined);
   }
 
-  getNextElementTerm(term: Fmt.Expression, resolveParameters: HLMResolveParameters): CachedPromise<Fmt.Expression | undefined> {
-    return this.getNextElementTerms(term, resolveParameters).then((resultTerms: Fmt.Expression[] | undefined) => (resultTerms?.length ? resultTerms[0] : undefined));
+  getNextElementTerm(term: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression | undefined> {
+    return this.getNextElementTerms(term, unfoldParameters).then((resultTerms: Fmt.Expression[] | undefined) => (resultTerms?.length ? resultTerms[0] : undefined));
   }
 
   getNextSetTerms(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
@@ -568,8 +568,8 @@ export class HLMUtils extends GenericUtils {
             } else {
               return CachedPromise.reject(new Error('Element parameter expected'));
             }
-          } else if (typeSearchParameters.resolveFixedSubterms || typeSearchParameters.extractStructuralCasesFromFixedSubterms) {
-            return this.resolveConstructionArguments(term, definition, typeSearchParameters);
+          } else if (typeSearchParameters.unfoldFixedSubterms || typeSearchParameters.extractStructuralCasesFromFixedSubterms) {
+            return this.unfoldConstructionArguments(term, definition, typeSearchParameters);
           }
         } else if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           if (typeSearchParameters.followSupersets) {
@@ -677,27 +677,27 @@ export class HLMUtils extends GenericUtils {
     return this.getNextSetTerms(term, typeSearchParameters).then((resultTerms: Fmt.Expression[] | undefined) => (resultTerms?.length ? resultTerms[0] : undefined));
   }
 
-  private getNextIndices(term: Fmt.VariableRefExpression, expressionType: HLMExpressionType, resolveParameters: HLMResolveParameters): CachedPromise<Fmt.Expression[] | undefined> {
-    if (term.indices && (resolveParameters.resolveFixedSubterms || resolveParameters.extractStructuralCasesFromFixedSubterms)) {
+  private getNextIndices(term: Fmt.VariableRefExpression, expressionType: HLMExpressionType, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
+    if (term.indices && (unfoldParameters.unfoldFixedSubterms || unfoldParameters.extractStructuralCasesFromFixedSubterms)) {
       let newIndicesPromise: CachedPromise<Fmt.Expression[][]> = CachedPromise.resolve([[]]);
       let indicesChanged = false;
       let extractedStructuralCases: FmtHLM.MetaRefExpression_structuralCases | undefined = undefined;
       for (let index of term.indices) {
         newIndicesPromise = newIndicesPromise.then((newIndices: Fmt.Expression[][]) => {
           if (!indicesChanged) {
-            if (resolveParameters.extractStructuralCasesFromFixedSubterms && index instanceof FmtHLM.MetaRefExpression_structuralCases && index.cases.length === 1) {
+            if (unfoldParameters.extractStructuralCasesFromFixedSubterms && index instanceof FmtHLM.MetaRefExpression_structuralCases && index.cases.length === 1) {
               indicesChanged = true;
               extractedStructuralCases = index;
               let structuralCase = index.cases[0];
               return newIndices.map((prevIndices: Fmt.Expression[]) => prevIndices.concat(structuralCase.value));
-            } else if (resolveParameters.resolveFixedSubterms) {
-              return this.getNextElementTerms(index, resolveParameters).then((resolvedTerms: Fmt.Expression[] | undefined) => {
-                if (resolvedTerms) {
+            } else if (unfoldParameters.unfoldFixedSubterms) {
+              return this.getNextElementTerms(index, unfoldParameters).then((unfolddTerms: Fmt.Expression[] | undefined) => {
+                if (unfolddTerms) {
                   indicesChanged = true;
                   let changedIndices: Fmt.Expression[][] = [];
                   for (let prevIndices of newIndices) {
-                    for (let resolvedTerm of resolvedTerms) {
-                      changedIndices.push(prevIndices.concat(resolvedTerm));
+                    for (let unfolddTerm of unfolddTerms) {
+                      changedIndices.push(prevIndices.concat(unfolddTerm));
                     }
                   }
                   return changedIndices;
@@ -731,7 +731,7 @@ export class HLMUtils extends GenericUtils {
     return CachedPromise.resolve(undefined);
   }
 
-  private resolveConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
+  private unfoldConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
     let supersetResult: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
     for (let param of definition.parameters) {
       let type = param.type.expression;
@@ -752,7 +752,7 @@ export class HLMUtils extends GenericUtils {
                   followDefinitions: typeSearchParameters.followDefinitions,
                   followSupersets: embedSubsets,
                   followEmbeddings: embedSubsets,
-                  resolveFixedSubterms: typeSearchParameters.resolveFixedSubterms,
+                  unfoldFixedSubterms: typeSearchParameters.unfoldFixedSubterms,
                   extractStructuralCasesFromFixedSubterms: typeSearchParameters.extractStructuralCasesFromFixedSubterms
                 };
                 return this.getNextSetTerms(argValue, innerSearchParameters).then((newArgValues: Fmt.Expression[] | undefined) => {

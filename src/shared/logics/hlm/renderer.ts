@@ -2445,7 +2445,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-                 || type instanceof FmtHLM.MetaRefExpression_ResolveDef
+                 || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
                  || type instanceof FmtHLM.MetaRefExpression_UseForAll
                  || type instanceof FmtHLM.MetaRefExpression_Embed
                  || type instanceof FmtHLM.MetaRefExpression_SetExtend
@@ -2475,7 +2475,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         }
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
-            || sourceType instanceof FmtHLM.MetaRefExpression_ResolveDef) {
+            || sourceType instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
           source = new Notation.TextExpression('def');
           source.styleClasses = ['miniature'];
           // TODO link to definition
@@ -2805,7 +2805,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addProofParts(type.proof, result);
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-               || type instanceof FmtHLM.MetaRefExpression_ResolveDef) {
+               || type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
       this.addFormulaParts(type.result, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
                || type instanceof FmtHLM.MetaRefExpression_ProveCases) {

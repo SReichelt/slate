@@ -399,7 +399,7 @@ export class HLMDefinitionChecker {
         followDefinitions: true,
         followSupersets: true,
         followEmbeddings: true,
-        resolveFixedSubterms: false,
+        unfoldFixedSubterms: false,
         extractStructuralCasesFromFixedSubterms: false
       };
       let checkSubset = this.utils.getFinalSuperset(subset, typeSearchParameters)
@@ -1115,7 +1115,7 @@ export class HLMDefinitionChecker {
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: false,
-      resolveFixedSubterms: false,
+      unfoldFixedSubterms: false,
       extractStructuralCasesFromFixedSubterms: false
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
@@ -1285,7 +1285,7 @@ export class HLMDefinitionChecker {
           followDefinitions: true,
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings,
-          resolveFixedSubterms: nextStatus.followedEmbeddings,
+          unfoldFixedSubterms: nextStatus.followedEmbeddings,
           extractStructuralCasesFromFixedSubterms: nextStatus.followedEmbeddings
         };
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
