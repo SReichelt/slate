@@ -38,7 +38,7 @@
 
 .open-menu.variable {
   max-height: 20em;
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .open-menu-row>* {

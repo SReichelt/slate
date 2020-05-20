@@ -6,12 +6,15 @@ export interface TutorialToolTip {
   contents: React.ReactNode;
   position: ToolTipPosition;
   index: number;
+  condition?: (component: React.Component<any, any>) => boolean;
 }
 
 export interface TutorialManipulationEntry {
   type?: any;
   key?: any;
   constraint?: (props: any) => boolean;
+  refConstraint?: (refComponents: (React.Component<any, any> | undefined)[]) => boolean;
+  refIndex?: number;
   children?: TutorialManipulationEntry[];
   toolTip?: TutorialToolTip;
   manipulateProps?: (props: any) => any;
@@ -19,14 +22,13 @@ export interface TutorialManipulationEntry {
   elementAction?: (reactElement: React.ReactElement, htmlElement: HTMLElement) => void;
 }
 
-type NodeManipulationFn = (node: React.ReactNode) => React.ReactNode;
-
-function applyTutorialManipulationEntries(node: React.ReactNode, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
+function applyTutorialManipulationEntries(tutorialState: TutorialState, node: React.ReactNode, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
   let visitor = (element: React.ReactElement) => {
     for (let entry of entries) {
       if ((entry.type === undefined || element.type === entry.type)
           && (entry.key === undefined || element.key === entry.key || element.key === entry.key.toString())
-          && (entry.constraint === undefined || entry.constraint(element.props))) {
+          && (entry.constraint === undefined || entry.constraint(element.props))
+          && (entry.refConstraint === undefined || (tutorialState.refComponents && entry.refConstraint(tutorialState.refComponents)))) {
         let entryName = '?';
         if (entry.type !== undefined) {
           if (typeof entry.type === 'string') {
@@ -39,7 +41,7 @@ function applyTutorialManipulationEntries(node: React.ReactNode, entries: Tutori
           entryName = `${entryName} key="${entry.key}"`;
         }
         console.log(`${indent}Found ${entryName}.`);
-        return createTutorialManipulator(entry, indent + '  ');
+        return createTutorialManipulator(tutorialState, entry, indent + '  ');
       }
     }
     return undefined;
@@ -47,11 +49,33 @@ function applyTutorialManipulationEntries(node: React.ReactNode, entries: Tutori
   return traverseReactComponents(node, visitor);
 }
 
-function createTutorialManipulator(entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
-  let traverseChildren: NodeManipulationFn | undefined = undefined;
+type NodeManipulationFn = (node: React.ReactNode, component: React.Component<any, any> | undefined) => React.ReactNode;
+
+function createTutorialManipulator(tutorialState: TutorialState, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
+  let applyRef: NodeManipulationFn | undefined = undefined;
+  if (entry.refIndex !== undefined) {
+    let refIndex = entry.refIndex;
+    applyRef = (node: React.ReactNode, component: React.Component<any, any> | undefined) => {
+      if (!tutorialState.refComponents) {
+        tutorialState.refComponents = [];
+      }
+      for (let index = tutorialState.refComponents.length; index < refIndex; index++) {
+        tutorialState.refComponents.push(undefined);
+      }
+      tutorialState.refComponents[refIndex] = component;
+      return node;
+    };
+  }
+
+  let traverseChildren = applyRef;
   if (entry.children && entry.children.length) {
     let children = entry.children;
-    traverseChildren = (node: React.ReactNode) => applyTutorialManipulationEntries(node, children, indent);
+    traverseChildren = (node: React.ReactNode, component: React.Component<any, any> | undefined) => {
+      if (applyRef) {
+        node = applyRef(node, component);
+      }
+      return applyTutorialManipulationEntries(tutorialState, node, children, indent);
+    };
   }
 
   let manipulateContents = traverseChildren;
@@ -75,11 +99,14 @@ function createTutorialManipulator(entry: TutorialManipulationEntry, indent: str
         }
       }
     };
-    manipulateContents = (node: React.ReactNode) => {
+    manipulateContents = (node: React.ReactNode, component: React.Component<any, any> | undefined) => {
       if (traverseChildren) {
-        node = traverseChildren(node);
+        node = traverseChildren(node, component);
       }
-      let toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={() => toolTip.contents} key="tutorial-tooltip"/>;
+      let toolTipElement: React.ReactNode = null;
+      if (!toolTip.condition || (component && toolTip.condition(component))) {
+        toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={() => toolTip.contents} key="tutorial-tooltip"/>;
+      }
       let ref = (refNode: HTMLElement | null) => {
         parentNode = refNode;
         if (entry.elementAction && refNode) {
@@ -138,8 +165,9 @@ function createTutorialManipulator(entry: TutorialManipulationEntry, indent: str
 
 export interface TutorialState {
   manipulationEntries: TutorialManipulationEntry[];
+  refComponents?: (React.Component<any, any> | undefined)[];
 }
 
 export function addTutorial(node: React.ReactNode, tutorialState: TutorialState): React.ReactNode {
-  return applyTutorialManipulationEntries(node, tutorialState.manipulationEntries);
+  return applyTutorialManipulationEntries(tutorialState, node, tutorialState.manipulationEntries);
 }

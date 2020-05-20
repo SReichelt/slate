@@ -1003,7 +1003,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startTutorial = (withTouchWarning: boolean): void => {
-    let onChangeTutorialState = (newTutorialState: TutorialState | undefined) => this.setState({tutorialState: newTutorialState});
+    let onChangeTutorialState = (newTutorialState: TutorialState | undefined) => {
+      if (this.state.tutorialState !== newTutorialState) {
+        this.setState({tutorialState: newTutorialState});
+      }
+    };
     startTutorial(onChangeTutorialState, this.docLinkClicked, withTouchWarning);
   };
 

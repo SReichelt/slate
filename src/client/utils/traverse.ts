@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export interface ReactElementManipulator {
   manipulateProps?(props: any): any;
-  manipulateContents?(node: React.ReactNode): React.ReactNode;
+  manipulateContents?(node: React.ReactNode, component: React.Component<any, any> | undefined): React.ReactNode;
   componentAction?(component: React.Component<any, any>): void;
   elementAction?(reactElement: React.ReactElement, htmlElement: HTMLElement): void;
 }
@@ -77,9 +77,9 @@ function attachElementAction(nodeObject: any, elementAction: (reactElement: Reac
 let wrappedClassComponents = new Map<any, any>();
 let wrappedFunctionComponents = new Map<any, any>();
 
-function getManipulatedContents(contents: any, props: any): any {
+function getManipulatedContents(contents: any, props: any, component: React.Component<any, any> | undefined): any {
   if (props._manipulateContents) {
-    contents = props._manipulateContents(contents);
+    contents = props._manipulateContents(contents, component);
   }
   if (props._elementAction) {
     contents = attachElementAction(contents, props._elementAction);
@@ -102,12 +102,12 @@ function getWrappedClassComponent(type: any): any {
       }
       render(): React.ReactNode {
         let contents = super.render();
-        contents = getManipulatedContents(contents, this.props);
+        contents = getManipulatedContents(contents, this.props, this as any);
         if (this.props._componentAction) {
           if (this.actionTimer) {
             clearTimeout(this.actionTimer);
           }
-          this.actionTimer = setTimeout(() => this.props._componentAction(this), 0);
+          this.actionTimer = setTimeout(() => this.props._componentAction?.(this), 0);
         }
         return contents;
       }
@@ -131,12 +131,12 @@ function getWrappedFunctionComponent(type: any): any {
       }
       render(): React.ReactNode {
         let contents = type(this.props);
-        contents = getManipulatedContents(contents, this.props);
+        contents = getManipulatedContents(contents, this.props, this);
         if (this.props._componentAction) {
           if (this.actionTimer) {
             clearTimeout(this.actionTimer);
           }
-          this.actionTimer = setTimeout(() => this.props._componentAction(this), 0);
+          this.actionTimer = setTimeout(() => this.props._componentAction?.(this), 0);
         }
         return contents;
       }
@@ -181,7 +181,7 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
           throw new Error('Trying to attach component action to non-component node');
         }
         if (manipulator.manipulateContents) {
-          let contents = manipulator.manipulateContents(node);
+          let contents = manipulator.manipulateContents(node, undefined);
           if (manipulator.elementAction) {
             contents = attachElementAction(contents, manipulator.elementAction);
           }
