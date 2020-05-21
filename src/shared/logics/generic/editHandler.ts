@@ -306,9 +306,26 @@ export abstract class GenericEditHandler {
       newPath.name = template.name;
       for (let param of template.parameters) {
         if (param.type.arrayDimensions) {
-          let emptyArray = new Fmt.ArrayExpression;
-          emptyArray.items = [];
-          newPath.arguments.add(emptyArray, param.name);
+          let arrayValue = new Fmt.ArrayExpression;
+          arrayValue.items = [];
+          if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && variables.length === 2))) {
+            for (let variable of variables) {
+              let value = new Fmt.VariableRefExpression;
+              value.variable = variable.param;
+              arrayValue.items.push(value);
+            }
+          }
+          newPath.arguments.add(arrayValue, param.name);
+        } else {
+          if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
+            let value = new Fmt.StringExpression;
+            value.value = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
+            newPath.arguments.add(value, param.name);
+          } else if (param.name === 'operand' && variables.length === 1) {
+            let value = new Fmt.VariableRefExpression;
+            value.variable = variables[0].param;
+            newPath.arguments.add(value, param.name);
+          }
         }
       }
       newNotationItem = new Fmt.DefinitionRefExpression;
@@ -409,6 +426,7 @@ export abstract class GenericEditHandler {
                   variable.styleClasses = ['var', 'dummy'];
                   return variable;
                 },
+                omitArguments: 0,
                 negationCount: 0,
                 forceInnerNegations: 0
               };
@@ -492,7 +510,7 @@ export abstract class GenericEditHandler {
     // TODO add preview in different contexts, to validate parentheses
     let listItem = new Dialog.ExpressionDialogListItem<number | undefined>();
     listItem.items = includeNegation ? [0, 1] : [undefined];
-    listItem.onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notationItem, renderedTemplateArguments, negationCount);
+    listItem.onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notationItem, renderedTemplateArguments, 0, negationCount);
     return listItem;
   }
 

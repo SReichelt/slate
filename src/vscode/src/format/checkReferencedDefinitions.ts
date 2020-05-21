@@ -42,7 +42,10 @@ class ReferenceChecker {
             let argumentType = new Fmt.Type;
             argumentType.expression = argumentTypeExpression;
             argumentType.arrayDimensions = param.type.arrayDimensions;
-            let onObjectContentsCreated = (expression: Fmt.CompoundExpression, objectContents: FmtDynamic.DynamicObjectContents) => this.parsedDocument.objectContentsMap?.set(expression, objectContents);
+            let onObjectContentsCreated: FmtDynamic.ObjectContentsCallbackFn | undefined = undefined;
+            if (this.parsedDocument.objectContentsMap) {
+                onObjectContentsCreated = (expression: Fmt.CompoundExpression, objectContents: FmtDynamic.DynamicObjectContents) => this.parsedDocument.objectContentsMap?.set(expression, objectContents);
+            }
             let onMemberFound: FmtDynamic.MemberCallbackFn | undefined = undefined;
             if (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression) {
                 let paramType = param.type.expression;

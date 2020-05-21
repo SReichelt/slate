@@ -322,6 +322,7 @@ export type NegationFallbackFn = (expression: RenderedExpression) => RenderedExp
 
 export interface RenderedTemplateConfig {
   getArgFn: GetArgFn;
+  omitArguments: number;
   negationCount: number;
   forceInnerNegations: number;
   negationFallbackFn?: NegationFallbackFn;
@@ -476,6 +477,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       }
       let config: RenderedTemplateConfig = {
         getArgFn: (name: string) => args.get(name),
+        omitArguments: this.config.omitArguments,
         negationCount: 0,
         forceInnerNegations: 0
       };
@@ -583,7 +585,21 @@ export class UserDefinedExpression extends ExpressionWithArgs {
             throw new Error('Inconsistent negations');
           }
         }
-        this.translateExpression(expression.items[index], undefined, result);
+        let item = expression.items[index];
+        if (this.config.omitArguments && item instanceof Fmt.StringExpression && item.value.length > 1 && item.value.indexOf(' ') < 0) {
+          let value = item.value;
+          for (index++; index < expression.items.length; index++) {
+            item = expression.items[index];
+            if (item instanceof Fmt.StringExpression && item.value.indexOf(' ') < 0) {
+              value += '/' + item.value;
+            } else {
+              break;
+            }
+          }
+          result.push(value);
+        } else {
+          this.translateExpression(item, undefined, result);
+        }
       } else {
         throw new Error('Undefined meta reference');
       }
@@ -678,6 +694,19 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       break;
     default:
       if (this.template.contents instanceof FmtNotation.ObjectContents_Template) {
+        if (this.config.omitArguments > 1 && (this.config.omitArguments > 2 || !(this.template.contents.useSymbol instanceof FmtNotation.MetaRefExpression_false))) {
+          let symbol = this.template.contents.symbol;
+          if (symbol) {
+            expression = new UserDefinedExpression(symbol, this.config, this.allTemplates);
+            while (expression instanceof IndirectExpression) {
+              expression = expression.resolve();
+            }
+            if (expression instanceof TextExpression && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
+              this.negationsSatisfied = this.config.negationCount;
+              break;
+            }
+          }
+        }
         let notation = this.template.contents.notation;
         if (notation) {
           expression = new UserDefinedExpression(notation, this.config, this.allTemplates);

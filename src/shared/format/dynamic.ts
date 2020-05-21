@@ -10,6 +10,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
   fileName: string;
   definitions: Fmt.DefinitionList;
   private getReferencedMetaModel: Meta.MetaModelGetter;
+  onObjectContentsCreated?: ObjectContentsCallbackFn;
 
   constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Meta.MetaModelGetter) {
     let definitions = file.definitions;
@@ -322,7 +323,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   checkValue(type: Fmt.Type, value: Fmt.Expression, onObjectContentsCreated?: ObjectContentsCallbackFn, onMemberFound?: MemberCallbackFn): void {
-    this.checkValueImpl(type.expression, type.arrayDimensions, value, onObjectContentsCreated, onMemberFound);
+    this.checkValueImpl(type.expression, type.arrayDimensions, value, onObjectContentsCreated ?? this.onObjectContentsCreated, onMemberFound);
   }
 }
 

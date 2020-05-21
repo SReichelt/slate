@@ -47,7 +47,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, protected utils: HLMUtils, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
     super(definition, libraryDataAccessor, utils, templates, options, editHandler);
-    this.renderUtils = new HLMRenderUtils(definition, this.utils);
+    this.renderUtils = new HLMRenderUtils(definition, utils, templates);
     if (editHandler) {
       this.readOnlyRenderer = Object.create(this);
       this.readOnlyRenderer.editHandler = undefined;
@@ -1404,59 +1404,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderSpecificNotationExpression(notation: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression {
-    if (omitArguments > 1 && notation instanceof Fmt.DefinitionRefExpression) {
-      // TODO make this code generic, by adding appropriate info to template definitions
-      let abbr: Fmt.Expression | undefined = undefined;
-      if (notation.path.name === 'Operator'
-          || notation.path.name === 'AssociativeOperator'
-          || notation.path.name === 'Relation'
-          || notation.path.name === 'TextualRelation'
-          || notation.path.name === 'BooleanOperator'
-          || (omitArguments > 2
-              && (notation.path.name === 'UnaryOperator'
-                  || notation.path.name === 'PrefixUnaryOperator'
-                  || notation.path.name === 'UnaryBooleanOperator'))) {
-        abbr = notation.path.arguments.getValue('symbol');
-      } else if (notation.path.name === 'FunctionOperator') {
-        abbr = notation.path.arguments.getOptionalValue('symbol');
-        if (abbr === undefined) {
-          let symbol = new Fmt.StringExpression;
-          symbol.value = '→';
-          abbr = symbol;
-        }
-      } else if (notation.path.name === 'Function') {
-        abbr = notation.path.arguments.getValue('function');
-      } else if (notation.path.name === 'Property'
-                 || notation.path.name === 'RelationalProperty'
-                 || notation.path.name === 'MultiProperty') {
-        abbr = notation.path.arguments.getValue('property');
-        if (abbr instanceof FmtNotation.MetaRefExpression_neg) {
-          let negationList = new Fmt.ArrayExpression;
-          negationList.items = [];
-          let comma = new Fmt.StringExpression;
-          comma.value = ', ';
-          for (let item of abbr.items) {
-            if (negationList.items.length) {
-              negationList.items.push(comma);
-            }
-            negationList.items.push(item);
-          }
-          abbr = negationList;
-        }
-      } else if (notation.path.name === 'NounProperty'
-                 || notation.path.name === 'NounRelation'
-                 || notation.path.name === 'Structure'
-                 || notation.path.name === 'Feature') {
-        abbr = notation.path.arguments.getValue('singular');
-      }
-      if ((abbr instanceof Fmt.StringExpression && abbr.value)
-          || (abbr instanceof Fmt.ArrayExpression && abbr.items.length)
-          || abbr instanceof Fmt.MetaRefExpression) {
-        notation = abbr;
-      }
-    }
     let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, omitArguments > 0);
-    return this.renderNotationExpression(notation, args, negationCount);
+    return this.renderNotationExpression(notation, args, omitArguments, negationCount);
   }
 
   private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], parameterOverrides?: ParameterOverrides, markAsDummy: boolean = false): RenderedTemplateArguments {
@@ -2011,8 +1960,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (property instanceof FmtNotation.MetaRefExpression_neg && property.items.length > 1) {
             let args = this.getRenderedTemplateArguments([definition]);
             let extraContents = this.renderTemplate('EquivalenceDefinition', {
-                                                      'left': this.renderNotationExpression(notation, args, 1),
-                                                      'right': this.renderNotationExpression(notation, args, 1, 1)
+                                                      'left': this.renderNotationExpression(notation, args, 0, 1),
+                                                      'right': this.renderNotationExpression(notation, args, 0, 1, 1)
                                                     });
             if (!extraContents.styleClasses) {
               extraContents.styleClasses = [];

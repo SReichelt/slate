@@ -25,7 +25,7 @@ export interface ExtractedStructuralCase {
 export type ElementParameterOverrides = Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>;
 
 export class HLMRenderUtils {
-  constructor(private definition: Fmt.Definition, private utils: HLMUtils) {}
+  constructor(private definition: Fmt.Definition, private utils: HLMUtils, private templates: Fmt.File) {}
 
   extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): PropertyInfo[] | undefined {
     let result: PropertyInfo[] | undefined = undefined;
@@ -109,25 +109,27 @@ export class HLMRenderUtils {
           && definition.contents.notation
           && definition.contents.notation.length) {
         let notation = definition.contents.notation[0];
-        if (notation instanceof Fmt.DefinitionRefExpression) {
-          if (notation.path.name === 'Property'
-              || notation.path.name === 'NounProperty'
-              || notation.path.name === 'Feature') {
-            let operand = notation.path.arguments.getValue('operand');
-            if (operand instanceof Fmt.VariableRefExpression) {
-              let operandArg = constraint.path.arguments.getValue(operand.variable.name);
-              if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
-                let operandArgValue = operandArg.arguments[0].value;
-                if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
-                  return {
-                    property: this.getNotationArgument(notation, 'property', negationCount),
-                    singular: this.getNotationArgument(notation, 'singular', negationCount),
-                    plural: this.getNotationArgument(notation, 'plural', negationCount),
-                    article: this.getNotationArgument(notation, 'article', negationCount),
-                    isFeature: notation.path.name === 'Feature',
-                    definitionRef: constraint,
-                    extracted: true
-                  };
+        if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
+          let template = this.templates.definitions.getDefinition(notation.path.name);
+          if (template.contents instanceof FmtNotation.ObjectContents_Template) {
+            let elements = template.contents.elements;
+            if (elements && elements.operand instanceof Fmt.VariableRefExpression) {
+              let operand = notation.path.arguments.getValue(elements.operand.variable.name);
+              if (operand instanceof Fmt.VariableRefExpression) {
+                let operandArg = constraint.path.arguments.getValue(operand.variable.name);
+                if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
+                  let operandArgValue = operandArg.arguments[0].value;
+                  if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
+                    return {
+                      property: this.getNotationArgument(notation, elements.property, negationCount),
+                      singular: this.getNotationArgument(notation, elements.singular, negationCount),
+                      plural: this.getNotationArgument(notation, elements.plural, negationCount),
+                      article: this.getNotationArgument(notation, elements.article, negationCount),
+                      isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
+                      definitionRef: constraint,
+                      extracted: true
+                    };
+                  }
                 }
               }
             }
@@ -138,16 +140,18 @@ export class HLMRenderUtils {
     return undefined;
   }
 
-  private getNotationArgument(notation: Fmt.DefinitionRefExpression, paramName: string, negationCount: number): string | undefined {
-    let value = notation.path.arguments.getOptionalValue(paramName);
-    if (value instanceof FmtNotation.MetaRefExpression_neg) {
-      if (negationCount < value.items.length) {
-        value = value.items[negationCount];
-        negationCount = 0;
+  private getNotationArgument(notation: Fmt.DefinitionRefExpression, element: Fmt.Expression | undefined, negationCount: number): string | undefined {
+    if (element instanceof Fmt.VariableRefExpression) {
+      let value = notation.path.arguments.getOptionalValue(element.variable.name);
+      if (value instanceof FmtNotation.MetaRefExpression_neg) {
+        if (negationCount < value.items.length) {
+          value = value.items[negationCount];
+          negationCount = 0;
+        }
       }
-    }
-    if (value instanceof Fmt.StringExpression && !negationCount) {
-      return value.value;
+      if (value instanceof Fmt.StringExpression && !negationCount) {
+        return value.value;
+      }
     }
     return undefined;
   }

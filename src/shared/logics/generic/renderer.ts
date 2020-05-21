@@ -32,12 +32,12 @@ export abstract class GenericRenderer {
     } catch (error) {
       return new Notation.ErrorExpression(error.message);
     }
-    let config = this.getRenderedTemplateConfig(args, negationCount);
+    let config = this.getRenderedTemplateConfig(args, 0, negationCount);
     return new Notation.TemplateInstanceExpression(template, config, this.templates);
   }
 
-  renderNotationExpression(notation: Fmt.Expression, args: RenderedTemplateArguments = {}, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
-    let config = this.getRenderedTemplateConfig(args, negationCount, forceInnerNegations);
+  renderNotationExpression(notation: Fmt.Expression, args: RenderedTemplateArguments = {}, omitArguments: number = 0, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
+    let config = this.getRenderedTemplateConfig(args, omitArguments, negationCount, forceInnerNegations);
     return this.renderUserDefinedExpression(notation, config);
   }
 
@@ -45,9 +45,10 @@ export abstract class GenericRenderer {
     return new Notation.UserDefinedExpression(notation, config, this.templates);
   }
 
-  private getRenderedTemplateConfig(args: RenderedTemplateArguments, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
+  private getRenderedTemplateConfig(args: RenderedTemplateArguments, omitArguments: number, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
     return {
       getArgFn: (name: string) => args[name],
+      omitArguments: omitArguments,
       negationCount: negationCount,
       forceInnerNegations: forceInnerNegations,
       negationFallbackFn: this.renderNegation.bind(this)

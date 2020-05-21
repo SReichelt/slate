@@ -7,15 +7,57 @@ import * as Meta from '../format/metaModel';
 
 export class ObjectContents_Template extends Fmt.ObjectContents {
   notation?: Fmt.Expression;
+  symbol?: Fmt.Expression;
+  useSymbol?: Fmt.Expression;
+  elements?: ObjectContents_TemplateElements;
+  context?: ObjectContents_TemplateContext;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.notation = argumentList.getOptionalValue('notation', 0);
+    this.symbol = argumentList.getOptionalValue('symbol', 1);
+    this.useSymbol = argumentList.getOptionalValue('useSymbol', 2);
+    let elementsRaw = argumentList.getOptionalValue('elements', 3);
+    if (elementsRaw !== undefined) {
+      if (elementsRaw instanceof Fmt.CompoundExpression) {
+        let newItem = new ObjectContents_TemplateElements;
+        newItem.fromCompoundExpression(elementsRaw);
+        this.elements = newItem;
+      } else {
+        throw new Error('elements: Compound expression expected');
+      }
+    }
+    let contextRaw = argumentList.getOptionalValue('context', 4);
+    if (contextRaw !== undefined) {
+      if (contextRaw instanceof Fmt.CompoundExpression) {
+        let newItem = new ObjectContents_TemplateContext;
+        newItem.fromCompoundExpression(contextRaw);
+        this.context = newItem;
+      } else {
+        throw new Error('context: Compound expression expected');
+      }
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     if (this.notation !== undefined) {
       argumentList.add(this.notation, 'notation', true);
+    }
+    if (this.symbol !== undefined) {
+      argumentList.add(this.symbol, 'symbol', true);
+    }
+    if (this.useSymbol !== undefined) {
+      argumentList.add(this.useSymbol, 'useSymbol', true);
+    }
+    if (this.elements !== undefined) {
+      let elementsExpr = new Fmt.CompoundExpression;
+      this.elements.toCompoundExpression(elementsExpr, true);
+      argumentList.add(elementsExpr, 'elements', true);
+    }
+    if (this.context !== undefined) {
+      let contextExpr = new Fmt.CompoundExpression;
+      this.context.toCompoundExpression(contextExpr, true);
+      argumentList.add(contextExpr, 'context', true);
     }
   }
 
@@ -29,6 +71,18 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     if (this.notation) {
       this.notation.traverse(fn);
     }
+    if (this.symbol) {
+      this.symbol.traverse(fn);
+    }
+    if (this.useSymbol) {
+      this.useSymbol.traverse(fn);
+    }
+    if (this.elements) {
+      this.elements.traverse(fn);
+    }
+    if (this.context) {
+      this.context.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -36,6 +90,30 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     if (this.notation) {
       result.notation = this.notation.substitute(fn, replacedParameters);
       if (result.notation !== this.notation) {
+        changed = true;
+      }
+    }
+    if (this.symbol) {
+      result.symbol = this.symbol.substitute(fn, replacedParameters);
+      if (result.symbol !== this.symbol) {
+        changed = true;
+      }
+    }
+    if (this.useSymbol) {
+      result.useSymbol = this.useSymbol.substitute(fn, replacedParameters);
+      if (result.useSymbol !== this.useSymbol) {
+        changed = true;
+      }
+    }
+    if (this.elements) {
+      result.elements = new ObjectContents_TemplateElements;
+      if (this.elements.substituteExpression(fn, result.elements!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.context) {
+      result.context = new ObjectContents_TemplateContext;
+      if (this.context.substituteExpression(fn, result.context!, replacedParameters)) {
         changed = true;
       }
     }
@@ -48,6 +126,26 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     }
     if (this.notation || objectContents.notation) {
       if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.symbol || objectContents.symbol) {
+      if (!this.symbol || !objectContents.symbol || !this.symbol.isEquivalentTo(objectContents.symbol, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.useSymbol || objectContents.useSymbol) {
+      if (!this.useSymbol || !objectContents.useSymbol || !this.useSymbol.isEquivalentTo(objectContents.useSymbol, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.elements || objectContents.elements) {
+      if (!this.elements || !objectContents.elements || !this.elements.isEquivalentTo(objectContents.elements, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.context || objectContents.context) {
+      if (!this.context || !objectContents.context || !this.context.isEquivalentTo(objectContents.context, fn, replacedParameters)) {
         return false;
       }
     }
@@ -84,6 +182,258 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
     return new ObjectContents_Template;
+  }
+}
+
+export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
+  operand?: Fmt.Expression;
+  property?: Fmt.Expression;
+  singular?: Fmt.Expression;
+  plural?: Fmt.Expression;
+  article?: Fmt.Expression;
+  isFeature?: Fmt.Expression;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.operand = argumentList.getOptionalValue('operand', 0);
+    this.property = argumentList.getOptionalValue('property', 1);
+    this.singular = argumentList.getOptionalValue('singular', 2);
+    this.plural = argumentList.getOptionalValue('plural', 3);
+    this.article = argumentList.getOptionalValue('article', 4);
+    this.isFeature = argumentList.getOptionalValue('isFeature', 5);
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    if (this.operand !== undefined) {
+      argumentList.add(this.operand, 'operand', true);
+    }
+    if (this.property !== undefined) {
+      argumentList.add(this.property, 'property', true);
+    }
+    if (this.singular !== undefined) {
+      argumentList.add(this.singular, 'singular', true);
+    }
+    if (this.plural !== undefined) {
+      argumentList.add(this.plural, 'plural', true);
+    }
+    if (this.article !== undefined) {
+      argumentList.add(this.article, 'article', true);
+    }
+    if (this.isFeature !== undefined) {
+      argumentList.add(this.isFeature, 'isFeature', true);
+    }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateElements {
+    let result = new ObjectContents_TemplateElements;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.operand) {
+      this.operand.traverse(fn);
+    }
+    if (this.property) {
+      this.property.traverse(fn);
+    }
+    if (this.singular) {
+      this.singular.traverse(fn);
+    }
+    if (this.plural) {
+      this.plural.traverse(fn);
+    }
+    if (this.article) {
+      this.article.traverse(fn);
+    }
+    if (this.isFeature) {
+      this.isFeature.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_TemplateElements, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.operand) {
+      result.operand = this.operand.substitute(fn, replacedParameters);
+      if (result.operand !== this.operand) {
+        changed = true;
+      }
+    }
+    if (this.property) {
+      result.property = this.property.substitute(fn, replacedParameters);
+      if (result.property !== this.property) {
+        changed = true;
+      }
+    }
+    if (this.singular) {
+      result.singular = this.singular.substitute(fn, replacedParameters);
+      if (result.singular !== this.singular) {
+        changed = true;
+      }
+    }
+    if (this.plural) {
+      result.plural = this.plural.substitute(fn, replacedParameters);
+      if (result.plural !== this.plural) {
+        changed = true;
+      }
+    }
+    if (this.article) {
+      result.article = this.article.substitute(fn, replacedParameters);
+      if (result.article !== this.article) {
+        changed = true;
+      }
+    }
+    if (this.isFeature) {
+      result.isFeature = this.isFeature.substitute(fn, replacedParameters);
+      if (result.isFeature !== this.isFeature) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_TemplateElements, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.operand || objectContents.operand) {
+      if (!this.operand || !objectContents.operand || !this.operand.isEquivalentTo(objectContents.operand, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.property || objectContents.property) {
+      if (!this.property || !objectContents.property || !this.property.isEquivalentTo(objectContents.property, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.singular || objectContents.singular) {
+      if (!this.singular || !objectContents.singular || !this.singular.isEquivalentTo(objectContents.singular, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.plural || objectContents.plural) {
+      if (!this.plural || !objectContents.plural || !this.plural.isEquivalentTo(objectContents.plural, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.article || objectContents.article) {
+      if (!this.article || !objectContents.article || !this.article.isEquivalentTo(objectContents.article, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.isFeature || objectContents.isFeature) {
+      if (!this.isFeature || !objectContents.isFeature || !this.isFeature.isEquivalentTo(objectContents.isFeature, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
+  operator?: Fmt.Expression;
+  predicate?: Fmt.Expression;
+  definitionNotation?: Fmt.Expression;
+  argument?: Fmt.Expression;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    this.operator = argumentList.getOptionalValue('operator', 0);
+    this.predicate = argumentList.getOptionalValue('predicate', 1);
+    this.definitionNotation = argumentList.getOptionalValue('definitionNotation', 2);
+    this.argument = argumentList.getOptionalValue('argument', 3);
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    if (this.operator !== undefined) {
+      argumentList.add(this.operator, 'operator', true);
+    }
+    if (this.predicate !== undefined) {
+      argumentList.add(this.predicate, 'predicate', true);
+    }
+    if (this.definitionNotation !== undefined) {
+      argumentList.add(this.definitionNotation, 'definitionNotation', true);
+    }
+    if (this.argument !== undefined) {
+      argumentList.add(this.argument, 'argument', true);
+    }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateContext {
+    let result = new ObjectContents_TemplateContext;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.operator) {
+      this.operator.traverse(fn);
+    }
+    if (this.predicate) {
+      this.predicate.traverse(fn);
+    }
+    if (this.definitionNotation) {
+      this.definitionNotation.traverse(fn);
+    }
+    if (this.argument) {
+      this.argument.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_TemplateContext, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.operator) {
+      result.operator = this.operator.substitute(fn, replacedParameters);
+      if (result.operator !== this.operator) {
+        changed = true;
+      }
+    }
+    if (this.predicate) {
+      result.predicate = this.predicate.substitute(fn, replacedParameters);
+      if (result.predicate !== this.predicate) {
+        changed = true;
+      }
+    }
+    if (this.definitionNotation) {
+      result.definitionNotation = this.definitionNotation.substitute(fn, replacedParameters);
+      if (result.definitionNotation !== this.definitionNotation) {
+        changed = true;
+      }
+    }
+    if (this.argument) {
+      result.argument = this.argument.substitute(fn, replacedParameters);
+      if (result.argument !== this.argument) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_TemplateContext, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.operator || objectContents.operator) {
+      if (!this.operator || !objectContents.operator || !this.operator.isEquivalentTo(objectContents.operator, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.predicate || objectContents.predicate) {
+      if (!this.predicate || !objectContents.predicate || !this.predicate.isEquivalentTo(objectContents.predicate, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.definitionNotation || objectContents.definitionNotation) {
+      if (!this.definitionNotation || !objectContents.definitionNotation || !this.definitionNotation.isEquivalentTo(objectContents.definitionNotation, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.argument || objectContents.argument) {
+      if (!this.argument || !objectContents.argument || !this.argument.isEquivalentTo(objectContents.argument, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -708,6 +1058,19 @@ export class MetaModel extends Meta.MetaModel {
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
     let parent = context.parentObject;
+    if (parent instanceof Fmt.Definition) {
+      let type = parent.type.expression;
+      if (type instanceof Fmt.MetaRefExpression) {
+        if (type instanceof MetaRefExpression_Template) {
+          if (argument.name === 'elements' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new ArgumentTypeContext(ObjectContents_TemplateElements, context);
+          }
+          if (argument.name === 'context' || (argument.name === undefined && argumentIndex === 4)) {
+            context = new ArgumentTypeContext(ObjectContents_TemplateContext, context);
+          }
+        }
+      }
+    }
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {

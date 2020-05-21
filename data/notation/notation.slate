@@ -9,7 +9,31 @@ $notation: %MetaModel {
 
 $Template: %DefinitionType($Expr) {
   members = #(
-    notation?: $Expr
+    notation?: $Expr,
+    symbol?: $Expr,
+    useSymbol?: $Bool = $true,
+    elements?: $TemplateElements,
+    context?: $TemplateContext
+  )
+}
+
+$TemplateElements: %ExpressionType {
+  members = #(
+    operand?: $Expr,
+    property?: $Expr,
+    singular?: $Expr,
+    plural?: $Expr,
+    article?: $Expr,
+    isFeature: $Bool = $false
+  )
+}
+
+$TemplateContext: %ExpressionType {
+  members = #(
+    operator: $Bool = $false,
+    predicate: $Bool = $false,
+    definitionNotation: $Bool = $false,
+    argument: $Bool = $false
   )
 }
 

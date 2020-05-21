@@ -80,6 +80,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
     let errorHandler = new ErrorHandler(parsedDocument, diagnostics);
 
     let getReferencedMetaModel = (sourceFileName: string, path: Fmt.Path): Meta.MetaModel => {
+        let onObjectContentsCreated = parsedDocument.objectContentsMap ? (expression: Fmt.CompoundExpression, objectContents: FmtDynamic.DynamicObjectContents) => parsedDocument.objectContentsMap?.set(expression, objectContents) : undefined;
         let metaModelFileName = getFileNameFromPath(sourceFileName, path);
         let parsedMetaModel = metaModelCache.get(metaModelFileName);
         if (parsedMetaModel) {
@@ -89,6 +90,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             for (let [referencedMetaModel, referencedMetaModelDocument] of parsedMetaModel.metaModelDocuments) {
                 parsedDocument.metaModelDocuments!.set(referencedMetaModel, referencedMetaModelDocument);
             }
+            parsedMetaModel.metaModel.onObjectContentsCreated = onObjectContentsCreated;
             return parsedMetaModel.metaModel;
         }
         let parsedMetaModelDocument: ParsedDocument = {
@@ -116,6 +118,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             metaModelDocument: parsedMetaModelDocument,
             metaModelDocuments: parsedDocument.metaModelDocuments!
         });
+        metaModel.onObjectContentsCreated = onObjectContentsCreated;
         return metaModel;
     };
 
