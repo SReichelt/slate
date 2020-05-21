@@ -440,11 +440,22 @@ export abstract class GenericEditHandler {
               value.items.splice(index, 1);
             }
           };
-          items.push(this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer));
+          let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
+          if (arrayDimensions > 1) {
+            argValue = new Notation.ParenExpression(argValue, '[]');
+          }
+          items.push(argValue);
         }
-        let group = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
-        if (arrayDimensions === 1) {
-          let insertButton = new Notation.InsertPlaceholderExpression;
+        let group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
+        let insertButton = new Notation.InsertPlaceholderExpression;
+        if (arrayDimensions > 1) {
+          let onInsertItem = () => {
+            let newItem = new Fmt.ArrayExpression;
+            newItem.items = [];
+            value.items.push(newItem);
+          };
+          insertButton.action = new Menu.ImmediateExpressionMenuAction(onInsertItem);
+        } else {
           let semanticLink = new Notation.SemanticLink(insertButton, false, false);
           let onInsertItem = (newValue: Fmt.Expression | undefined) => {
             if (newValue) {
@@ -453,22 +464,15 @@ export abstract class GenericEditHandler {
           };
           this.addNotationItemMenu(semanticLink, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
           insertButton.semanticLinks = [semanticLink];
-          if (group) {
-            return new Notation.RowExpression([
-              group,
-              new Notation.TextExpression(' '),
-              insertButton
-            ]);
-          } else {
-            return insertButton;
-          }
+        }
+        if (group) {
+          return new Notation.RowExpression([
+            group,
+            new Notation.TextExpression(' '),
+            insertButton
+          ]);
         } else {
-          // TODO add proper support for multi-dimensional arrays
-          if (group) {
-            return group;
-          } else {
-            return new Notation.EmptyExpression;
-          }
+          return insertButton;
         }
       } else {
         return new Notation.EmptyExpression;
