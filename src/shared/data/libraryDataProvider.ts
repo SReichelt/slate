@@ -434,8 +434,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return result;
   }
 
-  private fetchSection(name: string, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
-    let result = this.fetchDefinition(name, true, this.childName, FmtLibrary.getMetaModel, false);
+  private fetchSection(name: string, prefetchContents: boolean = true, fullContentsRequired: boolean = false): CachedPromise<LibraryDefinition> {
+    let result = this.fetchDefinition(name, true, this.childName, FmtLibrary.getMetaModel, fullContentsRequired);
     if (prefetchContents) {
       result.then((libraryDefinition: LibraryDefinition) => {
         let contents = libraryDefinition.definition.contents;
@@ -479,7 +479,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   insertLocalSubsection(name: string, title: string, insertBefore?: string): CachedPromise<LibraryDefinition> {
     let localSectionFileName = this.getLocalSectionFileName();
-    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
+    return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
       let newSubsectionRef = new Fmt.DefinitionRefExpression;
       newSubsectionRef.path = new Fmt.Path;
@@ -594,7 +594,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
     let localSectionFileName = this.getLocalSectionFileName();
     return itemNumberPromise
-      .then(() => this.fetchSection(localSectionFileName, false))
+      .then(() => this.fetchSection(localSectionFileName, false, true))
       .then((sectionDefinition: LibraryDefinition) => {
         let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
         let newItemRef = new Fmt.DefinitionRefExpression;
@@ -670,6 +670,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   editLocalItem(libraryDefinition: LibraryDefinition, itemInfo: LibraryItemInfo): LibraryDefinition {
+    if (!libraryDefinition.fileReference) {
+      throw new Error('Internal error: trying to edit definition without file reference');
+    }
     let name = libraryDefinition.definition.name;
     let clonedFile = libraryDefinition.file.clone();
     let clonedLibraryDefinition: LibraryDefinition = {
@@ -692,7 +695,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private localDefinitionModified(name: string, editedLibraryDefinition: LibraryDefinition): void {
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
-      throw new Error('Trying to modify definition that is not being edited');
+      throw new Error('Internal error: trying to modify definition that is not being edited');
     }
     editedLibraryDefinition.modified = true;
     this.prePublishLocalDefinition(editedLibraryDefinition);
@@ -739,9 +742,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
+    if (!editedLibraryDefinition.fileReference) {
+      return CachedPromise.reject(new Error('Internal error: trying to submit definition without file reference'));
+    }
     let name = editedLibraryDefinition.definition.name;
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
-      return CachedPromise.reject(new Error('Trying to submit definition that is not being edited'));
+      return CachedPromise.reject(new Error('Internal error: trying to submit definition that is not being edited'));
     }
     if (editedLibraryDefinition.definition.documentation) {
       for (let item of editedLibraryDefinition.definition.documentation.items) {
@@ -815,9 +821,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
+    if (!editedLibraryDefinition.fileReference) {
+      return CachedPromise.reject(new Error('Internal error: trying to submit definition without file reference'));
+    }
     try {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
-      return editedLibraryDefinition.fileReference!.write!(contents, isPartOfGroup)
+      return editedLibraryDefinition.fileReference.write!(contents, isPartOfGroup)
         .then((result: WriteFileResult) => {
           this.replaceLocalDefinition(name, editedLibraryDefinition);
           return result;
@@ -906,7 +915,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   setLocalItemInfo(name: string, info: LibraryItemInfo): CachedPromise<void> {
     let localSectionFileName = this.getLocalSectionFileName();
-    return this.fetchSection(localSectionFileName, false).then((sectionDefinition: LibraryDefinition) => {
+    return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
       for (let item of sectionContents.items) {
         if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
