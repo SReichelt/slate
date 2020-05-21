@@ -458,8 +458,6 @@ div.display-math {
 
 .radical {
   display: inline-table;
-  margin-left: 1pt;
-  margin-right: 1pt;
   margin-top: 0.1em;
   margin-bottom: 0.2em;
   white-space: nowrap;
@@ -494,6 +492,7 @@ div.display-math {
   position: relative;
   bottom: 0.3em;
   left: 0.5pt;
+  min-width: 1ch;
 }
 
 .radical-degree-bottom-cell {
