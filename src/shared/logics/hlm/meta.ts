@@ -68,6 +68,20 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.properties) {
+      this.properties.traverse(fn);
+    }
+    if (this.notation) {
+      for (let item of this.notation) {
+        item.traverse(fn);
+      }
+    }
+    if (this.definitionNotation) {
+      this.definitionNotation.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.properties) {
@@ -184,6 +198,26 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.notation) {
+      for (let item of this.notation) {
+        item.traverse(fn);
+      }
+    }
+    if (this.singularName) {
+      this.singularName.traverse(fn);
+    }
+    if (this.pluralName) {
+      this.pluralName.traverse(fn);
+    }
+    if (this.nameOptional) {
+      this.nameOptional.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionNotation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
@@ -297,6 +331,12 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.embedding) {
+      this.embedding.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.embedding) {
@@ -402,6 +442,18 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.target) {
+      this.target.traverse(fn);
+    }
+    if (this.wellDefinednessProof) {
+      this.wellDefinednessProof.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Embedding, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
@@ -494,6 +546,15 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     let result = new ObjectContents_Constructor;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.equalityDefinition) {
+      this.equalityDefinition.traverse(fn);
+    }
+    if (this.rewrite) {
+      this.rewrite.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -692,6 +753,37 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.leftParameters) {
+      this.leftParameters.traverse(fn);
+    }
+    if (this.rightParameters) {
+      this.rightParameters.traverse(fn);
+    }
+    if (this.definition) {
+      for (let item of this.definition) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equivalenceProofs) {
+      for (let item of this.equivalenceProofs) {
+        item.traverse(fn);
+      }
+    }
+    if (this.reflexivityProof) {
+      this.reflexivityProof.traverse(fn);
+    }
+    if (this.symmetryProof) {
+      this.symmetryProof.traverse(fn);
+    }
+    if (this.transitivityProof) {
+      this.transitivityProof.traverse(fn);
+    }
+    if (this.isomorphic) {
+      this.isomorphic.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_EqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.leftParameters) {
@@ -842,6 +934,15 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.value) {
+      this.value.traverse(fn);
+    }
+    if (this.theorem) {
+      this.theorem.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_RewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.value) {
@@ -953,6 +1054,25 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     let result = new ObjectContents_SetOperator;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.definition) {
+      for (let item of this.definition) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equalityProofs) {
+      for (let item of this.equalityProofs) {
+        item.traverse(fn);
+      }
+    }
+    if (this.setRestriction) {
+      this.setRestriction.traverse(fn);
+    }
+    if (this.setRestrictionProof) {
+      this.setRestrictionProof.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SetOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1085,6 +1205,9 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Operator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
@@ -1174,6 +1297,25 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     let result = new ObjectContents_ExplicitOperator;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.definition) {
+      for (let item of this.definition) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equalityProofs) {
+      for (let item of this.equalityProofs) {
+        item.traverse(fn);
+      }
+    }
+    if (this.setRestriction) {
+      this.setRestriction.traverse(fn);
+    }
+    if (this.setRestrictionProof) {
+      this.setRestrictionProof.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ExplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1374,6 +1516,25 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.definition) {
+      for (let item of this.definition) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equivalenceProofs) {
+      for (let item of this.equivalenceProofs) {
+        item.traverse(fn);
+      }
+    }
+    if (this.wellDefinednessProof) {
+      this.wellDefinednessProof.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ImplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.parameter) {
@@ -1533,6 +1694,15 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.variables) {
+      this.variables.traverse(fn);
+    }
+    if (this.references) {
+      this.references.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.variables) {
@@ -1655,6 +1825,19 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
     let result = new ObjectContents_Predicate;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.definition) {
+      for (let item of this.definition) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equivalenceProofs) {
+      for (let item of this.equivalenceProofs) {
+        item.traverse(fn);
+      }
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Predicate, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -1796,6 +1979,17 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.claim) {
+      this.claim.traverse(fn);
+    }
+    if (this.proofs) {
+      for (let item of this.proofs) {
+        item.traverse(fn);
+      }
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StandardTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.claim) {
@@ -1930,6 +2124,19 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
     let result = new ObjectContents_EquivalenceTheorem;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.conditions) {
+      for (let item of this.conditions) {
+        item.traverse(fn);
+      }
+    }
+    if (this.equivalenceProofs) {
+      for (let item of this.equivalenceProofs) {
+        item.traverse(fn);
+      }
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -2656,6 +2863,12 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.formula) {
+      this.formula.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_PropArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.formula) {
@@ -2696,6 +2909,12 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     let result = new ObjectContents_SetArg;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this._set) {
+      this._set.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -2754,6 +2973,15 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     let result = new ObjectContents_SubsetArg;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this._set) {
+      this._set.traverse(fn);
+    }
+    if (this.subsetProof) {
+      this.subsetProof.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_SubsetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -2825,6 +3053,15 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.element) {
+      this.element.traverse(fn);
+    }
+    if (this.elementProof) {
+      this.elementProof.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ElementArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.element) {
@@ -2891,6 +3128,12 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.proof) {
+      this.proof.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ConstraintArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.proof) {
@@ -2948,6 +3191,15 @@ export class ObjectContents_BindingArg extends Fmt.ObjectContents {
     let result = new ObjectContents_BindingArg;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.arguments) {
+      this.arguments.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_BindingArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -4554,6 +4806,18 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameters) {
+      this.parameters.traverse(fn);
+    }
+    if (this.goal) {
+      this.goal.traverse(fn);
+    }
+    if (this.steps) {
+      this.steps.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Proof, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     result._from = this._from;
@@ -5879,6 +6143,18 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.formula) {
+      this.formula.traverse(fn);
+    }
+    if (this.value) {
+      this.value.traverse(fn);
+    }
+    if (this.exclusivityProof) {
+      this.exclusivityProof.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.formula) {
@@ -5979,6 +6255,24 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     let result = new ObjectContents_StructuralCase;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this._constructor) {
+      this._constructor.traverse(fn);
+    }
+    if (this.parameters) {
+      this.parameters.traverse(fn);
+    }
+    if (this.value) {
+      this.value.traverse(fn);
+    }
+    if (this.rewrite) {
+      this.rewrite.traverse(fn);
+    }
+    if (this.wellDefinednessProof) {
+      this.wellDefinednessProof.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

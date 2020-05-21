@@ -48,3 +48,13 @@ export function readCode(code: string, metaModel: Meta.MetaModel): Fmt.Expressio
   let context = new Ctx.DummyContext(metaModel);
   return reader.readExpression(false, metaModel.functions, context);
 }
+
+export function definitionContainsPlaceholders(definition: Fmt.Definition): boolean {
+  let result = false;
+  definition.traverse((subExpression: Fmt.Expression) => {
+    if (subExpression instanceof Fmt.PlaceholderExpression) {
+      result = true;
+    }
+  });
+  return result;
+}

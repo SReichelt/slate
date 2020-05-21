@@ -43,6 +43,14 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.items) {
+      for (let item of this.items) {
+        item.traverse(fn);
+      }
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Section, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     result.logic = this.logic;
@@ -129,6 +137,9 @@ export class ObjectContents_Library extends ObjectContents_Section {
     let result = new ObjectContents_Library;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

@@ -10,7 +10,7 @@ import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
 import config from '../utils/config';
-import { getDefinitionIcon, getButtonIcon, ButtonType } from '../utils/icons';
+import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import * as SimpleMDE from 'easymde';
@@ -55,6 +55,7 @@ interface ExpressionState {
   showToolTip: boolean;
   clicking: boolean;
   inputError: boolean;
+  unfolded?: boolean;
   openMenu?: Menu.ExpressionMenu;
   openDialog?: Dialog.DialogBase;
 }
@@ -829,6 +830,31 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           {dialog}
         </div>
       );
+    } else if (expression instanceof Notation.FoldableExpression) {
+      className += ' foldable';
+      let unfolded = this.state.unfolded ?? expression.initiallyUnfolded;
+      let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (event.button < 1) {
+          this.setState({unfolded: !unfolded});
+          this.stopPropagation(event);
+        }
+      };
+      let rows = [
+        (
+          <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
+            <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
+            <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
+          </div>
+        )
+      ];
+      if (unfolded) {
+        rows.push(
+          <div className={'paragraph'} key={'contents'}>
+            <Expression expression={expression.contents} parent={this} interactionHandler={this.props.interactionHandler}/>
+          </div>
+        );
+      }
+      result = rows;
     } else if (expression instanceof Notation.IndirectExpression) {
       return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PromiseExpression) {

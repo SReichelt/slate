@@ -9,10 +9,12 @@ export class File {
   clone(): File {
     let result = new File;
     result.metaModelPath = this.metaModelPath;
-    for (let definition of this.definitions) {
-      result.definitions.push(definition.clone());
-    }
+    this.definitions.clone(result.definitions);
     return result;
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    this.definitions.traverse(fn);
   }
 
   toString(): string {
@@ -179,6 +181,12 @@ export class Definition {
     return result;
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    this.type.traverse(fn);
+    this.parameters.traverse(fn);
+    this.contents?.traverse(fn);
+  }
+
   toString(): string {
     return writeToString((writer: FmtWriter.Writer) => writer.writeDefinition(this));
   }
@@ -192,6 +200,22 @@ export class DefinitionList extends Array<Definition> {
       }
     }
     throw new Error(`Definition "${name}" not found`);
+  }
+
+  clone(result: DefinitionList): void {
+    for (let definition of this) {
+      result.push(definition.clone());
+    }
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    for (let definition of this) {
+      definition.traverse(fn);
+    }
+  }
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writeDefinitions(this));
   }
 }
 
@@ -217,6 +241,16 @@ export class Parameter {
 
   clone(replacedParameters: ReplacedParameter[] = []): Parameter {
     return this.substituteExpression(undefined, replacedParameters);
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    this.type.traverse(fn);
+    this.defaultValue?.traverse(fn);
+    if (this.dependencies) {
+      for (let dependency of this.dependencies) {
+        dependency.traverse(fn);
+      }
+    }
   }
 
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Parameter {
@@ -314,6 +348,12 @@ export class ParameterList extends Array<Parameter> {
     this.substituteExpression(undefined, result, replacedParameters);
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    for (let parameter of this) {
+      parameter.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let parameter of this) {
@@ -355,6 +395,10 @@ export class Argument {
 
   clone(replacedParameters: ReplacedParameter[] = []): Argument {
     return this.substituteExpression(undefined, replacedParameters);
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    this.value.traverse(fn);
   }
 
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Argument {
@@ -460,6 +504,12 @@ export class ArgumentList extends Array<Argument> {
     this.substituteExpression(undefined, result, replacedParameters);
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    for (let argument of this) {
+      argument.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, result: ArgumentList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let argument of this) {
@@ -517,6 +567,10 @@ export class Type {
     return this.substituteExpression(undefined, replacedParameters);
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    this.expression.traverse(fn);
+  }
+
   substituteExpression(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Type {
     let newExpression = this.expression.substitute(fn, replacedParameters);
     if (newExpression !== this.expression || !fn) {
@@ -556,6 +610,8 @@ export abstract class ObjectContents {
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
 
+  abstract traverse(fn: ExpressionTraversalFn): void;
+
   toString(): string {
     let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
     this.toArgumentList(argumentList, false);
@@ -580,6 +636,10 @@ export class GenericObjectContents extends ObjectContents {
     let result = new GenericObjectContents;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    this.arguments.traverse(fn);
   }
 
   substituteExpression(fn: ExpressionSubstitutionFn, result: GenericObjectContents, replacedParameters?: ReplacedParameter[]): boolean {

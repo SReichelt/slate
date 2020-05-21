@@ -141,4 +141,8 @@ export class GenericUtils {
     });
     return result;
   }
+
+  containsPlaceholders(): boolean {
+    return FmtUtils.definitionContainsPlaceholders(this.definition);
+  }
 }

@@ -69,6 +69,7 @@
 
 .open-menu-title-cell-icon {
   display: inline-block;
+  position: relative;
   width: 1em;
   min-width: 1em;
   padding-right: 2pt;

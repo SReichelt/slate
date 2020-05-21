@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
+import { HLMUtils } from './utils';
 import { HLMRenderer } from './renderer';
 import { HLMEditHandler } from './editHandler';
 import { LibraryDataProvider, LibraryDataAccessor } from '../../data/libraryDataProvider';
@@ -27,11 +28,13 @@ export class HLMDisplay implements Logic.LogicDisplay {
   }
 
   getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions): Logic.LogicRenderer {
-    return new HLMRenderer(definition, libraryDataAccessor, templates, options);
+    let utils = new HLMUtils(definition, libraryDataAccessor);
+    return new HLMRenderer(definition, libraryDataAccessor, utils, templates, options);
   }
 
   getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean, mruList: MRUList): Logic.LogicRenderer {
-    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, templates, mruList) : undefined;
-    return new HLMRenderer(definition, libraryDataProvider, templates, options, editHandler);
+    let utils = new HLMUtils(definition, libraryDataProvider);
+    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, utils, templates, mruList) : undefined;
+    return new HLMRenderer(definition, libraryDataProvider, utils, templates, options, editHandler);
   }
 }

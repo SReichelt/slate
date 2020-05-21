@@ -25,6 +25,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.notation) {
+      this.notation.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.notation) {

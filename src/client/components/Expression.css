@@ -15,7 +15,7 @@
   line-height: initial;
 }
 
-.expr.hover, .expr.hover span {
+.expr.hover, .expr.hover span, .foldable-heading:hover {
   background-color: var(--expression-hover-background-color);
 }
 
@@ -51,6 +51,16 @@ span.expr.interactive.link span.expr.interactive {
 .sub-heading {
   display: inline-block;
   margin-top: 1em;
+}
+
+.foldable-heading {
+  display: inline-block;
+  margin-top: 1em;
+  cursor: pointer;
+}
+
+.foldable-heading>.sub-heading {
+  margin-top: 0;
 }
 
 .proof-placeholder {
@@ -680,6 +690,26 @@ div.display-math {
   right: -0.3pt;
 }
 
+.expr .foldable-icon {
+  display: inline-block;
+  position: relative;
+  width: 1em;
+  min-width: 1em;
+  padding-right: 2pt;
+  vertical-align: middle;
+}
+
+.expr .foldable-icon svg {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 .menu-container {
   display: inline-block;
   position: relative;
@@ -824,6 +854,7 @@ div.display-math {
 
 .expr .CodeMirror, .expr .CodeMirror-scroll {
 	min-height: 3.5em;
+	max-height: 10em;
 }
 
 .expr .editor-toolbar:before {

@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as Notation from '../../notation/notation';
 import * as Logic from '../logic';
+import { GenericUtils } from './utils';
 import { GenericEditHandler, SetNotationFn } from './editHandler';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { readCode } from '../../format/utils';
@@ -18,7 +19,7 @@ export interface RenderedTemplateArguments {
 export abstract class GenericRenderer {
   private variableNameEditHandler?: GenericEditHandler;
 
-  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected templates: Fmt.File, protected options: Logic.LogicRendererOptions, protected editHandler?: GenericEditHandler) {
+  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected utils: GenericUtils, protected templates: Fmt.File, protected options: Logic.LogicRendererOptions, protected editHandler?: GenericEditHandler) {
     // Variable names can be edited even in some cases where the rest is read-only.
     // Derived classes can reset editHandler but not variableNameEditHandler.
     this.variableNameEditHandler = editHandler;
@@ -144,12 +145,13 @@ export abstract class GenericRenderer {
         }
       }
     }
-    if (this.editHandler ? kind !== 'example' : texts.length) {
-      let heading = kind.charAt(0).toUpperCase() + kind.slice(1);
-      if (heading === 'Example' && texts.length > 1) {
-        heading = 'Examples';
+    let canEdit = this.editHandler && kind !== 'example';
+    if (texts.length || canEdit) {
+      let headingText = kind.charAt(0).toUpperCase() + kind.slice(1);
+      if (headingText === 'Example' && texts.length > 1) {
+        headingText = 'Examples';
       }
-      paragraphs.push(this.renderSubHeading(heading));
+      let heading = this.renderSubHeading(headingText);
       let text = texts.join(kind === 'example' ? ', ' : '\n\n');
       let markdown = new Notation.MarkdownExpression(text);
       markdown.onRenderCode = (code: string) => {
@@ -161,10 +163,13 @@ export abstract class GenericRenderer {
           return new Notation.ErrorExpression(error.message);
         }
       };
-      if (this.editHandler) {
-        this.editHandler.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
+      if (canEdit) {
+        this.editHandler!.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
+        let initiallyUnfolded = text.length > 0 && !this.utils.containsPlaceholders();
+        paragraphs.push(new Notation.FoldableExpression(heading, markdown, initiallyUnfolded));
+      } else {
+        paragraphs.push(heading, markdown);
       }
-      paragraphs.push(markdown);
     }
   }
 

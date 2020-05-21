@@ -72,6 +72,27 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.definitionTypes) {
+      for (let item of this.definitionTypes) {
+        item.traverse(fn);
+      }
+    }
+    if (this.expressionTypes) {
+      for (let item of this.expressionTypes) {
+        item.traverse(fn);
+      }
+    }
+    if (this.functions) {
+      for (let item of this.functions) {
+        item.traverse(fn);
+      }
+    }
+    if (this.lookup) {
+      this.lookup.traverse(fn);
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.definitionTypes) {
@@ -251,6 +272,20 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.superType) {
+      this.superType.traverse(fn);
+    }
+    if (this.members) {
+      this.members.traverse(fn);
+    }
+    if (this.exports) {
+      for (let item of this.exports) {
+        item.traverse(fn);
+      }
+    }
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinedType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.superType) {
@@ -341,6 +376,14 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     let result = new ObjectContents_DefinitionType;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.innerDefinitionTypes) {
+      for (let item of this.innerDefinitionTypes) {
+        item.traverse(fn);
+      }
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -442,6 +485,9 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
     return result;
   }
 
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+  }
+
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
@@ -511,6 +557,15 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     let result = new ObjectContents_ParameterType;
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.optional) {
+      this.optional.traverse(fn);
+    }
+    if (this.argumentType) {
+      this.argumentType.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {

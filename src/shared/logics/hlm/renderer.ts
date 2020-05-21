@@ -42,13 +42,11 @@ interface ParameterListState {
 }
 
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
-  protected utils: HLMUtils;
   protected renderUtils: HLMRenderUtils;
   protected readOnlyRenderer: HLMRenderer;
 
-  constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
-    super(definition, libraryDataAccessor, templates, options, editHandler);
-    this.utils = new HLMUtils(definition, libraryDataAccessor);
+  constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, protected utils: HLMUtils, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
+    super(definition, libraryDataAccessor, utils, templates, options, editHandler);
     this.renderUtils = new HLMRenderUtils(definition, this.utils);
     if (editHandler) {
       this.readOnlyRenderer = Object.create(this);

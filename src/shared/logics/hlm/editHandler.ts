@@ -57,13 +57,10 @@ export const fullFormulaSelection: FormulaSelection = {
 };
 
 export class HLMEditHandler extends GenericEditHandler {
-  protected utils: HLMUtils;
   protected checker: HLMDefinitionChecker;
 
-  constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, mruList: MRUList) {
-    let utils = new HLMUtils(definition, libraryDataProvider);
+  constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, protected utils: HLMUtils, templates: Fmt.File, mruList: MRUList) {
     super(definition, libraryDataProvider, new HLMEditAnalysis, utils, templates, mruList);
-    this.utils = utils;
     this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, this.utils, true, true);
     this.update();
   }

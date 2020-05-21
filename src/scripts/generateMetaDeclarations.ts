@@ -333,6 +333,22 @@ function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type
   return outFileStr;
 }
 
+function outputTraversalCode(inFile: Fmt.File, source: string, contentType: string | undefined, remainingArrayDimensions: number, indent: string): string {
+  let outFileStr = '';
+  if (remainingArrayDimensions) {
+    let item = 'item';
+    if (remainingArrayDimensions - 1) {
+      item += remainingArrayDimensions - 1;
+    }
+    outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
+    outFileStr += outputTraversalCode(inFile, item, contentType, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += `${indent}}\n`;
+  } else {
+    outFileStr += `${indent}${source}.traverse(fn);\n`;
+  }
+  return outFileStr;
+}
+
 function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string, contentType: string | undefined, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   let subTarget = target;
@@ -539,6 +555,20 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
       outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
       outFileStr += `    return result;\n`;
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
+      outFileStr += `  traverse(fn: Fmt.ExpressionTraversalFn): void {\n`;
+      if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+        for (let member of definition.contents.members) {
+          let memberName = translateMemberName(member.name);
+          if (!(member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String)) {
+            let contentType = getMemberContentType(inFile, member.type);
+            outFileStr += `    if (this.${memberName}) {\n`;
+            outFileStr += outputTraversalCode(inFile, `this.${memberName}`, contentType, member.type.arrayDimensions, '      ');
+            outFileStr += `    }\n`;
+          }
+        }
+      }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
       outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;

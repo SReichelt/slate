@@ -281,7 +281,7 @@ export class RadicalExpression extends RenderedExpression {
   }
 
   getLineHeight(): CachedPromise<number> {
-    return CachedPromise.resolve(0);
+    return this.radicand.getLineHeight();
   }
 }
 
@@ -297,6 +297,16 @@ export class MarkdownExpression extends RenderedExpression {
   defaultSearchText?: string;
 
   constructor(public text: string) {
+    super();
+  }
+
+  getLineHeight(): CachedPromise<number> {
+    return CachedPromise.resolve(0);
+  }
+}
+
+export class FoldableExpression extends RenderedExpression {
+  constructor(public heading: RenderedExpression, public contents: RenderedExpression, public initiallyUnfolded: boolean) {
     super();
   }
 
