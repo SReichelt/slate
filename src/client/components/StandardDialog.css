@@ -67,6 +67,10 @@
   display: inline-block;
 }
 
+.dialog-param-title-cell {
+  white-space: nowrap;
+}
+
 .dialog-group {
   border: solid 1px var(--dialog-group-border-color);
   margin: 0;

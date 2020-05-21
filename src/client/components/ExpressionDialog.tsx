@@ -174,7 +174,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
       }
       return (
         <tr className={className}>
-          <th className={'dialog-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
+          <th className={'dialog-cell dialog-param-title-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
             {title}
           </th>
           <td className={'dialog-cell'} key="value">
