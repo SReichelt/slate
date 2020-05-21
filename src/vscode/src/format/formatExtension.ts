@@ -152,6 +152,7 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
     );
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
+        vscode.workspace.onDidCloseTextDocument((document) => diagnosticCollection.delete(document.uri)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             if (parseAllTimer && reparseConditions === undefined) {
                 // After certain events like file renaming, we want to avoid registering intermediate errors.

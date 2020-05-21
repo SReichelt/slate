@@ -31,6 +31,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             } catch (error) {
             }
         }),
+        vscode.workspace.onDidCloseTextDocument((document) => libraryDocumentProvider.invalidateUris([document.uri])),
         vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );
