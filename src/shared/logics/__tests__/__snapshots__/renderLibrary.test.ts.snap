@@ -4038,14 +4038,14 @@ References.
 `;
 
 exports[`render hlm library: 1.6.4.6 data/libraries/hlm/Essentials/Numbers/Integer/difference 1`] = `
-"Definition 1.6.4.6.  Let b, a ∈ ℤ. We define
+"Definition 1.6.4.6.  Let a, b ∈ ℤ. We define
 
-  b − a
+  a − b
 
 by:
 
-  (n_b-m_b) − (n_a-m_a) := ((n_b + m_a)-(m_b + n_a))  (n_b, m_b ∈ ℕ, n_a, m_a ∈ ℕ)
-   = b + (−a)
+  (n_a-m_a) − (n_b-m_b) := ((n_a + m_b)-(m_a + n_b))  (n_a, m_a ∈ ℕ, n_b, m_b ∈ ℕ)
+   = a + (−b)
 
 Equality.  No proof.
 
@@ -4292,9 +4292,9 @@ exports[`render hlm library: 1.6.4.16 data/libraries/hlm/Essentials/Numbers/Inte
 `;
 
 exports[`render hlm library: 1.6.4.17 data/libraries/hlm/Essentials/Numbers/Integer/quotient 1`] = `
-"Definition 1.6.4.17.  Let b ∈ ℤ, a ∈ Div_ℤ(b). For x ∈ ℤ, we define:
+"Definition 1.6.4.17.  Let a ∈ ℤ, b ∈ Div_ℤ(a). For x ∈ ℤ, we define:
 
-  b/a = x  :⇔  b = x ⋅ a
+  a/b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof.
 
@@ -4479,14 +4479,14 @@ References.
 `;
 
 exports[`render hlm library: 1.6.5.4 data/libraries/hlm/Essentials/Numbers/Rational/difference 1`] = `
-"Definition 1.6.5.4.  Let b, a ∈ ℚ. We define
+"Definition 1.6.5.4.  Let a, b ∈ ℚ. We define
 
-  b − a
+  a − b
 
 by:
 
-  (n_b/d_b) − (n_a/d_a) := ((n_b ⋅ d_a − n_a ⋅ d_b)/(d_b ⋅ d_a))  (n_b ∈ ℤ, d_b ∈ ℕ_+, n_a ∈ ℤ, d_a ∈ ℕ_+)
-   = b + (−a)
+  (n_a/d_a) − (n_b/d_b) := ((n_a ⋅ d_b − n_b ⋅ d_a)/(d_a ⋅ d_b))  (n_a ∈ ℤ, d_a ∈ ℕ_+, n_b ∈ ℤ, d_b ∈ ℕ_+)
+   = a + (−b)
 
 Equality.  No proof.
 
@@ -4655,9 +4655,9 @@ References.
 `;
 
 exports[`render hlm library: 1.6.5.10 data/libraries/hlm/Essentials/Numbers/Rational/quotient 1`] = `
-"Definition 1.6.5.10.  Let b ∈ ℚ, a ∈ ℚ_±. For x ∈ ℚ, we define:
+"Definition 1.6.5.10.  Let a ∈ ℚ, b ∈ ℚ_±. For x ∈ ℚ, we define:
 
-  b/a = x  :⇔  b = x ⋅ a
+  a/b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof.
 
@@ -4828,14 +4828,14 @@ by:
 `;
 
 exports[`render hlm library: 1.6.5.15.7 data/libraries/hlm/Essentials/Numbers/Rational/Sequences/sequence%20difference 1`] = `
-"Definition 1.6.5.15.7.  Let 𝐛, 𝐚 be sequences on ℚ. We define
+"Definition 1.6.5.15.7.  Let 𝐚, 𝐛 be sequences on ℚ. We define
 
-  𝐛 − 𝐚
+  𝐚 − 𝐛
 
 by:
 
-  (b_n)_(n ∈ ℕ) − (a_n)_(n ∈ ℕ) := (b_n − a_n)_(n ∈ ℕ)  (b_n ∈ ℚ for each n ∈ ℕ, a_n ∈ ℚ for each n ∈ ℕ)
-   = 𝐛 + (−𝐚)
+  (a_n)_(n ∈ ℕ) − (b_n)_(n ∈ ℕ) := (a_n − b_n)_(n ∈ ℕ)  (a_n ∈ ℚ for each n ∈ ℕ, b_n ∈ ℚ for each n ∈ ℕ)
+   = 𝐚 + (−𝐛)
 
 Equality.  No proof."
 `;
@@ -4911,14 +4911,14 @@ References.
 `;
 
 exports[`render hlm library: 1.6.6.4 data/libraries/hlm/Essentials/Numbers/Real/difference 1`] = `
-"Definition 1.6.6.4.  Let b, a ∈ ℝ. We define
+"Definition 1.6.6.4.  Let a, b ∈ ℝ. We define
 
-  b − a
+  a − b
 
 by:
 
-  [r_b] − [r_a] := [r_b − r_a]  (r_b is a sequence on ℚ, r_a is a sequence on ℚ with suitable conditions)
-   = b + (−a)
+  [r_a] − [r_b] := [r_a − r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+   = a + (−b)
 
 Equality.  No proof.
 
@@ -5062,9 +5062,9 @@ References.
 `;
 
 exports[`render hlm library: 1.6.6.9 data/libraries/hlm/Essentials/Numbers/Real/quotient 1`] = `
-"Definition 1.6.6.9.  Let b ∈ ℝ, a ∈ ℝ_±. For x ∈ ℝ, we define:
+"Definition 1.6.6.9.  Let a ∈ ℝ, b ∈ ℝ_±. For x ∈ ℝ, we define:
 
-  b/a = x  :⇔  b = x ⋅ a
+  a/b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof."
 `;
@@ -5340,14 +5340,14 @@ by:
 `;
 
 exports[`render hlm library: 1.6.7.7 data/libraries/hlm/Essentials/Numbers/Complex/difference 1`] = `
-"Definition 1.6.7.7.  Let b, a ∈ ℂ. We define
+"Definition 1.6.7.7.  Let a, b ∈ ℂ. We define
 
-  b − a
+  a − b
 
 by:
 
-  (r_b+i_b𝒊) − (r_a+i_a𝒊) := ((r_b − r_a)+(i_b − i_a)𝒊)  (r_b, i_b ∈ ℝ, r_a, i_a ∈ ℝ)
-   = b + (−a)
+  (r_a+i_a𝒊) − (r_b+i_b𝒊) := ((r_a − r_b)+(i_a − i_b)𝒊)  (r_a, i_a ∈ ℝ, r_b, i_b ∈ ℝ)
+   = a + (−b)
 
 Equality.  No proof."
 `;
@@ -5410,9 +5410,9 @@ Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.6.7.13 data/libraries/hlm/Essentials/Numbers/Complex/quotient 1`] = `
-"Definition 1.6.7.13.  Let b ∈ ℂ, a ∈ ℂ^×. For x ∈ ℂ, we define:
+"Definition 1.6.7.13.  Let a ∈ ℂ, b ∈ ℂ^×. For x ∈ ℂ, we define:
 
-  b/a = x  :⇔  b = x ⋅ a
+  a/b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof."
 `;
