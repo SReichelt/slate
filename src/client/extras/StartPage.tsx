@@ -4,7 +4,7 @@ import * as Fmt from '../../shared/format/format';
 import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
-import { HLMUtils } from '../../shared/logics/hlm/utils';
+import * as Logics from '../../shared/logics/logics';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
 import Button from '../components/Button';
 import Expression, { ExpressionInteractionHandler } from '../components/Expression';
@@ -88,8 +88,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
     let rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false
     };
-    let utils = new HLMUtils(definition.definition, libraryDataProvider);
-    let definitionRenderer = new HLMRenderer(definition.definition, libraryDataProvider, utils, props.templates!, rendererOptions);
+    let definitionRenderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
   let expression = new Notation.PromiseExpression(expressionPromise);
@@ -112,8 +111,7 @@ function StartPage(props: StartPageProps) {
     let rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false
     };
-    let utils = new HLMUtils(dummyDefinition, props.libraryDataProvider);
-    let renderer = new HLMRenderer(dummyDefinition, props.libraryDataProvider, utils, props.templates, rendererOptions);
+    let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
     let examples = [
       renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer, ['multiple definitions', 'of finiteness']),
       renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer, ['definition']),

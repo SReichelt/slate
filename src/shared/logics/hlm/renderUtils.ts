@@ -1,18 +1,8 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
-import * as FmtNotation from '../../notation/meta';
+import { GenericRenderUtils } from '../generic/renderUtils';
 import { HLMUtils } from './utils';
 import CachedPromise from '../../data/cachedPromise';
-
-export interface PropertyInfo {
-  property?: string;
-  singular?: string;
-  plural?: string;
-  article?: string;
-  isFeature: boolean;
-  definitionRef?: Fmt.DefinitionRefExpression;
-  extracted: boolean;
-}
 
 export interface ExtractedStructuralCase {
   affectedParameters?: Fmt.Parameter[];
@@ -24,135 +14,30 @@ export interface ExtractedStructuralCase {
 
 export type ElementParameterOverrides = Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>;
 
-export class HLMRenderUtils {
-  constructor(private definition: Fmt.Definition, private utils: HLMUtils, private templates: Fmt.File) {}
-
-  extractProperties(parameters: Fmt.Parameter[], noun: PropertyInfo, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined): PropertyInfo[] | undefined {
-    let result: PropertyInfo[] | undefined = undefined;
-    if (remainingParameters && remainingDefinitions) {
-      let nounAllowed = noun.singular !== undefined;
-      while (remainingParameters.length >= parameters.length && remainingDefinitions.length >= parameters.length) {
-        let definition = remainingDefinitions[0];
-        if (!definition) {
-          break;
-        }
-        for (let index = 1; index < parameters.length; index++) {
-          if (remainingDefinitions[index] !== definition) {
-            definition = undefined;
-            break;
-          }
-        }
-        if (!definition) {
-          break;
-        }
-        let property: PropertyInfo | undefined = undefined;
-        for (let index = 0; index < parameters.length; index++) {
-          let currentProperty = this.getProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
-          if (!currentProperty) {
-            property = undefined;
-            break;
-          }
-          if (property) {
-            if (currentProperty.property !== property.property
-                || currentProperty.singular !== property.singular
-                || currentProperty.plural !== property.plural
-                || currentProperty.isFeature !== property.isFeature) {
-              property = undefined;
-              break;
-            }
-          } else {
-            property = currentProperty;
-          }
-        }
-        if (!property) {
-          break;
-        }
-        if (property.singular || property.plural) {
-          if (property.article === undefined) {
-            property.article = 'a';
-          }
-          if (!property.isFeature) {
-            if (!nounAllowed) {
-              break;
-            }
-            Object.assign(noun, property);
-          }
-        }
-        if (property.property || property.isFeature) {
-          if (!(noun.singular && noun.plural)) {
-            break;
-          }
-          if (!result) {
-            result = [];
-          }
-          result.push(property);
-        }
-        remainingParameters.splice(0, parameters.length);
-        remainingDefinitions.splice(0, parameters.length);
-        nounAllowed = false;
-      }
-    }
-    return result;
+export class HLMRenderUtils extends GenericRenderUtils {
+  constructor(definition: Fmt.Definition, protected utils: HLMUtils, templates: Fmt.File) {
+    super(definition, utils, templates);
   }
 
-  private getProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): PropertyInfo | undefined {
-    if (constraintParam.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
-      let negationCount = 0;
-      let constraint = constraintParam.type.expression.formula;
+  protected getDefinitionNotation(definition: Fmt.Definition): Fmt.Expression | undefined {
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
+      return definition.contents.notation;
+    } else {
+      return undefined;
+    }
+  }
+
+  protected getConstraint(param: Fmt.Parameter): [Fmt.Expression | undefined, number] {
+    let constraint = undefined;
+    let negationCount = 0;
+    if (param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
+      constraint = param.type.expression.formula;
       while (constraint instanceof FmtHLM.MetaRefExpression_not) {
         negationCount++;
         constraint = constraint.formula;
       }
-      if (constraint instanceof Fmt.DefinitionRefExpression
-          && definition
-          && definition.contents instanceof FmtHLM.ObjectContents_Definition
-          && definition.contents.notation) {
-        let notation = definition.contents.notation;
-        if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
-          let template = this.templates.definitions.getDefinition(notation.path.name);
-          if (template.contents instanceof FmtNotation.ObjectContents_Template) {
-            let elements = template.contents.elements;
-            if (elements && elements.operand instanceof Fmt.VariableRefExpression) {
-              let operand = notation.path.arguments.getValue(elements.operand.variable.name);
-              if (operand instanceof Fmt.VariableRefExpression) {
-                let operandArg = constraint.path.arguments.getValue(operand.variable.name);
-                if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
-                  let operandArgValue = operandArg.arguments[0].value;
-                  if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
-                    return {
-                      property: this.getNotationArgument(notation, elements.property, negationCount),
-                      singular: this.getNotationArgument(notation, elements.singular, negationCount),
-                      plural: this.getNotationArgument(notation, elements.plural, negationCount),
-                      article: this.getNotationArgument(notation, elements.article, negationCount),
-                      isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
-                      definitionRef: constraint,
-                      extracted: true
-                    };
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
-    return undefined;
-  }
-
-  private getNotationArgument(notation: Fmt.DefinitionRefExpression, element: Fmt.Expression | undefined, negationCount: number): string | undefined {
-    if (element instanceof Fmt.VariableRefExpression) {
-      let value = notation.path.arguments.getOptionalValue(element.variable.name);
-      if (value instanceof FmtNotation.MetaRefExpression_neg) {
-        if (negationCount < value.items.length) {
-          value = value.items[negationCount];
-          negationCount = 0;
-        }
-      }
-      if (value instanceof Fmt.StringExpression && !negationCount) {
-        return value.value;
-      }
-    }
-    return undefined;
+    return [constraint, negationCount];
   }
 
   extractConstraints(parameters: Fmt.Parameter[], extractedConstraints: Fmt.Parameter[]): Fmt.Parameter[] {

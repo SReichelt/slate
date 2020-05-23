@@ -533,7 +533,7 @@ export abstract class GenericEditHandler {
     let missingVariables: RenderedVariable[] = [];
     let autoVariables: RenderedVariable[] = [];
     for (let variable of variables) {
-      if (!referencedParams.has(variable.param)) {
+      if (referencedParams.indexOf(variable.param) < 0) {
         if (variable.canAutoFill) {
           autoVariables.push(variable);
         } else {

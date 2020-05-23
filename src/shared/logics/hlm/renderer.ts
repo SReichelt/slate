@@ -8,7 +8,8 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
 import { GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, DefinitionVariableRefExpression } from './utils';
-import { HLMRenderUtils, ExtractedStructuralCase, PropertyInfo, ElementParameterOverrides } from './renderUtils';
+import { HLMRenderUtils, ExtractedStructuralCase, ElementParameterOverrides } from './renderUtils';
+import { PropertyInfo } from '../generic/renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -41,12 +42,10 @@ interface ParameterListState {
 }
 
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
-  protected renderUtils: HLMRenderUtils;
   protected readOnlyRenderer: HLMRenderer;
 
-  constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, protected utils: HLMUtils, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
+  constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, protected utils: HLMUtils, protected renderUtils: HLMRenderUtils, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
     super(definition, libraryDataAccessor, utils, templates, options, editHandler);
-    this.renderUtils = new HLMRenderUtils(definition, utils, templates);
     if (editHandler) {
       this.readOnlyRenderer = Object.create(this);
       this.readOnlyRenderer.editHandler = undefined;

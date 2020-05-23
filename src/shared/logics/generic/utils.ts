@@ -137,14 +137,32 @@ export class GenericUtils {
       (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param)));
   }
 
-  findReferencedParameters(expression: Fmt.Expression): Set<Fmt.Parameter> {
-    let result = new Set<Fmt.Parameter>();
+  findReferencedParameters(expression: Fmt.Expression): Fmt.Parameter[] {
+    let result: Fmt.Parameter[] = [];
     expression.traverse((subExpression: Fmt.Expression) => {
       if (subExpression instanceof Fmt.VariableRefExpression) {
-        result.add(subExpression.variable);
+        result.push(subExpression.variable);
       }
     });
     return result;
+  }
+
+  reorderArguments(argumentList: Fmt.ArgumentList, expression: Fmt.Expression): void {
+    let refs = this.findReferencedParameters(expression);
+    let lastArgIndex = argumentList.length;
+    for (let refIndex = refs.length - 1; refIndex >= 0; refIndex--) {
+      let ref = refs[refIndex];
+      for (let argIndex = 0; argIndex < argumentList.length; argIndex++) {
+        if (ref.name === argumentList[argIndex].name) {
+          if (argIndex > lastArgIndex) {
+            argumentList.splice(lastArgIndex, 0, ...argumentList.splice(argIndex, 1));
+          } else {
+            lastArgIndex = argIndex;
+          }
+          break;
+        }
+      }
+    }
   }
 
   containsPlaceholders(): boolean {

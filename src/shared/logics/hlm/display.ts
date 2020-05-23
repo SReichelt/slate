@@ -2,6 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import { HLMUtils } from './utils';
+import { HLMRenderUtils } from './renderUtils';
 import { HLMRenderer } from './renderer';
 import { HLMEditHandler } from './editHandler';
 import { LibraryDataProvider, LibraryDataAccessor } from '../../data/libraryDataProvider';
@@ -27,14 +28,16 @@ export class HLMDisplay implements Logic.LogicDisplay {
     }
   }
 
-  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions): Logic.LogicRenderer {
+  getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions): HLMRenderer {
     let utils = new HLMUtils(definition, libraryDataAccessor);
-    return new HLMRenderer(definition, libraryDataAccessor, utils, templates, options);
+    let renderUtils = new HLMRenderUtils(definition, utils, templates);
+    return new HLMRenderer(definition, libraryDataAccessor, utils, renderUtils, templates, options);
   }
 
-  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean, mruList: MRUList): Logic.LogicRenderer {
+  getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean, mruList: MRUList): HLMRenderer {
     let utils = new HLMUtils(definition, libraryDataProvider);
-    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, utils, templates, mruList) : undefined;
-    return new HLMRenderer(definition, libraryDataProvider, utils, templates, options, editHandler);
+    let renderUtils = new HLMRenderUtils(definition, utils, templates);
+    let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, utils, renderUtils, templates, mruList) : undefined;
+    return new HLMRenderer(definition, libraryDataProvider, utils, renderUtils, templates, options, editHandler);
   }
 }

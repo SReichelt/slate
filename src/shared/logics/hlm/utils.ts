@@ -1397,13 +1397,13 @@ export class HLMUtils extends GenericUtils {
     return false;
   }
 
-  markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Set<Fmt.Parameter>): void {
+  markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Fmt.Parameter[]): void {
     for (let param of params) {
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         this.markUnreferencedParametersAsAuto(type.parameters, referencedParams);
       } else if (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element) {
-        if (!referencedParams.has(param)) {
+        if (referencedParams.indexOf(param) < 0) {
           type.auto = new FmtHLM.MetaRefExpression_true;
         }
       }

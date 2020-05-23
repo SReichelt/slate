@@ -583,7 +583,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         this.translateExpression(expression.list, loopData, arg);
         for (let item of arg) {
           if (item instanceof Array) {
-            result.push(item.reverse());
+            result.push(item.slice().reverse());
           } else {
             result.push(item);
           }

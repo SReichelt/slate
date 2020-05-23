@@ -11,8 +11,8 @@ import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
+import { HLMRenderUtils } from './renderUtils';
 import { HLMDefinitionChecker } from './checker';
-import { findBestMatch, reorderArguments, collectVariableRefs } from '../generic/notationMatching';
 import CachedPromise from '../../data/cachedPromise';
 
 export interface ParameterSelection {
@@ -59,9 +59,9 @@ export const fullFormulaSelection: FormulaSelection = {
 export class HLMEditHandler extends GenericEditHandler {
   protected checker: HLMDefinitionChecker;
 
-  constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, protected utils: HLMUtils, templates: Fmt.File, mruList: MRUList) {
+  constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, protected utils: HLMUtils, protected renderUtils: HLMRenderUtils, templates: Fmt.File, mruList: MRUList) {
     super(definition, libraryDataProvider, new HLMEditAnalysis, utils, templates, mruList);
-    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, this.utils, true, true);
+    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, utils, true, true);
     this.update();
   }
 
@@ -684,15 +684,9 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T[] {
-    let notationItems: Fmt.Expression[] | undefined = undefined;
-    let notationExpressions: (Fmt.Expression | undefined)[] = [undefined];
-    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.notation) {
-      // TODO
-      notationItems = [definition.contents.notation];
-      notationExpressions = notationItems;
-    }
+    let notationAlternatives = this.renderUtils.getNotationAlternatives(definition);
     let result: T[] = [];
-    for (let notationExpression of notationExpressions) {
+    for (let notationAlternative of notationAlternatives) {
       let parentPaths: (Fmt.PathItem | undefined)[] = [];
       if (path.parentPath instanceof Fmt.Path) {
         let checkParentPath = (prevResult: Fmt.Path | undefined, parentPath: Fmt.Path) => prevResult || parentPath;
@@ -707,29 +701,22 @@ export class HLMEditHandler extends GenericEditHandler {
         let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, expressionEditInfo.context);
         this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createPlaceholder, createElementParameter);
         resultPath.parentPath = parentPath;
-        if (notationExpression && notationItems && notationItems.length > 1) {
-          reorderArguments(resultPath.arguments, notationExpression);
-          if (notationItems && result.length) {
-            // Ignore items that cannot be distinguished by argument order.
-            let argumentLists: Fmt.ArgumentList[] = [resultPath.arguments];
-            if (parentPath instanceof Fmt.Path) {
-              argumentLists.unshift(parentPath.arguments);
-            }
-            if (findBestMatch(notationItems, argumentLists) !== notationExpression) {
-              continue;
-            }
-          }
+        if (notationAlternative) {
+          this.utils.reorderArguments(resultPath.arguments, notationAlternative);
         }
-        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, notationExpression, preFillExpression, preFillExpressionType));
+        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, preFillExpression, preFillExpressionType));
       }
     }
     return result;
   }
 
-  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, notationExpression: Fmt.Expression | undefined, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
+  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
     let currentResultItem: T | undefined = undefined;
     if (preFillExpression) {
-      let visibleParameters = notationExpression ? collectVariableRefs(notationExpression) : definition.parameters;
+      let visibleParameters: Fmt.Parameter[] = definition.parameters;
+      if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.notation) {
+        visibleParameters = this.utils.findReferencedParameters(definition.contents.notation);
+      }
       for (let param of visibleParameters) {
         let type = param.type.expression;
         let newResultPath: Fmt.Path | undefined = undefined;
