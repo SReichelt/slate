@@ -12,8 +12,31 @@ export interface RenderedVariable {
   canAutoFill: boolean;
 }
 
+export class ArgumentWithInfo {
+  constructor(public value: Notation.ExpressionValue, public index: number) {}
+
+  static getValue(arg: RenderedTemplateArgument | undefined): Notation.ExpressionValue {
+    if (arg instanceof ArgumentWithInfo) {
+      return arg.value;
+    } else {
+      return arg;
+    }
+  }
+
+  static getArgIndex(args: RenderedTemplateArguments, value: Notation.ExpressionValue): number {
+    for (let arg of Object.values(args)) {
+      if (arg instanceof ArgumentWithInfo && arg.value === value) {
+        return arg.index;
+      }
+    }
+    return -1;
+  }
+}
+
+export type RenderedTemplateArgument = Notation.ExpressionValue | ArgumentWithInfo;
+
 export interface RenderedTemplateArguments {
-  [name: string]: Notation.ExpressionValue;
+  [name: string]: RenderedTemplateArgument;
 }
 
 export abstract class GenericRenderer {
@@ -46,8 +69,14 @@ export abstract class GenericRenderer {
   }
 
   private getRenderedTemplateConfig(args: RenderedTemplateArguments, omitArguments: number, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
+    let getArgFn = (name: string) => ArgumentWithInfo.getValue(args[name]);
+    let isBeforeFn = undefined;
+    if (Object.values(args).some((arg) => (arg instanceof ArgumentWithInfo))) {
+      isBeforeFn = (value1: Notation.ExpressionValue, value2: Notation.ExpressionValue) => (ArgumentWithInfo.getArgIndex(args, value1) < ArgumentWithInfo.getArgIndex(args, value2));
+    }
     return {
-      getArgFn: (name: string) => args[name],
+      getArgFn: getArgFn,
+      isBeforeFn: isBeforeFn,
       omitArguments: omitArguments,
       negationCount: negationCount,
       forceInnerNegations: forceInnerNegations,
@@ -117,7 +146,7 @@ export abstract class GenericRenderer {
     return semanticLink;
   }
 
-  protected setDefinitionSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object, notation: Fmt.Expression[] | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Notation.SemanticLink {
+  protected setDefinitionSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Notation.SemanticLink {
     let semanticLink = new Notation.SemanticLink(linkedObject, true);
     if (this.editHandler) {
       this.editHandler.addNotationMenu(semanticLink, notation, onSetNotation, onGetDefault, onGetVariables, isPredicate, this);

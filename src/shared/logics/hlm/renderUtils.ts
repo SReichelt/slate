@@ -106,9 +106,8 @@ export class HLMRenderUtils {
       if (constraint instanceof Fmt.DefinitionRefExpression
           && definition
           && definition.contents instanceof FmtHLM.ObjectContents_Definition
-          && definition.contents.notation
-          && definition.contents.notation.length) {
-        let notation = definition.contents.notation[0];
+          && definition.contents.notation) {
+        let notation = definition.contents.notation;
         if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
           let template = this.templates.definitions.getDefinition(notation.path.name);
           if (template.contents instanceof FmtNotation.ObjectContents_Template) {

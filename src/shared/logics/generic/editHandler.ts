@@ -15,8 +15,7 @@ import CachedPromise from '../../data/cachedPromise';
 
 export type RenderTypeFn = (type: string | undefined) => Notation.RenderedExpression;
 
-export type SetNotationFn = (notation: Fmt.Expression[] | undefined) => void;
-export type SetNotationItemFn = (notationItem: Fmt.Expression | undefined) => void;
+export type SetNotationFn = (notation: Fmt.Expression | undefined) => void;
 
 export type RenderParameterFn = (parameter: Fmt.Parameter) => Notation.RenderedExpression;
 export type InsertParameterFn = (parameter: Fmt.Parameter) => void;
@@ -85,37 +84,23 @@ export abstract class GenericEditHandler {
     return this.getActionInsertButton(action);
   }
 
-  addNotationMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression[] | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
-    let notationItem = notation && notation.length === 1 ? notation[0] : undefined;
-    let onSetNotationItem = (newNotationItem: Fmt.Expression | undefined) => {
-      if (newNotationItem) {
-        onSetNotation([newNotationItem]);
-      } else {
-        onSetNotation(undefined);
-      }
-    };
+  addNotationMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
     let type = new FmtNotation.MetaRefExpression_Expr;
     semanticLink.onMenuOpened = () => {
       let defaultValue = onGetDefault();
       let variables = onGetVariables();
       let rows: Menu.ExpressionMenuRow[] = [];
-      this.addNotationMenuRows(rows, notationItem, onSetNotationItem, defaultValue, variables, type, !notation, true, false, isPredicate, renderer);
-      if (variables.length > 1) {
-        rows.push(
-          new Menu.ExpressionMenuSeparator,
-          this.getNotationMenuAlternativesRow(notation, onSetNotation, variables, true, isPredicate, renderer)
-        );
-      }
+      this.addNotationMenuRows(rows, notation, onSetNotation, defaultValue, variables, type, !notation, true, false, isPredicate, renderer);
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
     semanticLink.alwaysShowMenu = true;
   }
 
-  private addNotationItemMenu(semanticLink: Notation.SemanticLink, notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, defaultValue: Notation.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
+  private addNotationItemMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, defaultValue: Notation.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     semanticLink.onMenuOpened = () => {
-      let isDefault = !notationItem && !canRemove;
+      let isDefault = !notation && !canRemove;
       let rows: Menu.ExpressionMenuRow[] = [];
-      this.addNotationMenuRows(rows, notationItem, onSetNotationItem, defaultValue, variables, type, isDefault, isTopLevel, canRemove, isPredicate, renderer);
+      this.addNotationMenuRows(rows, notation, onSetNotation, defaultValue, variables, type, isDefault, isTopLevel, canRemove, isPredicate, renderer);
       if (rows.length === 1) {
         let row = rows[0];
         if (row instanceof Menu.StandardExpressionMenuRow && row.subMenu instanceof Menu.ExpressionMenu) {
@@ -127,37 +112,37 @@ export abstract class GenericEditHandler {
     semanticLink.alwaysShowMenu = true;
   }
 
-  private addNotationMenuRows(rows: Menu.ExpressionMenuRow[], notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, defaultValue: Notation.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
+  private addNotationMenuRows(rows: Menu.ExpressionMenuRow[], notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, defaultValue: Notation.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isDefault: boolean, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     if (defaultValue || canRemove) {
       rows.push(
-        this.getNotationMenuDefaultRow(defaultValue, onSetNotationItem, isDefault, canRemove),
+        this.getNotationMenuDefaultRow(defaultValue, onSetNotation, isDefault, canRemove),
         new Menu.ExpressionMenuSeparator
       );
     }
     let complexExpressionRequired = isTopLevel && variables.length !== 0;
     if (type instanceof FmtNotation.MetaRefExpression_Expr) {
       if (!complexExpressionRequired) {
-        rows.push(this.getNotationMenuTextRow(notationItem, onSetNotationItem));
+        rows.push(this.getNotationMenuTextRow(notation, onSetNotation));
         if (variables.length && !isTopLevel) {
-          rows.push(this.getNotationMenuVariablesRow(notationItem, onSetNotationItem, variables));
+          rows.push(this.getNotationMenuVariablesRow(notation, onSetNotation, variables));
         }
       }
-      rows.push(this.getNotationMenuTemplatesRow(notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, complexExpressionRequired, renderer));
+      rows.push(this.getNotationMenuTemplatesRow(notation, onSetNotation, variables, isTopLevel, isPredicate, complexExpressionRequired, renderer));
     } else if (type instanceof FmtNotation.MetaRefExpression_Bool) {
-      rows.push(this.getNotationMenuFalseRow(notationItem, onSetNotationItem));
-      rows.push(this.getNotationMenuTrueRow(notationItem, onSetNotationItem));
+      rows.push(this.getNotationMenuFalseRow(notation, onSetNotation));
+      rows.push(this.getNotationMenuTrueRow(notation, onSetNotation));
     } else if (type instanceof FmtNotation.MetaRefExpression_Int) {
-      rows.push(this.getNotationMenuIntegerRow(notationItem, onSetNotationItem));
+      rows.push(this.getNotationMenuIntegerRow(notation, onSetNotation));
     } else if (type instanceof FmtNotation.MetaRefExpression_String) {
-      rows.push(this.getNotationMenuTextRow(notationItem, onSetNotationItem, 'String'));
+      rows.push(this.getNotationMenuTextRow(notation, onSetNotation, 'String'));
     }
     if (isPredicate && !isTopLevel) {
-      rows.push(this.getNotationMenuNegationRow(notationItem, onSetNotationItem, variables, type, isTopLevel, isPredicate, renderer));
+      rows.push(this.getNotationMenuNegationRow(notation, onSetNotation, variables, type, isTopLevel, isPredicate, renderer));
     }
   }
 
-  private getNotationMenuDefaultRow(renderedDefault: Notation.RenderedExpression | undefined, onSetNotationItem: SetNotationItemFn, isDefault: boolean, isRemoveRow: boolean): Menu.ExpressionMenuRow {
-    let defaultAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotationItem(undefined));
+  private getNotationMenuDefaultRow(renderedDefault: Notation.RenderedExpression | undefined, onSetNotation: SetNotationFn, isDefault: boolean, isRemoveRow: boolean): Menu.ExpressionMenuRow {
+    let defaultAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(undefined));
     let defaultRow = new Menu.StandardExpressionMenuRow(isRemoveRow ? 'Remove' : 'Default');
     if (isRemoveRow) {
       defaultRow.iconType = 'remove';
@@ -173,69 +158,69 @@ export abstract class GenericEditHandler {
     return defaultRow;
   }
 
-  private getNotationMenuFalseRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn): Menu.ExpressionMenuRow {
+  private getNotationMenuFalseRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
     let falseRow = new Menu.StandardExpressionMenuRow('False');
-    falseRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotationItem(new FmtNotation.MetaRefExpression_false));
-    falseRow.selected = notationItem instanceof FmtNotation.MetaRefExpression_false;
+    falseRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(new FmtNotation.MetaRefExpression_false));
+    falseRow.selected = notation instanceof FmtNotation.MetaRefExpression_false;
     return falseRow;
   }
 
-  private getNotationMenuTrueRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn): Menu.ExpressionMenuRow {
+  private getNotationMenuTrueRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
     let trueRow = new Menu.StandardExpressionMenuRow('True');
-    trueRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotationItem(new FmtNotation.MetaRefExpression_true));
-    trueRow.selected = notationItem instanceof FmtNotation.MetaRefExpression_true;
+    trueRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(new FmtNotation.MetaRefExpression_true));
+    trueRow.selected = notation instanceof FmtNotation.MetaRefExpression_true;
     return trueRow;
   }
 
-  private getNotationMenuIntegerRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn): Menu.ExpressionMenuRow {
+  private getNotationMenuIntegerRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
     let integerItem = new Menu.ExpressionMenuTextInput;
-    if (notationItem instanceof Fmt.IntegerExpression) {
+    if (notation instanceof Fmt.IntegerExpression) {
       integerItem.selected = true;
-      integerItem.text = notationItem.value.toString();
+      integerItem.text = notation.value.toString();
     } else {
       integerItem.text = '';
     }
     integerItem.expectedTextLength = 4;
     integerItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newNotationItem = new Fmt.IntegerExpression;
-      newNotationItem.value = new Fmt.BN(integerItem.text, 10);
-      onSetNotationItem(newNotationItem);
+      let newNotation = new Fmt.IntegerExpression;
+      newNotation.value = new Fmt.BN(integerItem.text, 10);
+      onSetNotation(newNotation);
     });
     let integerRow = new Menu.StandardExpressionMenuRow('Number');
     integerRow.subMenu = integerItem;
     return integerRow;
   }
 
-  private getNotationMenuTextRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
+  private getNotationMenuTextRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
     let textItem = new Menu.ExpressionMenuTextInput;
-    if (notationItem instanceof Fmt.StringExpression) {
+    if (notation instanceof Fmt.StringExpression) {
       textItem.selected = true;
-      textItem.text = notationItem.value;
+      textItem.text = notation.value;
     } else {
       textItem.text = '';
     }
     textItem.expectedTextLength = 4;
     textItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newNotationItem = new Fmt.StringExpression;
-      newNotationItem.value = textItem.text;
-      onSetNotationItem(newNotationItem);
+      let newNotation = new Fmt.StringExpression;
+      newNotation.value = textItem.text;
+      onSetNotation(newNotation);
     });
     let textRow = new Menu.StandardExpressionMenuRow(title);
     textRow.subMenu = textItem;
     return textRow;
   }
 
-  private getNotationMenuVariablesRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
+  private getNotationMenuVariablesRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
     let items: Menu.ExpressionMenuItem[] = [];
     for (let variable of variables) {
       let variableItem = new Menu.ExpressionMenuItem(variable.notation);
-      if (notationItem instanceof Fmt.VariableRefExpression && notationItem.variable === variable.param) {
+      if (notation instanceof Fmt.VariableRefExpression && notation.variable === variable.param) {
         variableItem.selected = true;
       }
       variableItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-        let newNotationItem = new Fmt.VariableRefExpression;
-        newNotationItem.variable = variable.param;
-        onSetNotationItem(newNotationItem);
+        let newNotation = new Fmt.VariableRefExpression;
+        newNotation.variable = variable.param;
+        onSetNotation(newNotation);
       });
       items.push(variableItem);
     }
@@ -245,12 +230,12 @@ export abstract class GenericEditHandler {
     return variablesRow;
   }
 
-  private getNotationMenuTemplatesRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getNotationMenuTemplatesRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let rows: Menu.ExpressionMenuRow[] = [];
     for (let template of this.templates.definitions) {
       if ((!complexExpressionRequired || template.parameters.length)
           && this.isTemplateApplicable(template, isTopLevel, isPredicate)) {
-        let templateRow = this.getNotationMenuTemplateRow(template, notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, renderer);
+        let templateRow = this.getNotationMenuTemplateRow(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer);
         rows.push(templateRow);
       }
     }
@@ -288,28 +273,28 @@ export abstract class GenericEditHandler {
     return false;
   }
 
-  private getNotationMenuTemplateRow(template: Fmt.Definition, notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getNotationMenuTemplateRow(template: Fmt.Definition, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let title = new Notation.TextExpression(template.name);
     title.styleClasses = ['source-code'];
     let templateRow = new Menu.StandardExpressionMenuRow(title);
     templateRow.info = this.getDocumentation(template);
     templateRow.examples = this.getExamples(template, renderer);
     if (template.parameters.length) {
-      templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, renderer));
+      templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer));
     } else {
       templateRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => {
         let newPath = new Fmt.Path;
         newPath.name = template.name;
-        let newNotationItem = new Fmt.DefinitionRefExpression;
-        newNotationItem.path = newPath;
-        onSetNotationItem(newNotationItem);
+        let newNotation = new Fmt.DefinitionRefExpression;
+        newNotation.path = newPath;
+        onSetNotation(newNotation);
       });
     }
-    templateRow.selected = notationItem instanceof Fmt.DefinitionRefExpression && notationItem.path.name === template.name;
+    templateRow.selected = notation instanceof Fmt.DefinitionRefExpression && notation.path.name === template.name;
     return templateRow;
   }
 
-  private getTemplateDialog(template: Fmt.Definition, notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getTemplateDialog(template: Fmt.Definition, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let title: Notation.RenderedExpression = new Notation.TextExpression(template.name);
     title.styleClasses = ['source-code'];
@@ -326,9 +311,9 @@ export abstract class GenericEditHandler {
       titleItem,
       new Dialog.ExpressionDialogSeparatorItem
     ];
-    let newNotationItem: Fmt.DefinitionRefExpression;
-    if (notationItem instanceof Fmt.DefinitionRefExpression && !notationItem.path.parentPath && notationItem.path.name === template.name) {
-      newNotationItem = notationItem.clone() as Fmt.DefinitionRefExpression;
+    let newNotation: Fmt.DefinitionRefExpression;
+    if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath && notation.path.name === template.name) {
+      newNotation = notation.clone() as Fmt.DefinitionRefExpression;
     } else {
       let newPath = new Fmt.Path;
       newPath.name = template.name;
@@ -357,20 +342,20 @@ export abstract class GenericEditHandler {
           }
         }
       }
-      newNotationItem = new Fmt.DefinitionRefExpression;
-      newNotationItem.path = newPath;
+      newNotation = new Fmt.DefinitionRefExpression;
+      newNotation.path = newPath;
     }
-    let previewItem = this.createTemplateDialogPreviewItem(newNotationItem, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
+    let previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
     let messageItem: Dialog.ExpressionDialogInfoItem | undefined = undefined;
     if (isTopLevel) {
       messageItem = new Dialog.ExpressionDialogInfoItem;
       messageItem.visible = false;
       messageItem.info = new Notation.EmptyExpression;
     }
-    let requiredArgumentsFilled = this.checkRequiredArguments(template, newNotationItem);
+    let requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
     previewItem.visible = requiredArgumentsFilled;
     let okEnabled = requiredArgumentsFilled;
-    if (messageItem && !this.checkReferencedParameters(newNotationItem, variables, messageItem)) {
+    if (messageItem && !this.checkReferencedParameters(newNotation, variables, messageItem)) {
       okEnabled = false;
     }
     let paramIndex = 0;
@@ -381,14 +366,14 @@ export abstract class GenericEditHandler {
       paramItem.title.styleClasses = ['source-code'];
       let localPreviousParamNames = previousParamNames.slice();
       paramItem.onGetValue = () => {
-        let value = newNotationItem.path.arguments.getOptionalValue(param.name, paramIndex);
+        let value = newNotation.path.arguments.getOptionalValue(param.name, paramIndex);
         let onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
-          newNotationItem.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
-          requiredArgumentsFilled = this.checkRequiredArguments(template, newNotationItem);
+          newNotation.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
+          requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
           previewItem.visible = requiredArgumentsFilled;
           previewItem.changed();
           okEnabled = requiredArgumentsFilled;
-          if (messageItem && !this.checkReferencedParameters(newNotationItem, variables, messageItem)) {
+          if (messageItem && !this.checkReferencedParameters(newNotation, variables, messageItem)) {
             okEnabled = false;
           }
         };
@@ -408,7 +393,7 @@ export abstract class GenericEditHandler {
       dialog.items.push(messageItem);
     }
     dialog.onCheckOKEnabled = () => okEnabled;
-    dialog.onOK = () => onSetNotationItem(newNotationItem);
+    dialog.onOK = () => onSetNotation(newNotation);
     return dialog;
   }
 
@@ -474,7 +459,7 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
     if (arrayDimensions) {
       if (value instanceof Fmt.ArrayExpression) {
         let items: Notation.RenderedExpression[] = [];
@@ -529,22 +514,22 @@ export abstract class GenericEditHandler {
       let renderedValue = valueOrDefault ? renderer.renderNotationExpression(valueOrDefault, renderedTemplateArguments) : new Notation.EmptyExpression;
       let semanticLink = new Notation.SemanticLink(renderedValue, false, false);
       let onGetDefault = () => defaultValue ? renderer.renderNotationExpression(defaultValue, renderedTemplateArguments) : undefined;
-      this.addNotationItemMenu(semanticLink, value, onSetNotationItem, onGetDefault(), variables, type, isTopLevel, canRemove, isPredicate, renderer);
+      this.addNotationItemMenu(semanticLink, value, onSetNotation, onGetDefault(), variables, type, isTopLevel, canRemove, isPredicate, renderer);
       renderedValue.semanticLinks = [semanticLink];
       return renderedValue;
     }
   }
 
-  private createTemplateDialogPreviewItem(notationItem: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
+  private createTemplateDialogPreviewItem(notation: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
     // TODO add preview in different contexts, to validate parentheses
     let listItem = new Dialog.ExpressionDialogListItem<number | undefined>();
     listItem.items = includeNegation ? [0, 1] : [undefined];
-    listItem.onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notationItem, renderedTemplateArguments, 0, negationCount);
+    listItem.onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notation, renderedTemplateArguments, 0, negationCount);
     return listItem;
   }
 
-  private checkReferencedParameters(notationItem: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem): boolean {
-    let referencedParams = this.utils.findReferencedParameters(notationItem);
+  private checkReferencedParameters(notation: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem): boolean {
+    let referencedParams = this.utils.findReferencedParameters(notation);
     let missingVariables: RenderedVariable[] = [];
     let autoVariables: RenderedVariable[] = [];
     for (let variable of variables) {
@@ -568,9 +553,9 @@ export abstract class GenericEditHandler {
     return true;
   }
 
-  private checkRequiredArguments(template: Fmt.Definition, notationItem: Fmt.DefinitionRefExpression): boolean {
+  private checkRequiredArguments(template: Fmt.Definition, notation: Fmt.DefinitionRefExpression): boolean {
     for (let param of template.parameters) {
-      if (!param.optional && !param.defaultValue && !notationItem.path.arguments.getOptionalValue(param.name)) {
+      if (!param.optional && !param.defaultValue && !notation.path.arguments.getOptionalValue(param.name)) {
         return false;
       }
     }
@@ -591,25 +576,25 @@ export abstract class GenericEditHandler {
     messageItem.visible = true;
   }
 
-  private getNotationMenuNegationRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
+  private getNotationMenuNegationRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let negationRow = new Menu.StandardExpressionMenuRow('With negation');
-    negationRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getNegationDialog(notationItem, onSetNotationItem, variables, type, isTopLevel, isPredicate, renderer));
-    negationRow.selected = notationItem instanceof FmtNotation.MetaRefExpression_neg;
+    negationRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getNegationDialog(notation, onSetNotation, variables, type, isTopLevel, isPredicate, renderer));
+    negationRow.selected = notation instanceof FmtNotation.MetaRefExpression_neg;
     return negationRow;
   }
 
-  private getNegationDialog(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
+  private getNegationDialog(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let dialog = new Dialog.ExpressionDialog;
     dialog.items = [];
-    let newNotationItem: FmtNotation.MetaRefExpression_neg;
-    if (notationItem instanceof FmtNotation.MetaRefExpression_neg) {
-      newNotationItem = notationItem.clone() as FmtNotation.MetaRefExpression_neg;
+    let newNotation: FmtNotation.MetaRefExpression_neg;
+    if (notation instanceof FmtNotation.MetaRefExpression_neg) {
+      newNotation = notation.clone() as FmtNotation.MetaRefExpression_neg;
     } else {
-      newNotationItem = new FmtNotation.MetaRefExpression_neg;
-      newNotationItem.items = [];
-      if (notationItem) {
-        newNotationItem.items.push(notationItem);
+      newNotation = new FmtNotation.MetaRefExpression_neg;
+      newNotation.items = [];
+      if (notation) {
+        newNotation.items.push(notation);
       }
     }
     for (let index = 0; index <= 1; index++) {
@@ -617,54 +602,21 @@ export abstract class GenericEditHandler {
       paramItem.title = index ? 'Negated' : 'Regular';
       let onSetItem = (newItem: Fmt.Expression | undefined) => {
         if (newItem) {
-          if (newNotationItem.items.length <= index) {
+          if (newNotation.items.length <= index) {
             do {
-              newNotationItem.items.push(newItem);
-            } while (newNotationItem.items.length <= index);
+              newNotation.items.push(newItem);
+            } while (newNotation.items.length <= index);
           } else {
-            newNotationItem.items[index] = newItem;
+            newNotation.items[index] = newItem;
           }
         }
       };
       paramItem.onGetValue = () => {
-        let regular = newNotationItem.items.length > index ? newNotationItem.items[index] : undefined;
+        let regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
         return this.renderArgumentValue(regular, type, 0, undefined, onSetItem, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
       };
       dialog.items.push(paramItem);
     }
-    dialog.onOK = () => onSetNotationItem(newNotationItem);
-    return dialog;
-  }
-
-  private getNotationMenuAlternativesRow(notation: Fmt.Expression[] | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let alternativesRow = new Menu.StandardExpressionMenuRow('Multiple alternatives');
-    alternativesRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getAlternativesDialog(notation, onSetNotation, variables, isTopLevel, isPredicate, renderer));
-    alternativesRow.selected = notation !== undefined && notation.length > 1;
-    return alternativesRow;
-  }
-
-  private getAlternativesDialog(notation: Fmt.Expression[] | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
-    let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
-    let dialog = new Dialog.ExpressionDialog;
-    dialog.items = [];
-    let newNotation: Fmt.Expression[] = [];
-    if (notation) {
-      newNotation = notation.slice();
-    }
-    let paramItem = new Dialog.ExpressionDialogParameterItem;
-    paramItem.title = 'Alternatives';
-    paramItem.onGetValue = () => {
-      let newNotationExpression = new Fmt.ArrayExpression;
-      newNotationExpression.items = newNotation;
-      let type = new FmtNotation.MetaRefExpression_Expr;
-      let onSetNotationExpression = (notationExpression: Fmt.Expression) => {
-        if (notationExpression instanceof Fmt.ArrayExpression) {
-          onSetNotation(notationExpression.items);
-        }
-      };
-      return this.renderArgumentValue(newNotationExpression, type, 1, undefined, onSetNotationExpression, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
-    };
-    dialog.items.push(paramItem);
     dialog.onOK = () => onSetNotation(newNotation);
     return dialog;
   }

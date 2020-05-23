@@ -1,5 +1,7 @@
 import * as Fmt from '../../format/format';
 
+// TODO replace the code in this file
+
 export function collectVariableRefs(expression: Fmt.Expression): Fmt.Parameter[] {
   let result: Fmt.Parameter[] = [];
   expression.traverse((subExpression: Fmt.Expression) => {

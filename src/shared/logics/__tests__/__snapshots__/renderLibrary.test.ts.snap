@@ -567,6 +567,8 @@ by:
 
   s is [p_t]_(t ∈ S)  :⇔  p_s  (p_t is a proposition for each t ∈ S)
 
+  s is not p  :⇔  not [s is p]
+
 Remarks.
 
 \\"\`s\` is \`p\`\\" is shorthand for \\"\`s\` has property \`p\`.\\""
@@ -4758,6 +4760,8 @@ by:
 
   (a_n)_(n ∈ ℕ) converges to l  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : |a_m − l| < ε  (a_n ∈ ℚ for each n ∈ ℕ)
 
+  𝐚 does not converge to l  :⇔  not [𝐚 converges to l]
+
 References.
 
 * https://en.wikipedia.org/wiki/Limit_of_a_sequence
@@ -8114,13 +8118,9 @@ by:
 `;
 
 exports[`render hlm library: 2.8.29.1.6 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/additive%20inverse 1`] = `
-"Definition 2.8.29.1.6.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x ∈ 𝐌. We define
+"Definition 2.8.29.1.6.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, x ∈ 𝐌. We define:
 
-  −x
-
-by:
-
-  −x := ⊖(x)  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)"
+  −x := ⊖(x) if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)"
 `;
 
 exports[`render hlm library: 2.8.29.1.7 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/difference 1`] = `
@@ -8573,13 +8573,9 @@ by:
 `;
 
 exports[`render hlm library: 2.8.29.2.6 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/additive%20inverse 1`] = `
-"Definition 2.8.29.2.6.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌. We define
+"Definition 2.8.29.2.6.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, x ∈ 𝐌. We define:
 
-  −x
-
-by:
-
-  −x := ⊖(x)  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)"
+  −x := ⊖(x) if 𝐌 = [M, ⊕, 0, ⊖, ⊙]_𝐑 (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)"
 `;
 
 exports[`render hlm library: 2.8.29.2.7 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/difference 1`] = `
@@ -9700,6 +9696,8 @@ exports[`render hlm library: 5.4.3 data/libraries/hlm/Formal%20systems/Untyped%2
 "Definition 5.4.3.  Let V ⊆ 𝓥𝓪𝓻 such that V is finite, ℜ ⊆ 𝓡𝓮𝔀𝓻(𝓣_V), L, R ∈ 𝓣_V. We define:
 
   L →_ℜ R  :⇔  (L → R) ∈ ℜ or {false if R = (z) (z ∈ V), [{false if L = (y) (y ∈ V), ∀ v ∈ Fresh(V) : M_v →_ℜ N_v if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), false if L = M N (M, N ∈ 𝓣_V)] if R = λz. N_z (N_z ∈ 𝓣_(V ∪ {z}) for each z ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : N_a[a := b] = N_b]), [{false if L = (y) (y ∈ V), false if L = λy. M_y (M_y ∈ 𝓣_(V ∪ {y}) for each y ∈ Fresh(V), [∀ a, b ∈ Fresh(V) : M_a[a := b] = M_b]), [M →_ℜ O and N = P] or [M = O and N →_ℜ P] if L = M N (M, N ∈ 𝓣_V)] if R = O P (O, P ∈ 𝓣_V)
+
+  L ↛_ℜ R  :⇔  not [L →_ℜ R]
 
 Remarks.
 

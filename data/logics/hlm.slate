@@ -20,7 +20,7 @@ $hlm: %MetaModel {
 $Definition: %DefinitionType {
   members = #(
     properties: %ArgumentList = {},
-    notation?: $../notation/notation/Expr[],
+    notation?: $../notation/notation/Expr,
     definitionNotation?: $DefinitionNotation
   )
 }
@@ -28,7 +28,7 @@ $Definition: %DefinitionType {
 $DefinitionNotation: %ExpressionType {
   members = #(
     parameter: %SingleParameter($Expr),
-    notation[parameter]?: $../notation/notation/Expr[],
+    notation[parameter]?: $../notation/notation/Expr,
     singularName?: $../notation/notation/Expr,
     pluralName?: $../notation/notation/Expr,
     nameOptional: $../notation/notation/Bool = $../notation/notation/false

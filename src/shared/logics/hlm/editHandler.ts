@@ -686,11 +686,10 @@ export class HLMEditHandler extends GenericEditHandler {
   private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T[] {
     let notationItems: Fmt.Expression[] | undefined = undefined;
     let notationExpressions: (Fmt.Expression | undefined)[] = [undefined];
-    if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
-      notationItems = definition.contents.notation;
-      if (notationItems) {
-        notationExpressions = notationItems;
-      }
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.notation) {
+      // TODO
+      notationItems = [definition.contents.notation];
+      notationExpressions = notationItems;
     }
     let result: T[] = [];
     for (let notationExpression of notationExpressions) {

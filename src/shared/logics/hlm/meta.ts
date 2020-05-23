@@ -8,7 +8,7 @@ import * as FmtNotation from '../../notation/meta';
 
 export class ObjectContents_Definition extends Fmt.ObjectContents {
   properties?: Fmt.ArgumentList;
-  notation?: Fmt.Expression[];
+  notation?: Fmt.Expression;
   definitionNotation?: ObjectContents_DefinitionNotation;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -20,14 +20,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
         throw new Error('properties: Compound expression expected');
       }
     }
-    let notationRaw = argumentList.getOptionalValue('notation', 1);
-    if (notationRaw !== undefined) {
-      if (notationRaw instanceof Fmt.ArrayExpression) {
-        this.notation = notationRaw.items;
-      } else {
-        throw new Error('notation: Array expression expected');
-      }
-    }
+    this.notation = argumentList.getOptionalValue('notation', 1);
     let definitionNotationRaw = argumentList.getOptionalValue('definitionNotation', 2);
     if (definitionNotationRaw !== undefined) {
       if (definitionNotationRaw instanceof Fmt.CompoundExpression) {
@@ -48,12 +41,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       argumentList.add(propertiesExpr, 'properties', true);
     }
     if (this.notation !== undefined) {
-      let notationExpr = new Fmt.ArrayExpression;
-      notationExpr.items = [];
-      for (let item of this.notation) {
-        notationExpr.items.push(item);
-      }
-      argumentList.add(notationExpr, 'notation', true);
+      argumentList.add(this.notation, 'notation', true);
     }
     if (this.definitionNotation !== undefined) {
       let definitionNotationExpr = new Fmt.CompoundExpression;
@@ -73,9 +61,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       this.properties.traverse(fn);
     }
     if (this.notation) {
-      for (let item of this.notation) {
-        item.traverse(fn);
-      }
+      this.notation.traverse(fn);
     }
     if (this.definitionNotation) {
       this.definitionNotation.traverse(fn);
@@ -91,13 +77,9 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       }
     }
     if (this.notation) {
-      result.notation = [];
-      for (let item of this.notation) {
-        let newItem = item.substitute(fn, replacedParameters);
-        if (newItem !== item) {
-          changed = true;
-        }
-        result.notation.push(newItem);
+      result.notation = this.notation.substitute(fn, replacedParameters);
+      if (result.notation !== this.notation) {
+        changed = true;
       }
     }
     if (this.definitionNotation) {
@@ -119,17 +101,8 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       }
     }
     if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || this.notation.length !== objectContents.notation.length) {
+      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
         return false;
-      }
-      for (let i = 0; i < this.notation.length; i++) {
-        let leftItem = this.notation[i];
-        let rightItem = objectContents.notation[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
-        }
       }
     }
     if (this.definitionNotation || objectContents.definitionNotation) {
@@ -143,7 +116,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 
 export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   parameter: Fmt.Parameter;
-  notation?: Fmt.Expression[];
+  notation?: Fmt.Expression;
   singularName?: Fmt.Expression;
   pluralName?: Fmt.Expression;
   nameOptional?: Fmt.Expression;
@@ -155,14 +128,7 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     } else {
       throw new Error('parameter: Parameter expression with single parameter expected');
     }
-    let notationRaw = argumentList.getOptionalValue('notation', 1);
-    if (notationRaw !== undefined) {
-      if (notationRaw instanceof Fmt.ArrayExpression) {
-        this.notation = notationRaw.items;
-      } else {
-        throw new Error('notation: Array expression expected');
-      }
-    }
+    this.notation = argumentList.getOptionalValue('notation', 1);
     this.singularName = argumentList.getOptionalValue('singularName', 2);
     this.pluralName = argumentList.getOptionalValue('pluralName', 3);
     this.nameOptional = argumentList.getOptionalValue('nameOptional', 4);
@@ -174,12 +140,7 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     parameterExpr.parameters.push(this.parameter);
     argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
     if (this.notation !== undefined) {
-      let notationExpr = new Fmt.ArrayExpression;
-      notationExpr.items = [];
-      for (let item of this.notation) {
-        notationExpr.items.push(item);
-      }
-      argumentList.add(notationExpr, 'notation', true);
+      argumentList.add(this.notation, 'notation', true);
     }
     if (this.singularName !== undefined) {
       argumentList.add(this.singularName, 'singularName', true);
@@ -203,9 +164,7 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
       this.parameter.traverse(fn);
     }
     if (this.notation) {
-      for (let item of this.notation) {
-        item.traverse(fn);
-      }
+      this.notation.traverse(fn);
     }
     if (this.singularName) {
       this.singularName.traverse(fn);
@@ -227,13 +186,9 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
       }
     }
     if (this.notation) {
-      result.notation = [];
-      for (let item of this.notation) {
-        let newItem = item.substitute(fn, replacedParameters);
-        if (newItem !== item) {
-          changed = true;
-        }
-        result.notation.push(newItem);
+      result.notation = this.notation.substitute(fn, replacedParameters);
+      if (result.notation !== this.notation) {
+        changed = true;
       }
     }
     if (this.singularName) {
@@ -267,17 +222,8 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
       }
     }
     if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || this.notation.length !== objectContents.notation.length) {
+      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
         return false;
-      }
-      for (let i = 0; i < this.notation.length; i++) {
-        let leftItem = this.notation[i];
-        let rightItem = objectContents.notation[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
-        }
       }
     }
     if (this.singularName || objectContents.singularName) {

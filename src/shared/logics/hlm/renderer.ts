@@ -2,8 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as FmtNotation from '../../notation/meta';
 import * as Logic from '../logic';
-import { GenericRenderer, RenderedVariable, RenderedTemplateArguments } from '../generic/renderer';
-import { findBestMatch } from '../generic/notationMatching';
+import { GenericRenderer, RenderedVariable, ArgumentWithInfo, RenderedTemplateArgument, RenderedTemplateArguments } from '../generic/renderer';
 import * as Notation from '../../notation/notation';
 import { HLMExpressionType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
@@ -619,9 +618,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (definitionNotation) {
             let args = this.getRenderedTemplateArguments(definitions, argumentLists);
             args[definitionNotation.parameter.name] = variableDefinitions;
-            if (definitionNotation.notation && definitionNotation.notation.length) {
-              let notation = findBestMatch(definitionNotation.notation, argumentLists)!;
-              variableNotation = this.renderNotationExpression(notation, args);
+            if (definitionNotation.notation) {
+              variableNotation = this.renderNotationExpression(definitionNotation.notation, args);
               this.addSemanticLink(variableNotation, definitionRef);
             }
             if (!(state.abbreviate && definitionNotation.nameOptional instanceof FmtNotation.MetaRefExpression_true)) {
@@ -872,13 +870,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let innerDefinition = definitions[definitions.length - 1];
     let contents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
     let definitionRef = this.renderDefinitionRef(definitions);
-    let onSetNotation = (notation: Fmt.Expression[] | undefined) => {
+    let onSetNotation = (notation: Fmt.Expression | undefined) => {
       if (notation) {
-        for (let notationItem of notation) {
-          let referencedParams = this.utils.findReferencedParameters(notationItem);
-          for (let definition of definitions) {
-            this.utils.markUnreferencedParametersAsAuto(definition.parameters, referencedParams);
-          }
+        let referencedParams = this.utils.findReferencedParameters(notation);
+        for (let definition of definitions) {
+          this.utils.markUnreferencedParametersAsAuto(definition.parameters, referencedParams);
         }
       }
       contents.notation = notation;
@@ -1344,7 +1340,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderDefinitionRef(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression {
     let result: Notation.RenderedExpression | undefined = undefined;
     let definition = definitions[definitions.length - 1];
-    if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.notation) {
       result = this.renderDefinitionNotationExpression(definition.contents.notation, definitions, argumentLists, omitArguments, negationCount, parameterOverrides);
     }
     if (!result) {
@@ -1370,7 +1366,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    });
     }
     if (!omitArguments) {
-      let args: Notation.ExpressionValue[] = [];
+      let args: RenderedTemplateArgument[] = [];
       let curArgumentLists = parameterOverrides ? undefined : argumentLists;
       this.fillArguments(definition.parameters, parameterOverrides, curArgumentLists, undefined, true, false, undefined, args);
       if (args.length) {
@@ -1386,16 +1382,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return result;
   }
 
-  private renderDefinitionNotationExpression(notationExpression: Fmt.Expression[] | undefined, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression | undefined {
-    if (notationExpression && notationExpression.length) {
-      let notation = findBestMatch(notationExpression, argumentLists)!;
-      return this.renderSpecificNotationExpression(notation, definitions, argumentLists, omitArguments, negationCount, parameterOverrides);
-    } else {
-      return undefined;
-    }
-  }
-
-  private renderSpecificNotationExpression(notation: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression {
+  private renderDefinitionNotationExpression(notation: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression {
     let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides, omitArguments > 0);
     return this.renderNotationExpression(notation, args, omitArguments, negationCount);
   }
@@ -1405,7 +1392,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let index = 0;
     for (let curDefinition of definitions) {
       let curParams: Fmt.Parameter[] = [];
-      let curArgs: Notation.ExpressionValue[] = [];
+      let curArgs: RenderedTemplateArgument[] = [];
       let curParameterOverrides = index === definitions.length - 1 ? parameterOverrides : undefined;
       let curReplacementParameters = curParameterOverrides?.replacementParameters;
       let curArgumentLists = argumentLists && !curReplacementParameters ? argumentLists.slice(0, index + 1) : undefined;
@@ -1420,35 +1407,35 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Notation.RenderedExpression[]): Notation.RenderedExpression {
-    let args: Notation.ExpressionValue[] = [];
+    let args: RenderedTemplateArgument[] = [];
     this.fillArguments(parameters, undefined, argumentList ? [argumentList] : undefined, indices, true, false, undefined, args);
     if (args.length === 1) {
-      return args[0];
+      return ArgumentWithInfo.getValue(args[0]);
     } else {
-      return new Notation.ParenExpression(this.renderTemplate('Group', {'items': args}), '()');
+      return this.renderTemplate('Tuple', {'items': args});
     }
   }
 
   private renderArgumentDefinitionList(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList): Notation.RenderedExpression {
     let params: Fmt.Parameter[] = [];
-    let args: Notation.ExpressionValue[] = [];
+    let args: RenderedTemplateArgument[] = [];
     // TODO handle bindings better
     this.fillArguments(parameters, undefined, [argumentList], undefined, true, false, params, args);
     args = params.map((param: Fmt.Parameter, index: number) =>
       this.renderTemplate('EqualityDefinition', {
         'operands': [
           this.renderVariable(param),
-          args[index]
+          ArgumentWithInfo.getValue(args[index])
         ]
       }));
     if (args.length === 1) {
-      return args[0];
+      return ArgumentWithInfo.getValue(args[0]);
     } else {
       return this.renderTemplate('Group', {'items': args, 'separator': ', '});
     }
   }
 
-  private fillArguments(parameters: Fmt.ParameterList, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Notation.ExpressionValue[]): void {
+  private fillArguments(parameters: Fmt.ParameterList, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     let replacementParameters = parameterOverrides?.replacementParameters;
     if (replacementParameters) {
       indices = replacementParameters.indices;
@@ -1461,7 +1448,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private fillArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Notation.ExpressionValue[]): void {
+  private fillArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       this.fillBindingArgument(param, replacementParam, type, parameterOverrides, argumentLists, indices, combineBindings, markAsDummy, resultParams, resultArgs);
@@ -1472,7 +1459,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private fillBindingArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: FmtHLM.MetaRefExpression_Binding, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Notation.ExpressionValue[]): void {
+  private fillBindingArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: FmtHLM.MetaRefExpression_Binding, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, combineBindings: boolean, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     let parameter: Fmt.Parameter | undefined = undefined;
     let bindingArgumentList: Fmt.ArgumentList | undefined = undefined;
     let newIndices = indices;
@@ -1524,7 +1511,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private fillRegularArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: Fmt.Expression, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: Notation.ExpressionValue[]): void {
+  private fillRegularArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: Fmt.Expression, parameterOverrides: ParameterOverrides | undefined, argumentLists: Fmt.ArgumentList[] | undefined, indices: Notation.RenderedExpression[] | undefined, markAsDummy: boolean, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     if (resultParams) {
       resultParams.push(param);
     }
@@ -1539,9 +1526,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     if (argumentLists) {
-      let rawArg = this.utils.getRawArgument(argumentLists, param);
+      let rawArg: Fmt.Expression | undefined = undefined;
+      let index = 0;
+      for (let argumentList of argumentLists) {
+        for (let curArg of argumentList) {
+          if (curArg.name === param.name) {
+            rawArg = curArg.value;
+            break;
+          }
+          index++;
+        }
+      }
       if (rawArg) {
-        resultArgs.push(this.getRegularArgumentResult(rawArg, type, param.type.arrayDimensions));
+        let argResult = this.getRegularArgumentResult(rawArg, type, param.type.arrayDimensions);
+        resultArgs.push(new ArgumentWithInfo(argResult, index));
       } else {
         resultArgs.push(new Notation.ErrorExpression('Undefined argument'));
       }
@@ -1801,9 +1799,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                   let parameterOverrides: ParameterOverrides = {elementParameterOverrides: elementParameterOverrides};
                   let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides);
                   args[definitionNotation.parameter.name] = renderLeftSide(elementParameterOverrides);
-                  if (definitionNotation.notation && definitionNotation.notation.length) {
-                    let notation = findBestMatch(definitionNotation.notation, argumentLists)!;
-                    let result = this.renderNotationExpression(notation, args);
+                  if (definitionNotation.notation) {
+                    let result = this.renderNotationExpression(definitionNotation.notation, args);
                     this.addSemanticLink(result, definitionRef);
                     if (this.editHandler) {
                       let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
@@ -1942,11 +1939,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
 
       this.addSubsetEmbeddings(paragraphs);
-    } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate
-               && definition.contents.notation
-               && definition.contents.notation.length) {
-      let notation = definition.contents.notation[0];
-      if (this.utils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
+    } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+      let notation = definition.contents.notation;
+      if (notation && this.utils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
         let args = this.getRenderedTemplateArguments([definition]);
         let extraContents = this.renderTemplate('EquivalenceDefinition', {
                                                   'operands': [
@@ -2530,9 +2525,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (contents instanceof FmtHLM.ObjectContents_Definition) {
         if (contents.notation) {
-          for (let notation of contents.notation) {
-            result.set(notation, () => this.renderSpecificNotationExpression(notation, definitions));
-          }
+          let notation = contents.notation;
+          result.set(notation, () => this.renderDefinitionNotationExpression(notation, definitions));
         }
         if (contents instanceof FmtHLM.ObjectContents_Construction) {
           if (contents.embedding) {

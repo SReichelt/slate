@@ -321,10 +321,12 @@ export class FoldableExpression extends RenderedExpression {
 export type ExpressionValue = any; // depending on type: constant or RenderedExpression or RenderedExpression[] or RenderedExpression[][] or ...
 
 export type GetArgFn = (name: string) => ExpressionValue | undefined;
+export type IsBeforeFn = (value1: ExpressionValue, value2: ExpressionValue) => boolean;
 export type NegationFallbackFn = (expression: RenderedExpression) => RenderedExpression;
 
 export interface RenderedTemplateConfig {
   getArgFn: GetArgFn;
+  isBeforeFn?: IsBeforeFn;
   omitArguments: number;
   negationCount: number;
   forceInnerNegations: number;
@@ -466,7 +468,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       result.push(arg);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       let referencedTemplate = this.allTemplates.definitions.getDefinition(expression.path.name);
-      let args = new Map<string, RenderedExpression>();
+      let args = new Map<string, ExpressionValue>();
       for (let argument of expression.path.arguments) {
         if (argument.name) {
           let arg: ExpressionValue[] = [];
@@ -482,6 +484,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       }
       let config: RenderedTemplateConfig = {
         getArgFn: (name: string) => args.get(name),
+        isBeforeFn: this.config.isBeforeFn,
         omitArguments: this.config.omitArguments,
         negationCount: 0,
         forceInnerNegations: 0
@@ -576,13 +579,26 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       } else if (expression instanceof FmtNotation.MetaRefExpression_last) {
         result.push(loopData && loopData.lastIteration);
       } else if (expression instanceof FmtNotation.MetaRefExpression_rev) {
-        let list: any[] = [];
-        this.translateExpression(expression.list, loopData, list);
-        result.push(...list.reverse());
+        let arg: any[] = [];
+        this.translateExpression(expression.list, loopData, arg);
+        for (let item of arg) {
+          if (item instanceof Array) {
+            result.push(item.reverse());
+          } else {
+            result.push(item);
+          }
+        }
       } else if (expression instanceof FmtNotation.MetaRefExpression_sel) {
-        // TODO
         if (expression.items.length) {
-          this.translateExpression(expression.items[0], loopData, result, isTopLevel);
+          let item = expression.items[0];
+          for (let index = 1; index < expression.items.length; index++) {
+            let curItem = expression.items[index];
+            if (this.orderMatches(curItem)) {
+              item = curItem;
+              break;
+            }
+          }
+          this.translateExpression(item, loopData, result, isTopLevel);
         }
       } else if (expression instanceof FmtNotation.MetaRefExpression_neg) {
         let index = 0;
@@ -630,6 +646,30 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     for (let expression of expressions) {
       this.translateExpression(expression, loopData, result);
     }
+  }
+
+  private orderMatches(expression: Fmt.Expression): boolean {
+    let result: boolean | undefined = undefined;
+    if (this.config.isBeforeFn) {
+      let isBeforeFn = this.config.isBeforeFn;
+      expression.traverse((subExpression: Fmt.Expression) => {
+        if (result !== false && subExpression instanceof FmtNotation.MetaRefExpression_rev) {
+          let arg: any[] = [];
+          this.translateExpression(subExpression.list, undefined, arg);
+          for (let item of arg) {
+            if (item instanceof Array && item.length > 1) {
+              result = true;
+              for (let index = item.length - 1; index > 0; index--) {
+                if (!isBeforeFn(item[index], item[index - 1])) {
+                  result = false;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    return result ?? false;
   }
 }
 
