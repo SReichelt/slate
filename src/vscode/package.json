@@ -72,7 +72,7 @@
 		"package": "vsce package -o slate.vsix"
 	},
 	"engines": {
-		"vscode": "^1.45.0"
+		"vscode": "^1.45.1"
 	},
 	"dependencies": {
 		"bn.js": "^5.1.2",
