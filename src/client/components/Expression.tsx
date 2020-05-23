@@ -13,7 +13,7 @@ import config from '../utils/config';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
 import ReactMarkdownEditor from 'react-simplemde-editor';
-import * as SimpleMDE from 'easymde';
+import * as EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -792,14 +792,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
         } else {
           let key = 'markdown-editor';
-          let toolbar: (string | SimpleMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
+          let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
           if (!config.embedded) {
             toolbar.push('guide');
           }
           if (expression.searchURLs) {
             let searchURLs = expression.searchURLs;
             let onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
-            let searchButton: SimpleMDE.ToolbarIcon = {
+            let searchButton: EasyMDE.ToolbarIcon = {
               name: 'search',
               action: onSearch,
               className: 'fa fa-search',
@@ -809,8 +809,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             key = 'markdown-editor-with-search';
           }
           let previewElement = document.createElement('div');
-          let options: SimpleMDE.Options = {
-            toolbar: toolbar,
+          let options: EasyMDE.Options = {
+            toolbar: toolbar as any,
             status: false,
             spellChecker: false,
             autoDownloadFontAwesome: false,
