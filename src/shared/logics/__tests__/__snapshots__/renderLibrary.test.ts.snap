@@ -2600,7 +2600,7 @@ References.
 exports[`render hlm library: 1.6.1.33 data/libraries/hlm/Essentials/Numbers/Natural/quotient 1`] = `
 "Definition 1.6.1.33.  Let n ∈ ℕ, m ∈ Div_ℕ(n). For x ∈ ℕ, we define:
 
-  n/m = x  :⇔  n = x ⋅ m
+  n∕m = x  :⇔  n = x ⋅ m
 
 Well-definedness.  No proof.
 
@@ -2930,7 +2930,7 @@ References.
 exports[`render hlm library: 1.6.1.50 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
 "Proposition 1.6.1.50.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
 
-  (n, k) = (n!)/(k! ⋅ (n − k)!)
+  (n, k) = n!∕(k! ⋅ (n − k)!)
 
 No proof.
 
@@ -2986,7 +2986,7 @@ No proof."
 exports[`render hlm library: 1.6.1.51.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
 "Proposition 1.6.1.51.5.  Let n ∈ ℕ. Then:
 
-  ∑_(i < n) i = (n, 2) = {(n ⋅ (n − 1))/2 if n ≠ 0, 0 if n = 0
+  ∑_(i < n) i = (n, 2) = {(n ⋅ (n − 1))∕2 if n ≠ 0, 0 if n = 0
 
 No proof."
 `;
@@ -4294,7 +4294,7 @@ exports[`render hlm library: 1.6.4.16 data/libraries/hlm/Essentials/Numbers/Inte
 exports[`render hlm library: 1.6.4.17 data/libraries/hlm/Essentials/Numbers/Integer/quotient 1`] = `
 "Definition 1.6.4.17.  Let a ∈ ℤ, b ∈ Div_ℤ(a). For x ∈ ℤ, we define:
 
-  a/b = x  :⇔  a = x ⋅ b
+  a∕b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof.
 
@@ -4657,7 +4657,7 @@ References.
 exports[`render hlm library: 1.6.5.10 data/libraries/hlm/Essentials/Numbers/Rational/quotient 1`] = `
 "Definition 1.6.5.10.  Let a ∈ ℚ, b ∈ ℚ_±. For x ∈ ℚ, we define:
 
-  a/b = x  :⇔  a = x ⋅ b
+  a∕b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof.
 
@@ -4675,7 +4675,7 @@ References.
 exports[`render hlm library: 1.6.5.11 data/libraries/hlm/Essentials/Numbers/Rational/Actual%20quotient%20equals%20formal%20quotient 1`] = `
 "Proposition 1.6.5.11.  Let n ∈ ℤ, d ∈ ℕ_+. Then:
 
-  (n/d) = n/d
+  (n/d) = n∕d
 
 No proof.
 
@@ -4704,7 +4704,7 @@ References.
 exports[`render hlm library: 1.6.5.13 data/libraries/hlm/Essentials/Numbers/Rational/power%20to%20integer 1`] = `
 "Definition 1.6.5.13.  Let a ∈ ℚ, b ∈ ℤ such that a ≠ 0 or b ≥ 0. We define:
 
-  a^b := {a^b if b ≥ 0, 1/(a^(−b)) if b < 0
+  a^b := {a^b if b ≥ 0, 1∕a^(−b) if b < 0
 
 Remarks.
 
@@ -5064,7 +5064,7 @@ References.
 exports[`render hlm library: 1.6.6.9 data/libraries/hlm/Essentials/Numbers/Real/quotient 1`] = `
 "Definition 1.6.6.9.  Let a ∈ ℝ, b ∈ ℝ_±. For x ∈ ℝ, we define:
 
-  a/b = x  :⇔  a = x ⋅ b
+  a∕b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof."
 `;
@@ -5083,7 +5083,7 @@ by:
 exports[`render hlm library: 1.6.6.11 data/libraries/hlm/Essentials/Numbers/Real/power%20to%20integer 1`] = `
 "Definition 1.6.6.11.  Let a ∈ ℝ, b ∈ ℤ such that a ≠ 0 or b ≥ 0. We define:
 
-  a^b := {a^b if b ≥ 0, 1/(a^(−b)) if b < 0"
+  a^b := {a^b if b ≥ 0, 1∕a^(−b) if b < 0"
 `;
 
 exports[`render hlm library: 1.6.6.12 data/libraries/hlm/Essentials/Numbers/Real/Power%20base%20product%20law 1`] = `
@@ -5101,7 +5101,7 @@ References.
 exports[`render hlm library: 1.6.6.13 data/libraries/hlm/Essentials/Numbers/Real/Power%20base%20quotient%20law 1`] = `
 "Proposition 1.6.6.13.  Let b ∈ ℝ, a ∈ ℝ_±, n ∈ ℕ_+. Then:
 
-  (b/a)^n = (b^n)/(a^n)
+  (b∕a)^n = b^n∕a^n
 
 No proof.
 
@@ -5132,8 +5132,8 @@ exports[`render hlm library: 1.6.6.16 data/libraries/hlm/Essentials/Numbers/Real
 "Definition 1.6.6.16.  Let a ∈ ℝ. We define:
 
   a is rational  :⇔  a ∈ ℚ
-    ⇔  ∃ b ∈ ℤ_±, c ∈ ℤ : a = c/b
-    ⇔  ∃! d ∈ ℤ_+, e ∈ ℤ s.t. d and e are coprime : a = e/d
+    ⇔  ∃ b ∈ ℤ_±, c ∈ ℤ : a = c∕b
+    ⇔  ∃! d ∈ ℤ_+, e ∈ ℤ s.t. d and e are coprime : a = e∕d
 
   a is irrational  :⇔  a is not rational
 
@@ -5183,11 +5183,11 @@ exports[`render hlm library: 1.6.6.18 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.  Assume n√p is rational.
 
-⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b/a
+⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
-⇒^def p = (b/a)^n
+⇒^def p = (b∕a)^n
 
-⇒^1.6.6.13 p = (b^n)/(a^n)
+⇒^1.6.6.13 p = b^n∕a^n
 
 ⇒^def p ⋅ a^n = b^n
 
@@ -5412,7 +5412,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.7.13 data/libraries/hlm/Essentials/Numbers/Complex/quotient 1`] = `
 "Definition 1.6.7.13.  Let a ∈ ℂ, b ∈ ℂ^×. For x ∈ ℂ, we define:
 
-  a/b = x  :⇔  a = x ⋅ b
+  a∕b = x  :⇔  a = x ⋅ b
 
 Well-definedness.  No proof."
 `;
@@ -7742,7 +7742,7 @@ exports[`render hlm library: 2.8.26.3 data/libraries/hlm/Algebra/Rings/Polynomia
 by:
 
   aX^0 := a
-  aX^(m+1) := [aX^mX+0_𝐑]  (m ∈ ℕ)
+  aX^(m+1) := [(aX^m)X+0_𝐑]  (m ∈ ℕ)
 
 Remarks.
 
@@ -8954,7 +8954,7 @@ References.
 exports[`render hlm library: 2.9.2 data/libraries/hlm/Algebra/Fields/quotient 1`] = `
 "Definition 2.9.2.  Let 𝐅 be a field, b ∈ 𝐅, a ∈ 𝐅^×. For x ∈ 𝐅, we define:
 
-  b/a = x  :⇔  b = x ⋅ a
+  b∕a = x  :⇔  b = x ⋅ a
 
 Well-definedness.  No proof."
 `;
@@ -9021,7 +9021,7 @@ exports[`render hlm library: 2.9.5.1 data/libraries/hlm/Algebra/Fields/Prime%20f
 "Proposition 2.9.5.1 (Euler's criterion).  Let p be an odd prime, a ∈ (𝔽_p)^×. Then the following are equivalent:
 
   1. ∃ y ∈ 𝔽_p : y^2 = a
-  2. a^((p−1)/2) = 1_(𝔽_p)
+  2. a^((p−1)∕2) = 1_(𝔽_p)
 
 No proof.
 
