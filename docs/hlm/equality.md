@@ -19,9 +19,14 @@ TBD
 ## How should I think about equality of isomorphic structures?
 
 * Dealing with _bundled_ structures really means dealing with isomorphism classes of these structures.
+  * We write "\[G,∗\]" for such an isomorphism class if e.g. (G,∗) is a group.
   * Type system guarantees that all definable properties are invariant under isomorphism.
 * "Let G be a group" really means "Let G be an isomorphism class of groups".
   * Deconstructing G yields a representative set and operation.
+* In fact, we have always been doing this with cardinal and ordinal numbers.
+  * Construction in ZFC does yield specific sets.
+  * However, we usually think of cardinal and ordinal numbers as isomorphism classes instead, and of operations like addition as being defined on abstract representative sets.
+  * HLM extends this concept to other structures.
 
 ## Why does this not lead to problems?
 

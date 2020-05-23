@@ -7,6 +7,7 @@ export abstract class RenderedExpression {
   styleClasses?: string[];
   optionalParenStyle: string = '()';
   semanticLinks?: SemanticLink[];
+  fallback?: RenderedExpression;
 
   getLineHeight(): CachedPromise<number> {
     let lineHeight = 1;
@@ -180,7 +181,7 @@ export class TableExpression extends RenderedExpression {
   }
 }
 
-export class DecoratedExpression extends RenderedExpression {
+export abstract class AbstractDecoratedExpression extends RenderedExpression {
   constructor(public body: RenderedExpression) {
     super();
   }
@@ -194,7 +195,9 @@ export class DecoratedExpression extends RenderedExpression {
   }
 }
 
-export class ParenExpression extends DecoratedExpression {
+export class DecoratedExpression extends AbstractDecoratedExpression {}
+
+export class ParenExpression extends AbstractDecoratedExpression {
   constructor(body: RenderedExpression, public style: string) {
     super(body);
   }
@@ -212,7 +215,7 @@ export class ParenExpression extends DecoratedExpression {
   }
 }
 
-export abstract class OptionalParenExpression extends DecoratedExpression {
+export abstract class OptionalParenExpression extends AbstractDecoratedExpression {
   left: boolean = true;
   right: boolean = true;
 }
@@ -253,14 +256,14 @@ export class InnerParenExpression extends OptionalParenExpression {
   }
 }
 
-export class SubSupExpression extends DecoratedExpression {
+export class SubSupExpression extends AbstractDecoratedExpression {
   sub?: RenderedExpression;
   sup?: RenderedExpression;
   preSub?: RenderedExpression;
   preSup?: RenderedExpression;
 }
 
-export class OverUnderExpression extends DecoratedExpression {
+export class OverUnderExpression extends AbstractDecoratedExpression {
   over?: RenderedExpression;
   under?: RenderedExpression;
 }
@@ -419,13 +422,15 @@ interface LoopData {
 }
 
 export class UserDefinedExpression extends ExpressionWithArgs {
-  constructor(private notation: Fmt.Expression, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
+  constructor(private notation: Fmt.Expression | undefined, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
     super(config);
   }
 
   protected doResolveExpressionWithArgs(): RenderedExpression {
     let result: ExpressionValue[] = [];
-    this.translateExpression(this.notation, undefined, result);
+    if (this.notation) {
+      this.translateExpression(this.notation, undefined, result, true);
+    }
     let row = this.toRenderedExpressionList(result);
     if (row.length === 1) {
       return row[0];
@@ -434,7 +439,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     }
   }
 
-  private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: ExpressionValue[]): void {
+  private translateExpression(expression: Fmt.Expression, loopData: LoopData | undefined, result: ExpressionValue[], isTopLevel: boolean = false): void {
     if (expression instanceof Fmt.StringExpression) {
       result.push(expression.value);
     } else if (expression instanceof Fmt.IntegerExpression) {
@@ -481,7 +486,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         negationCount: 0,
         forceInnerNegations: 0
       };
-      if (expression === this.notation && this.config.negationCount && this.negationsSatisfied === undefined) {
+      if (isTopLevel && this.config.negationCount && this.negationsSatisfied === undefined) {
         config.negationCount = this.config.negationCount;
         config.negationFallbackFn = this.config.negationFallbackFn;
         this.negationsSatisfied = this.config.negationCount;
@@ -502,13 +507,13 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         let arg = this.getOptionalArg(param);
         if (arg === undefined) {
           if (expression.valueIfMissing) {
-            this.translateExpression(expression.valueIfMissing, undefined, result);
+            this.translateExpression(expression.valueIfMissing, loopData, result);
           }
         } else {
           if (expression.valueIfPresent) {
-            this.translateExpression(expression.valueIfPresent, undefined, result);
+            this.translateExpression(expression.valueIfPresent, loopData, result);
           } else {
-            this.translateExpression(arg, undefined, result);
+            this.translateExpression(arg, loopData, result);
           }
         }
       } else if (expression instanceof FmtNotation.MetaRefExpression_add) {
@@ -570,6 +575,15 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         result.push(loopData && loopData.firstIteration);
       } else if (expression instanceof FmtNotation.MetaRefExpression_last) {
         result.push(loopData && loopData.lastIteration);
+      } else if (expression instanceof FmtNotation.MetaRefExpression_rev) {
+        let list: any[] = [];
+        this.translateExpression(expression.list, loopData, list);
+        result.push(...list.reverse());
+      } else if (expression instanceof FmtNotation.MetaRefExpression_sel) {
+        // TODO
+        if (expression.items.length) {
+          this.translateExpression(expression.items[0], loopData, result, isTopLevel);
+        }
       } else if (expression instanceof FmtNotation.MetaRefExpression_neg) {
         let index = 0;
         if (this.forcedInnerNegations < this.config.forceInnerNegations) {
@@ -586,7 +600,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           }
         }
         let item = expression.items[index];
-        if (this.config.omitArguments && item instanceof Fmt.StringExpression && item.value.length > 1 && item.value.indexOf(' ') < 0) {
+        if (this.config.omitArguments && this.config.omitArguments <= 2 && item instanceof Fmt.StringExpression && item.value.length > 1 && item.value.indexOf(' ') < 0) {
           let value = item.value;
           for (index++; index < expression.items.length; index++) {
             item = expression.items[index];
@@ -598,7 +612,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           }
           result.push(value);
         } else {
-          this.translateExpression(item, undefined, result);
+          this.translateExpression(item, loopData, result);
         }
       } else {
         throw new Error('Undefined meta reference');
@@ -628,8 +642,11 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     let expression: RenderedExpression | undefined = undefined;
     switch (this.template.name) {
     case 'Style':
-      expression = new DecoratedExpression(this.getExpressionArg('body'));
-      expression.styleClasses = [this.getArg('styleClass')];
+      {
+        let body = this.getExpressionArg('body');
+        expression = new DecoratedExpression(body);
+        expression.styleClasses = [this.getArg('styleClass')];
+      }
       break;
     case 'Table':
       expression = new TableExpression(this.getExpressionListListArg('items'));
@@ -664,58 +681,58 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
         expression = parenExpression;
       }
       break;
-    case 'SubSup':
-      {
-        let subSupExpression = new SubSupExpression(this.getExpressionArg('body'));
-        subSupExpression.sub = this.getOptionalExpressionArg('sub');
-        subSupExpression.sup = this.getOptionalExpressionArg('sup');
-        subSupExpression.preSub = this.getOptionalExpressionArg('preSub');
-        subSupExpression.preSup = this.getOptionalExpressionArg('preSup');
-        expression = subSupExpression;
-      }
-      break;
-    case 'OverUnder':
-      {
-        let overUnderExpression = new OverUnderExpression(this.getExpressionArg('body'));
-        overUnderExpression.over = this.getOptionalExpressionArg('over');
-        overUnderExpression.under = this.getOptionalExpressionArg('under');
-        let style = this.getOptionalArg('style');
-        if (style) {
-          overUnderExpression.styleClasses = [style];
-        }
-        expression = overUnderExpression;
-      }
-      break;
-    case 'Fraction':
-      expression = new FractionExpression(this.getExpressionArg('numerator'), this.getExpressionArg('denominator'));
-      break;
-    case 'Radical':
-      expression = new RadicalExpression(this.getExpressionArg('radicand'), this.getOptionalExpressionArg('degree'));
-      break;
     default:
-      if (this.template.contents instanceof FmtNotation.ObjectContents_Template) {
-        if (this.config.omitArguments > 1 && (this.config.omitArguments > 2 || !(this.template.contents.useSymbol instanceof FmtNotation.MetaRefExpression_false))) {
-          let symbol = this.template.contents.symbol;
-          if (symbol) {
-            expression = new UserDefinedExpression(symbol, this.config, this.allTemplates);
-            while (expression instanceof IndirectExpression) {
-              expression = expression.resolve();
+      {
+        let contents = this.template.contents as FmtNotation.ObjectContents_Template;
+        let fallback = new UserDefinedExpression(contents.notation, this.config, this.allTemplates);
+        switch (this.template.name) {
+        case 'SubSup':
+          {
+            let subSupExpression = new SubSupExpression(this.getExpressionArg('body'));
+            subSupExpression.sub = this.getOptionalExpressionArg('sub');
+            subSupExpression.sup = this.getOptionalExpressionArg('sup');
+            subSupExpression.preSub = this.getOptionalExpressionArg('preSub');
+            subSupExpression.preSup = this.getOptionalExpressionArg('preSup');
+            expression = subSupExpression;
+          }
+          break;
+        case 'OverUnder':
+          {
+            let overUnderExpression = new OverUnderExpression(this.getExpressionArg('body'));
+            overUnderExpression.over = this.getOptionalExpressionArg('over');
+            overUnderExpression.under = this.getOptionalExpressionArg('under');
+            let style = this.getOptionalArg('style');
+            if (style) {
+              overUnderExpression.styleClasses = [style];
             }
-            if (expression instanceof TextExpression && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
-              this.negationsSatisfied = this.config.negationCount;
-              break;
+            expression = overUnderExpression;
+          }
+          break;
+        case 'Fraction':
+          expression = new FractionExpression(this.getExpressionArg('numerator'), this.getExpressionArg('denominator'));
+          break;
+        case 'Radical':
+          expression = new RadicalExpression(this.getExpressionArg('radicand'), this.getOptionalExpressionArg('degree'));
+          break;
+        default:
+          if (this.config.omitArguments > 1 && (this.config.omitArguments > 2 || !(contents.useSymbol instanceof FmtNotation.MetaRefExpression_false))) {
+            let symbol = contents.symbol;
+            if (symbol) {
+              expression = new UserDefinedExpression(symbol, this.config, this.allTemplates);
+              while (expression instanceof IndirectExpression) {
+                expression = expression.resolve();
+              }
+              if (expression instanceof TextExpression && expression.text && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
+                this.negationsSatisfied = this.config.negationCount;
+                break;
+              }
             }
           }
-        }
-        let notation = this.template.contents.notation;
-        if (notation) {
-          expression = new UserDefinedExpression(notation, this.config, this.allTemplates);
+          expression = fallback;
           this.negationsSatisfied = this.config.negationCount;
         }
+        expression.fallback = fallback;
       }
-    }
-    if (!expression) {
-      expression = new EmptyExpression;
     }
     return expression;
   }

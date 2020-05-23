@@ -248,7 +248,8 @@ export abstract class GenericEditHandler {
   private getNotationMenuTemplatesRow(notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
     let rows: Menu.ExpressionMenuRow[] = [];
     for (let template of this.templates.definitions) {
-      if (!complexExpressionRequired || template.parameters.length) {
+      if ((!complexExpressionRequired || template.parameters.length)
+          && this.isTemplateApplicable(template, isTopLevel, isPredicate)) {
         let templateRow = this.getNotationMenuTemplateRow(template, notationItem, onSetNotationItem, variables, isTopLevel, isPredicate, renderer);
         rows.push(templateRow);
       }
@@ -258,6 +259,33 @@ export abstract class GenericEditHandler {
     let templatesRow = new Menu.StandardExpressionMenuRow('Template');
     templatesRow.subMenu = templateMenu;
     return templatesRow;
+  }
+
+  private isTemplateApplicable(template: Fmt.Definition, isTopLevel: boolean, isPredicate: boolean): boolean {
+    if (template.contents instanceof FmtNotation.ObjectContents_Template) {
+      let context = template.contents.context;
+      if (context) {
+        if (isTopLevel) {
+          if (isPredicate) {
+            return context.predicate instanceof FmtNotation.MetaRefExpression_true;
+          } else {
+            return context.operator instanceof FmtNotation.MetaRefExpression_true;
+          }
+        } else {
+          return context.argument instanceof FmtNotation.MetaRefExpression_true;
+        }
+      } else {
+        let notation = template.contents.notation;
+        while (notation instanceof FmtNotation.MetaRefExpression_sel && notation.items.length) {
+          notation = notation.items[0];
+        }
+        if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
+          let notationTemplate = this.templates.definitions.getDefinition(notation.path.name);
+          return this.isTemplateApplicable(notationTemplate, isTopLevel, isPredicate);
+        }
+      }
+    }
+    return false;
   }
 
   private getNotationMenuTemplateRow(template: Fmt.Definition, notationItem: Fmt.Expression | undefined, onSetNotationItem: SetNotationItemFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
@@ -304,12 +332,13 @@ export abstract class GenericEditHandler {
     } else {
       let newPath = new Fmt.Path;
       newPath.name = template.name;
+      let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
       for (let param of template.parameters) {
         if (param.type.arrayDimensions) {
           let arrayValue = new Fmt.ArrayExpression;
           arrayValue.items = [];
-          if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && variables.length === 2))) {
-            for (let variable of variables) {
+          if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
+            for (let variable of requiredVariables) {
               let value = new Fmt.VariableRefExpression;
               value.variable = variable.param;
               arrayValue.items.push(value);
@@ -321,9 +350,9 @@ export abstract class GenericEditHandler {
             let value = new Fmt.StringExpression;
             value.value = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
             newPath.arguments.add(value, param.name);
-          } else if (param.name === 'operand' && variables.length === 1) {
+          } else if (param.name === 'operand' && requiredVariables.length === 1) {
             let value = new Fmt.VariableRefExpression;
-            value.variable = variables[0].param;
+            value.variable = requiredVariables[0].param;
             newPath.arguments.add(value, param.name);
           }
         }

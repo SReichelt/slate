@@ -164,7 +164,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           allowCases: true
         };
         let items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
-        claim = this.renderTemplate('MultiEquivalenceRelation', {
+        claim = this.renderTemplate('EquivalenceRelation', {
                                       'operands': items
                                     });
       }
@@ -183,8 +183,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             });
             claim.optionalParenStyle = '[]';
             claim = this.renderTemplate('ImplicationRelation', {
-                                          'left': constraints,
-                                          'right': claim
+                                          'operands': [constraints, claim]
                                         });
           }
           if (multiLine) {
@@ -754,7 +753,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowCases: false
       };
       row.push(this.renderTemplate('SubsetParameter', {
-                                     'subset': variableDefinitions,
+                                     'variable': variableDefinitions,
                                      'superset': this.renderSetTerm(type.superset, termSelection)
                                    }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
@@ -764,19 +763,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowCases: false
       };
       row.push(this.renderTemplate('ElementParameter', {
-                                     'element': variableDefinitions,
+                                     'variable': variableDefinitions,
                                      'set': this.renderSetTerm(type._set, termSelection)
                                    }));
     } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
       row.push(this.renderTemplate('VariableDefinition', {
-                                     'left': variableDefinitions,
-                                     'right': this.renderSetTerm(type._set, fullSetTermSelection)
+                                     'variable': variableDefinitions,
+                                     'term': this.renderSetTerm(type._set, fullSetTermSelection)
                                    }));
       state.inDefinition = true;
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       row.push(this.renderTemplate('VariableDefinition', {
-                                     'left': variableDefinitions,
-                                     'right': this.renderElementTerm(type.element, fullElementTermSelection)
+                                     'variable': variableDefinitions,
+                                     'term': this.renderElementTerm(type.element, fullElementTermSelection)
                                    }));
       state.inDefinition = true;
     } else {
@@ -1043,7 +1042,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (innerFormula instanceof Fmt.VariableRefExpression
           || innerFormula instanceof Fmt.PlaceholderExpression
           || ((innerFormula instanceof FmtHLM.MetaRefExpression_setEquals || innerFormula instanceof FmtHLM.MetaRefExpression_equals)
-              && innerFormula.terms.length !== 2)) {
+              && innerFormula.terms.length !== 2)
+          || formula instanceof FmtHLM.MetaRefExpression_structural) {
         break;
       }
       negationCount++;
@@ -1065,8 +1065,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       return this.renderTemplate('Negation', {
                                    'operand': this.renderFormula(formula.formula, formulaSelection)
-                                 },
-                                 negationCount);
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
       if (formula.formulae) {
         let formulaSelection: FormulaSelection = {
@@ -1076,8 +1075,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         return this.renderTemplate('Conjunction', {
                                      'operands': formula.formulae.map((item) => this.renderFormula(item, formulaSelection))
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       } else {
         return this.renderTemplate('True', {}, negationCount);
       }
@@ -1090,8 +1088,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         return this.renderTemplate('Disjunction', {
                                      'operands': formula.formulae.map((item) => this.renderFormula(item, formulaSelection))
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       } else {
         return this.renderTemplate('False', {}, negationCount);
       }
@@ -1102,10 +1099,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowCases: true
       };
       return this.renderTemplate('EquivalenceRelation', {
-                                   'left': this.renderFormula(formula.left, formulaSelection),
-                                   'right': this.renderFormula(formula.right, formulaSelection)
-                                 },
-                                 negationCount);
+                                   'operands': [
+                                     this.renderFormula(formula.left, formulaSelection),
+                                     this.renderFormula(formula.right, formulaSelection)
+                                   ]
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       let formulaSelection: FormulaSelection = {
         allowTruthValue: false,
@@ -1115,8 +1113,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       return this.renderTemplate('UniversalQuantification', {
                                    'parameters': this.renderParameterList(formula.parameters, false, true, true),
                                    'formula': this.renderFormula(formula.formula, formulaSelection)
-                                 },
-                                 negationCount);
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
       if (formula.formula) {
         let formulaSelection: FormulaSelection = {
@@ -1127,13 +1124,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderTemplate('ExistentialQuantification', {
                                      'parameters': this.renderParameterList(formula.parameters, false, true, false),
                                      'formula': this.renderFormula(formula.formula, formulaSelection)
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       } else {
         return this.renderTemplate('PlainExistentialQuantification', {
                                      'parameters': this.renderParameterList(formula.parameters, false, true, false)
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       if (formula.formula) {
@@ -1145,13 +1140,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderTemplate('UniqueExistentialQuantification', {
                                      'parameters': this.renderParameterList(formula.parameters, false, true, false),
                                      'formula': this.renderFormula(formula.formula, formulaSelection)
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       } else {
         return this.renderTemplate('PlainUniqueExistentialQuantification', {
                                      'parameters': this.renderParameterList(formula.parameters, false, true, false)
-                                   },
-                                   negationCount);
+                                   }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       let elementTermSelection: ElementTermSelection = {
@@ -1164,10 +1157,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowCases: true
       };
       return this.renderTemplate('ElementRelation', {
-                                   'element': this.renderElementTerm(formula.element, elementTermSelection),
-                                   'set': this.renderSetTerm(formula._set, setTermSelection)
-                                 },
-                                 negationCount);
+                                   'operands': [
+                                     this.renderElementTerm(formula.element, elementTermSelection),
+                                     this.renderSetTerm(formula._set, setTermSelection)
+                                   ]
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       let subsetTermSelection: SetTermSelection = {
         allowEnumeration: false,
@@ -1180,20 +1174,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowCases: true
       };
       return this.renderTemplate('SubsetRelation', {
-                                   'subset': this.renderSetTerm(formula.subset, subsetTermSelection),
-                                   'superset': this.renderSetTerm(formula.superset, supersetTermSelection)
-                                 },
-                                 negationCount);
+                                   'operands': [
+                                     this.renderSetTerm(formula.subset, subsetTermSelection),
+                                     this.renderSetTerm(formula.superset, supersetTermSelection)
+                                   ]
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
-      return this.renderTemplate('MultiEqualityRelation', {
+      return this.renderTemplate('EqualityRelation', {
                                    'operands': formula.terms.map((item) => this.renderSetTerm(item, fullSetTermSelection))
-                                 },
-                                 negationCount);
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
-      return this.renderTemplate('MultiEqualityRelation', {
+      return this.renderTemplate('EqualityRelation', {
                                    'operands': formula.terms.map((item) => this.renderElementTerm(item, fullElementTermSelection))
-                                 },
-                                 negationCount);
+                                 }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       let renderCase = (value: Fmt.Expression | undefined) => {
         if (value) {
@@ -1226,8 +1219,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           constructorNotation = new Notation.TextExpression('…');
         }
         let formula = this.renderTemplate('EqualityRelation', {
-                                            'left': termNotation,
-                                            'right': constructorNotation
+                                            'operands': [termNotation, constructorNotation]
                                           });
         let value = renderCase(structuralCase.value);
         let row = this.buildCaseRow(value, formula);
@@ -1238,8 +1230,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       });
     } else {
       let formula = this.renderTemplate('EqualityRelation', {
-                                          'left': termNotation,
-                                          'right': new Notation.TextExpression('…')
+                                          'operands': [termNotation, new Notation.TextExpression('…')]
                                         });
       if (this.editHandler && this.editHandler.isTemporaryExpression(term)) {
         let row = this.buildCaseRow(renderCase(undefined), formula);
@@ -1373,9 +1364,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       result.styleClasses = ['ctor'];
     }
     if (definitions.length > 1) {
-      let subSupExpression = new Notation.SubSupExpression(result);
-      subSupExpression.sub = this.renderDefinitionRef(definitions.slice(0, -1), argumentLists ? argumentLists.slice(0, -1) : undefined);
-      result = subSupExpression;
+      result = this.renderTemplate('SubSup', {
+                                     'body': result,
+                                     'sub': this.renderDefinitionRef(definitions.slice(0, -1), argumentLists ? argumentLists.slice(0, -1) : undefined)
+                                   });
     }
     if (!omitArguments) {
       let args: Notation.ExpressionValue[] = [];
@@ -1442,7 +1434,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let args: Notation.ExpressionValue[] = [];
     // TODO handle bindings better
     this.fillArguments(parameters, undefined, [argumentList], undefined, true, false, params, args);
-    args = params.map((param: Fmt.Parameter, index: number) => this.renderTemplate('EqualityDefinition', {'left': this.renderVariable(param), 'right': args[index]}));
+    args = params.map((param: Fmt.Parameter, index: number) =>
+      this.renderTemplate('EqualityDefinition', {
+        'operands': [
+          this.renderVariable(param),
+          args[index]
+        ]
+      }));
     if (args.length === 1) {
       return args[0];
     } else {
@@ -1683,8 +1681,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                                  'constructors': rows
                                                });
         return this.renderTemplate('ConstructionDefinition', {
-                                     'left': definitionRef,
-                                     'right': construction
+                                     'operands': [definitionRef, construction]
                                    });
       } else {
         let renderDefinitionRef = (elementParameterOverrides?: ElementParameterOverrides) => {
@@ -1712,8 +1709,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let definitions = contents.definition;
           renderLeftSide = (elementParameterOverrides?: ElementParameterOverrides) =>
             this.renderTemplate('EqualityRelation', {
-                                  'left': renderDefinitionRef(elementParameterOverrides),
-                                  'right': parameter
+                                  'operands': [renderDefinitionRef(elementParameterOverrides), parameter]
                                 });
           let formulaSelection: FormulaSelection = {
             allowTruthValue: false,
@@ -1753,16 +1749,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (first) {
           let caseDefinition = renderLeftSide(elementParameterOverrides);
           leftItem = this.renderTemplate(type + 'Definition', {
-                                           'left': caseDefinition,
-                                           'right': new Notation.EmptyExpression
+                                           'operands': [caseDefinition, new Notation.EmptyExpression]
                                          });
           if (rows.length) {
             rows.push([]);
           }
         } else {
           leftItem = this.renderTemplate(type + 'Relation', {
-                                           'left': new Notation.EmptyExpression,
-                                           'right': new Notation.EmptyExpression
+                                           'operands': [new Notation.EmptyExpression, new Notation.EmptyExpression]
                                          });
         }
         let rightItem = new Notation.InnerParenExpression(renderRightSide(definition));
@@ -1920,8 +1914,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let superset = this.renderDefinitionRef([definition]);
         this.addSemanticLink(superset, definition);
         let supersetDefinition = this.renderTemplate('EmbeddingDefinition', {
-                                                       'subset': new Notation.EmptyExpression,
-                                                       'superset': superset
+                                                       'operands': [new Notation.EmptyExpression, superset]
                                                      });
         let supersetWithText = new Notation.RowExpression([supersetDefinition, new Notation.TextExpression(' via')]);
         rows.push([subset, supersetWithText]);
@@ -1930,8 +1923,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let subsetElement = this.renderVariable(embedding.parameter, undefined, true, false, undefined, elementParameterOverrides);
         let target = this.renderElementTerm(targetTerm, fullElementTermSelection);
         let supersetElement = this.renderTemplate('EqualityRelation', {
-                                                    'left': new Notation.EmptyExpression,
-                                                    'right': target
+                                                    'operands': [new Notation.EmptyExpression, target]
                                                   });
         rows.push([subsetElement, supersetElement]);
         let table = new Notation.TableExpression(rows);
@@ -1941,8 +1933,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (this.editHandler) {
         let onRenderEmbedding = (subset: Fmt.Expression) =>
           this.renderTemplate('EmbeddingDefinition', {
-                                'subset': this.renderSetTerm(subset, fullSetTermSelection),
-                                'superset': this.renderDefinitionRef([definition])
+                                'operands': [
+                                  this.renderSetTerm(subset, fullSetTermSelection),
+                                  this.renderDefinitionRef([definition])
+                                ]
                               });
         paragraphs.push(this.editHandler.getEmbeddingInsertButton(definition.contents, onRenderEmbedding));
       }
@@ -1952,24 +1946,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                && definition.contents.notation
                && definition.contents.notation.length) {
       let notation = definition.contents.notation[0];
-      if (notation instanceof Fmt.DefinitionRefExpression) {
-        if (notation.path.name === 'Property'
-            || notation.path.name === 'RelationalProperty'
-            || notation.path.name === 'MultiProperty') {
-          let property = notation.path.arguments.getValue('property');
-          if (property instanceof FmtNotation.MetaRefExpression_neg && property.items.length > 1) {
-            let args = this.getRenderedTemplateArguments([definition]);
-            let extraContents = this.renderTemplate('EquivalenceDefinition', {
-                                                      'left': this.renderNotationExpression(notation, args, 0, 1),
-                                                      'right': this.renderNotationExpression(notation, args, 0, 1, 1)
-                                                    });
-            if (!extraContents.styleClasses) {
-              extraContents.styleClasses = [];
-            }
-            extraContents.styleClasses.push('display-math');
-            paragraphs.push(extraContents);
-          }
+      if (this.utils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
+        let args = this.getRenderedTemplateArguments([definition]);
+        let extraContents = this.renderTemplate('EquivalenceDefinition', {
+                                                  'operands': [
+                                                    this.renderNotationExpression(notation, args, 0, 1),
+                                                    this.renderNotationExpression(notation, args, 0, 1, 1)
+                                                  ]
+                                                });
+        if (!extraContents.styleClasses) {
+          extraContents.styleClasses = [];
         }
+        extraContents.styleClasses.push('display-math');
+        paragraphs.push(extraContents);
       }
     }
 
@@ -2079,8 +2068,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, 0, 0, rightParameterOverrides);
           this.addSemanticLink(rightConstructor, innerDefinition);
           let equality = this.renderTemplate('EqualityRelation', {
-                                               'left': leftConstructor,
-                                               'right': rightConstructor
+                                               'operands': [leftConstructor, rightConstructor]
                                              });
           this.addSemanticLink(equality, equalityDefinition);
           let definitions = equalityDefinition.definition;
@@ -2132,7 +2120,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             hadParameters = true;
           }
           row.push(this.renderTemplate('SubsetParameter', {
-                                         'subset': this.renderVariable(replacementParam, undefined, true),
+                                         'variable': this.renderVariable(replacementParam, undefined, true),
                                          'superset': this.renderVariable(param)
                                        }));
         } else {

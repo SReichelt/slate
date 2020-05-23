@@ -172,10 +172,8 @@ export class HLMRenderUtils {
     return this.doExtractStructuralCases(this.definition.parameters, definitions, true);
   }
 
-  doExtractStructuralCases(parameters: Fmt.Parameter[], expressions: Fmt.Expression[], allowMultipleCases: boolean): ExtractedStructuralCase[] {
-    let cases: ExtractedStructuralCase[] = [{
-      definitions: expressions
-    }];
+  private doExtractStructuralCases(parameters: Fmt.Parameter[], expressions: Fmt.Expression[], allowMultipleCases: boolean): ExtractedStructuralCase[] {
+    let cases: ExtractedStructuralCase[] = [{definitions: expressions}];
     if (expressions.length) {
       let changed: boolean;
       do {

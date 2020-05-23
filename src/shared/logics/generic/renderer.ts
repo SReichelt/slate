@@ -78,7 +78,8 @@ export abstract class GenericRenderer {
     let result: Notation.RenderedExpression = text;
     if (suffixes) {
       let subExpression = new Notation.SubSupExpression(result);
-      subExpression.sub = this.renderTemplate('Group', {'items': suffixes});
+      subExpression.sub = this.renderTemplate('Group', {'items': suffixes, 'separator': ','});
+      subExpression.fallback = new Notation.RowExpression([result, new Notation.TextExpression('_'), subExpression.sub]);
       result = subExpression;
     }
     result.styleClasses = ['var'];
@@ -87,14 +88,16 @@ export abstract class GenericRenderer {
     }
     result.semanticLinks = [new Notation.SemanticLink(param, isDefinition)];
     if (indices) {
-      let subExpression = new Notation.SubSupExpression(result);
-      subExpression.sub = this.renderTemplate('Group', {'items': indices});
-      result = subExpression;
+      result = this.renderTemplate('SubSup', {
+                                     'body': result,
+                                     'sub': this.renderTemplate('Group', {'items': indices})
+                                   });
     }
     return result;
   }
 
   protected renderNegation(expression: Notation.RenderedExpression): Notation.RenderedExpression {
+    expression.optionalParenStyle = '[]';
     return this.renderTemplate('Negation', {'operand': expression});
   }
 

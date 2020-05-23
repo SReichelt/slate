@@ -4,9 +4,15 @@ import { shrinkMathSpaces } from '../format/common';
 
 const escapeForMarkdown = require('markdown-escape');
 
-class ScriptExpression extends Notation.InnerParenExpression {}
-
 export function renderAsText(expression: Notation.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, indent: string = '', optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
+  let result = renderAsTextInternal(expression, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+  if (expression.styleClasses && expression.styleClasses.indexOf('script') >= 0) {
+    result = result.then((text: string) => shrinkMathSpaces(text));
+  }
+  return result;
+}
+
+function renderAsTextInternal(expression: Notation.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, indent: string, optionalParenLeft: boolean, optionalParenRight: boolean, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
@@ -108,57 +114,7 @@ export function renderAsText(expression: Notation.RenderedExpression, outputMark
       return renderAsText(expression.body, outputMarkdown, true);
     }
   } else if (expression instanceof Notation.InnerParenExpression) {
-    let result = renderAsText(expression.body, outputMarkdown, true, undefined, expression.left, expression.right, expression.maxLevel);
-    if (expression instanceof ScriptExpression) {
-      result = result.then((text: string) => shrinkMathSpaces(text));
-    }
-    return result;
-  } else if (expression instanceof Notation.SubSupExpression) {
-    let items: Notation.RenderedExpression[] = [new Notation.InnerParenExpression(expression.body)];
-    if (expression.sub) {
-      items.push(new Notation.TextExpression('_'));
-      items.push(new ScriptExpression(expression.sub));
-    }
-    if (expression.sup) {
-      items.push(new Notation.TextExpression('^'));
-      items.push(new ScriptExpression(expression.sup));
-    }
-    if (expression.preSub) {
-      items.unshift(new Notation.TextExpression('_'));
-      items.unshift(new ScriptExpression(expression.preSub));
-    }
-    if (expression.preSup) {
-      items.unshift(new Notation.TextExpression('^'));
-      items.unshift(new ScriptExpression(expression.preSup));
-    }
-    return renderAsText(new Notation.RowExpression(items), outputMarkdown, true);
-  } else if (expression instanceof Notation.OverUnderExpression) {
-    let items: Notation.RenderedExpression[] = [new Notation.InnerParenExpression(expression.body)];
-    if (expression.under) {
-      items.push(new Notation.TextExpression('_'));
-      items.push(new ScriptExpression(expression.under));
-    }
-    if (expression.over) {
-      items.push(new Notation.TextExpression('^'));
-      items.push(new ScriptExpression(expression.over));
-    }
-    return renderAsText(new Notation.RowExpression(items), outputMarkdown, true);
-  } else if (expression instanceof Notation.FractionExpression) {
-    let items: Notation.RenderedExpression[] = [
-      new Notation.InnerParenExpression(expression.numerator),
-      new Notation.TextExpression('/'),
-      new Notation.InnerParenExpression(expression.denominator)
-    ];
-    return renderAsText(new Notation.RowExpression(items), outputMarkdown, true);
-  } else if (expression instanceof Notation.RadicalExpression) {
-    let items: Notation.RenderedExpression[] = [
-      new Notation.TextExpression('√'),
-      new Notation.InnerParenExpression(expression.radicand)
-    ];
-    if (expression.degree) {
-      items.unshift(new ScriptExpression(expression.degree));
-    }
-    return renderAsText(new Notation.RowExpression(items), outputMarkdown, true);
+    return renderAsText(expression.body, outputMarkdown, true, undefined, expression.left, expression.right, expression.maxLevel);
   } else if (expression instanceof Notation.MarkdownExpression) {
     return CachedPromise.resolve(expression.text);
   } else if (expression instanceof Notation.IndirectExpression) {
@@ -171,6 +127,8 @@ export function renderAsText(expression: Notation.RenderedExpression, outputMark
     return expression.promise.then((innerExpression: Notation.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
   } else if (expression instanceof Notation.DecoratedExpression) {
     return renderAsText(expression.body, outputMarkdown, singleLine, indent);
+  } else if (expression.fallback) {
+    return renderAsText(expression.fallback, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve('?');
   } else {

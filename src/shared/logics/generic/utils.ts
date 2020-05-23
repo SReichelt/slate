@@ -122,14 +122,19 @@ export class GenericUtils {
     return parameter;
   }
 
-  referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
+  containsSubExpression(expression: Fmt.Expression, fn: (subExpression: Fmt.Expression) => boolean): boolean {
     let result = false;
     expression.traverse((subExpression: Fmt.Expression) => {
-      if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param) {
+      if (!result && fn(subExpression)) {
         result = true;
       }
     });
     return result;
+  }
+
+  referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
+    return this.containsSubExpression(expression, ((subExpression: Fmt.Expression) =>
+      (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param)));
   }
 
   findReferencedParameters(expression: Fmt.Expression): Set<Fmt.Parameter> {
