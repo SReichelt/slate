@@ -77,7 +77,7 @@ export enum PullRequestState {
 }
 
 function quote(s: string) {
-  return `"${s.replace('"', '\\"')}"`;
+  return `"${s.split('"').join('\\"')}"`;
 }
 
 export class APIAccess {

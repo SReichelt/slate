@@ -1353,7 +1353,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderDefaultDefinitionRef(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides): Notation.RenderedExpression {
     let definition = definitions[definitions.length - 1];
-    let name = definition.name.replace(' ', '-');
+    let name = definition.name.split(' ').join('-');
     let result: Notation.RenderedExpression = new Notation.TextExpression(name);
     if (definition.contents instanceof FmtHLM.ObjectContents_Constructor) {
       result.styleClasses = ['ctor'];
