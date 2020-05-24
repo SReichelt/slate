@@ -623,7 +623,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
       this.setState({
         clickable: clickable,
         filtering: needsFiltering,
-        filtered: false
+        filtered: needsFiltering && !props.isSubsection
       });
     }
     return needsFiltering;
