@@ -1,5 +1,4 @@
 // Generated from data/format/meta.slate by generateMetaDeclarations.ts.
-/* eslint @typescript-eslint/class-name-casing: off */
 
 import * as Fmt from './format';
 import * as Ctx from './context';

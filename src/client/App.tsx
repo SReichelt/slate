@@ -80,6 +80,7 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   editedDefinitions: LibraryItemListEntry[];
   showStartPage: boolean;
   tutorialState?: TutorialState;
+  tutorialStateAdditionalData?: any;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -1003,9 +1004,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startTutorial = (withTouchWarning: boolean): void => {
-    let onChangeTutorialState = (newTutorialState: TutorialState | undefined) => {
-      if (this.state.tutorialState !== newTutorialState) {
-        this.setState({tutorialState: newTutorialState});
+    let onChangeTutorialState = (newTutorialState: TutorialState | undefined, additionalStateData?: any) => {
+      if (this.state.tutorialState !== newTutorialState || this.state.tutorialStateAdditionalData !== additionalStateData) {
+        this.setState({
+          tutorialState: newTutorialState,
+          tutorialStateAdditionalData: additionalStateData
+        });
       }
     };
     startTutorial(onChangeTutorialState, this.docLinkClicked, withTouchWarning);

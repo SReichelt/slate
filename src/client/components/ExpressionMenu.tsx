@@ -60,7 +60,12 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
           let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
           let hoveredExternally = this.props.hoveredExternally && index === 0;
           let subMenuOpen = (this.state.openSubMenu === row);
-          rows.push(<ExpressionMenuRow row={row} separated={separated} key={index++} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler}/>);
+          let key: number | string = index;
+          if (row instanceof Menu.StandardExpressionMenuRow && row.title instanceof Notation.TextExpression) {
+            key = row.title.text;
+          }
+          rows.push(<ExpressionMenuRow row={row} separated={separated} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler} key={key}/>);
+          index++;
           separated = false;
         }
       }
@@ -291,6 +296,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
         };
         if (standardRow.subMenu instanceof Menu.ExpressionMenu && subMenuRows.length > 1) {
           hasSubMenu = true;
+          // TODO if the menu was opened by touching and we have a title action, separate the arrow from the title
           title = (
             <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.titleNode = node)} key="title">
               {title}
@@ -304,7 +310,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             title = [title, subMenu];
           }
         } else {
-          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.titleNode = node)}>{title}</div>;
+          title = <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.titleNode = node)} key="title">{title}</div>;
         }
         let colSpan = contentCell ? 1 : 2;
         let cells: React.ReactNode = <th colSpan={colSpan} className={titleCellClassName} key="title">{title}</th>;

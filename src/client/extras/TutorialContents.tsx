@@ -18,11 +18,11 @@ import StandardDialog from '../components/StandardDialog';
 import InsertDialog from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
-import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem } from '../components/ExpressionMenu';
+import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
 import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
 
-type TutorialStateFn = (newTutorialState: TutorialState | undefined) => void;
+type TutorialStateFn = (newTutorialState: TutorialState | undefined, additionalStateData?: any) => void;
 
 function inject(fn: (...args: any) => any, action: (...args: any) => void) {
   return (...args: any) => {
@@ -57,10 +57,12 @@ function createDummyEvent(target: HTMLElement) {
   };
 }
 
+const defaultDelay = 200;
+
 class TutorialStates {
   constructor(private changeState: TutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
-  private automateClick(delay: number = 200) {
+  private automateClick(delay: number = defaultDelay) {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done) {
@@ -97,7 +99,36 @@ class TutorialStates {
     };
   }
 
-  private automateTextInput(text: string, delay: number = 200) {
+  private automateHover(delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done) {
+        done = true;
+        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseEnter) {
+          if (Array.isArray(reactElement.props.children)) {
+            if (reactElement.props.children.length) {
+              reactElement = reactElement.props.children[0];
+            } else {
+              break;
+            }
+          } else {
+            reactElement = reactElement.props.children;
+          }
+        }
+        if (reactElement.props) {
+          let simulateHover = () => {
+            if (reactElement.props.onMouseEnter) {
+              let mouseEnterEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseEnter(mouseEnterEvent);
+            }
+          };
+          setTimeout(simulateHover, delay);
+        }
+      }
+    };
+  }
+
+  private automateTextInput(text: string, delay: number = defaultDelay) {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
@@ -107,6 +138,19 @@ class TutorialStates {
           reactElement.props.onChange(createDummyEvent(htmlElement));
         };
         setTimeout(simulateTextInput, delay);
+      }
+    };
+  }
+
+  private automateFormSubmission(delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done) {
+        done = true;
+        let simulateFormSubmission = () => {
+          reactElement.props.onSubmit(createDummyEvent(htmlElement));
+        };
+        setTimeout(simulateFormSubmission, delay);
       }
     };
   }
@@ -134,11 +178,11 @@ class TutorialStates {
                   <p>No prior experience with interactive theorem proving is required.</p>
                   {this.withTouchWarning ? <p><strong>Note:</strong> Using a mouse is recommended (though not required) because editing possibilities are easier to discover using hover effects.</p> : null}
                   <div className={'tutorial-tooltip-button-row'}>
-                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.searchFunctions_enterSearchText)}>
+                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.searchFunctions)}>
                       {getButtonIcon(ButtonType.OK)} Start
                     </Button>
                     {config.development ? (
-                       <Button className={'tutorial-tooltip-button standalone'} onClick={() => { this.runAutomatically = true; this.changeState(this.searchFunctions_enterSearchText); }}>
+                       <Button className={'tutorial-tooltip-button standalone'} onClick={() => { this.runAutomatically = true; this.changeState(this.searchFunctions); }}>
                          {getButtonIcon(ButtonType.Submit)} Run automatically
                        </Button>
                      ) : null}
@@ -153,7 +197,7 @@ class TutorialStates {
             },
             elementAction: () => {
               if (this.runAutomatically) {
-                this.changeState(this.searchFunctions_enterSearchText);
+                this.changeState(this.searchFunctions);
               }
             }
           }
@@ -164,7 +208,7 @@ class TutorialStates {
 
   // Search for "Functions".
 
-  searchFunctions_enterSearchText: TutorialState = {
+  searchFunctions: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -178,106 +222,9 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onSearch: inject(props.onSearch, () => this.changeState(this.searchFunctions_openEssentials))
+              onSearch: inject(props.onSearch, () => this.changeState(this.insertOperator_openInsertMenu))
             }),
             elementAction: this.automateTextInput('functions')
-          }
-        ]
-      }
-    ]
-  };
-
-  searchFunctions_openEssentials: TutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryTree,
-        children: [
-          {
-            // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-            type: SearchInput,
-            toolTip: {
-              contents: null,
-              position: 'bottom',
-              index: 0
-            }
-          },
-          {
-            type: InnerLibraryTreeItems,
-            children: [
-              {
-                type: LibraryTreeItem,
-                key: 'Essentials',
-                children: [
-                  {
-                    key: 'display-span',
-                    toolTip: {
-                      contents: <p>Look in here.</p>,
-                      position: 'right',
-                      index: 1
-                    }
-                  }
-                ],
-                componentAction: (component) => {
-                  if (component.state.opened) {
-                    this.changeState(this.searchFunctions_openFunctions);
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  searchFunctions_openFunctions: TutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryTree,
-        children: [
-          {
-            // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-            type: SearchInput,
-            toolTip: {
-              contents: null,
-              position: 'bottom',
-              index: 0
-            }
-          },
-          {
-            type: InnerLibraryTreeItems,
-            children: [
-              {
-                type: LibraryTreeItem,
-                key: 'Essentials',
-                children: [
-                  {
-                    type: InnerLibraryTreeItems,
-                    children: [
-                      {
-                        type: LibraryTreeItem,
-                        key: 'Functions',
-                        children: [
-                          {
-                            key: 'display-span',
-                            toolTip: {
-                              contents: <p>This is the section we are looking for.</p>,
-                              position: 'right',
-                              index: 1
-                            }
-                          }
-                        ],
-                        componentAction: (component) => {
-                          if (component.state.opened) {
-                            this.changeState(this.insertOperator_openInsertMenu);
-                          }
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
           }
         ]
       }
@@ -308,6 +255,15 @@ class TutorialStates {
                 key: 'Essentials',
                 children: [
                   {
+                    key: 'display-span',
+                    toolTip: {
+                      contents: <p>Look in here.</p>,
+                      position: 'right',
+                      index: 1,
+                      condition: (component) => !component.state.opened
+                    }
+                  },
+                  {
                     type: InnerLibraryTreeItems,
                     children: [
                       {
@@ -317,7 +273,7 @@ class TutorialStates {
                           {
                             key: 'display-span',
                             toolTip: {
-                              contents: <p>This is the section we are looking for.<br/>Scroll down.</p>,
+                              contents: (component) => <p>This is the section we are looking for.{component.state.opened ? <><br/>Scroll down.</> : null}</p>,
                               position: 'right',
                               index: 1
                             }
@@ -501,6 +457,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -579,6 +536,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -636,6 +594,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -717,6 +676,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -777,6 +737,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -858,6 +819,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -931,7 +893,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(component.props.selected ? this.insertOperatorParameters_f_set_dialog_ok : this.insertOperatorParameters_f_set_dialog_selectFunctions)
+                                                                        componentAction: (component) => this.changeState(this.insertOperatorParameters_f_set_dialog_selectFunctions, component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -983,11 +945,6 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_dialog_ok: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.insertOperatorParameters_f_set_dialog_selectFunctions
-  };
-
   insertOperatorParameters_f_set_arg1: TutorialState = {
     manipulationEntries: [
       {
@@ -1003,6 +960,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1095,6 +1053,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1193,6 +1152,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1264,6 +1224,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1324,6 +1285,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1406,6 +1368,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1498,6 +1461,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1595,6 +1559,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1666,6 +1631,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1726,6 +1692,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1813,6 +1780,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1892,6 +1860,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 0,
                 children: [
                   {
@@ -1976,7 +1945,7 @@ class TutorialStates {
                                                                                     elementAction: this.automateClick()
                                                                                   }
                                                                                 ],
-                                                                                componentAction: (component) => this.changeState(component.props.selected ? this.insertOperatorParameters_n_set_dialog_ok : this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers)
+                                                                                componentAction: (component) => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers, component.props.selected)
                                                                               }
                                                                             ]
                                                                           }
@@ -2027,11 +1996,6 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_dialog_ok: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers
-  };
-
   // Insert composition term.
 
   fillOperatorDefinition_composition_openPlaceholderMenu: TutorialState = {
@@ -2044,6 +2008,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2119,6 +2084,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2126,10 +2092,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2196,6 +2164,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2203,10 +2172,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2272,7 +2243,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(component.props.selected ? this.fillOperatorDefinition_composition_dialog_ok : this.fillOperatorDefinition_composition_dialog_selectFunctionComposition)
+                                                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition, component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -2319,11 +2290,6 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_dialog_ok: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_dialog_selectFunctionComposition
-  };
-
   // Select f.
 
   fillOperatorDefinition_composition_arg1_openPlaceholderMenu: TutorialState = {
@@ -2336,6 +2302,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2343,10 +2310,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2363,7 +2332,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       (component as Expression).disableWindowClickListener();
-                                      this.changeState(component.state.openMenu ? this.fillOperatorDefinition_composition_arg1_placeholderMenu : this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu);
+                                      this.changeState(this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu, component.state.openMenu);
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -2418,11 +2387,6 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg1_placeholderMenu: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu
-  };
-
   // Select g.
 
   fillOperatorDefinition_composition_arg2_openPlaceholderMenu: TutorialState = {
@@ -2435,6 +2399,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2442,10 +2407,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2460,7 +2427,7 @@ class TutorialStates {
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeState(component.state.openMenu ? this.fillOperatorDefinition_composition_arg2_placeholderMenu : this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu),
+                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu, component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2509,11 +2476,6 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_placeholderMenu: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu
-  };
-
   fillOperatorDefinition_composition_arg2_openReselectionMenu: TutorialState = {
     manipulationEntries: [
       {
@@ -2524,6 +2486,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2531,10 +2494,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2549,7 +2514,7 @@ class TutorialStates {
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeState(component.state.openMenu ? this.fillOperatorDefinition_composition_arg2_reselectionMenu : this.fillOperatorDefinition_composition_arg2_openReselectionMenu),
+                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_openReselectionMenu, component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2596,11 +2561,6 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_reselectionMenu: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_arg2_openReselectionMenu
-  };
-
   fillOperatorDefinition_composition_arg2_dialog_searchFunctionPower: TutorialState = {
     manipulationEntries: [
       {
@@ -2611,6 +2571,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2618,10 +2579,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2694,6 +2657,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2701,10 +2665,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2774,7 +2740,7 @@ class TutorialStates {
                                                                                 elementAction: this.automateClick()
                                                                               }
                                                                             ],
-                                                                            componentAction: (component) => this.changeState(component.props.selected ? this.fillOperatorDefinition_composition_arg2_dialog_ok : this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower)
+                                                                            componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower, component.props.selected)
                                                                           }
                                                                         ]
                                                                       }
@@ -2823,11 +2789,6 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_dialog_ok: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower
-  };
-
   // Select n.
 
   fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu: TutorialState = {
@@ -2840,6 +2801,7 @@ class TutorialStates {
             children: [
               {
                 type: 'div',
+                className: 'paragraph',
                 key: 1,
                 children: [
                   {
@@ -2847,10 +2809,12 @@ class TutorialStates {
                     children: [
                       {
                         type: 'span',
+                        className: 'table-row',
                         key: 0,
                         children: [
                           {
                             type: 'span',
+                            className: 'table-cell',
                             key: 1,
                             children: [
                               {
@@ -2869,7 +2833,7 @@ class TutorialStates {
                                           index: 0,
                                           condition: (component) => !component.state.openMenu
                                         },
-                                        componentAction: (component) => this.changeState(component.state.openMenu ? this.fillOperatorDefinition_composition_arg2_arg2_placeholderMenu : this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu),
+                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu, component.state.openMenu),
                                         elementAction: this.automateClick(),
                                         children: [
                                           {
@@ -2888,7 +2852,7 @@ class TutorialStates {
                                                         manipulateProps: (props) => ({
                                                           ...props,
                                                           onItemClicked: inject(props.onItemClicked, () => {
-                                                            this.changeState(this.tutorialCompleted);
+                                                            this.changeState(this.selectOperatorNotation_openMenu);
                                                           })
                                                         }),
                                                         elementAction: this.automateClick()
@@ -2920,9 +2884,713 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_arg2_placeholderMenu: TutorialState = {
-    // Duplicate state to force refresh on selection change.
-    ...this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu
+  // Select notation template.
+
+  selectOperatorNotation_openMenu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Now it is time for the most important task in Slate: finding a good notation.<br/>Since no standard notation exists for our definition, we will have to invent one.</p>,
+                                      position: 'bottom',
+                                      index: 0,
+                                      condition: (component) => !component.state.openMenu
+                                    },
+                                    elementAction: this.automateClick(),
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 1,
+                                            children: [
+                                              {
+                                                type: 'div',
+                                                key: 'title',
+                                                toolTip: {
+                                                  contents: <p>Open this menu and scroll down.</p>,
+                                                  position: 'left',
+                                                  index: 0
+                                                },
+                                                elementAction: this.automateHover()
+                                              },
+                                              {
+                                                type: ExpressionMenu,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuRow,
+                                                    key: 'SubSup',
+                                                    children: [
+                                                      {
+                                                        type: 'div',
+                                                        key: 'title',
+                                                        toolTip: {
+                                                          contents: <p>For simplicity, we will notate the definition as an expression with a subscript and a superscript.</p>,
+                                                          position: 'left',
+                                                          index: 1
+                                                        },
+                                                        elementAction: this.automateClick()
+                                                      }
+                                                    ],
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_g))
+                                                    })
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  selectOperatorNotation_dialog_arg_g: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 1,
+                                                children: [
+                                                  {
+                                                    type: 'td',
+                                                    key: 'value',
+                                                    children: [
+                                                      {
+                                                        type: Expression,
+                                                        toolTip: {
+                                                          contents: <p>Select g here.</p>,
+                                                          position: 'bottom',
+                                                          index: 0,
+                                                          condition: (component) => !component.state.openMenu
+                                                        },
+                                                        elementAction: this.automateClick(),
+                                                        children: [
+                                                          {
+                                                            type: ExpressionMenu,
+                                                            children: [
+                                                              {
+                                                                type: ExpressionMenuRow,
+                                                                key: 1,
+                                                                children: [
+                                                                  {
+                                                                    type: ExpressionMenuRow,
+                                                                    children: [
+                                                                      {
+                                                                        type: ExpressionMenuItem,
+                                                                        key: 3,
+                                                                        manipulateProps: (props) => ({
+                                                                          ...props,
+                                                                          onItemClicked: inject(props.onItemClicked, () => {
+                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_n);
+                                                                          })
+                                                                        }),
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  selectOperatorNotation_dialog_arg_n: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 3,
+                                                children: [
+                                                  {
+                                                    type: 'td',
+                                                    key: 'value',
+                                                    children: [
+                                                      {
+                                                        type: Expression,
+                                                        toolTip: {
+                                                          contents: <p>Select n here.</p>,
+                                                          position: 'bottom',
+                                                          index: 0,
+                                                          condition: (component) => !component.state.openMenu
+                                                        },
+                                                        elementAction: this.automateClick(),
+                                                        children: [
+                                                          {
+                                                            type: ExpressionMenu,
+                                                            children: [
+                                                              {
+                                                                type: ExpressionMenuRow,
+                                                                key: 1,
+                                                                children: [
+                                                                  {
+                                                                    type: ExpressionMenuRow,
+                                                                    children: [
+                                                                      {
+                                                                        type: ExpressionMenuItem,
+                                                                        key: 4,
+                                                                        manipulateProps: (props) => ({
+                                                                          ...props,
+                                                                          onItemClicked: inject(props.onItemClicked, () => {
+                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_f);
+                                                                          })
+                                                                        }),
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  selectOperatorNotation_dialog_arg_f: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 4,
+                                                children: [
+                                                  {
+                                                    type: 'td',
+                                                    key: 'value',
+                                                    children: [
+                                                      {
+                                                        type: Expression,
+                                                        toolTip: {
+                                                          contents: <p>Select f here.</p>,
+                                                          position: 'bottom',
+                                                          index: 0,
+                                                          condition: (component) => !component.state.openMenu
+                                                        },
+                                                        elementAction: this.automateClick(),
+                                                        children: [
+                                                          {
+                                                            type: ExpressionMenu,
+                                                            children: [
+                                                              {
+                                                                type: ExpressionMenuRow,
+                                                                key: 1,
+                                                                children: [
+                                                                  {
+                                                                    type: ExpressionMenuRow,
+                                                                    children: [
+                                                                      {
+                                                                        type: ExpressionMenuItem,
+                                                                        key: 2,
+                                                                        manipulateProps: (props) => ({
+                                                                          ...props,
+                                                                          onItemClicked: inject(props.onItemClicked, () => {
+                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_text);
+                                                                          })
+                                                                        }),
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  selectOperatorNotation_dialog_arg_text: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: ExpressionDialogItem,
+                                                key: 5,
+                                                children: [
+                                                  {
+                                                    type: 'td',
+                                                    key: 'value',
+                                                    children: [
+                                                      {
+                                                        type: Expression,
+                                                        toolTip: {
+                                                          contents: <p>Enter a text like "my" here, so you will recognize the definition more easily.</p>,
+                                                          position: 'bottom',
+                                                          index: 0,
+                                                          condition: (component) => !component.state.openMenu
+                                                        },
+                                                        elementAction: this.automateClick(),
+                                                        children: [
+                                                          {
+                                                            type: ExpressionMenu,
+                                                            children: [
+                                                              {
+                                                                type: ExpressionMenuRow,
+                                                                key: 0,
+                                                                children: [
+                                                                  {
+                                                                    type: ExpressionMenuTextInput,
+                                                                    children: [
+                                                                      {
+                                                                        type: 'form',
+                                                                        manipulateProps: (props) => ({
+                                                                          ...props,
+                                                                          onSubmit: inject(props.onSubmit, () => {
+                                                                            this.changeState(this.selectOperatorNotation_dialog_ok);
+                                                                          })
+                                                                        }),
+                                                                        elementAction: this.automateFormSubmission(300),
+                                                                        children: [
+                                                                          {
+                                                                            type: 'input',
+                                                                            elementAction: this.automateTextInput('my')
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  selectOperatorNotation_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'span',
+                        className: 'table-row',
+                        key: 0,
+                        children: [
+                          {
+                            type: 'span',
+                            className: 'table-cell',
+                            key: 0,
+                            children: [
+                              {
+                                type: Expression,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionDialog,
+                                        children: [
+                                          {
+                                            type: StandardDialog,
+                                            children: [
+                                              {
+                                                type: Button,
+                                                key: 'ok',
+                                                toolTip: {
+                                                  contents: <p>Since S and T can be inferred automatically, we are done.<br/>After the tutorial, you will be able to experiment with notation.</p>,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                },
+                                                manipulateProps: (props) => ({
+                                                  ...props,
+                                                  onClick: inject(props.onClick, () => this.changeState(this.submitOperator))
+                                                }),
+                                                elementAction: this.automateClick()
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  submitOperator: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 3,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: 'div',
+                        key: 'contents',
+                        children: [
+                          {
+                            type: Expression,
+                            toolTip: {
+                              contents: (
+                                <div>
+                                  <p>Finally, you should add some documentation, including references to external material.</p>
+                                  <p>At a minimum, please fill the given list of default references where applicable. Links to the corresponding definition/theorem in other theorem provers may become especially valuable in the future.</p>
+                                  <p>For convenience, you can click on the "Search" button in the editor toolbar to search the default references for a given term, either one by one or (if your browser allows it) all at once. {this.withTouchWarning ? <>(Unfortunately, the markdown editor including this feature does not work on mobile devices.)</> : null}</p>
+                                  <p>However, in tutorial mode, you can just "submit" your definition.</p>
+                                </div>
+                              ),
+                              position: 'top',
+                              index: 0,
+                              condition: (component) => !component.state.openDialog
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: 'div',
+        key: 'toolbar',
+        children: [
+          {
+            type: Button,
+            key: 'submit',
+            toolTip: {
+              contents: <p>Click here.</p>,
+              position: 'top',
+              index: 1
+            },
+            manipulateProps: (props) => ({
+              ...props,
+              onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
   };
 
   // The end.
@@ -2938,7 +3606,7 @@ class TutorialStates {
               <p>Thank you for following the tutorial.</p>
               <p>As you have seen, Slate is designed to be learned intuitively, by exploring the user interface. As a next step, we recommend taking a look at the contents of the library and making small contributions.</p>
               <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
-              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>.</p>
+              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>, where you can always switch to the text editor as a fallback.</p>
               <div className={'tutorial-tooltip-button-row'}>
                 <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
                   Continue in tutorial mode

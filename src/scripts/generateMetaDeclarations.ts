@@ -1189,7 +1189,6 @@ function generate(inFileName: string, outFileName: string, ReferencedMetaModels:
   let inFile: Fmt.File = FmtReader.readString(inFileStr, inFileName, FmtMeta.getMetaModel);
 
   let outFileStr = `// Generated from ${inFileName} by generateMetaDeclarations.ts.\n`;
-  outFileStr += `/* eslint @typescript-eslint/class-name-casing: off */\n`;
   outFileStr += `\n`;
 
   let srcPath = outFileName.split('/');

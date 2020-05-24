@@ -3,7 +3,7 @@ import { ReactElementManipulator, traverseReactComponents } from '../utils/trave
 import { PermanentToolTip, ToolTipPosition } from '../components/ExpressionToolTip';
 
 export interface TutorialToolTip {
-  contents: React.ReactNode;
+  contents: React.ReactElement | ((component: React.Component<any, any>) => React.ReactNode) | null;
   position: ToolTipPosition;
   index: number;
   condition?: (component: React.Component<any, any>) => boolean;
@@ -11,7 +11,8 @@ export interface TutorialToolTip {
 
 export interface TutorialManipulationEntry {
   type?: any;
-  key?: any;
+  key?: string | number;
+  className?: string;
   constraint?: (props: any) => boolean;
   refConstraint?: (refComponents: (React.Component<any, any> | undefined)[]) => boolean;
   refIndex?: number;
@@ -22,11 +23,12 @@ export interface TutorialManipulationEntry {
   elementAction?: (reactElement: React.ReactElement, htmlElement: HTMLElement) => void;
 }
 
-function applyTutorialManipulationEntries(tutorialState: TutorialState, node: React.ReactNode, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
+function applyTutorialManipulationEntries(tutorialState: TutorialState, node: React.ReactNode, parentComponent: React.Component<any, any> | undefined, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
   let visitor = (element: React.ReactElement) => {
     for (let entry of entries) {
       if ((entry.type === undefined || element.type === entry.type)
           && (entry.key === undefined || element.key === entry.key || element.key === entry.key.toString())
+          && (entry.className === undefined || element.props.className.split(' ').indexOf(entry.className) >= 0)
           && (entry.constraint === undefined || entry.constraint(element.props))
           && (entry.refConstraint === undefined || (tutorialState.refComponents && entry.refConstraint(tutorialState.refComponents)))) {
         let entryName = '?';
@@ -41,7 +43,7 @@ function applyTutorialManipulationEntries(tutorialState: TutorialState, node: Re
           entryName = `${entryName} key="${entry.key}"`;
         }
         console.log(`${indent}Found ${entryName}.`);
-        return createTutorialManipulator(tutorialState, entry, indent + '  ');
+        return createTutorialManipulator(tutorialState, parentComponent, entry, indent + '  ');
       }
     }
     return undefined;
@@ -51,7 +53,7 @@ function applyTutorialManipulationEntries(tutorialState: TutorialState, node: Re
 
 type NodeManipulationFn = (node: React.ReactNode, component: React.Component<any, any> | undefined) => React.ReactNode;
 
-function createTutorialManipulator(tutorialState: TutorialState, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
+function createTutorialManipulator(tutorialState: TutorialState, parentComponent: React.Component<any, any> | undefined, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
   let applyRef: NodeManipulationFn | undefined = undefined;
   if (entry.refIndex !== undefined) {
     let refIndex = entry.refIndex;
@@ -74,7 +76,7 @@ function createTutorialManipulator(tutorialState: TutorialState, entry: Tutorial
       if (applyRef) {
         node = applyRef(node, component);
       }
-      return applyTutorialManipulationEntries(tutorialState, node, children, indent);
+      return applyTutorialManipulationEntries(tutorialState, node, component ?? parentComponent, children, indent);
     };
   }
 
@@ -104,8 +106,20 @@ function createTutorialManipulator(tutorialState: TutorialState, entry: Tutorial
         node = traverseChildren(node, component);
       }
       let toolTipElement: React.ReactNode = null;
-      if (!toolTip.condition || (component && toolTip.condition(component))) {
-        toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={() => toolTip.contents} key="tutorial-tooltip"/>;
+      let currentComponent = component ?? parentComponent;
+      if (!toolTip.condition || (currentComponent && toolTip.condition(currentComponent))) {
+        let getContents = () => {
+          if (typeof toolTip.contents === 'function' && typeof (toolTip.contents as any).type === 'undefined') {
+            if (currentComponent) {
+              return (toolTip.contents as any)(currentComponent);
+            } else {
+              return null;
+            }
+          } else {
+            return toolTip.contents;
+          }
+        };
+        toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={getContents} key="tutorial-tooltip"/>;
       }
       let ref = (refNode: HTMLElement | null) => {
         parentNode = refNode;
@@ -169,5 +183,5 @@ export interface TutorialState {
 }
 
 export function addTutorial(node: React.ReactNode, tutorialState: TutorialState): React.ReactNode {
-  return applyTutorialManipulationEntries(tutorialState, node, tutorialState.manipulationEntries);
+  return applyTutorialManipulationEntries(tutorialState, node, undefined, tutorialState.manipulationEntries);
 }

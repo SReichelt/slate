@@ -12,12 +12,10 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "@typescript-eslint/class-name-casing": "error",
         "@typescript-eslint/indent": [
             "off",
             4
         ],
-        "@typescript-eslint/interface-name-prefix": "warn",
         "@typescript-eslint/member-delimiter-style": [
             "warn",
             {

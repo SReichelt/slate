@@ -16,6 +16,7 @@ import CachedPromise from '../../data/cachedPromise';
 export type RenderTypeFn = (type: string | undefined) => Notation.RenderedExpression;
 
 export type SetNotationFn = (notation: Fmt.Expression | undefined) => void;
+export type UpdateNotationFn = () => void;
 
 export type RenderParameterFn = (parameter: Fmt.Parameter) => Notation.RenderedExpression;
 export type InsertParameterFn = (parameter: Fmt.Parameter) => void;
@@ -367,8 +368,7 @@ export abstract class GenericEditHandler {
       let localPreviousParamNames = previousParamNames.slice();
       paramItem.onGetValue = () => {
         let value = newNotation.path.arguments.getOptionalValue(param.name, paramIndex);
-        let onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
-          newNotation.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
+        let onUpdateParamNotation = () => {
           requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
           previewItem.visible = requiredArgumentsFilled;
           previewItem.changed();
@@ -377,8 +377,12 @@ export abstract class GenericEditHandler {
             okEnabled = false;
           }
         };
+        let onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
+          newNotation.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
+          onUpdateParamNotation();
+        };
         let canRemove = param.optional && value !== undefined;
-        return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
+        return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamNotation, onUpdateParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
       paramItem.info = this.getDocumentation(template, param);
       dialog.items.push(paramItem);
@@ -459,7 +463,7 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onUpdateNotation: UpdateNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
     if (arrayDimensions) {
       if (value instanceof Fmt.ArrayExpression) {
         let items: Notation.RenderedExpression[] = [];
@@ -471,8 +475,9 @@ export abstract class GenericEditHandler {
             } else {
               value.items.splice(index, 1);
             }
+            onUpdateNotation();
           };
-          let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
+          let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, onUpdateNotation, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
           if (arrayDimensions > 1) {
             argValue = new Notation.ParenExpression(argValue, '[]');
           }
@@ -485,6 +490,7 @@ export abstract class GenericEditHandler {
             let newItem = new Fmt.ArrayExpression;
             newItem.items = [];
             value.items.push(newItem);
+            onUpdateNotation();
           };
           insertButton.action = new Menu.ImmediateExpressionMenuAction(onInsertItem);
         } else {
@@ -492,6 +498,7 @@ export abstract class GenericEditHandler {
           let onInsertItem = (newValue: Fmt.Expression | undefined) => {
             if (newValue) {
               value.items.push(newValue);
+              onUpdateNotation();
             }
           };
           this.addNotationItemMenu(semanticLink, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
@@ -613,7 +620,7 @@ export abstract class GenericEditHandler {
       };
       paramItem.onGetValue = () => {
         let regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
-        return this.renderArgumentValue(regular, type, 0, undefined, onSetItem, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
+        return this.renderArgumentValue(regular, type, 0, undefined, onSetItem, () => {}, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
       };
       dialog.items.push(paramItem);
     }

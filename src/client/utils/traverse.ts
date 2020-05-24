@@ -181,11 +181,15 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
           throw new Error('Trying to attach component action to non-component node');
         }
         if (manipulator.manipulateContents) {
-          let contents = manipulator.manipulateContents(node, undefined);
-          if (manipulator.elementAction) {
-            contents = attachElementAction(contents, manipulator.elementAction);
+          nodeObject = manipulator.manipulateContents(node, undefined);
+          if (manipulator.manipulateProps) {
+            let newProps = manipulator.manipulateProps(nodeObject.props);
+            nodeObject = React.createElement(nodeObject.type, newProps);
           }
-          return contents;
+          if (manipulator.elementAction) {
+            nodeObject = attachElementAction(nodeObject, manipulator.elementAction);
+          }
+          return nodeObject;
         }
       }
 
