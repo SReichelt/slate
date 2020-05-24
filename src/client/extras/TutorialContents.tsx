@@ -216,7 +216,7 @@ class TutorialStates {
           {
             type: SearchInput,
             toolTip: {
-              contents: <p>Our definition and theorem will be about functions, so type "functions" here to search for a good place to add them.</p>,
+              contents: <p>Our definition and theorem will be about functions, so type "functions" into this search box to find good place to add them.</p>,
               position: 'bottom',
               index: 0
             },
@@ -4456,13 +4456,13 @@ class TutorialStates {
                                       position: 'bottom',
                                       index: 0
                                     },
-                                    manipulateProps: (props) => ({
-                                      ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
-                                    }),
                                     elementAction: this.automateClick()
                                   }
-                                ]
+                                ],
+                                manipulateProps: (props) => ({
+                                  ...props,
+                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
+                                })
                               }
                             ]
                           }

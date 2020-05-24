@@ -52,7 +52,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
   }
 
   render(): React.ReactNode {
-    return <input className={'tree-search-input'} type={'search'} placeholder={'Search...'} onChange={this.onChangeSearchText} autoFocus={this.props.autoFocus} ref={(node) => (this.searchInputNode = node)}/>;
+    return <input className={'tree-search-input'} type={'search'} placeholder={'Search the library'} onChange={this.onChangeSearchText} autoFocus={this.props.autoFocus} ref={(node) => (this.searchInputNode = node)}/>;
   }
 
   private onChangeSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
