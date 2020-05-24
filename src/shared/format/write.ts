@@ -494,55 +494,57 @@ export class Writer {
           needEmptyLine = false;
         }
         this.writeNewLine();
-        this.writeIndent(indent);
-        this.write(' *');
-        if (item.kind) {
-          this.write(' ');
-          this.writeRange(item, false, false, true, false, () => {
-            this.write('@');
-            this.write(item.kind!);
-          });
-        }
-        if (item.parameter) {
-          this.write(' ');
-          this.writeIdentifier(item.parameter.name, item, true);
-        } else {
-          needEmptyLine = true;
-        }
-        let indentLength = this.lineLength + 1;
-        let textLine = '';
-        for (let c of item.text.trim()) {
-          if (c === '\r') {
-            // ignore
-          } else if (c === '\n') {
-            textLine = textLine.trimRight();
-            if (textLine.startsWith('@')) {
-              textLine = textLine.substring(1);
-            }
-            if (textLine) {
-              if (indentLength > this.lineLength) {
-                this.write(' '.repeat(indentLength - this.lineLength));
-              }
-              this.write(textLine);
-            }
-            textLine = '';
-            this.writeNewLine();
-            this.writeIndent(indent);
-            this.write(' *');
-          } else if (c === '/' && textLine.endsWith('*')) {
-            textLine += ' /';
+        this.writeRange(item, false, false, false, false, () => {
+          this.writeIndent(indent);
+          this.write(' *');
+          if (item.kind) {
+            this.write(' ');
+            this.writeRange(item, false, false, true, false, () => {
+              this.write('@');
+              this.write(item.kind!);
+            });
+          }
+          if (item.parameter) {
+            this.write(' ');
+            this.writeIdentifier(item.parameter.name, item, true);
           } else {
-            textLine += c;
+            needEmptyLine = true;
           }
-        }
-        textLine = textLine.trimRight();
-        if (textLine) {
-          if (indentLength > this.lineLength) {
-            this.write(' '.repeat(indentLength - this.lineLength));
+          let indentLength = this.lineLength + 1;
+          let textLine = '';
+          for (let c of item.text.trim()) {
+            if (c === '\r') {
+              // ignore
+            } else if (c === '\n') {
+              textLine = textLine.trimRight();
+              if (textLine.startsWith('@')) {
+                textLine = textLine.substring(1);
+              }
+              if (textLine) {
+                if (indentLength > this.lineLength) {
+                  this.write(' '.repeat(indentLength - this.lineLength));
+                }
+                this.write(textLine);
+              }
+              textLine = '';
+              this.writeNewLine();
+              this.writeIndent(indent);
+              this.write(' *');
+            } else if (c === '/' && textLine.endsWith('*')) {
+              textLine += ' /';
+            } else {
+              textLine += c;
+            }
           }
-          this.write(textLine);
-        }
-        first = false;
+          textLine = textLine.trimRight();
+          if (textLine) {
+            if (indentLength > this.lineLength) {
+              this.write(' '.repeat(indentLength - this.lineLength));
+            }
+            this.write(textLine);
+          }
+          first = false;
+        });
       }
       this.writeNewLine();
       this.writeIndent(indent);

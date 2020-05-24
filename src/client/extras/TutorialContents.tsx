@@ -222,7 +222,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onSearch: inject(props.onSearch, () => this.changeState(this.insertOperator_openInsertMenu))
+              onSearch: inject(props.onSearch, () => this.changeState(this.insertOperator_menu))
             }),
             elementAction: this.automateTextInput('functions')
           }
@@ -231,9 +231,9 @@ class TutorialStates {
     ]
   };
 
-  // Insert operator.
+  // Insert Operator.
 
-  insertOperator_openInsertMenu: TutorialState = {
+  insertOperator_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -273,7 +273,12 @@ class TutorialStates {
                           {
                             key: 'display-span',
                             toolTip: {
-                              contents: (component) => <p>This is the section we are looking for.{component.state.opened ? <><br/>Scroll down.</> : null}</p>,
+                              contents: (component) => (
+                                <div>
+                                  <p>This is the section we are looking for.</p>
+                                  {component.state.opened ? <p>Scroll down.</p> : null}
+                                </div>
+                              ),
                               position: 'right',
                               index: 1
                             }
@@ -305,7 +310,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.insertOperator_dialog_enterName))
+                                          onClick: inject(props.onClick, () => this.changeState(this.insertOperator_dialog_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -328,7 +333,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperator_dialog_enterName: TutorialState = {
+  insertOperator_dialog_name: TutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -438,7 +443,7 @@ class TutorialStates {
         ],
         manipulateProps: (props) => ({
           ...props,
-          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_ST_openInsertMenu))
+          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_ST_menu))
         })
       }
     ]
@@ -446,7 +451,7 @@ class TutorialStates {
 
   // Insert parameters S and T.
 
-  insertOperatorParameters_ST_openInsertMenu: TutorialState = {
+  insertOperatorParameters_ST_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -490,7 +495,7 @@ class TutorialStates {
                                     },
                                     manipulateProps: (props) => ({
                                       ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_enterNames))
+                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_names))
                                     }),
                                     elementAction: this.automateClick()
                                   }
@@ -524,7 +529,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_ST_enterNames: TutorialState = {
+  insertOperatorParameters_ST_names: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -572,7 +577,7 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters.length >= 2) {
-            this.changeState(this.insertOperatorParameters_f_openInsertMenu);
+            this.changeState(this.insertOperatorParameters_f_menu);
           }
         })
       }
@@ -581,7 +586,7 @@ class TutorialStates {
 
   // Insert parameter f.
 
-  insertOperatorParameters_f_openInsertMenu: TutorialState = {
+  insertOperatorParameters_f_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -641,7 +646,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_enterName))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -664,7 +669,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_enterName: TutorialState = {
+  insertOperatorParameters_f_name: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -718,14 +723,14 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[2].name === 'f') {
-            this.changeState(this.insertOperatorParameters_f_set_openPlaceholderMenu);
+            this.changeState(this.insertOperatorParameters_f_set_menu);
           }
         })
       }
     ]
   };
 
-  insertOperatorParameters_f_set_openPlaceholderMenu: TutorialState = {
+  insertOperatorParameters_f_set_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -784,8 +789,8 @@ class TutorialStates {
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
                                             this.changeState(action instanceof Menu.DialogExpressionMenuAction
-                                                              ? this.insertOperatorParameters_f_set_dialog_selectFunctions
-                                                              : this.insertOperatorParameters_f_set_arg1);
+                                                             ? this.insertOperatorParameters_f_set_dialog
+                                                             : this.insertOperatorParameters_f_set_arg1);
                                           })
                                         })
                                       }
@@ -808,7 +813,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_dialog_selectFunctions: TutorialState = {
+  insertOperatorParameters_f_set_dialog: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -893,7 +898,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(this.insertOperatorParameters_f_set_dialog_selectFunctions, component.props.selected)
+                                                                        componentAction: (component) => this.changeState(this.insertOperatorParameters_f_set_dialog, component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -982,7 +987,12 @@ class TutorialStates {
                                     type: Expression,
                                     key: 0,
                                     toolTip: {
-                                      contents: <p>Select S here.</p>,
+                                      contents: (
+                                        <div>
+                                          <p>Note how the "∈" symbol was replaced by a different notation. Some library definitions specify a special appearance for better readability.</p>
+                                          <p>Select S here.</p>
+                                        </div>
+                                      ),
                                       position: 'bottom',
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
@@ -1004,9 +1014,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_f_set_arg2);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_set_arg2))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1097,9 +1105,7 @@ class TutorialStates {
                                                     key: 1,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_g_openInsertMenu);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_menu))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1130,7 +1136,7 @@ class TutorialStates {
 
   // Insert parameter g.
 
-  insertOperatorParameters_g_openInsertMenu: TutorialState = {
+  insertOperatorParameters_g_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1189,7 +1195,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_enterName))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -1212,7 +1218,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_g_enterName: TutorialState = {
+  insertOperatorParameters_g_name: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1266,14 +1272,14 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[3].name === 'g') {
-            this.changeState(this.insertOperatorParameters_g_set_openPlaceholderMenu);
+            this.changeState(this.insertOperatorParameters_g_set_menu);
           }
         })
       }
     ]
   };
 
-  insertOperatorParameters_g_set_openPlaceholderMenu: TutorialState = {
+  insertOperatorParameters_g_set_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1330,9 +1336,7 @@ class TutorialStates {
                                         ],
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => {
-                                            this.changeState(this.insertOperatorParameters_g_set_arg1);
-                                          })
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_set_arg1))
                                         })
                                       }
                                     ]
@@ -1412,9 +1416,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_g_set_arg2);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_set_arg2))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1505,9 +1507,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.insertOperatorParameters_n_openInsertMenu);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_menu))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1538,7 +1538,7 @@ class TutorialStates {
 
   // Insert parameter n.
 
-  insertOperatorParameters_n_openInsertMenu: TutorialState = {
+  insertOperatorParameters_n_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1596,7 +1596,7 @@ class TutorialStates {
                                         },
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_enterName))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -1619,7 +1619,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_enterName: TutorialState = {
+  insertOperatorParameters_n_name: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1673,14 +1673,14 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[4].name === 'n') {
-            this.changeState(this.insertOperatorParameters_n_set_openPlaceholderMenu);
+            this.changeState(this.insertOperatorParameters_n_set_menu);
           }
         })
       }
     ]
   };
 
-  insertOperatorParameters_n_set_openPlaceholderMenu: TutorialState = {
+  insertOperatorParameters_n_set_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1747,7 +1747,7 @@ class TutorialStates {
                                         ],
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_set_dialog_searchNaturalNumbers))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_set_dialog_search))
                                         })
                                       }
                                     ]
@@ -1769,7 +1769,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_dialog_searchNaturalNumbers: TutorialState = {
+  insertOperatorParameters_n_set_dialog_search: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1820,7 +1820,7 @@ class TutorialStates {
                                                     },
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers))
+                                                      onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_select))
                                                     }),
                                                     elementAction: this.automateTextInput('natural numbers')
                                                   }
@@ -1849,7 +1849,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_dialog_selectNaturalNumbers: TutorialState = {
+  insertOperatorParameters_n_set_dialog_select: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1945,7 +1945,7 @@ class TutorialStates {
                                                                                     elementAction: this.automateClick()
                                                                                   }
                                                                                 ],
-                                                                                componentAction: (component) => this.changeState(this.insertOperatorParameters_n_set_dialog_selectNaturalNumbers, component.props.selected)
+                                                                                componentAction: (component) => this.changeState(this.insertOperatorParameters_n_set_dialog_select, component.props.selected)
                                                                               }
                                                                             ]
                                                                           }
@@ -1971,7 +1971,7 @@ class TutorialStates {
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_openPlaceholderMenu))
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_menu))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -1998,10 +1998,14 @@ class TutorialStates {
 
   // Insert composition term.
 
-  fillOperatorDefinition_composition_openPlaceholderMenu: TutorialState = {
+  fillOperatorDefinition_composition_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
+                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[4].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[4].type.expression._set.path.name === 'Natural numbers')),
         children: [
           {
             type: Expression,
@@ -2052,7 +2056,7 @@ class TutorialStates {
                                         ],
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_dialog_searchFunctionComposition))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_dialog_search))
                                         })
                                       }
                                     ]
@@ -2074,7 +2078,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_dialog_searchFunctionComposition: TutorialState = {
+  fillOperatorDefinition_composition_dialog_search: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2125,7 +2129,7 @@ class TutorialStates {
                                                     },
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition))
+                                                      onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_select))
                                                     }),
                                                     elementAction: this.automateTextInput('composition')
                                                   }
@@ -2154,7 +2158,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_dialog_selectFunctionComposition: TutorialState = {
+  fillOperatorDefinition_composition_dialog_select: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2234,7 +2238,12 @@ class TutorialStates {
                                                                               {
                                                                                 key: 'display-span',
                                                                                 toolTip: {
-                                                                                  contents: <p>Click here.<br/>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.</p>,
+                                                                                  contents: (
+                                                                                    <div>
+                                                                                      <p>Click here.</p>
+                                                                                      <p>If you are unsure whether a given item is the correct one, you can hover over it to see its definition.</p>
+                                                                                    </div>
+                                                                                  ),
                                                                                   position: 'right',
                                                                                   index: 1
                                                                                 }
@@ -2243,7 +2252,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_dialog_selectFunctionComposition, component.props.selected)
+                                                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_dialog_select, component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -2265,7 +2274,7 @@ class TutorialStates {
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu))
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1_menu))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -2292,7 +2301,7 @@ class TutorialStates {
 
   // Select f.
 
-  fillOperatorDefinition_composition_arg1_openPlaceholderMenu: TutorialState = {
+  fillOperatorDefinition_composition_arg1_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2332,7 +2341,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       (component as Expression).disableWindowClickListener();
-                                      this.changeState(this.fillOperatorDefinition_composition_arg1_openPlaceholderMenu, component.state.openMenu);
+                                      this.changeState(this.fillOperatorDefinition_composition_arg1_menu, component.state.openMenu);
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -2351,15 +2360,18 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_menu))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
                                                 ],
                                                 toolTip: {
-                                                  contents: <p>Note how only f and g can be selected. This is because all input is restricted to well-typed terms.<br/><DocLink href="docs/hlm/types" onDocLinkClicked={this.onDocLinkClicked}>Read more about the type system.</DocLink></p>,
+                                                  contents: (
+                                                    <div>
+                                                      <p>Note how only f and g can be selected. This is because all input is restricted to well-typed terms.</p>
+                                                      <p><DocLink href="docs/hlm/types" onDocLinkClicked={this.onDocLinkClicked}>Read more about the type system.</DocLink></p>
+                                                    </div>
+                                                  ),
                                                   position: 'right',
                                                   index: 0
                                                 }
@@ -2389,7 +2401,7 @@ class TutorialStates {
 
   // Select g.
 
-  fillOperatorDefinition_composition_arg2_openPlaceholderMenu: TutorialState = {
+  fillOperatorDefinition_composition_arg2_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2427,7 +2439,7 @@ class TutorialStates {
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_openPlaceholderMenu, component.state.openMenu),
+                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_menu, component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2445,9 +2457,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => {
-                                                        this.changeState(this.fillOperatorDefinition_composition_arg2_openReselectionMenu);
-                                                      })
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_reselectionMenu))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -2476,7 +2486,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_openReselectionMenu: TutorialState = {
+  fillOperatorDefinition_composition_arg2_reselectionMenu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2509,12 +2519,12 @@ class TutorialStates {
                                     type: Expression,
                                     key: 4,
                                     toolTip: {
-                                      contents: <p>It turns out we actually wanted to write "g<sup>n</sup>". This can be fixed easily by clicking here again (but you need to be careful to only overwrite "g" instead of the entire expression).</p>,
+                                      contents: <p>It turns out we actually wanted to write "g<sup>n</sup>". This can be fixed easily by clicking here again. (But be careful to only overwrite "g" instead of the entire expression.)</p>,
                                       position: 'bottom',
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_openReselectionMenu, component.state.openMenu),
+                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_reselectionMenu, component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2528,7 +2538,7 @@ class TutorialStates {
                                                 type: 'div',
                                                 key: 'title',
                                                 toolTip: {
-                                                  contents: <p>Click here to search for the definition of the power of a function.</p>,
+                                                  contents: <p>Click here to search for the definition of the power (i.e. iterated application) of a function.</p>,
                                                   position: 'left',
                                                   index: 0
                                                 },
@@ -2537,7 +2547,7 @@ class TutorialStates {
                                             ],
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_searchFunctionPower))
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_search))
                                             })
                                           }
                                         ]
@@ -2561,7 +2571,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_dialog_searchFunctionPower: TutorialState = {
+  fillOperatorDefinition_composition_arg2_dialog_search: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2616,7 +2626,7 @@ class TutorialStates {
                                                         },
                                                         manipulateProps: (props) => ({
                                                           ...props,
-                                                          onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower))
+                                                          onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_select))
                                                         }),
                                                         elementAction: this.automateTextInput('power')
                                                       }
@@ -2647,7 +2657,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower: TutorialState = {
+  fillOperatorDefinition_composition_arg2_dialog_select: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2740,7 +2750,7 @@ class TutorialStates {
                                                                                 elementAction: this.automateClick()
                                                                               }
                                                                             ],
-                                                                            componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_selectFunctionPower, component.props.selected)
+                                                                            componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_select, component.props.selected)
                                                                           }
                                                                         ]
                                                                       }
@@ -2762,7 +2772,7 @@ class TutorialStates {
                                                 refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                                 manipulateProps: (props) => ({
                                                   ...props,
-                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu))
+                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu))
                                                 }),
                                                 elementAction: this.automateClick()
                                               }
@@ -2791,7 +2801,7 @@ class TutorialStates {
 
   // Select n.
 
-  fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu: TutorialState = {
+  fillOperatorDefinition_composition_arg2_arg2_menu: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2833,7 +2843,7 @@ class TutorialStates {
                                           index: 0,
                                           condition: (component) => !component.state.openMenu
                                         },
-                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_openPlaceholderMenu, component.state.openMenu),
+                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu, component.state.openMenu),
                                         elementAction: this.automateClick(),
                                         children: [
                                           {
@@ -2851,9 +2861,7 @@ class TutorialStates {
                                                         key: 0,
                                                         manipulateProps: (props) => ({
                                                           ...props,
-                                                          onItemClicked: inject(props.onItemClicked, () => {
-                                                            this.changeState(this.selectOperatorNotation_openMenu);
-                                                          })
+                                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_openMenu))
                                                         }),
                                                         elementAction: this.automateClick()
                                                       }
@@ -2919,7 +2927,7 @@ class TutorialStates {
                                     type: Expression,
                                     key: 0,
                                     toolTip: {
-                                      contents: <p>Now it is time for the most important task in Slate: finding a good notation.<br/>Since no standard notation exists for our definition, we will have to invent one.</p>,
+                                      contents: <p>Now it is time for one of the most important tasks in Slate: finding a good notation.<br/>Since no standard notation exists for our definition, we will have to invent one.</p>,
                                       position: 'bottom',
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
@@ -2937,7 +2945,7 @@ class TutorialStates {
                                                 type: 'div',
                                                 key: 'title',
                                                 toolTip: {
-                                                  contents: <p>Open this menu and scroll down.</p>,
+                                                  contents: <p>Open this menu and scroll down to "SubSup".</p>,
                                                   position: 'left',
                                                   index: 0
                                                 },
@@ -2963,7 +2971,7 @@ class TutorialStates {
                                                     ],
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_g))
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_body))
                                                     })
                                                   }
                                                 ]
@@ -2991,7 +2999,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_g: TutorialState = {
+  selectOperatorNotation_dialog_arg_body: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3063,9 +3071,7 @@ class TutorialStates {
                                                                         key: 3,
                                                                         manipulateProps: (props) => ({
                                                                           ...props,
-                                                                          onItemClicked: inject(props.onItemClicked, () => {
-                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_n);
-                                                                          })
+                                                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_sup))
                                                                         }),
                                                                         elementAction: this.automateClick()
                                                                       }
@@ -3104,7 +3110,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_n: TutorialState = {
+  selectOperatorNotation_dialog_arg_sup: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3176,9 +3182,7 @@ class TutorialStates {
                                                                         key: 4,
                                                                         manipulateProps: (props) => ({
                                                                           ...props,
-                                                                          onItemClicked: inject(props.onItemClicked, () => {
-                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_f);
-                                                                          })
+                                                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_preSub))
                                                                         }),
                                                                         elementAction: this.automateClick()
                                                                       }
@@ -3217,7 +3221,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_f: TutorialState = {
+  selectOperatorNotation_dialog_arg_preSub: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3289,9 +3293,7 @@ class TutorialStates {
                                                                         key: 2,
                                                                         manipulateProps: (props) => ({
                                                                           ...props,
-                                                                          onItemClicked: inject(props.onItemClicked, () => {
-                                                                            this.changeState(this.selectOperatorNotation_dialog_arg_text);
-                                                                          })
+                                                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_preSup))
                                                                         }),
                                                                         elementAction: this.automateClick()
                                                                       }
@@ -3330,7 +3332,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_text: TutorialState = {
+  selectOperatorNotation_dialog_arg_preSup: TutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3401,11 +3403,9 @@ class TutorialStates {
                                                                         type: 'form',
                                                                         manipulateProps: (props) => ({
                                                                           ...props,
-                                                                          onSubmit: inject(props.onSubmit, () => {
-                                                                            this.changeState(this.selectOperatorNotation_dialog_ok);
-                                                                          })
+                                                                          onSubmit: inject(props.onSubmit, () => this.changeState(this.selectOperatorNotation_dialog_ok))
                                                                         }),
-                                                                        elementAction: this.automateFormSubmission(300),
+                                                                        elementAction: this.automateFormSubmission(2 * defaultDelay),
                                                                         children: [
                                                                           {
                                                                             type: 'input',
@@ -3491,7 +3491,7 @@ class TutorialStates {
                                                 type: Button,
                                                 key: 'ok',
                                                 toolTip: {
-                                                  contents: <p>Since S and T can be inferred automatically, we are done.<br/>After the tutorial, you will be able to experiment with notation.</p>,
+                                                  contents: <p>Since S and T can be inferred automatically, we are done.<br/>After the tutorial is finished, you can go back and experiment with the notation.</p>,
                                                   position: 'bottom',
                                                   index: 0
                                                 },
@@ -3552,7 +3552,7 @@ class TutorialStates {
                                   <p>Finally, you should add some documentation, including references to external material.</p>
                                   <p>At a minimum, please fill the given list of default references where applicable. Links to the corresponding definition/theorem in other theorem provers may become especially valuable in the future.</p>
                                   <p>For convenience, you can click on the "Search" button in the editor toolbar to search the default references for a given term, either one by one or (if your browser allows it) all at once. {this.withTouchWarning ? <>(Unfortunately, the markdown editor including this feature does not work on mobile devices.)</> : null}</p>
-                                  <p>However, in tutorial mode, you can just "submit" your definition.</p>
+                                  <p>However, in tutorial mode, you can skip this step.</p>
                                 </div>
                               ),
                               position: 'top',
@@ -3584,7 +3584,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.tutorialCompleted))
+              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu))
             }),
             elementAction: this.automateClick()
           }
@@ -3593,33 +3593,1662 @@ class TutorialStates {
     ]
   };
 
-  // The end.
+  // Insert operator.
 
-  tutorialCompleted: TutorialState = {
+  insertTheorem_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryTree,
+        toolTip: {
+          contents: <p>Next, we will state a simple theorem about our new definition. Insert it below the definition.</p>,
+          position: 'right',
+          index: 0
+        },
+        children: [
+          {
+            type: InnerLibraryTreeItems,
+            children: [
+              {
+                type: LibraryTreeItem,
+                key: 'Essentials',
+                children: [
+                  {
+                    key: 'display-span',
+                    toolTip: {
+                      contents: <p>Open this section.</p>,
+                      position: 'right',
+                      index: 1,
+                      condition: (component) => !component.state.opened
+                    }
+                  },
+                  {
+                    type: InnerLibraryTreeItems,
+                    children: [
+                      {
+                        type: LibraryTreeItem,
+                        key: 'Functions',
+                        children: [
+                          {
+                            key: 'display-span',
+                            toolTip: {
+                              contents: (component) => component.state.opened ? <p>Scroll down again.</p> : <p>Open this section.</p>,
+                              position: 'right',
+                              index: 1
+                            }
+                          },
+                          {
+                            type: InnerLibraryTreeItems,
+                            children: [
+                              {
+                                type: LibraryTreeInsertionItem,
+                                children: [
+                                  {
+                                    type: MenuButton,
+                                    key: 'insert-button',
+                                    toolTip: {
+                                      contents: <p>Click here to insert a new item.</p>,
+                                      position: 'right',
+                                      index: 2,
+                                      condition: (component) => !component.state.menuOpen
+                                    },
+                                    elementAction: this.automateClick(),
+                                    children: [
+                                      {
+                                        type: Button,
+                                        key: Logic.LogicDefinitionType.Theorem,
+                                        toolTip: {
+                                          contents: <p>Click here to insert a theorem.</p>,
+                                          position: 'right',
+                                          index: 2
+                                        },
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_dialog_name))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertTheorem_dialog_name: TutorialState = {
+    manipulationEntries: [
+      {
+        // Keep previous library tree hierarchy so that library tree is not rebuilt.
+        type: LibraryTree,
+        children: [
+          {
+            type: InnerLibraryTreeItems,
+            children: [
+              {
+                type: LibraryTreeItem,
+                key: 'Essentials',
+                children: [
+                  {
+                    type: InnerLibraryTreeItems,
+                    children: [
+                      {
+                        type: LibraryTreeItem,
+                        key: 'Functions'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: InsertDialog,
+        children: [
+          {
+            type: StandardDialog,
+            children: [
+              {
+                type: 'input',
+                key: 'name',
+                toolTip: {
+                  contents: <p>Enter a name, which can be a sentence like "Simple fact about my definition".</p>,
+                  position: 'top',
+                  index: 0
+                },
+                elementAction: this.automateTextInput('Simple fact about my definition')
+              }
+            ]
+          }
+        ],
+        componentAction: (component) => {
+          if (component.state.name) {
+            this.changeState(this.insertTheorem_dialog_ok);
+          }
+        }
+      }
+    ]
+  };
+
+  insertTheorem_dialog_ok: TutorialState = {
+    manipulationEntries: [
+      {
+        // Keep previous library tree hierarchy so that library tree is not rebuilt.
+        type: LibraryTree,
+        children: [
+          {
+            type: InnerLibraryTreeItems,
+            children: [
+              {
+                type: LibraryTreeItem,
+                key: 'Essentials',
+                children: [
+                  {
+                    type: InnerLibraryTreeItems,
+                    children: [
+                      {
+                        type: LibraryTreeItem,
+                        key: 'Functions'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: InsertDialog,
+        children: [
+          {
+            type: StandardDialog,
+            children: [
+              {
+                // Keep tooltip at name input; otherwise the name input will be recreated while typing.
+                type: 'input',
+                key: 'name',
+                toolTip: {
+                  contents: null,
+                  position: 'top',
+                  index: 0
+                }
+              },
+              {
+                type: Button,
+                key: 'ok',
+                elementAction: this.automateClick()
+              }
+            ]
+          }
+        ],
+        manipulateProps: (props) => ({
+          ...props,
+          onOK: inject(props.onOK, () => this.changeState(this.insertTheoremParameters_f_menu))
+        })
+      }
+    ]
+  };
+
+  // Insert parameter f.
+
+  insertTheoremParameters_f_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 0)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        toolTip: {
+                          contents: <p>Add a parameter that is a function from the set of natural numbers to itself.</p>,
+                          position: 'bottom',
+                          index: 0,
+                          condition: (component) => !component.state.openMenu
+                        },
+                        elementAction: this.automateClick(),
+                        children: [
+                          {
+                            type: ExpressionMenu,
+                            children: [
+                              {
+                                type: ExpressionMenuRow,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: ExpressionMenuItem,
+                                    toolTip: {
+                                      contents: <p>Click here.</p>,
+                                      position: 'right',
+                                      index: 1
+                                    },
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_name))
+                                    }),
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertTheoremParameters_f_name: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('f')
+                                  }
+                                ],
+                                toolTip: {
+                                  contents: <p>Name this parameter "f".</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        componentAction: createContentAction((definition: Fmt.Definition) => {
+          if (definition.parameters[0].name === 'f') {
+            this.changeState(this.insertTheoremParameters_f_set_menu);
+          }
+        })
+      }
+    ]
+  };
+
+  insertTheoremParameters_f_set_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                toolTip: {
+                                  contents: <p>Select the set of functions, which should be in the list of recently used definitions.</p>,
+                                  position: 'bottom',
+                                  index: 0,
+                                  condition: (component) => !component.state.openMenu
+                                },
+                                elementAction: this.automateClick(),
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_set_arg1))
+                                        }),
+                                        children: [
+                                          {
+                                            type: 'div',
+                                            key: 'title',
+                                            elementAction: this.automateHover()
+                                          },
+                                          {
+                                            type: ExpressionMenu,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuRow,
+                                                key: 1,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuItem,
+                                                    elementAction: this.automateClick()
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertTheoremParameters_f_set_arg1: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
+                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Select the set of natural numbers, which should also be in the list of recently used definitions.</p>,
+                                      position: 'bottom',
+                                      index: 0,
+                                      condition: (component) => !component.state.openMenu
+                                    },
+                                    elementAction: this.automateClick(),
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 4,
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_set_arg2))
+                                            }),
+                                            children: [
+                                              {
+                                                type: 'div',
+                                                key: 'title',
+                                                elementAction: this.automateHover()
+                                              },
+                                              {
+                                                type: ExpressionMenu,
+                                                children: [
+                                                  {
+                                                    type: ExpressionMenuRow,
+                                                    key: 1,
+                                                    children: [
+                                                      {
+                                                        type: ExpressionMenuItem,
+                                                        elementAction: this.automateClick()
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertTheoremParameters_f_set_arg2: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
+                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value.path.name === 'Natural numbers')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 1,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                children: [
+                                  {
+                                    type: Expression,
+                                    key: 4,
+                                    toolTip: {
+                                      contents: <p>Same here.</p>,
+                                      position: 'bottom',
+                                      index: 0,
+                                      condition: (component) => !component.state.openMenu
+                                    },
+                                    elementAction: this.automateClick(),
+                                    children: [
+                                      {
+                                        type: ExpressionMenu,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuRow,
+                                            key: 4,
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n_menu))
+                                            }),
+                                            children: [
+                                              {
+                                                type: ExpressionMenuItem,
+                                                elementAction: this.automateClick()
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert parameter n.
+
+  insertTheoremParameters_n_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
+                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
+                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value.path.name === 'Natural numbers'
+                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value instanceof Fmt.CompoundExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value.arguments[0].value.path.name === 'Natural numbers')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            toolTip: {
+                              contents: <p>Insert a natural number "n".</p>,
+                              position: 'bottom',
+                              index: 0,
+                              condition: (component) => !component.state.openMenu
+                            },
+                            elementAction: this.automateClick(),
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n_name))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  insertTheoremParameters_n_name: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
+                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('n')
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        componentAction: createContentAction((definition: Fmt.Definition) => {
+          if (definition.parameters[1].name === 'n') {
+            this.changeState(this.insertTheoremParameters_n_set_menu);
+          }
+        })
+      }
+    ]
+  };
+
+  insertTheoremParameters_n_set_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
+                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 0,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 2,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 5,
+                            children: [
+                              {
+                                type: Expression,
+                                key: 4,
+                                toolTip: {
+                                  contents: <p>Select the set of natural numbers.</p>,
+                                  position: 'bottom',
+                                  index: 1,
+                                  condition: (component) => !component.state.openMenu
+                                },
+                                elementAction: this.automateClick(),
+                                children: [
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 2,
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_menu))
+                                        }),
+                                        children: [
+                                          {
+                                            type: ExpressionMenuItem,
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert equality.
+
+  fillTheoremClaim_equality_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
+                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element
+                                                             && definition.parameters[1].type.expression._set instanceof Fmt.DefinitionRefExpression
+                                                             && definition.parameters[1].type.expression._set.path.name === 'Natural numbers')),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    toolTip: {
+                      contents: <p>Now we need to state the claim of the theorem, which will be an equality.</p>,
+                      position: 'bottom',
+                      index: 0,
+                      condition: (component) => !component.state.openMenu
+                    },
+                    elementAction: this.automateClick(),
+                    children: [
+                      {
+                        type: ExpressionMenu,
+                        children: [
+                          {
+                            type: ExpressionMenuRow,
+                            key: 3,
+                            children: [
+                              {
+                                type: ExpressionMenuRow,
+                                children: [
+                                  {
+                                    type: ExpressionMenuItem,
+                                    key: 0,
+                                    toolTip: {
+                                      contents: <p>Click here.</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    },
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
+                                    }),
+                                    elementAction: this.automateClick()
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select "my definition".
+
+  fillTheoremClaim_equality_arg1_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        toolTip: {
+                          contents: <p>Here, please select the definition you just created, which should be the second item in the list of recently used definitions.</p>,
+                          position: 'bottom',
+                          index: 0,
+                          condition: (component) => !component.state.openMenu
+                        },
+                        elementAction: this.automateClick(),
+                        children: [
+                          {
+                            type: ExpressionMenu,
+                            children: [
+                              {
+                                type: ExpressionMenuRow,
+                                key: 2,
+                                manipulateProps: (props) => ({
+                                  ...props,
+                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg1_menu))
+                                }),
+                                children: [
+                                  {
+                                    type: 'div',
+                                    key: 'title',
+                                    elementAction: this.automateHover()
+                                  },
+                                  {
+                                    type: ExpressionMenu,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        key: 1,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuItem,
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select f.
+
+  fillTheoremClaim_equality_arg1_arg1_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 'preSub',
+                            toolTip: {
+                              contents: <p>Select f here.</p>,
+                              position: 'bottom',
+                              index: 0,
+                              condition: (component) => !component.state.openMenu
+                            },
+                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg1_menu, component.state.openMenu),
+                            elementAction: this.automateClick(),
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuItem,
+                                            key: 0,
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_menu))
+                                            }),
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select identity function.
+
+  fillTheoremClaim_equality_arg1_arg2_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 'body',
+                            toolTip: {
+                              contents: <p>Here, please select the identity function, which is a definition in the library.</p>,
+                              position: 'bottom',
+                              index: 0,
+                              condition: (component) => !component.state.openMenu
+                            },
+                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_menu, component.state.openMenu),
+                            elementAction: this.automateClick(),
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 2,
+                                    children: [
+                                      {
+                                        type: 'div',
+                                        key: 'title',
+                                        elementAction: this.automateClick()
+                                      }
+                                    ],
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
+                                        this.changeState(action instanceof Menu.DialogExpressionMenuAction
+                                                         ? this.fillTheoremClaim_equality_arg1_arg2_dialog_search
+                                                         : this.fillTheoremClaim_equality_arg1_arg3_menu);
+                                      })
+                                    })
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillTheoremClaim_equality_arg1_arg2_dialog_search: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 'body',
+                            children: [
+                              {
+                                type: ExpressionDialog,
+                                children: [
+                                  {
+                                    type: StandardDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: <p>Type "identity".</p>,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                },
+                                                manipulateProps: (props) => ({
+                                                  ...props,
+                                                  onSearch: inject(props.onSearch, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_dialog_select))
+                                                }),
+                                                elementAction: this.automateTextInput('identity')
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  fillTheoremClaim_equality_arg1_arg2_dialog_select: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 'body',
+                            children: [
+                              {
+                                type: ExpressionDialog,
+                                children: [
+                                  {
+                                    type: StandardDialog,
+                                    children: [
+                                      {
+                                        type: ExpressionDialogItem,
+                                        key: 0,
+                                        children: [
+                                          {
+                                            type: LibraryTree,
+                                            children: [
+                                              {
+                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
+                                                type: SearchInput,
+                                                toolTip: {
+                                                  contents: null,
+                                                  position: 'bottom',
+                                                  index: 0
+                                                }
+                                              },
+                                              {
+                                                type: InnerLibraryTreeItems,
+                                                children: [
+                                                  {
+                                                    type: LibraryTreeItem,
+                                                    key: 'Essentials',
+                                                    children: [
+                                                      {
+                                                        type: InnerLibraryTreeItems,
+                                                        children: [
+                                                          {
+                                                            type: LibraryTreeItem,
+                                                            key: 'Functions',
+                                                            children: [
+                                                              {
+                                                                type: InnerLibraryTreeItems,
+                                                                children: [
+                                                                  {
+                                                                    type: LibraryTreeItem,
+                                                                    key: 'identity',
+                                                                    refIndex: 0,
+                                                                    children: [
+                                                                      {
+                                                                        key: 'item',
+                                                                        refConstraint: (refComponents) => (refComponents.length > 0 && !refComponents[0]?.props.selected),
+                                                                        children: [
+                                                                          {
+                                                                            key: 'display-span',
+                                                                            toolTip: {
+                                                                              contents: <p>Click here.</p>,
+                                                                              position: 'right',
+                                                                              index: 1
+                                                                            }
+                                                                          }
+                                                                        ],
+                                                                        elementAction: this.automateClick()
+                                                                      }
+                                                                    ],
+                                                                    componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_dialog_select, component.props.selected)
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        type: Button,
+                                        key: 'ok',
+                                        refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onClick: inject(props.onClick, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3_menu))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select n.
+
+  fillTheoremClaim_equality_arg1_arg3_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        children: [
+                          {
+                            type: Expression,
+                            key: 'body',
+                            toolTip: {
+                              contents: <p>Note how Slate automatically figured out that this can only be the identity function on the natural numbers. Moreover, parentheses are displayed wherever the notation would cause ambiguities.</p>,
+                              position: 'top',
+                              index: 0,
+                              condition: (component) => !component.state.openMenu
+                            }
+                          },
+                          {
+                            type: Expression,
+                            key: 'sup',
+                            toolTip: {
+                              contents: <p>Select n here.</p>,
+                              position: 'bottom',
+                              index: 1,
+                              condition: (component) => !component.state.openMenu
+                            },
+                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg3_menu, component.state.openMenu),
+                            elementAction: this.automateClick(),
+                            children: [
+                              {
+                                type: ExpressionMenu,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuRow,
+                                        children: [
+                                          {
+                                            type: ExpressionMenuItem,
+                                            key: 0,
+                                            manipulateProps: (props) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2_menu))
+                                            }),
+                                            elementAction: this.automateClick()
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // Select f on the right side.
+
+  fillTheoremClaim_equality_arg2_menu: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 4,
+                        toolTip: {
+                          contents: <p>Select f here.</p>,
+                          position: 'bottom',
+                          index: 0,
+                          condition: (component) => !component.state.openMenu
+                        },
+                        componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg2_menu, component.state.openMenu),
+                        elementAction: this.automateClick(),
+                        children: [
+                          {
+                            type: ExpressionMenu,
+                            children: [
+                              {
+                                type: ExpressionMenuRow,
+                                key: 0,
+                                children: [
+                                  {
+                                    type: ExpressionMenuRow,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        key: 0,
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.openSourceCodeView))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // View source to see inferred arguments.
+
+  openSourceCodeView: TutorialState = {
     manipulationEntries: [
       {
         type: 'div',
         key: 'toolbar',
-        toolTip: {
-          contents: (
-            <div className={'large-tooltip'}>
-              <p>Thank you for following the tutorial.</p>
-              <p>As you have seen, Slate is designed to be learned intuitively, by exploring the user interface. As a next step, we recommend taking a look at the contents of the library and making small contributions.</p>
-              <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
-              <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>, where you can always switch to the text editor as a fallback.</p>
-              <div className={'tutorial-tooltip-button-row'}>
-                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
-                  Continue in tutorial mode
-                </Button>
-                <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined)}>
-                  {getButtonIcon(ButtonType.Close)} Exit tutorial
-                </Button>
-              </div>
-            </div>
-          ),
-          position: 'top',
-          index: 0
-        }
+        children: [
+          {
+            type: Button,
+            key: 'view-source',
+            toolTip: {
+              contents: (
+                <div>
+                  <p>Now you have stated your first theorem.</p>
+                  <p>By the way, what about the parameters S and T? To see that they have been inferred automatically, you can take a look at the source code.</p>
+                </div>
+              ),
+              position: 'top',
+              index: 0
+            },
+            manipulateProps: (props) => ({
+              ...props,
+              onClick: inject(props.onClick, () => this.changeState(this.closeSourceCodeView))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
+  };
+
+  closeSourceCodeView: TutorialState = {
+    manipulationEntries: [
+      {
+        type: 'div',
+        key: 'toolbar',
+        children: [
+          {
+            type: Button,
+            key: 'view-source',
+            toolTip: {
+              contents: <p>When you are done, please close the source code view again.</p>,
+              position: 'top',
+              index: 0
+            },
+            manipulateProps: (props) => ({
+              ...props,
+              onClick: inject(props.onClick, () => this.changeState(this.insertProof))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
+  };
+
+  // Insert proof.
+
+  insertProof: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 2,
+                children: [
+                  {
+                    type: Expression,
+                    toolTip: {
+                      contents: (
+                        <div>
+                          <p>Soon, you will be able to prove this theorem, but the user interface for proofs is not finished yet.</p>
+                          <p>Nevertheless, you can already contribute to the library by submitting definitions and theorem statements. In fact, in the beginning, creating a well-organized library will be the biggest challenge, whereas a lot of people can add proofs in parallel later.</p>
+                          <p>So for now, please "submit" the theorem without proof.</p>
+                        </div>
+                      ),
+                      position: 'bottom',
+                      index: 0
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: 'div',
+        key: 'toolbar',
+        children: [
+          {
+            type: Button,
+            key: 'submit',
+            toolTip: {
+              contents: <p>Click here.</p>,
+              position: 'top',
+              index: 1
+            },
+            manipulateProps: (props) => ({
+              ...props,
+              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
+  };
+
+  // Navigate to definition and end tutorial.
+
+  checkDefinition: TutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition.definition.type.expression instanceof FmtHLM.MetaRefExpression_StandardTheorem)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    children: [
+                      {
+                        type: Expression,
+                        key: 0,
+                        toolTip: {
+                          contents: <p>A new visitor will of course not understand this theorem without looking at our definition. But navigating the library is easy. Hover over the word "my" to see a tooltip, and click there to go to the definition.</p>,
+                          position: 'bottom',
+                          index: 0
+                        },
+                        elementAction: this.automateClick()
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: LibraryItem,
+        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition.definition.type.expression instanceof FmtHLM.MetaRefExpression_ExplicitOperator)),
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                children: [
+                  {
+                    type: Expression,
+                    toolTip: {
+                      contents: (
+                        <div className={'large-tooltip'}>
+                          <p>Thank you for following the tutorial.</p>
+                          <p>As you have seen, Slate is designed to be learned intuitively, by exploring the user interface. As a next step, we recommend taking a look at the contents of the library and making small contributions.</p>
+                          <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
+                          <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>, where you can always switch to the text editor as a fallback.</p>
+                          <div className={'tutorial-tooltip-button-row'}>
+                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
+                              Continue in tutorial mode
+                            </Button>
+                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined)}>
+                              {getButtonIcon(ButtonType.Close)} Exit tutorial
+                            </Button>
+                          </div>
+                        </div>
+                      ),
+                      position: 'bottom',
+                      index: 0
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   };

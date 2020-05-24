@@ -58,7 +58,9 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
         }
         let range = new Notation.RowExpression([]);
         range.styleClasses = ['source-code'];
-        if (((object instanceof Fmt.Expression || object instanceof Fmt.Argument || object instanceof Fmt.DocumentationComment) && !tag && !link && !tag && !signature) || (object instanceof Fmt.Definition && signature) || (object instanceof Fmt.DocumentationItem && tag)) {
+        if (((object instanceof Fmt.Expression || object instanceof Fmt.Argument || object instanceof Fmt.DocumentationComment || object instanceof Fmt.DocumentationItem)
+             && !link && !tag && !signature)
+            || (object instanceof Fmt.Definition && signature)) {
           range.semanticLinks = [new Notation.SemanticLink(object, signature, isMathematical)];
         }
         if (object instanceof Fmt.MetaRefExpression && tag) {

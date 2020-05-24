@@ -1123,12 +1123,14 @@ $PlainUniqueExistentialQuantification(parameters: %Expr): %Template {
 }
 
 /**
- * The default notation for an relation-like parameter in HLM.  
+ * The default notation for an relation-like parameter.  
  * Compared to `$Relation`, parameters are displayed with slightly reduced spacing.
  *
  * @param symbol The relation symbol.
  * @param variable The introduced variable(s).
  * @param term The term on the right side of the relation.
+ *
+ * @example `$RelationParameter(variable = a, symbol = ":", term = B)`
  */
 $RelationParameter(variable: %Expr, symbol: %Expr, term: %Expr): %Template {
   notation = $Relation(
@@ -1149,6 +1151,8 @@ $RelationParameter(variable: %Expr, symbol: %Expr, term: %Expr): %Template {
  *
  * @param variable The introduced variable(s).
  * @param set The set that these variables are defined to be members of.
+ *
+ * @example `$ElementParameter(variable = a, set = B)`
  */
 $ElementParameter(variable: %Expr, set: %Expr): %Template {
   notation = $RelationParameter(
@@ -1164,6 +1168,8 @@ $ElementParameter(variable: %Expr, set: %Expr): %Template {
  *
  * @param variable The introduced variable(s).
  * @param superset The set that these variables are defined to be subsets of.
+ *
+ * @example `$SubsetParameter(variable = A, superset = B)`
  */
 $SubsetParameter(variable: %Expr, superset: %Expr): %Template {
   notation = $RelationParameter(
@@ -1178,6 +1184,8 @@ $SubsetParameter(variable: %Expr, superset: %Expr): %Template {
  *
  * @param variable The introduced variable.
  * @param term The term that this variable is defined to be equal to.
+ *
+ * @example `$VariableDefinition(variable = a, term = b)`
  */
 $VariableDefinition(variable: %Expr, term: %Expr): %Template {
   notation = $RelationParameter(

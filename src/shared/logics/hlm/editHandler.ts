@@ -293,7 +293,10 @@ export class HLMEditHandler extends GenericEditHandler {
       {
         let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
           let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList) || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor)) {
+          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
+              || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
+              || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList)
+              || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor && !(fromMRUList && definition.contents instanceof FmtHLM.ObjectContents_Constructor && definition.contents.rewrite))) {
             return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
           } else {
             return undefined;
