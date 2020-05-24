@@ -3,7 +3,7 @@ import './LibraryTree.css';
 import * as Fmt from '../../shared/format/format';
 import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState, LibraryItemNumber } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
@@ -158,7 +158,7 @@ interface InnerLibraryTreeProps extends LibraryTreeProps {
   sectionPromise?: CachedPromise<LibraryDefinition>;
   libraryDefinition?: LibraryDefinition;
   innerDefinitions?: Fmt.Definition[];
-  itemNumber: number[];
+  itemNumber: LibraryItemNumber;
   indent: number;
   searchWords: string[];
 }
@@ -587,10 +587,11 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
         this.triggerFilterStateUpdate(props, props.libraryDefinition, definition);
       }
     } else {
+      let prefetchContents = !needsFiltering;  // Avoid re-filtering due to arrival of prefetched contents.
       if (props.isSubsection) {
-        this.libraryDefinitionPromise = props.libraryDataProvider.fetchSubsection(props.path);
+        this.libraryDefinitionPromise = props.libraryDataProvider.fetchSubsection(props.path, props.itemInfo.itemNumber, prefetchContents);
       } else {
-        this.libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path, false);
+        this.libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path, false, prefetchContents);
       }
       let libraryDefinitionPromise = this.libraryDefinitionPromise;
       libraryDefinitionPromise

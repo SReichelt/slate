@@ -15,7 +15,7 @@ export class GenericUtils {
     if (!path.parentPath && path.name === this.definition.name) {
       return CachedPromise.resolve(this.definition);
     } else {
-      return this.libraryDataAccessor.fetchItem(path, false)
+      return this.libraryDataAccessor.fetchItem(path, false, false)
         .then((definition: LibraryDefinition) => definition.definition);
     }
   }

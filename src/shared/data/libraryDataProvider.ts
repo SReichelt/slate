@@ -1,4 +1,4 @@
-import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber } from './libraryDataAccessor';
+import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber, LibraryItemNumber } from './libraryDataAccessor';
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from './fileAccessor';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
@@ -8,7 +8,7 @@ import * as FmtWriter from '../format/write';
 import * as FmtLibrary from '../logics/library';
 import * as Logic from '../logics/logic';
 
-export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber };
+export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryItemNumber, formatItemNumber };
 
 
 const fileExtension = '.slate';
@@ -82,7 +82,7 @@ interface WatchedFile {
 interface PrefetchQueueItem {
   path: Fmt.Path;
   isSubsection: boolean;
-  itemNumber?: number[];
+  itemNumber?: LibraryItemNumber;
 }
 
 interface CanonicalPathInfo {
@@ -102,7 +102,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
-  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: number[]) {
+  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }
@@ -132,7 +132,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.getProviderForSection(path);
   }
 
-  getProviderForSection(path?: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
+  getProviderForSection(path?: Fmt.PathItem, itemNumber?: LibraryItemNumber): LibraryDataProvider {
     if (!path) {
       return this;
     }
@@ -140,7 +140,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.getProviderForSubsection(path, itemNumber);
   }
 
-  private getProviderForSubsection(path: Fmt.PathItem, itemNumber?: number[]): LibraryDataProvider {
+  private getProviderForSubsection(path: Fmt.PathItem, itemNumber?: LibraryItemNumber): LibraryDataProvider {
     if (path instanceof Fmt.NamedPathItem) {
       let provider = this.subsectionProviderCache.get(path.name);
       if (provider) {
@@ -472,7 +472,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.parent ? indexFileName : this.childName;
   }
 
-  fetchSubsection(path: Fmt.Path, itemNumber?: number[], prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
+  fetchSubsection(path: Fmt.Path, itemNumber?: LibraryItemNumber, prefetchContents: boolean = true): CachedPromise<LibraryDefinition> {
     let provider = this.getProviderForSection(path, itemNumber);
     return provider.fetchLocalSection(prefetchContents);
   }
