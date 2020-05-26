@@ -371,7 +371,7 @@ class TutorialStates {
                 type: 'input',
                 key: 'name',
                 toolTip: {
-                  contents: <p>Enter a name like "my definition".<br/>Among other things, this will be the file name of the new item, so only certain characters are allowed.<br/>Moreover, the naming convention for operators requires the name to start with a lowercase letter.</p>,
+                  contents: <p>Enter a name like "my definition", then hit Enter.<br/>Among other things, this will be the file name of the new item, so only certain characters are allowed.<br/>Moreover, the naming convention for operators requires the name to start with a lowercase letter.</p>,
                   position: 'top',
                   index: 0
                 },
@@ -5253,9 +5253,7 @@ class TutorialStates {
     ]
   };
 
-  experiment: TutorialState = {
-    manipulationEntries: []
-  };
+  experiment: TutorialState = {};
 }
 
 export function startTutorial(onChangeTutorialState: TutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {

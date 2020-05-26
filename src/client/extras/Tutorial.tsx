@@ -178,10 +178,14 @@ function createTutorialManipulator(tutorialState: TutorialState, parentComponent
 }
 
 export interface TutorialState {
-  manipulationEntries: TutorialManipulationEntry[];
+  manipulationEntries?: TutorialManipulationEntry[];
   refComponents?: (React.Component<any, any> | undefined)[];
 }
 
 export function addTutorial(node: React.ReactNode, tutorialState: TutorialState): React.ReactNode {
-  return applyTutorialManipulationEntries(tutorialState, node, undefined, tutorialState.manipulationEntries);
+  if (tutorialState.manipulationEntries) {
+    return applyTutorialManipulationEntries(tutorialState, node, undefined, tutorialState.manipulationEntries);
+  } else {
+    return node;
+  }
 }

@@ -14,11 +14,15 @@ export class DialogBase {
 export interface InsertDialogResult extends DialogResultBase {
   name: string;
   title: string | undefined;
+  position?: number;
 }
 
 export class InsertDialog extends DialogBase {
+  libraryDataProvider: LibraryDataProvider;
+  section?: LibraryDefinition;
   definitionType: Logic.LogicDefinitionTypeDescription | undefined;
   onCheckNameInUse: (name: string) => boolean;
+  templates?: Fmt.File;
 }
 
 export class ExpressionDialog extends DialogBase {

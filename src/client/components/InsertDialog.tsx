@@ -3,6 +3,7 @@ import * as Dialog from '../../shared/notation/dialog';
 import * as Logic from '../../shared/logics/logic';
 import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';
+import { SectionItemList } from './LibraryTree';
 
 interface InsertDialogProps {
   dialog: Dialog.InsertDialog;
@@ -16,6 +17,7 @@ interface InsertDialogState {
   nameError?: Error;
   title: string;
   titleError?: Error;
+  position?: number;
 }
 
 class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState> {
@@ -75,12 +77,24 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         </td>
       </tr>
     );
+    let positionRow: React.ReactNode = null;
+    if (this.props.dialog.section) {
+      let title = this.state.title || this.state.name;
+      titleRow = (
+        <tr className={'dialog-row separated-above separated-below'}>
+          <td className={'dialog-cell dialog-position-list-cell'} colSpan={2}>
+            <SectionItemList libraryDataProvider={this.props.dialog.libraryDataProvider} section={this.props.dialog.section} templates={this.props.dialog.templates} positionSelectionMode={true} newItemType={this.props.dialog.definitionType} newItemTitle={title} newItemPosition={this.state.position} onChangeNewItemPosition={(newPosition) => this.setState({position: newPosition})}/>
+          </td>
+        </tr>
+      );
+    }
     return (
       <StandardDialog onOK={this.onOK} onCancel={this.props.onCancel} okVisible={true} okEnabled={this.state.okEnabled}>
         <table className={'dialog-contents'}>
           <tbody>
             {nameRow}
             {titleRow}
+            {positionRow}
           </tbody>
         </table>
       </StandardDialog>
@@ -177,7 +191,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
     let title = InsertDialog.trimString(this.state.title);
     let result: Dialog.InsertDialogResult = {
       name: InsertDialog.trimString(this.state.name),
-      title: title || undefined
+      title: title || undefined,
+      position: this.state.position
     };
     this.props.onOK(result);
   };

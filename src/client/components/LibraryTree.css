@@ -4,6 +4,14 @@
   position: relative;
 }
 
+.tree-area {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
 .tree-search-area {
   position: absolute;
   left: 0;
@@ -25,12 +33,48 @@
   border-radius: 2px;
 }
 
-.tree-area {
-  position: absolute;
-  left: 0;
-  right: 0;
+.tree-area.tree-area-with-search {
   top: 1.8em;
+}
+
+.tree-button-area {
+  position: absolute;
+  right: 0;
+  top: 0;
   bottom: 0;
+  width: 2em;
+  height: 100%;
+  display: table;
+}
+
+.tree-button-row {
+  display: table-row;
+}
+
+.tree-button-cell {
+  display: table-cell;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.tree-area.tree-area-with-buttons {
+  right: 2em;
+  border: solid 1px var(--dialog-group-border-color);
+}
+
+.tree-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+}
+
+.tree-table-tree-cell {
+  width: 100%;
+  border: solid 1px var(--dialog-group-border-color);
+}
+
+.tree-table-button-cell {
+  padding-left: 1ex;
 }
 
 .tree {
@@ -70,7 +114,7 @@
   color: var(--item-hover-foreground-color);
 }
 
-.tree-item.hoverable.selected {
+.tree-item.selected, .tree-item.hoverable.selected {
   background-color: var(--item-selected-background-color);
   color: var(--item-selected-foreground-color);
 }
@@ -115,6 +159,10 @@
 .tree-item-minor {
   font-size: smaller;
   color: var(--item-minor-foreground-color);
+}
+
+.tree-item-disabled {
+  color: var(--disabled-color)
 }
 
 .button.tree-item-insert-button {

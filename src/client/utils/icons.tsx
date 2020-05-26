@@ -14,9 +14,11 @@ export enum ButtonType {
   ViewSource,
   LogIn,
   LogOut,
+  TableOfContents,
   Insert,
   Remove,
-  TableOfContents
+  Up,
+  Down
 }
 
 function getForegroundColor(color: string, enabled: boolean): string {
@@ -80,6 +82,16 @@ function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true):
       <circle cx="3" cy="0" r="0.75" fill={getMainButtonForegroundColor(enabled)} stroke="none" key="dot3"/>,
       <path d="M 4 -6 Q 6 -6 6 -4 L 6 -2 Q 6 0 8 0 Q 6 0 6 2 L 6 4 Q 6 6 4 6" fill={'none'} stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="right"/>
     ];
+  case ButtonType.TableOfContents:
+    return [
+      <path d="M -7 -7 L -4 -3 L -1 -7 z" fill={getBackgroundColor('#f2cd00', enabled)} stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="arrow1"/>,
+      <line x1="0" y1="-5" x2="7" y2="-5" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="2" key="line1"/>,
+      <path d="M -6 0 L -2 3 L -6 6 z" fill="none" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="arrow2"/>,
+      <line x1="2" y1="-2" x2="7" y2="-2" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line2"/>,
+      <line x1="2" y1="0" x2="7" y2="0" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line3"/>,
+      <line x1="0" y1="3" x2="7" y2="3" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line4"/>,
+      <line x1="0" y1="6" x2="7" y2="6" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line5"/>
+    ];
   case ButtonType.Insert:
     return [
       <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={getBackgroundColor('lime', enabled)} stroke={getForegroundColor('darkgreen', enabled)} strokeWidth="0.5" key="cross"/>
@@ -90,15 +102,13 @@ function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true):
       <line x1="-4" y1="-4" x2="4" y2="4" stroke={getForegroundColor('white', enabled)} strokeWidth="2" key="cross1"/>,
       <line x1="-4" y1="4" x2="4" y2="-4" stroke={getForegroundColor('white', enabled)} strokeWidth="2" key="cross2"/>
     ];
-  case ButtonType.TableOfContents:
+  case ButtonType.Up:
     return [
-      <path d="M -7 -7 L -4 -3 L -1 -7 z" fill={getBackgroundColor('#f2cd00', enabled)} stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="arrow1"/>,
-      <line x1="0" y1="-5" x2="7" y2="-5" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="2" key="line1"/>,
-      <path d="M -6 0 L -2 3 L -6 6 z" fill="none" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="arrow2"/>,
-      <line x1="2" y1="-2" x2="7" y2="-2" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line2"/>,
-      <line x1="2" y1="0" x2="7" y2="0" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line3"/>,
-      <line x1="0" y1="3" x2="7" y2="3" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line4"/>,
-      <line x1="0" y1="6" x2="7" y2="6" stroke={getMainButtonForegroundColor(enabled)} strokeWidth="1" key="line5"/>
+      <path d="M 0 -7 L 7 0 L 3 0 L 3 7 L -3 7 L -3 0 L -7 0 z" fill={getBackgroundColor('blue', enabled)} stroke={getForegroundColor('darkblue', enabled)} strokeWidth="1" key="arrow"/>
+    ];
+  case ButtonType.Down:
+    return [
+      <path d="M 0 7 L 7 0 L 3 0 L 3 -7 L -3 -7 L -3 0 L -7 0 z" fill={getBackgroundColor('blue', enabled)} stroke={getForegroundColor('darkblue', enabled)} strokeWidth="1" key="arrow"/>
     ];
   default:
     return [];

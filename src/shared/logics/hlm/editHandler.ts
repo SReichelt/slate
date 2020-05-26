@@ -792,6 +792,7 @@ export class HLMEditHandler extends GenericEditHandler {
   getConstructorInsertButton(definitions: Fmt.DefinitionList): Notation.RenderedExpression {
     let action = new Menu.DialogExpressionMenuAction(() => {
       let dialog = new Dialog.InsertDialog;
+      dialog.libraryDataProvider = this.libraryDataProvider;
       let definitionType: Logic.LogicDefinitionTypeDescription = {
         definitionType: Logic.LogicDefinitionType.Constructor,
         name: 'Constructor',

@@ -625,10 +625,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let openDialog: React.ReactNode = null;
-    if (this.state.insertDialogLibraryDataProvider) {
+    if (this.state.insertDialogLibraryDataProvider && this.state.insertDialogSection) {
       let dialog = new Dialog.InsertDialog;
+      dialog.libraryDataProvider = this.state.insertDialogLibraryDataProvider;
+      dialog.section = this.state.insertDialogSection;
       dialog.definitionType = this.state.insertDialogDefinitionType;
       dialog.onCheckNameInUse = this.checkNameInUse;
+      dialog.templates = this.state.templates;
       openDialog = (
         <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key="insert-dialog"/>
       );
@@ -675,6 +678,19 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       return false;
     }
+  }
+
+  private navigateToRoot(showStartPage: boolean): void {
+    this.setState({showStartPage: showStartPage});
+    this.navigate({
+      selectedDocURI: undefined,
+      selectedItemAbsolutePath: undefined,
+      selectedItemProvider: undefined,
+      selectedItemLocalPath: undefined,
+      selectedItemDefinition: undefined,
+      selectedItemInfo: undefined,
+      interactionHandler: undefined
+    });
   }
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
@@ -776,9 +792,8 @@ class App extends React.Component<AppProps, AppState> {
     let libraryDataProvider = this.state.insertDialogLibraryDataProvider;
     if (libraryDataProvider) {
       let definitionType = this.state.insertDialogDefinitionType;
-      // TODO position
       if (definitionType) {
-        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined)
+        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
             let localPath = new Fmt.Path;
             localPath.name = result.name;
@@ -814,7 +829,7 @@ class App extends React.Component<AppProps, AppState> {
             this.forceUpdate();
           });
       } else {
-        libraryDataProvider.insertLocalSubsection(result.name, result.title || '')
+        libraryDataProvider.insertLocalSubsection(result.name, result.title || '', result.position)
           .then(this.cancelInsert)
           .catch((error) => {
             this.props.alert.error('Error adding section: ' + error.message);
@@ -925,16 +940,7 @@ class App extends React.Component<AppProps, AppState> {
         libraryDataProvider.cancelEditing(definition);
         this.removeEditedDefinition(definition);
         if (definition.state === LibraryDefinitionState.EditingNew) {
-          this.setState({showStartPage: false});
-          this.navigate({
-            selectedDocURI: undefined,
-            selectedItemAbsolutePath: undefined,
-            selectedItemProvider: undefined,
-            selectedItemLocalPath: undefined,
-            selectedItemDefinition: undefined,
-            selectedItemInfo: undefined,
-            interactionHandler: undefined
-          });
+          this.navigateToRoot(false);
         } else {
           let oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
           this.setState({selectedItemDefinition: oldDefinition});
@@ -1004,19 +1010,23 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startTutorial = (withTouchWarning: boolean): void => {
-    let onChangeTutorialState = (newTutorialState: TutorialState | undefined, additionalStateData?: any) => {
-      if (this.state.tutorialState !== newTutorialState || this.state.tutorialStateAdditionalData !== additionalStateData) {
-        this.setState({
-          tutorialState: newTutorialState,
-          tutorialStateAdditionalData: additionalStateData
-        });
-      }
-    };
-    startTutorial(onChangeTutorialState, this.docLinkClicked, withTouchWarning);
+    startTutorial(this.changeTutorialState, this.docLinkClicked, withTouchWarning);
   };
 
   private endTutorial = (): void => {
     this.setState({tutorialState: undefined});
+  };
+
+  private changeTutorialState = (newTutorialState: TutorialState | undefined, additionalStateData?: any): void => {
+    if (this.state.tutorialState !== newTutorialState || this.state.tutorialStateAdditionalData !== additionalStateData) {
+      this.setState({
+        tutorialState: newTutorialState,
+        tutorialStateAdditionalData: additionalStateData
+      });
+      if (!newTutorialState || !newTutorialState.manipulationEntries) {
+        this.navigateToRoot(true);
+      }
+    }
   };
 }
 

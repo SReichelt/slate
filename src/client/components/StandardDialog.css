@@ -52,15 +52,15 @@
   padding-right: 1em;
 }
 
-.dialog-info-cell {
+.dialog-cell.dialog-info-cell {
+  width: unset;
   min-width: 12em;
   max-width: 17em;
 }
 
-.wide .dialog-info-cell {
+.wide .dialog-cell.dialog-info-cell {
   min-width: 30em;
   max-width: 30em;
-  width: 30em;
 }
 
 .dialog-info-cell .dialog-info-cell>.paragraph {
@@ -119,4 +119,8 @@
 
 .dialog .tree-container {
   height: 20em;
+}
+
+.dialog .dialog-position-list-cell .tree-container {
+  height: 7em;
 }

@@ -477,7 +477,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return provider.fetchLocalSection(prefetchContents);
   }
 
-  insertLocalSubsection(name: string, title: string, insertBefore?: string): CachedPromise<LibraryDefinition> {
+  insertLocalSubsection(name: string, title: string, position?: number): CachedPromise<LibraryDefinition> {
     let localSectionFileName = this.getLocalSectionFileName();
     return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
@@ -487,18 +487,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let newSubsection = new FmtLibrary.MetaRefExpression_subsection;
       newSubsection.ref = newSubsectionRef;
       newSubsection.title = title || '';
-      let insertIndex = undefined;
-      if (insertBefore) {
-        sectionContents.items.map((item: Fmt.Expression, index: number) => {
-          if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
-            insertIndex = index;
-          }
-        });
-      }
-      if (insertIndex === undefined) {
+      if (position === undefined) {
         sectionContents.items.push(newSubsection);
       } else {
-        sectionContents.items.splice(insertIndex, 0, newSubsection);
+        sectionContents.items.splice(position, 0, newSubsection);
       }
       if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
         sectionDefinition.state = LibraryDefinitionState.Editing;
@@ -582,7 +574,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
   }
 
-  insertLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, title: string | undefined, type: string | undefined, insertBefore?: string): CachedPromise<LibraryDefinition> {
+  insertLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, title: string | undefined, type: string | undefined, position?: number): CachedPromise<LibraryDefinition> {
     let itemNumberPromise: CachedPromise<void>;
     if (this.itemNumber) {
       itemNumberPromise = CachedPromise.resolve();
@@ -604,19 +596,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         newItem.ref = newItemRef;
         newItem.title = title;
         newItem.type = type;
-        let insertIndex = undefined;
-        if (insertBefore) {
-          sectionContents.items.map((item: Fmt.Expression, index: number) => {
-            if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) && item.ref instanceof Fmt.DefinitionRefExpression && item.ref.path.name === name) {
-              insertIndex = index;
-            }
-          });
-        }
-        if (insertIndex === undefined) {
-          insertIndex = sectionContents.items.length;
+        if (position === undefined) {
+          position = sectionContents.items.length;
           sectionContents.items.push(newItem);
         } else {
-          sectionContents.items.splice(insertIndex, 0, newItem);
+          sectionContents.items.splice(position, 0, newItem);
         }
         if (sectionDefinition.state === LibraryDefinitionState.Preloaded || sectionDefinition.state === LibraryDefinitionState.Loaded) {
           sectionDefinition.state = LibraryDefinitionState.Editing;
@@ -628,7 +612,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         metaModelPath.name = this.logic.name;
         metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
         this.editedItemInfos.set(name, {
-          itemNumber: [...this.itemNumber!, insertIndex + 1],
+          itemNumber: [...this.itemNumber!, position + 1],
           type: type,
           title: title
         });
