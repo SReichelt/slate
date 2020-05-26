@@ -230,8 +230,10 @@ export class HLMDefinitionChecker {
             let context = placeholderRestriction.context;
             result = result.then(() =>
               this.checkSetCompatibility(placeholder, compatibleSets, context).then((superset: Fmt.Expression) => {
-                placeholderValues.set(placeholder, superset);
-                placeholderCollection.unfilledPlaceholderCount--;
+                if (!(superset instanceof Fmt.PlaceholderExpression)) {
+                  placeholderValues.set(placeholder, superset);
+                  placeholderCollection.unfilledPlaceholderCount--;
+                }
               }));
           }
         }
