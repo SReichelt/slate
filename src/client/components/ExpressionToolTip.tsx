@@ -101,7 +101,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
     }
     return (
       <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow="center" style={ExpressionToolTip.toolTipStyle}>
-        <div className={'tooltip'}>{ExpressionToolTip.currentContents}</div>
+        <div className={'tooltip preview'}>{ExpressionToolTip.currentContents}</div>
       </ToolTip>
     );
   }
@@ -158,7 +158,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
     }
     return (
       <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow="center" group={this.props.group} style={PermanentToolTip.toolTipStyle}>
-        <div className={'tooltip'}>{this.contents}</div>
+        <div className={'tooltip permanent'}>{this.contents}</div>
       </ToolTip>
     );
   }

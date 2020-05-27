@@ -1,5 +1,8 @@
 .tooltip {
   max-width: 30em;
+}
+
+.tooltip.preview {
   max-height: 15em;
   overflow: hidden;
 }
