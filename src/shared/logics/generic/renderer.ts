@@ -16,7 +16,9 @@ export class ArgumentWithInfo {
   constructor(public value: Notation.ExpressionValue, public index: number) {}
 
   static getValue(arg: RenderedTemplateArgument | undefined): Notation.ExpressionValue {
-    if (arg instanceof ArgumentWithInfo) {
+    if (Array.isArray(arg)) {
+      return arg.map((item: RenderedTemplateArgument) => ArgumentWithInfo.getValue(item));
+    } else if (arg instanceof ArgumentWithInfo) {
       return arg.value;
     } else {
       return arg;
