@@ -1,5 +1,7 @@
 .tooltip {
   max-width: 30em;
+  max-height: 15em;
+  overflow: hidden;
 }
 
 .tooltip>a {

@@ -485,7 +485,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       let config: RenderedTemplateConfig = {
         getArgFn: (name: string) => args.get(name),
         isBeforeFn: this.config.isBeforeFn,
-        omitArguments: this.config.omitArguments,
+        omitArguments: isTopLevel ? this.config.omitArguments : 0,
         negationCount: 0,
         forceInnerNegations: 0
       };
