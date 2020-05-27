@@ -1274,7 +1274,7 @@ export class HLMDefinitionChecker {
         }
         return CachedPromise.resolve(firstTerm);
       } else {
-        let checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence && (!context.editData || status.obtainedFinalSets);
+        let checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence;
         let nextSetTermsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         let nextStatus: HLMCheckerCompatibilityStatus = {
           directEquivalenceUnlikely: false,
