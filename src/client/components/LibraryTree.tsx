@@ -636,7 +636,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     }
     if (this.props.isSubsection !== prevProps.isSubsection
         || this.props.libraryDefinition !== prevProps.libraryDefinition
-        || (!this.props.isSubsection && !this.props.libraryDefinition && this.libraryDefinitionPromise && !this.props.libraryDataProvider.isItemUpToDate(this.props.path, this.libraryDefinitionPromise))) {
+        || (!this.props.libraryDefinition && this.libraryDefinitionPromise && !(this.props.isSubsection ? this.props.libraryDataProvider.isSubsectionUpToDate(this.props.path, this.libraryDefinitionPromise) : this.props.libraryDataProvider.isItemUpToDate(this.props.path, this.libraryDefinitionPromise)))) {
       this.updateItem(this.props);
     } else if (this.props.onFilter !== prevProps.onFilter
                || !areSearchWordsEqual(this.props.searchWords, prevProps.searchWords)) {

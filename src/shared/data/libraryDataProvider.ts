@@ -402,8 +402,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       if (this.config.canPreload && !fullContentsRequired) {
         if (isSection) {
           result = this.preloadDefinitions(uri + '.preload', definitionName)
+            .then((preloadedDefinition: LibraryDefinition) => {
+              return preloadedDefinition;
+            })
             .catch((error) => {
-              console.log(error);
               return this.fetchDefinition(name, isSection, definitionName, getMetaModel, true);
             });
           this.preloadedDefinitions.set(name, result);
@@ -572,6 +574,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   isItemUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
     let parentProvider = this.getProviderForSection(path.parentPath);
     return parentProvider.isLocalItemUpToDate(path.name, definitionPromise);
+  }
+
+  isSubsectionUpToDate(path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>): boolean {
+    let provider = this.getProviderForSection(path);
+    return provider.isLocalItemUpToDate(provider.getLocalSectionFileName(), definitionPromise);
   }
 
   insertLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, title: string | undefined, type: string | undefined, position?: number): CachedPromise<LibraryDefinition> {
