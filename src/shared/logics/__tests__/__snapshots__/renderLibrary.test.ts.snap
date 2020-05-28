@@ -2948,7 +2948,7 @@ References.
 exports[`render hlm library: 1.6.1.51.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.1.51.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅]
+  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℕ
 
 Example.
 
@@ -2996,7 +2996,7 @@ No proof."
 exports[`render hlm library: 1.6.1.51.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.1.51.6.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅]
+  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℕ
 
 Example.
 
@@ -4349,7 +4349,7 @@ No proof."
 exports[`render hlm library: 1.6.4.22.1 data/libraries/hlm/Essentials/Numbers/Integer/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.4.22.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅]
+  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℤ
 
 Example.
 
@@ -4365,7 +4365,7 @@ References.
 exports[`render hlm library: 1.6.4.22.2 data/libraries/hlm/Essentials/Numbers/Integer/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.4.22.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅]
+  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℤ
 
 Example.
 
@@ -4722,7 +4722,7 @@ References.
 exports[`render hlm library: 1.6.5.14.1 data/libraries/hlm/Essentials/Numbers/Rational/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.5.14.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅]
+  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℚ
 
 Example.
 
@@ -4738,7 +4738,7 @@ References.
 exports[`render hlm library: 1.6.5.14.2 data/libraries/hlm/Essentials/Numbers/Rational/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.5.14.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅]
+  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℚ
 
 Example.
 
@@ -5151,7 +5151,7 @@ References.
 exports[`render hlm library: 1.6.6.17.1 data/libraries/hlm/Essentials/Numbers/Real/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.6.17.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅]
+  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℝ
 
 Example.
 
@@ -5167,7 +5167,7 @@ References.
 exports[`render hlm library: 1.6.6.17.2 data/libraries/hlm/Essentials/Numbers/Real/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.6.17.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅]
+  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℝ
 
 Example.
 
@@ -5424,7 +5424,7 @@ Well-definedness.  No proof."
 exports[`render hlm library: 1.6.7.14.1 data/libraries/hlm/Essentials/Numbers/Complex/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.6.7.14.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅]
+  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℂ
 
 Example.
 
@@ -5440,7 +5440,7 @@ References.
 exports[`render hlm library: 1.6.7.14.2 data/libraries/hlm/Essentials/Numbers/Complex/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.6.7.14.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅]
+  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℂ
 
 Example.
 
@@ -5683,7 +5683,7 @@ exports[`render hlm library: 2.2.5.1 data/libraries/hlm/Algebra/Pointed%20sets/S
 exports[`render hlm library: 2.2.5.2 data/libraries/hlm/Algebra/Pointed%20sets/Subsets/subset%20as%20pointed%20set 1`] = `
 "Definition 2.2.5.2.  Let 𝐒 be a pointed set, S ⊆ (𝐒) such that S is a pointed subset of 𝐒. We define:
 
-  [S]_𝐒 := [S, base(𝐒)]"
+  [S]_𝐒 := [S, base(𝐒)] is a pointed set"
 `;
 
 exports[`render hlm library: 2.2.5.3 data/libraries/hlm/Algebra/Pointed%20sets/Subsets/pointed%20subset 1`] = `
@@ -5875,7 +5875,7 @@ exports[`render hlm library: 2.3.7.2 data/libraries/hlm/Algebra/Magmas/Submagmas
 
 by:
 
-  [S]_[M,∗] := [S, ∗∣_S]  (M is a set, ∗ : M × M → M is an operation on M)"
+  [S]_[M,∗] := [S, ∗∣_S] is a magma  (M is a set, ∗ : M × M → M is an operation on M)"
 `;
 
 exports[`render hlm library: 2.3.7.3 data/libraries/hlm/Algebra/Magmas/Submagmas/submagma 1`] = `
@@ -5917,7 +5917,7 @@ References.
 exports[`render hlm library: 2.3.8.2 data/libraries/hlm/Algebra/Magmas/Free%20magma/free%20magma 1`] = `
 "Definition 2.3.8.2.  Let S be a set, T := 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S). We define:
 
-  free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)]
+  free_𝓜𝓰𝓶(S) := [T, (T × T → T, (a, b) ↦ a^b)] is a magma
 
 References.
 
@@ -6070,7 +6070,7 @@ exports[`render hlm library: 2.5.3 data/libraries/hlm/Algebra/Monoids/semigroup%
 
 by:
 
-  [S, ∗]_𝓜𝓸𝓷 := [S, ∗, 1_𝐒]  (S is a set, ∗ : S × S → S is an operation on S)"
+  [S, ∗]_𝓜𝓸𝓷 := [S, ∗, 1_𝐒] is a monoid  (S is a set, ∗ : S × S → S is an operation on S)"
 `;
 
 exports[`render hlm library: 2.5.4 data/libraries/hlm/Algebra/Monoids/Carrier 1`] = `
@@ -6240,7 +6240,7 @@ exports[`render hlm library: 2.5.10.2 data/libraries/hlm/Algebra/Monoids/Submono
 
 by:
 
-  [S]_[M,∗,e] := [S, ∗∣_S, e]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
+  [S]_[M,∗,e] := [S, ∗∣_S, e] is a monoid  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
 
 References.
 
@@ -6259,7 +6259,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.5.11.1 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20addition 1`] = `
 "Definition 2.5.11.1.  We define:
 
-  (ℕ, +) := [ℕ, +, 0]
+  (ℕ, +) := [ℕ, +, 0] is a monoid
 
 References.
 
@@ -6270,7 +6270,7 @@ References.
 exports[`render hlm library: 2.5.11.2 data/libraries/hlm/Algebra/Monoids/Examples/natural%20numbers%20with%20multiplication 1`] = `
 "Definition 2.5.11.2.  We define:
 
-  (ℕ, ⋅) := [ℕ, ⋅, 1]
+  (ℕ, ⋅) := [ℕ, ⋅, 1] is a monoid
 
 References.
 
@@ -6336,7 +6336,7 @@ exports[`render hlm library: 2.5.16 data/libraries/hlm/Algebra/Monoids/iterated%
 
 by:
 
-  ∏_[M,∗,e] := [e ∗ ⋅⋅⋅]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
+  ∏_[M,∗,e] := [e ∗ ⋅⋅⋅] is an iterated operation on M  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
 
 Example.
 
@@ -6388,7 +6388,7 @@ exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/monoid%20wi
 
 by:
 
-  [M, ∗, e]_𝓖𝓻𝓹 := [M, ∗, e, (M → M, a ↦ a^-1)]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)"
+  [M, ∗, e]_𝓖𝓻𝓹 := [M, ∗, e, (M → M, a ↦ a^-1)] is a group  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)"
 `;
 
 exports[`render hlm library: 2.6.4 data/libraries/hlm/Algebra/Groups/Carrier 1`] = `
@@ -6621,7 +6621,7 @@ exports[`render hlm library: 2.6.13.2 data/libraries/hlm/Algebra/Groups/Subgroup
 
 by:
 
-  [S]_[G,∗,e,i] := [S, ∗∣_S, e, i∣_S^S]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
+  [S]_[G,∗,e,i] := [S, ∗∣_S, e, i∣_S^S] is a group  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
 
 References.
 
@@ -6693,7 +6693,7 @@ References.
 exports[`render hlm library: 2.6.14.1 data/libraries/hlm/Algebra/Groups/Quotients/quotient%20group 1`] = `
 "Definition 2.6.14.1.  Let 𝐆 be a group, S ⊆ (𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ (𝐆)), Q := (𝐆)∕∼. We define:
 
-  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)]
+  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)] is a group
 
 References.
 
@@ -6707,7 +6707,7 @@ References.
 exports[`render hlm library: 2.6.15.1 data/libraries/hlm/Algebra/Groups/Examples/integers 1`] = `
 "Definition 2.6.15.1.  We define:
 
-  ℤ := [ℤ, +, 0, −]
+  ℤ := [ℤ, +, 0, −] is a group
 
 References.
 
@@ -6731,7 +6731,7 @@ References.
 exports[`render hlm library: 2.6.15.3 data/libraries/hlm/Algebra/Groups/Examples/symmetric%20group 1`] = `
 "Definition 2.6.15.3.  Let X be a set. We define:
 
-  𝑆_X := [X ↔ X, ∘, id_X, ((X ↔ X) → (X ↔ X), f ↦ f^-1)]
+  𝑆_X := [X ↔ X, ∘, id_X, ((X ↔ X) → (X ↔ X), f ↦ f^-1)] is a group
 
 References.
 
@@ -6873,7 +6873,7 @@ exports[`render hlm library: 2.6.17 data/libraries/hlm/Algebra/Groups/iterated%2
 
 by:
 
-  ∏_[G,∗,e,i] := [e ∗ ⋅⋅⋅]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
+  ∏_[G,∗,e,i] := [e ∗ ⋅⋅⋅] is an iterated operation on G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
 
 Example.
 
@@ -6961,7 +6961,7 @@ exports[`render hlm library: 2.7.6 data/libraries/hlm/Algebra/Semirings/additive
 
 by:
 
-  [[R, ⊕, 0, ⊙, 1], +] := [R, ⊕, 0]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)
+  [[R, ⊕, 0, ⊙, 1], +] := [R, ⊕, 0] is a monoid  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)
 
 References.
 
@@ -6995,7 +6995,7 @@ exports[`render hlm library: 2.7.9 data/libraries/hlm/Algebra/Semirings/multipli
 
 by:
 
-  [[R, ⊕, 0, ⊙, 1], ⋅] := [R, ⊙, 1]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)
+  [[R, ⊕, 0, ⊙, 1], ⋅] := [R, ⊙, 1] is a monoid  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)
 
 References.
 
@@ -7116,7 +7116,7 @@ exports[`render hlm library: 2.7.11.2 data/libraries/hlm/Algebra/Semirings/Subse
 
 by:
 
-  [S]_[R,⊕,0,⊙,1] := [S, ⊕∣_S, 0, ⊙∣_S, 1]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)"
+  [S]_[R,⊕,0,⊙,1] := [S, ⊕∣_S, 0, ⊙∣_S, 1] is a semiring  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring)"
 `;
 
 exports[`render hlm library: 2.7.11.3 data/libraries/hlm/Algebra/Semirings/Subsemirings/subsemiring 1`] = `
@@ -7162,7 +7162,7 @@ References.
 exports[`render hlm library: 2.7.14.1 data/libraries/hlm/Algebra/Semirings/Examples/natural%20numbers 1`] = `
 "Definition 2.7.14.1.  We define:
 
-  ℕ := [ℕ, +, 0, ⋅, 1]
+  ℕ := [ℕ, +, 0, ⋅, 1] is a semiring
 
 References.
 
@@ -7312,7 +7312,7 @@ exports[`render hlm library: 2.8.8 data/libraries/hlm/Algebra/Rings/additive%20g
 
 by:
 
-  [[R, ⊕, 0, ⊖, ⊙, 1], +] := [R, ⊕, 0, ⊖]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [[R, ⊕, 0, ⊖, ⊙, 1], +] := [R, ⊕, 0, ⊖] is a group  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -7356,7 +7356,7 @@ exports[`render hlm library: 2.8.12 data/libraries/hlm/Algebra/Rings/multiplicat
 
 by:
 
-  [[R, ⊕, 0, ⊖, ⊙, 1], ⋅] := [R, ⊙, 1]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [[R, ⊕, 0, ⊖, ⊙, 1], ⋅] := [R, ⊙, 1] is a monoid  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -7480,7 +7480,7 @@ exports[`render hlm library: 2.8.14.2 data/libraries/hlm/Algebra/Rings/Subrings/
 
 by:
 
-  [S]_[R,⊕,0,⊖,⊙,1] := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_S, 1]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [S]_[R,⊕,0,⊖,⊙,1] := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_S, 1] is a ring  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -7538,7 +7538,7 @@ exports[`render hlm library: 2.8.18 data/libraries/hlm/Algebra/Rings/unit%20grou
 
 by:
 
-  [[R, ⊕, 0, ⊖, ⊙, 1]^×] := [𝐑^×, ⊙∣_(𝐑^×), 1, (𝐑^× → 𝐑^×, a ↦ a^-1)]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [[R, ⊕, 0, ⊖, ⊙, 1]^×] := [𝐑^×, ⊙∣_(𝐑^×), 1, (𝐑^× → 𝐑^×, a ↦ a^-1)] is a group  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -7633,7 +7633,7 @@ References.
 exports[`render hlm library: 2.8.23.1 data/libraries/hlm/Algebra/Rings/Quotients/quotient%20ring 1`] = `
 "Definition 2.8.23.1.  Let 𝐑 be a ring, I ⊆ (𝐑) such that I is an ideal of 𝐑, ∼ := [∃ s ∈ I : g + s = h]_(g,h ∈ (𝐑)), Q := (𝐑)∕∼. We define:
 
-  𝐑∕I := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g + h]_∼), [0_𝐑]_∼, (Q → Q, [g]_∼ ↦ [−g]_∼), (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g ⋅ h]_∼), [1_𝐑]_∼]
+  𝐑∕I := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g + h]_∼), [0_𝐑]_∼, (Q → Q, [g]_∼ ↦ [−g]_∼), (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g ⋅ h]_∼), [1_𝐑]_∼] is a ring
 
 References.
 
@@ -7647,7 +7647,7 @@ References.
 exports[`render hlm library: 2.8.24.1 data/libraries/hlm/Algebra/Rings/Examples/integers 1`] = `
 "Definition 2.8.24.1.  We define:
 
-  ℤ := [ℤ, +, 0, −, ⋅, 1]
+  ℤ := [ℤ, +, 0, −, ⋅, 1] is a ring
 
 References.
 
@@ -7828,7 +7828,7 @@ by:
 exports[`render hlm library: 2.8.26.11 data/libraries/hlm/Algebra/Rings/Polynomials/polynomial%20ring 1`] = `
 "Definition 2.8.26.11.  Let 𝐑 be a ring, X be a variable. We define:
 
-  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, 1_𝐑]
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅, 1_𝐑] is a ring
 
 References.
 
@@ -8024,7 +8024,7 @@ References.
 exports[`render hlm library: 2.8.28.12 data/libraries/hlm/Algebra/Rings/Matrices/matrix%20ring 1`] = `
 "Definition 2.8.28.12.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
-  𝐑^(n×n) := [𝐑^(n×n), +, 0_(𝐑^(n×n)), −, ⋅, I_(𝐑^(n×n))]
+  𝐑^(n×n) := [𝐑^(n×n), +, 0_(𝐑^(n×n)), −, ⋅, I_(𝐑^(n×n))] is a ring
 
 References.
 
@@ -8136,7 +8136,7 @@ exports[`render hlm library: 2.8.29.1.8 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)
+  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖] is a group  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)
 
 Remarks.
 
@@ -8297,7 +8297,7 @@ exports[`render hlm library: 2.8.29.1.12.2 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_((𝐑)×S)]_𝐑  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)
+  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_((𝐑)×S)]_𝐑 is a left 𝐑-module  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module)
 
 References.
 
@@ -8476,7 +8476,7 @@ exports[`render hlm library: 2.8.29.1.14.1 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(R×I)]_𝐑  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(R×I)]_𝐑 is a left 𝐑-module  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -8488,7 +8488,7 @@ References.
 exports[`render hlm library: 2.8.29.1.14.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/polynomial%20module 1`] = `
 "Definition 2.8.29.1.14.2.  Let 𝐑 be a ring, X be a variable. We define:
 
-  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑 is a left 𝐑-module
 
 References.
 
@@ -8500,7 +8500,7 @@ References.
 exports[`render hlm library: 2.8.29.1.14.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/matrix%20module 1`] = `
 "Definition 2.8.29.1.14.3.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑
+  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑 is a left 𝐑-module
 
 References.
 
@@ -8591,7 +8591,7 @@ exports[`render hlm library: 2.8.29.2.8 data/libraries/hlm/Algebra/Rings/Modules
 
 by:
 
-  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)
+  [[M, ⊕, 0, ⊖, ⊙]_𝐑, +] := [M, ⊕, 0, ⊖] is a group  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)
 
 Remarks.
 
@@ -8743,7 +8743,7 @@ exports[`render hlm library: 2.8.29.2.12.2 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_(S×(𝐑))]_𝐑  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)"
+  [S]_([M,⊕,0,⊖,⊙]_𝐑) := [S, ⊕∣_S, 0, ⊖∣_S^S, ⊙∣_(S×(𝐑))]_𝐑 is a right 𝐑-module  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module)"
 `;
 
 exports[`render hlm library: 2.8.29.2.12.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Submodules/submodule 1`] = `
@@ -8905,7 +8905,7 @@ exports[`render hlm library: 2.8.29.2.14.1 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(I×R)]_𝐑  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
+  [I]_[R,⊕,0,⊖,⊙,1] := [I, ⊕∣_I, 0, ⊖∣_I^I, ⊙∣_(I×R)]_𝐑 is a right 𝐑-module  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring)
 
 References.
 
@@ -8916,7 +8916,7 @@ References.
 exports[`render hlm library: 2.8.29.2.14.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Examples/polynomial%20module 1`] = `
 "Definition 2.8.29.2.14.2.  Let 𝐑 be a ring, X be a variable. We define:
 
-  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑
+  𝐑[X] := [𝐑[X], +, (0)_(𝐑[X]), −, ⋅]_𝐑 is a right 𝐑-module
 
 References.
 
@@ -8927,7 +8927,7 @@ References.
 exports[`render hlm library: 2.8.29.2.14.3 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Examples/matrix%20module 1`] = `
 "Definition 2.8.29.2.14.3.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑"
+  𝐑^(m×n) := [𝐑^(m×n), +, 0_(𝐑^(m×n)), −, ⋅]_𝐑 is a right 𝐑-module"
 `;
 
 exports[`render hlm library: 2.9.1 data/libraries/hlm/Algebra/Fields/Fields 1`] = `
@@ -8972,7 +8972,7 @@ References.
 exports[`render hlm library: 2.9.4.1 data/libraries/hlm/Algebra/Fields/Examples/rational%20numbers 1`] = `
 "Definition 2.9.4.1.  We define:
 
-  ℚ := [ℚ, +, 0, −, ⋅, 1]
+  ℚ := [ℚ, +, 0, −, ⋅, 1] is a ring
 
 References.
 
@@ -8982,7 +8982,7 @@ References.
 exports[`render hlm library: 2.9.4.2 data/libraries/hlm/Algebra/Fields/Examples/real%20numbers 1`] = `
 "Definition 2.9.4.2.  We define:
 
-  ℝ := [ℝ, +, 0, −, ⋅, 1]
+  ℝ := [ℝ, +, 0, −, ⋅, 1] is a ring
 
 References.
 
@@ -8992,7 +8992,7 @@ References.
 exports[`render hlm library: 2.9.4.3 data/libraries/hlm/Algebra/Fields/Examples/complex%20numbers 1`] = `
 "Definition 2.9.4.3.  We define:
 
-  ℂ := [ℂ, +, 0, −, ⋅, 1]
+  ℂ := [ℂ, +, 0, −, ⋅, 1] is a ring
 
 References.
 
@@ -9345,7 +9345,7 @@ References.
 exports[`render hlm library: 4.9.1 data/libraries/hlm/Category%20theory/Concrete%20categories/elements 1`] = `
 "Definition 4.9.1.  Let u ∈ ℕ, S be a set. We define:
 
-  𝐃𝐢𝐬_u(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_u
+  𝐃𝐢𝐬_u(S) := [S, ({a} ∩ {b})_(a,b ∈ S), (c)_(c ∈ S), (({e} ∩ {f}) × ({d} ∩ {e}) → ({d} ∩ {f}), x ↦ e)_(d,e,f ∈ S)]_u is a/an u-small category
 
 Remarks.
 
@@ -9364,7 +9364,7 @@ References.
 exports[`render hlm library: 4.9.2 data/libraries/hlm/Category%20theory/Concrete%20categories/cardinals 1`] = `
 "Definition 4.9.2.  Let u ∈ ℕ. We define:
 
-  𝐒𝐞𝐭_u := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_u
+  𝐒𝐞𝐭_u := [𝓒𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓒𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓒𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓒𝓻𝓭)]_u is a/an u-small category
 
 Remarks.
 
@@ -9381,7 +9381,7 @@ References.
 exports[`render hlm library: 4.9.3 data/libraries/hlm/Category%20theory/Concrete%20categories/ordinals 1`] = `
 "Definition 4.9.3.  Let u ∈ ℕ. We define:
 
-  𝐖𝐨𝐬𝐞𝐭_u := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_u
+  𝐖𝐨𝐬𝐞𝐭_u := [𝓞𝓻𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓞𝓻𝓭), (id_𝐂)_(𝐂 ∈ 𝓞𝓻𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓞𝓻𝓭)]_u is a/an u-small category
 
 Remarks.
 
@@ -9391,7 +9391,7 @@ The objects of this category are actually isomorphism classes of well-ordered se
 exports[`render hlm library: 4.9.4 data/libraries/hlm/Category%20theory/Concrete%20categories/pointed%20sets 1`] = `
 "Definition 4.9.4.  Let u ∈ ℕ. We define:
 
-  𝐏𝐭𝐒𝐞𝐭_u := [𝓟𝓽𝓢𝓮𝓽, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓟𝓽𝓢𝓮𝓽), (id_𝐂)_(𝐂 ∈ 𝓟𝓽𝓢𝓮𝓽), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓟𝓽𝓢𝓮𝓽)]_u
+  𝐏𝐭𝐒𝐞𝐭_u := [𝓟𝓽𝓢𝓮𝓽, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓟𝓽𝓢𝓮𝓽), (id_𝐂)_(𝐂 ∈ 𝓟𝓽𝓢𝓮𝓽), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓟𝓽𝓢𝓮𝓽)]_u is a/an u-small category
 
 Remarks.
 
@@ -9407,7 +9407,7 @@ References.
 exports[`render hlm library: 4.9.5 data/libraries/hlm/Category%20theory/Concrete%20categories/magmas 1`] = `
 "Definition 4.9.5.  Let u ∈ ℕ. We define:
 
-  𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u
+  𝐌𝐚𝐠_u := [𝓜𝓪𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓪𝓰), (id_𝐂)_(𝐂 ∈ 𝓜𝓪𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓪𝓰)]_u is a/an u-small category
 
 Remarks.
 
@@ -9421,7 +9421,7 @@ References.
 exports[`render hlm library: 4.9.6 data/libraries/hlm/Category%20theory/Concrete%20categories/semigroups 1`] = `
 "Definition 4.9.6.  Let u ∈ ℕ. We define:
 
-  𝐒𝐞𝐦𝐢𝐆𝐫𝐩_u := [𝓢𝓮𝓶𝓲𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹)]_u
+  𝐒𝐞𝐦𝐢𝐆𝐫𝐩_u := [𝓢𝓮𝓶𝓲𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓖𝓻𝓹)]_u is a/an u-small category
 
 Remarks.
 
@@ -9431,7 +9431,7 @@ The objects of this category are actually isomorphism classes of semigroups."
 exports[`render hlm library: 4.9.7 data/libraries/hlm/Category%20theory/Concrete%20categories/monoids 1`] = `
 "Definition 4.9.7.  Let u ∈ ℕ. We define:
 
-  𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u
+  𝐌𝐨𝐧_u := [𝓜𝓸𝓷, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓜𝓸𝓷), (id_𝐂)_(𝐂 ∈ 𝓜𝓸𝓷), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓜𝓸𝓷)]_u is a/an u-small category
 
 Remarks.
 
@@ -9446,7 +9446,7 @@ References.
 exports[`render hlm library: 4.9.8 data/libraries/hlm/Category%20theory/Concrete%20categories/groups 1`] = `
 "Definition 4.9.8.  Let u ∈ ℕ. We define:
 
-  𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u
+  𝐆𝐫𝐩_u := [𝓖𝓻𝓹, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓖𝓻𝓹), (id_𝐂)_(𝐂 ∈ 𝓖𝓻𝓹), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓖𝓻𝓹)]_u is a/an u-small category
 
 Remarks.
 
@@ -9463,7 +9463,7 @@ References.
 exports[`render hlm library: 4.9.9 data/libraries/hlm/Category%20theory/Concrete%20categories/semirings 1`] = `
 "Definition 4.9.9.  Let u ∈ ℕ. We define:
 
-  𝐒𝐞𝐦𝐢𝐑𝐢𝐧𝐠_u := [𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰)]_u
+  𝐒𝐞𝐦𝐢𝐑𝐢𝐧𝐠_u := [𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰)]_u is a/an u-small category
 
 Remarks.
 
@@ -9473,7 +9473,7 @@ The objects of this category are actually isomorphism classes of semirings."
 exports[`render hlm library: 4.9.10 data/libraries/hlm/Category%20theory/Concrete%20categories/rings 1`] = `
 "Definition 4.9.10.  Let u ∈ ℕ. We define:
 
-  𝐑𝐢𝐧𝐠_u := [𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓲𝓷𝓰)]_u
+  𝐑𝐢𝐧𝐠_u := [𝓡𝓲𝓷𝓰, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓲𝓷𝓰), (id_𝐂)_(𝐂 ∈ 𝓡𝓲𝓷𝓰), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓲𝓷𝓰)]_u is a/an u-small category
 
 Remarks.
 
@@ -9488,7 +9488,7 @@ References.
 exports[`render hlm library: 4.9.11 data/libraries/hlm/Category%20theory/Concrete%20categories/left%20modules 1`] = `
 "Definition 4.9.11.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
-  𝐋𝐌𝐨𝐝_u(𝐑) := [𝓛𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓛𝓜𝓸𝓭(𝐑))]_u
+  𝐋𝐌𝐨𝐝_u(𝐑) := [𝓛𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓛𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓛𝓜𝓸𝓭(𝐑))]_u is a/an u-small category
 
 Remarks.
 
@@ -9505,7 +9505,7 @@ References.
 exports[`render hlm library: 4.9.12 data/libraries/hlm/Category%20theory/Concrete%20categories/right%20modules 1`] = `
 "Definition 4.9.12.  Let u ∈ ℕ, 𝐑 be a ring. We define:
 
-  𝐑𝐌𝐨𝐝_u(𝐑) := [𝓡𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓜𝓸𝓭(𝐑))]_u
+  𝐑𝐌𝐨𝐝_u(𝐑) := [𝓡𝓜𝓸𝓭(𝐑), (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (id_𝐂)_(𝐂 ∈ 𝓡𝓜𝓸𝓭(𝐑)), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓡𝓜𝓸𝓭(𝐑))]_u is a/an u-small category
 
 Remarks.
 
@@ -9521,7 +9521,7 @@ References.
 exports[`render hlm library: 4.9.13 data/libraries/hlm/Category%20theory/Concrete%20categories/fields 1`] = `
 "Definition 4.9.13.  Let u ∈ ℕ. We define:
 
-  𝐅𝐥𝐝_u := [𝓕𝓵𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓕𝓵𝓭), (id_𝐂)_(𝐂 ∈ 𝓕𝓵𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓕𝓵𝓭)]_u
+  𝐅𝐥𝐝_u := [𝓕𝓵𝓭, (Hom(𝐀, 𝐁))_(𝐀,𝐁 ∈ 𝓕𝓵𝓭), (id_𝐂)_(𝐂 ∈ 𝓕𝓵𝓭), (∘)_(𝐃,𝐄,𝐅 ∈ 𝓕𝓵𝓭)]_u is a/an u-small category
 
 Remarks.
 
@@ -9536,7 +9536,7 @@ References.
 exports[`render hlm library: 4.9.14 data/libraries/hlm/Category%20theory/Concrete%20categories/categories 1`] = `
 "Definition 4.9.14.  Let u ∈ ℕ. We define:
 
-  𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (Fun(𝓐, 𝓑))_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1)
+  𝐂𝐚𝐭(u) := [𝓒𝓪𝓽_u, (Fun(𝓐, 𝓑))_(𝓐,𝓑 ∈ 𝓒𝓪𝓽_u), (id_𝓒)_(𝓒 ∈ 𝓒𝓪𝓽_u), (∘)_(𝓓,𝓔,𝓕 ∈ 𝓒𝓪𝓽_u)]_(u+1) is a/an (u + 1)-small category
 
 Remarks.
 
@@ -9553,7 +9553,7 @@ References.
 exports[`render hlm library: 4.9.15 data/libraries/hlm/Category%20theory/Concrete%20categories/functors 1`] = `
 "Definition 4.9.15.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
-  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(max(u,v)+1)
+  𝐅𝐮𝐧(𝓒, 𝓓) := [Fun(𝓒, 𝓓), (Nat(A, B))_(A,B ∈ Fun(𝓒,𝓓)), (id_C)_(C ∈ Fun(𝓒,𝓓)), (∘)_(D,E,F ∈ Fun(𝓒,𝓓))]_(max(u,v)+1) is a/an (max(u, v) + 1)-small category
 
 References.
 

@@ -708,36 +708,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (combineWithNext) {
           state.inDefinitionNotationGroup = true;
         } else {
-          if (parameters.length === 1 && !state.inDefinitionNotationGroup) {
-            let singularStart = singular[0];
-            for (;;) {
-              if (singularStart instanceof Notation.RowExpression && singularStart.items.length) {
-                singularStart = singularStart.items[0];
-              } else if (singularStart instanceof Notation.IndirectExpression) {
-                singularStart = singularStart.resolve();
-              } else {
-                break;
-              }
-            }
-            if (!noun.article) {
-              noun.article = this.getSingularArticle(singularStart instanceof Notation.TextExpression ? singularStart.text : undefined);
-            }
-            if (state.sentence) {
-              row.push(new Notation.TextExpression(` be ${noun.article} `));
-              row.push(...singular);
-            } else {
-              row.push(new Notation.TextExpression(` is ${noun.article} `));
-              row.push(...singular);
-            }
-          } else {
-            if (state.sentence) {
-              row.push(new Notation.TextExpression(' be '));
-              row.push(...plural);
-            } else {
-              row.push(new Notation.TextExpression(' are '));
-              row.push(...plural);
-            }
-          }
+          let isPlural = parameters.length > 1 || state.inDefinitionNotationGroup;
+          this.addNounDefinition(isPlural ? plural : singular, noun.article, isPlural, state.sentence, row);
           state.inDefinitionNotationGroup = false;
         }
       }
@@ -810,6 +782,39 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         result[0] = newName;
       } else {
         result.push(newName);
+      }
+    }
+  }
+
+  private addNounDefinition(noun: Notation.RenderedExpression[], article: string | undefined, isPlural: boolean, isLetExpression: boolean, row: Notation.RenderedExpression[]): void {
+    if (isPlural) {
+      if (isLetExpression) {
+        row.push(new Notation.TextExpression(' be '));
+        row.push(...noun);
+      } else {
+        row.push(new Notation.TextExpression(' are '));
+        row.push(...noun);
+      }
+    } else {
+      let nounStart = noun[0];
+      for (;;) {
+        if (nounStart instanceof Notation.RowExpression && nounStart.items.length) {
+          nounStart = nounStart.items[0];
+        } else if (nounStart instanceof Notation.IndirectExpression) {
+          nounStart = nounStart.resolve();
+        } else {
+          break;
+        }
+      }
+      if (!article) {
+        article = this.getSingularArticle(nounStart instanceof Notation.TextExpression ? nounStart.text : undefined);
+      }
+      if (isLetExpression) {
+        row.push(new Notation.TextExpression(` be ${article} `));
+        row.push(...noun);
+      } else {
+        row.push(new Notation.TextExpression(` is ${article} `));
+        row.push(...noun);
       }
     }
   }
@@ -1785,27 +1790,40 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (expression instanceof Fmt.DefinitionRefExpression) {
           let definitionRef = expression;
           let promise = this.utils.getOuterDefinition(definitionRef)
-            .then((definition: Fmt.Definition) => {
+            .then((outerDefinition: Fmt.Definition) => {
               let definitions: Fmt.Definition[] = [];
               let argumentLists: Fmt.ArgumentList[] = [];
-              this.utils.analyzeDefinitionRef(definitionRef, definition, definitions, argumentLists);
+              this.utils.analyzeDefinitionRef(definitionRef, outerDefinition, definitions, argumentLists);
               let innerDefinition = definitions[definitions.length - 1];
               if (innerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
-                let definitionNotation = innerDefinition.contents.definitionNotation;
-                if (definitionNotation) {
+                let innerDefinitionNotation = innerDefinition.contents.definitionNotation;
+                if (innerDefinitionNotation) {
                   let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
                   this.renderUtils.fillVariableOverridesFromExtractedCase(currentCase, elementParameterOverrides);
                   let parameterOverrides: ParameterOverrides = {elementParameterOverrides: elementParameterOverrides};
                   let args = this.getRenderedTemplateArguments(definitions, argumentLists, parameterOverrides);
-                  args[definitionNotation.parameter.name] = renderLeftSide(elementParameterOverrides);
-                  if (definitionNotation.notation) {
-                    let result = this.renderNotationExpression(definitionNotation.notation, args);
+                  args[innerDefinitionNotation.parameter.name] = renderLeftSide(elementParameterOverrides);
+                  if (innerDefinitionNotation.notation) {
+                    let result = this.renderNotationExpression(innerDefinitionNotation.notation, args);
                     this.addSemanticLink(result, definitionRef);
                     if (this.editHandler) {
                       let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
                       result = new Notation.ParagraphExpression([result, insertButton]);
                     }
                     return result;
+                  }
+                } else if (outerDefinition !== innerDefinition && outerDefinition.contents instanceof FmtHLM.ObjectContents_Definition) {
+                  let outerDefinitionNotation = outerDefinition.contents.definitionNotation;
+                  if (outerDefinitionNotation && outerDefinitionNotation.singularName && !(outerDefinitionNotation.nameOptional instanceof FmtNotation.MetaRefExpression_true)) {
+                    let singular: Notation.RenderedExpression[] = [];
+                    let args = this.getRenderedTemplateArguments(definitions, argumentLists);
+                    this.applyName(outerDefinitionNotation.singularName, args, definitionRef, singular);
+                    let renderRightSideOrig = renderRightSide;
+                    renderRightSide = (rightSideExpression: Fmt.Expression) => {
+                      let row = [renderRightSideOrig(rightSideExpression)];
+                      this.addNounDefinition(singular, undefined, false, false, row);
+                      return new Notation.RowExpression(row);
+                    };
                   }
                 }
               }
