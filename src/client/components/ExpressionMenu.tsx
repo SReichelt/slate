@@ -57,6 +57,9 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
             separated = true;
           }
         } else {
+          if (separated) {
+            rows.push(<tr className={'open-menu-row'}><td className={'open-menu-separator'} colSpan={2}/></tr>);
+          }
           let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
           let hoveredExternally = this.props.hoveredExternally && index === 0;
           let subMenuOpen = (this.state.openSubMenu === row);
@@ -64,7 +67,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
           if (row instanceof Menu.StandardExpressionMenuRow && row.title instanceof Notation.TextExpression) {
             key = row.title.text;
           }
-          rows.push(<ExpressionMenuRow row={row} separated={separated} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler} key={key}/>);
+          rows.push(<ExpressionMenuRow row={row} onItemClicked={this.props.onItemClicked} onEnter={onEnter} hoveredExternally={hoveredExternally} subMenuOpen={subMenuOpen} interactionHandler={this.props.interactionHandler} key={key}/>);
           index++;
           separated = false;
         }
@@ -100,7 +103,6 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
 
 interface ExpressionMenuRowProps {
   row: Menu.ExpressionMenuRow;
-  separated: boolean;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
   onEnter?: (openSubMenu?: boolean) => void;
   onLeave?: () => void;
@@ -212,7 +214,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
                 <td className={'open-menu-content-cell'} key="content">
                   <table className={'open-menu-content-cell-table'}>
                     <tbody>
-                      <ExpressionMenuRow row={subMenuMainRow} separated={false} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} embedded={true} interactionHandler={this.props.interactionHandler}/>
+                      <ExpressionMenuRow row={subMenuMainRow} onItemClicked={this.props.onItemClicked} onEnter={onEnter} onLeave={onLeave} embedded={true} interactionHandler={this.props.interactionHandler}/>
                     </tbody>
                   </table>
                 </td>
@@ -334,12 +336,6 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
     }
 
     let className = 'open-menu-row';
-    if (this.props.separated) {
-      className += ' separated';
-    }
-    if (row.extraSpace) {
-      className += ' extra-space';
-    }
 
     let resultPromise = cellsPromise.then((cells: React.ReactNode) => {
       if (cells) {

@@ -53,7 +53,8 @@
   --item-minor-foreground-color: var(--light-foreground-color);
   --item-separator-color: var(--light-foreground-color);
   --menu-foreground-color: var(--vscode-editorWidget-foreground);
-  --menu-background-color: var(--vscode-editorWidget-background);
+  --menu-background-color: var(--vscode-peekViewEditor-background);
+  --menu-title-background-color: var(--vscode-editorWidget-background);
   --menu-border-color: var(--vscode-dropdown-border);
   --menu-separator-color: var(--vscode-editorGroup-border);
   --menu-hover-foreground-color: var(--vscode-menu-selectionForeground);

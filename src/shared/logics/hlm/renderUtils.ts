@@ -74,21 +74,8 @@ export class HLMRenderUtils extends GenericRenderUtils {
               && currentCaseDefinition.term instanceof Fmt.VariableRefExpression
               && !currentCaseDefinition.term.indices) {
             let currentParameter = currentCaseDefinition.term.variable;
-            let currentParameterIndex = parameters.indexOf(currentParameter);
-            let currentParameterStructuralCase: FmtHLM.ObjectContents_StructuralCase | undefined = undefined;
-            if (currentParameterIndex < 0 && currentCase.structuralCases) {
-              for (let structuralCase of currentCase.structuralCases) {
-                if (structuralCase.parameters) {
-                  currentParameterIndex = structuralCase.parameters.indexOf(currentParameter);
-                  if (currentParameterIndex >= 0) {
-                    currentParameterStructuralCase = structuralCase;
-                    break;
-                  }
-                }
-              }
-            }
-            let currentParameterType = currentParameter.type.expression;
-            if (currentParameterIndex >= 0 && currentParameterType instanceof FmtHLM.MetaRefExpression_Element && !currentParameterType.auto) {
+            let currentParameterStructuralCase = this.findExtractableInductionParameterOrigin(currentParameter, parameters, currentCase.structuralCases);
+            if (currentParameterStructuralCase !== undefined && this.mayExtractStructuralCases(currentParameter, currentCaseDefinition.cases)) {
               let affectedParameters = currentCase.affectedParameters ? [currentParameter, ...currentCase.affectedParameters] : [currentParameter];
               let constructions = currentCase.constructions ? [currentCaseDefinition.construction, ...currentCase.constructions] : [currentCaseDefinition.construction];
               let previousStructuralCases = currentCase.structuralCases || [];
@@ -124,9 +111,37 @@ export class HLMRenderUtils extends GenericRenderUtils {
     return cases;
   }
 
+  private findExtractableInductionParameterOrigin(param: Fmt.Parameter, parameters: Fmt.Parameter[], parentCases: FmtHLM.ObjectContents_StructuralCase[] | undefined): FmtHLM.ObjectContents_StructuralCase | null | undefined {
+    let type = param.type.expression;
+    if (!(type instanceof FmtHLM.MetaRefExpression_Element) || type.auto) {
+      return undefined;
+    }
+    if (parameters.indexOf(param) >= 0) {
+      return null;
+    }
+    if (parentCases) {
+      for (let parentCase of parentCases) {
+        if (parentCase.parameters) {
+          if (parentCase.parameters.indexOf(param) >= 0) {
+            return parentCase;
+          }
+        }
+      }
+    }
+    return undefined;
+  }
+
+  private mayExtractStructuralCases(param: Fmt.Parameter, cases: FmtHLM.ObjectContents_StructuralCase[]): boolean {
+    for (let structuralCase of cases) {
+      if (this.utils.referencesParameter(structuralCase.value, param)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   convertStructuralCaseToOverride(parameters: Fmt.Parameter[], expression: Fmt.Expression, elementParameterOverrides: ElementParameterOverrides): Fmt.Expression {
-    let allowedParameters = parameters.filter((parameter) => parameter.name.startsWith('_'));
-    let cases = this.doExtractStructuralCases(allowedParameters, [expression], false);
+    let cases = this.doExtractStructuralCases(parameters, [expression], false);
     if (cases.length === 1) {
       let extractedCase = cases[0];
       if (this.fillVariableOverridesFromExtractedCase(extractedCase, elementParameterOverrides, true)) {
@@ -159,45 +174,42 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], bindingArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {
-    let allowedParameters = parameters.filter((param) => param.name.startsWith('_'));
-    if (allowedParameters.length) {
-      let newBindingArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      let changed = false;
-      for (let bindingArg of bindingArgumentList) {
-        if (bindingArg.value instanceof Fmt.CompoundExpression && bindingArg.value.arguments.length) {
-          let expression = bindingArg.value.arguments[0].value;
-          if (expression instanceof Fmt.ParameterExpression) {
-            // Looks like a nested binding argument; recurse into it.
-            if (bindingArg.value.arguments.length > 1) {
-              let nestedArgumentsExpression = bindingArg.value.arguments[1].value;
-              if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
-                let allParameters: Fmt.Parameter[] = [];
-                allParameters.push(...allowedParameters);
-                allParameters.push(...expression.parameters);
-                let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
-                if (newNestedArguments !== nestedArgumentsExpression.arguments) {
-                  bindingArg = bindingArg.clone();
-                  (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = expression;
-                  ((bindingArg.value as Fmt.CompoundExpression).arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
-                  changed = true;
-                }
+    let newBindingArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+    let changed = false;
+    for (let bindingArg of bindingArgumentList) {
+      if (bindingArg.value instanceof Fmt.CompoundExpression && bindingArg.value.arguments.length) {
+        let expression = bindingArg.value.arguments[0].value;
+        if (expression instanceof Fmt.ParameterExpression) {
+          // Looks like a nested binding argument; recurse into it.
+          if (bindingArg.value.arguments.length > 1) {
+            let nestedArgumentsExpression = bindingArg.value.arguments[1].value;
+            if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
+              let allParameters: Fmt.Parameter[] = [];
+              allParameters.push(...parameters);
+              allParameters.push(...expression.parameters);
+              let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
+              if (newNestedArguments !== nestedArgumentsExpression.arguments) {
+                bindingArg = bindingArg.clone();
+                (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = expression;
+                ((bindingArg.value as Fmt.CompoundExpression).arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
+                changed = true;
               }
             }
-          } else {
-            // We expect this to be a regular argument.
-            let newExpression = this.convertStructuralCaseToOverride(allowedParameters, expression, elementParameterOverrides);
-            if (newExpression !== expression) {
-              bindingArg = bindingArg.clone();
-              (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = newExpression;
-              changed = true;
-            }
+          }
+        } else {
+          // We expect this to be a regular argument.
+          let newExpression = this.convertStructuralCaseToOverride(parameters, expression, elementParameterOverrides);
+          if (newExpression !== expression) {
+            bindingArg = bindingArg.clone();
+            (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = newExpression;
+            changed = true;
           }
         }
-        newBindingArgumentList.push(bindingArg);
       }
-      if (changed) {
-        return newBindingArgumentList;
-      }
+      newBindingArgumentList.push(bindingArg);
+    }
+    if (changed) {
+      return newBindingArgumentList;
     }
     return bindingArgumentList;
   }

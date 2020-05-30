@@ -61,3 +61,6 @@ I.e.: What should be done differently in the presence of isomorphism=equality?
 ## HoTT
 
 ## Similar situation in e.g. Lean
+
+* Similar set of provable statements.
+* "isomorphism <=> equality" for particular structures may actually be consistent with Lean.

@@ -58,6 +58,7 @@
   --item-separator-color: var(--light-foreground-color);
   --menu-foreground-color: black;
   --menu-background-color: #f8f8f8;
+  --menu-title-background-color: #f2f2f2;
   --menu-border-color: #a0a0a0;
   --menu-separator-color: #e0e0e0;
   --menu-hover-foreground-color: var(--menu-foreground-color);

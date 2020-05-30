@@ -100,6 +100,26 @@ export class HLMDefinitionChecker {
   constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private supportPlaceholders: boolean, private supportRechecking: boolean) {}
 
   checkDefinition(): CachedPromise<Logic.LogicCheckResult> {
+    return this.check(() => this.checkRootDefinition());
+  }
+
+  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType): CachedPromise<Logic.LogicCheckResult> {
+    return this.check(() => {
+      switch (expressionType) {
+      case HLMExpressionType.SetTerm:
+        this.checkSetTerm(expression, this.rootContext);
+        break;
+      case HLMExpressionType.ElementTerm:
+        this.checkElementTerm(expression, this.rootContext);
+        break;
+      case HLMExpressionType.Formula:
+        this.checkFormula(expression, this.rootContext);
+        break;
+      }
+    });
+  }
+
+  private check(checkFn: () => void): CachedPromise<Logic.LogicCheckResult> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -120,7 +140,7 @@ export class HLMDefinitionChecker {
         hasErrors: false
       };
       try {
-        this.checkRootDefinition();
+        checkFn();
       } catch (error) {
         this.error(this.definition, error.message);
       }
@@ -185,27 +205,9 @@ export class HLMDefinitionChecker {
     } else {
       if (this.rootContext.currentPlaceholderCollection) {
         let placeholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
-        return this.getAutoPlaceholderValues(this.rootContext.currentPlaceholderCollection, placeholderValues).then(() => {
-          let substitutedPlaceholders: Fmt.PlaceholderExpression[] = [];
-          let substitutePlaceholders = (expression: Fmt.Expression): Fmt.Expression => {
-            if (expression instanceof Fmt.PlaceholderExpression) {
-              if (substitutedPlaceholders.indexOf(expression) < 0) {
-                substitutedPlaceholders.push(expression);
-                let substitutedExpression = placeholderValues.get(expression);
-                if (substitutedExpression) {
-                  return substitutedExpression.substitute(substitutePlaceholders);
-                }
-              }
-            }
-            return expression;
-          };
-          for (let [placeholder, value] of placeholderValues) {
-            substitutedPlaceholders = [];
-            let substitutedValue = value.substitute(substitutePlaceholders).clone();
-            onFillExpression(placeholder, substitutedValue, []);
-          }
-          return this.callAutoFillFns(this.rootContext.currentPlaceholderCollection!, placeholderValues, onFillExpression);
-        });
+        return this.getAutoPlaceholderValues(this.rootContext.currentPlaceholderCollection, placeholderValues)
+          .then(() => this.callAutoFillFns(this.rootContext.currentPlaceholderCollection!, placeholderValues, onFillExpression))
+          .then(() => this.autoFillPlaceholders(placeholderValues, onFillExpression));
       }
       return CachedPromise.resolve();
     }
@@ -242,6 +244,27 @@ export class HLMDefinitionChecker {
     return result;
   }
 
+  private autoFillPlaceholders(placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn): void {
+    let substitutedPlaceholders: Fmt.PlaceholderExpression[] = [];
+    let substitutePlaceholders = (expression: Fmt.Expression): Fmt.Expression => {
+      if (expression instanceof Fmt.PlaceholderExpression) {
+        if (substitutedPlaceholders.indexOf(expression) < 0) {
+          substitutedPlaceholders.push(expression);
+          let substitutedExpression = placeholderValues.get(expression);
+          if (substitutedExpression) {
+            return substitutedExpression.substitute(substitutePlaceholders);
+          }
+        }
+      }
+      return expression;
+    };
+    for (let [placeholder, value] of placeholderValues) {
+      substitutedPlaceholders = [];
+      let substitutedValue = value.substitute(substitutePlaceholders).clone();
+      onFillExpression(placeholder, substitutedValue, []);
+    }
+  }
+
   private callAutoFillFns(placeholderCollection: HLMCheckerPlaceholderCollection, placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn): CachedPromise<void> {
     let result = CachedPromise.resolve();
     if (placeholderCollection.childCollections) {
@@ -250,7 +273,14 @@ export class HLMDefinitionChecker {
       }
     }
     if (placeholderCollection.autoFillFn && !placeholderCollection.unfilledPlaceholderCount) {
-      result = result.then(() => placeholderCollection.autoFillFn!(placeholderValues, onFillExpression));
+      let onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
+        let onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
+          filledExpression = this.utils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
+        };
+        this.autoFillPlaceholders(placeholderValues, onFillInnerPlaceholder);
+        onFillExpression(originalExpression, filledExpression, newParameterLists);
+      };
+      result = result.then(() => placeholderCollection.autoFillFn!(placeholderValues, onFillExpressionWithPlaceholders));
     }
     return result;
   }
@@ -780,7 +810,9 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
         }
-        let newTerm = term.clone() as FmtHLM.MetaRefExpression_setStructuralCases;
+        let newTerm = new FmtHLM.MetaRefExpression_setStructuralCases;
+        newTerm.term = term.term;
+        newTerm.construction = term.construction;
         newTerm.cases = newCases;
         return {
           originalExpression: term,
@@ -842,7 +874,9 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
         }
-        let newTerm = term.clone() as FmtHLM.MetaRefExpression_structuralCases;
+        let newTerm = new FmtHLM.MetaRefExpression_structuralCases;
+        newTerm.term = term.term;
+        newTerm.construction = term.construction;
         newTerm.cases = newCases;
         return {
           originalExpression: term,
@@ -923,7 +957,9 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
         }
-        let newFormula = formula.clone() as FmtHLM.MetaRefExpression_structural;
+        let newFormula = new FmtHLM.MetaRefExpression_structural;
+        newFormula.term = formula.term;
+        newFormula.construction = formula.construction;
         newFormula.cases = newCases;
         return {
           originalExpression: formula,
