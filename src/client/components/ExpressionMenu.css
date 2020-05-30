@@ -16,16 +16,6 @@
   border-spacing: 0;
 }
 
-.open-menu .hover, .open-menu .selected.hover {
-  color: var(--menu-hover-foreground-color);
-  background-color: var(--menu-hover-background-color);
-}
-
-.open-menu .selected {
-  color: var(--menu-selected-foreground-color);
-  background-color: var(--menu-selected-background-color);
-}
-
 .open-menu, .open-menu-row>th, .open-menu-arrow {
   font-family: var(--font-family);
   font-weight: var(--font-weight);
@@ -72,8 +62,14 @@
   background-color: var(--menu-title-background-color);
 }
 
-.open-menu-content-cell-table .open-menu-title-cell {
-  background-color: var(--menu-background-color);
+.open-menu-title-cell.selected, .open-menu-item.selected {
+  color: var(--menu-selected-foreground-color);
+  background-color: var(--menu-selected-background-color);
+}
+
+.open-menu-title-cell.hover, .open-menu-title-cell.selected.hover, .open-menu-item.hover, .open-menu-item.selected.hover {
+  color: var(--menu-hover-foreground-color);
+  background-color: var(--menu-hover-background-color);
 }
 
 .open-menu-title-cell.clickable, .open-menu-item.clickable {

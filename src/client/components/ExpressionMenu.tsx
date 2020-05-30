@@ -223,10 +223,13 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
           }
         }
         let title: any = standardRow.title;
+        let titleCellClassName = 'open-menu-title-cell';
         if (title instanceof Notation.RenderedExpression) {
           title = <Expression expression={title} key="title"/>;
+          if (!standardRow.subMenu) {
+            titleCellClassName = 'open-menu-item';
+          }
         }
-        let titleCellClassName = 'open-menu-title-cell';
         if (titleAction) {
           titleCellClassName += ' clickable';
           onClick = (event: React.SyntheticEvent<HTMLElement>) => {
