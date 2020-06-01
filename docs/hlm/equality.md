@@ -63,4 +63,5 @@ I.e.: What should be done differently in the presence of isomorphism=equality?
 ## Similar situation in e.g. Lean
 
 * Similar set of provable statements.
+* Disallowing equality on types would lead to a similar result as in HLM.
 * "isomorphism <=> equality" for particular structures may actually be consistent with Lean.

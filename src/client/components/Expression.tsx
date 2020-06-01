@@ -405,11 +405,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'table-cell'} key={colIndex++}/>
           );
         }
-        rows.push(
-          <span className={'table-row'} key={rowIndex++}>
+        let curRowIndex = rowIndex++;
+        let renderCurRow = (additionalClassName: string = '') => (
+          <span className={'table-row' + additionalClassName} key={curRowIndex}>
             {columns}
           </span>
         );
+        if (row.length) {
+          let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
+            renderCurRow(lineHeight ? '' : ' large'));
+          rows.push(renderPromise(renderRow));
+        } else {
+          rows.push(renderCurRow());
+        }
       }
       result = rows;
     } else if (expression instanceof Notation.ParenExpression) {

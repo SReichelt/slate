@@ -1,7 +1,7 @@
 import * as Fmt from '../format/format';
 import * as Logic from '../logics/logic';
 import * as Notation from './notation';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo } from '../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryItemNumber } from '../data/libraryDataProvider';
 import CachedPromise from '../data/cachedPromise';
 
 export interface DialogResultBase {
@@ -20,6 +20,7 @@ export interface InsertDialogResult extends DialogResultBase {
 export class InsertDialog extends DialogBase {
   libraryDataProvider: LibraryDataProvider;
   section?: LibraryDefinition;
+  sectionItemNumber?: LibraryItemNumber;
   definitionType: Logic.LogicDefinitionTypeDescription | undefined;
   onCheckNameInUse: (name: string) => boolean;
   templates?: Fmt.File;

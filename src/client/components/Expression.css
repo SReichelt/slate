@@ -419,8 +419,8 @@ div.display-math {
   padding-top: 1pt;
 }
 
-.table.construction>.table-row>.table-cell {
-  vertical-align: middle;
+.table.construction>.table-row.large>.table-cell {
+  vertical-align: top;
 }
 
 .table.construction>.table-row>.table-cell:first-child {

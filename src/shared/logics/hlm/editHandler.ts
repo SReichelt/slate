@@ -79,12 +79,11 @@ export class HLMEditHandler extends GenericEditHandler {
                 autoFilled = true;
               }
             };
-            return this.checker.autoFill(onFillExpression)
-              .then((): void | CachedPromise<void> => {
-                if (autoFilled) {
-                  onAutoFilled();
-                }
-              });
+            return this.checker.autoFill(onFillExpression).then(() => {
+              if (autoFilled) {
+                onAutoFilled();
+              }
+            });
           }
         })
         .catch(() => {}));

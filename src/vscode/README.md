@@ -2,6 +2,8 @@
 
 This extension integrates the [Slate interactive theorem prover](https://sreichelt.github.io/slate) into Microsoft Visual Studio Code.
 
+![Screenshot](media/screenshot.png)
+
 ## Features
 
 * Full integration of the web-based graphical editor, with bidirectional synchronization between source code and graphical editor.

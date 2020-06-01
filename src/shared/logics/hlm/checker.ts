@@ -224,20 +224,23 @@ export class HLMDefinitionChecker {
       for (let placeholder of placeholderCollection.placeholders) {
         let placeholderRestriction = this.rootContext.editData.restrictions.get(placeholder);
         if (placeholderRestriction) {
-          if (placeholderRestriction.exactValueSuggestion) {
-            placeholderValues.set(placeholder, placeholderRestriction.exactValueSuggestion);
-            placeholderCollection.unfilledPlaceholderCount--;
-          } else if (placeholderRestriction.compatibleSets.length) {
-            let compatibleSets = placeholderRestriction.compatibleSets;
-            let context = placeholderRestriction.context;
-            result = result.then(() =>
-              this.checkSetCompatibility(placeholder, compatibleSets, context).then((superset: Fmt.Expression) => {
-                if (!(superset instanceof Fmt.PlaceholderExpression)) {
-                  placeholderValues.set(placeholder, superset);
-                  placeholderCollection.unfilledPlaceholderCount--;
-                }
-              }));
-          }
+          result = result.then((): void | CachedPromise<void> => {
+            if (placeholderRestriction) {
+              if (placeholderRestriction.exactValueSuggestion) {
+                placeholderValues.set(placeholder, placeholderRestriction.exactValueSuggestion);
+                placeholderCollection.unfilledPlaceholderCount--;
+              } else if (placeholderRestriction.compatibleSets.length) {
+                let compatibleSets = placeholderRestriction.compatibleSets;
+                let context = placeholderRestriction.context;
+                return this.checkSetCompatibility(placeholder, compatibleSets, context).then((superset: Fmt.Expression) => {
+                  if (!(superset instanceof Fmt.PlaceholderExpression)) {
+                    placeholderValues.set(placeholder, superset);
+                    placeholderCollection.unfilledPlaceholderCount--;
+                  }
+                });
+              }
+            }
+          });
         }
       }
     }

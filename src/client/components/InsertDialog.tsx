@@ -83,7 +83,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
       positionRow = (
         <tr className={'dialog-row separated-above separated-below'}>
           <td className={'dialog-cell dialog-position-list-cell'} colSpan={2}>
-            <SectionItemList libraryDataProvider={this.props.dialog.libraryDataProvider} section={this.props.dialog.section} templates={this.props.dialog.templates} positionSelectionMode={true} newItemType={this.props.dialog.definitionType} newItemTitle={title} newItemPosition={this.state.position} onChangeNewItemPosition={(newPosition) => this.setState({position: newPosition})}/>
+            <SectionItemList libraryDataProvider={this.props.dialog.libraryDataProvider} section={this.props.dialog.section} sectionItemNumber={this.props.dialog.sectionItemNumber!} templates={this.props.dialog.templates} positionSelectionMode={true} newItemType={this.props.dialog.definitionType} newItemTitle={title} newItemPosition={this.state.position} onChangeNewItemPosition={(newPosition) => this.setState({position: newPosition})}/>
           </td>
         </tr>
       );

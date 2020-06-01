@@ -1,10 +1,13 @@
 {
   "name": "slate",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Slate Proof Assistant",
   "license": "MIT",
   "author": "Sebastian Reichelt",
-  "repository": "github:sreichelt/slate",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/SReichelt/slate.git"
+  },
   "homepage": "https://sreichelt.github.io/slate",
   "main": "index.js",
   "scripts": {

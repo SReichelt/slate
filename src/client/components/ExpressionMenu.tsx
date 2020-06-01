@@ -58,7 +58,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
           }
         } else {
           if (separated) {
-            rows.push(<tr className={'open-menu-row'}><td className={'open-menu-separator'} colSpan={2}/></tr>);
+            rows.push(<tr className={'open-menu-row'} key={`separator-${index}`}><td className={'open-menu-separator'} colSpan={2}/></tr>);
           }
           let onEnter = (openSubMenu: boolean = false) => this.setState({openSubMenu: openSubMenu ? row : undefined});
           let hoveredExternally = this.props.hoveredExternally && index === 0;

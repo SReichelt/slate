@@ -30,7 +30,7 @@ import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
-import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderConfig } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderConfig, LibraryItemNumber } from '../shared/data/libraryDataProvider';
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
@@ -65,13 +65,7 @@ interface GitHubState {
   gitHubUserInfo?: CachedPromise<GitHub.UserInfo>;
 }
 
-interface InsertDialogState {
-  insertDialogLibraryDataProvider?: LibraryDataProvider;
-  insertDialogSection?: LibraryDefinition;
-  insertDialogDefinitionType?: Logic.LogicDefinitionTypeDescription;
-}
-
-interface AppState extends SelectionState, GitHubState, InsertDialogState {
+interface AppState extends SelectionState, GitHubState {
   verticalLayout: boolean;
   navigationPaneVisible: boolean;
   extraContentsVisible: boolean;
@@ -81,6 +75,7 @@ interface AppState extends SelectionState, GitHubState, InsertDialogState {
   showStartPage: boolean;
   tutorialState?: TutorialState;
   tutorialStateAdditionalData?: any;
+  insertDialog?: Dialog.InsertDialog;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -625,15 +620,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let openDialog: React.ReactNode = null;
-    if (this.state.insertDialogLibraryDataProvider && this.state.insertDialogSection) {
-      let dialog = new Dialog.InsertDialog;
-      dialog.libraryDataProvider = this.state.insertDialogLibraryDataProvider;
-      dialog.section = this.state.insertDialogSection;
-      dialog.definitionType = this.state.insertDialogDefinitionType;
-      dialog.onCheckNameInUse = this.checkNameInUse;
-      dialog.templates = this.state.templates;
+    if (this.state.insertDialog) {
       openDialog = (
-        <InsertDialog dialog={dialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key="insert-dialog"/>
+        <InsertDialog dialog={this.state.insertDialog} onOK={this.finishInsert} onCancel={this.cancelInsert} key="insert-dialog"/>
       );
     }
 
@@ -780,25 +769,31 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
+  private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, sectionItemNumber: LibraryItemNumber, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
+    let dialog = new Dialog.InsertDialog;
+    dialog.libraryDataProvider = libraryDataProvider;
+    dialog.section = section;
+    dialog.sectionItemNumber = sectionItemNumber;
+    dialog.definitionType = definitionType;
+    dialog.onCheckNameInUse = this.checkNameInUse;
+    dialog.templates = this.state.templates;
     this.setState({
-      insertDialogLibraryDataProvider: libraryDataProvider,
-      insertDialogSection: section,
-      insertDialogDefinitionType: definitionType
+      insertDialog: dialog
     });
   };
 
   private finishInsert = (result: Dialog.InsertDialogResult): void => {
-    let libraryDataProvider = this.state.insertDialogLibraryDataProvider;
-    if (libraryDataProvider) {
-      let definitionType = this.state.insertDialogDefinitionType;
-      if (definitionType) {
+    let dialog = this.state.insertDialog;
+    if (dialog && dialog.libraryDataProvider) {
+      let libraryDataProvider = dialog.libraryDataProvider;
+      if (dialog.definitionType) {
+        let definitionType = dialog.definitionType;
         libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
             let localPath = new Fmt.Path;
             localPath.name = result.name;
-            let absolutePath = libraryDataProvider!.getAbsolutePath(localPath);
-            let itemInfoPromise = libraryDataProvider!.getLocalItemInfo(result.name);
+            let absolutePath = libraryDataProvider.getAbsolutePath(localPath);
+            let itemInfoPromise = libraryDataProvider.getLocalItemInfo(result.name);
             this.navigate({
               selectedDocURI: undefined,
               selectedItemAbsolutePath: absolutePath,
@@ -812,7 +807,7 @@ class App extends React.Component<AppProps, AppState> {
             }
             return itemInfoPromise.then((itemInfo: LibraryItemInfo) => {
               let editedDefinition: LibraryItemListEntry = {
-                libraryDataProvider: libraryDataProvider!,
+                libraryDataProvider: libraryDataProvider,
                 libraryDefinition: libraryDefinition,
                 absolutePath: absolutePath,
                 localPath: localPath,
@@ -825,7 +820,7 @@ class App extends React.Component<AppProps, AppState> {
             });
           })
           .catch((error) => {
-            this.props.alert.error(`Error adding ${definitionType!.name.toLowerCase()}: ` + error.message);
+            this.props.alert.error(`Error adding ${definitionType.name.toLowerCase()}: ` + error.message);
             this.forceUpdate();
           });
       } else {
@@ -841,16 +836,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private cancelInsert = (): void => {
     this.setState({
-      insertDialogLibraryDataProvider: undefined,
-      insertDialogSection: undefined,
-      insertDialogDefinitionType: undefined
+      insertDialog: undefined
     });
   };
 
   private checkNameInUse = (name: string): boolean => {
-    if (this.state.insertDialogSection) {
+    let dialog = this.state.insertDialog;
+    if (dialog && dialog.section) {
       let nameLower = name.toLowerCase();
-      let sectionContents = this.state.insertDialogSection.definition.contents as FmtLibrary.ObjectContents_Section;
+      let sectionContents = dialog.section.definition.contents as FmtLibrary.ObjectContents_Section;
       for (let item of sectionContents.items) {
         if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection)
             && item.ref instanceof Fmt.DefinitionRefExpression

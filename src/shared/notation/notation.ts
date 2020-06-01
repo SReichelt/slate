@@ -759,10 +759,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
             let symbol = contents.symbol;
             if (symbol) {
               expression = new UserDefinedExpression(symbol, this.config, this.allTemplates);
-              while (expression instanceof IndirectExpression) {
-                expression = expression.resolve();
-              }
-              if (expression instanceof TextExpression && expression.text && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
+              if (this.canUseSymbol(expression)) {
                 this.negationsSatisfied = this.config.negationCount;
                 break;
               }
@@ -775,6 +772,22 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       }
     }
     return expression;
+  }
+
+  private canUseSymbol(expression: RenderedExpression): boolean {
+    while (expression instanceof IndirectExpression) {
+      expression = expression.resolve();
+    }
+    if (expression instanceof TextExpression && expression.text && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
+      return true;
+    } else if (expression instanceof RowExpression) {
+      for (let item of expression.items) {
+        if (this.canUseSymbol(item)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 

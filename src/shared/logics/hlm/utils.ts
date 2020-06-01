@@ -32,7 +32,7 @@ export interface HLMTypeSearchParameters extends HLMUnfoldParameters {
 
 const eliminateVariablesOnly: HLMTypeSearchParameters = {
   followDefinitions: false,
-  followSupersets: false,
+  followSupersets: true,
   followEmbeddings: false,
   unfoldFixedSubterms: false,
   extractStructuralCasesFromFixedSubterms: false

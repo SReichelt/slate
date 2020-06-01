@@ -885,10 +885,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     };
     let onGetDefault = () => this.renderDefaultDefinitionRef(definitions);
     let onGetVariables = () => {
-      let variables: RenderedVariable[] = [];
+      let parameters: Fmt.Parameter[] = [];
       for (let definition of definitions) {
-        this.addRenderedVariables(definition.parameters, variables);
+        parameters.push(...definition.parameters);
       }
+      let variables: RenderedVariable[] = [];
+      this.addRenderedVariables(parameters, variables);
       return variables;
     };
     let isPredicate = contents instanceof FmtHLM.ObjectContents_Predicate;
@@ -2802,7 +2804,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addRenderedVariables(parameters: Fmt.ParameterList, variables: RenderedVariable[], indices?: Notation.RenderedExpression[]): void {
+  private addRenderedVariables(parameters: Fmt.Parameter[], variables: RenderedVariable[], indices?: Notation.RenderedExpression[]): void {
     let remainingParameters = [...parameters];
     while (remainingParameters.length) {
       let param = remainingParameters.shift()!;
