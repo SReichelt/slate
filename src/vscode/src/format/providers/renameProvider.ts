@@ -11,7 +11,7 @@ import { fileExtension } from '../../../../fs/format/dynamic';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
 import { parseFile } from '../parse';
 import { isDefinitionReferenceToUri, getNameDefinitionLocation, findReferencedDefinition } from '../navigate';
-import { RenamedUri, changeParentUri } from '../../utils';
+import { RenamedUri, changeParentUri, RangeInfo } from '../../utils';
 import { findReferences } from './referenceProvider';
 
 function getNewUri(renamedUris: ReadonlyArray<RenamedUri>, oldUri: vscode.Uri): vscode.Uri | undefined {
@@ -175,24 +175,16 @@ export class SlateRenameProvider implements vscode.RenameProvider {
                     if (parsedDocument) {
                         let mainDefinition = parsedDocument.file && parsedDocument.file.definitions.length ? parsedDocument.file.definitions[0] : undefined;
                         for (let rangeInfo of parsedDocument.rangeList) {
-                            if (mainDefinition && rangeInfo.object === mainDefinition && rangeInfo.nameRange && newOriginUri) {
-                                let context = rangeInfo.context;
-                                if (context && context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
-                                    let metaModelDefinition = context.metaModel.definitions[0];
-                                    if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-                                        if (metaModelDefinition.contents.lookup instanceof FmtMeta.MetaRefExpression_Any) {
-                                            let changedName = getChangedName(oldOriginUri, newOriginUri);
-                                            if (changedName) {
-                                                let [oldOriginName, newOriginName] = changedName;
-                                                if (mainDefinition.name === oldOriginName) {
-                                                    result.replace(oldOriginUri, rangeInfo.nameRange, escapeIdentifier(newOriginName));
-                                                }
-                                            }
-                                        }
+                            if (mainDefinition && rangeInfo.object === mainDefinition && rangeInfo.nameRange && newOriginUri && this.containsRelativePaths(rangeInfo)) {
+                                let changedName = getChangedName(oldOriginUri, newOriginUri);
+                                if (changedName) {
+                                    let [oldOriginName, newOriginName] = changedName;
+                                    if (mainDefinition.name === oldOriginName) {
+                                        result.replace(oldOriginUri, rangeInfo.nameRange, escapeIdentifier(newOriginName));
                                     }
                                 }
                             }
-                            if (rangeInfo.object instanceof Fmt.Path && !(rangeInfo.object.parentPath instanceof Fmt.Path) && rangeInfo.linkRange) {
+                            if (rangeInfo.object instanceof Fmt.Path && !(rangeInfo.object.parentPath instanceof Fmt.Path) && rangeInfo.linkRange && this.containsRelativePaths(rangeInfo)) {
                                 let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, undefined, newOriginUri ? undefined : checkUri);
                                 if (referencedDefinition) {
                                     let oldTargetUri = referencedDefinition.parsedDocument.uri;
@@ -221,5 +213,21 @@ export class SlateRenameProvider implements vscode.RenameProvider {
             }
             return result;
         });
+    }
+
+    private containsRelativePaths(rangeInfo: RangeInfo): boolean {
+        let context = rangeInfo.context;
+        if (!context) {
+            // Must be the metamodel reference at the top of the file.
+            return true;
+        } else if (context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
+            let metaModelDefinition = context.metaModel.definitions[0];
+            if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
+                if (metaModelDefinition.contents.lookup instanceof FmtMeta.MetaRefExpression_Any) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

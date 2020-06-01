@@ -318,30 +318,8 @@ export abstract class GenericEditHandler {
     } else {
       let newPath = new Fmt.Path;
       newPath.name = template.name;
-      let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
-      for (let param of template.parameters) {
-        if (param.type.arrayDimensions) {
-          let arrayValue = new Fmt.ArrayExpression;
-          arrayValue.items = [];
-          if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
-            for (let variable of requiredVariables) {
-              let value = new Fmt.VariableRefExpression;
-              value.variable = variable.param;
-              arrayValue.items.push(value);
-            }
-          }
-          newPath.arguments.add(arrayValue, param.name);
-        } else {
-          if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
-            let value = new Fmt.StringExpression;
-            value.value = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
-            newPath.arguments.add(value, param.name);
-          } else if (param.name === 'operand' && requiredVariables.length === 1) {
-            let value = new Fmt.VariableRefExpression;
-            value.variable = requiredVariables[0].param;
-            newPath.arguments.add(value, param.name);
-          }
-        }
+      if (isTopLevel) {
+        this.preFillArguments(template.parameters, newPath.arguments, variables);
       }
       newNotation = new Fmt.DefinitionRefExpression;
       newNotation.path = newPath;
@@ -581,6 +559,34 @@ export abstract class GenericEditHandler {
     }
     messageItem.info = new Notation.RowExpression(row);
     messageItem.visible = true;
+  }
+
+  private preFillArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, variables: RenderedVariable[]): void {
+    let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
+    for (let param of params) {
+      if (param.type.arrayDimensions) {
+        let arrayValue = new Fmt.ArrayExpression;
+        arrayValue.items = [];
+        if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
+          for (let variable of requiredVariables) {
+            let value = new Fmt.VariableRefExpression;
+            value.variable = variable.param;
+            arrayValue.items.push(value);
+          }
+        }
+        args.add(arrayValue, param.name);
+      } else {
+        if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
+          let value = new Fmt.StringExpression;
+          value.value = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
+          args.add(value, param.name);
+        } else if (param.name === 'operand' && requiredVariables.length === 1) {
+          let value = new Fmt.VariableRefExpression;
+          value.variable = requiredVariables[0].param;
+          args.add(value, param.name);
+        }
+      }
+    }
   }
 
   private getNotationMenuNegationRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {

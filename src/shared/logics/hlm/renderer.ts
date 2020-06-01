@@ -439,6 +439,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             contents.notation = undefined;
             contents.definitionNotation = undefined;
             if (contents instanceof FmtHLM.ObjectContents_Constructor) {
+              // TODO this also needs to be executed when the parameter list changes in any other way
               contents.equalityDefinition = this.editHandler!.createEqualityDefinition(stateCopy.associatedDefinition.parameters);
             }
           }

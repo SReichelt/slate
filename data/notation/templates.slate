@@ -107,7 +107,10 @@ $Group(items: %Expr[], separator: %String = ', '): %Template {
     dimension = 0,
     item = items,
     separator = separator
-  )
+  ),
+  context = {
+    argument = %true
+  }
 }
 
 /**
@@ -1829,6 +1832,7 @@ $SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): 
   ),
   context = {
     operator = %true,
+    predicate = %true,
     argument = %true
   }
 }
@@ -1900,6 +1904,7 @@ $OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template
   ),
   context = {
     operator = %true,
+    predicate = %true,
     argument = %true
   }
 }

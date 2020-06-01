@@ -404,72 +404,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
 `;
 
-exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Generalized%20intersection 1`] = `
-"Definition 1.1.20.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
-
-  ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
-
-Remarks.
-
-Similarly to the definition of the intersection of two sets, we have to specify a common superset \`U\` for all sets. As a side effect, \`I\` is allowed to be empty, in which case the result is simply \`U\`.
-
-References.
-
-* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections
-* https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
-`;
-
-exports[`render hlm library: 1.1.21 data/libraries/hlm/Essentials/Sets/Generalized%20intersection%20using%20power%20set 1`] = `
-"Definition 1.1.21.  Let U be a set, S ⊆ 𝒫(U). We define:
-
-  ⋂S := ⋂_((T) ∈ S) T
-
-References.
-
-* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
-`;
-
-exports[`render hlm library: 1.1.22 data/libraries/hlm/Essentials/Sets/Generalized%20union 1`] = `
-"Definition 1.1.22.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
-
-  ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
-
-References.
-
-* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions
-* https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
-`;
-
-exports[`render hlm library: 1.1.23 data/libraries/hlm/Essentials/Sets/Generalized%20union%20using%20power%20set 1`] = `
-"Definition 1.1.23.  Let U be a set, S ⊆ 𝒫(U). We define:
-
-  ⋃S := ⋃_((T) ∈ S) T
-
-References.
-
-* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
-`;
-
-exports[`render hlm library: 1.1.24 data/libraries/hlm/Essentials/Sets/Generalized%20cartesian%20product 1`] = `
-"Definition 1.1.24.  Let I be a set, let S_i be a set for each i ∈ I. We define:
-
-  ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
-
-  (s_j)_(j ∈ I) = (s'_j)_(j ∈ I)  :⇔  ∀ j ∈ I : s_j = s'_j  (s_j ∈ S_j for each j ∈ I, s'_j ∈ S_j for each j ∈ I)
-
-Remarks.
-
-The generalized Cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
-
-References.
-
-* https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
-* https://proofwiki.org/wiki/Definition:Cartesian_Product/Family_of_Sets
-* https://ncatlab.org/nlab/show/cartesian+product#in_sets"
-`;
-
-exports[`render hlm library: 1.1.25 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
-"Definition 1.1.25.  We define:
+exports[`render hlm library: 1.1.20 data/libraries/hlm/Essentials/Sets/Truth%20values 1`] = `
+"Definition 1.1.20.  We define:
 
   𝓣𝓻𝓾𝓽𝓱 :=: {[p] | p is a proposition}
 
@@ -488,8 +424,89 @@ References.
 * https://ncatlab.org/nlab/show/truth+value"
 `;
 
-exports[`render hlm library: 1.1.26.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
-"Definition 1.1.26.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.21.1 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
+"Definition 1.1.21.1.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+
+  ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
+
+Remarks.
+
+Similarly to the definition of the intersection of two sets, we have to specify a common superset \`U\` for all sets. As a side effect, \`I\` is allowed to be empty, in which case the result is simply \`U\`.
+
+References.
+
+* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections
+* https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
+`;
+
+exports[`render hlm library: 1.1.21.2 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.21.2.  Let U be a set, S ⊆ 𝒫(U). We define:
+
+  ⋂S := ⋂_((T) ∈ S) T
+
+References.
+
+* https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
+`;
+
+exports[`render hlm library: 1.1.21.3 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
+"Definition 1.1.21.3.  Let U, I be sets, let S_i ⊆ U for each i ∈ I. We define:
+
+  ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
+
+References.
+
+* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions
+* https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
+`;
+
+exports[`render hlm library: 1.1.21.4 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.21.4.  Let U be a set, S ⊆ 𝒫(U). We define:
+
+  ⋃S := ⋃_((T) ∈ S) T
+
+References.
+
+* https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
+`;
+
+exports[`render hlm library: 1.1.21.5 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
+"Definition 1.1.21.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
+
+  ⨄_(i ∈ I)^≃ S_i :=: {(j, s) | j ∈ I, s ∈ S_j}
+
+  (j, s) = (k, t)  :⇔  j = k and s ≃ t  (j ∈ I, s ∈ S_j, k ∈ I, t ∈ S_k)
+
+Remarks.
+
+In HLM, the disjoint union additionally needs to be equipped with a \\"dependent equality\\" \`≃\` that allows us to ask whether \`%equals(s, t)\` given \`%equals(j, k)\`.
+
+References.
+
+* https://en.wikipedia.org/wiki/Disjoint_union#Set_theory_definition
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sigma"
+`;
+
+exports[`render hlm library: 1.1.21.6 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.21.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+
+  ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
+
+  (s_j)_(j ∈ I) = (t_j)_(j ∈ I)  :⇔  ∀ j ∈ I : s_j = t_j  (s_j ∈ S_j for each j ∈ I, t_j ∈ S_j for each j ∈ I)
+
+Remarks.
+
+The generalized Cartesian product over an index set can be constructed in HLM via its integrated bound variable concept. It is essentially the same as a set of dependent functions.
+
+References.
+
+* https://en.wikipedia.org/wiki/Cartesian_product#Infinite_Cartesian_products
+* https://proofwiki.org/wiki/Definition:Cartesian_Product/Family_of_Sets
+* https://ncatlab.org/nlab/show/cartesian+product#in_sets"
+`;
+
+exports[`render hlm library: 1.1.22.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.22.1.  Let S be a set. We define:
 
   𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
@@ -500,14 +517,14 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
 `;
 
-exports[`render hlm library: 1.1.26.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
-"Definition 1.1.26.2.  Let S be a set. We define:
+exports[`render hlm library: 1.1.22.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.22.2.  Let S be a set. We define:
 
   S has a choice function  :⇔  𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
 `;
 
-exports[`render hlm library: 1.1.26.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
-"Axiom 1.1.26.3 (Axiom of choice).  We define:
+exports[`render hlm library: 1.1.22.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.22.3 (Axiom of choice).  We define:
 
   AC  :⇔  ∀ sets S : S has a choice function
 
@@ -515,7 +532,7 @@ Remarks.
 
 This is the simplest formulation of the axiom of choice that can be formalized in HLM. The standard formulation is not directly applicable because an indexed family of arbitrary sets cannot be defined as an object – there is no suitable equality definition.
 
-It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../\\"Generalized cartesian product\\"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
+It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../\\"Generalized operators\\"/\\"Generalized cartesian product\\"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
 
 HLM actually does not have \\"axioms\\" as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
 * The simplest solution is to add \\"assume AC\\" as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
@@ -539,8 +556,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
-exports[`render hlm library: 1.1.27.1 data/libraries/hlm/Essentials/Sets/Multisets/Multisets 1`] = `
-"Definition 1.1.27.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.23.1 data/libraries/hlm/Essentials/Sets/Multisets/Multisets 1`] = `
+"Definition 1.1.23.1.  Let S be a set. We define:
 
   𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(S) :=: {{s^(m_s)} | m_s ∈ ℕ for each s ∈ S}
 
@@ -562,8 +579,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/multiset.html#multiset"
 `;
 
-exports[`render hlm library: 1.1.27.2 data/libraries/hlm/Essentials/Sets/Multisets/multiplicity 1`] = `
-"Definition 1.1.27.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
+exports[`render hlm library: 1.1.23.2 data/libraries/hlm/Essentials/Sets/Multisets/multiplicity 1`] = `
+"Definition 1.1.23.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
 
   mult_𝑻(t)
 
@@ -572,22 +589,22 @@ by:
   mult_{s^(m_s)}(t) := m_t  (m_s ∈ ℕ for each s ∈ S)"
 `;
 
-exports[`render hlm library: 1.1.27.3 data/libraries/hlm/Essentials/Sets/Multisets/Set 1`] = `
-"Definition 1.1.27.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.23.3 data/libraries/hlm/Essentials/Sets/Multisets/Set 1`] = `
+"Definition 1.1.23.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Set(𝑻) := {s ∈ S : mult_𝑻(s) ≠ 0}
 
 We write “let t ∈ 𝑻” for “let t ∈ Set(𝑻).”"
 `;
 
-exports[`render hlm library: 1.1.27.4 data/libraries/hlm/Essentials/Sets/Multisets/Items 1`] = `
-"Definition 1.1.27.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
+exports[`render hlm library: 1.1.23.4 data/libraries/hlm/Essentials/Sets/Multisets/Items 1`] = `
+"Definition 1.1.23.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
 
   Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<(mult_𝑻(t)))}"
 `;
 
-exports[`render hlm library: 1.1.27.5 data/libraries/hlm/Essentials/Sets/Multisets/Elements 1`] = `
-"Definition 1.1.27.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.23.5 data/libraries/hlm/Essentials/Sets/Multisets/Elements 1`] = `
+"Definition 1.1.23.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<(mult_𝑻(t)))}
    = ⋃_(t ∈ S) Items_𝑻(t)
@@ -595,8 +612,8 @@ exports[`render hlm library: 1.1.27.5 data/libraries/hlm/Essentials/Sets/Multise
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.27.6 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
-"Definition 1.1.27.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.23.6 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
+"Definition 1.1.23.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   𝑻 is finite  :⇔  Elems(𝑻) is finite
     ⇔  Set(𝑻) is finite
@@ -606,8 +623,8 @@ exports[`render hlm library: 1.1.27.6 data/libraries/hlm/Essentials/Sets/Multise
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.1.27.7 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
-"Definition 1.1.27.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.23.7 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
+"Definition 1.1.23.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   |𝑻| := |Elems(𝑻)|
    = {∑_(i ∈ Set(𝑻)) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
@@ -763,7 +780,7 @@ exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/gener
 
 Remarks.
 
-This definition is the equivalent of \`$../Sets/\\"Generalized union using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
+This definition is the equivalent of \`$../Sets/\\"Generalized operators\\"/\\"Generalized union using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
 `;
 
 exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapping 1`] = `
@@ -833,7 +850,7 @@ This definition is not exactly standard but very simple. The main reason to incl
 exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/equality 1`] = `
 "Definition 1.3.14.  Let S be a set. We define:
 
-  =_S := [s = t]_(s,t ∈ S)
+  (=_S) := [s = t]_(s,t ∈ S)
 
 References.
 
@@ -1113,7 +1130,7 @@ exports[`render hlm library: 1.3.32.2 data/libraries/hlm/Essentials/Relations/Cl
 "Definition 1.3.32.2.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^= := cl_reflexive(≺)
-   = ≺ ∨ =_S
+   = ≺ ∨ (=_S)
 
 Equality.  No proof.
 
@@ -1188,6 +1205,38 @@ exports[`render hlm library: 1.3.32.7 data/libraries/hlm/Essentials/Relations/Cl
 References.
 
 * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive symmetric closure"
+`;
+
+exports[`render hlm library: 1.3.33.1 data/libraries/hlm/Essentials/Relations/Dependent%20equality/Dependent%20equality 1`] = `
+"Definition 1.3.33.1.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+
+  𝓓𝓮𝓹𝓔𝓺((S_i)_(i∈I)) :=: {(≡_a,b)_(a = b)^((S_i)_(i∈I)) | ≡_a,b is a relation from S_a to S_b for each a, b ∈ I, [∀ i ∈ I : ≡_i,i = (=_(S_i))]}
+
+  (≡_a,b)_(a = b)^((S_i)_(i∈I)) = (≡'_a,b)_(a = b)^((S_i)_(i∈I))  :⇔  ∀ a, b ∈ I : ≡_a,b = ≡'_a,b  (≡_a,b is a relation from S_a to S_b for each a, b ∈ I, ≡'_a,b is a relation from S_a to S_b for each a, b ∈ I with suitable conditions)
+
+We write “let ≃ be a dependent equality on S_i (i ∈ I)” for “let ≃ ∈ 𝓓𝓮𝓹𝓔𝓺((S_i)_(i∈I)).”
+
+Remarks.
+
+This somewhat technical construction exposes the equality relation on \`S[i]\` in such a way that it becomes possible to ask whether \`%equals(s, t)\` for \`%in(s, S[a])\` and \`%in(t, S[b])\` whenever a \`%equals(a, b)\`.
+
+It might seem that asking whether \`%equals(s, t)\` should simply be allowed in this case, but the type system of HLM restricts it to the case when \`a\` and \`b\` are literally the same expression. If \`%equals(a, b)\` is given as a proposition, the equality can carry information that needs to be transported from \`I\` to \`S\`.
+
+E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
+
+Dependent equality is a prerequisite to formalizing arbitrary disjoint unions (see \`$../../Sets/\\"Generalized operators\\"/\\"Generalized disjoint union\\"\`).
+
+Once GitHub issue [#65](https://github.com/SReichelt/slate/issues/65) is resolved, \`%equals(a, b)\` should be added as a condition on \`≡\`."
+`;
+
+exports[`render hlm library: 1.3.33.2 data/libraries/hlm/Essentials/Relations/Dependent%20equality/dependently%20equal 1`] = `
+"Definition 1.3.33.2.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I), a, b ∈ I, s ∈ S_a, t ∈ S_b. We define
+
+  s ≃ t
+
+by:
+
+  s (≡_j,k)_(j = k)^((S_i)_(i∈I)) t  :⇔  s ≡_a,b t  (≡_j,k is a relation from S_j to S_k for each j, k ∈ I, [∀ i ∈ I : ≡_i,i = (=_(S_i))])"
 `;
 
 exports[`render hlm library: 1.4.1 data/libraries/hlm/Essentials/Functions/Functions 1`] = `
@@ -1862,7 +1911,7 @@ This is a slightly generalized notion of \\"tuple\\" where the length \`α\` can
 
 We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit \`S\` from the constructor.
 
-In this definition, the codomain is a fixed set \`S\`. If each item is an element of a different set, a generalized Cartesian product \`$../Sets/\\"Generalized cartesian product\\"\` can be used instead.
+In this definition, the codomain is a fixed set \`S\`. If each item is an element of a different set, a generalized Cartesian product \`$../Sets/\\"Generalized operators\\"/\\"Generalized cartesian product\\"\` can be used instead.
 
 References.
 
@@ -3802,8 +3851,18 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.6.2.22.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
-"Definition 1.6.2.22.2.  We define:
+exports[`render hlm library: 1.6.2.22.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20sum 1`] = `
+"Definition 1.6.2.22.2.  Let I be a set, let κ_i ∈ 𝓒𝓻𝓭 for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
+
+  ∑_(i ∈ I)^≃ κ_i := |⨄_(j ∈ I)^≃ (κ_j)|
+
+Remarks.
+
+In contrast to the previous definition, this definition works for arbitrary index sets \`I\`, using the generalized disjoint union to add cardinal numbers. However, due to the definition of disjoint union, it requires a \\"dependent equality\\" on the carrier sets of cardinalities."
+`;
+
+exports[`render hlm library: 1.6.2.22.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
+"Definition 1.6.2.22.3.  We define:
 
   ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on 𝓒𝓻𝓭
 
@@ -3818,10 +3877,14 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.6.2.22.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
-"Definition 1.6.2.22.3.  Let I be a set, let κ_i ∈ 𝓒𝓻𝓭 for each i ∈ I. We define:
+exports[`render hlm library: 1.6.2.22.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
+"Definition 1.6.2.22.4.  Let I be a set, let κ_i ∈ 𝓒𝓻𝓭 for each i ∈ I. We define:
 
-  ∏_(i ∈ I) κ_i := |∏_(j ∈ I) (κ_j)|"
+  ∏_(i ∈ I) κ_i := |∏_(j ∈ I) (κ_j)|
+
+Remarks.
+
+In contrast to the previous definition, this definition works for arbitrary index sets \`I\`, using the generalized Cartesian product to multiply cardinal numbers."
 `;
 
 exports[`render hlm library: 1.6.3.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordinal%20numbers 1`] = `
