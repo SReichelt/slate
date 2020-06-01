@@ -2308,7 +2308,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.1.12 data/libraries/hlm/Essentials/Numbers/Natural/Less%20and%20less%20or%20equal%20combine%20to%20less 1`] = `
-"Proposition 1.6.1.12.  Let a, b, c ∈ ℕ such that a < b and b ≤ c. Then:
+"Proposition 1.6.1.12.  Let a, b, c ∈ ℕ such that a < b ≤ c. Then:
 
   a < c
 
@@ -2320,7 +2320,7 @@ References.
 `;
 
 exports[`render hlm library: 1.6.1.13 data/libraries/hlm/Essentials/Numbers/Natural/Less%20or%20equal%20and%20less%20combine%20to%20less 1`] = `
-"Proposition 1.6.1.13.  Let a, b, c ∈ ℕ such that a ≤ b and b < c. Then:
+"Proposition 1.6.1.13.  Let a, b, c ∈ ℕ such that a ≤ b < c. Then:
 
   a < c
 
@@ -4455,7 +4455,7 @@ Equality.  No proof."
 exports[`render hlm library: 1.6.4.10.11 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Interval 1`] = `
 "Definition 1.6.4.10.11.  Let a, b ∈ ℤ. We define:
 
-  {a, ..., b} := {c ∈ ℤ : a ≤ c and c ≤ b}"
+  {a, ..., b} := {c ∈ ℤ : a ≤ c ≤ b}"
 `;
 
 exports[`render hlm library: 1.6.4.10.12 data/libraries/hlm/Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
