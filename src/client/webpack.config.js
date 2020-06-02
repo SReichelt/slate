@@ -37,11 +37,13 @@ const plugins = [
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsEmbedded
   }),
-  new CopyWebpackPlugin([
-    {
-      from: 'theme-*.css'
-    }
-  ])
+  new CopyWebpackPlugin({
+    patterns: [
+      {
+        from: 'theme-*.css'
+      }
+    ]
+  })
 ];
 
 if (!config.IS_PRODUCTION) {
