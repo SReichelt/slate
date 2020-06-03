@@ -569,6 +569,8 @@ Remarks.
 
 Note that we only formalize multi-subsets of a given set \`S\`. Arbitrary multisets cannot be defined because there is no suitable notion of equality.
 
+A multi-subset of \`S\` is essentially the same as a function from \`S\` to \`$../../Numbers/Natural/\\"Natural numbers\\"\`.
+
 References.
 
 * https://en.wikipedia.org/wiki/Multiset
@@ -612,25 +614,26 @@ exports[`render hlm library: 1.1.23.5 data/libraries/hlm/Essentials/Sets/Multise
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.23.6 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
+exports[`render hlm library: 1.1.23.6 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
 "Definition 1.1.23.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
-
-  𝑻 is finite  :⇔  Elems(𝑻) is finite
-    ⇔  Set(𝑻) is finite
-
-  𝑻 is infinite  :⇔  𝑻 is not finite
-
-Equivalence.  No proof."
-`;
-
-exports[`render hlm library: 1.1.23.7 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
-"Definition 1.1.23.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   |𝑻| := |Elems(𝑻)|
    = {∑_(i ∈ Set(𝑻)) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
    = {∑_(i ∈ S) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
 
 Equality.  No proof."
+`;
+
+exports[`render hlm library: 1.1.23.7 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
+"Definition 1.1.23.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+
+  𝑻 is finite  :⇔  |𝑻| is finite
+    ⇔  Elems(𝑻) is finite
+    ⇔  Set(𝑻) is finite
+
+  𝑻 is infinite  :⇔  𝑻 is not finite
+
+Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.2.1 data/libraries/hlm/Essentials/Properties/Properties 1`] = `

@@ -3552,7 +3552,7 @@ class TutorialStates {
                                   <p>Finally, you should add some documentation, including references to external material.</p>
                                   <p>At a minimum, please fill the given list of default references where applicable. Links to the corresponding definition/theorem in other theorem provers may become especially valuable in the future.</p>
                                   <p>For convenience, you can click on the "Search" button in the editor toolbar to search the default references for a given term, either one by one or (if your browser allows it) all at once. {this.withTouchWarning ? <>(Unfortunately, the markdown editor including this feature does not work on mobile devices.)</> : null}</p>
-                                  <p>However, in tutorial mode, you can skip this step.</p>
+                                  <p>However, in tutorial mode, you can skip this and just hit "Submit".</p>
                                 </div>
                               ),
                               position: 'top',

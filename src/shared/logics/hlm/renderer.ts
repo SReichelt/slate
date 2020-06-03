@@ -195,7 +195,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         definitions.unshift(this.definition);
       }
       let omitArguments = contents instanceof FmtHLM.ObjectContents_Construction ? 1 : 2;
-      return this.renderDefinitionRef(definitions, undefined, omitArguments);
+      let result = this.renderDefinitionRef(definitions, undefined, omitArguments);
+      if (contents instanceof FmtHLM.ObjectContents_Definition && contents.definitionNotation) {
+        let pluralName = contents.definitionNotation.pluralName;
+        if (pluralName) {
+          let name = this.renderDefinitionNotationExpression(pluralName, definitions, undefined, omitArguments);
+          name = this.splitName(name);
+          let nameWithParens = new Notation.ParenExpression(name, '()');
+          nameWithParens.styleClasses = ['addendum-hint'];
+          result = new Notation.RowExpression([
+            result,
+            new Notation.TextExpression(' '),
+            nameWithParens
+          ]);
+        }
+      }
+      return result;
     }
     return undefined;
   }
@@ -764,20 +779,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private applyName(name: Fmt.Expression, args: RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Notation.RenderedExpression[]): string | undefined {
     result.length = 0;
     let expression = this.renderNotationExpression(name, args);
-    while (expression instanceof Notation.IndirectExpression) {
-      expression = expression.resolve();
-    }
-    if (expression instanceof Notation.RowExpression && expression.items.length) {
-      result.push(...expression.items);
-    } else {
-      result.push(expression);
-    }
-    let firstItem = result[0];
+    let firstItem = this.splitName(expression, result);
     this.addSemanticLink(firstItem, definitionRef);
     if (firstItem instanceof Notation.TextExpression) {
       return firstItem.text;
     } else {
       return undefined;
+    }
+  }
+
+  private splitName(expression: Notation.RenderedExpression, result?: Notation.RenderedExpression[]): Notation.RenderedExpression {
+    while (expression instanceof Notation.UserDefinedExpression) {
+      expression = expression.resolve();
+    }
+    if (expression instanceof Notation.RowExpression && expression.items.length) {
+      result?.push(...expression.items);
+      return expression.items[0];
+    } else {
+      result?.push(expression);
+      return expression;
     }
   }
 

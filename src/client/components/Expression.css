@@ -145,6 +145,10 @@ div.display-math {
   color: var(--addendum-foreground-color);
 }
 
+.addendum-hint {
+  color: var(--addendum-foreground-color);
+}
+
 .display-math>.aligned-row>.aligned-left, .display-math>.aligned-row>.aligned-right {
   padding-top: 1pt;
   padding-bottom: 1pt;
