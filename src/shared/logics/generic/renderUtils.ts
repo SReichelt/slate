@@ -89,7 +89,7 @@ export abstract class GenericRenderUtils {
         }
         let property: PropertyInfo | undefined = undefined;
         for (let index = 0; index < parameters.length; index++) {
-          let currentProperty = this.getProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
+          let currentProperty = this.getConstraintParamProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
           if (!currentProperty) {
             property = undefined;
             break;
@@ -137,33 +137,38 @@ export abstract class GenericRenderUtils {
     return result;
   }
 
-  private getProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): PropertyInfo | undefined {
+  private getConstraintParamProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): PropertyInfo | undefined {
     if (definition) {
       let [constraint, negationCount] = this.getConstraint(constraintParam);
       if (constraint instanceof Fmt.DefinitionRefExpression) {
-        let notation = this.getDefinitionNotation(definition);
-        if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
-          let template = this.templates.definitions.getDefinition(notation.path.name);
-          if (template.contents instanceof FmtNotation.ObjectContents_Template) {
-            let elements = template.contents.elements;
-            if (elements && elements.operand instanceof Fmt.VariableRefExpression) {
-              let operand = notation.path.arguments.getValue(elements.operand.variable.name);
-              if (operand instanceof Fmt.VariableRefExpression) {
-                let operandArg = constraint.path.arguments.getValue(operand.variable.name);
-                if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
-                  let operandArgValue = operandArg.arguments[0].value;
-                  if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
-                    return {
-                      property: this.getNotationArgument(notation, elements.property, negationCount),
-                      singular: this.getNotationArgument(notation, elements.singular, negationCount),
-                      plural: this.getNotationArgument(notation, elements.plural, negationCount),
-                      article: this.getNotationArgument(notation, elements.article, negationCount),
-                      isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
-                      definitionRef: constraint,
-                      extracted: true
-                    };
-                  }
-                }
+        return this.getConstraintProperty(param, constraint, negationCount, definition);
+      }
+    }
+    return undefined;
+  }
+
+  getConstraintProperty(param: Fmt.Parameter, constraint: Fmt.DefinitionRefExpression, negationCount: number, definition: Fmt.Definition): PropertyInfo | undefined {
+    let notation = this.getDefinitionNotation(definition);
+    if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
+      let template = this.templates.definitions.getDefinition(notation.path.name);
+      if (template.contents instanceof FmtNotation.ObjectContents_Template) {
+        let elements = template.contents.elements;
+        if (elements && elements.operand instanceof Fmt.VariableRefExpression) {
+          let operand = notation.path.arguments.getValue(elements.operand.variable.name);
+          if (operand instanceof Fmt.VariableRefExpression) {
+            let operandArg = constraint.path.arguments.getValue(operand.variable.name);
+            if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
+              let operandArgValue = operandArg.arguments[0].value;
+              if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
+                return {
+                  property: this.getNotationArgument(notation, elements.property, negationCount),
+                  singular: this.getNotationArgument(notation, elements.singular, negationCount),
+                  plural: this.getNotationArgument(notation, elements.plural, negationCount),
+                  article: this.getNotationArgument(notation, elements.article, negationCount),
+                  isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
+                  definitionRef: constraint,
+                  extracted: true
+                };
               }
             }
           }

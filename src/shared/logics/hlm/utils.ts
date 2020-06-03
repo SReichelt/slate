@@ -75,6 +75,19 @@ export class HLMUtils extends GenericUtils {
     return (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element);
   }
 
+  getParameterExpressionType(param: Fmt.Parameter): HLMExpressionType | undefined {
+    let type = param.type.expression;
+    if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+      return HLMExpressionType.Formula;
+    } else if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef) {
+      return HLMExpressionType.SetTerm;
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
+      return HLMExpressionType.ElementTerm;
+    } else {
+      return undefined;
+    }
+  }
+
   // OPT omit proofs during argument conversion, as they are not used
   private getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
     let arg = this.getRawArgument([argumentList], param);

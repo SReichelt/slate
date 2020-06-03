@@ -25,6 +25,8 @@ export type RenderExpressionFn = (expression: Fmt.Expression) => Notation.Render
 export type InsertExpressionFn = (expression: Fmt.Expression) => void;
 export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
+export type RenderExpressionsFn = (expressions: Fmt.Expression[]) => Notation.RenderedExpression;
+
 export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {

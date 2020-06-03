@@ -1,11 +1,12 @@
 import * as Fmt from '../../format/format';
+import * as Ctx from '../../format/context';
 import * as Edit from '../../format/edit';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as Notation from '../../notation/notation';
 import * as Menu from '../../notation/menu';
 import * as Dialog from '../../notation/dialog';
-import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn } from '../generic/editHandler';
+import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn, RenderExpressionsFn } from '../generic/editHandler';
 import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
@@ -56,6 +57,15 @@ export const fullFormulaSelection: FormulaSelection = {
   allowCases: true
 };
 
+function addNegations(expressions: Fmt.Expression[]): Fmt.Expression[] {
+  let negatedExpressions = expressions.map((expression: Fmt.Expression) => {
+    let negatedExpression = new FmtHLM.MetaRefExpression_not;
+    negatedExpression.formula = expression;
+    return negatedExpression;
+  });
+  return expressions.concat(negatedExpressions);
+};
+
 export class HLMEditHandler extends GenericEditHandler {
   protected checker: HLMDefinitionChecker;
 
@@ -66,11 +76,27 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   update(onAutoFilled?: () => void): CachedPromise<void> {
-    return super.update().then(() =>
-      this.checker.checkDefinition()
+    return super.update().then(() => {
+      let autoFilled = false;
+      for (let innerDefinition of this.definition.innerDefinitions) {
+        let contents = innerDefinition.contents;
+        if (contents instanceof FmtHLM.ObjectContents_Constructor) {
+          if (!contents.equalityDefinition
+              || !contents.equalityDefinition.leftParameters.isEquivalentTo(innerDefinition.parameters)
+              || !contents.equalityDefinition.rightParameters.isEquivalentTo(innerDefinition.parameters)) {
+            if (contents.equalityDefinition) {
+              autoFilled = true;
+            }
+            contents.equalityDefinition = this.createEqualityDefinition(innerDefinition.parameters);
+            if (contents.equalityDefinition) {
+              autoFilled = true;
+            }
+          }
+        }
+      }
+      return this.checker.checkDefinition()
         .then((result: Logic.LogicCheckResult): void | CachedPromise<void> => {
           if (onAutoFilled && !result.hasErrors) {
-            let autoFilled = false;
             let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
               let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
               if (expressionEditInfo) {
@@ -86,7 +112,8 @@ export class HLMEditHandler extends GenericEditHandler {
             });
           }
         })
-        .catch(() => {}));
+        .catch(() => {});
+    });
   }
 
   private adaptNewParameterLists(newParameterLists: Fmt.ParameterList[], expressionEditInfo: Edit.ExpressionEditInfo): void {
@@ -243,30 +270,32 @@ export class HLMEditHandler extends GenericEditHandler {
         rows.push(this.getSetCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      {
-        let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
-          let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.SetTerm);
-          } else {
-            return undefined;
-          }
-        };
-        let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
-          let renderedExpression = onRenderTerm(term);
-          if (!renderedExpression.semanticLinks) {
-            renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
-          }
-          return renderedExpression;
-        };
-        rows.push(
-          new Menu.ExpressionMenuSeparator,
-          this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], onGetExpressions, onRenderTermWithSemanticLink)
-        );
-      }
+      rows.push(
+        new Menu.ExpressionMenuSeparator,
+        this.getSetTermDefinitionRow(expressionEditInfo, onRenderTerm)
+      );
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
+  }
+
+  private getSetTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
+    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+      let type = definition.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
+        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.SetTerm);
+      } else {
+        return undefined;
+      }
+    };
+    let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
+      let renderedExpression = onRenderTerm(term);
+      if (!renderedExpression.semanticLinks) {
+        renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
+      }
+      return renderedExpression;
+    };
+    return this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.SetOperator, Logic.LogicDefinitionType.Construction], onGetExpressions, onRenderTermWithSemanticLink);
   }
 
   addElementTermMenu(semanticLink: Notation.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
@@ -302,33 +331,35 @@ export class HLMEditHandler extends GenericEditHandler {
         rows.push(this.getElementCasesRow(expressionEditInfo, onRenderTerm));
       }
 
-      {
-        let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
-          let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
-              || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
-              || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList)
-              || (termSelection.allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor && !(fromMRUList && definition.contents instanceof FmtHLM.ObjectContents_Constructor && definition.contents.rewrite))) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
-          } else {
-            return undefined;
-          }
-        };
-        let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
-          let renderedExpression = onRenderTerm(term);
-          if (!renderedExpression.semanticLinks) {
-            renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
-          }
-          return renderedExpression;
-        };
-        rows.push(
-          new Menu.ExpressionMenuSeparator,
-          this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], onGetExpressions, onRenderTermWithSemanticLink)
-        );
-      }
+      rows.push(
+        new Menu.ExpressionMenuSeparator,
+        this.getElementTermDefinitionRow(expressionEditInfo, onRenderTerm, termSelection.allowConstructors)
+      );
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
+  }
+
+  private getElementTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, allowConstructors: boolean): Menu.ExpressionMenuRow {
+    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
+      let type = definition.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
+          || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
+          || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList)
+          || (allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor && !(fromMRUList && definition.contents instanceof FmtHLM.ObjectContents_Constructor && definition.contents.rewrite))) {
+        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
+      } else {
+        return undefined;
+      }
+    };
+    let onRenderTermWithSemanticLink = (term: Fmt.Expression) => {
+      let renderedExpression = onRenderTerm(term);
+      if (!renderedExpression.semanticLinks) {
+        renderedExpression.semanticLinks = [new Notation.SemanticLink(term)];
+      }
+      return renderedExpression;
+    };
+    return this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Operator, Logic.LogicDefinitionType.Constructor], onGetExpressions, onRenderTermWithSemanticLink);
   }
 
   addFormulaMenu(semanticLink: Notation.SemanticLink, formula: Fmt.Expression, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): void {
@@ -348,15 +379,6 @@ export class HLMEditHandler extends GenericEditHandler {
           new Menu.ExpressionMenuSeparator
         );
       }
-
-      let addNegations = (expressions: Fmt.Expression[]) => {
-        let negatedExpressions = expressions.map((expression: Fmt.Expression) => {
-          let negatedExpression = new FmtHLM.MetaRefExpression_not;
-          negatedExpression.formula = expression;
-          return negatedExpression;
-        });
-        return expressions.concat(negatedExpressions);
-      };
 
       {
         let onGetExpressions = (variable: Fmt.Parameter) => {
@@ -380,34 +402,36 @@ export class HLMEditHandler extends GenericEditHandler {
         rows.push(this.getFormulaCasesRow(expressionEditInfo, onRenderFormula));
       }
 
-      {
-        let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
-          let type = definition.type.expression;
-          if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
-            return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false, HLMExpressionType.Formula)
-              .then(addNegations);
-          } else {
-            return undefined;
-          }
-        };
-        let onRenderFormulaWithSemanticLink = (formula: Fmt.Expression) => {
-          let renderedExpression = onRenderFormula(formula);
-          if (!renderedExpression.semanticLinks) {
-            while (formula instanceof FmtHLM.MetaRefExpression_not) {
-              formula = formula.formula;
-            }
-            renderedExpression.semanticLinks = [new Notation.SemanticLink(formula)];
-          }
-          return renderedExpression;
-        };
-        rows.push(
-          new Menu.ExpressionMenuSeparator,
-          this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], onGetExpressions, onRenderFormulaWithSemanticLink)
-        );
-      }
+      rows.push(
+        new Menu.ExpressionMenuSeparator,
+        this.getFormulaDefinitionRow(expressionEditInfo, onRenderFormula)
+      );
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
+  }
+
+  private getFormulaDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, preFillExpressionType: HLMExpressionType = HLMExpressionType.Formula, requirePreFilling: boolean = false): Menu.ExpressionMenuRow {
+    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+      let type = definition.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
+        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false, preFillExpressionType, requirePreFilling)
+          .then(addNegations);
+      } else {
+        return undefined;
+      }
+    };
+    let onRenderFormulaWithSemanticLink = (formula: Fmt.Expression) => {
+      let renderedExpression = onRenderFormula(formula);
+      if (!renderedExpression.semanticLinks) {
+        while (formula instanceof FmtHLM.MetaRefExpression_not) {
+          formula = formula.formula;
+        }
+        renderedExpression.semanticLinks = [new Notation.SemanticLink(formula)];
+      }
+      return renderedExpression;
+    };
+    return this.getDefinitionRow(expressionEditInfo, [Logic.LogicDefinitionType.Predicate], onGetExpressions, onRenderFormulaWithSemanticLink);
   }
 
   private getRemoveRow(expressionEditInfo: Edit.ExpressionEditInfo): Menu.ExpressionMenuRow {
@@ -670,7 +694,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return undefined;
   }
 
-  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkType: boolean, expressionType: HLMExpressionType): CachedPromise<Fmt.Expression[]> {
+  private getDefinitionRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkType: boolean, preFillExpressionType: HLMExpressionType, requirePreFilling: boolean = false): CachedPromise<Fmt.Expression[]> {
     let checkResultPath = (prevResultPromise: CachedPromise<Fmt.Expression | undefined> | undefined, resultPath: Fmt.Path) => {
       if (!prevResultPromise) {
         prevResultPromise = CachedPromise.resolve(undefined);
@@ -691,7 +715,7 @@ export class HLMEditHandler extends GenericEditHandler {
       });
     };
     let preFillExpression = expressionEditInfo.expression instanceof Fmt.PlaceholderExpression ? undefined : expressionEditInfo.expression;
-    let resultExpressionPromises = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition, checkResultPath, preFillExpression, expressionType);
+    let resultExpressionPromises = this.createPathsWithArguments(expressionEditInfo, path, outerDefinition, definition, checkResultPath, preFillExpression, preFillExpressionType, requirePreFilling);
     let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let resultExpressionPromise of resultExpressionPromises) {
       result = result.then((currentResult: Fmt.Expression[]) =>
@@ -701,7 +725,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return result;
   }
 
-  private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T[] {
+  private createPathsWithArguments<T>(expressionEditInfo: Edit.ExpressionEditInfo, path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType, requirePreFilling: boolean = false): T[] {
     let notationAlternatives = this.renderUtils.getNotationAlternatives(definition);
     let result: T[] = [];
     for (let notationAlternative of notationAlternatives) {
@@ -722,13 +746,16 @@ export class HLMEditHandler extends GenericEditHandler {
         if (notationAlternative) {
           this.utils.reorderArguments(resultPath.arguments, notationAlternative);
         }
-        result.push(this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, preFillExpression, preFillExpressionType));
+        let pathWithArgumentsResult = this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, preFillExpression, preFillExpressionType, requirePreFilling);
+        if (pathWithArgumentsResult) {
+          result.push(pathWithArgumentsResult);
+        }
       }
     }
     return result;
   }
 
-  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType): T {
+  private getPathWithArgumentsResult<T>(resultPath: Fmt.Path, checkResultPath: (prevResult: T | undefined, resultPath: Fmt.Path) => T, definition: Fmt.Definition, preFillExpression?: Fmt.Expression, preFillExpressionType?: HLMExpressionType, requirePreFilling: boolean = false): T | undefined {
     let currentResultItem: T | undefined = undefined;
     if (preFillExpression) {
       let visibleParameters: Fmt.Parameter[] = definition.parameters;
@@ -786,7 +813,11 @@ export class HLMEditHandler extends GenericEditHandler {
         }
       }
     }
-    return checkResultPath(currentResultItem, resultPath);
+    if (requirePreFilling) {
+      return currentResultItem;
+    } else {
+      return checkResultPath(currentResultItem, resultPath);
+    }
   }
 
   private findResultPathArgument(resultPath: Fmt.Path, param: Fmt.Parameter): Fmt.Expression | undefined {
@@ -954,6 +985,63 @@ export class HLMEditHandler extends GenericEditHandler {
     this.addElementTermInsertButton(items, term, onInsertTerm, onRenderTerm, termSelection);
   }
 
+  getPropertyInsertButton(objectParams: Fmt.Parameter[], onInsertParam: InsertParameterFn, onRenderFormulas: RenderExpressionsFn): Notation.RenderedExpression | undefined {
+    if (!objectParams.length) {
+      return undefined;
+    }
+    let firstObjectParam = objectParams[0];
+    let objectExpressionType = this.utils.getParameterExpressionType(firstObjectParam);
+    let context = this.editAnalysis.parameterContext.get(firstObjectParam);
+    if (!objectExpressionType || !context) {
+      return undefined;
+    }
+    objectParams = objectParams.slice();
+    let insertButton = new Notation.InsertPlaceholderExpression;
+    insertButton.styleClasses = ['mini-placeholder'];
+    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
+    semanticLink.onMenuOpened = () => {
+      let firstObjectExpression = new Fmt.VariableRefExpression;
+      firstObjectExpression.variable = firstObjectParam;
+      let getPropertyFormulas = (formula: Fmt.Expression) => objectParams.map((objectParam: Fmt.Parameter) => {
+        let objectExpression = new Fmt.VariableRefExpression;
+        objectExpression.variable = objectParam;
+        return this.utils.substituteExpression(formula, firstObjectExpression, objectExpression);
+      });
+      let onInsertProperty = (formula: Fmt.Expression | undefined) => {
+        if (formula) {
+          for (let propertyFormula of getPropertyFormulas(formula)) {
+            let newParamType = new FmtHLM.MetaRefExpression_Constraint;
+            newParamType.formula = propertyFormula;
+            let newParam = this.utils.createParameter(newParamType, '_1', context);
+            onInsertParam(newParam);
+            context = new Ctx.ParameterContext(newParam, context!);
+          }
+        }
+      };
+      let expressionEditInfo: Edit.ExpressionEditInfo = {
+        expression: firstObjectExpression,
+        optional: true,
+        onSetValue: onInsertProperty,
+        context: context!
+      };
+      let onRenderProperty = (formula: Fmt.Expression) => onRenderFormulas(getPropertyFormulas(formula));
+      return new Menu.ExpressionMenu(CachedPromise.resolve([
+        this.getFormulaDefinitionRow(expressionEditInfo, onRenderProperty, objectExpressionType, true)
+      ]));
+    };
+    insertButton.semanticLinks = [semanticLink];
+    return insertButton;
+  }
+
+  addPropertyInsertButton(singular: Notation.RenderedExpression[], plural: Notation.RenderedExpression[], objectParams: Fmt.Parameter[], onInsertParam: InsertParameterFn, onRenderFormulas: RenderExpressionsFn): void {
+    let insertButton = this.getPropertyInsertButton(objectParams, onInsertParam, onRenderFormulas);
+    if (insertButton) {
+      let space = new Notation.TextExpression(' ');
+      singular.unshift(insertButton, space);
+      plural.unshift(insertButton, space);
+    }
+  }
+
   addImplicitDefinitionMenu(semanticLink: Notation.SemanticLink, onRenderExplicitIntro: Logic.RenderFn, onRenderImplicitIntro: RenderParameterFn): void {
     semanticLink.onMenuOpened = () => {
       return new Menu.ExpressionMenu(CachedPromise.resolve([
@@ -1040,7 +1128,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
+  private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
     let result = new FmtHLM.ObjectContents_EqualityDefinition;
     let leftParameters = new Fmt.ParameterList;
     parameters.clone(leftParameters);

@@ -621,7 +621,7 @@ class TutorialStates {
                           },
                           {
                             type: Expression,
-                            key: 5,
+                            key: 7,
                             toolTip: {
                               contents: <p>Add another parameter, which will be a function between these two sets.</p>,
                               position: 'bottom',
@@ -1170,7 +1170,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 9,
+                            key: 11,
                             toolTip: {
                               contents: <p>Add another function, but this will be a function from S to S.</p>,
                               position: 'bottom',
@@ -4237,7 +4237,7 @@ class TutorialStates {
                         children: [
                           {
                             type: Expression,
-                            key: 5,
+                            key: 7,
                             toolTip: {
                               contents: <p>Insert a natural number "n".</p>,
                               position: 'bottom',

@@ -357,6 +357,10 @@ div.display-math {
   font-size: 70%;
 }
 
+.mini-placeholder {
+  font-size: smaller;
+}
+
 .table {
   display: inline-table;
   vertical-align: middle;

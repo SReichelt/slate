@@ -86,6 +86,18 @@ export abstract class GenericRenderer {
     };
   }
 
+  protected renderGroup(items: Notation.RenderedExpression[], separator?: string): Notation.RenderedExpression {
+    if (items.length === 1) {
+      return items[0];
+    } else {
+      let args: RenderedTemplateArguments = {'items': items};
+      if (separator !== undefined) {
+        args['separator'] = separator;
+      }
+      return this.renderTemplate('Group', args);
+    }
+  }
+
   renderVariable(param: Fmt.Parameter, indices?: Notation.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList): Notation.RenderedExpression {
     let name = param.name;
     let suffixes: Notation.RenderedExpression[] | undefined = undefined;
