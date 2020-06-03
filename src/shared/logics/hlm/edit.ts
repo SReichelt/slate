@@ -30,8 +30,8 @@ export class HLMEditAnalysis extends Edit.EditAnalysis {
     if (expression instanceof FmtHLM.MetaRefExpression_equals || expression instanceof FmtHLM.MetaRefExpression_setEquals) {
       this.analyzeExpressions(expression.terms, 2, undefined, context);
     } else if (expression instanceof FmtHLM.MetaRefExpression_and || expression instanceof FmtHLM.MetaRefExpression_or) {
-      if (expression.formulae) {
-        this.analyzeExpressions(expression.formulae, 2, undefined, context);
+      if (expression.formulas) {
+        this.analyzeExpressions(expression.formulas, 2, undefined, context);
       }
     } else {
       super.analyzeMetaRefExpression(expression, context);

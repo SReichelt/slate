@@ -511,9 +511,9 @@ export class HLMEditHandler extends GenericEditHandler {
     let leftPlaceholder = expressionEditInfo.expression || new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let rightPlaceholder = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let andExpression = new FmtHLM.MetaRefExpression_and;
-    andExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
+    andExpression.formulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
     let orExpression = new FmtHLM.MetaRefExpression_or;
-    orExpression.formulae = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulae ? [...expressionEditInfo.expression.formulae, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
+    orExpression.formulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
 
     let mainList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
       this.getExpressionItem(andExpression, expressionEditInfo, onRenderFormula),
@@ -647,8 +647,8 @@ export class HLMEditHandler extends GenericEditHandler {
           item.selected = false;
         } else if ((newExpression instanceof FmtHLM.MetaRefExpression_and && origExpression instanceof FmtHLM.MetaRefExpression_and)
                    || (newExpression instanceof FmtHLM.MetaRefExpression_or && origExpression instanceof FmtHLM.MetaRefExpression_or)) {
-          let origEmpty = !origExpression.formulae || !origExpression.formulae.length;
-          let newEmpty = !newExpression.formulae || !newExpression.formulae.length;
+          let origEmpty = !origExpression.formulas || !origExpression.formulas.length;
+          let newEmpty = !newExpression.formulas || !newExpression.formulas.length;
           item.selected = (newEmpty === origEmpty);
         }
       }

@@ -1161,7 +1161,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    'operand': this.renderFormula(formula.formula, formulaSelection)
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
-      if (formula.formulae) {
+      if (formula.formulas) {
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
@@ -1169,7 +1169,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         let operands: Notation.RenderedExpression[] = [];
         let prevItem: Notation.RenderedExpression | undefined = undefined;
-        for (let item of formula.formulae) {
+        for (let item of formula.formulas) {
           if (this.hasAssociativeArg(item)) {
             operands.pop();
           } else {
@@ -1185,13 +1185,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderTemplate('True', {}, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
-      if (formula.formulae) {
+      if (formula.formulas) {
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
-        let operands = formula.formulae.map((item) => this.renderFormula(item, formulaSelection));
+        let operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
         return this.renderTemplate('Disjunction', {
                                      'operands': operands
                                    }, negationCount);
@@ -2565,7 +2565,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           // TODO unset dependsOnPrevious if theorem does not depend on previous
         }
         let resultToNotation: Notation.RenderedExpression;
-        if (result instanceof FmtHLM.MetaRefExpression_or && !result.formulae) {
+        if (result instanceof FmtHLM.MetaRefExpression_or && !result.formulas) {
           resultToNotation = new Notation.TextExpression('⚡');
         } else {
           resultToNotation = this.readOnlyRenderer.renderFormula(result, fullFormulaSelection);

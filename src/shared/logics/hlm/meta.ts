@@ -3948,35 +3948,35 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_and extends Fmt.MetaRefExpression {
-  formulae?: Fmt.Expression[];
+  formulas?: Fmt.Expression[];
 
   getName(): string {
     return 'and';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    if (this.formulae) {
-      this.formulae = undefined;
+    if (this.formulas) {
+      this.formulas = undefined;
     }
     let index = 0;
     for (;;) {
-      let formulaeRaw = argumentList.getOptionalValue(undefined, index);
-      if (formulaeRaw === undefined) {
+      let formulasRaw = argumentList.getOptionalValue(undefined, index);
+      if (formulasRaw === undefined) {
         break;
       }
-      if (!this.formulae) {
-        this.formulae = [];
+      if (!this.formulas) {
+        this.formulas = [];
       }
-      this.formulae!.push(formulaeRaw);
+      this.formulas!.push(formulasRaw);
       index++;
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    if (this.formulae !== undefined) {
-      for (let formulaeArg of this.formulae) {
-        argumentList.add(formulaeArg, undefined, true);
+    if (this.formulas !== undefined) {
+      for (let formulasArg of this.formulas) {
+        argumentList.add(formulasArg, undefined, true);
       }
     }
   }
@@ -3984,14 +3984,14 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_and;
     let changed = false;
-    if (this.formulae) {
-      result.formulae = [];
-      for (let item of this.formulae) {
+    if (this.formulas) {
+      result.formulas = [];
+      for (let item of this.formulas) {
         let newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
-        result.formulae.push(newItem);
+        result.formulas.push(newItem);
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
@@ -4001,13 +4001,13 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_and)) {
       return false;
     }
-    if (this.formulae || expression.formulae) {
-      if (!this.formulae || !expression.formulae || this.formulae.length !== expression.formulae.length) {
+    if (this.formulas || expression.formulas) {
+      if (!this.formulas || !expression.formulas || this.formulas.length !== expression.formulas.length) {
         return false;
       }
-      for (let i = 0; i < this.formulae.length; i++) {
-        let leftItem = this.formulae[i];
-        let rightItem = expression.formulae[i];
+      for (let i = 0; i < this.formulas.length; i++) {
+        let leftItem = this.formulas[i];
+        let rightItem = expression.formulas[i];
         if (leftItem || rightItem) {
           if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
             return false;
@@ -4020,35 +4020,35 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_or extends Fmt.MetaRefExpression {
-  formulae?: Fmt.Expression[];
+  formulas?: Fmt.Expression[];
 
   getName(): string {
     return 'or';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    if (this.formulae) {
-      this.formulae = undefined;
+    if (this.formulas) {
+      this.formulas = undefined;
     }
     let index = 0;
     for (;;) {
-      let formulaeRaw = argumentList.getOptionalValue(undefined, index);
-      if (formulaeRaw === undefined) {
+      let formulasRaw = argumentList.getOptionalValue(undefined, index);
+      if (formulasRaw === undefined) {
         break;
       }
-      if (!this.formulae) {
-        this.formulae = [];
+      if (!this.formulas) {
+        this.formulas = [];
       }
-      this.formulae!.push(formulaeRaw);
+      this.formulas!.push(formulasRaw);
       index++;
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
-    if (this.formulae !== undefined) {
-      for (let formulaeArg of this.formulae) {
-        argumentList.add(formulaeArg, undefined, true);
+    if (this.formulas !== undefined) {
+      for (let formulasArg of this.formulas) {
+        argumentList.add(formulasArg, undefined, true);
       }
     }
   }
@@ -4056,14 +4056,14 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_or;
     let changed = false;
-    if (this.formulae) {
-      result.formulae = [];
-      for (let item of this.formulae) {
+    if (this.formulas) {
+      result.formulas = [];
+      for (let item of this.formulas) {
         let newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
-        result.formulae.push(newItem);
+        result.formulas.push(newItem);
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
@@ -4073,13 +4073,13 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_or)) {
       return false;
     }
-    if (this.formulae || expression.formulae) {
-      if (!this.formulae || !expression.formulae || this.formulae.length !== expression.formulae.length) {
+    if (this.formulas || expression.formulas) {
+      if (!this.formulas || !expression.formulas || this.formulas.length !== expression.formulas.length) {
         return false;
       }
-      for (let i = 0; i < this.formulae.length; i++) {
-        let leftItem = this.formulae[i];
-        let rightItem = expression.formulae[i];
+      for (let i = 0; i < this.formulas.length; i++) {
+        let leftItem = this.formulas[i];
+        let rightItem = expression.formulas[i];
         if (leftItem || rightItem) {
           if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
             return false;

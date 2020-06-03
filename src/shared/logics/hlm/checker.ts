@@ -929,8 +929,8 @@ export class HLMDefinitionChecker {
     } else if (formula instanceof FmtHLM.MetaRefExpression_not) {
       this.checkFormula(formula.formula, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
-      if (formula.formulae) {
-        for (let item of formula.formulae) {
+      if (formula.formulas) {
+        for (let item of formula.formulas) {
           this.checkFormula(item, context);
         }
       }

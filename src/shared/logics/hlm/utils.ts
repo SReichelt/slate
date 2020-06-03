@@ -1029,15 +1029,15 @@ export class HLMUtils extends GenericUtils {
     if (formula instanceof FmtHLM.MetaRefExpression_not) {
       return CachedPromise.resolve(formula.formula);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
-      return this.negateFormulae(formula.formulae).then((negatedFormulae: Fmt.Expression[] | undefined) => {
+      return this.negateFormulas(formula.formulas).then((negatedFormulas: Fmt.Expression[] | undefined) => {
         let result = new FmtHLM.MetaRefExpression_or;
-        result.formulae = negatedFormulae;
+        result.formulas = negatedFormulas;
         return result;
       });
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
-      return this.negateFormulae(formula.formulae).then((negatedFormulae: Fmt.Expression[] | undefined) => {
+      return this.negateFormulas(formula.formulas).then((negatedFormulas: Fmt.Expression[] | undefined) => {
         let result = new FmtHLM.MetaRefExpression_and;
-        result.formulae = negatedFormulae;
+        result.formulas = negatedFormulas;
         return result;
       });
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
@@ -1094,13 +1094,13 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  negateFormulae(formulae: Fmt.Expression[] | undefined): CachedPromise<Fmt.Expression[] | undefined> {
-    if (formulae) {
+  negateFormulas(formulas: Fmt.Expression[] | undefined): CachedPromise<Fmt.Expression[] | undefined> {
+    if (formulas) {
       let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-      for (let formula of formulae) {
-        result = result.then((negatedFormulae: Fmt.Expression[]) =>
+      for (let formula of formulas) {
+        result = result.then((negatedFormulas: Fmt.Expression[]) =>
           this.negateFormula(formula).then((negatedFormula: Fmt.Expression) =>
-            negatedFormulae.concat(negatedFormula)
+            negatedFormulas.concat(negatedFormula)
           )
         );
       }
@@ -1113,8 +1113,8 @@ export class HLMUtils extends GenericUtils {
   isTrivialTautology(formula: Fmt.Expression): CachedPromise<boolean> {
     if (formula instanceof FmtHLM.MetaRefExpression_and) {
       let resultPromise = CachedPromise.resolve(true);
-      if (formula.formulae) {
-        for (let item of formula.formulae) {
+      if (formula.formulas) {
+        for (let item of formula.formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (!currentResult) {
               return false;
@@ -1127,9 +1127,9 @@ export class HLMUtils extends GenericUtils {
       return resultPromise;
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
       let resultPromise = CachedPromise.resolve(false);
-      if (formula.formulae) {
-        let formulae = formula.formulae;
-        for (let item of formulae) {
+      if (formula.formulas) {
+        let formulas = formula.formulas;
+        for (let item of formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (currentResult) {
               return true;
@@ -1137,20 +1137,20 @@ export class HLMUtils extends GenericUtils {
               return this.isTrivialTautology(item);
             }
           });
-          if (item !== formulae[0]) {
+          if (item !== formulas[0]) {
             resultPromise = resultPromise.then((currentResult: boolean) => {
               if (currentResult) {
                 return true;
               } else {
                 return this.negateFormula(item).then((negatedItem: Fmt.Expression) => {
-                  for (let previousItem of formulae) {
+                  for (let previousItem of formulas) {
                     if (previousItem === item) {
                       break;
                     }
-                    if (this.areFormulaeSyntacticallyEquivalent(negatedItem, previousItem)) {
+                    if (this.areFormulasSyntacticallyEquivalent(negatedItem, previousItem)) {
                       return true;
                     }
-                    if (previousItem instanceof FmtHLM.MetaRefExpression_not && this.areFormulaeSyntacticallyEquivalent(item, formula)) {
+                    if (previousItem instanceof FmtHLM.MetaRefExpression_not && this.areFormulasSyntacticallyEquivalent(item, formula)) {
                       return true;
                     }
                   }
@@ -1184,13 +1184,13 @@ export class HLMUtils extends GenericUtils {
   }
 
   triviallyImplies(sourceFormula: Fmt.Expression, targetFormula: Fmt.Expression, followDefinitions: boolean): CachedPromise<boolean> {
-    if (this.areFormulaeSyntacticallyEquivalent(sourceFormula, targetFormula)) {
+    if (this.areFormulasSyntacticallyEquivalent(sourceFormula, targetFormula)) {
       return CachedPromise.resolve(true);
     }
     if (sourceFormula instanceof FmtHLM.MetaRefExpression_and) {
       let resultPromise = this.isTrivialTautology(targetFormula);
-      if (sourceFormula.formulae) {
-        for (let item of sourceFormula.formulae) {
+      if (sourceFormula.formulas) {
+        for (let item of sourceFormula.formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (currentResult) {
               return true;
@@ -1203,8 +1203,8 @@ export class HLMUtils extends GenericUtils {
       return resultPromise;
     } else if (sourceFormula instanceof FmtHLM.MetaRefExpression_or) {
       let resultPromise = CachedPromise.resolve(true);
-      if (sourceFormula.formulae) {
-        for (let item of sourceFormula.formulae) {
+      if (sourceFormula.formulas) {
+        for (let item of sourceFormula.formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (!currentResult) {
               return false;
@@ -1218,8 +1218,8 @@ export class HLMUtils extends GenericUtils {
     }
     if (targetFormula instanceof FmtHLM.MetaRefExpression_and) {
       let resultPromise = CachedPromise.resolve(true);
-      if (targetFormula.formulae) {
-        for (let item of targetFormula.formulae) {
+      if (targetFormula.formulas) {
+        for (let item of targetFormula.formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (!currentResult) {
               return false;
@@ -1232,8 +1232,8 @@ export class HLMUtils extends GenericUtils {
       return resultPromise;
     } else if (targetFormula instanceof FmtHLM.MetaRefExpression_or) {
       let resultPromise = this.isTrivialContradiction(sourceFormula);
-      if (targetFormula.formulae) {
-        for (let item of targetFormula.formulae) {
+      if (targetFormula.formulas) {
+        for (let item of targetFormula.formulas) {
           resultPromise = resultPromise.then((currentResult: boolean) => {
             if (currentResult) {
               return true;
@@ -1299,7 +1299,7 @@ export class HLMUtils extends GenericUtils {
     return finalResultPromise;
   }
 
-  private areFormulaeSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
+  private areFormulasSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
     let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
       if (((leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals)
            || (leftPart instanceof FmtHLM.MetaRefExpression_setEquals && rightPart instanceof FmtHLM.MetaRefExpression_setEquals))

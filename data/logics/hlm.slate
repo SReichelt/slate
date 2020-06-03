@@ -248,8 +248,8 @@ $asElementOf(term: $ElementTerm, set: $SetTerm, proof?: $Proof): $ElementTerm {}
 $associative(term: $ElementTerm): $ElementTerm {}
 
 $not(formula: $Formula): $Formula {}
-$and(formulae...?: $Formula): $Formula {}
-$or(formulae...?: $Formula): $Formula {}
+$and(formulas...?: $Formula): $Formula {}
+$or(formulas...?: $Formula): $Formula {}
 $equiv(left: $Formula, right: $Formula): $Formula {}
 $forall(parameters: %ParameterList, formula[parameters]: $Formula): $Formula {}
 $exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
