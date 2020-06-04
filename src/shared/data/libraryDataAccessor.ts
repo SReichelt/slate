@@ -5,6 +5,7 @@ import * as Logic from '../logics/logic';
 
 export interface LibraryDataAccessor {
   readonly logic: Logic.Logic;
+  getParentAccessor(): LibraryDataAccessor | undefined;
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor;
   fetchLocalSection(prefetchContents?: boolean): CachedPromise<LibraryDefinition>;
   fetchSubsection(path: Fmt.Path, itemNumber?: LibraryItemNumber, prefetchContents?: boolean): CachedPromise<LibraryDefinition>;

@@ -690,15 +690,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let firstObjectParam = parameters[0];
         let onRenderFormulas = (expressions: Fmt.Expression[]) => this.renderConstraintMenuItem(expressions, firstObjectParam);
         let parameterList = state.associatedParameterList;
-        let onInsertParam = (parameter: Fmt.Parameter) => {
-          let index = remainingParameters?.length ? parameterList.indexOf(remainingParameters[0]) : -1;
-          if (index >= 0) {
-            parameterList.splice(index, 0, parameter);
-          } else {
-            parameterList.push(parameter);
-          }
-        };
-        this.editHandler.addPropertyInsertButton(singular, plural, parameters, onInsertParam, onRenderFormulas);
+        let onInsertParam = (parameter: Fmt.Parameter) => parameterList.push(parameter);
+        this.editHandler.addPropertyInsertButton(parameterList, singular, plural, parameters, onInsertParam, onRenderFormulas);
       }
       if (!variableNotation) {
         variableNotation = variableDefinitions;
@@ -910,7 +903,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return new Notation.PromiseExpression(constraintDefinitionPromise.then((constraintDefinition: Fmt.Definition | undefined) => {
       if (constraintDefinition) {
         let constraintProperty = this.renderUtils.getConstraintProperty(firstObjectParam, constraint as Fmt.DefinitionRefExpression, negationCount, constraintDefinition);
-        if (constraintProperty) {
+        if (constraintProperty && !constraintProperty.isFeature) {
           let property: string | undefined = undefined;
           if (constraintProperty.property) {
             property = constraintProperty.property;

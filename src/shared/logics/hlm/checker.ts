@@ -26,6 +26,7 @@ interface HLMCheckerStructuralCaseRef {
 }
 
 type HLMCheckerRecheckFn = (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => HLMCheckerContext;
+type HLMCheckerCheckFormulaFn = (formula: Fmt.Expression) => HLMCheckerContext;
 type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => void;
 
 interface HLMCheckerContext {
@@ -49,6 +50,7 @@ interface HLMCheckerCompatibilityStatus {
 interface HLMCheckerEditData {
   restrictions: Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>;
   recheckFns?: Map<Fmt.Expression, HLMCheckerRecheckFn>;
+  constraintCheckFns?: Map<Fmt.ParameterList, HLMCheckerCheckFormulaFn>;
 }
 
 interface HLMCheckerPlaceholderRestriction {
@@ -128,7 +130,8 @@ export class HLMDefinitionChecker {
       if (this.supportPlaceholders) {
         this.rootContext.editData = {
           restrictions: new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(),
-          recheckFns: this.supportRechecking ? new Map<Fmt.Expression, HLMCheckerRecheckFn>() : undefined
+          recheckFns: this.supportRechecking ? new Map<Fmt.Expression, HLMCheckerRecheckFn>() : undefined,
+          constraintCheckFns: this.supportRechecking ? new Map<Fmt.ParameterList, HLMCheckerCheckFormulaFn>() : undefined
         };
         this.rootContext.currentPlaceholderCollection = {
           containsNonAutoPlaceholders: false,
@@ -172,29 +175,61 @@ export class HLMDefinitionChecker {
           }
         }
       }
-      return this.getPendingChecksPromise().then((result: Logic.LogicCheckResult) => {
-        if (result.hasErrors) {
-          return {
-            ...result,
-            expression: substitutedExpression
-          };
-        } else {
-          let resultExpression = substitutedExpression.substitute((subExpression: Fmt.Expression) => {
-            if (subExpression instanceof Fmt.PlaceholderExpression && recheckContext) {
-              let restriction = recheckContext.editData!.restrictions.get(subExpression);
-              if (restriction && restriction.exactValue) {
-                return restriction.exactValue;
-              }
-            }
-            return subExpression;
-          });
-          return {
-            ...result,
-            expression: resultExpression
-          };
-        }
-      });
+      return this.getRecheckResult(substitutedExpression, recheckContext);
     }
+  }
+
+  checkConstraint(parameterList: Fmt.ParameterList, formula: Fmt.Expression): CachedPromise<Logic.LogicCheckResultWithExpression> {
+    if (this.pendingChecksPromise) {
+      return this.pendingChecksPromise
+        .catch(() => {})
+        .then(() => this.checkConstraint(parameterList, formula));
+    } else {
+      if (debugRecheck) {
+        console.log(`Checking ${formula}...`);
+      }
+      this.result = {
+        diagnostics: [],
+        hasErrors: false
+      };
+      let recheckContext: HLMCheckerContext | undefined = undefined;
+      if (this.rootContext.editData && this.rootContext.editData.constraintCheckFns) {
+        let checkConstraintFn = this.rootContext.editData.constraintCheckFns.get(parameterList);
+        if (checkConstraintFn) {
+          try {
+            recheckContext = checkConstraintFn(formula);
+          } catch (error) {
+            this.error(formula, error.message);
+          }
+        }
+      }
+      return this.getRecheckResult(formula, recheckContext);
+    }
+  }
+
+  private getRecheckResult(expression: Fmt.Expression, recheckContext: HLMCheckerContext | undefined): CachedPromise<Logic.LogicCheckResultWithExpression> {
+    return this.getPendingChecksPromise().then((result: Logic.LogicCheckResult) => {
+      if (result.hasErrors) {
+        return {
+          ...result,
+          expression: expression
+        };
+      } else {
+        let resultExpression = expression.substitute((subExpression: Fmt.Expression) => {
+          if (subExpression instanceof Fmt.PlaceholderExpression && recheckContext) {
+            let restriction = recheckContext.editData!.restrictions.get(subExpression);
+            if (restriction && restriction.exactValue) {
+              return restriction.exactValue;
+            }
+          }
+          return subExpression;
+        });
+        return {
+          ...result,
+          expression: resultExpression
+        };
+      }
+    });
   }
 
   autoFill(onFillExpression: HLMCheckerFillExpressionFn): CachedPromise<void> {
@@ -509,36 +544,8 @@ export class HLMDefinitionChecker {
         ...context,
         currentRecheckFn: (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => {
           let substituted = this.utils.substituteExpression(expression, originalExpression, substitutedExpression);
-          let restrictions = originalExpression instanceof Fmt.PlaceholderExpression ? context.editData!.restrictions : new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>();
-          let recheckContext: HLMCheckerContext = {
-            ...context,
-            editData: {
-              restrictions: restrictions
-            }
-          };
-          checkFn(substituted, recheckContext);
-          let lastSetsToCheckLength = 0;
-          let checkRestrictions = () => {
-            let setsToCheck: Fmt.Expression[][] = [];
-            for (let [placeholder, restriction] of restrictions) {
-              if (!placeholder.isTemporary) {
-                let sets = restriction.compatibleSets.concat(restriction.declaredSets);
-                if (sets.length > 1) {
-                  setsToCheck.push(sets);
-                }
-              }
-            }
-            if (setsToCheck.length > lastSetsToCheckLength) {
-              for (let sets of setsToCheck) {
-                this.checkSetCompatibility(substitutedExpression, sets, recheckContext);
-              }
-              lastSetsToCheckLength = setsToCheck.length;
-              this.pendingChecks.push(checkRestrictions);
-            }
-            return CachedPromise.resolve();
-          };
-          this.pendingChecks.push(checkRestrictions);
-          return recheckContext;
+          let fn = (recheckContext: HLMCheckerContext) => checkFn(substituted, recheckContext);
+          return this.recheck(substitutedExpression, fn, context, originalExpression);
         },
         currentPlaceholderCollection: {
           containsNonAutoPlaceholders: false,
@@ -560,6 +567,39 @@ export class HLMDefinitionChecker {
     }
   }
 
+  private recheck(object: Object, fn: (recheckContext: HLMCheckerContext) => void, context: HLMCheckerContext, originalExpression?: Fmt.Expression): HLMCheckerContext {
+    let restrictions = originalExpression instanceof Fmt.PlaceholderExpression ? context.editData!.restrictions : new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>();
+    let recheckContext: HLMCheckerContext = {
+      ...context,
+      editData: {
+        restrictions: restrictions
+      }
+    };
+    fn(recheckContext);
+    let lastSetsToCheckLength = 0;
+    let checkRestrictions = () => {
+      let setsToCheck: Fmt.Expression[][] = [];
+      for (let [placeholder, restriction] of restrictions) {
+        if (!placeholder.isTemporary) {
+          let sets = restriction.compatibleSets.concat(restriction.declaredSets);
+          if (sets.length > 1) {
+            setsToCheck.push(sets);
+          }
+        }
+      }
+      if (setsToCheck.length > lastSetsToCheckLength) {
+        for (let sets of setsToCheck) {
+          this.checkSetCompatibility(object, sets, recheckContext);
+        }
+        lastSetsToCheckLength = setsToCheck.length;
+        this.pendingChecks.push(checkRestrictions);
+      }
+      return CachedPromise.resolve();
+    };
+    this.pendingChecks.push(checkRestrictions);
+    return recheckContext;
+  }
+
   private checkParameterList(parameterList: Fmt.ParameterList, context: HLMCheckerContext): void {
     let currentContext = context;
     for (let param of parameterList) {
@@ -576,6 +616,13 @@ export class HLMDefinitionChecker {
       } else {
         currentContext = context;
       }
+    }
+    if (context.editData && context.editData.constraintCheckFns) {
+      let constraintCheckFn = (formula: Fmt.Expression) => {
+        let fn = (recheckContext: HLMCheckerContext) => this.checkFormula(formula, recheckContext);
+        return this.recheck(formula, fn, context);
+      };
+      context.editData.constraintCheckFns.set(parameterList, constraintCheckFn);
     }
   }
 

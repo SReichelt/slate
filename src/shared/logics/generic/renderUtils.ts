@@ -109,6 +109,7 @@ export abstract class GenericRenderUtils {
         if (!property) {
           break;
         }
+        let handled = false;
         if (property.singular || property.plural) {
           if (property.article === undefined) {
             property.article = 'a';
@@ -118,6 +119,7 @@ export abstract class GenericRenderUtils {
               break;
             }
             Object.assign(noun, property);
+            handled = true;
           }
         }
         if (property.property || property.isFeature) {
@@ -128,6 +130,10 @@ export abstract class GenericRenderUtils {
             result = [];
           }
           result.push(property);
+          handled = true;
+        }
+        if (!handled) {
+          break;
         }
         remainingParameters.splice(0, parameters.length);
         remainingDefinitions.splice(0, parameters.length);

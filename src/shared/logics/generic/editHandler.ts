@@ -815,6 +815,10 @@ export abstract class GenericEditHandler {
 
   private setValueAndAddToMRU(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo): void {
     expressionEditInfo.onSetValue(expression);
+    this.addToMRU(expression);
+  }
+
+  protected addToMRU(expression: Fmt.Expression): void {
     if (expression instanceof Fmt.DefinitionRefExpression) {
       let absolutePath = this.libraryDataProvider.getAbsolutePath(expression.path);
       this.mruList.add(absolutePath);

@@ -128,6 +128,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.sectionChangeCounter;
   }
 
+  getParentAccessor(): LibraryDataAccessor | undefined {
+    return this.parent;
+  }
+
   getAccessorForSection(path?: Fmt.PathItem): LibraryDataAccessor {
     return this.getProviderForSection(path);
   }

@@ -12,7 +12,6 @@ export interface ExpressionEditInfo {
 
 export class EditAnalysis {
   definitionContentsContext = new Map<Fmt.Definition, Ctx.Context>();
-  parameterContext = new Map<Fmt.Parameter, Ctx.Context>();
   newParameterContext = new Map<Fmt.ParameterList, Ctx.Context>();
   newArgumentContext = new Map<Fmt.ArgumentList, Ctx.Context>();
   expressionEditInfo = new Map<Fmt.Expression, ExpressionEditInfo>();
@@ -56,7 +55,6 @@ export class EditAnalysis {
   }
 
   analyzeParameter(parameter: Fmt.Parameter, context: Ctx.Context): void {
-    this.parameterContext.set(parameter, context);
     let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
     this.analyzeType(parameter.type, typeContext);
     if (parameter.defaultValue) {

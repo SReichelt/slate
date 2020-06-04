@@ -35,21 +35,26 @@ export class MRUList {
 
 export class MRUListIterator {
   private entriesIndex = 0;
-  private sectionContentsPromise: CachedPromise<Fmt.Expression[]>;
+  private sectionContentsPromise?: CachedPromise<Fmt.Expression[]>;
   private sectionContentsIndex = 0;
 
-  constructor(private entries: Fmt.Path[], private libraryDataAccessor: LibraryDataAccessor) {
-    this.sectionContentsPromise = libraryDataAccessor.fetchLocalSection()
-      .then((libraryDefinition: LibraryDefinition) => (libraryDefinition.definition.contents as FmtLibrary.ObjectContents_Section).items)
-      .catch(() => []);
+  constructor(private entries: Fmt.Path[], private libraryDataAccessor?: LibraryDataAccessor) {
   }
 
   next(): CachedPromise<Fmt.Path | undefined> {
     if (this.entriesIndex < this.entries.length) {
       let entry = this.entries[this.entriesIndex++];
       return CachedPromise.resolve(entry);
-    } else {
+    } else if (this.libraryDataAccessor) {
+      if (!this.sectionContentsPromise) {
+        this.sectionContentsPromise = this.libraryDataAccessor.fetchLocalSection()
+          .then((libraryDefinition: LibraryDefinition) => (libraryDefinition.definition.contents as FmtLibrary.ObjectContents_Section).items)
+          .catch(() => []);
+      }
       return this.sectionContentsPromise.then((contents: Fmt.Expression[]) => {
+        if (!this.libraryDataAccessor) {
+          return undefined;
+        }
         while (this.sectionContentsIndex < contents.length) {
           let item = contents[this.sectionContentsIndex++];
           if (item instanceof FmtLibrary.MetaRefExpression_item && item.ref instanceof Fmt.DefinitionRefExpression) {
@@ -59,8 +64,13 @@ export class MRUListIterator {
             }
           }
         }
-        return undefined;
+        this.sectionContentsPromise = undefined;
+        this.sectionContentsIndex = 0;
+        this.libraryDataAccessor = this.libraryDataAccessor.getParentAccessor();
+        return this.next();
       });
+    } else {
+      return CachedPromise.resolve(undefined);
     }
   }
 }
