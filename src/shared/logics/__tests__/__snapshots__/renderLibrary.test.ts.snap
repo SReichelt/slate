@@ -3338,10 +3338,16 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/ring_theory/multiplicity.html#multiplicity"
 `;
 
-exports[`render hlm library: 1.6.1.52.9 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20factorization 1`] = `
-"Theorem 1.6.1.52.9 (Prime factorization).  Let n ∈ ℕ_+. Then:
+exports[`render hlm library: 1.6.1.52.9 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime%20factors 1`] = `
+"Definition 1.6.1.52.9.  Let n ∈ ℕ. We define:
 
-  n = ∏_(p ∈ ℙ) p^(mult(p,n))
+  PrimeFactors(n) := {p^(mult(p,n))} is a/an ℙ-multiset"
+`;
+
+exports[`render hlm library: 1.6.1.52.10 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20factorization 1`] = `
+"Theorem 1.6.1.52.10 (Prime factorization).  Let n ∈ ℕ_+. Then:
+
+  n = ∏_(p ∈ ℙ) p^(mult(p,n)) = ∏_(p ∈ PrimeFactors(n)) p
 
 No proof.
 
@@ -3360,8 +3366,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.factors"
 `;
 
-exports[`render hlm library: 1.6.1.52.10 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
-"Theorem 1.6.1.52.10 (Fundametal theorem of arithmetic).  Let n ∈ ℕ_+. Then:
+exports[`render hlm library: 1.6.1.52.11 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
+"Theorem 1.6.1.52.11 (Fundametal theorem of arithmetic).  Let n ∈ ℕ_+. Then:
 
   ∃! 𝑷 ∈ 𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(ℙ) s.t. 𝑷 is finite : n = ∏_(p ∈ 𝑷) p
 

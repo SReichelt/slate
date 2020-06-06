@@ -23,7 +23,7 @@ export interface TutorialManipulationEntry {
   elementAction?: (reactElement: React.ReactElement, htmlElement: HTMLElement) => void;
 }
 
-function applyTutorialManipulationEntries(tutorialState: TutorialState, node: React.ReactNode, parentComponent: React.Component<any, any> | undefined, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
+function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, node: React.ReactNode, parentComponent: React.Component<any, any> | undefined, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
   let visitor = (element: React.ReactElement) => {
     for (let entry of entries) {
       if ((entry.type === undefined || element.type === entry.type)
@@ -53,7 +53,7 @@ function applyTutorialManipulationEntries(tutorialState: TutorialState, node: Re
 
 type NodeManipulationFn = (node: React.ReactNode, component: React.Component<any, any> | undefined) => React.ReactNode;
 
-function createTutorialManipulator(tutorialState: TutorialState, parentComponent: React.Component<any, any> | undefined, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
+function createTutorialManipulator(tutorialState: DynamicTutorialState, parentComponent: React.Component<any, any> | undefined, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
   let applyRef: NodeManipulationFn | undefined = undefined;
   if (entry.refIndex !== undefined) {
     let refIndex = entry.refIndex;
@@ -177,14 +177,20 @@ function createTutorialManipulator(tutorialState: TutorialState, parentComponent
   };
 }
 
-export interface TutorialState {
+export interface StaticTutorialState {
   manipulationEntries?: TutorialManipulationEntry[];
-  refComponents?: (React.Component<any, any> | undefined)[];
 }
 
-export function addTutorial(node: React.ReactNode, tutorialState: TutorialState): React.ReactNode {
-  if (tutorialState.manipulationEntries) {
-    return applyTutorialManipulationEntries(tutorialState, node, undefined, tutorialState.manipulationEntries);
+export interface DynamicTutorialState {
+  staticState: StaticTutorialState;
+  refComponents?: (React.Component<any, any> | undefined)[];
+  additionalStateData?: any;
+}
+
+export function addTutorial(node: React.ReactNode, tutorialState: DynamicTutorialState): React.ReactNode {
+  let manipulationEntries = tutorialState.staticState.manipulationEntries;
+  if (manipulationEntries) {
+    return applyTutorialManipulationEntries(tutorialState, node, undefined, manipulationEntries);
   } else {
     return node;
   }

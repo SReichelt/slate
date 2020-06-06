@@ -5,7 +5,7 @@ import { withAlert, AlertManager } from 'react-alert';
 import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
 import DocPage, { markdownSuffix } from './extras/DocPage';
-import { TutorialState, addTutorial } from './extras/Tutorial';
+import { DynamicTutorialState, addTutorial } from './extras/Tutorial';
 import { startTutorial } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
@@ -73,8 +73,7 @@ interface AppState extends SelectionState, GitHubState {
   templates?: Fmt.File;
   editedDefinitions: LibraryItemListEntry[];
   showStartPage: boolean;
-  tutorialState?: TutorialState;
-  tutorialStateAdditionalData?: any;
+  tutorialState?: DynamicTutorialState;
   insertDialog?: Dialog.InsertDialog;
 }
 
@@ -1011,13 +1010,11 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({tutorialState: undefined});
   };
 
-  private changeTutorialState = (newTutorialState: TutorialState | undefined, additionalStateData?: any): void => {
-    if (this.state.tutorialState !== newTutorialState || this.state.tutorialStateAdditionalData !== additionalStateData) {
-      this.setState({
-        tutorialState: newTutorialState,
-        tutorialStateAdditionalData: additionalStateData
-      });
-      if (!newTutorialState || !newTutorialState.manipulationEntries) {
+  private changeTutorialState = (newTutorialState: DynamicTutorialState | undefined): void => {
+    let oldTutorialState = this.state.tutorialState;
+    if (oldTutorialState?.staticState !== newTutorialState?.staticState || oldTutorialState?.additionalStateData !== newTutorialState?.additionalStateData) {
+      this.setState({tutorialState: newTutorialState});
+      if (!newTutorialState || !newTutorialState.staticState.manipulationEntries) {
         this.navigateToRoot(true);
       }
     }

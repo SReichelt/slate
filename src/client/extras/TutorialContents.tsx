@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './TutorialContents.css';
-import { TutorialState } from './Tutorial';
+import { StaticTutorialState, DynamicTutorialState } from './Tutorial';
 import { ButtonType, getButtonIcon } from '../utils/icons';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 import config from '../utils/config';
@@ -22,7 +22,7 @@ import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem, ExpressionMenuTe
 import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
 import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
 
-type TutorialStateFn = (newTutorialState: TutorialState | undefined, additionalStateData?: any) => void;
+type TutorialStateFn = (newTutorialState: DynamicTutorialState | undefined) => void;
 
 function inject(fn: (...args: any) => any, action: (...args: any) => void) {
   return (...args: any) => {
@@ -60,104 +60,11 @@ function createDummyEvent(target: HTMLElement) {
 const defaultDelay = 200;
 
 class TutorialStates {
-  constructor(private changeState: TutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
-
-  private automateClick(delay: number = defaultDelay) {
-    let done = false;
-    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
-      if (this.runAutomatically && !done) {
-        done = true;
-        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseDown && !reactElement.props.onMouseUp && !reactElement.props.onClick) {
-          if (Array.isArray(reactElement.props.children)) {
-            if (reactElement.props.children.length) {
-              reactElement = reactElement.props.children[0];
-            } else {
-              break;
-            }
-          } else {
-            reactElement = reactElement.props.children;
-          }
-        }
-        if (reactElement.props) {
-          let simulateClick = () => {
-            if (reactElement.props.onMouseDown) {
-              let mouseDownEvent = createDummyEvent(htmlElement);
-              reactElement.props.onMouseDown(mouseDownEvent);
-            }
-            if (reactElement.props.onMouseUp) {
-              let mouseUpEvent = createDummyEvent(htmlElement);
-              reactElement.props.onMouseUp(mouseUpEvent);
-            }
-            if (reactElement.props.onClick) {
-              let clickEvent = createDummyEvent(htmlElement);
-              reactElement.props.onClick(clickEvent);
-            }
-          };
-          setTimeout(simulateClick, delay);
-        }
-      }
-    };
-  }
-
-  private automateHover(delay: number = defaultDelay) {
-    let done = false;
-    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
-      if (this.runAutomatically && !done) {
-        done = true;
-        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseEnter) {
-          if (Array.isArray(reactElement.props.children)) {
-            if (reactElement.props.children.length) {
-              reactElement = reactElement.props.children[0];
-            } else {
-              break;
-            }
-          } else {
-            reactElement = reactElement.props.children;
-          }
-        }
-        if (reactElement.props) {
-          let simulateHover = () => {
-            if (reactElement.props.onMouseEnter) {
-              let mouseEnterEvent = createDummyEvent(htmlElement);
-              reactElement.props.onMouseEnter(mouseEnterEvent);
-            }
-          };
-          setTimeout(simulateHover, delay);
-        }
-      }
-    };
-  }
-
-  private automateTextInput(text: string, delay: number = defaultDelay) {
-    let done = false;
-    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
-      if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
-        done = true;
-        let simulateTextInput = () => {
-          htmlElement.value = text;
-          reactElement.props.onChange(createDummyEvent(htmlElement));
-        };
-        setTimeout(simulateTextInput, delay);
-      }
-    };
-  }
-
-  private automateFormSubmission(delay: number = defaultDelay) {
-    let done = false;
-    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
-      if (this.runAutomatically && !done) {
-        done = true;
-        let simulateFormSubmission = () => {
-          reactElement.props.onSubmit(createDummyEvent(htmlElement));
-        };
-        setTimeout(simulateFormSubmission, delay);
-      }
-    };
-  }
+  constructor(private onChangeTutorialState: TutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
   // Introduction.
 
-  introduction: TutorialState = {
+  private introduction: StaticTutorialState = {
     manipulationEntries: [
       {
         type: StartPage,
@@ -208,7 +115,7 @@ class TutorialStates {
 
   // Search for "Functions".
 
-  searchFunctions: TutorialState = {
+  private searchFunctions: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -233,7 +140,7 @@ class TutorialStates {
 
   // Insert Operator.
 
-  insertOperator_menu: TutorialState = {
+  private insertOperator_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -333,7 +240,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperator_dialog_name: TutorialState = {
+  private insertOperator_dialog_name: StaticTutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -389,7 +296,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperator_dialog_ok: TutorialState = {
+  private insertOperator_dialog_ok: StaticTutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -451,7 +358,7 @@ class TutorialStates {
 
   // Insert parameters S and T.
 
-  insertOperatorParameters_ST_menu: TutorialState = {
+  private insertOperatorParameters_ST_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -529,7 +436,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_ST_names: TutorialState = {
+  private insertOperatorParameters_ST_names: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -586,7 +493,7 @@ class TutorialStates {
 
   // Insert parameter f.
 
-  insertOperatorParameters_f_menu: TutorialState = {
+  private insertOperatorParameters_f_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -669,7 +576,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_name: TutorialState = {
+  private insertOperatorParameters_f_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -730,7 +637,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_menu: TutorialState = {
+  private insertOperatorParameters_f_set_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -813,7 +720,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_dialog: TutorialState = {
+  private insertOperatorParameters_f_set_dialog: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -950,7 +857,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg1: TutorialState = {
+  private insertOperatorParameters_f_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1043,7 +950,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_f_set_arg2: TutorialState = {
+  private insertOperatorParameters_f_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1136,7 +1043,7 @@ class TutorialStates {
 
   // Insert parameter g.
 
-  insertOperatorParameters_g_menu: TutorialState = {
+  private insertOperatorParameters_g_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1218,7 +1125,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_g_name: TutorialState = {
+  private insertOperatorParameters_g_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1279,7 +1186,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_g_set_menu: TutorialState = {
+  private insertOperatorParameters_g_set_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1358,7 +1265,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_g_set_arg1: TutorialState = {
+  private insertOperatorParameters_g_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1445,7 +1352,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_g_set_arg2: TutorialState = {
+  private insertOperatorParameters_g_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1538,7 +1445,7 @@ class TutorialStates {
 
   // Insert parameter n.
 
-  insertOperatorParameters_n_menu: TutorialState = {
+  private insertOperatorParameters_n_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1619,7 +1526,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_name: TutorialState = {
+  private insertOperatorParameters_n_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1680,7 +1587,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_menu: TutorialState = {
+  private insertOperatorParameters_n_set_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1769,7 +1676,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_dialog_search: TutorialState = {
+  private insertOperatorParameters_n_set_dialog_search: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1849,7 +1756,7 @@ class TutorialStates {
     ]
   };
 
-  insertOperatorParameters_n_set_dialog_select: TutorialState = {
+  private insertOperatorParameters_n_set_dialog_select: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -1998,7 +1905,7 @@ class TutorialStates {
 
   // Insert composition term.
 
-  fillOperatorDefinition_composition_menu: TutorialState = {
+  private fillOperatorDefinition_composition_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2078,7 +1985,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_dialog_search: TutorialState = {
+  private fillOperatorDefinition_composition_dialog_search: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2158,7 +2065,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_dialog_select: TutorialState = {
+  private fillOperatorDefinition_composition_dialog_select: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2301,7 +2208,7 @@ class TutorialStates {
 
   // Select f.
 
-  fillOperatorDefinition_composition_arg1_menu: TutorialState = {
+  private fillOperatorDefinition_composition_arg1_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2401,7 +2308,7 @@ class TutorialStates {
 
   // Select g.
 
-  fillOperatorDefinition_composition_arg2_menu: TutorialState = {
+  private fillOperatorDefinition_composition_arg2_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2486,7 +2393,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_reselectionMenu: TutorialState = {
+  private fillOperatorDefinition_composition_arg2_reselectionMenu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2571,7 +2478,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_dialog_search: TutorialState = {
+  private fillOperatorDefinition_composition_arg2_dialog_search: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2657,7 +2564,7 @@ class TutorialStates {
     ]
   };
 
-  fillOperatorDefinition_composition_arg2_dialog_select: TutorialState = {
+  private fillOperatorDefinition_composition_arg2_dialog_select: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2801,7 +2708,7 @@ class TutorialStates {
 
   // Select n.
 
-  fillOperatorDefinition_composition_arg2_arg2_menu: TutorialState = {
+  private fillOperatorDefinition_composition_arg2_arg2_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2894,7 +2801,7 @@ class TutorialStates {
 
   // Select notation template.
 
-  selectOperatorNotation_openMenu: TutorialState = {
+  private selectOperatorNotation_openMenu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2999,7 +2906,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_body: TutorialState = {
+  private selectOperatorNotation_dialog_arg_body: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3110,7 +3017,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_sup: TutorialState = {
+  private selectOperatorNotation_dialog_arg_sup: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3221,7 +3128,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_preSub: TutorialState = {
+  private selectOperatorNotation_dialog_arg_preSub: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3332,7 +3239,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_arg_preSup: TutorialState = {
+  private selectOperatorNotation_dialog_arg_preSup: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3448,7 +3355,7 @@ class TutorialStates {
     ]
   };
 
-  selectOperatorNotation_dialog_ok: TutorialState = {
+  private selectOperatorNotation_dialog_ok: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3524,7 +3431,7 @@ class TutorialStates {
     ]
   };
 
-  submitOperator: TutorialState = {
+  private submitOperator: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3595,7 +3502,7 @@ class TutorialStates {
 
   // Insert operator.
 
-  insertTheorem_menu: TutorialState = {
+  private insertTheorem_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryTree,
@@ -3686,7 +3593,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheorem_dialog_name: TutorialState = {
+  private insertTheorem_dialog_name: StaticTutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -3742,7 +3649,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheorem_dialog_ok: TutorialState = {
+  private insertTheorem_dialog_ok: StaticTutorialState = {
     manipulationEntries: [
       {
         // Keep previous library tree hierarchy so that library tree is not rebuilt.
@@ -3804,7 +3711,7 @@ class TutorialStates {
 
   // Insert parameter f.
 
-  insertTheoremParameters_f_menu: TutorialState = {
+  private insertTheoremParameters_f_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3869,7 +3776,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_f_name: TutorialState = {
+  private insertTheoremParameters_f_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -3930,7 +3837,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_f_set_menu: TutorialState = {
+  private insertTheoremParameters_f_set_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4019,7 +3926,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_f_set_arg1: TutorialState = {
+  private insertTheoremParameters_f_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4117,7 +4024,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_f_set_arg2: TutorialState = {
+  private insertTheoremParameters_f_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4204,7 +4111,7 @@ class TutorialStates {
 
   // Insert parameter n.
 
-  insertTheoremParameters_n_menu: TutorialState = {
+  private insertTheoremParameters_n_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4280,7 +4187,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_n_name: TutorialState = {
+  private insertTheoremParameters_n_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4336,7 +4243,7 @@ class TutorialStates {
     ]
   };
 
-  insertTheoremParameters_n_set_menu: TutorialState = {
+  private insertTheoremParameters_n_set_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4411,7 +4318,7 @@ class TutorialStates {
 
   // Insert equality.
 
-  fillTheoremClaim_equality_menu: TutorialState = {
+  private fillTheoremClaim_equality_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4481,7 +4388,7 @@ class TutorialStates {
 
   // Select "my definition".
 
-  fillTheoremClaim_equality_arg1_menu: TutorialState = {
+  private fillTheoremClaim_equality_arg1_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4558,7 +4465,7 @@ class TutorialStates {
 
   // Select f.
 
-  fillTheoremClaim_equality_arg1_arg1_menu: TutorialState = {
+  private fillTheoremClaim_equality_arg1_arg1_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4632,7 +4539,7 @@ class TutorialStates {
 
   // Select identity function.
 
-  fillTheoremClaim_equality_arg1_arg2_menu: TutorialState = {
+  private fillTheoremClaim_equality_arg1_arg2_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4703,7 +4610,7 @@ class TutorialStates {
     ]
   };
 
-  fillTheoremClaim_equality_arg1_arg2_dialog_search: TutorialState = {
+  private fillTheoremClaim_equality_arg1_arg2_dialog_search: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4776,7 +4683,7 @@ class TutorialStates {
     ]
   };
 
-  fillTheoremClaim_equality_arg1_arg2_dialog_select: TutorialState = {
+  private fillTheoremClaim_equality_arg1_arg2_dialog_select: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4907,7 +4814,7 @@ class TutorialStates {
 
   // Select n.
 
-  fillTheoremClaim_equality_arg1_arg3_menu: TutorialState = {
+  private fillTheoremClaim_equality_arg1_arg3_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4991,7 +4898,7 @@ class TutorialStates {
 
   // Select f on the right side.
 
-  fillTheoremClaim_equality_arg2_menu: TutorialState = {
+  private fillTheoremClaim_equality_arg2_menu: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -5059,7 +4966,7 @@ class TutorialStates {
 
   // View source to see inferred arguments.
 
-  openSourceCodeView: TutorialState = {
+  private openSourceCodeView: StaticTutorialState = {
     manipulationEntries: [
       {
         type: 'div',
@@ -5089,7 +4996,7 @@ class TutorialStates {
     ]
   };
 
-  closeSourceCodeView: TutorialState = {
+  private closeSourceCodeView: StaticTutorialState = {
     manipulationEntries: [
       {
         type: 'div',
@@ -5116,7 +5023,7 @@ class TutorialStates {
 
   // Insert proof.
 
-  insertProof: TutorialState = {
+  private insertProof: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -5174,7 +5081,7 @@ class TutorialStates {
 
   // Navigate to definition and end tutorial.
 
-  checkDefinition: TutorialState = {
+  private checkDefinition: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -5253,10 +5160,119 @@ class TutorialStates {
     ]
   };
 
-  experiment: TutorialState = {};
+  private experiment: StaticTutorialState = {};
+
+  start() {
+    this.changeState(this.introduction);
+  }
+
+  private changeState(staticState: StaticTutorialState | undefined, additionalStateData?: any): void {
+    if (staticState) {
+      let dynamicState: DynamicTutorialState = {
+        staticState: staticState,
+        additionalStateData: additionalStateData
+      };
+      this.onChangeTutorialState(dynamicState);
+    } else {
+      this.onChangeTutorialState(undefined);
+    }
+  }
+
+  private automateClick(delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done) {
+        done = true;
+        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseDown && !reactElement.props.onMouseUp && !reactElement.props.onClick) {
+          if (Array.isArray(reactElement.props.children)) {
+            if (reactElement.props.children.length) {
+              reactElement = reactElement.props.children[0];
+            } else {
+              break;
+            }
+          } else {
+            reactElement = reactElement.props.children;
+          }
+        }
+        if (reactElement.props) {
+          let simulateClick = () => {
+            if (reactElement.props.onMouseDown) {
+              let mouseDownEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseDown(mouseDownEvent);
+            }
+            if (reactElement.props.onMouseUp) {
+              let mouseUpEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseUp(mouseUpEvent);
+            }
+            if (reactElement.props.onClick) {
+              let clickEvent = createDummyEvent(htmlElement);
+              reactElement.props.onClick(clickEvent);
+            }
+          };
+          setTimeout(simulateClick, delay);
+        }
+      }
+    };
+  }
+
+  private automateHover(delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done) {
+        done = true;
+        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseEnter) {
+          if (Array.isArray(reactElement.props.children)) {
+            if (reactElement.props.children.length) {
+              reactElement = reactElement.props.children[0];
+            } else {
+              break;
+            }
+          } else {
+            reactElement = reactElement.props.children;
+          }
+        }
+        if (reactElement.props) {
+          let simulateHover = () => {
+            if (reactElement.props.onMouseEnter) {
+              let mouseEnterEvent = createDummyEvent(htmlElement);
+              reactElement.props.onMouseEnter(mouseEnterEvent);
+            }
+          };
+          setTimeout(simulateHover, delay);
+        }
+      }
+    };
+  }
+
+  private automateTextInput(text: string, delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
+        done = true;
+        let simulateTextInput = () => {
+          htmlElement.value = text;
+          reactElement.props.onChange(createDummyEvent(htmlElement));
+        };
+        setTimeout(simulateTextInput, delay);
+      }
+    };
+  }
+
+  private automateFormSubmission(delay: number = defaultDelay) {
+    let done = false;
+    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
+      if (this.runAutomatically && !done) {
+        done = true;
+        let simulateFormSubmission = () => {
+          reactElement.props.onSubmit(createDummyEvent(htmlElement));
+        };
+        setTimeout(simulateFormSubmission, delay);
+      }
+    };
+  }
 }
 
 export function startTutorial(onChangeTutorialState: TutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
   let tutorialStates = new TutorialStates(onChangeTutorialState, onDocLinkClicked, withTouchWarning);
-  onChangeTutorialState(tutorialStates.introduction);
+  tutorialStates.start();
 }
