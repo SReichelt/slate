@@ -68,7 +68,7 @@ interface ScrollPaneReference {
   htmlNode: HTMLElement | null;
 }
 
-interface LibraryTreeProps {
+export interface LibraryTreeProps {
   libraryDataProvider: LibraryDataProvider;
   templates?: Fmt.File;
   onFilter?: OnFilter;
@@ -130,7 +130,7 @@ export interface LibraryItemListEntry {
   itemInfo: LibraryItemInfo;
 }
 
-interface LibraryItemListProps extends LibraryTreeProps {
+export interface LibraryItemListProps extends LibraryTreeProps {
   items: LibraryItemListEntry[];
 }
 
@@ -153,7 +153,7 @@ export class LibraryItemList extends React.Component<LibraryItemListProps> {
   }
 }
 
-interface SectionItemListProps extends LibraryTreeProps {
+export interface SectionItemListProps extends LibraryTreeProps {
   section: LibraryDefinition;
   sectionItemNumber: LibraryItemNumber;
   positionSelectionMode: boolean;
@@ -474,7 +474,7 @@ interface LibraryTreeItemBaseProps {
   indent: number;
 }
 
-interface LibraryTreeItemProps extends LibraryTreeItemBaseProps {
+export interface LibraryTreeItemProps extends LibraryTreeItemBaseProps {
   libraryDefinition?: LibraryDefinition;
   isSubsection: boolean;
   path: Fmt.Path;

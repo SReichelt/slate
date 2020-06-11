@@ -6,7 +6,7 @@ import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
 import DocPage, { markdownSuffix } from './extras/DocPage';
 import { DynamicTutorialState, addTutorial } from './extras/Tutorial';
-import { startTutorial } from './extras/TutorialContents';
+import { startTutorial, TutorialStateTransitionFn, getReturnToDefinitionState } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
@@ -645,8 +645,13 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (this.state.tutorialState) {
-      result = addTutorial(result, this.state.tutorialState);
+    let tutorialState = this.state.tutorialState;
+    if (tutorialState) {
+      let editedDefinition = tutorialState.editedDefinition;
+      if (editedDefinition && this.state.selectedItemDefinition?.getImmediateResult() !== editedDefinition) {
+        tutorialState = getReturnToDefinitionState(editedDefinition);
+      }
+      result = addTutorial(result, tutorialState);
     }
 
     return result;
@@ -781,13 +786,13 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private finishInsert = (result: Dialog.InsertDialogResult): void => {
+  private finishInsert = (result: Dialog.InsertDialogResult): CachedPromise<LibraryDefinition | undefined> => {
     let dialog = this.state.insertDialog;
     if (dialog && dialog.libraryDataProvider) {
       let libraryDataProvider = dialog.libraryDataProvider;
       if (dialog.definitionType) {
         let definitionType = dialog.definitionType;
-        libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
+        return libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
             let localPath = new Fmt.Path;
             localPath.name = result.name;
@@ -816,20 +821,28 @@ class App extends React.Component<AppProps, AppState> {
                 editedDefinitions: prevState.editedDefinitions.concat(editedDefinition)
               }));
               this.cancelInsert();
+              return libraryDefinition;
             });
           })
           .catch((error) => {
             this.props.alert.error(`Error adding ${definitionType.name.toLowerCase()}: ` + error.message);
             this.forceUpdate();
+            return undefined;
           });
       } else {
-        libraryDataProvider.insertLocalSubsection(result.name, result.title || '', result.position)
-          .then(this.cancelInsert)
+        return libraryDataProvider.insertLocalSubsection(result.name, result.title || '', result.position)
+          .then((libraryDefinition: LibraryDefinition) => {
+            this.cancelInsert();
+            return libraryDefinition;
+          })
           .catch((error) => {
             this.props.alert.error('Error adding section: ' + error.message);
             this.forceUpdate();
+            return undefined;
           });
       }
+    } else {
+      return CachedPromise.resolve(undefined);
     }
   };
 
@@ -1010,8 +1023,9 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({tutorialState: undefined});
   };
 
-  private changeTutorialState = (newTutorialState: DynamicTutorialState | undefined): void => {
+  private changeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
     let oldTutorialState = this.state.tutorialState;
+    let newTutorialState = stateTransitionFn(oldTutorialState);
     if (oldTutorialState?.staticState !== newTutorialState?.staticState || oldTutorialState?.additionalStateData !== newTutorialState?.additionalStateData) {
       this.setState({tutorialState: newTutorialState});
       if (!newTutorialState || !newTutorialState.staticState.manipulationEntries) {

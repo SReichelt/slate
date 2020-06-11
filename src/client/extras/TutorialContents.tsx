@@ -4,6 +4,8 @@ import { StaticTutorialState, DynamicTutorialState } from './Tutorial';
 import { ButtonType, getButtonIcon } from '../utils/icons';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 import config from '../utils/config';
+import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
+import CachedPromise from '../../shared/data/cachedPromise';
 
 import * as Fmt from '../../shared/format/format';
 import * as FmtHLM from '../../shared/logics/hlm/meta';
@@ -13,21 +15,21 @@ import * as Menu from '../../shared/notation/menu';
 import StartPage from './StartPage';
 import Button from '../components/Button';
 import MenuButton from '../components/MenuButton';
-import LibraryTree, { SearchInput, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeInsertionItem, LibraryItemList } from '../components/LibraryTree';
+import LibraryTree, { LibraryItemList, SearchInput, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeItemProps, LibraryTreeInsertionItem } from '../components/LibraryTree';
 import StandardDialog from '../components/StandardDialog';
 import InsertDialog from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
-import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
 
-type TutorialStateFn = (newTutorialState: DynamicTutorialState | undefined) => void;
+export type TutorialStateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => DynamicTutorialState | undefined;
+export type ChangeTutorialStateFn = (stateTransitionFn: TutorialStateTransitionFn) => void;
 
-function inject(fn: (...args: any) => any, action: (...args: any) => void) {
+function inject(fn: (...args: any) => any, action: (result: any, ...args: any) => void) {
   return (...args: any) => {
     let result = fn(...args);
-    action(...args);
+    action(result, ...args);
     return result;
   };
 }
@@ -60,7 +62,7 @@ function createDummyEvent(target: HTMLElement) {
 const defaultDelay = 200;
 
 class TutorialStates {
-  constructor(private onChangeTutorialState: TutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
+  constructor(private onChangeTutorialState: ChangeTutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
   // Introduction.
 
@@ -350,7 +352,11 @@ class TutorialStates {
         ],
         manipulateProps: (props) => ({
           ...props,
-          onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_ST_menu))
+          onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
+            if (libraryDefinition) {
+              this.changeState(this.insertOperatorParameters_ST_menu, undefined, libraryDefinition);
+            }
+          }))
         })
       }
     ]
@@ -424,7 +430,7 @@ class TutorialStates {
         type: LibraryItemList,
         children: [
           {
-            type: LibraryTreeItem,
+            type: 'div',
             toolTip: {
               contents: <p>This is the list of unsubmitted changes. While editing an item, you can browse the library and then return to the edited item by clicking on it.</p>,
               position: 'bottom',
@@ -694,7 +700,7 @@ class TutorialStates {
                                         ],
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
+                                          onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
                                             this.changeState(action instanceof Menu.DialogExpressionMenuAction
                                                              ? this.insertOperatorParameters_f_set_dialog
                                                              : this.insertOperatorParameters_f_set_arg1);
@@ -3491,7 +3497,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu))
+              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu, undefined, null))
             }),
             elementAction: this.automateClick()
           }
@@ -3500,7 +3506,7 @@ class TutorialStates {
     ]
   };
 
-  // Insert operator.
+  // Insert theorem.
 
   private insertTheorem_menu: StaticTutorialState = {
     manipulationEntries: [
@@ -3703,7 +3709,11 @@ class TutorialStates {
         ],
         manipulateProps: (props) => ({
           ...props,
-          onOK: inject(props.onOK, () => this.changeState(this.insertTheoremParameters_f_menu))
+          onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
+            if (libraryDefinition) {
+              this.changeState(this.insertTheoremParameters_f_menu, undefined, libraryDefinition);
+            }
+          }))
         })
       }
     ]
@@ -4365,13 +4375,13 @@ class TutorialStates {
                                     },
                                     elementAction: this.automateClick()
                                   }
-                                ],
-                                manipulateProps: (props) => ({
-                                  ...props,
-                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
-                                })
+                                ]
                               }
-                            ]
+                            ],
+                            manipulateProps: (props) => ({
+                              ...props,
+                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
+                            })
                           }
                         ]
                       }
@@ -4586,7 +4596,7 @@ class TutorialStates {
                                     ],
                                     manipulateProps: (props) => ({
                                       ...props,
-                                      onItemClicked: inject(props.onItemClicked, (action: Menu.ExpressionMenuAction) => {
+                                      onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
                                         this.changeState(action instanceof Menu.DialogExpressionMenuAction
                                                          ? this.fillTheoremClaim_equality_arg1_arg2_dialog_search
                                                          : this.fillTheoremClaim_equality_arg1_arg3_menu);
@@ -5070,7 +5080,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition))
+              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition, undefined, null))
             }),
             elementAction: this.automateClick()
           }
@@ -5163,18 +5173,20 @@ class TutorialStates {
   private experiment: StaticTutorialState = {};
 
   start() {
-    this.changeState(this.introduction);
+    this.changeState(this.introduction, undefined, null);
   }
 
-  private changeState(staticState: StaticTutorialState | undefined, additionalStateData?: any): void {
+  private changeState(staticState: StaticTutorialState | undefined, additionalStateData?: any, newEditedDefinition?: LibraryDefinition | null): void {
     if (staticState) {
-      let dynamicState: DynamicTutorialState = {
+      let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined): DynamicTutorialState => ({
         staticState: staticState,
-        additionalStateData: additionalStateData
-      };
-      this.onChangeTutorialState(dynamicState);
+        refComponents: oldTutorialState?.staticState === staticState ? oldTutorialState?.refComponents : undefined,
+        additionalStateData: additionalStateData,
+        editedDefinition: newEditedDefinition === undefined ? oldTutorialState?.editedDefinition : newEditedDefinition ?? undefined
+      });
+      this.onChangeTutorialState(stateTransitionFn);
     } else {
-      this.onChangeTutorialState(undefined);
+      this.onChangeTutorialState(() => undefined);
     }
   }
 
@@ -5272,7 +5284,30 @@ class TutorialStates {
   }
 }
 
-export function startTutorial(onChangeTutorialState: TutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
+export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
   let tutorialStates = new TutorialStates(onChangeTutorialState, onDocLinkClicked, withTouchWarning);
   tutorialStates.start();
+}
+
+export function getReturnToDefinitionState(editedDefinition: LibraryDefinition): DynamicTutorialState {
+  return {
+    staticState: {
+      manipulationEntries: [
+        {
+          type: LibraryItemList,
+          children: [
+            {
+              type: LibraryTreeItem,
+              constraint: (props: LibraryTreeItemProps) => (props.libraryDefinition === editedDefinition),
+              toolTip: {
+                contents: <p>Select the edited definition to continue the tutorial.</p>,
+                position: 'bottom',
+                index: 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  };
 }

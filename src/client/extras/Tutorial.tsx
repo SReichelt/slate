@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
 import { PermanentToolTip, ToolTipPosition } from '../components/ExpressionToolTip';
+import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
 
 export interface TutorialToolTip {
   contents: React.ReactElement | ((component: React.Component<any, any>) => React.ReactNode) | null;
@@ -184,6 +185,7 @@ export interface StaticTutorialState {
 export interface DynamicTutorialState {
   staticState: StaticTutorialState;
   refComponents?: (React.Component<any, any> | undefined)[];
+  editedDefinition?: LibraryDefinition;
   additionalStateData?: any;
 }
 
