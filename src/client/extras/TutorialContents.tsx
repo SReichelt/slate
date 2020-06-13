@@ -22,9 +22,11 @@ import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
+import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
 
 export type TutorialStateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => DynamicTutorialState | undefined;
 export type ChangeTutorialStateFn = (stateTransitionFn: TutorialStateTransitionFn) => void;
+export type ReplaceDefinitionContentsFn = (definition: Fmt.Definition) => void;
 
 function inject(fn: (...args: any) => any, action: (result: any, ...args: any) => void) {
   return (...args: any) => {
@@ -62,7 +64,10 @@ function createDummyEvent(target: HTMLElement) {
 const defaultDelay = 200;
 
 class TutorialStates {
-  constructor(private onChangeTutorialState: ChangeTutorialStateFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
+  private operator?: LibraryDefinition;
+  private theorem?: LibraryDefinition;
+
+  constructor(private onChangeTutorialState: ChangeTutorialStateFn, private onReplaceDefinitionContents: ReplaceDefinitionContentsFn, private onDocLinkClicked: OnDocLinkClicked, private withTouchWarning: boolean, private runAutomatically: boolean = false) {}
 
   // Introduction.
 
@@ -280,7 +285,12 @@ class TutorialStates {
                 type: 'input',
                 key: 'name',
                 toolTip: {
-                  contents: <p>Enter a name like "my definition", then hit Enter.<br/>Among other things, this will be the file name of the new item, so only certain characters are allowed.<br/>Moreover, the naming convention for operators requires the name to start with a lowercase letter.</p>,
+                  contents: (
+                    <div>
+                      <p>Enter a name like "my definition", then hit Enter.</p>
+                      <p>Among other things, this will be the file name of the new item, so only certain characters are allowed.<br/>Moreover, the naming convention for operators requires the name to start with a lowercase letter.</p>
+                    </div>
+                  ),
                   position: 'top',
                   index: 0
                 },
@@ -354,7 +364,8 @@ class TutorialStates {
           ...props,
           onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
             if (libraryDefinition) {
-              this.changeState(this.insertOperatorParameters_ST_menu, undefined, libraryDefinition);
+              this.operator = libraryDefinition;
+              this.changeState(this.insertOperatorParameters_ST, libraryDefinition);
             }
           }))
         })
@@ -364,11 +375,10 @@ class TutorialStates {
 
   // Insert parameters S and T.
 
-  private insertOperatorParameters_ST_menu: StaticTutorialState = {
+  private insertOperatorParameters_ST: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 0)),
         children: [
           {
             type: Expression,
@@ -439,15 +449,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addSetParameter(definition, 'S');
+    }
   };
 
   private insertOperatorParameters_ST_names: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Set)),
         children: [
           {
             type: Expression,
@@ -490,22 +501,22 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters.length >= 2) {
-            this.changeState(this.insertOperatorParameters_f_menu);
+            this.changeState(this.insertOperatorParameters_f);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addSetParameter(definition, 'T');
+    }
   };
 
   // Insert parameter f.
 
-  private insertOperatorParameters_f_menu: StaticTutorialState = {
+  private insertOperatorParameters_f: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
-                                                             && definition.parameters[0].name === 'S'
-                                                             && definition.parameters[1].name === 'T')),
         children: [
           {
             type: Expression,
@@ -579,15 +590,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addElementParameter(definition, 'x');
+    }
   };
 
   private insertOperatorParameters_f_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
-                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -636,19 +648,20 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[2].name === 'f') {
-            this.changeState(this.insertOperatorParameters_f_set_menu);
+            this.changeState(this.insertOperatorParameters_f_set);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.changeParameterName(definition, 'f');
+    }
   };
 
-  private insertOperatorParameters_f_set_menu: StaticTutorialState = {
+  private insertOperatorParameters_f_set: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
-                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -676,7 +689,7 @@ class TutorialStates {
                                   contents: <p>We need to fill this placeholder.</p>,
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -701,60 +714,14 @@ class TutorialStates {
                                         manipulateProps: (props) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
-                                            this.changeState(action instanceof Menu.DialogExpressionMenuAction
-                                                             ? this.insertOperatorParameters_f_set_dialog
-                                                             : this.insertOperatorParameters_f_set_arg1);
+                                            if (action instanceof Menu.ImmediateExpressionMenuAction) {
+                                              this.changeState(this.insertOperatorParameters_f_set_arg1);
+                                            }
                                           })
                                         })
                                       }
                                     ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private insertOperatorParameters_f_set_dialog: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3)),
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 0,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: Expression,
-                        key: 2,
-                        children: [
-                          {
-                            type: Expression,
-                            key: 5,
-                            children: [
-                              {
-                                type: Expression,
-                                key: 4,
-                                children: [
+                                  },
                                   {
                                     type: ExpressionDialog,
                                     children: [
@@ -767,12 +734,16 @@ class TutorialStates {
                                             children: [
                                               {
                                                 type: LibraryTree,
-                                                toolTip: {
-                                                  contents: <p>This tree shows only the definitions in the library that can be used at the given location.</p>,
-                                                  position: 'top',
-                                                  index: 0
-                                                },
                                                 children: [
+                                                  {
+                                                    type: SearchInput,
+                                                    refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
+                                                    toolTip: {
+                                                      contents: <p>This tree shows only the definitions in the library that can be used at the given location.</p>,
+                                                      position: 'top',
+                                                      index: 0
+                                                    }
+                                                  },
                                                   {
                                                     type: InnerLibraryTreeItems,
                                                     children: [
@@ -811,7 +782,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(this.insertOperatorParameters_f_set_dialog, component.props.selected)
+                                                                        componentAction: (component) => this.changeAdditionalStateData(() => component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -860,18 +831,21 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      type._set = this.createDefinitionRefExpression(['Functions'], [[
+        this.createSetArg('X'),
+        this.createSetArg('Y')
+      ]]);
+    }
   };
 
   private insertOperatorParameters_f_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
-                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[2].type.expression._set.path.arguments.length === 2)),
         children: [
           {
             type: Expression,
@@ -953,21 +927,20 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(functions.path.arguments, 'X', variableRef);
+    }
   };
 
   private insertOperatorParameters_f_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
-                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[2].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value.arguments[0].value.variable === definition.parameters[0])),
         children: [
           {
             type: Expression,
@@ -1018,7 +991,7 @@ class TutorialStates {
                                                     key: 1,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_menu))
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1044,27 +1017,22 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'T');
+      this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
+    }
   };
 
   // Insert parameter g.
 
-  private insertOperatorParameters_g_menu: StaticTutorialState = {
+  private insertOperatorParameters_g: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 3
-                                                             && definition.parameters[2].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[2].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[2].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[0].value.arguments[0].value.variable === definition.parameters[0]
-                                                             && definition.parameters[2].type.expression._set.path.arguments[1].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[1].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[2].type.expression._set.path.arguments[1].value.arguments[0].value.variable === definition.parameters[1]
-                                                             && definition.parameters[0].name === 'S')),
         children: [
           {
             type: Expression,
@@ -1085,7 +1053,7 @@ class TutorialStates {
                             type: Expression,
                             key: 11,
                             toolTip: {
-                              contents: <p>Add another function, but this will be a function from S to S.</p>,
+                              contents: <p>Add another function. (This will be a function from S to S.)</p>,
                               position: 'bottom',
                               index: 0,
                               condition: (component) => !component.state.openMenu
@@ -1128,15 +1096,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addElementParameter(definition, 'x');
+    }
   };
 
   private insertOperatorParameters_g_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1185,19 +1154,20 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[3].name === 'g') {
-            this.changeState(this.insertOperatorParameters_g_set_menu);
+            this.changeState(this.insertOperatorParameters_g_set);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.changeParameterName(definition, 'g');
+    }
   };
 
-  private insertOperatorParameters_g_set_menu: StaticTutorialState = {
+  private insertOperatorParameters_g_set: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1268,17 +1238,21 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('g');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      type._set = this.createDefinitionRefExpression(['Functions'], [[
+        this.createSetArg('X'),
+        this.createSetArg('Y')
+      ]]);
+    }
   };
 
   private insertOperatorParameters_g_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')),
         children: [
           {
             type: Expression,
@@ -1307,7 +1281,7 @@ class TutorialStates {
                                     type: Expression,
                                     key: 0,
                                     toolTip: {
-                                      contents: <p>Select S here.</p>,
+                                      contents: <p>Select S here. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertOperatorParameters_g_set_arg1, this.insertOperatorParameters_g_set_arg2], this.insertOperatorParameters_n)}>Skip</Button></p>,
                                       position: 'bottom',
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
@@ -1355,21 +1329,20 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('g');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(functions.path.arguments, 'X', variableRef);
+    }
   };
 
   private insertOperatorParameters_g_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')
-                                                             && definition.parameters[3].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value.arguments[0].value.variable === definition.parameters[0]),
         children: [
           {
             type: Expression,
@@ -1420,7 +1393,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_menu))
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -1446,26 +1419,22 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('g');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
+    }
   };
 
   // Insert parameter n.
 
-  private insertOperatorParameters_n_menu: StaticTutorialState = {
+  private insertOperatorParameters_n: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 4
-                                                             && definition.parameters[3].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[3].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.name === 'Functions')
-                                                             && definition.parameters[3].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[0].value.arguments[0].value.variable === definition.parameters[0]
-                                                             && definition.parameters[3].type.expression._set.path.arguments[1].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[1].value.arguments[0].value instanceof Fmt.VariableRefExpression
-                                                             && definition.parameters[3].type.expression._set.path.arguments[1].value.arguments[0].value.variable === definition.parameters[0]),
         children: [
           {
             type: Expression,
@@ -1529,15 +1498,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addElementParameter(definition, 'x');
+    }
   };
 
   private insertOperatorParameters_n_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
-                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1586,19 +1556,20 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[4].name === 'n') {
-            this.changeState(this.insertOperatorParameters_n_set_menu);
+            this.changeState(this.insertOperatorParameters_n_set);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.changeParameterName(definition, 'n');
+    }
   };
 
-  private insertOperatorParameters_n_set_menu: StaticTutorialState = {
+  private insertOperatorParameters_n_set: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
-                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -1636,7 +1607,7 @@ class TutorialStates {
                                   contents: <p>Click here.</p>,
                                   position: 'bottom',
                                   index: 1,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -1657,140 +1628,10 @@ class TutorialStates {
                                             },
                                             elementAction: this.automateClick()
                                           }
-                                        ],
-                                        manipulateProps: (props) => ({
-                                          ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_set_dialog_search))
-                                        })
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private insertOperatorParameters_n_set_dialog_search: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 0,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: Expression,
-                        key: 2,
-                        children: [
-                          {
-                            type: Expression,
-                            key: 11,
-                            children: [
-                              {
-                                type: Expression,
-                                key: 4,
-                                children: [
-                                  {
-                                    type: ExpressionDialog,
-                                    children: [
-                                      {
-                                        type: StandardDialog,
-                                        children: [
-                                          {
-                                            type: ExpressionDialogItem,
-                                            key: 0,
-                                            children: [
-                                              {
-                                                type: LibraryTree,
-                                                children: [
-                                                  {
-                                                    type: SearchInput,
-                                                    toolTip: {
-                                                      contents: <p>Type "natural numbers" here, which will further filter the tree.</p>,
-                                                      position: 'bottom',
-                                                      index: 0
-                                                    },
-                                                    manipulateProps: (props) => ({
-                                                      ...props,
-                                                      onSearch: inject(props.onSearch, () => this.changeState(this.insertOperatorParameters_n_set_dialog_select))
-                                                    }),
-                                                    elementAction: this.automateTextInput('natural numbers')
-                                                  }
-                                                ]
-                                              }
-                                            ]
-                                          }
                                         ]
                                       }
                                     ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private insertOperatorParameters_n_set_dialog_select: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 5)),
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 0,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: Expression,
-                        key: 2,
-                        children: [
-                          {
-                            type: Expression,
-                            key: 11,
-                            children: [
-                              {
-                                type: Expression,
-                                key: 4,
-                                children: [
+                                  },
                                   {
                                     type: ExpressionDialog,
                                     children: [
@@ -1805,13 +1646,19 @@ class TutorialStates {
                                                 type: LibraryTree,
                                                 children: [
                                                   {
-                                                    // Keep tooltip at search input; otherwise the search input will be recreated while typing.
                                                     type: SearchInput,
+                                                    refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
                                                     toolTip: {
-                                                      contents: null,
+                                                      contents: <p>Type "natural numbers" here, which will further filter the tree.</p>,
                                                       position: 'bottom',
-                                                      index: 0
-                                                    }
+                                                      index: 0,
+                                                      condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
+                                                    },
+                                                    manipulateProps: (props) => ({
+                                                      ...props,
+                                                      onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
+                                                    }),
+                                                    elementAction: this.automateTextInput('natural numbers')
                                                   },
                                                   {
                                                     type: InnerLibraryTreeItems,
@@ -1858,7 +1705,7 @@ class TutorialStates {
                                                                                     elementAction: this.automateClick()
                                                                                   }
                                                                                 ],
-                                                                                componentAction: (component) => this.changeState(this.insertOperatorParameters_n_set_dialog_select, component.props.selected)
+                                                                                componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                               }
                                                                             ]
                                                                           }
@@ -1884,7 +1731,7 @@ class TutorialStates {
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_menu))
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -1906,19 +1753,20 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('n');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+    }
   };
 
   // Insert composition term.
 
-  private fillOperatorDefinition_composition_menu: StaticTutorialState = {
+  private fillOperatorDefinition_composition: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 5
-                                                             && definition.parameters[4].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[4].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[4].type.expression._set.path.name === 'Natural numbers')),
         children: [
           {
             type: Expression,
@@ -1942,10 +1790,15 @@ class TutorialStates {
                               {
                                 type: Expression,
                                 toolTip: {
-                                  contents: <p>Now we need to fill our new definition.<br/>In general, expressions in Slate are entered hierarchically. So we need to consider the outermost symbol, which in our case will be function composition.</p>,
+                                  contents: (
+                                    <div>
+                                      <p>Now we need to fill our new definition.</p>
+                                      <p>In general, expressions in Slate are entered hierarchically. So we need to consider the outermost symbol, which in our case will be function composition.</p>
+                                    </div>
+                                  ),
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -1969,57 +1822,15 @@ class TutorialStates {
                                         ],
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_dialog_search))
+                                          onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
+                                            if (action instanceof Menu.ImmediateExpressionMenuAction) {
+                                              this.changeState(this.fillOperatorDefinition_composition_arg1);
+                                            }
+                                          })
                                         })
                                       }
                                     ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillOperatorDefinition_composition_dialog_search: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: 'span',
-                        className: 'table-row',
-                        key: 0,
-                        children: [
-                          {
-                            type: 'span',
-                            className: 'table-cell',
-                            key: 1,
-                            children: [
-                              {
-                                type: Expression,
-                                children: [
+                                  },
                                   {
                                     type: ExpressionDialog,
                                     children: [
@@ -2035,92 +1846,18 @@ class TutorialStates {
                                                 children: [
                                                   {
                                                     type: SearchInput,
+                                                    refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
                                                     toolTip: {
                                                       contents: <p>Type "composition".</p>,
                                                       position: 'bottom',
-                                                      index: 0
+                                                      index: 0,
+                                                      condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                     },
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_dialog_select))
+                                                      onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                     }),
                                                     elementAction: this.automateTextInput('composition')
-                                                  }
-                                                ]
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillOperatorDefinition_composition_dialog_select: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: 'span',
-                        className: 'table-row',
-                        key: 0,
-                        children: [
-                          {
-                            type: 'span',
-                            className: 'table-cell',
-                            key: 1,
-                            children: [
-                              {
-                                type: Expression,
-                                children: [
-                                  {
-                                    type: ExpressionDialog,
-                                    children: [
-                                      {
-                                        type: StandardDialog,
-                                        children: [
-                                          {
-                                            type: ExpressionDialogItem,
-                                            key: 0,
-                                            children: [
-                                              {
-                                                type: LibraryTree,
-                                                children: [
-                                                  {
-                                                    // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-                                                    type: SearchInput,
-                                                    toolTip: {
-                                                      contents: null,
-                                                      position: 'bottom',
-                                                      index: 0
-                                                    }
                                                   },
                                                   {
                                                     type: InnerLibraryTreeItems,
@@ -2165,7 +1902,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_dialog_select, component.props.selected)
+                                                                        componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                       }
                                                                     ]
                                                                   }
@@ -2187,7 +1924,7 @@ class TutorialStates {
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1_menu))
+                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -2209,12 +1946,22 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      contents.definition[0] = this.createDefinitionRefExpression(['composition'], [[
+        this.createSetArg('X'),
+        this.createSetArg('Y'),
+        this.createSetArg('Z'),
+        this.createElementArg('f'),
+        this.createElementArg('g')
+      ]]);
+    }
   };
 
   // Select f.
 
-  private fillOperatorDefinition_composition_arg1_menu: StaticTutorialState = {
+  private fillOperatorDefinition_composition_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2254,7 +2001,7 @@ class TutorialStates {
                                     },
                                     componentAction: (component) => {
                                       (component as Expression).disableWindowClickListener();
-                                      this.changeState(this.fillOperatorDefinition_composition_arg1_menu, component.state.openMenu);
+                                      this.changeAdditionalStateData(() => component.state.openMenu);
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -2273,7 +2020,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_menu))
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -2309,12 +2056,18 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'f');
+      this.setElementArgValue(composition.path.arguments, 'g', variableRef);
+    }
   };
 
   // Select g.
 
-  private fillOperatorDefinition_composition_arg2_menu: StaticTutorialState = {
+  private fillOperatorDefinition_composition_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2352,7 +2105,7 @@ class TutorialStates {
                                       index: 0,
                                       condition: (component) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_menu, component.state.openMenu),
+                                    componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2370,7 +2123,7 @@ class TutorialStates {
                                                     key: 0,
                                                     manipulateProps: (props) => ({
                                                       ...props,
-                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_reselectionMenu))
+                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_reselection))
                                                     }),
                                                     elementAction: this.automateClick()
                                                   }
@@ -2396,10 +2149,22 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      let variableRef1 = this.createVariableRefExpression(definition, 'g');
+      this.setElementArgValue(composition.path.arguments, 'f', variableRef1);
+      let variableRef2 = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(composition.path.arguments, 'X', variableRef2);
+      let variableRef3 = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(composition.path.arguments, 'Y', variableRef3);
+      let variableRef4 = this.createVariableRefExpression(definition, 'T');
+      this.setSetArgValue(composition.path.arguments, 'Z', variableRef4);
+    }
   };
 
-  private fillOperatorDefinition_composition_arg2_reselectionMenu: StaticTutorialState = {
+  private fillOperatorDefinition_composition_arg2_reselection: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2435,9 +2200,9 @@ class TutorialStates {
                                       contents: <p>It turns out we actually wanted to write "g<sup>n</sup>". This can be fixed easily by clicking here again. (But be careful to only overwrite "g" instead of the entire expression.)</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component) => !(component.state.openMenu || component.state.openDialog)
                                     },
-                                    componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_reselectionMenu, component.state.openMenu),
+                                    componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2457,152 +2222,10 @@ class TutorialStates {
                                                 },
                                                 elementAction: this.automateClick()
                                               }
-                                            ],
-                                            manipulateProps: (props) => ({
-                                              ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_search))
-                                            })
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillOperatorDefinition_composition_arg2_dialog_search: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: 'span',
-                        className: 'table-row',
-                        key: 0,
-                        children: [
-                          {
-                            type: 'span',
-                            className: 'table-cell',
-                            key: 1,
-                            children: [
-                              {
-                                type: Expression,
-                                children: [
-                                  {
-                                    type: Expression,
-                                    key: 4,
-                                    children: [
-                                      {
-                                        type: ExpressionDialog,
-                                        children: [
-                                          {
-                                            type: StandardDialog,
-                                            children: [
-                                              {
-                                                type: ExpressionDialogItem,
-                                                key: 0,
-                                                children: [
-                                                  {
-                                                    type: LibraryTree,
-                                                    children: [
-                                                      {
-                                                        type: SearchInput,
-                                                        toolTip: {
-                                                          contents: <p>Type "power".</p>,
-                                                          position: 'bottom',
-                                                          index: 0
-                                                        },
-                                                        manipulateProps: (props) => ({
-                                                          ...props,
-                                                          onSearch: inject(props.onSearch, () => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_select))
-                                                        }),
-                                                        elementAction: this.automateTextInput('power')
-                                                      }
-                                                    ]
-                                                  }
-                                                ]
-                                              }
                                             ]
                                           }
                                         ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillOperatorDefinition_composition_arg2_dialog_select: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: 'span',
-                        className: 'table-row',
-                        key: 0,
-                        children: [
-                          {
-                            type: 'span',
-                            className: 'table-cell',
-                            key: 1,
-                            children: [
-                              {
-                                type: Expression,
-                                children: [
-                                  {
-                                    type: Expression,
-                                    key: 4,
-                                    children: [
+                                      },
                                       {
                                         type: ExpressionDialog,
                                         children: [
@@ -2617,13 +2240,19 @@ class TutorialStates {
                                                     type: LibraryTree,
                                                     children: [
                                                       {
-                                                        // Keep tooltip at search input; otherwise the search input will be recreated while typing.
                                                         type: SearchInput,
+                                                        refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
                                                         toolTip: {
-                                                          contents: null,
+                                                          contents: <p>Type "power".</p>,
                                                           position: 'bottom',
-                                                          index: 0
-                                                        }
+                                                          index: 0,
+                                                          condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
+                                                        },
+                                                        manipulateProps: (props) => ({
+                                                          ...props,
+                                                          onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
+                                                        }),
+                                                        elementAction: this.automateTextInput('power')
                                                       },
                                                       {
                                                         type: InnerLibraryTreeItems,
@@ -2663,7 +2292,7 @@ class TutorialStates {
                                                                                 elementAction: this.automateClick()
                                                                               }
                                                                             ],
-                                                                            componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_dialog_select, component.props.selected)
+                                                                            componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                           }
                                                                         ]
                                                                       }
@@ -2685,7 +2314,7 @@ class TutorialStates {
                                                 refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                                 manipulateProps: (props) => ({
                                                   ...props,
-                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu))
+                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2))
                                                 }),
                                                 elementAction: this.automateClick()
                                               }
@@ -2709,12 +2338,26 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      let power = this.createDefinitionRefExpression(['power to natural number'], [[
+        this.createSetArg('X'),
+        this.createElementArg('f'),
+        this.createElementArg('n')
+      ]]);
+      let variableRef1 = this.createVariableRefExpression(definition, 'g');
+      this.setElementArgValue(power.path.arguments, 'f', variableRef1);
+      let variableRef2 = this.createVariableRefExpression(definition, 'S');
+      this.setSetArgValue(power.path.arguments, 'X', variableRef2);
+      this.setElementArgValue(composition.path.arguments, 'f', power);
+    }
   };
 
   // Select n.
 
-  private fillOperatorDefinition_composition_arg2_arg2_menu: StaticTutorialState = {
+  private fillOperatorDefinition_composition_arg2_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -2756,7 +2399,7 @@ class TutorialStates {
                                           index: 0,
                                           condition: (component) => !component.state.openMenu
                                         },
-                                        componentAction: (component) => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2_menu, component.state.openMenu),
+                                        componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
                                         elementAction: this.automateClick(),
                                         children: [
                                           {
@@ -2802,7 +2445,14 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      let power = this.getElementArgValue(composition.path.arguments, 'f') as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'n');
+      this.setElementArgValue(power.path.arguments, 'n', variableRef);
+    }
   };
 
   // Select notation template.
@@ -3295,7 +2945,7 @@ class TutorialStates {
                                                       {
                                                         type: Expression,
                                                         toolTip: {
-                                                          contents: <p>Enter a text like "my" here, so you will recognize the definition more easily.</p>,
+                                                          contents: <p>Enter the text "my" here, so you will recognize the definition more easily.</p>,
                                                           position: 'bottom',
                                                           index: 0,
                                                           condition: (component) => !component.state.openMenu
@@ -3434,7 +3084,27 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param1 = definition.parameters.getParameter('S');
+      let paramType1 = param1.type.expression as FmtHLM.MetaRefExpression_Set;
+      paramType1.auto = new FmtHLM.MetaRefExpression_true;
+      let param2 = definition.parameters.getParameter('T');
+      let paramType2 = param2.type.expression as FmtHLM.MetaRefExpression_Set;
+      paramType2.auto = new FmtHLM.MetaRefExpression_true;
+      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      let body = this.createVariableRefExpression(definition, 'g');
+      let sup = this.createVariableRefExpression(definition, 'n');
+      let preSub = this.createVariableRefExpression(definition, 'f');
+      let preSup = new Fmt.StringExpression;
+      preSup.value = 'my';
+      contents.notation = this.createDefinitionRefExpression(['SubSup'], [[
+        this.createRawArg('body', body),
+        this.createRawArg('sup', sup),
+        this.createRawArg('preSub', preSub),
+        this.createRawArg('preSup', preSup)
+      ]]);
+    }
   };
 
   private submitOperator: StaticTutorialState = {
@@ -3497,7 +3167,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu, undefined, null))
+              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu, null))
             }),
             elementAction: this.automateClick()
           }
@@ -3711,7 +3381,8 @@ class TutorialStates {
           ...props,
           onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
             if (libraryDefinition) {
-              this.changeState(this.insertTheoremParameters_f_menu, undefined, libraryDefinition);
+              this.theorem = libraryDefinition;
+              this.changeState(this.insertTheoremParameters_f, libraryDefinition);
             }
           }))
         })
@@ -3721,11 +3392,10 @@ class TutorialStates {
 
   // Insert parameter f.
 
-  private insertTheoremParameters_f_menu: StaticTutorialState = {
+  private insertTheoremParameters_f: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 0)),
         children: [
           {
             type: Expression,
@@ -3742,7 +3412,7 @@ class TutorialStates {
                         type: Expression,
                         key: 2,
                         toolTip: {
-                          contents: <p>Add a parameter that is a function from the set of natural numbers to itself.</p>,
+                          contents: <p>Add a parameter that is a function from the set of natural numbers to itself. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertTheoremParameters_f, this.insertTheoremParameters_f_name, this.insertTheoremParameters_f_set, this.insertTheoremParameters_f_set_arg1, this.insertTheoremParameters_f_set_arg2], this.insertTheoremParameters_n)}>Skip</Button></p>,
                           position: 'bottom',
                           index: 0,
                           condition: (component) => !component.state.openMenu
@@ -3783,15 +3453,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addElementParameter(definition, 'x');
+    }
   };
 
   private insertTheoremParameters_f_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -3840,19 +3511,20 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[0].name === 'f') {
-            this.changeState(this.insertTheoremParameters_f_set_menu);
+            this.changeState(this.insertTheoremParameters_f_set);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.changeParameterName(definition, 'f');
+    }
   };
 
-  private insertTheoremParameters_f_set_menu: StaticTutorialState = {
+  private insertTheoremParameters_f_set: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -3933,18 +3605,21 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      type._set = this.createDefinitionRefExpression(['Functions'], [[
+        this.createSetArg('X'),
+        this.createSetArg('Y')
+      ]]);
+    }
   };
 
   private insertTheoremParameters_f_set_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2)),
         children: [
           {
             type: Expression,
@@ -4031,21 +3706,20 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      this.setSetArgValue(functions.path.arguments, 'X', naturalNumbers);
+    }
   };
 
   private insertTheoremParameters_f_set_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value.path.name === 'Natural numbers')),
         children: [
           {
             type: Expression,
@@ -4089,7 +3763,7 @@ class TutorialStates {
                                             key: 4,
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n_menu))
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n))
                                             }),
                                             children: [
                                               {
@@ -4116,26 +3790,22 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('f');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let functions = type._set as Fmt.DefinitionRefExpression;
+      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      this.setSetArgValue(functions.path.arguments, 'Y', naturalNumbers);
+    }
   };
 
   // Insert parameter n.
 
-  private insertTheoremParameters_n_menu: StaticTutorialState = {
+  private insertTheoremParameters_n: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 1
-                                                             && definition.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[0].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.name === 'Functions'
-                                                             && definition.parameters[0].type.expression._set.path.arguments.length === 2
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[0].value.arguments[0].value.path.name === 'Natural numbers'
-                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value instanceof Fmt.CompoundExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value.arguments[0].value instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[0].type.expression._set.path.arguments[1].value.arguments[0].value.path.name === 'Natural numbers')),
         children: [
           {
             type: Expression,
@@ -4156,7 +3826,7 @@ class TutorialStates {
                             type: Expression,
                             key: 7,
                             toolTip: {
-                              contents: <p>Insert a natural number "n".</p>,
+                              contents: <p>Insert a natural number "n". <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertTheoremParameters_n, this.insertTheoremParameters_n_name, this.insertTheoremParameters_n_set], this.fillTheoremClaim_equality)}>Skip</Button></p>,
                               position: 'bottom',
                               index: 0,
                               condition: (component) => !component.state.openMenu
@@ -4194,15 +3864,16 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.addElementParameter(definition, 'x');
+    }
   };
 
   private insertTheoremParameters_n_name: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
-                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -4246,19 +3917,20 @@ class TutorialStates {
         ],
         componentAction: createContentAction((definition: Fmt.Definition) => {
           if (definition.parameters[1].name === 'n') {
-            this.changeState(this.insertTheoremParameters_n_set_menu);
+            this.changeState(this.insertTheoremParameters_n_set);
           }
         })
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      this.changeParameterName(definition, 'n');
+    }
   };
 
-  private insertTheoremParameters_n_set_menu: StaticTutorialState = {
+  private insertTheoremParameters_n_set: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
-                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element)),
         children: [
           {
             type: Expression,
@@ -4298,7 +3970,7 @@ class TutorialStates {
                                         key: 2,
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_menu))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality))
                                         }),
                                         children: [
                                           {
@@ -4323,19 +3995,20 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let param = definition.parameters.getParameter('n');
+      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+    }
   };
 
   // Insert equality.
 
-  private fillTheoremClaim_equality_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createContentConstraint((definition) => (definition.parameters.length === 2
-                                                             && definition.parameters[1].type.expression instanceof FmtHLM.MetaRefExpression_Element
-                                                             && definition.parameters[1].type.expression._set instanceof Fmt.DefinitionRefExpression
-                                                             && definition.parameters[1].type.expression._set.path.name === 'Natural numbers')),
         children: [
           {
             type: Expression,
@@ -4380,7 +4053,7 @@ class TutorialStates {
                             ],
                             manipulateProps: (props) => ({
                               ...props,
-                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_menu))
+                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1))
                             })
                           }
                         ]
@@ -4393,12 +4066,18 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = new FmtHLM.MetaRefExpression_equals;
+      equality.terms = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
+      contents.claim = equality;
+    }
   };
 
   // Select "my definition".
 
-  private fillTheoremClaim_equality_arg1_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4418,7 +4097,7 @@ class TutorialStates {
                         type: Expression,
                         key: 0,
                         toolTip: {
-                          contents: <p>Here, please select the definition you just created, which should be the second item in the list of recently used definitions.</p>,
+                          contents: <p>Here, please select the definition you just created, which should be the one of the top items in the list of recently used definitions.</p>,
                           position: 'bottom',
                           index: 0,
                           condition: (component) => !component.state.openMenu
@@ -4433,7 +4112,7 @@ class TutorialStates {
                                 key: 2,
                                 manipulateProps: (props) => ({
                                   ...props,
-                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg1_menu))
+                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg1))
                                 }),
                                 children: [
                                   {
@@ -4470,12 +4149,23 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      equality.terms[0] = this.createDefinitionRefExpression([this.operator!.definition.name], [[
+        this.createSetArg('S'),
+        this.createSetArg('T'),
+        this.createElementArg('f'),
+        this.createElementArg('g'),
+        this.createElementArg('n')
+      ]]);
+    }
   };
 
   // Select f.
 
-  private fillTheoremClaim_equality_arg1_arg1_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality_arg1_arg1: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4504,7 +4194,7 @@ class TutorialStates {
                               index: 0,
                               condition: (component) => !component.state.openMenu
                             },
-                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg1_menu, component.state.openMenu),
+                            componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4522,7 +4212,7 @@ class TutorialStates {
                                             key: 0,
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_menu))
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -4544,12 +4234,19 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'f');
+      this.setSetArgValue(operator.path.arguments, 'f', variableRef);
+    }
   };
 
   // Select identity function.
 
-  private fillTheoremClaim_equality_arg1_arg2_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality_arg1_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4576,9 +4273,9 @@ class TutorialStates {
                               contents: <p>Here, please select the identity function, which is a definition in the library.</p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component) => !(component.state.openMenu || component.state.openDialog)
                             },
-                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_menu, component.state.openMenu),
+                            componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4597,53 +4294,16 @@ class TutorialStates {
                                     manipulateProps: (props) => ({
                                       ...props,
                                       onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
-                                        this.changeState(action instanceof Menu.DialogExpressionMenuAction
-                                                         ? this.fillTheoremClaim_equality_arg1_arg2_dialog_search
-                                                         : this.fillTheoremClaim_equality_arg1_arg3_menu);
+                                        if (action instanceof Menu.ImmediateExpressionMenuAction) {
+                                          this.changeState(this.fillTheoremClaim_equality_arg1_arg3);
+                                        } else {
+                                          this.changeAdditionalStateData(() => undefined);
+                                        }
                                       })
                                     })
                                   }
                                 ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillTheoremClaim_equality_arg1_arg2_dialog_search: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: Expression,
-                        key: 0,
-                        children: [
-                          {
-                            type: Expression,
-                            key: 'body',
-                            children: [
+                              },
                               {
                                 type: ExpressionDialog,
                                 children: [
@@ -4659,85 +4319,18 @@ class TutorialStates {
                                             children: [
                                               {
                                                 type: SearchInput,
+                                                refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
                                                 toolTip: {
                                                   contents: <p>Type "identity".</p>,
                                                   position: 'bottom',
-                                                  index: 0
+                                                  index: 0,
+                                                  condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                 },
                                                 manipulateProps: (props) => ({
                                                   ...props,
-                                                  onSearch: inject(props.onSearch, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_dialog_select))
+                                                  onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                 }),
                                                 elementAction: this.automateTextInput('identity')
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
-  private fillTheoremClaim_equality_arg1_arg2_dialog_select: StaticTutorialState = {
-    manipulationEntries: [
-      {
-        type: LibraryItem,
-        children: [
-          {
-            type: Expression,
-            children: [
-              {
-                type: 'div',
-                className: 'paragraph',
-                key: 1,
-                children: [
-                  {
-                    type: Expression,
-                    children: [
-                      {
-                        type: Expression,
-                        key: 0,
-                        children: [
-                          {
-                            type: Expression,
-                            key: 'body',
-                            children: [
-                              {
-                                type: ExpressionDialog,
-                                children: [
-                                  {
-                                    type: StandardDialog,
-                                    children: [
-                                      {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
-                                        children: [
-                                          {
-                                            type: LibraryTree,
-                                            children: [
-                                              {
-                                                // Keep tooltip at search input; otherwise the search input will be recreated while typing.
-                                                type: SearchInput,
-                                                toolTip: {
-                                                  contents: null,
-                                                  position: 'bottom',
-                                                  index: 0
-                                                }
                                               },
                                               {
                                                 type: InnerLibraryTreeItems,
@@ -4777,7 +4370,7 @@ class TutorialStates {
                                                                         elementAction: this.automateClick()
                                                                       }
                                                                     ],
-                                                                    componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg2_dialog_select, component.props.selected)
+                                                                    componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                   }
                                                                 ]
                                                               }
@@ -4799,7 +4392,7 @@ class TutorialStates {
                                         refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
                                         manipulateProps: (props) => ({
                                           ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3_menu))
+                                          onClick: inject(props.onClick, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -4819,12 +4412,23 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      let identity = this.createDefinitionRefExpression(['identity'], [[
+        this.createSetArg('X')
+      ]]);
+      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      this.setSetArgValue(identity.path.arguments, 'X', naturalNumbers);
+      this.setSetArgValue(operator.path.arguments, 'g', identity);
+    }
   };
 
   // Select n.
 
-  private fillTheoremClaim_equality_arg1_arg3_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality_arg1_arg3: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4863,7 +4467,7 @@ class TutorialStates {
                               index: 1,
                               condition: (component) => !component.state.openMenu
                             },
-                            componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg1_arg3_menu, component.state.openMenu),
+                            componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4881,7 +4485,7 @@ class TutorialStates {
                                             key: 0,
                                             manipulateProps: (props) => ({
                                               ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2_menu))
+                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2))
                                             }),
                                             elementAction: this.automateClick()
                                           }
@@ -4903,12 +4507,19 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      let variableRef = this.createVariableRefExpression(definition, 'n');
+      this.setSetArgValue(operator.path.arguments, 'n', variableRef);
+    }
   };
 
   // Select f on the right side.
 
-  private fillTheoremClaim_equality_arg2_menu: StaticTutorialState = {
+  private fillTheoremClaim_equality_arg2: StaticTutorialState = {
     manipulationEntries: [
       {
         type: LibraryItem,
@@ -4933,7 +4544,7 @@ class TutorialStates {
                           index: 0,
                           condition: (component) => !component.state.openMenu
                         },
-                        componentAction: (component) => this.changeState(this.fillTheoremClaim_equality_arg2_menu, component.state.openMenu),
+                        componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
                         elementAction: this.automateClick(),
                         children: [
                           {
@@ -4971,7 +4582,17 @@ class TutorialStates {
           }
         ]
       }
-    ]
+    ],
+    applyExpectedChange: (definition: Fmt.Definition) => {
+      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      equality.terms[1] = this.createVariableRefExpression(definition, 'f');
+      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      let naturalNumbers1 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      this.setSetArgValue(operator.path.arguments, 'S', naturalNumbers1);
+      let naturalNumbers2 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      this.setSetArgValue(operator.path.arguments, 'T', naturalNumbers2);
+    }
   };
 
   // View source to see inferred arguments.
@@ -4993,6 +4614,7 @@ class TutorialStates {
                 </div>
               ),
               position: 'top',
+              arrow: 'right',
               index: 0
             },
             manipulateProps: (props) => ({
@@ -5018,6 +4640,7 @@ class TutorialStates {
             toolTip: {
               contents: <p>When you are done, please close the source code view again.</p>,
               position: 'top',
+              arrow: 'right',
               index: 0
             },
             manipulateProps: (props) => ({
@@ -5080,7 +4703,7 @@ class TutorialStates {
             },
             manipulateProps: (props) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition, undefined, null))
+              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition, null))
             }),
             elementAction: this.automateClick()
           }
@@ -5095,7 +4718,7 @@ class TutorialStates {
     manipulationEntries: [
       {
         type: LibraryItem,
-        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition.definition.type.expression instanceof FmtHLM.MetaRefExpression_StandardTheorem)),
+        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition === this.theorem)),
         children: [
           {
             type: Expression,
@@ -5128,7 +4751,7 @@ class TutorialStates {
       },
       {
         type: LibraryItem,
-        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition.definition.type.expression instanceof FmtHLM.MetaRefExpression_ExplicitOperator)),
+        constraint: createLibraryDefinitionConstraint((libraryDefinition) => (libraryDefinition === this.operator)),
         children: [
           {
             type: Expression,
@@ -5173,21 +4796,201 @@ class TutorialStates {
   private experiment: StaticTutorialState = {};
 
   start() {
-    this.changeState(this.introduction, undefined, null);
+    this.changeState(this.introduction, null);
   }
 
-  private changeState(staticState: StaticTutorialState | undefined, additionalStateData?: any, newEditedDefinition?: LibraryDefinition | null): void {
+  private changeState(staticState: StaticTutorialState | undefined, newEditedDefinition?: LibraryDefinition | null): void {
     if (staticState) {
-      let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined): DynamicTutorialState => ({
-        staticState: staticState,
-        refComponents: oldTutorialState?.staticState === staticState ? oldTutorialState?.refComponents : undefined,
-        additionalStateData: additionalStateData,
-        editedDefinition: newEditedDefinition === undefined ? oldTutorialState?.editedDefinition : newEditedDefinition ?? undefined
-      });
+      let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
+        let result: DynamicTutorialState = {
+          ...oldTutorialState,
+          staticState: staticState,
+          refComponents: [],
+          additionalStateData: undefined,
+          checkPreconditions: this.checkPreconditions
+        };
+        let oldStaticState = oldTutorialState?.staticState;
+        if (oldStaticState !== staticState) {
+          if (result.editedDefinition && result.initialDefinitionContents && oldStaticState?.applyExpectedChange) {
+            let expectedContents = result.initialDefinitionContents.clone();
+            oldStaticState.applyExpectedChange(expectedContents, staticState);
+            let actualContents = result.editedDefinition.definition;
+            if (actualContents.toString() === expectedContents.toString()) {
+              result.initialDefinitionContents = expectedContents;
+              result.initialDefinitionContentsState = result;
+            } else if (oldTutorialState) {
+              return this.getRevertUnexpectedChangeState(oldTutorialState);
+            }
+          }
+        }
+        if (newEditedDefinition !== undefined) {
+          if (newEditedDefinition) {
+            result.editedDefinition = newEditedDefinition;
+            result.initialDefinitionContents = newEditedDefinition.definition.clone();
+            result.initialDefinitionContentsState = result;
+          } else {
+            result.editedDefinition = undefined;
+            result.initialDefinitionContents = undefined;
+            result.initialDefinitionContentsState = undefined;
+          }
+        }
+        return result;
+      };
       this.onChangeTutorialState(stateTransitionFn);
     } else {
       this.onChangeTutorialState(() => undefined);
     }
+  }
+
+  private changeAdditionalStateData(changeData: (oldAdditionalStateData: any) => any): void {
+    let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined): DynamicTutorialState | undefined => {
+      if (oldTutorialState) {
+        let oldAdditionalStateData = oldTutorialState.additionalStateData;
+        let newAdditionalStateData = changeData(oldAdditionalStateData);
+        if (newAdditionalStateData !== oldAdditionalStateData) {
+          return {
+            ...oldTutorialState,
+            additionalStateData: newAdditionalStateData
+          };
+        }
+      }
+      return oldTutorialState;
+    };
+    this.onChangeTutorialState(stateTransitionFn);
+  }
+
+  private checkPreconditions = (tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined): DynamicTutorialState | undefined => {
+    let editedDefinition = tutorialState.editedDefinition;
+    if (editedDefinition) {
+      if (currentEditedDefinition !== editedDefinition) {
+        return this.getReturnToDefinitionState(editedDefinition);
+      } else if (tutorialState.initialDefinitionContents) {
+        let contentsAsString = editedDefinition.definition.toString();
+        if (contentsAsString === tutorialState.initialDefinitionContents.toString()) {
+          return undefined;
+        }
+        if (tutorialState.staticState.applyExpectedChange) {
+          let finalContents = tutorialState.initialDefinitionContents.clone();
+          tutorialState.staticState.applyExpectedChange(finalContents);
+          if (contentsAsString === finalContents.toString()) {
+            return undefined;
+          }
+        }
+        return this.getRevertUnexpectedChangeState(tutorialState);
+      }
+    }
+    return undefined;
+  };
+
+  private getReturnToDefinitionState(editedDefinition: LibraryDefinition): DynamicTutorialState {
+    return {
+      staticState: {
+        manipulationEntries: [
+          {
+            type: LibraryItemList,
+            children: [
+              {
+                type: LibraryTreeItem,
+                constraint: (props: LibraryTreeItemProps) => (props.libraryDefinition === editedDefinition),
+                toolTip: {
+                  contents: <p>Select the edited definition to continue the tutorial.</p>,
+                  position: 'bottom',
+                  index: 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      refComponents: []
+    };
+  }
+
+  private getRevertUnexpectedChangeState(tutorialState: DynamicTutorialState): DynamicTutorialState {
+    return {
+      staticState: this.revertUnexpectedChange,
+      refComponents: [],
+      editedDefinition: tutorialState.editedDefinition,
+      initialDefinitionContents: tutorialState.initialDefinitionContents,
+      initialDefinitionContentsState: tutorialState.initialDefinitionContentsState
+    };
+  }
+
+  private revertUnexpectedChange: StaticTutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItem,
+        children: [
+          {
+            type: Expression,
+            children: [
+              {
+                type: 'div',
+                className: 'paragraph',
+                key: 1,
+                toolTip: {
+                  contents: (
+                    <div className={'large-tooltip'}>
+                      <p>You have entered something unexpected. To continue the tutorial, this change must be reverted.</p>
+                      <div className={'tutorial-tooltip-button-row'}>
+                        <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.revertChanges()}>
+                          Revert change
+                        </Button>
+                        <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
+                          Continue experimenting
+                        </Button>
+                      </div>
+                    </div>
+                  ),
+                  position: 'bottom',
+                  index: 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  private revertChanges(): void {
+    let stateTransitionFn = (currentState: DynamicTutorialState | undefined) => {
+      if (!currentState) {
+        return undefined;
+      }
+      if (currentState.initialDefinitionContents) {
+        this.onReplaceDefinitionContents(currentState.initialDefinitionContents);
+      }
+      return currentState.initialDefinitionContentsState;
+    };
+    this.onChangeTutorialState(stateTransitionFn);
+  }
+
+  private skipStates(skippedStates: StaticTutorialState[], targetState: StaticTutorialState): void {
+    let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
+      if (!oldTutorialState) {
+        return undefined;
+      }
+      if (oldTutorialState.initialDefinitionContents) {
+        let definitionContents = oldTutorialState.initialDefinitionContents.clone();
+        for (let skippedState of skippedStates) {
+          skippedState.applyExpectedChange?.(definitionContents, targetState);
+        }
+        this.onReplaceDefinitionContents(definitionContents);
+        let result: DynamicTutorialState = {
+          ...oldTutorialState,
+          staticState: targetState,
+          refComponents: [],
+          initialDefinitionContents: definitionContents,
+          additionalStateData: undefined,
+          checkPreconditions: this.checkPreconditions
+        };
+        result.initialDefinitionContentsState = result;
+        return result;
+      }
+      return undefined;
+    };
+    this.onChangeTutorialState(stateTransitionFn);
   }
 
   private automateClick(delay: number = defaultDelay) {
@@ -5282,32 +5085,160 @@ class TutorialStates {
       }
     };
   }
-}
 
-export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
-  let tutorialStates = new TutorialStates(onChangeTutorialState, onDocLinkClicked, withTouchWarning);
-  tutorialStates.start();
-}
-
-export function getReturnToDefinitionState(editedDefinition: LibraryDefinition): DynamicTutorialState {
-  return {
-    staticState: {
-      manipulationEntries: [
-        {
-          type: LibraryItemList,
-          children: [
-            {
-              type: LibraryTreeItem,
-              constraint: (props: LibraryTreeItemProps) => (props.libraryDefinition === editedDefinition),
-              toolTip: {
-                contents: <p>Select the edited definition to continue the tutorial.</p>,
-                position: 'bottom',
-                index: 0
-              }
-            }
-          ]
-        }
-      ]
+  private addParameter(definition: Fmt.Definition, name: string, type: Fmt.Expression): void {
+    let paramType = new Fmt.Type;
+    paramType.expression = type;
+    paramType.arrayDimensions = 0;
+    let param = new Fmt.Parameter;
+    param.name = name;
+    param.type = paramType;
+    param.optional = false;
+    param.list = false;
+    if (definition.parameters.length) {
+      param.previousParameter = definition.parameters[definition.parameters.length - 1];
     }
-  };
+    definition.parameters.push(param);
+  }
+
+  private addSetParameter(definition: Fmt.Definition, name: string): void {
+    this.addParameter(definition, name, new FmtHLM.MetaRefExpression_Set);
+  }
+
+  private addSubsetParameter(definition: Fmt.Definition, name: string): void {
+    let type = new FmtHLM.MetaRefExpression_Subset;
+    type.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    this.addParameter(definition, name, type);
+  }
+
+  private addElementParameter(definition: Fmt.Definition, name: string): void {
+    let type = new FmtHLM.MetaRefExpression_Element;
+    type._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    this.addParameter(definition, name, type);
+  }
+
+  private changeParameterName(definition: Fmt.Definition, name: string): void {
+    if (definition.parameters.length) {
+      definition.parameters[definition.parameters.length - 1].name = name;
+    }
+  }
+
+  private createVariableRefExpression(definition: Fmt.Definition, name: string): Fmt.VariableRefExpression {
+    let result = new Fmt.VariableRefExpression;
+    result.variable = definition.parameters.getParameter(name);
+    return result;
+  }
+
+  private createDefinitionRefExpression(path: string[], args: Fmt.Argument[][]): Fmt.DefinitionRefExpression {
+    let parentPath: Fmt.PathItem | undefined = undefined;
+    for (let pathIndex = 0; pathIndex < path.length - args.length; pathIndex++) {
+      let pathComponent = path[pathIndex];
+      let pathItem: Fmt.PathItem;
+      if (pathComponent === '.') {
+        pathItem = new Fmt.IdentityPathItem;
+      } else if (pathComponent === '..') {
+        pathItem = new Fmt.ParentPathItem;
+      } else {
+        let namedPathItem = new Fmt.NamedPathItem;
+        namedPathItem.name = pathComponent;
+        pathItem = namedPathItem;
+      }
+      pathItem.parentPath = parentPath;
+      parentPath = pathItem;
+    }
+    for (let argIndex = 0; argIndex < args.length; argIndex++) {
+      let pathIndex = path.length - args.length + argIndex;
+      let pathItem = new Fmt.Path;
+      pathItem.name = path[pathIndex];
+      pathItem.arguments.push(...args[argIndex]);
+      pathItem.parentPath = parentPath;
+      parentPath = pathItem;
+    }
+    let result = new Fmt.DefinitionRefExpression;
+    result.path = parentPath as Fmt.Path;
+    return result;
+  }
+
+  private createRawArg(name: string, value: Fmt.Expression): Fmt.Argument {
+    let result = new Fmt.Argument;
+    result.name = name;
+    result.value = value;
+    return result;
+  }
+
+  private createArg(name: string, value: Fmt.ObjectContents): Fmt.Argument {
+    let valueExpression = new Fmt.CompoundExpression;
+    value.toCompoundExpression(valueExpression, false);
+    return this.createRawArg(name, valueExpression);
+  }
+
+  private createSetArg(name: string): Fmt.Argument {
+    let contents = new FmtHLM.ObjectContents_SetArg;
+    contents._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    return this.createArg(name, contents);
+  }
+
+  private createSubsetArg(name: string): Fmt.Argument {
+    let contents = new FmtHLM.ObjectContents_SubsetArg;
+    contents._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    return this.createArg(name, contents);
+  }
+
+  private createElementArg(name: string): Fmt.Argument {
+    let contents = new FmtHLM.ObjectContents_ElementArg;
+    contents.element = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    return this.createArg(name, contents);
+  }
+
+  private getArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
+    let valueExpression = argumentList.getValue(name) as Fmt.CompoundExpression;
+    value.fromCompoundExpression(valueExpression);
+  }
+
+  private getSetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
+    let contents = new FmtHLM.ObjectContents_SetArg;
+    this.getArgValue(argumentList, name, contents);
+    return contents._set;
+  }
+
+  private getSubsetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
+    let contents = new FmtHLM.ObjectContents_SubsetArg;
+    this.getArgValue(argumentList, name, contents);
+    return contents._set;
+  }
+
+  private getElementArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
+    let contents = new FmtHLM.ObjectContents_ElementArg;
+    this.getArgValue(argumentList, name, contents);
+    return contents.element;
+  }
+
+  private setArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
+    let valueExpression = new Fmt.CompoundExpression;
+    value.toCompoundExpression(valueExpression, false);
+    argumentList.setValue(valueExpression, name);
+  }
+
+  private setSetArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
+    let contents = new FmtHLM.ObjectContents_SetArg;
+    contents._set = value;
+    this.setArgValue(argumentList, name, contents);
+  }
+
+  private setSubsetArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
+    let contents = new FmtHLM.ObjectContents_SubsetArg;
+    contents._set = value;
+    this.setArgValue(argumentList, name, contents);
+  }
+
+  private setElementArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
+    let contents = new FmtHLM.ObjectContents_ElementArg;
+    contents.element = value;
+    this.setArgValue(argumentList, name, contents);
+  }
+}
+
+export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onReplaceDefinitionContents: ReplaceDefinitionContentsFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
+  let tutorialStates = new TutorialStates(onChangeTutorialState, onReplaceDefinitionContents, onDocLinkClicked, withTouchWarning);
+  tutorialStates.start();
 }

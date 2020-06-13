@@ -6,7 +6,7 @@ import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
 import DocPage, { markdownSuffix } from './extras/DocPage';
 import { DynamicTutorialState, addTutorial } from './extras/Tutorial';
-import { startTutorial, TutorialStateTransitionFn, getReturnToDefinitionState } from './extras/TutorialContents';
+import { startTutorial, TutorialStateTransitionFn } from './extras/TutorialContents';
 import LibraryTree, { LibraryItemListEntry, LibraryItemList } from './components/LibraryTree';
 import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
@@ -372,9 +372,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       break;
     case 'UPDATE':
-      if (this.state.interactionHandler) {
-        this.state.interactionHandler.expressionChanged(true, false);
-      }
+      this.state.interactionHandler?.expressionChanged(true, false);
       this.forceUpdate();
       break;
     }
@@ -429,7 +427,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (editing) {
             if (this.state.tutorialState) {
-              mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
+              mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
             } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
             } else if (this.state.selectedItemRepository) {
@@ -647,11 +645,8 @@ class App extends React.Component<AppProps, AppState> {
 
     let tutorialState = this.state.tutorialState;
     if (tutorialState) {
-      let editedDefinition = tutorialState.editedDefinition;
-      if (editedDefinition && this.state.selectedItemDefinition?.getImmediateResult() !== editedDefinition) {
-        tutorialState = getReturnToDefinitionState(editedDefinition);
-      }
-      result = addTutorial(result, tutorialState);
+      let currentEditedDefinition = this.state.selectedItemDefinition?.getImmediateResult();
+      result = addTutorial(this, result, tutorialState, currentEditedDefinition);
     }
 
     return result;
@@ -1016,22 +1011,33 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startTutorial = (withTouchWarning: boolean): void => {
-    startTutorial(this.changeTutorialState, this.docLinkClicked, withTouchWarning);
+    let onChangeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
+      let oldTutorialState = this.state.tutorialState;
+      let newTutorialState = stateTransitionFn(oldTutorialState);
+      if (newTutorialState !== oldTutorialState) {
+        this.setState({tutorialState: newTutorialState});
+        if (!newTutorialState) {
+          this.navigateToRoot(true);
+        }
+      }
+    };
+    let onReplaceDefinitionContents = (definition: Fmt.Definition) => {
+      let editedDefinition = this.state.tutorialState?.editedDefinition;
+      if (editedDefinition) {
+        editedDefinition.definition.contents = undefined;
+        editedDefinition.definition.parameters.length = 0;
+        let replacedParameters: Fmt.ReplacedParameter[] = [];
+        definition.parameters.clone(editedDefinition.definition.parameters, replacedParameters);
+        editedDefinition.definition.contents = definition.contents?.clone(replacedParameters);
+        this.state.interactionHandler?.expressionChanged();
+      }
+      this.forceUpdate();
+    };
+    startTutorial(onChangeTutorialState, onReplaceDefinitionContents, this.docLinkClicked, withTouchWarning);
   };
 
   private endTutorial = (): void => {
     this.setState({tutorialState: undefined});
-  };
-
-  private changeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
-    let oldTutorialState = this.state.tutorialState;
-    let newTutorialState = stateTransitionFn(oldTutorialState);
-    if (oldTutorialState?.staticState !== newTutorialState?.staticState || oldTutorialState?.additionalStateData !== newTutorialState?.additionalStateData) {
-      this.setState({tutorialState: newTutorialState});
-      if (!newTutorialState || !newTutorialState.staticState.manipulationEntries) {
-        this.navigateToRoot(true);
-      }
-    }
   };
 }
 

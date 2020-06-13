@@ -4,6 +4,7 @@ import './ExpressionToolTip.css';
 const ToolTip = require('react-portal-tooltip').default;
 
 export type ToolTipPosition = 'left' | 'top' | 'right' | 'bottom';
+export type ToolTipArrow = 'center' | 'left' | 'top' | 'right' | 'bottom';
 
 export interface ToolTipParent {
   getBoundingClientRect(): ClientRect;
@@ -13,6 +14,7 @@ interface ToolTipProps {
   active: boolean;
   parent: ToolTipParent;
   position: ToolTipPosition;
+  arrow?: ToolTipArrow;
   getContents: () => React.ReactNode;
 }
 
@@ -100,7 +102,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
       }
     }
     return (
-      <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow="center" style={ExpressionToolTip.toolTipStyle}>
+      <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} style={ExpressionToolTip.toolTipStyle}>
         <div className={'tooltip preview'}>{ExpressionToolTip.currentContents}</div>
       </ToolTip>
     );
@@ -157,7 +159,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
       this.contents = this.props.getContents();
     }
     return (
-      <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow="center" group={this.props.group} style={PermanentToolTip.toolTipStyle}>
+      <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} group={this.props.group} style={PermanentToolTip.toolTipStyle}>
         <div className={'tooltip permanent'}>{this.contents}</div>
       </ToolTip>
     );

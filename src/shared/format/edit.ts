@@ -91,7 +91,7 @@ export class EditAnalysis {
         onApplyConvertedArgument();
       }
     };
-    this.analyzeExpression(arg.value, arg.optional || false, onSetValue, onApplyConvertedArgument, valueContext);
+    this.analyzeExpression(arg.value, arg.optional ?? false, onSetValue, onApplyConvertedArgument, valueContext);
   }
 
   analyzeType(type: Fmt.Type, context: Ctx.Context): void {

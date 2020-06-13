@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
-import { PermanentToolTip, ToolTipPosition } from '../components/ExpressionToolTip';
+import { PermanentToolTip, ToolTipPosition, ToolTipArrow } from '../components/ExpressionToolTip';
 import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
+import * as Fmt from '../../shared/format/format';
 
 export interface TutorialToolTip {
   contents: React.ReactElement | ((component: React.Component<any, any>) => React.ReactNode) | null;
   position: ToolTipPosition;
+  arrow?: ToolTipArrow;
   index: number;
-  condition?: (component: React.Component<any, any>) => boolean;
+  condition?: (component: React.Component<any, any>, tutorialState: DynamicTutorialState) => boolean;
 }
 
 export interface TutorialManipulationEntry {
@@ -24,14 +26,20 @@ export interface TutorialManipulationEntry {
   elementAction?: (reactElement: React.ReactElement, htmlElement: HTMLElement) => void;
 }
 
-function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, node: React.ReactNode, parentComponent: React.Component<any, any> | undefined, entries: TutorialManipulationEntry[], indent: string = ''): React.ReactNode {
+type CheckInterruptFn = () => boolean;
+
+function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, node: React.ReactNode, parentComponent: React.Component<any, any> | undefined, entries: TutorialManipulationEntry[], checkInterrupt?: CheckInterruptFn, indent: string = ''): React.ReactNode {
+  if (checkInterrupt?.()) {
+    return node;
+  }
+
   let visitor = (element: React.ReactElement) => {
     for (let entry of entries) {
       if ((entry.type === undefined || element.type === entry.type)
           && (entry.key === undefined || element.key === entry.key || element.key === entry.key.toString())
           && (entry.className === undefined || element.props.className.split(' ').indexOf(entry.className) >= 0)
           && (entry.constraint === undefined || entry.constraint(element.props))
-          && (entry.refConstraint === undefined || (tutorialState.refComponents && entry.refConstraint(tutorialState.refComponents)))) {
+          && (entry.refConstraint === undefined || (entry.refConstraint(tutorialState.refComponents)))) {
         let entryName = '?';
         if (entry.type !== undefined) {
           if (typeof entry.type === 'string') {
@@ -44,7 +52,7 @@ function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, n
           entryName = `${entryName} key="${entry.key}"`;
         }
         console.log(`${indent}Found ${entryName}.`);
-        return createTutorialManipulator(tutorialState, parentComponent, entry, indent + '  ');
+        return createTutorialManipulator(tutorialState, parentComponent, entry, checkInterrupt, indent + '  ');
       }
     }
     return undefined;
@@ -54,14 +62,11 @@ function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, n
 
 type NodeManipulationFn = (node: React.ReactNode, component: React.Component<any, any> | undefined) => React.ReactNode;
 
-function createTutorialManipulator(tutorialState: DynamicTutorialState, parentComponent: React.Component<any, any> | undefined, entry: TutorialManipulationEntry, indent: string): ReactElementManipulator {
+function createTutorialManipulator(tutorialState: DynamicTutorialState, parentComponent: React.Component<any, any> | undefined, entry: TutorialManipulationEntry, checkInterrupt: CheckInterruptFn | undefined, indent: string): ReactElementManipulator {
   let applyRef: NodeManipulationFn | undefined = undefined;
   if (entry.refIndex !== undefined) {
     let refIndex = entry.refIndex;
     applyRef = (node: React.ReactNode, component: React.Component<any, any> | undefined) => {
-      if (!tutorialState.refComponents) {
-        tutorialState.refComponents = [];
-      }
       for (let index = tutorialState.refComponents.length; index < refIndex; index++) {
         tutorialState.refComponents.push(undefined);
       }
@@ -77,7 +82,7 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
       if (applyRef) {
         node = applyRef(node, component);
       }
-      return applyTutorialManipulationEntries(tutorialState, node, component ?? parentComponent, children, indent);
+      return applyTutorialManipulationEntries(tutorialState, node, component ?? parentComponent, children, checkInterrupt, indent);
     };
   }
 
@@ -108,7 +113,7 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
       }
       let toolTipElement: React.ReactNode = null;
       let currentComponent = component ?? parentComponent;
-      if (!toolTip.condition || (currentComponent && toolTip.condition(currentComponent))) {
+      if (!toolTip.condition || (currentComponent && toolTip.condition(currentComponent, tutorialState))) {
         let getContents = () => {
           if (typeof toolTip.contents === 'function' && typeof (toolTip.contents as any).type === 'undefined') {
             if (currentComponent) {
@@ -120,7 +125,7 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
             return toolTip.contents;
           }
         };
-        toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={getContents} key="tutorial-tooltip"/>;
+        toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} arrow={toolTip.arrow} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={getContents} key="tutorial-tooltip"/>;
       }
       let ref = (refNode: HTMLElement | null) => {
         parentNode = refNode;
@@ -180,19 +185,39 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
 
 export interface StaticTutorialState {
   manipulationEntries?: TutorialManipulationEntry[];
+  applyExpectedChange?: (definition: Fmt.Definition, targetState?: StaticTutorialState) => void;
 }
 
 export interface DynamicTutorialState {
   staticState: StaticTutorialState;
-  refComponents?: (React.Component<any, any> | undefined)[];
+  refComponents: (React.Component<any, any> | undefined)[];
   editedDefinition?: LibraryDefinition;
+  initialDefinitionContents?: Fmt.Definition;
+  initialDefinitionContentsState?: DynamicTutorialState;
   additionalStateData?: any;
+  checkPreconditions?: (tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined) => DynamicTutorialState | undefined;
 }
 
-export function addTutorial(node: React.ReactNode, tutorialState: DynamicTutorialState): React.ReactNode {
+export function addTutorial(component: React.Component<any, any>, node: React.ReactNode, tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined): React.ReactNode {
+  let getInterruptState = () => tutorialState.checkPreconditions?.(tutorialState, currentEditedDefinition);
+  let interruptState = getInterruptState();
+  let checkInterrupt = undefined;
+  if (interruptState) {
+    tutorialState = interruptState;
+  } else {
+    checkInterrupt = () => {
+      let innerInterruptState = getInterruptState();
+      if (innerInterruptState) {
+        setTimeout(() => component.forceUpdate(), 0);
+        return true;
+      }
+      return false;
+    };
+  }
+
   let manipulationEntries = tutorialState.staticState.manipulationEntries;
   if (manipulationEntries) {
-    return applyTutorialManipulationEntries(tutorialState, node, undefined, manipulationEntries);
+    return applyTutorialManipulationEntries(tutorialState, node, undefined, manipulationEntries, checkInterrupt);
   } else {
     return node;
   }

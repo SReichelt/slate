@@ -78,10 +78,6 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
   isBlocked(): boolean {
     return this.blockCounter !== 0;
   }
-
-  renderCode(code: string): React.ReactNode {
-    return undefined;
-  }
 }
 
 export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerImpl {
@@ -91,12 +87,6 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     includeLabel: false,
     includeExtras: true,
     includeRemarks: false
-  };
-  private static readonly codeRenderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
-    includeProofs: true,
-    includeLabel: true,
-    includeExtras: true,
-    includeRemarks: true
   };
 
   constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<LibraryDefinition>, private onLinkClicked?: OnLinkClicked) {

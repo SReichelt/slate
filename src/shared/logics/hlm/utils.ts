@@ -118,20 +118,13 @@ export class HLMUtils extends GenericUtils {
       let argValue = new Fmt.CompoundExpression;
       if (type instanceof FmtHLM.MetaRefExpression_Binding) {
         let bindingArg = new FmtHLM.ObjectContents_BindingArg;
-        let bindingArgParam = new Fmt.Parameter;
-        bindingArgParam.name = targetParam ? targetParam.name : param.name;
-        let bindingArgParamType = new Fmt.Type;
-        let bindingArgParamTypeExpr = new FmtHLM.MetaRefExpression_Element;
-        bindingArgParamTypeExpr._set = this.substituteParameterSet(type._set, context, false);
-        bindingArgParamType.expression = bindingArgParamTypeExpr;
-        bindingArgParamType.arrayDimensions = 0;
-        bindingArgParam.type = bindingArgParamType;
-        bindingArgParam.optional = false;
-        bindingArgParam.list = false;
+        let bindingArgParamType = new FmtHLM.MetaRefExpression_Element;
+        bindingArgParamType._set = this.substituteParameterSet(type._set, context, false);
+        let bindingArgParam = this.createParameter(bindingArgParamType, targetParam ? targetParam.name : param.name);
         bindingArg.parameter = bindingArgParam;
         let newContext: HLMSubstitutionContext = {
           ...context,
-          previousSetTerm: bindingArgParamTypeExpr._set,
+          previousSetTerm: bindingArgParamType._set,
           originalBindingParameters: context.originalBindingParameters ? [...context.originalBindingParameters, param] : [param],
           substitutedBindingParameters: context.substitutedBindingParameters ? [...context.substitutedBindingParameters, bindingArgParam] : [bindingArgParam]
         };

@@ -2106,10 +2106,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       term.path = path;
       let type = new FmtHLM.MetaRefExpression_Element;
       type._set = term;
-      let parameter = new Fmt.Parameter;
-      parameter.name = definition.contents.definitionNotation.parameter.name;
-      parameter.type = new Fmt.Type;
-      parameter.type.expression = type;
+      let parameter = this.utils.createParameter(type, definition.contents.definitionNotation.parameter.name);
       let row: Notation.RenderedExpression[] = [];
       row.push(new Notation.TextExpression('We write “'));
       let initialState: ParameterListState = {
@@ -2148,10 +2145,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           term.path = path;
           let type = new FmtHLM.MetaRefExpression_Def;
           type.element = term;
-          let parameter = new Fmt.Parameter;
-          parameter.name = constructorDefinition.contents.definitionNotation.parameter.name;
-          parameter.type = new Fmt.Type;
-          parameter.type.expression = type;
+          let parameter = this.utils.createParameter(type, constructorDefinition.contents.definitionNotation.parameter.name);
           let row: Notation.RenderedExpression[] = [];
           row.push(new Notation.TextExpression('We write “'));
           let initialState: ParameterListState = {

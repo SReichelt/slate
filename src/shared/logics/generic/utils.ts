@@ -116,6 +116,8 @@ export class GenericUtils {
     parameterType.expression = type;
     parameterType.arrayDimensions = 0;
     parameter.type = parameterType;
+    parameter.optional = false;
+    parameter.list = false;
     if (context) {
       parameter.previousParameter = context.getPreviousParameter();
     }
