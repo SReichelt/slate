@@ -319,35 +319,6 @@ nat.lt m.element n.element
 def Initial_segment (n : Element Natural_numbers) :=
 subset {m : Element Natural_numbers | Natural_numbers_less m n} trivially_respects_equality
 
-structure Integers_Struct :=
-difference :: (n m : Element Natural_numbers)
-instance Integers_setoid : setoid Integers_Struct := setoid.mk (λ a b : Integers_Struct, Natural_numbers_sum a.n b.m ≈ Natural_numbers_sum a.m b.n) (begin
-  split,
-  { intro a,
-    exact Natural_numbers_sum_commutative a.n a.m },
-  split,
-  { intros a b h1,
-    symmetry,
-    transitivity Natural_numbers_sum a.n b.m,
-    exact Natural_numbers_sum_commutative b.m a.n,
-    transitivity Natural_numbers_sum a.m b.n,
-    exact h1,
-    exact Natural_numbers_sum_commutative a.m b.n },
-  { intros a b c h1 h2,
-    have h3 : Natural_numbers_sum (Natural_numbers_sum a.n c.m) b.n ≈ Natural_numbers_sum (Natural_numbers_sum a.m c.n) b.n, begin
-      transitivity Natural_numbers_sum (Natural_numbers_sum a.n c.n) b.m,
-      sorry,  -- rewrite using h1, associativity, commutativity
-      sorry   -- rewrite using h2, associativity, commutativity
-    end,
-    exact Natural_numbers_sum_right_cancel (Natural_numbers_sum a.n c.m) (Natural_numbers_sum a.m c.n) b.n h3 }
-end)
-
-def Integers :=
-lean_setoid_to_set Integers_Struct
-
-instance Integers_embedding : has_embedding Natural_numbers Integers :=
-⟨(λ n : Element Natural_numbers, make_element Integers (Integers_Struct.difference n Natural_numbers_zero) trivial), sorry⟩
-
 def Functions (X Y : Set) :=
 let base_type := make_base_type (Element X → Element Y) (λ f g : Element X → Element Y, ∀ x : Element X, f x ≈ g x) (begin
   split,

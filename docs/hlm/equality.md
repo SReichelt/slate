@@ -1,4 +1,4 @@
-# Equality in the HLM logic
+# Equality in HLM
 
 This document describes the treatment of equality in the HLM logic, especially regarding equality of isomorphic structures.
 

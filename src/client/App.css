@@ -5,15 +5,16 @@ body {
   background-color: var(--background-color);
 }
 
-p {
+p, ol, ul {
   margin-top: 0;
   margin-bottom: 0;
-  margin-block-start: 0;
-  margin-block-end: 0;
+  margin-block-start: 1ex;
+  margin-block-end: 1ex;
 }
 
-p+p {
-  margin-top: 1ex;
+ol p, ul p {
+  margin-block-start: 0.5ex;
+  margin-block-end: 0.5ex;
 }
 
 .error {

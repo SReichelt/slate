@@ -159,6 +159,10 @@ function StartPage(props: StartPageProps) {
       </p>
       <p>
         HLM is based on classical logic and has a set-theoretic flavor. It can be viewed as a <a href="https://ncatlab.org/nlab/show/structural+set+theory" target="_blank">structural set theory</a> but is conceptually closer to a <a href="https://en.wikipedia.org/wiki/Type_theory#Dependent_types" target="_blank">dependent type theory</a>.
+        <br/>
+        <DocLink href="docs/hlm/types" onDocLinkClicked={props.onDocLinkClicked}>Read about the HLM type system.</DocLink>
+      </p>
+      <p>
         In fact, a reasonably direct translation to the theorem provers <a href="https://coq.inria.fr/" target="_blank">Coq</a> and <a href="https://leanprover.github.io/" target="_blank">Lean</a> exists.
       </p>
       <p>
