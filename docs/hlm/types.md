@@ -17,13 +17,13 @@ In the Slate user interface, these three categories are immediately apparent bec
 
 On top of these three basic categories, set terms and element terms are governed by type restrictions. Although no explicit type declarations exist, we can assign types as follows:
 
-* A variable x introduced as "Let x ∈ S" is an element term that inherits the type of the set term S.
+* A variable x introduced as "Let x ∈ S" is an element term that inherits the type of the set term S. (Note that due to the distinction between set terms and element terms, there is no ambiguity in saying that the types of x and S are the same.)
 * A variable T introduced as "Let T ⊆ S" is a set term that inherits the type of S.
-* A variable S introduced as "Let S be a set" also introduces a type variable. (Alternatively, we can treat S itself as a type variable.)
+* A variable S introduced as "Let S be a set" implicitly introduces an additional type variable α such that S is a set term of type α.
 * All expressions are typed in the obvious way, for example {x ∈ S : ...} inherits the type of S.
-* A "construction" introduces a new type, as a construction is fundamentally the same as an inductive data type.
+* A "construction" introduces a new type. (In fact, a construction is fundamentally the same as an inductive data type.)
 
-In all cases where terms are required to be "compatible" in some sense, e.g. in formulas like "x = y" or "x ∈ S" (as a formula, not introducing a variable), we require these terms to have the same type according to the above rules.
+In all cases where terms are required to be "compatible" in some sense, e.g. in formulas like "x = y" or "x ∈ S", we require these terms to have the same type according to the above rules.
 
 **Informally, we may say that two set terms are compatible if and only if they have been declared as subsets of some common superset. Likewise, two element terms are compatible if and only if they have been declared as elements of the same set, taking subset declarations into account.**
 
@@ -49,7 +49,7 @@ A distinguishing property of HLM is that a formula like "x = y" or "x ∈ S" can
 
 2. Even though HLM appears set-theoretic, it can also be interpreted as a (dependent) type theory, essentially by taking its "type" concept literally.
 
-   E.g. one might replace a variable introduced as "Let x ∈ S" with "Let x : T such that S(x)", where T is the type corresponding to S (i.e. the largest known superset), and S(x) is the proposition that formalizes "x ∈ S".
+   E.g. one might replace a variable introduced as "Let x ∈ S" with "Let x : α such that S(x)", where α is the type corresponding to S (i.e. the largest known superset), and S(x) is the proposition that formalizes "x ∈ S".
 
    Alternatively, HLM can be treated as a type theory with subtypes. Then "Let x ∈ S" can literally be translated as "x : S", where S is a type that is possibly a subtype of some larger type. (Taken to the extreme, such a type theory is not really distinguishable from a structural set theory, which is ultimately the reason why HLM can be interpreted as either.)
 
