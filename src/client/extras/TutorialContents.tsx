@@ -807,15 +807,15 @@ class TutorialStates {
                                               position: 'top',
                                               index: 1
                                             },
-                                            manipulateProps: (props) => ({
-                                              ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.insertOperatorParameters_f_set_arg1))
-                                            }),
                                             elementAction: this.automateClick()
                                           }
                                         ]
                                       }
-                                    ]
+                                    ],
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_f_set_arg1))
+                                    })
                                   }
                                 ]
                               }
@@ -1729,15 +1729,15 @@ class TutorialStates {
                                             type: Button,
                                             key: 'ok',
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
-                                            manipulateProps: (props) => ({
-                                              ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition))
-                                            }),
                                             elementAction: this.automateClick()
                                           }
                                         ]
                                       }
-                                    ]
+                                    ],
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition))
+                                    })
                                   }
                                 ]
                               }
@@ -1922,15 +1922,15 @@ class TutorialStates {
                                             type: Button,
                                             key: 'ok',
                                             refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
-                                            manipulateProps: (props) => ({
-                                              ...props,
-                                              onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg1))
-                                            }),
                                             elementAction: this.automateClick()
                                           }
                                         ]
                                       }
-                                    ]
+                                    ],
+                                    manipulateProps: (props) => ({
+                                      ...props,
+                                      onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition_arg1))
+                                    })
                                   }
                                 ]
                               }
@@ -2312,15 +2312,15 @@ class TutorialStates {
                                                 type: Button,
                                                 key: 'ok',
                                                 refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
-                                                manipulateProps: (props) => ({
-                                                  ...props,
-                                                  onClick: inject(props.onClick, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2))
-                                                }),
                                                 elementAction: this.automateClick()
                                               }
                                             ]
                                           }
-                                        ]
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2))
+                                        })
                                       }
                                     ]
                                   }
@@ -3058,15 +3058,15 @@ class TutorialStates {
                                                   position: 'bottom',
                                                   index: 0
                                                 },
-                                                manipulateProps: (props) => ({
-                                                  ...props,
-                                                  onClick: inject(props.onClick, () => this.changeState(this.submitOperator))
-                                                }),
                                                 elementAction: this.automateClick()
                                               }
                                             ]
                                           }
-                                        ]
+                                        ],
+                                        manipulateProps: (props) => ({
+                                          ...props,
+                                          onOK: inject(props.onOK, () => this.changeState(this.submitOperator))
+                                        })
                                       }
                                     ]
                                   }
@@ -4390,15 +4390,15 @@ class TutorialStates {
                                         type: Button,
                                         key: 'ok',
                                         refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
-                                        manipulateProps: (props) => ({
-                                          ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
-                                        }),
                                         elementAction: this.automateClick()
                                       }
                                     ]
                                   }
-                                ]
+                                ],
+                                manipulateProps: (props) => ({
+                                  ...props,
+                                  onOK: inject(props.onOK, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
+                                })
                               }
                             ]
                           }
