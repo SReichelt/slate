@@ -12,6 +12,14 @@ p, ol, ul {
   margin-block-end: 1ex;
 }
 
+p:first-child {
+  margin-block-start: 0;
+}
+
+p:last-child {
+  margin-block-end: 0;
+}
+
 ol p, ul p {
   margin-block-start: 0.5ex;
   margin-block-end: 0.5ex;
