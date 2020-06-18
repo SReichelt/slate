@@ -47,6 +47,7 @@ $Embedding: %ExpressionType {
   members = #(
     parameter: %SingleParameter($Element),
     target[parameter]: $ElementTerm,
+    full?: $Bool,
     wellDefinednessProof?: $Proof
   )
 }

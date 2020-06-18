@@ -346,6 +346,7 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
 export class ObjectContents_Embedding extends Fmt.ObjectContents {
   parameter: Fmt.Parameter;
   target: Fmt.Expression;
+  full?: Fmt.Expression;
   wellDefinednessProof?: ObjectContents_Proof;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
@@ -356,7 +357,8 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
       throw new Error('parameter: Parameter expression with single parameter expected');
     }
     this.target = argumentList.getValue('target', 1);
-    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 2);
+    this.full = argumentList.getOptionalValue('full', 2);
+    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 3);
     if (wellDefinednessProofRaw !== undefined) {
       if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Proof;
@@ -374,6 +376,9 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     parameterExpr.parameters.push(this.parameter);
     argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
     argumentList.add(this.target, outputAllNames ? 'target' : undefined, false);
+    if (this.full !== undefined) {
+      argumentList.add(this.full, 'full', true);
+    }
     if (this.wellDefinednessProof !== undefined) {
       let wellDefinednessProofExpr = new Fmt.CompoundExpression;
       this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true);
@@ -394,6 +399,9 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     if (this.target) {
       this.target.traverse(fn);
     }
+    if (this.full) {
+      this.full.traverse(fn);
+    }
     if (this.wellDefinednessProof) {
       this.wellDefinednessProof.traverse(fn);
     }
@@ -410,6 +418,12 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     if (this.target) {
       result.target = this.target.substitute(fn, replacedParameters);
       if (result.target !== this.target) {
+        changed = true;
+      }
+    }
+    if (this.full) {
+      result.full = this.full.substitute(fn, replacedParameters);
+      if (result.full !== this.full) {
         changed = true;
       }
     }
@@ -433,6 +447,11 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
     if (this.target || objectContents.target) {
       if (!this.target || !objectContents.target || !this.target.isEquivalentTo(objectContents.target, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.full || objectContents.full) {
+      if (!this.full || !objectContents.full || !this.full.isEquivalentTo(objectContents.full, fn, replacedParameters)) {
         return false;
       }
     }
@@ -6525,7 +6544,7 @@ export class MetaModel extends Meta.MetaModel {
                 context = this.getParameterListContext(parameterValue.parameters, context);
               }
             }
-            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 2)) {
+            if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 3)) {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
             }
           }

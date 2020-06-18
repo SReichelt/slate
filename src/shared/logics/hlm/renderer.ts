@@ -2049,7 +2049,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let subset = this.renderSetTerm(source._set, fullSetTermSelection);
         let superset = this.renderDefinitionRef([definition]);
         this.addSemanticLink(superset, definition);
-        let supersetDefinition = this.renderTemplate('EmbeddingDefinition', {
+        let full = (embedding.full instanceof FmtHLM.MetaRefExpression_true);
+        let supersetDefinition = this.renderTemplate(full ? 'FullEmbeddingDefinition' : 'EmbeddingDefinition', {
                                                        'operands': [new Notation.EmptyExpression, superset]
                                                      });
         let supersetWithText = new Notation.RowExpression([supersetDefinition, new Notation.TextExpression(' via')]);
@@ -2067,8 +2068,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         paragraphs.push(table);
         this.addIndentedProof(embedding.wellDefinednessProof, 'Well-definedness', paragraphs);
       } else if (this.editHandler) {
-        let onRenderEmbedding = (subset: Fmt.Expression) =>
-          this.renderTemplate('EmbeddingDefinition', {
+        let onRenderEmbedding = (subset: Fmt.Expression, full: boolean) =>
+          this.renderTemplate(full ? 'FullEmbeddingDefinition' : 'EmbeddingDefinition', {
                                 'operands': [
                                   this.renderSetTerm(subset, fullSetTermSelection),
                                   this.renderDefinitionRef([definition])

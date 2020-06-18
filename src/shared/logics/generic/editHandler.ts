@@ -445,56 +445,60 @@ export abstract class GenericEditHandler {
 
   private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onUpdateNotation: UpdateNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
     if (arrayDimensions) {
+      let arrayExpression: Fmt.ArrayExpression;
       if (value instanceof Fmt.ArrayExpression) {
-        let items: Notation.RenderedExpression[] = [];
-        for (let index = 0; index < value.items.length; index++) {
-          let item = value.items[index];
-          let onSetItem = (newValue: Fmt.Expression | undefined) => {
-            if (newValue) {
-              value.items[index] = newValue;
-            } else {
-              value.items.splice(index, 1);
-            }
-            onUpdateNotation();
-          };
-          let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, onUpdateNotation, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
-          if (arrayDimensions > 1) {
-            argValue = new Notation.ParenExpression(argValue, '[]');
-          }
-          items.push(argValue);
-        }
-        let group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
-        let insertButton = new Notation.InsertPlaceholderExpression;
-        if (arrayDimensions > 1) {
-          let onInsertItem = () => {
-            let newItem = new Fmt.ArrayExpression;
-            newItem.items = [];
-            value.items.push(newItem);
-            onUpdateNotation();
-          };
-          insertButton.action = new Menu.ImmediateExpressionMenuAction(onInsertItem);
-        } else {
-          let semanticLink = new Notation.SemanticLink(insertButton, false, false);
-          let onInsertItem = (newValue: Fmt.Expression | undefined) => {
-            if (newValue) {
-              value.items.push(newValue);
-              onUpdateNotation();
-            }
-          };
-          this.addNotationItemMenu(semanticLink, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
-          insertButton.semanticLinks = [semanticLink];
-        }
-        if (group) {
-          return new Notation.RowExpression([
-            group,
-            new Notation.TextExpression(' '),
-            insertButton
-          ]);
-        } else {
-          return insertButton;
-        }
+        arrayExpression = value;
       } else {
-        return new Notation.EmptyExpression;
+        arrayExpression = new Fmt.ArrayExpression;
+        arrayExpression.items = [];
+        onUpdateNotation = () => onSetNotation(arrayExpression);
+      }
+      let items: Notation.RenderedExpression[] = [];
+      for (let index = 0; index < arrayExpression.items.length; index++) {
+        let item = arrayExpression.items[index];
+        let onSetItem = (newValue: Fmt.Expression | undefined) => {
+          if (newValue) {
+            arrayExpression.items[index] = newValue;
+          } else {
+            arrayExpression.items.splice(index, 1);
+          }
+          onUpdateNotation();
+        };
+        let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, onUpdateNotation, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
+        if (arrayDimensions > 1) {
+          argValue = new Notation.ParenExpression(argValue, '[]');
+        }
+        items.push(argValue);
+      }
+      let group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
+      let insertButton = new Notation.InsertPlaceholderExpression;
+      if (arrayDimensions > 1) {
+        let onInsertItem = () => {
+          let newItem = new Fmt.ArrayExpression;
+          newItem.items = [];
+          arrayExpression.items.push(newItem);
+          onUpdateNotation();
+        };
+        insertButton.action = new Menu.ImmediateExpressionMenuAction(onInsertItem);
+      } else {
+        let semanticLink = new Notation.SemanticLink(insertButton, false, false);
+        let onInsertItem = (newValue: Fmt.Expression | undefined) => {
+          if (newValue) {
+            arrayExpression.items.push(newValue);
+            onUpdateNotation();
+          }
+        };
+        this.addNotationItemMenu(semanticLink, undefined, onInsertItem, undefined, variables, type, isTopLevel, false, isPredicate, renderer);
+        insertButton.semanticLinks = [semanticLink];
+      }
+      if (group) {
+        return new Notation.RowExpression([
+          group,
+          new Notation.TextExpression(' '),
+          insertButton
+        ]);
+      } else {
+        return insertButton;
       }
     } else {
       let valueOrDefault = value || defaultValue;

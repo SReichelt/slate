@@ -78,18 +78,22 @@ export class HLMEditHandler extends GenericEditHandler {
   update(onAutoFilled?: () => void): CachedPromise<void> {
     return super.update().then(() => {
       let autoFilled = false;
-      for (let innerDefinition of this.definition.innerDefinitions) {
-        let contents = innerDefinition.contents;
-        if (contents instanceof FmtHLM.ObjectContents_Constructor) {
-          if (!contents.equalityDefinition
-              || !contents.equalityDefinition.leftParameters.isEquivalentTo(innerDefinition.parameters)
-              || !contents.equalityDefinition.rightParameters.isEquivalentTo(innerDefinition.parameters)) {
-            if (contents.equalityDefinition) {
-              autoFilled = true;
-            }
-            contents.equalityDefinition = this.createEqualityDefinition(innerDefinition.parameters);
-            if (contents.equalityDefinition) {
-              autoFilled = true;
+      if (onAutoFilled) {
+        for (let innerDefinition of this.definition.innerDefinitions) {
+          let contents = innerDefinition.contents;
+          if (contents instanceof FmtHLM.ObjectContents_Constructor) {
+            if (innerDefinition.parameters.length) {
+              if (!contents.equalityDefinition
+                  || !contents.equalityDefinition.leftParameters.isEquivalentTo(innerDefinition.parameters)
+                  || !contents.equalityDefinition.rightParameters.isEquivalentTo(innerDefinition.parameters)) {
+                contents.equalityDefinition = this.createEqualityDefinition(innerDefinition.parameters);
+                autoFilled = true;
+              }
+            } else {
+              if (contents.equalityDefinition) {
+                contents.equalityDefinition = undefined;
+                autoFilled = true;
+              }
             }
           }
         }
@@ -918,29 +922,35 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getActionInsertButton(action);
   }
 
-  getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Notation.RenderedExpression {
+  getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Notation.RenderedExpression {
     let insertButton = new Notation.InsertPlaceholderExpression;
     let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     semanticLink.onMenuOpened = () => {
-      return new Menu.ExpressionMenu(CachedPromise.resolve([this.getEmbeddingRow(definitionContents, onRenderEmbedding)]));
+      return new Menu.ExpressionMenu(CachedPromise.resolve([
+        this.getEmbeddingRow(definitionContents, false, onRenderEmbedding),
+        this.getEmbeddingRow(definitionContents, true, onRenderEmbedding)
+      ]));
     };
     insertButton.semanticLinks = [semanticLink];
     return insertButton;
   }
 
-  private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: RenderExpressionFn): Menu.ExpressionMenuRow {
+  private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, full: boolean, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Menu.ExpressionMenuRow {
     let context = this.editAnalysis.definitionContentsContext.get(this.definition);
     let parameter = this.utils.createElementParameter('x', context);
     let parameterType = parameter.type.expression as FmtHLM.MetaRefExpression_Element;
-    let item = new Menu.ExpressionMenuItem(onRenderEmbedding(parameterType._set));
+    let item = new Menu.ExpressionMenuItem(onRenderEmbedding(parameterType._set, full));
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
       let embedding = new FmtHLM.ObjectContents_Embedding;
       embedding.parameter = parameter;
       embedding.target = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+      if (full) {
+        embedding.full = new FmtHLM.MetaRefExpression_true;
+      }
       definitionContents.embedding = embedding;
       GenericEditHandler.lastInsertedParameter = embedding.parameter;
     });
-    let row = new Menu.StandardExpressionMenuRow('Embedding');
+    let row = new Menu.StandardExpressionMenuRow(full ? 'Equivalence' : 'Embedding');
     row.subMenu = item;
     return row;
   }

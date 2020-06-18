@@ -1377,6 +1377,20 @@ $EmbeddingDefinition(operands: %Expr[]): %Template {
 }
 
 /**
+ * Similar to `$EmbeddingDefinition` but indicates that the embedded set is actually equal to the newly defined set.
+ *
+ * @param operands The left and right operands of the definition.
+ *
+ * @example `$FullEmbeddingDefinition(operands = [A, B])`
+ */
+$FullEmbeddingDefinition(operands: %Expr[]): %Template {
+  notation = $DefinitionRelation(
+    symbol = ['=', $DefinitionColon],
+    operands = operands
+  )
+}
+
+/**
  * @example `$LessOrEqualRelation(operands = [a, b])`
  */
 $LessOrEqualRelation(operands: %Expr[]): %Template {
