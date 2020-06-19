@@ -1617,9 +1617,18 @@ No proof."
 exports[`render hlm library: 1.4.30.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
 "Definition 1.4.30.1.  Let X, Y, Z be sets. We define:
 
-  𝓞𝓹(X, Y, Z) := (X × Y → Z)
+  𝓞𝓹(X, Y, Z) :=: {(X × Y → Z, (x, y) ↦ z_x,y) | z_x,y ∈ Z for each x ∈ X and y ∈ Y}
+
+  (X × Y → Z, (x, y) ↦ z_x,y) = (X × Y → Z, (x, y) ↦ z'_x,y)  :⇔  ∀ x ∈ X, y ∈ Y : z_x,y = z'_x,y  (z_x,y ∈ Z for each x ∈ X and y ∈ Y, z'_x,y ∈ Z for each x ∈ X and y ∈ Y)
+
+X × Y → Z =: 𝓞𝓹(X, Y, Z) via
+f = (X × Y → Z, (x, y) ↦ f(x, y))
+
+Well-definedness.  No proof.
 
 We write “let ∗ : X × Y → Z be an operation” for “let ∗ ∈ 𝓞𝓹(X, Y, Z).”
+
+We write “let ∗ :  X × Y → Z, (x, y) ↦ z_x,y” for “let ∗ := (X × Y → Z, (x, y) ↦ z_x,y).”
 
 References.
 
@@ -1627,9 +1636,16 @@ References.
 `;
 
 exports[`render hlm library: 1.4.30.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
-"Definition 1.4.30.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define:
+"Definition 1.4.30.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define
 
-  x ∗ y := ∗(x, y)"
+  x ∗ y
+
+by:
+
+  x (X × Y → Z, (a, b) ↦ c_a,b) y := c_x,y  (c_a,b ∈ Z for each a ∈ X and b ∈ Y)
+   = ∗(x, y)
+
+Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.4.30.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
@@ -5739,7 +5755,7 @@ exports[`render hlm library: 2.1.1.3 data/libraries/hlm/Algebra/Generic/Isomorph
 
 by:
 
-  φ[(X × X → X, x ↦ z_x)] := (Y × Y → Y, (y_1, y_2) ↦ φ(z_(φ^-1(y_1),φ^-1(y_2))))  (z_x ∈ X for each x ∈ X × X)
+  φ[(X × X → X, (x_1, x_2) ↦ z_x_1,x_2)] := (Y × Y → Y, (y_1, y_2) ↦ φ(z_φ^-1(y_1),φ^-1(y_2)))  (z_x_1,x_2 ∈ X for each x_1 ∈ X and x_2 ∈ X)
    = φ ∘ ∗ ∘ (φ × φ)^-1
 
 Equality.  No proof."
@@ -5752,7 +5768,7 @@ exports[`render hlm library: 2.1.1.4 data/libraries/hlm/Algebra/Generic/Isomorph
 
 by:
 
-  φ[(S × X → X, x ↦ z_x)] := (S × Y → Y, (s, y) ↦ φ(z_(s,φ^-1(y))))  (z_x ∈ X for each x ∈ S × X)
+  φ[(S × X → X, (s, x) ↦ z_s,x)] := (S × Y → Y, (s, y) ↦ φ(z_s,φ^-1(y)))  (z_s,x ∈ X for each s ∈ S and x ∈ X)
    = φ ∘ ∗ ∘ (id_S × φ)^-1
 
 Equality.  No proof."
@@ -5765,7 +5781,7 @@ exports[`render hlm library: 2.1.1.5 data/libraries/hlm/Algebra/Generic/Isomorph
 
 by:
 
-  φ[(X × S → X, x ↦ z_x)] := (Y × S → Y, (y, s) ↦ φ(z_(φ^-1(y),s)))  (z_x ∈ X for each x ∈ X × S)
+  φ[(X × S → X, (x, s) ↦ z_x,s)] := (Y × S → Y, (y, s) ↦ φ(z_φ^-1(y),s))  (z_x,s ∈ X for each x ∈ X and s ∈ S)
    = φ ∘ ∗ ∘ (φ × id_S)^-1
 
 Equality.  No proof."
@@ -5788,7 +5804,7 @@ exports[`render hlm library: 2.1.1.7 data/libraries/hlm/Algebra/Generic/Isomorph
 
 by:
 
-  (φ_1, φ_2, φ_3)[(X_1 × X_2 → X_3, x ↦ z_x)] := (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ φ_3(z_((φ_1)^-1(y_1),(φ_2)^-1(y_2))))  (z_x ∈ X_3 for each x ∈ X_1 × X_2)
+  (φ_1, φ_2, φ_3)[(X_1 × X_2 → X_3, (x_1, x_2) ↦ z_x_1,x_2)] := (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ φ_3(z_(φ_1)^-1(y_1),(φ_2)^-1(y_2)))  (z_x_1,x_2 ∈ X_3 for each x_1 ∈ X_1 and x_2 ∈ X_2)
    = φ_3 ∘ ∙ ∘ (φ_1 × φ_2)^-1
 
 Equality.  No proof."
