@@ -428,20 +428,25 @@ export class Argument {
 }
 
 export class ArgumentList extends Array<Argument> {
-  getOptionalValue(name?: string, index?: number): Expression | undefined {
+  get(name?: string, index?: number): Argument | undefined {
     let curIndex = 0;
     for (let arg of this) {
       if (arg.name !== undefined ? arg.name === name : curIndex === index) {
-        return arg.value;
+        return arg;
       }
       curIndex++;
     }
     return undefined;
   }
 
+  getOptionalValue(name?: string, index?: number): Expression | undefined {
+    let arg = this.get(name, index);
+    return arg?.value;
+  }
+
   getValue(name?: string, index?: number): Expression {
-    let value = this.getOptionalValue(name, index);
-    if (value === undefined) {
+    let arg = this.get(name, index);
+    if (!arg) {
       if (name !== undefined) {
         throw new Error(`Missing argument for parameter "${name}"`);
       } else if (index !== undefined) {
@@ -450,7 +455,7 @@ export class ArgumentList extends Array<Argument> {
         throw new Error('Argument name or index must be given');
       }
     }
-    return value;
+    return arg.value;
   }
 
   add(value: Expression, name?: string, optional?: boolean): void {
