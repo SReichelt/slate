@@ -2,8 +2,6 @@ import * as Fmt from '../../../format/format';
 import * as HLMMacro from '../macro';
 import { LibraryDataAccessor } from '../../../data/libraryDataAccessor';
 import { NumberMacro } from './number';
-import { PredicateMacro } from './predicate';
-import { OperatorMacro } from './operator';
 import { TupleMacro } from './tuple';
 import { NumberTupleMacro } from './numberTuple';
 import { MatrixMacro } from './matrix';
@@ -11,8 +9,6 @@ import CachedPromise from '../../../data/cachedPromise';
 
 export const macros: HLMMacro.HLMMacro[] = [
   new NumberMacro,
-  new PredicateMacro,
-  new OperatorMacro,
   new TupleMacro,
   new NumberTupleMacro,
   new MatrixMacro
