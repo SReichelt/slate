@@ -1097,6 +1097,243 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   }
 }
 
+export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
+  parameters: Fmt.ParameterList;
+  originalParameter: Fmt.Expression;
+  originalParameterValue: Fmt.Expression;
+  abbreviation: Fmt.Expression;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    let parametersRaw = argumentList.getValue('parameters', 0);
+    if (parametersRaw instanceof Fmt.ParameterExpression) {
+      this.parameters = parametersRaw.parameters;
+    } else {
+      throw new Error('parameters: Parameter expression expected');
+    }
+    this.originalParameter = argumentList.getValue('originalParameter', 1);
+    this.originalParameterValue = argumentList.getValue('originalParameterValue', 2);
+    this.abbreviation = argumentList.getValue('abbreviation', 3);
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    let parametersExpr = new Fmt.ParameterExpression;
+    parametersExpr.parameters.push(...this.parameters);
+    argumentList.add(parametersExpr, outputAllNames ? 'parameters' : undefined, false);
+    argumentList.add(this.originalParameter, outputAllNames ? 'originalParameter' : undefined, false);
+    argumentList.add(this.originalParameterValue, outputAllNames ? 'originalParameterValue' : undefined, false);
+    argumentList.add(this.abbreviation, outputAllNames ? 'abbreviation' : undefined, false);
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
+    let result = new ObjectContents_NotationAbbreviation;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameters) {
+      this.parameters.traverse(fn);
+    }
+    if (this.originalParameter) {
+      this.originalParameter.traverse(fn);
+    }
+    if (this.originalParameterValue) {
+      this.originalParameterValue.traverse(fn);
+    }
+    if (this.abbreviation) {
+      this.abbreviation.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_NotationAbbreviation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.parameters) {
+      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.originalParameter) {
+      result.originalParameter = this.originalParameter.substitute(fn, replacedParameters);
+      if (result.originalParameter !== this.originalParameter) {
+        changed = true;
+      }
+    }
+    if (this.originalParameterValue) {
+      result.originalParameterValue = this.originalParameterValue.substitute(fn, replacedParameters);
+      if (result.originalParameterValue !== this.originalParameterValue) {
+        changed = true;
+      }
+    }
+    if (this.abbreviation) {
+      result.abbreviation = this.abbreviation.substitute(fn, replacedParameters);
+      if (result.abbreviation !== this.abbreviation) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_NotationAbbreviation, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameters || objectContents.parameters) {
+      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.originalParameter || objectContents.originalParameter) {
+      if (!this.originalParameter || !objectContents.originalParameter || !this.originalParameter.isEquivalentTo(objectContents.originalParameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.originalParameterValue || objectContents.originalParameterValue) {
+      if (!this.originalParameterValue || !objectContents.originalParameterValue || !this.originalParameterValue.isEquivalentTo(objectContents.originalParameterValue, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.abbreviation || objectContents.abbreviation) {
+      if (!this.abbreviation || !objectContents.abbreviation || !this.abbreviation.isEquivalentTo(objectContents.abbreviation, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
+  parameter: Fmt.Parameter;
+  notation?: Fmt.Expression;
+  singularName?: Fmt.Expression;
+  pluralName?: Fmt.Expression;
+  nameOptional?: Fmt.Expression;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    let parameterRaw = argumentList.getValue('parameter', 0);
+    if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
+      this.parameter = parameterRaw.parameters[0];
+    } else {
+      throw new Error('parameter: Parameter expression with single parameter expected');
+    }
+    this.notation = argumentList.getOptionalValue('notation', 1);
+    this.singularName = argumentList.getOptionalValue('singularName', 2);
+    this.pluralName = argumentList.getOptionalValue('pluralName', 3);
+    this.nameOptional = argumentList.getOptionalValue('nameOptional', 4);
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    let parameterExpr = new Fmt.ParameterExpression;
+    parameterExpr.parameters.push(this.parameter);
+    argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
+    if (this.notation !== undefined) {
+      argumentList.add(this.notation, 'notation', true);
+    }
+    if (this.singularName !== undefined) {
+      argumentList.add(this.singularName, 'singularName', true);
+    }
+    if (this.pluralName !== undefined) {
+      argumentList.add(this.pluralName, 'pluralName', true);
+    }
+    if (this.nameOptional !== undefined) {
+      argumentList.add(this.nameOptional, 'nameOptional', true);
+    }
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
+    let result = new ObjectContents_DefinitionNotation;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.notation) {
+      this.notation.traverse(fn);
+    }
+    if (this.singularName) {
+      this.singularName.traverse(fn);
+    }
+    if (this.pluralName) {
+      this.pluralName.traverse(fn);
+    }
+    if (this.nameOptional) {
+      this.nameOptional.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionNotation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.parameter) {
+      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      if (result.parameter !== this.parameter) {
+        changed = true;
+      }
+    }
+    if (this.notation) {
+      result.notation = this.notation.substitute(fn, replacedParameters);
+      if (result.notation !== this.notation) {
+        changed = true;
+      }
+    }
+    if (this.singularName) {
+      result.singularName = this.singularName.substitute(fn, replacedParameters);
+      if (result.singularName !== this.singularName) {
+        changed = true;
+      }
+    }
+    if (this.pluralName) {
+      result.pluralName = this.pluralName.substitute(fn, replacedParameters);
+      if (result.pluralName !== this.pluralName) {
+        changed = true;
+      }
+    }
+    if (this.nameOptional) {
+      result.nameOptional = this.nameOptional.substitute(fn, replacedParameters);
+      if (result.nameOptional !== this.nameOptional) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_DefinitionNotation, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.parameter || objectContents.parameter) {
+      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.notation || objectContents.notation) {
+      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.singularName || objectContents.singularName) {
+      if (!this.singularName || !objectContents.singularName || !this.singularName.isEquivalentTo(objectContents.singularName, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.pluralName || objectContents.pluralName) {
+      if (!this.pluralName || !objectContents.pluralName || !this.pluralName.isEquivalentTo(objectContents.pluralName, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.nameOptional || objectContents.nameOptional) {
+      if (!this.nameOptional || !objectContents.nameOptional || !this.nameOptional.isEquivalentTo(objectContents.nameOptional, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 class DefinitionContentsContext extends Ctx.DerivedContext {
   constructor(public definition: Fmt.Definition, parentContext: Ctx.Context) {
     super(parentContext);
@@ -1179,6 +1416,28 @@ export class MetaModel extends Meta.MetaModel {
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
+          if (currentContext.objectContentsClass === ObjectContents_NotationAbbreviation) {
+            if (argument.name === 'originalParameterValue' || (argument.name === undefined && argumentIndex === 2)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+            if (argument.name === 'abbreviation' || (argument.name === undefined && argumentIndex === 3)) {
+              let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+              if (parametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parametersValue.parameters, context);
+              }
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_DefinitionNotation) {
+            if (argument.name === 'notation' || (argument.name === undefined && argumentIndex === 1)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+          }
           break;
         } else if (currentContext.parentObject !== parent && !(currentContext.parentObject instanceof Fmt.ArrayExpression)) {
           break;

@@ -13,13 +13,22 @@ export interface RenderedVariable {
 }
 
 export class ArgumentWithInfo {
-  constructor(public value: Notation.ExpressionValue, public index: number) {}
+  private value?: Notation.ExpressionValue;
+
+  constructor(private onGetValue: () => Notation.ExpressionValue, public index: number) {}
+
+  getValue(): Notation.ExpressionValue {
+    if (this.value === undefined) {
+      this.value = this.onGetValue();
+    }
+    return this.value;
+  }
 
   static getValue(arg: RenderedTemplateArgument | undefined): Notation.ExpressionValue {
     if (Array.isArray(arg)) {
       return arg.map((item: RenderedTemplateArgument) => ArgumentWithInfo.getValue(item));
     } else if (arg instanceof ArgumentWithInfo) {
-      return arg.value;
+      return arg.getValue();
     } else {
       return arg;
     }
@@ -27,7 +36,7 @@ export class ArgumentWithInfo {
 
   static getArgIndex(args: RenderedTemplateArguments, value: Notation.ExpressionValue): number {
     for (let arg of Object.values(args)) {
-      if (arg instanceof ArgumentWithInfo && arg.value === value) {
+      if (arg instanceof ArgumentWithInfo && arg.getValue() === value) {
         return arg.index;
       }
     }

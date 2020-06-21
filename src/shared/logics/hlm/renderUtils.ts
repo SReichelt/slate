@@ -1,5 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
+import * as FmtNotation from '../../notation/meta';
 import { GenericRenderUtils } from '../generic/renderUtils';
 import { HLMUtils } from './utils';
 import CachedPromise from '../../data/cachedPromise';
@@ -19,7 +20,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
     super(definition, utils, templates);
   }
 
-  protected getDefinitionNotation(definition: Fmt.Definition): Fmt.Expression | undefined {
+  protected getNotation(definition: Fmt.Definition): Fmt.Expression | undefined {
     if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
       return definition.contents.notation;
     } else {
@@ -212,5 +213,14 @@ export class HLMRenderUtils extends GenericRenderUtils {
       return newBindingArgumentList;
     }
     return bindingArgumentList;
+  }
+
+  getDefinitionNotation(definition: Fmt.Definition): FmtNotation.ObjectContents_DefinitionNotation | undefined {
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.definitionNotation instanceof Fmt.CompoundExpression) {
+      let result = new FmtNotation.ObjectContents_DefinitionNotation;
+      result.fromCompoundExpression(definition.contents.definitionNotation);
+      return result;
+    }
+    return undefined;
   }
 }

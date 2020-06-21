@@ -50,16 +50,6 @@ export abstract class IndirectExpression extends RenderedExpression {
   }
 }
 
-export class LazyExpression extends IndirectExpression {
-  constructor(private evaluate: () => RenderedExpression) {
-    super();
-  }
-
-  protected doResolve(): RenderedExpression {
-    return this.evaluate();
-  }
-}
-
 export class PromiseExpression extends RenderedExpression {
   constructor(public promise: CachedPromise<RenderedExpression>) {
     super();
@@ -337,7 +327,7 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   protected negationsSatisfied?: number;
   protected forcedInnerNegations: number = 0;
 
-  constructor(protected config: RenderedTemplateConfig) {
+  constructor(public config: RenderedTemplateConfig) {
     super();
   }
 
@@ -674,7 +664,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
 }
 
 export class TemplateInstanceExpression extends ExpressionWithArgs {
-  constructor(private template: Fmt.Definition, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
+  constructor(public template: Fmt.Definition, config: RenderedTemplateConfig, private allTemplates: Fmt.File) {
     super(config);
   }
 

@@ -58,3 +58,22 @@ $rev(list: %Any): %Any {}
 
 $sel(items...: %Any): %Any {}
 $neg(items...: %Any): %Any {}
+
+$NotationAbbreviation: %ExpressionType {
+  members = #(
+    parameters: %ParameterList,
+    originalParameter: $Expr,
+    originalParameterValue[parameters]: $Expr,
+    abbreviation[parameters]: $Expr
+  )
+}
+
+$DefinitionNotation: %ExpressionType {
+  members = #(
+    parameter: %SingleParameter($Expr),
+    notation[parameter]?: $Expr,
+    singularName?: $Expr,
+    pluralName?: $Expr,
+    nameOptional: $Bool = $false
+  )
+}

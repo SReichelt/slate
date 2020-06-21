@@ -155,7 +155,7 @@ S is finite
 
 Choose m := n, f := g∣_T. We show that g∣_T is injective:
 
-1.4.18 ⇒ g∣_T is injective
+1.4.17 ⇒ g∣_T is injective
 
 Remarks.
 
@@ -671,14 +671,6 @@ Remarks.
 \\"\`s\` is \`p\`\\" is shorthand for \\"\`s\` has property \`p\`.\\""
 `;
 
-exports[`render hlm library: 1.2.3 data/libraries/hlm/Essentials/Properties/predicate 1`] = `
-"Definition 1.2.3 (Predicate as property).
-
-Remarks.
-
-This is a macro to convert a predicate taking an element of \`S\` to a property on \`S\`."
-`;
-
 exports[`render hlm library: 1.3.1 data/libraries/hlm/Essentials/Relations/Relations 1`] = `
 "Definition 1.3.1.  Let S, T be sets. We define:
 
@@ -711,16 +703,8 @@ by:
   s [p_u,v]_u ∈ S,v ∈ T t  :⇔  p_s,t  (p_u,v is a proposition for each u ∈ S and v ∈ T)"
 `;
 
-exports[`render hlm library: 1.3.3 data/libraries/hlm/Essentials/Relations/predicate 1`] = `
-"Definition 1.3.3 (Predicate as relation).
-
-Remarks.
-
-This is a macro to convert a predicate taking elements of \`S\` and \`T\` to a relation from \`S\` to \`T\`."
-`;
-
-exports[`render hlm library: 1.3.4 data/libraries/hlm/Essentials/Relations/converse 1`] = `
-"Definition 1.3.4.  Let S, T be sets, ≺ be a relation from S to T. We define:
+exports[`render hlm library: 1.3.3 data/libraries/hlm/Essentials/Relations/converse 1`] = `
+"Definition 1.3.3.  Let S, T be sets, ≺ be a relation from S to T. We define:
 
   ≺^T := [s ≺ t]_t ∈ T,s ∈ S
 
@@ -731,8 +715,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/rel.html#rel.inv"
 `;
 
-exports[`render hlm library: 1.3.5 data/libraries/hlm/Essentials/Relations/implies 1`] = `
-"Definition 1.3.5.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+exports[`render hlm library: 1.3.4 data/libraries/hlm/Essentials/Relations/implies 1`] = `
+"Definition 1.3.4.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
 
   (≺ ⇒ ⊂)  :⇔  ∀ s ∈ S, t ∈ T s.t. s ≺ t : s ⊂ t
 
@@ -746,8 +730,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#subrelation (ditto)"
 `;
 
-exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/conjunction 1`] = `
-"Definition 1.3.6.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+exports[`render hlm library: 1.3.5 data/libraries/hlm/Essentials/Relations/conjunction 1`] = `
+"Definition 1.3.5.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
 
   ≺ ∧ ⊂ := [s ≺ t and s ⊂ t]_s ∈ S,t ∈ T
 
@@ -756,8 +740,8 @@ Remarks.
 This definition is the equivalent of \`$../Sets/Intersection(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {≺}, T = {⊂})\` (if relations were encoded as subsets)."
 `;
 
-exports[`render hlm library: 1.3.7 data/libraries/hlm/Essentials/Relations/disjunction 1`] = `
-"Definition 1.3.7.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
+exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/disjunction 1`] = `
+"Definition 1.3.6.  Let S, T be sets, ≺, ⊂ be relations from S to T. We define:
 
   ≺ ∨ ⊂ := [s ≺ t or s ⊂ t]_s ∈ S,t ∈ T
 
@@ -766,8 +750,8 @@ Remarks.
 This definition is the equivalent of \`$../Sets/Union(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {≺}, T = {⊂})\` (if relations were encoded as subsets)."
 `;
 
-exports[`render hlm library: 1.3.8 data/libraries/hlm/Essentials/Relations/generalized%20conjunction 1`] = `
-"Definition 1.3.8.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
+exports[`render hlm library: 1.3.7 data/libraries/hlm/Essentials/Relations/generalized%20conjunction 1`] = `
+"Definition 1.3.7.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
 
   ⋀R := [∀ ≺ ∈ R : s ≺ t]_s ∈ S,t ∈ T
 
@@ -776,8 +760,8 @@ Remarks.
 This definition is the equivalent of \`$../Sets/\\"Generalized intersection using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
 `;
 
-exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/generalized%20disjunction 1`] = `
-"Definition 1.3.9.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
+exports[`render hlm library: 1.3.8 data/libraries/hlm/Essentials/Relations/generalized%20disjunction 1`] = `
+"Definition 1.3.8.  Let S, T be sets, R ⊆ 𝓡𝓮𝓵(S, T). We define:
 
   ⋁R := [∃ ≺ ∈ R : s ≺ t]_s ∈ S,t ∈ T
 
@@ -786,8 +770,8 @@ Remarks.
 This definition is the equivalent of \`$../Sets/\\"Generalized operators\\"/\\"Generalized union using power set\\"(U = {$../Sets/\\"Cartesian product\\"(S = {S}, T = {T})}, S = {R})\` (if relations were encoded as subsets)."
 `;
 
-exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapping 1`] = `
-"Definition 1.3.10.  Let S, T be sets, ≺ be a relation from S to T. We define:
+exports[`render hlm library: 1.3.9 data/libraries/hlm/Essentials/Relations/mapping 1`] = `
+"Definition 1.3.9.  Let S, T be sets, ≺ be a relation from S to T. We define:
 
   ≺ is a mapping  :⇔  ∀ s ∈ S : ∃! t ∈ T : s ≺ t
 
@@ -802,8 +786,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Mapping"
 `;
 
-exports[`render hlm library: 1.3.11 data/libraries/hlm/Essentials/Relations/mapping%20value 1`] = `
-"Definition 1.3.11.  Let S, T be sets, ≺ be a mapping from S to T, s ∈ S. For t ∈ T, we define:
+exports[`render hlm library: 1.3.10 data/libraries/hlm/Essentials/Relations/mapping%20value 1`] = `
+"Definition 1.3.10.  Let S, T be sets, ≺ be a mapping from S to T, s ∈ S. For t ∈ T, we define:
 
   ≺(s) = t  :⇔  s ≺ t
 
@@ -814,8 +798,8 @@ References.
 * https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation"
 `;
 
-exports[`render hlm library: 1.3.12 data/libraries/hlm/Essentials/Relations/Endorelations 1`] = `
-"Definition 1.3.12 (Endorelations).  Let S be a set. We define:
+exports[`render hlm library: 1.3.11 data/libraries/hlm/Essentials/Relations/Endorelations 1`] = `
+"Definition 1.3.11 (Endorelations).  Let S be a set. We define:
 
   𝓡𝓮𝓵(S) :=: {[p_s,t]_(s,t ∈ S) | p_s,t is a proposition for each s, t ∈ S}
 
@@ -840,8 +824,8 @@ References.
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Relation"
 `;
 
-exports[`render hlm library: 1.3.13 data/libraries/hlm/Essentials/Relations/restriction 1`] = `
-"Definition 1.3.13.  Let S be a set, ≺ be a relation on S, T ⊆ S. We define:
+exports[`render hlm library: 1.3.12 data/libraries/hlm/Essentials/Relations/restriction 1`] = `
+"Definition 1.3.12.  Let S be a set, ≺ be a relation on S, T ⊆ S. We define:
 
   ≺∣_T := [t ≺ u]_(t,u ∈ T)
 
@@ -850,8 +834,8 @@ Remarks.
 This definition is not exactly standard but very simple. The main reason to include it is that the result is defined to be a relation on \`T\` instead of \`S\`, which is sometimes needed."
 `;
 
-exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/equality 1`] = `
-"Definition 1.3.14.  Let S be a set. We define:
+exports[`render hlm library: 1.3.13 data/libraries/hlm/Essentials/Relations/equality 1`] = `
+"Definition 1.3.13.  Let S be a set. We define:
 
   (=_S) := [s = t]_(s,t ∈ S)
 
@@ -862,8 +846,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#eq"
 `;
 
-exports[`render hlm library: 1.3.15 data/libraries/hlm/Essentials/Relations/reflexive 1`] = `
-"Definition 1.3.15.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.14 data/libraries/hlm/Essentials/Relations/reflexive 1`] = `
+"Definition 1.3.14.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is reflexive  :⇔  ∀ s ∈ S : s ⪯ s
 
@@ -877,8 +861,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#reflexive"
 `;
 
-exports[`render hlm library: 1.3.16 data/libraries/hlm/Essentials/Relations/connex 1`] = `
-"Definition 1.3.16.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.15 data/libraries/hlm/Essentials/Relations/connex 1`] = `
+"Definition 1.3.15.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺ is connex  :⇔  ∀ s, t ∈ S : [s ≺ t or t ≺ s]
 
@@ -890,8 +874,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#total"
 `;
 
-exports[`render hlm library: 1.3.17 data/libraries/hlm/Essentials/Relations/symmetric 1`] = `
-"Definition 1.3.17.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.16 data/libraries/hlm/Essentials/Relations/symmetric 1`] = `
+"Definition 1.3.16.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺ is symmetric  :⇔  ∀ s, t ∈ S s.t. s ≺ t : t ≺ s
     ⇔  ≺ = ≺^T
@@ -908,8 +892,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#symmetric"
 `;
 
-exports[`render hlm library: 1.3.18 data/libraries/hlm/Essentials/Relations/antisymmetric 1`] = `
-"Definition 1.3.18.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.17 data/libraries/hlm/Essentials/Relations/antisymmetric 1`] = `
+"Definition 1.3.17.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is antisymmetric  :⇔  ∀ s, t ∈ S s.t. s ⪯ t and t ⪯ s : s = t
 
@@ -923,8 +907,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#anti_symmetric"
 `;
 
-exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/transitive 1`] = `
-"Definition 1.3.19.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.18 data/libraries/hlm/Essentials/Relations/transitive 1`] = `
+"Definition 1.3.18.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺ is transitive  :⇔  ∀ s, t, u ∈ S s.t. s ≺ t and t ≺ u : s ≺ u
 
@@ -938,8 +922,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#transitive"
 `;
 
-exports[`render hlm library: 1.3.20 data/libraries/hlm/Essentials/Relations/preorder 1`] = `
-"Definition 1.3.20.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.19 data/libraries/hlm/Essentials/Relations/preorder 1`] = `
+"Definition 1.3.19.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is a preorder  :⇔  ⪯ is reflexive and ⪯ is transitive
 
@@ -953,8 +937,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#preorder"
 `;
 
-exports[`render hlm library: 1.3.21 data/libraries/hlm/Essentials/Relations/partial%20order 1`] = `
-"Definition 1.3.21.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.20 data/libraries/hlm/Essentials/Relations/partial%20order 1`] = `
+"Definition 1.3.20.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is a partial order  :⇔  ⪯ is reflexive and ⪯ is antisymmetric and ⪯ is transitive
     ⇔  ⪯ is a preorder and ⪯ is antisymmetric
@@ -970,8 +954,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#partial_order"
 `;
 
-exports[`render hlm library: 1.3.22 data/libraries/hlm/Essentials/Relations/total%20order 1`] = `
-"Definition 1.3.22.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.21 data/libraries/hlm/Essentials/Relations/total%20order 1`] = `
+"Definition 1.3.21.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is a total order  :⇔  ⪯ is connex and ⪯ is antisymmetric and ⪯ is transitive
     ⇔  ⪯ is a partial order and ⪯ is connex
@@ -986,14 +970,14 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#linear_order"
 `;
 
-exports[`render hlm library: 1.3.23 data/libraries/hlm/Essentials/Relations/lower%20bound 1`] = `
-"Definition 1.3.23.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
+exports[`render hlm library: 1.3.22 data/libraries/hlm/Essentials/Relations/lower%20bound 1`] = `
+"Definition 1.3.22.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
 
   s is a ≺-lower bound of T  :⇔  ∀ t ∈ T : s ≺ t"
 `;
 
-exports[`render hlm library: 1.3.24 data/libraries/hlm/Essentials/Relations/upper%20bound 1`] = `
-"Definition 1.3.24.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
+exports[`render hlm library: 1.3.23 data/libraries/hlm/Essentials/Relations/upper%20bound 1`] = `
+"Definition 1.3.23.  Let S be a set, ≺ be a relation on S, T ⊆ S, s ∈ S. We define:
 
   s is a ≺-upper bound of T  :⇔  ∀ t ∈ T : t ≺ s
     ⇔  s is a ≺^T-lower bound of T
@@ -1001,8 +985,8 @@ exports[`render hlm library: 1.3.24 data/libraries/hlm/Essentials/Relations/uppe
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.3.25 data/libraries/hlm/Essentials/Relations/least%20element 1`] = `
-"Definition 1.3.25.  Let S be a set, ⪯ be a relation on S, T ⊆ S, t ∈ T. We define:
+exports[`render hlm library: 1.3.24 data/libraries/hlm/Essentials/Relations/least%20element 1`] = `
+"Definition 1.3.24.  Let S be a set, ⪯ be a relation on S, T ⊆ S, t ∈ T. We define:
 
   t is a ⪯-least element of T  :⇔  t is a ⪯-lower bound of T
 
@@ -1011,8 +995,8 @@ References.
 * https://en.wikipedia.org/wiki/Greatest_and_least_elements"
 `;
 
-exports[`render hlm library: 1.3.26 data/libraries/hlm/Essentials/Relations/greatest%20element 1`] = `
-"Definition 1.3.26.  Let S be a set, ⪯ be a relation on S, T ⊆ S, t ∈ T. We define:
+exports[`render hlm library: 1.3.25 data/libraries/hlm/Essentials/Relations/greatest%20element 1`] = `
+"Definition 1.3.25.  Let S be a set, ⪯ be a relation on S, T ⊆ S, t ∈ T. We define:
 
   t is a ⪯-greatest element of T  :⇔  t is a ⪯-upper bound of T
     ⇔  t is a ⪯^T-least element of T
@@ -1024,8 +1008,8 @@ References.
 * https://en.wikipedia.org/wiki/Greatest_and_least_elements"
 `;
 
-exports[`render hlm library: 1.3.27 data/libraries/hlm/Essentials/Relations/well-order 1`] = `
-"Definition 1.3.27.  Let S be a set, ⪯ be a relation on S. We define:
+exports[`render hlm library: 1.3.26 data/libraries/hlm/Essentials/Relations/well-order 1`] = `
+"Definition 1.3.26.  Let S be a set, ⪯ be a relation on S. We define:
 
   ⪯ is a well-order  :⇔  ⪯ is a total order and ∀ T ⊆ S s.t. T is nonempty : ∃ t ∈ T : t is a ⪯-least element of T
 
@@ -1037,8 +1021,8 @@ References.
 * https://ncatlab.org/nlab/show/well-order"
 `;
 
-exports[`render hlm library: 1.3.28 data/libraries/hlm/Essentials/Relations/equivalence 1`] = `
-"Definition 1.3.28.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.27 data/libraries/hlm/Essentials/Relations/equivalence 1`] = `
+"Definition 1.3.27.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺ is an equivalence relation  :⇔  ≺ is a preorder and ≺ is symmetric
 
@@ -1052,8 +1036,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#equivalence"
 `;
 
-exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/Equivalence%20classes 1`] = `
-"Definition 1.3.29.  Let S be a set, ∼ be an equivalence relation on S. We define:
+exports[`render hlm library: 1.3.28 data/libraries/hlm/Essentials/Relations/Equivalence%20classes 1`] = `
+"Definition 1.3.28.  Let S be a set, ∼ be an equivalence relation on S. We define:
 
   S∕∼ :=: {[s]_∼ | s ∈ S}
 
@@ -1082,8 +1066,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/quot.html#quotient"
 `;
 
-exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/succession 1`] = `
-"Definition 1.3.30 (Succession).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
+exports[`render hlm library: 1.3.29 data/libraries/hlm/Essentials/Relations/succession 1`] = `
+"Definition 1.3.29 (Succession).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
 
   ⪯ ≪ ⊑ := [{[{s_a ⪯ s_b if a = l(s_a) (s_a ∈ S), false if a = r(t_a) (t_a ∈ T)] if b = l(s_b) (s_b ∈ S), [{true if a = l(s_a) (s_a ∈ S), t_a ⊑ t_b if a = r(t_a) (t_a ∈ T)] if b = r(t_b) (t_b ∈ T)]_(a,b ∈ S ⊎ T)
 
@@ -1097,8 +1081,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/sum.html#sum.lex"
 `;
 
-exports[`render hlm library: 1.3.31 data/libraries/hlm/Essentials/Relations/lexicographical%20order 1`] = `
-"Definition 1.3.31 (Lexicographical order).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
+exports[`render hlm library: 1.3.30 data/libraries/hlm/Essentials/Relations/lexicographical%20order 1`] = `
+"Definition 1.3.30 (Lexicographical order).  Let S, T be sets, ⪯ be a partial order on S, ⊑ be a partial order on T. We define:
 
   ⪯ ∠ ⊑ := [s ⪯ s' and [s ≠ s' or t ⊑ t']]_((s,t),(s',t') ∈ S×T)
 
@@ -1115,8 +1099,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/wf.html#prod.lex"
 `;
 
-exports[`render hlm library: 1.3.32.1 data/libraries/hlm/Essentials/Relations/Closures/closure 1`] = `
-"Definition 1.3.32.1.  Let S be a set, ≺ be a relation on S, p be a property on 𝓡𝓮𝓵(S). We define:
+exports[`render hlm library: 1.3.31.1 data/libraries/hlm/Essentials/Relations/Closures/closure 1`] = `
+"Definition 1.3.31.1.  Let S be a set, ≺ be a relation on S, p be a property on 𝓡𝓮𝓵(S). We define:
 
   cl_p(≺) := ⋀{⊂ ∈ 𝓡𝓮𝓵(S) : [≺ ⇒ ⊂] and ⊂ is p}
 
@@ -1129,8 +1113,8 @@ References.
 * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures"
 `;
 
-exports[`render hlm library: 1.3.32.2 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20closure 1`] = `
-"Definition 1.3.32.2.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.2 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20closure 1`] = `
+"Definition 1.3.31.2.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^= := cl_reflexive(≺)
    = ≺ ∨ (=_S)
@@ -1145,8 +1129,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.refl_gen"
 `;
 
-exports[`render hlm library: 1.3.32.3 data/libraries/hlm/Essentials/Relations/Closures/symmetric%20closure 1`] = `
-"Definition 1.3.32.3.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.3 data/libraries/hlm/Essentials/Relations/Closures/symmetric%20closure 1`] = `
+"Definition 1.3.31.3.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^↔ := cl_symmetric(≺)
    = ≺ ∨ ≺^T
@@ -1159,8 +1143,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Symmetric_Closure"
 `;
 
-exports[`render hlm library: 1.3.32.4 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20closure 1`] = `
-"Definition 1.3.32.4.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.4 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20closure 1`] = `
+"Definition 1.3.31.4.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^⇔ := cl_([⊂ is reflexive and ⊂ is symmetric]_(⊂∈𝓡𝓮𝓵(S)))(≺)
    = (≺^=)^↔
@@ -1169,8 +1153,8 @@ exports[`render hlm library: 1.3.32.4 data/libraries/hlm/Essentials/Relations/Cl
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.3.32.5 data/libraries/hlm/Essentials/Relations/Closures/transitive%20closure 1`] = `
-"Definition 1.3.32.5.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.5 data/libraries/hlm/Essentials/Relations/Closures/transitive%20closure 1`] = `
+"Definition 1.3.31.5.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^+ := cl_transitive(≺)
 
@@ -1183,8 +1167,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.trans_gen"
 `;
 
-exports[`render hlm library: 1.3.32.6 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20transitive%20closure 1`] = `
-"Definition 1.3.32.6.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.6 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20transitive%20closure 1`] = `
+"Definition 1.3.31.6.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^∗ := cl_preorder(≺)
    = (≺^+)^=
@@ -1200,8 +1184,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/relation.html#relation.refl_trans_gen"
 `;
 
-exports[`render hlm library: 1.3.32.7 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20transitive%20closure 1`] = `
-"Definition 1.3.32.7.  Let S be a set, ≺ be a relation on S. We define:
+exports[`render hlm library: 1.3.31.7 data/libraries/hlm/Essentials/Relations/Closures/reflexive%20symmetric%20transitive%20closure 1`] = `
+"Definition 1.3.31.7.  Let S be a set, ≺ be a relation on S. We define:
 
   ≺^≡ := cl_equivalence relation(≺)
 
@@ -1210,8 +1194,8 @@ References.
 * https://en.wikipedia.org/wiki/Closure_(mathematics)#Binary_relation_closures: reflexive transitive symmetric closure"
 `;
 
-exports[`render hlm library: 1.3.33.1 data/libraries/hlm/Essentials/Relations/Dependent%20equality/Dependent%20equality 1`] = `
-"Definition 1.3.33.1.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+exports[`render hlm library: 1.3.32.1 data/libraries/hlm/Essentials/Relations/Dependent%20equality/Dependent%20equality 1`] = `
+"Definition 1.3.32.1.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
   𝓓𝓮𝓹𝓔𝓺((S_i)_(i∈I)) :=: {(≡_a,b)_(a = b)^((S_i)_(i∈I)) | ≡_a,b is a relation from S_a to S_b for each a, b ∈ I, [∀ i ∈ I : ≡_i,i = (=_(S_i))]}
 
@@ -1232,8 +1216,8 @@ Dependent equality is a prerequisite to formalizing arbitrary disjoint unions (s
 Once GitHub issue [#65](https://github.com/SReichelt/slate/issues/65) is resolved, \`%equals(a, b)\` should be added as a condition on \`≡\`."
 `;
 
-exports[`render hlm library: 1.3.33.2 data/libraries/hlm/Essentials/Relations/Dependent%20equality/dependently%20equal 1`] = `
-"Definition 1.3.33.2.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I), a, b ∈ I, s ∈ S_a, t ∈ S_b. We define
+exports[`render hlm library: 1.3.32.2 data/libraries/hlm/Essentials/Relations/Dependent%20equality/dependently%20equal 1`] = `
+"Definition 1.3.32.2.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I), a, b ∈ I, s ∈ S_a, t ∈ S_b. We define
 
   s ≃ t
 
@@ -1251,7 +1235,7 @@ exports[`render hlm library: 1.4.1 data/libraries/hlm/Essentials/Functions/Funct
 
 We write “let f : X → Y be a function” for “let f ∈ (X → Y).”
 
-We write “let f :  X → Y, x ↦ y_x” for “let f := (X → Y, x ↦ y_x).”
+We write “f :  X → Y, x ↦ y_x” for “f := (X → Y, x ↦ y_x).”
 
 Remarks.
 
@@ -1291,16 +1275,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.app"
 `;
 
-exports[`render hlm library: 1.4.3 data/libraries/hlm/Essentials/Functions/operator 1`] = `
-"Definition 1.4.3 (Operator as function).
-
-Remarks.
-
-This is a macro to convert an operator taking an element of \`X\` and returning an element of \`Y\` to a function from \`X\` to \`Y\`."
-`;
-
-exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Image 1`] = `
-"Definition 1.4.4.  Let X, Y be sets, f : X → Y be a function, S ⊆ X. We define:
+exports[`render hlm library: 1.4.3 data/libraries/hlm/Essentials/Functions/Image 1`] = `
+"Definition 1.4.3.  Let X, Y be sets, f : X → Y be a function, S ⊆ X. We define:
 
   f(S) := {f(x) : x ∈ S}
 
@@ -1311,8 +1287,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.image"
 `;
 
-exports[`render hlm library: 1.4.5 data/libraries/hlm/Essentials/Functions/Preimage 1`] = `
-"Definition 1.4.5.  Let X, Y be sets, f : X → Y be a function, S ⊆ Y. We define:
+exports[`render hlm library: 1.4.4 data/libraries/hlm/Essentials/Functions/Preimage 1`] = `
+"Definition 1.4.4.  Let X, Y be sets, f : X → Y be a function, S ⊆ Y. We define:
 
   f^-1(S) := {x ∈ X : f(x) ∈ S}
 
@@ -1321,8 +1297,8 @@ References.
 * https://en.wikipedia.org/wiki/Preimage"
 `;
 
-exports[`render hlm library: 1.4.6 data/libraries/hlm/Essentials/Functions/mapping%20as%20function 1`] = `
-"Definition 1.4.6.  Let S, T be sets, ≺ be a mapping from S to T. We define:
+exports[`render hlm library: 1.4.5 data/libraries/hlm/Essentials/Functions/mapping%20as%20function 1`] = `
+"Definition 1.4.5.  Let S, T be sets, ≺ be a mapping from S to T. We define:
 
   (≺)_(S→T) :  S → T, s ↦ ≺(s)
 
@@ -1331,8 +1307,8 @@ Remarks.
 This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward as well.)"
 `;
 
-exports[`render hlm library: 1.4.7 data/libraries/hlm/Essentials/Functions/identity 1`] = `
-"Definition 1.4.7.  Let X be a set. We define:
+exports[`render hlm library: 1.4.6 data/libraries/hlm/Essentials/Functions/identity 1`] = `
+"Definition 1.4.6.  Let X be a set. We define:
 
   id_X :  X → X, x ↦ x
 
@@ -1344,8 +1320,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#id"
 `;
 
-exports[`render hlm library: 1.4.8 data/libraries/hlm/Essentials/Functions/generalized%20restriction 1`] = `
-"Definition 1.4.8.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.7 data/libraries/hlm/Essentials/Functions/generalized%20restriction 1`] = `
+"Definition 1.4.7.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function. We define:
 
   f∣_A^B :  A → B, x ↦ f(x)
 
@@ -1356,8 +1332,8 @@ This definition is a slight extension of \`$restriction\` that simultaneously ex
 It might seem tempting to remove the need for this definition by implicitly treating a function to \`Y\` as a function to a superset \`B\` of \`Y\`, without explicitly specifying \`B\`. However, this could lead to confusion as the resulting function may not be surjective even though the original function is."
 `;
 
-exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/codomain%20restriction 1`] = `
-"Definition 1.4.9.  Let X be a set, A ⊆ X, Y be a set, B ⊆ Y, f : X → Y be a function such that f(A) ⊆ B. We define:
+exports[`render hlm library: 1.4.8 data/libraries/hlm/Essentials/Functions/codomain%20restriction 1`] = `
+"Definition 1.4.8.  Let X be a set, A ⊆ X, Y be a set, B ⊆ Y, f : X → Y be a function such that f(A) ⊆ B. We define:
 
   f∣_A^B :  A → B, x ↦ f(x)
 
@@ -1370,8 +1346,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Restriction/Mapping"
 `;
 
-exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/restriction 1`] = `
-"Definition 1.4.10.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.9 data/libraries/hlm/Essentials/Functions/restriction 1`] = `
+"Definition 1.4.9.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. We define:
 
   f∣_A := f∣_A^Y
 
@@ -1383,8 +1359,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.restrict"
 `;
 
-exports[`render hlm library: 1.4.11 data/libraries/hlm/Essentials/Functions/composition 1`] = `
-"Definition 1.4.11.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions. We define:
+exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/composition 1`] = `
+"Definition 1.4.10.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions. We define:
 
   g ∘ f :  X → Z, x ↦ g(f(x))
 
@@ -1398,8 +1374,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp"
 `;
 
-exports[`render hlm library: 1.4.12 data/libraries/hlm/Essentials/Functions/Composition%20is%20associative 1`] = `
-"Proposition 1.4.12.  Let W, X, Y, Z be sets, f : W → X, g : X → Y, h : Y → Z be functions. Then:
+exports[`render hlm library: 1.4.11 data/libraries/hlm/Essentials/Functions/Composition%20is%20associative 1`] = `
+"Proposition 1.4.11.  Let W, X, Y, Z be sets, f : W → X, g : X → Y, h : Y → Z be functions. Then:
 
   (h ∘ g) ∘ f = h ∘ (g ∘ f)
 
@@ -1414,8 +1390,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp.assoc"
 `;
 
-exports[`render hlm library: 1.4.13 data/libraries/hlm/Essentials/Functions/cartesian%20product 1`] = `
-"Definition 1.4.13.  Let V, W, X, Y be sets, f : V → W, g : X → Y be functions. We define:
+exports[`render hlm library: 1.4.12 data/libraries/hlm/Essentials/Functions/cartesian%20product 1`] = `
+"Definition 1.4.12.  Let V, W, X, Y be sets, f : V → W, g : X → Y be functions. We define:
 
   f × g :  V × X → W × Y, (v, x) ↦ (f(v), g(x))
 
@@ -1424,8 +1400,8 @@ Remarks.
 This definition is not standard in mathematics but convenient in some cases."
 `;
 
-exports[`render hlm library: 1.4.14 data/libraries/hlm/Essentials/Functions/injective 1`] = `
-"Definition 1.4.14.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.13 data/libraries/hlm/Essentials/Functions/injective 1`] = `
+"Definition 1.4.13.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is injective  :⇔  ∀ a, b ∈ X s.t. f(a) = f(b) : a = b
     ⇔  ∀ c ∈ Y, d, e ∈ f^-1({c}) : d = e
@@ -1443,8 +1419,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.injective"
 `;
 
-exports[`render hlm library: 1.4.15 data/libraries/hlm/Essentials/Functions/surjective 1`] = `
-"Definition 1.4.15.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.14 data/libraries/hlm/Essentials/Functions/surjective 1`] = `
+"Definition 1.4.14.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is surjective  :⇔  ∀ y ∈ Y : ∃ x ∈ X : f(x) = y
     ⇔  Y ⊆ f(X)
@@ -1461,8 +1437,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.surjective"
 `;
 
-exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/bijective 1`] = `
-"Definition 1.4.16.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.15 data/libraries/hlm/Essentials/Functions/bijective 1`] = `
+"Definition 1.4.15.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is bijective  :⇔  f is injective and f is surjective
     ⇔  ∀ y ∈ Y : ∃! x ∈ X : f(x) = y
@@ -1482,48 +1458,48 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.bijective_iff_has_inverse"
 `;
 
-exports[`render hlm library: 1.4.17 data/libraries/hlm/Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
-"Proposition 1.4.17.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be an injective function. Then:
+exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
+"Proposition 1.4.16.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be an injective function. Then:
 
   f∣_A^B is injective
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.18 data/libraries/hlm/Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
-"Corollary 1.4.18.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be an injective function. Then:
+exports[`render hlm library: 1.4.17 data/libraries/hlm/Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
+"Corollary 1.4.17.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be an injective function. Then:
 
   f∣_A is injective
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.19 data/libraries/hlm/Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
-"Proposition 1.4.19.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
+exports[`render hlm library: 1.4.18 data/libraries/hlm/Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
+"Proposition 1.4.18.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
 
   f is surjective
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.20 data/libraries/hlm/Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
-"Corollary 1.4.20.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
+exports[`render hlm library: 1.4.19 data/libraries/hlm/Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
+"Corollary 1.4.19.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
 
   f is surjective
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.21 data/libraries/hlm/Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
-"Proposition 1.4.21.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
+exports[`render hlm library: 1.4.20 data/libraries/hlm/Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
+"Proposition 1.4.20.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
 
   f∣_A^(f(A)) is surjective
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.22 data/libraries/hlm/Essentials/Functions/Bijections 1`] = `
-"Definition 1.4.22.  Let X, Y be sets. We define:
+exports[`render hlm library: 1.4.21 data/libraries/hlm/Essentials/Functions/Bijections 1`] = `
+"Definition 1.4.21.  Let X, Y be sets. We define:
 
   (X ↔ Y) := {f : X → Y : f is bijective}
 
@@ -1541,8 +1517,8 @@ References.
 * https://ncatlab.org/nlab/show/bijection"
 `;
 
-exports[`render hlm library: 1.4.23 data/libraries/hlm/Essentials/Functions/inverse 1`] = `
-"Definition 1.4.23.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
+exports[`render hlm library: 1.4.22 data/libraries/hlm/Essentials/Functions/inverse 1`] = `
+"Definition 1.4.22.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
 
   f^-1 = g  :⇔  g ∘ f = id_X
     ⇔  f ∘ g = id_Y
@@ -1560,32 +1536,32 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.inv_fun"
 `;
 
-exports[`render hlm library: 1.4.24 data/libraries/hlm/Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
-"Proposition 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
+exports[`render hlm library: 1.4.23 data/libraries/hlm/Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
+"Proposition 1.4.23.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
 
   (f^-1)^-1 = f
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.25 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
-"Corollary 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
+exports[`render hlm library: 1.4.24 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
+"Corollary 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
 
   f^-1(f(x)) = x
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.26 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
-"Corollary 1.4.26.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
+exports[`render hlm library: 1.4.25 data/libraries/hlm/Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
+"Corollary 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
 
   f(f^-1(y)) = y
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.27 data/libraries/hlm/Essentials/Functions/power%20to%20natural%20number 1`] = `
-"Definition 1.4.27.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
+exports[`render hlm library: 1.4.26 data/libraries/hlm/Essentials/Functions/power%20to%20natural%20number 1`] = `
+"Definition 1.4.26.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
 
   f^n
 
@@ -1600,22 +1576,22 @@ References.
 * https://mathworld.wolfram.com/IteratedMap.html"
 `;
 
-exports[`render hlm library: 1.4.28 data/libraries/hlm/Essentials/Functions/power%20to%20integer 1`] = `
-"Definition 1.4.28.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
+exports[`render hlm library: 1.4.27 data/libraries/hlm/Essentials/Functions/power%20to%20integer 1`] = `
+"Definition 1.4.27.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
 
   f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
 `;
 
-exports[`render hlm library: 1.4.29 data/libraries/hlm/Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
-"Proposition 1.4.29.  Let X be a set, a ∈ ℤ. Then:
+exports[`render hlm library: 1.4.28 data/libraries/hlm/Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
+"Proposition 1.4.28.  Let X be a set, a ∈ ℤ. Then:
 
   (id_X)^a = id_X
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.30.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
-"Definition 1.4.30.1.  Let X, Y, Z be sets. We define:
+exports[`render hlm library: 1.4.29.1 data/libraries/hlm/Essentials/Functions/Operations/Operations 1`] = `
+"Definition 1.4.29.1.  Let X, Y, Z be sets. We define:
 
   𝓞𝓹(X, Y, Z) :=: {(X × Y → Z, (x, y) ↦ z_x,y) | z_x,y ∈ Z for each x ∈ X and y ∈ Y}
 
@@ -1628,15 +1604,15 @@ Well-definedness.  No proof.
 
 We write “let ∗ : X × Y → Z be an operation” for “let ∗ ∈ 𝓞𝓹(X, Y, Z).”
 
-We write “let ∗ :  X × Y → Z, (x, y) ↦ z_x,y” for “let ∗ := (X × Y → Z, (x, y) ↦ z_x,y).”
+We write “∗ :  X × Y → Z, (x, y) ↦ z_x,y” for “∗ := (X × Y → Z, (x, y) ↦ z_x,y).”
 
 References.
 
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.30.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
-"Definition 1.4.30.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define
+exports[`render hlm library: 1.4.29.2 data/libraries/hlm/Essentials/Functions/Operations/value 1`] = `
+"Definition 1.4.29.2.  Let X, Y, Z be sets, ∗ : X × Y → Z be an operation, x ∈ X, y ∈ Y. We define
 
   x ∗ y
 
@@ -1648,16 +1624,8 @@ by:
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.4.30.3 data/libraries/hlm/Essentials/Functions/Operations/operator 1`] = `
-"Definition 1.4.30.3 (Operator as operation).
-
-Remarks.
-
-This is a macro to convert an operator taking elements of \`X\` and \`Y\` and returning an element of \`Z\` to an operation from \`X\` and \`Y\` to \`Z\`."
-`;
-
-exports[`render hlm library: 1.4.30.4 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
-"Definition 1.4.30.4 (Inner operations).  Let X be a set. We define:
+exports[`render hlm library: 1.4.29.3 data/libraries/hlm/Essentials/Functions/Operations/Inner%20operations 1`] = `
+"Definition 1.4.29.3 (Inner operations).  Let X be a set. We define:
 
   𝓞𝓹(X) := 𝓞𝓹(X, X, X)
 
@@ -1670,8 +1638,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Operation/Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.30.5 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
-"Definition 1.4.30.5.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
+exports[`render hlm library: 1.4.29.4 data/libraries/hlm/Essentials/Functions/Operations/associative 1`] = `
+"Definition 1.4.29.4.  Let X be a set, ∗ : X × X → X be an operation on X. We define:
 
   ∗ is associative  :⇔  ∀ x, y, z ∈ X : (x ∗ y) ∗ z = x ∗ (y ∗ z)
 
@@ -1683,8 +1651,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
 `;
 
-exports[`render hlm library: 1.4.30.6 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
-"Definition 1.4.30.6.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
+exports[`render hlm library: 1.4.29.5 data/libraries/hlm/Essentials/Functions/Operations/commutative 1`] = `
+"Definition 1.4.29.5.  Let X, Z be sets, ∗ : X × X → Z be an operation. We define:
 
   ∗ is commutative  :⇔  ∀ x, y ∈ X : x ∗ y = y ∗ x
 
@@ -1696,8 +1664,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
 `;
 
-exports[`render hlm library: 1.4.30.7 data/libraries/hlm/Essentials/Functions/Operations/left%20identity%20element 1`] = `
-"Definition 1.4.30.7.  Let X, Y be sets, ∗ : X × Y → Y be an operation, e ∈ X. We define:
+exports[`render hlm library: 1.4.29.6 data/libraries/hlm/Essentials/Functions/Operations/left%20identity%20element 1`] = `
+"Definition 1.4.29.6.  Let X, Y be sets, ∗ : X × Y → Y be an operation, e ∈ X. We define:
 
   e is a left identity for ∗  :⇔  ∀ a ∈ Y : e ∗ a = a
 
@@ -1708,8 +1676,8 @@ References.
 * https://ncatlab.org/nlab/show/identity+element"
 `;
 
-exports[`render hlm library: 1.4.30.8 data/libraries/hlm/Essentials/Functions/Operations/right%20identity%20element 1`] = `
-"Definition 1.4.30.8.  Let X, Y be sets, ∗ : X × Y → X be an operation, e ∈ Y. We define:
+exports[`render hlm library: 1.4.29.7 data/libraries/hlm/Essentials/Functions/Operations/right%20identity%20element 1`] = `
+"Definition 1.4.29.7.  Let X, Y be sets, ∗ : X × Y → X be an operation, e ∈ Y. We define:
 
   e is a right identity for ∗  :⇔  ∀ a ∈ X : a ∗ e = a
 
@@ -1720,8 +1688,8 @@ References.
 * https://ncatlab.org/nlab/show/identity+element"
 `;
 
-exports[`render hlm library: 1.4.30.9 data/libraries/hlm/Essentials/Functions/Operations/identity%20element 1`] = `
-"Definition 1.4.30.9.  Let X be a set, ∗ : X × X → X be an operation on X, e ∈ X. We define:
+exports[`render hlm library: 1.4.29.8 data/libraries/hlm/Essentials/Functions/Operations/identity%20element 1`] = `
+"Definition 1.4.29.8.  Let X be a set, ∗ : X × X → X be an operation on X, e ∈ X. We define:
 
   e is an identity for ∗  :⇔  e is a left identity for ∗ and e is a right identity for ∗
     ⇔  ∀ a ∈ X : a ∗ e = e ∗ a = a
@@ -1735,8 +1703,8 @@ References.
 * https://ncatlab.org/nlab/show/identity+element"
 `;
 
-exports[`render hlm library: 1.4.30.10 data/libraries/hlm/Essentials/Functions/Operations/left%20absorbing%20element 1`] = `
-"Definition 1.4.30.10.  Let X, Y be sets, ∗ : X × Y → X be an operation, z ∈ X. We define:
+exports[`render hlm library: 1.4.29.9 data/libraries/hlm/Essentials/Functions/Operations/left%20absorbing%20element 1`] = `
+"Definition 1.4.29.9.  Let X, Y be sets, ∗ : X × Y → X be an operation, z ∈ X. We define:
 
   z is a left absorbing element for ∗  :⇔  ∀ a ∈ Y : z ∗ a = z
 
@@ -1746,8 +1714,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Left_Zero"
 `;
 
-exports[`render hlm library: 1.4.30.11 data/libraries/hlm/Essentials/Functions/Operations/right%20absorbing%20element 1`] = `
-"Definition 1.4.30.11.  Let X, Y be sets, ∗ : X × Y → Y be an operation, z ∈ Y. We define:
+exports[`render hlm library: 1.4.29.10 data/libraries/hlm/Essentials/Functions/Operations/right%20absorbing%20element 1`] = `
+"Definition 1.4.29.10.  Let X, Y be sets, ∗ : X × Y → Y be an operation, z ∈ Y. We define:
 
   z is a right absorbing element for ∗  :⇔  ∀ a ∈ X : a ∗ z = z
 
@@ -1757,8 +1725,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Right_Zero"
 `;
 
-exports[`render hlm library: 1.4.30.12 data/libraries/hlm/Essentials/Functions/Operations/absorbing%20element 1`] = `
-"Definition 1.4.30.12.  Let X be a set, ∗ : X × X → X be an operation on X, z ∈ X. We define:
+exports[`render hlm library: 1.4.29.11 data/libraries/hlm/Essentials/Functions/Operations/absorbing%20element 1`] = `
+"Definition 1.4.29.11.  Let X be a set, ∗ : X × X → X be an operation on X, z ∈ X. We define:
 
   z is an absorbing element for ∗  :⇔  z is a left absorbing element for ∗ and z is a right absorbing element for ∗
     ⇔  ∀ a ∈ X : a ∗ z = z ∗ a = z
@@ -1771,8 +1739,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Zero_Element#Zero"
 `;
 
-exports[`render hlm library: 1.4.30.13 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
-"Definition 1.4.30.13.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.29.12 data/libraries/hlm/Essentials/Functions/Operations/left-distributive 1`] = `
+"Definition 1.4.29.12.  Let X, Y be sets, ∗ : X × Y → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is left-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : x ∗ (y ⋆ z) = (x ∗ y) ⋆ (x ∗ z)
 
@@ -1784,8 +1752,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
 `;
 
-exports[`render hlm library: 1.4.30.14 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
-"Definition 1.4.30.14.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
+exports[`render hlm library: 1.4.29.13 data/libraries/hlm/Essentials/Functions/Operations/right-distributive 1`] = `
+"Definition 1.4.29.13.  Let X, Y be sets, ∗ : Y × X → Y be an operation, ⋆ : Y × Y → Y be an operation on Y. We define:
 
   ∗ is right-distributive over ⋆  :⇔  ∀ x ∈ X, y, z ∈ Y : (y ⋆ z) ∗ x = (y ∗ x) ⋆ (z ∗ x)
 
@@ -1797,8 +1765,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
 `;
 
-exports[`render hlm library: 1.4.30.15 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
-"Definition 1.4.30.15.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
+exports[`render hlm library: 1.4.29.14 data/libraries/hlm/Essentials/Functions/Operations/distributive 1`] = `
+"Definition 1.4.29.14.  Let X be a set, ∗, ⋆ : X × X → X be operations on X. We define:
 
   ∗ is distributive over ⋆  :⇔  ∗ is left-distributive over ⋆ and ∗ is right-distributive over ⋆
 
@@ -1810,20 +1778,20 @@ References.
 * https://ncatlab.org/nlab/show/distributive+law"
 `;
 
-exports[`render hlm library: 1.4.30.16 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
-"Definition 1.4.30.16.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.15 data/libraries/hlm/Essentials/Functions/Operations/left%20operation%20restriction 1`] = `
+"Definition 1.4.29.15.  Let X, Y be sets, A ⊆ Y, ∗ : X × Y → Y be an operation such that ∀ x ∈ X, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_(X×A) := ∗∣_(X×A)^A"
 `;
 
-exports[`render hlm library: 1.4.30.17 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
-"Definition 1.4.30.17.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.16 data/libraries/hlm/Essentials/Functions/Operations/right%20operation%20restriction 1`] = `
+"Definition 1.4.29.16.  Let X, Y be sets, A ⊆ X, ∗ : X × Y → X be an operation such that ∀ x ∈ A, y ∈ Y : x ∗ y ∈ A. We define:
 
   ∗∣_(A×Y) := ∗∣_(A×Y)^A"
 `;
 
-exports[`render hlm library: 1.4.30.18 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
-"Definition 1.4.30.18.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
+exports[`render hlm library: 1.4.29.17 data/libraries/hlm/Essentials/Functions/Operations/inner%20operation%20restriction 1`] = `
+"Definition 1.4.29.17.  Let X be a set, A ⊆ X, ∗ : X × X → X be an operation on X such that ∀ x, y ∈ A : x ∗ y ∈ A. We define:
 
   ∗∣_A := ∗∣_(A×A)^A
 
@@ -1832,8 +1800,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Restriction/Operation"
 `;
 
-exports[`render hlm library: 1.4.30.19.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
-"Definition 1.4.30.19.1.  Let X be a set. We define:
+exports[`render hlm library: 1.4.29.18.1 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operations 1`] = `
+"Definition 1.4.29.18.1.  Let X be a set. We define:
 
   𝓑𝓲𝓰𝓞𝓹(X) :=: {[e ∗ ⋅⋅⋅] | ∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid}
 
@@ -1847,8 +1815,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Iterated_Binary_Operation"
 `;
 
-exports[`render hlm library: 1.4.30.19.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/identity%20element 1`] = `
-"Definition 1.4.30.19.2.  Let X be a set, ⨂ be an iterated operation on X. We define
+exports[`render hlm library: 1.4.29.18.2 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/identity%20element 1`] = `
+"Definition 1.4.29.18.2.  Let X be a set, ⨂ be an iterated operation on X. We define
 
   e_⨂
 
@@ -1857,14 +1825,14 @@ by:
   e_[e∗⋅⋅⋅] := e  (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
 `;
 
-exports[`render hlm library: 1.4.30.19.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
-"Definition 1.4.30.19.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
+exports[`render hlm library: 1.4.29.18.3 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/operation 1`] = `
+"Definition 1.4.29.18.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
 
   x ⨂ y := x ∗ y if ⨂ = [e ∗ ⋅⋅⋅] (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
 `;
 
-exports[`render hlm library: 1.4.30.19.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
-"Definition 1.4.30.19.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
+exports[`render hlm library: 1.4.29.18.4 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
+"Definition 1.4.29.18.4.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). We define
 
   ⨂_(i < n) a_i
 
@@ -1874,22 +1842,22 @@ by:
   ⨂_(i < m+1) a_i := (⨂_(j < m) a_j) ⨂ a_m  (m ∈ ℕ)"
 `;
 
-exports[`render hlm library: 1.4.30.19.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
-"Proposition 1.4.30.19.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.4.29.18.5 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/Iterated%20operation%20indexed%20by%20natural%20number%20is%20distributive 1`] = `
+"Proposition 1.4.29.18.5.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i, b_i ∈ X for each i ∈ ℕ_(<n). Then:
 
   ⨂_(i < n) (a_i ⨂ b_i) = (⨂_(i < n) a_i) ⨂ (⨂_(i < n) b_i)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.30.19.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
-"Definition 1.4.30.19.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
+exports[`render hlm library: 1.4.29.18.6 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
+"Definition 1.4.29.18.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
 
   ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
 `;
 
-exports[`render hlm library: 1.4.30.19.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
-"Definition 1.4.30.19.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
+exports[`render hlm library: 1.4.29.18.7 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
+"Definition 1.4.29.18.7.  Let X be a set, ⨂ be an iterated operation on X, I be a finite set, let a_i ∈ X for each i ∈ I. For x ∈ X, we define:
 
   ⨂_(i ∈ I) a_i = x  :⇔  ∀ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
     ⇔  ∃ n ∈ ℕ, f : ℕ_(<n) ↔ I : ⨂_(j < n) a_(f(j)) = x
@@ -1899,14 +1867,14 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.4.30.19.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
-"Definition 1.4.30.19.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, let J := {i ∈ I : a_i ≠ e_⨂}, assume J is finite. We define:
+exports[`render hlm library: 1.4.29.18.8 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
+"Definition 1.4.29.18.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, let J := {i ∈ I : a_i ≠ e_⨂}, assume J is finite. We define:
 
   ⨂_(i ∈ I) a_i := ⨂_(j ∈ J) a_j"
 `;
 
-exports[`render hlm library: 1.4.30.19.9 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20multiset 1`] = `
-"Definition 1.4.30.19.9.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a/an S-multiset such that 𝑰 is finite, let a_i ∈ X for each i ∈ 𝑰. We define:
+exports[`render hlm library: 1.4.29.18.9 data/libraries/hlm/Essentials/Functions/Operations/Iterated%20operations/indexed%20by%20finite%20multiset 1`] = `
+"Definition 1.4.29.18.9.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a/an S-multiset such that 𝑰 is finite, let a_i ∈ X for each i ∈ 𝑰. We define:
 
   ⨂_(i ∈ 𝑰) a_i := ⨂_((t,n) ∈ Elems(𝑰)) a_t
    = ⨂_(j ∈ Set(𝑰)) (⨂_(k < mult_𝑰(j)) a_j)
@@ -3298,7 +3266,7 @@ Let b := a + 1.
 
 ⇒^1.6.1.51.9 f(f^-1(p)) ∣ a
 
-⇒^1.4.26 p ∣ a
+⇒^1.4.25 p ∣ a
 
 ⇒^1.6.1.31 p ∣ 1
 
@@ -9517,7 +9485,7 @@ exports[`render hlm library: 4.7.1 data/libraries/hlm/Category%20theory/Functors
 
 We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ Fun(𝓒, 𝓓).”
 
-We write “let F :  𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f” for “let F := (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f).”
+We write “F :  𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f” for “F := (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f).”
 
 References.
 

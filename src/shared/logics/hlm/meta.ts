@@ -8,7 +8,8 @@ import * as FmtNotation from '../../notation/meta';
 export class ObjectContents_Definition extends Fmt.ObjectContents {
   properties?: Fmt.ArgumentList;
   notation?: Fmt.Expression;
-  definitionNotation?: ObjectContents_DefinitionNotation;
+  abbreviations?: Fmt.Expression[];
+  definitionNotation?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     let propertiesRaw = argumentList.getOptionalValue('properties', 0);
@@ -20,16 +21,15 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       }
     }
     this.notation = argumentList.getOptionalValue('notation', 1);
-    let definitionNotationRaw = argumentList.getOptionalValue('definitionNotation', 2);
-    if (definitionNotationRaw !== undefined) {
-      if (definitionNotationRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_DefinitionNotation;
-        newItem.fromCompoundExpression(definitionNotationRaw);
-        this.definitionNotation = newItem;
+    let abbreviationsRaw = argumentList.getOptionalValue('abbreviations', 2);
+    if (abbreviationsRaw !== undefined) {
+      if (abbreviationsRaw instanceof Fmt.ArrayExpression) {
+        this.abbreviations = abbreviationsRaw.items;
       } else {
-        throw new Error('definitionNotation: Compound expression expected');
+        throw new Error('abbreviations: Array expression expected');
       }
     }
+    this.definitionNotation = argumentList.getOptionalValue('definitionNotation', 3);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
@@ -42,10 +42,16 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     if (this.notation !== undefined) {
       argumentList.add(this.notation, 'notation', true);
     }
+    if (this.abbreviations !== undefined) {
+      let abbreviationsExpr = new Fmt.ArrayExpression;
+      abbreviationsExpr.items = [];
+      for (let item of this.abbreviations) {
+        abbreviationsExpr.items.push(item);
+      }
+      argumentList.add(abbreviationsExpr, 'abbreviations', true);
+    }
     if (this.definitionNotation !== undefined) {
-      let definitionNotationExpr = new Fmt.CompoundExpression;
-      this.definitionNotation.toCompoundExpression(definitionNotationExpr, true);
-      argumentList.add(definitionNotationExpr, 'definitionNotation', true);
+      argumentList.add(this.definitionNotation, 'definitionNotation', true);
     }
   }
 
@@ -61,6 +67,11 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     }
     if (this.notation) {
       this.notation.traverse(fn);
+    }
+    if (this.abbreviations) {
+      for (let item of this.abbreviations) {
+        item.traverse(fn);
+      }
     }
     if (this.definitionNotation) {
       this.definitionNotation.traverse(fn);
@@ -81,9 +92,19 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
         changed = true;
       }
     }
+    if (this.abbreviations) {
+      result.abbreviations = [];
+      for (let item of this.abbreviations) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.abbreviations.push(newItem);
+      }
+    }
     if (this.definitionNotation) {
-      result.definitionNotation = new ObjectContents_DefinitionNotation;
-      if (this.definitionNotation.substituteExpression(fn, result.definitionNotation!, replacedParameters)) {
+      result.definitionNotation = this.definitionNotation.substitute(fn, replacedParameters);
+      if (result.definitionNotation !== this.definitionNotation) {
         changed = true;
       }
     }
@@ -104,139 +125,22 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
         return false;
       }
     }
+    if (this.abbreviations || objectContents.abbreviations) {
+      if (!this.abbreviations || !objectContents.abbreviations || this.abbreviations.length !== objectContents.abbreviations.length) {
+        return false;
+      }
+      for (let i = 0; i < this.abbreviations.length; i++) {
+        let leftItem = this.abbreviations[i];
+        let rightItem = objectContents.abbreviations[i];
+        if (leftItem || rightItem) {
+          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
+            return false;
+          }
+        }
+      }
+    }
     if (this.definitionNotation || objectContents.definitionNotation) {
       if (!this.definitionNotation || !objectContents.definitionNotation || !this.definitionNotation.isEquivalentTo(objectContents.definitionNotation, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
-export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
-  parameter: Fmt.Parameter;
-  notation?: Fmt.Expression;
-  singularName?: Fmt.Expression;
-  pluralName?: Fmt.Expression;
-  nameOptional?: Fmt.Expression;
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    let parameterRaw = argumentList.getValue('parameter', 0);
-    if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
-      this.parameter = parameterRaw.parameters[0];
-    } else {
-      throw new Error('parameter: Parameter expression with single parameter expected');
-    }
-    this.notation = argumentList.getOptionalValue('notation', 1);
-    this.singularName = argumentList.getOptionalValue('singularName', 2);
-    this.pluralName = argumentList.getOptionalValue('pluralName', 3);
-    this.nameOptional = argumentList.getOptionalValue('nameOptional', 4);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    argumentList.length = 0;
-    let parameterExpr = new Fmt.ParameterExpression;
-    parameterExpr.parameters.push(this.parameter);
-    argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
-    if (this.notation !== undefined) {
-      argumentList.add(this.notation, 'notation', true);
-    }
-    if (this.singularName !== undefined) {
-      argumentList.add(this.singularName, 'singularName', true);
-    }
-    if (this.pluralName !== undefined) {
-      argumentList.add(this.pluralName, 'pluralName', true);
-    }
-    if (this.nameOptional !== undefined) {
-      argumentList.add(this.nameOptional, 'nameOptional', true);
-    }
-  }
-
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
-    let result = new ObjectContents_DefinitionNotation;
-    this.substituteExpression(undefined, result, replacedParameters);
-    return result;
-  }
-
-  traverse(fn: Fmt.ExpressionTraversalFn): void {
-    if (this.parameter) {
-      this.parameter.traverse(fn);
-    }
-    if (this.notation) {
-      this.notation.traverse(fn);
-    }
-    if (this.singularName) {
-      this.singularName.traverse(fn);
-    }
-    if (this.pluralName) {
-      this.pluralName.traverse(fn);
-    }
-    if (this.nameOptional) {
-      this.nameOptional.traverse(fn);
-    }
-  }
-
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionNotation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
-    if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
-      if (result.parameter !== this.parameter) {
-        changed = true;
-      }
-    }
-    if (this.notation) {
-      result.notation = this.notation.substitute(fn, replacedParameters);
-      if (result.notation !== this.notation) {
-        changed = true;
-      }
-    }
-    if (this.singularName) {
-      result.singularName = this.singularName.substitute(fn, replacedParameters);
-      if (result.singularName !== this.singularName) {
-        changed = true;
-      }
-    }
-    if (this.pluralName) {
-      result.pluralName = this.pluralName.substitute(fn, replacedParameters);
-      if (result.pluralName !== this.pluralName) {
-        changed = true;
-      }
-    }
-    if (this.nameOptional) {
-      result.nameOptional = this.nameOptional.substitute(fn, replacedParameters);
-      if (result.nameOptional !== this.nameOptional) {
-        changed = true;
-      }
-    }
-    return changed;
-  }
-
-  isEquivalentTo(objectContents: ObjectContents_DefinitionNotation, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    if (this === objectContents && !replacedParameters.length) {
-      return true;
-    }
-    if (this.parameter || objectContents.parameter) {
-      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.singularName || objectContents.singularName) {
-      if (!this.singularName || !objectContents.singularName || !this.singularName.isEquivalentTo(objectContents.singularName, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.pluralName || objectContents.pluralName) {
-      if (!this.pluralName || !objectContents.pluralName || !this.pluralName.isEquivalentTo(objectContents.pluralName, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    if (this.nameOptional || objectContents.nameOptional) {
-      if (!this.nameOptional || !objectContents.nameOptional || !this.nameOptional.isEquivalentTo(objectContents.nameOptional, fn, replacedParameters)) {
         return false;
       }
     }
@@ -249,7 +153,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let embeddingRaw = argumentList.getOptionalValue('embedding', 3);
+    let embeddingRaw = argumentList.getOptionalValue('embedding', 4);
     if (embeddingRaw !== undefined) {
       if (embeddingRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Embedding;
@@ -470,7 +374,7 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 3);
+    let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 4);
     if (equalityDefinitionRaw !== undefined) {
       if (equalityDefinitionRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_EqualityDefinition;
@@ -480,7 +384,7 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
         throw new Error('equalityDefinition: Compound expression expected');
       }
     }
-    let rewriteRaw = argumentList.getOptionalValue('rewrite', 4);
+    let rewriteRaw = argumentList.getOptionalValue('rewrite', 5);
     if (rewriteRaw !== undefined) {
       if (rewriteRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_RewriteDefinition;
@@ -950,13 +854,13 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let definitionRaw = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 4);
     if (definitionRaw instanceof Fmt.ArrayExpression) {
       this.definition = definitionRaw.items;
     } else {
       throw new Error('definition: Array expression expected');
     }
-    let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 4);
+    let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 5);
     if (equalityProofsRaw !== undefined) {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
@@ -973,8 +877,8 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
         throw new Error('equalityProofs: Array expression expected');
       }
     }
-    this.setRestriction = argumentList.getOptionalValue('setRestriction', 5);
-    let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 6);
+    this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
+    let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
       if (setRestrictionProofRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Proof;
@@ -1193,13 +1097,13 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let definitionRaw = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 4);
     if (definitionRaw instanceof Fmt.ArrayExpression) {
       this.definition = definitionRaw.items;
     } else {
       throw new Error('definition: Array expression expected');
     }
-    let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 4);
+    let equalityProofsRaw = argumentList.getOptionalValue('equalityProofs', 5);
     if (equalityProofsRaw !== undefined) {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
@@ -1216,8 +1120,8 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
         throw new Error('equalityProofs: Array expression expected');
       }
     }
-    this.setRestriction = argumentList.getOptionalValue('setRestriction', 5);
-    let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 6);
+    this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
+    let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
       if (setRestrictionProofRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Proof;
@@ -1405,19 +1309,19 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let parameterRaw = argumentList.getValue('parameter', 3);
+    let parameterRaw = argumentList.getValue('parameter', 4);
     if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
       this.parameter = parameterRaw.parameters[0];
     } else {
       throw new Error('parameter: Parameter expression with single parameter expected');
     }
-    let definitionRaw = argumentList.getValue('definition', 4);
+    let definitionRaw = argumentList.getValue('definition', 5);
     if (definitionRaw instanceof Fmt.ArrayExpression) {
       this.definition = definitionRaw.items;
     } else {
       throw new Error('definition: Array expression expected');
     }
-    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 5);
+    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 6);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
@@ -1434,7 +1338,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
         throw new Error('equivalenceProofs: Array expression expected');
       }
     }
-    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 6);
+    let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 7);
     if (wellDefinednessProofRaw !== undefined) {
       if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
         let newItem = new ObjectContents_Proof;
@@ -1620,7 +1524,7 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let variablesRaw = argumentList.getOptionalValue('variables', 3);
+    let variablesRaw = argumentList.getOptionalValue('variables', 4);
     if (variablesRaw !== undefined) {
       if (variablesRaw instanceof Fmt.ParameterExpression) {
         this.variables = variablesRaw.parameters;
@@ -1628,7 +1532,7 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
         throw new Error('variables: Parameter expression expected');
       }
     }
-    let referencesRaw = argumentList.getOptionalValue('references', 4);
+    let referencesRaw = argumentList.getOptionalValue('references', 5);
     if (referencesRaw !== undefined) {
       if (referencesRaw instanceof Fmt.CompoundExpression) {
         this.references = referencesRaw.arguments;
@@ -1740,13 +1644,13 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
-    let definitionRaw = argumentList.getValue('definition', 3);
+    let definitionRaw = argumentList.getValue('definition', 4);
     if (definitionRaw instanceof Fmt.ArrayExpression) {
       this.definition = definitionRaw.items;
     } else {
       throw new Error('definition: Array expression expected');
     }
-    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 4);
+    let equivalenceProofsRaw = argumentList.getOptionalValue('equivalenceProofs', 5);
     if (equivalenceProofsRaw !== undefined) {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
@@ -2302,90 +2206,6 @@ export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
 
   protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_Nat)) {
-      return false;
-    }
-    return true;
-  }
-}
-
-export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'Expr';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_Expr;
-    }
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_Expr)) {
-      return false;
-    }
-    return true;
-  }
-}
-
-export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'ParameterList';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_ParameterList;
-    }
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_ParameterList)) {
-      return false;
-    }
-    return true;
-  }
-}
-
-export class MetaRefExpression_DefinitionRef extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'DefinitionRef';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_DefinitionRef;
-    }
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_DefinitionRef)) {
       return false;
     }
     return true;
@@ -6326,7 +6146,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Expr': MetaRefExpression_Expr, 'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'ParameterList': MetaRefExpression_ParameterList, 'DefinitionRef': MetaRefExpression_DefinitionRef, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Meta.MetaModel {
@@ -6388,10 +6208,15 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 3)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 4)) {
             context = new ArgumentTypeContext(ObjectContents_Embedding, context);
           }
         }
@@ -6400,10 +6225,15 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 3)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 4)) {
             for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
               if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_Construction) {
                 break;
@@ -6414,7 +6244,7 @@ export class MetaModel extends Meta.MetaModel {
             }
             context = new ArgumentTypeContext(ObjectContents_EqualityDefinition, context);
           }
-          if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 5)) {
             context = new ArgumentTypeContext(ObjectContents_RewriteDefinition, context);
           }
         }
@@ -6423,13 +6253,18 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 5)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
-          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 6)) {
+          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 7)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
         }
@@ -6438,13 +6273,18 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'equalityProofs' || (argument.name === undefined && argumentIndex === 5)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
-          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 6)) {
+          if (argument.name === 'setRestrictionProof' || (argument.name === undefined && argumentIndex === 7)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
         }
@@ -6453,23 +6293,28 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 5)) {
             let parameterValue = previousArguments.getOptionalValue('parameter', 0);
             if (parameterValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(parameterValue.parameters, context);
             }
           }
-          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 5)) {
+          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 6)) {
             let parameterValue = previousArguments.getOptionalValue('parameter', 0);
             if (parameterValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(parameterValue.parameters, context);
             }
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
-          if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 6)) {
+          if (argument.name === 'wellDefinednessProof' || (argument.name === undefined && argumentIndex === 7)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
         }
@@ -6478,10 +6323,15 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'references' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'references' || (argument.name === undefined && argumentIndex === 5)) {
             let variablesValue = previousArguments.getOptionalValue('variables', 0);
             if (variablesValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(variablesValue.parameters, context);
@@ -6493,10 +6343,15 @@ export class MetaModel extends Meta.MetaModel {
             context = new Ctx.DerivedContext(context);
             context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 2)) {
-            context = new ArgumentTypeContext(ObjectContents_DefinitionNotation, context);
+          if (argument.name === 'abbreviations' || (argument.name === undefined && argumentIndex === 2)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
           }
-          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 4)) {
+          if (argument.name === 'definitionNotation' || (argument.name === undefined && argumentIndex === 3)) {
+            context = new Ctx.DerivedContext(context);
+            context.metaModel = FmtNotation.metaModel;
+          }
+          if (argument.name === 'equivalenceProofs' || (argument.name === undefined && argumentIndex === 5)) {
             context = new ArgumentTypeContext(ObjectContents_Proof, context);
           }
         }
@@ -6515,28 +6370,6 @@ export class MetaModel extends Meta.MetaModel {
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {
-          if (currentContext.objectContentsClass === ObjectContents_DefinitionNotation) {
-            if (argument.name === 'notation' || (argument.name === undefined && argumentIndex === 1)) {
-              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
-              if (parameterValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(parameterValue.parameters, context);
-              }
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtNotation.metaModel;
-            }
-            if (argument.name === 'singularName' || (argument.name === undefined && argumentIndex === 2)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtNotation.metaModel;
-            }
-            if (argument.name === 'pluralName' || (argument.name === undefined && argumentIndex === 3)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtNotation.metaModel;
-            }
-            if (argument.name === 'nameOptional' || (argument.name === undefined && argumentIndex === 4)) {
-              context = new Ctx.DerivedContext(context);
-              context.metaModel = FmtNotation.metaModel;
-            }
-          }
           if (currentContext.objectContentsClass === ObjectContents_Embedding) {
             if (argument.name === 'target' || (argument.name === undefined && argumentIndex === 1)) {
               let parameterValue = previousArguments.getOptionalValue('parameter', 0);

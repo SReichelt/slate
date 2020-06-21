@@ -129,13 +129,11 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   private getArgumentTypeContext(type: Fmt.Type, parentContext: Ctx.Context): Ctx.Context {
     if (type.expression instanceof Fmt.DefinitionRefExpression) {
-      let context = new ArgumentTypeContext(type.expression.path.name, parentContext);
-      let parentPath = type.expression.path.parentPath;
-      if (parentPath instanceof Fmt.NamedPathItem) {
-        let metaModelPath = new Fmt.Path;
-        metaModelPath.parentPath = parentPath.parentPath;
-        metaModelPath.name = parentPath.name;
-        context.metaModel = this.getReferencedMetaModel(metaModelPath);
+      let path = type.expression.path;
+      let context = new ArgumentTypeContext(path.name, parentContext);
+      let metaModel = this.getReferencedMetaModelFromPath(path);
+      if (metaModel) {
+        context.metaModel = metaModel;
       }
       return context;
     }
@@ -173,9 +171,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
     let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
-    if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
-      let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
-      let parentExports = this.getMemberArgumentExports(argumentList, parentMetaDefinition, member, context);
+    if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
+      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      let parentExports = parentMetaModel.getMemberArgumentExports(argumentList, parentMetaDefinition, member, context);
       context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
@@ -201,9 +199,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
       return context;
     } else if (expression instanceof Fmt.ParameterExpression) {
       return this.getParameterListContext(expression.parameters, parentContext);
-    } else if (expression instanceof Fmt.CompoundExpression && metaType instanceof Fmt.DefinitionRefExpression && !metaType.path.parentPath) {
-      let metaDefinition = this.definitions.getDefinition(metaType.path.name);
-      return this.getTypeExports(expression.arguments, metaDefinition, parentContext).result;
+    } else if (expression instanceof Fmt.CompoundExpression && metaType instanceof Fmt.DefinitionRefExpression) {
+      let [metaModel, metaDefinition] = this.getMetaDefinition(metaType.path);
+      return metaModel.getTypeExports(expression.arguments, metaDefinition, parentContext).result;
     } else {
       return parentContext;
     }
@@ -213,9 +211,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
     let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
-    if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
-      let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
-      let parentExports = this.getTypeExports(argumentList, parentMetaDefinition, context);
+    if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
+      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      let parentExports = parentMetaModel.getTypeExports(argumentList, parentMetaDefinition, context);
       context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
@@ -243,9 +241,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
       if (metaDefinition.contents.members) {
         return true;
       }
-      if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression && !metaDefinition.contents.superType.path.parentPath) {
-        let parentMetaDefinition = this.definitions.getDefinition(metaDefinition.contents.superType.path.name);
-        return this.hasObjectContents(parentMetaDefinition);
+      if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression) {
+        let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaDefinition.contents.superType.path);
+        return parentMetaModel.hasObjectContents(parentMetaDefinition);
       }
     }
     return false;
@@ -255,9 +253,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let result: Fmt.Parameter | undefined = undefined;
     let parentMemberCount = 0;
-    if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
-      let parentMetaDefinition = this.definitions.getDefinition(metaContents.superType.path.name);
-      let parentMember = this.findMember(parentMetaDefinition, name, index);
+    if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
+      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      let parentMember = parentMetaModel.findMember(parentMetaDefinition, name, index);
       result = parentMember.result;
       parentMemberCount = parentMember.memberCount;
     }
@@ -282,7 +280,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
         throw new Error('Array expression expected');
       }
       for (let item of value.items) {
-        this.checkValueImpl(type, arrayDimensions - 1, item);
+        this.checkValueImpl(type, arrayDimensions - 1, item, onObjectContentsCreated, onMemberFound);
       }
     } else if (type instanceof Fmt.MetaRefExpression) {
       if (type instanceof FmtMeta.MetaRefExpression_Int) {
@@ -309,13 +307,13 @@ export class DynamicMetaModel extends Meta.MetaModel {
           throw new Error('Compound expression expected');
         }
       }
-    } else if (type instanceof Fmt.DefinitionRefExpression && !type.path.parentPath) {
-      let metaDefinition = this.definitions.getDefinition(type.path.name);
-      if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(metaDefinition)) {
+    } else if (type instanceof Fmt.DefinitionRefExpression) {
+      let [metaModel, metaDefinition] = this.getMetaDefinition(type.path);
+      if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition)) {
         if (!(value instanceof Fmt.CompoundExpression)) {
           throw new Error('Compound expression expected');
         }
-        let objectContents = new DynamicObjectContents(this, metaDefinition, false, onMemberFound);
+        let objectContents = new DynamicObjectContents(metaModel, metaDefinition, false, onMemberFound);
         onObjectContentsCreated?.(value, objectContents);
         objectContents.fromCompoundExpression(value);
       }
@@ -324,6 +322,35 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   checkValue(type: Fmt.Type, value: Fmt.Expression, onObjectContentsCreated?: ObjectContentsCallbackFn, onMemberFound?: MemberCallbackFn): void {
     this.checkValueImpl(type.expression, type.arrayDimensions, value, onObjectContentsCreated ?? this.onObjectContentsCreated, onMemberFound);
+  }
+
+  private getReferencedMetaModelFromPath(path: Fmt.Path): Meta.MetaModel | undefined {
+    let parentPath = path.parentPath;
+    if (parentPath instanceof Fmt.NamedPathItem) {
+      let metaModelPath = new Fmt.Path;
+      metaModelPath.parentPath = parentPath.parentPath;
+      metaModelPath.name = parentPath.name;
+      return this.getReferencedMetaModel(metaModelPath);
+    } else {
+      return undefined;
+    }
+  }
+
+  getMetaDefinition(path: Fmt.Path): [DynamicMetaModel, Fmt.Definition] {
+    if (path.parentPath) {
+      let metaModel = this.getReferencedMetaModelFromPath(path);
+      if (metaModel instanceof DynamicMetaModel) {
+        return metaModel.getNamedMetaDefinition(path.name);
+      } else {
+        throw new Error('Path does not reference a meta model');
+      }
+    } else {
+      return this.getNamedMetaDefinition(path.name);
+    }
+  }
+
+  private getNamedMetaDefinition(name: string): [DynamicMetaModel, Fmt.Definition] {
+    return [this, this.definitions.getDefinition(name)];
   }
 }
 
@@ -448,7 +475,7 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.originalArguments = argumentList;
-    this.checkMembers(argumentList, this.metaDefinition);
+    this.checkMembers(argumentList, this.metaModel, this.metaDefinition);
     let foundMembers = new Set<Fmt.Parameter>();
     let argIndex = 0;
     for (let arg of argumentList) {
@@ -470,14 +497,14 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
     }
   }
 
-  private checkMembers(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
+  private checkMembers(argumentList: Fmt.ArgumentList, metaModel: DynamicMetaModel, metaDefinition: Fmt.Definition): {memberCount: number, hadOptionalMembers: boolean} {
     let memberIndex = 0;
     let hadOptionalMembers = this.isDefinition;
     if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
       let superType = metaDefinition.contents.superType;
-      if (superType instanceof Fmt.DefinitionRefExpression && !superType.path.parentPath) {
-        let superTypeMetaDefinition = this.metaModel.definitions.getDefinition(superType.path.name);
-        let superTypeResult = this.checkMembers(argumentList, superTypeMetaDefinition);
+      if (superType instanceof Fmt.DefinitionRefExpression) {
+        let [superTypeMetaModel, superTypeMetaDefinition] = metaModel.getMetaDefinition(superType.path);
+        let superTypeResult = this.checkMembers(argumentList, superTypeMetaModel, superTypeMetaDefinition);
         memberIndex = superTypeResult.memberCount;
         hadOptionalMembers = superTypeResult.hadOptionalMembers;
       }
@@ -495,7 +522,7 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
             }
           }
           if (value) {
-            this.metaModel.checkValue(member.type, value);
+            metaModel.checkValue(member.type, value);
             this.onMemberFound?.(member, value);
             this.arguments.add(value, memberName);
           }

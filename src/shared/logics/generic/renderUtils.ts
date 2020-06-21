@@ -1,6 +1,9 @@
 import * as Fmt from '../../format/format';
 import * as FmtNotation from '../../notation/meta';
+import * as Notation from '../../notation/notation';
 import { GenericUtils } from './utils';
+import CachedPromise from '../../data/cachedPromise';
+import { RenderedTemplateArguments } from './renderer';
 
 export interface PropertyInfo {
   property?: string;
@@ -12,11 +15,20 @@ export interface PropertyInfo {
   extracted: boolean;
 }
 
+export class AbbreviationParamExpression extends Notation.RenderedExpression {
+  constructor(public abbreviationParam: Fmt.Parameter) {
+    super();
+  }
+}
+
 export abstract class GenericRenderUtils {
   constructor(protected definition: Fmt.Definition, protected utils: GenericUtils, protected templates: Fmt.File) {}
 
+  protected abstract getNotation(definition: Fmt.Definition): Fmt.Expression | undefined;
+  protected abstract getConstraint(param: Fmt.Parameter): [Fmt.Expression | undefined, number];
+
   getNotationAlternatives(definition: Fmt.Definition): (Fmt.Expression | undefined)[] {
-    let notation = this.getDefinitionNotation(definition);
+    let notation = this.getNotation(definition);
     return this.getSelections(notation);
   }
 
@@ -154,7 +166,7 @@ export abstract class GenericRenderUtils {
   }
 
   getConstraintProperty(param: Fmt.Parameter, constraint: Fmt.DefinitionRefExpression, negationCount: number, definition: Fmt.Definition): PropertyInfo | undefined {
-    let notation = this.getDefinitionNotation(definition);
+    let notation = this.getNotation(definition);
     if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
       let template = this.templates.definitions.getDefinition(notation.path.name);
       if (template.contents instanceof FmtNotation.ObjectContents_Template) {
@@ -200,6 +212,68 @@ export abstract class GenericRenderUtils {
     return undefined;
   }
 
-  protected abstract getDefinitionNotation(definition: Fmt.Definition): Fmt.Expression | undefined;
-  protected abstract getConstraint(param: Fmt.Parameter): [Fmt.Expression | undefined, number];
+  matchParameterizedNotation(expression: Notation.ExpressionValue, notation: Notation.ExpressionValue, abbreviationArgs: RenderedTemplateArguments): CachedPromise<boolean> {
+    if (expression === notation) {
+      return CachedPromise.resolve(true);
+    }
+    if (notation instanceof Array) {
+      if (expression instanceof Array && expression.length === notation.length) {
+        let result = CachedPromise.resolve(true);
+        for (let index = 0; index < expression.length; index++) {
+          let expressionItem = expression[index];
+          let notationItem = notation[index];
+          result = result.then((currentResult: boolean) =>
+            currentResult && this.matchParameterizedNotation(expressionItem, notationItem, abbreviationArgs));
+        }
+        return result;
+      }
+    } else if (notation instanceof AbbreviationParamExpression) {
+      let paramName = notation.abbreviationParam.name;
+      if (abbreviationArgs[paramName] === notation) {
+        abbreviationArgs[paramName] = expression;
+        return CachedPromise.resolve(true);
+      } else {
+        return this.matchParameterizedNotation(expression, abbreviationArgs[paramName], abbreviationArgs);
+      }
+    } else if (notation instanceof Notation.TemplateInstanceExpression) {
+      if (expression instanceof Notation.TemplateInstanceExpression && expression.template === notation.template) {
+        let result = CachedPromise.resolve(true);
+        for (let param of expression.template.parameters) {
+          let expressionArg = expression.config.getArgFn(param.name);
+          let notationArg = notation.config.getArgFn(param.name);
+          if (notationArg !== undefined) {
+            if (expressionArg === undefined) {
+              return CachedPromise.resolve(false);
+            }
+            result = result.then((currentResult: boolean) =>
+              currentResult && this.matchParameterizedNotation(expressionArg, notationArg, abbreviationArgs));
+          }
+        }
+        return result;
+      } else if (expression instanceof Notation.IndirectExpression) {
+        return this.matchParameterizedNotation(expression.resolve(), notation, abbreviationArgs);
+      } else if (expression instanceof Notation.PromiseExpression) {
+        return expression.promise.then((innerExpression: Notation.RenderedExpression) =>
+          this.matchParameterizedNotation(innerExpression, notation, abbreviationArgs));
+      }
+    } else if (notation instanceof Notation.UserDefinedExpression) {
+      return this.matchParameterizedNotation(expression, notation.resolve(), abbreviationArgs);
+    } else if (notation instanceof Notation.PromiseExpression) {
+      return notation.promise.then((innerNotation: Notation.RenderedExpression) =>
+        this.matchParameterizedNotation(expression, innerNotation, abbreviationArgs));
+    } else if (notation instanceof Notation.RenderedExpression && notation.semanticLinks) {
+      if (expression instanceof Notation.RenderedExpression && expression.semanticLinks) {
+        for (let semanticLink of notation.semanticLinks) {
+          if (semanticLink.linkedObject instanceof Fmt.Parameter) {
+            for (let expressionSemanticLink of expression.semanticLinks) {
+              if (expressionSemanticLink.linkedObject === semanticLink.linkedObject) {
+                return CachedPromise.resolve(true);
+              }
+            }
+          }
+        }
+      }
+    }
+    return CachedPromise.resolve(false);
+  }
 }

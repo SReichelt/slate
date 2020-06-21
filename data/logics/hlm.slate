@@ -2,7 +2,7 @@
 
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
-  expressionTypes = [$Expr, $Bool, $Nat, $ParameterList, $DefinitionRef,
+  expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binding,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
@@ -21,17 +21,8 @@ $Definition: %DefinitionType {
   members = #(
     properties: %ArgumentList = {},
     notation?: $../notation/notation/Expr,
-    definitionNotation?: $DefinitionNotation
-  )
-}
-
-$DefinitionNotation: %ExpressionType {
-  members = #(
-    parameter: %SingleParameter($Expr),
-    notation[parameter]?: $../notation/notation/Expr,
-    singularName?: $../notation/notation/Expr,
-    pluralName?: $../notation/notation/Expr,
-    nameOptional: $../notation/notation/Bool = $../notation/notation/false
+    abbreviations: $../notation/notation/NotationAbbreviation[] = [],
+    definitionNotation?: $../notation/notation/DefinitionNotation
   )
 }
 
@@ -161,11 +152,6 @@ $true: $Bool {}
 $false: $Bool {}
 
 $Nat: %ExpressionType {}
-
-$Expr: %ExpressionType {}
-
-$ParameterList: %ExpressionType {}
-$DefinitionRef: %ExpressionType {}
 
 /* Parameter types */
 

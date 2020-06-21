@@ -242,7 +242,7 @@ export class HLMUtils extends GenericUtils {
     let previousParameters: Fmt.Parameter[] = [];
     for (let param of parameters) {
       let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Expr || type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat || type instanceof FmtHLM.MetaRefExpression_DefinitionRef) {
+      if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
         let argValue = this.getRawArgument([args], param);
         if (argValue) {
           expression = this.substituteVariable(expression, param, () => argValue!);
@@ -1333,8 +1333,9 @@ export class HLMUtils extends GenericUtils {
 
   private createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
     if (param.type.arrayDimensions) {
-      // TODO
-      return undefined;
+      let result = new Fmt.ArrayExpression;
+      result.items = [];
+      return result;
     }
     let contents = this.createArgumentContents(param, createPlaceholder, createElementParameter);
     if (contents) {
