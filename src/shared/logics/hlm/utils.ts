@@ -206,16 +206,6 @@ export class HLMUtils extends GenericUtils {
     return resultPromise;
   }
 
-  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
-    return expression.substitute((subExpression: Fmt.Expression) => {
-      if (subExpression === originalExpression) {
-        return substitutedExpression;
-      } else {
-        return subExpression;
-      }
-    });
-  }
-
   substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
     for (let paramIndex = 0; paramIndex < originalParameters.length && paramIndex < substitutedParameters.length; paramIndex++) {
       expression = this.substituteParameter(expression, originalParameters[paramIndex], substitutedParameters[paramIndex], markAsDefinition);
@@ -393,6 +383,12 @@ export class HLMUtils extends GenericUtils {
       }
     }
     return undefined;
+  }
+
+  getMacroInvocation(expression: Fmt.DefinitionRefExpression, definition: Fmt.Definition): HLMMacro.HLMMacroInvocation {
+    let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(expression.path.parentPath);
+    let macroInstance = HLMMacros.instantiateMacro(libraryDataAccessor, definition);
+    return macroInstance.invoke(this, expression);
   }
 
   getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression | undefined {
@@ -913,27 +909,25 @@ export class HLMUtils extends GenericUtils {
             }
           }
           visitedDefinitions.push(term);
-          let path = term.path;
+          let definitionRefExpression = term;
           return this.getOuterDefinition(term).then((definition: Fmt.Definition) => {
             if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
               if (definition.contents.definition.length) {
                 let item = definition.contents.definition[0];
-                return this.getFinalSetWithPath(item, path, definition);
+                return this.getFinalSetWithPath(item, definitionRefExpression.path, definition);
               } else {
                 return this.getWildcardFinalSet();
               }
             } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
               let type = definition.contents.parameter.type.expression;
               if (type instanceof FmtHLM.MetaRefExpression_Element) {
-                return this.followSetTermWithPath(type._set, path, definition);
+                return this.followSetTermWithPath(type._set, definitionRefExpression.path, definition);
               } else {
                 return CachedPromise.reject(new Error('Element parameter expected'));
               }
             } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
-              let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(path.parentPath);
-              return HLMMacros.instantiateMacro(libraryDataAccessor, definition)
-                .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.invoke(this, path))
-                .then((macroInvocation: HLMMacro.HLMMacroInvocation) => macroInvocation.getDeclaredSet());
+              let macroInvocation = this.getMacroInvocation(definitionRefExpression, definition);
+              return macroInvocation.getDeclaredSet();
             } else {
               return CachedPromise.reject(new Error('Referenced definition must be a constructor or operator'));
             }
@@ -1331,12 +1325,17 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  private createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
+  createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
     if (param.type.arrayDimensions) {
       let result = new Fmt.ArrayExpression;
+      // TODO add items if they are required for type correctness
       result.items = [];
       return result;
     }
+    return this.createArgumentItemValue(param, createPlaceholder, createElementParameter);
+  }
+
+  createArgumentItemValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
     let contents = this.createArgumentContents(param, createPlaceholder, createElementParameter);
     if (contents) {
       let argValue = new Fmt.CompoundExpression;

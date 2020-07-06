@@ -58,14 +58,12 @@ export class GenericUtils {
     this.analyzeDefinitionRefPath(childPaths, outerDefinition, definitions, argumentLists);
   }
 
+  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
+    return FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
+  }
+
   substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (indices?: Fmt.Expression[]) => Fmt.Expression): Fmt.Expression {
-    return expression.substitute((subExpression: Fmt.Expression) => {
-      if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {
-        return substitution(subExpression.indices);
-      } else {
-        return subExpression;
-      }
-    });
+    return FmtUtils.substituteVariable(expression, variable, substitution);
   }
 
   substituteTargetPath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {

@@ -526,16 +526,20 @@ export class HLMDefinitionChecker {
   }
 
   private checkMacroOperator(contents: FmtHLM.ObjectContents_MacroOperator): void {
-    let checkMacro = HLMMacros.instantiateMacro(this.libraryDataAccessor, this.definition)
-      .then((macroInstance: HLMMacro.HLMMacroInstance) => macroInstance.check())
-      .then((diagnostics: Logic.LogicCheckDiagnostic[]) => {
-        this.result.diagnostics.push(...diagnostics);
-        if (diagnostics.some((diagnostic: Logic.LogicCheckDiagnostic) => diagnostic.severity === Logic.DiagnosticSeverity.Error)) {
-          this.result.hasErrors = true;
-        }
-      })
-      .catch((error) => this.error(this.definition, error.message));
-    this.addPendingCheck(checkMacro);
+    try {
+      let macroInstance = HLMMacros.instantiateMacro(this.libraryDataAccessor, this.definition);
+      let checkMacro = macroInstance.check()
+        .then((diagnostics: Logic.LogicCheckDiagnostic[]) => {
+          this.result.diagnostics.push(...diagnostics);
+          if (diagnostics.some((diagnostic: Logic.LogicCheckDiagnostic) => diagnostic.severity === Logic.DiagnosticSeverity.Error)) {
+            this.result.hasErrors = true;
+          }
+        })
+        .catch((error) => this.error(this.definition, error.message));
+      this.addPendingCheck(checkMacro);
+    } catch (error) {
+      this.error(this.definition, error.message);
+    }
   }
 
   private setCurrentRecheckFn(expression: Fmt.Expression, checkFn: (substitutedExpression: Fmt.Expression, recheckContext: HLMCheckerContext) => void, autoFillFn: AutoFillFn | undefined, context: HLMCheckerContext): HLMCheckerContext {

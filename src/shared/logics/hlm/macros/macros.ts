@@ -5,7 +5,6 @@ import { NumberMacro } from './number';
 import { TupleMacro } from './tuple';
 import { NumberTupleMacro } from './numberTuple';
 import { MatrixMacro } from './matrix';
-import CachedPromise from '../../../data/cachedPromise';
 
 export const macros: HLMMacro.HLMMacro[] = [
   new NumberMacro,
@@ -14,15 +13,11 @@ export const macros: HLMMacro.HLMMacro[] = [
   new MatrixMacro
 ];
 
-export function instantiateMacro(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): CachedPromise<HLMMacro.HLMMacroInstance> {
+export function instantiateMacro(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): HLMMacro.HLMMacroInstance {
   let macro = macros.find((value: HLMMacro.HLMMacro) => value.name === definition.name);
   if (macro) {
-    try {
-      return macro.instantiate(libraryDataAccessor, definition);
-    } catch (error) {
-      return CachedPromise.reject(error);
-    }
+    return macro.instantiate(libraryDataAccessor, definition);
   } else {
-    return CachedPromise.reject(new Error(`Macro "${definition.name}" not found`));
+    throw new Error(`Macro "${definition.name}" not found`);
   }
 }

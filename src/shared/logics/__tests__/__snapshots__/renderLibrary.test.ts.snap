@@ -3358,7 +3358,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.1.52.11 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
-"Theorem 1.7.1.52.11 (Fundametal theorem of arithmetic).  Let n ∈ ℕ_+. Then:
+"Theorem 1.7.1.52.11 (Fundamental theorem of arithmetic).  Let n ∈ ℕ_+. Then:
 
   ∃! 𝑷 ∈ 𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(ℙ) s.t. 𝑷 is finite : n = ∏_(p ∈ 𝑷) p
 

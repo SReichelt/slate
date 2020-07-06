@@ -3,6 +3,7 @@ import * as Ctx from '../../format/context';
 import * as Edit from '../../format/edit';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
+import * as HLMMacro from './macro';
 import * as Notation from '../../notation/notation';
 import * as Menu from '../../notation/menu';
 import * as Dialog from '../../notation/dialog';
@@ -956,36 +957,28 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   getElementTermInsertButton(parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): Notation.RenderedExpression {
+    let onAddMenu = (semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo) =>
+      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
+    return this.getExpressionInsertButton(parentExpression, onInsertTerm, onAddMenu);
+  }
+
+  private getExpressionInsertButton(parentExpression: Fmt.Expression, onInsertExpression: InsertExpressionFn, onAddMenu: (semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo) => void): Notation.RenderedExpression {
     let insertButton = new Notation.InsertPlaceholderExpression;
     let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
     if (parentExpressionEditInfo) {
       let expressionEditInfo: Edit.ExpressionEditInfo = {
         optional: false,
-        onSetValue: (newValue) => onInsertTerm(newValue!),
+        onSetValue: (newValue) => onInsertExpression(newValue!),
         context: parentExpressionEditInfo.context
       };
-      this.addElementTermMenuWithEditInfo(semanticLink, expressionEditInfo, onRenderTerm, termSelection);
+      onAddMenu(semanticLink, expressionEditInfo);
     }
     insertButton.semanticLinks = [semanticLink];
     return insertButton;
   }
 
-  addElementTermInsertButton(items: Notation.RenderedExpression[], parentExpression: Fmt.Expression, onInsertTerm: InsertExpressionFn, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
-    let insertButton = this.getElementTermInsertButton(parentExpression, onInsertTerm, onRenderTerm, termSelection);
-    if (items.length) {
-      let lastItemWithButton = [
-        items[items.length - 1],
-        new Notation.TextExpression(' '),
-        insertButton
-      ];
-      items[items.length - 1] = new Notation.RowExpression(lastItemWithButton);
-    } else {
-      items.push(insertButton);
-    }
-  }
-
-  addEnumerationInsertButton(items: Notation.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
+  addEnumerationInsertButton(renderedItems: Notation.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
     let onInsertTerm = (expression: Fmt.Expression) => {
       if (term.terms) {
         term.terms.push(expression);
@@ -993,7 +986,40 @@ export class HLMEditHandler extends GenericEditHandler {
         term.terms = [expression];
       }
     };
-    this.addElementTermInsertButton(items, term, onInsertTerm, onRenderTerm, termSelection);
+    let insertButton = this.getElementTermInsertButton(term, onInsertTerm, onRenderTerm, termSelection);
+    this.addItemInsertButton(renderedItems, insertButton);
+  }
+
+  private addItemInsertButton(renderedItems: Notation.RenderedExpression[], insertButton: Notation.RenderedExpression): void {
+    if (renderedItems.length) {
+      let lastItemWithButton = [
+        renderedItems[renderedItems.length - 1],
+        new Notation.TextExpression(' '),
+        insertButton
+      ];
+      renderedItems[renderedItems.length - 1] = new Notation.RowExpression(lastItemWithButton);
+    } else {
+      renderedItems.push(insertButton);
+    }
+  }
+
+  addArrayArgumentInsertButton(renderedItems: Notation.ExpressionValue[], param: Fmt.Parameter, macroInvocation: HLMMacro.HLMMacroInvocation, subExpression: Fmt.ArrayExpression, remainingArrayDimensions: number): void {
+    let arrayArgumentOperations = macroInvocation.getArrayArgumentOperations?.(subExpression);
+    let originalExpression = macroInvocation.expression;
+    let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
+    if (arrayArgumentOperations && expressionEditInfo) {
+      let context = expressionEditInfo.context;
+      let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
+      let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, context);
+      let onCreateItem = () => this.utils.createArgumentItemValue(param, createPlaceholder, createElementParameter);
+      let substitutedExpression = arrayArgumentOperations.insertItem(onCreateItem);
+      if (substitutedExpression) {
+        let onInsertItem = () => expressionEditInfo!.onSetValue(substitutedExpression);
+        let enabledPromise = this.checker.recheckWithSubstitution(originalExpression, substitutedExpression)
+          .then((checkResult: Logic.LogicCheckResultWithExpression) => !checkResult.hasErrors);
+        this.addListItemInsertButton(renderedItems, onInsertItem, remainingArrayDimensions, enabledPromise);
+      }
+    }
   }
 
   getPropertyInsertButton(parameterList: Fmt.ParameterList, objectParams: Fmt.Parameter[], onInsertParam: InsertParameterFn, onRenderFormulas: RenderExpressionsFn): Notation.RenderedExpression | undefined {

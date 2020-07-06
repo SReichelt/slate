@@ -76,15 +76,24 @@ export abstract class GenericEditHandler {
     return titleRow;
   }
 
-  protected getActionInsertButton(action: Menu.ExpressionMenuAction): Notation.RenderedExpression {
+  protected getActionInsertButton(action: Menu.ExpressionMenuAction | undefined): Notation.RenderedExpression {
     let insertButton = new Notation.InsertPlaceholderExpression;
     insertButton.action = action;
     return insertButton;
   }
 
-  getImmediateInsertButton(onInsert: () => void): Notation.RenderedExpression {
-    let action = new Menu.ImmediateExpressionMenuAction(onInsert);
+  getImmediateInsertButton(onInsert: () => void, enabled: boolean = true): Notation.RenderedExpression {
+    let action = enabled ? new Menu.ImmediateExpressionMenuAction(onInsert) : undefined;
     return this.getActionInsertButton(action);
+  }
+
+  protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], onInsertItem: () => void, remainingArrayDimensions: number, enabledPromise: CachedPromise<boolean>): void {
+    let insertButtonPromise = enabledPromise.then((enabled: boolean) => this.getImmediateInsertButton(onInsertItem, enabled));
+    let insertButton: Notation.ExpressionValue = new Notation.PromiseExpression(insertButtonPromise);
+    for (let i = 0; i < remainingArrayDimensions; i++) {
+      insertButton = [insertButton];
+    }
+    renderedItems.push(insertButton);
   }
 
   addNotationMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
