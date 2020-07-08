@@ -1698,7 +1698,8 @@ class TutorialStates {
                                                                                         toolTip: {
                                                                                           contents: <p>Click here to select the set of natural numbers.</p>,
                                                                                           position: 'right',
-                                                                                          index: 1
+                                                                                          index: 1,
+                                                                                          condition: (component, tutorialState) => (tutorialState.additionalStateData !== undefined)
                                                                                         }
                                                                                       }
                                                                                     ],
@@ -1895,7 +1896,8 @@ class TutorialStates {
                                                                                     </div>
                                                                                   ),
                                                                                   position: 'right',
-                                                                                  index: 1
+                                                                                  index: 1,
+                                                                                  condition: (component, tutorialState) => (tutorialState.additionalStateData !== undefined)
                                                                                 }
                                                                               }
                                                                             ],
@@ -2285,7 +2287,8 @@ class TutorialStates {
                                                                                     toolTip: {
                                                                                       contents: <p>Click here.<br/>In fact, the definition below would also work. View the tooltips to see the difference.</p>,
                                                                                       position: 'right',
-                                                                                      index: 1
+                                                                                      index: 1,
+                                                                                      condition: (component, tutorialState) => (tutorialState.additionalStateData !== undefined)
                                                                                     }
                                                                                   }
                                                                                 ],
