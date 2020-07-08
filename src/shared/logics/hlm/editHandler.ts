@@ -343,7 +343,7 @@ export class HLMEditHandler extends GenericEditHandler {
       let type = definition.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
           || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
-          || (type instanceof FmtHLM.MetaRefExpression_MacroOperator && !fromMRUList)
+          || type instanceof FmtHLM.MetaRefExpression_MacroOperator
           || (allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor && !(fromMRUList && definition.contents instanceof FmtHLM.ObjectContents_Constructor && definition.contents.rewrite))) {
         return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
       } else {
@@ -1008,11 +1008,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let originalExpression = macroInvocation.expression;
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
     if (arrayArgumentOperations && expressionEditInfo) {
-      let context = expressionEditInfo.context;
-      let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-      let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, context);
-      let onCreateItem = () => this.utils.createArgumentItemValue(param, createPlaceholder, createElementParameter);
-      let substitutedExpression = arrayArgumentOperations.insertItem(onCreateItem);
+      let substitutedExpression = arrayArgumentOperations.insertItem();
       if (substitutedExpression) {
         let onInsertItem = () => expressionEditInfo!.onSetValue(substitutedExpression);
         let enabledPromise = this.checker.recheckWithSubstitution(originalExpression, substitutedExpression)

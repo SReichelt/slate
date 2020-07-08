@@ -3,6 +3,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Ctx from '../../format/context';
 import { HLMExpressionType } from './hlm';
+import * as Macro from '../macro';
 import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';
 import { LibraryDefinition } from '../../data/libraryDataAccessor';
@@ -40,6 +41,35 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
 
 type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
 type CreateParameterFn = (defaultName: string) => Fmt.Parameter;
+
+class HLMMacroInvocationConfig extends Macro.DefaultMacroInvocationConfig {
+  constructor(protected utils: HLMUtils) {
+    super();
+  }
+
+  createArgumentExpression?(param: Fmt.Parameter): Fmt.Expression | undefined {
+    let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
+    let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName);
+    return this.utils.createArgumentItemValue(param, createPlaceholder, createElementParameter);
+  }
+}
+
+class HLMMacroInvocationConfigWithPlaceholders extends HLMMacroInvocationConfig {
+  getNumberExpression(value: number, onSetValue?: (newValue: number) => void): Fmt.Expression {
+    if (value || !onSetValue) {
+      return super.getNumberExpression(value);
+    } else {
+      let result = new Fmt.PlaceholderExpression(undefined);
+      result.isTemporary = true;
+      result.onFill = (expression: Fmt.Expression) => {
+        if (expression instanceof Fmt.IntegerExpression) {
+          onSetValue(expression.value.toNumber());
+        }
+      };
+      return result;
+    }
+  }
+}
 
 export class HLMUtils extends GenericUtils {
   getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
@@ -388,7 +418,8 @@ export class HLMUtils extends GenericUtils {
   getMacroInvocation(expression: Fmt.DefinitionRefExpression, definition: Fmt.Definition): HLMMacro.HLMMacroInvocation {
     let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(expression.path.parentPath);
     let macroInstance = HLMMacros.instantiateMacro(libraryDataAccessor, definition);
-    return macroInstance.invoke(this, expression);
+    let config = this.supportPlaceholders ? new HLMMacroInvocationConfigWithPlaceholders(this) : new HLMMacroInvocationConfig(this);
+    return macroInstance.invoke(this, expression, config);
   }
 
   getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression | undefined {
@@ -625,7 +656,11 @@ export class HLMUtils extends GenericUtils {
               if (this.referencesCaseParameter(structuralCase)) {
                 if (term.term instanceof Fmt.PlaceholderExpression && structuralCase.parameters) {
                   let args = Object.create(Fmt.ArgumentList.prototype);
-                  let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType, true);
+                  let createPlaceholder = (placeholderType: HLMExpressionType) => {
+                    let result = new Fmt.PlaceholderExpression(placeholderType);
+                    result.isTemporary = true;
+                    return result;
+                  };
                   let createElementParameter = (defaultName: string) => this.createElementParameter(defaultName);
                   this.fillPlaceholderArguments(structuralCase.parameters, args, createPlaceholder, createElementParameter);
                   return this.substituteArguments(structuralCase.value, structuralCase.parameters, args);
@@ -977,7 +1012,7 @@ export class HLMUtils extends GenericUtils {
 
   private getTargetUtils(path: Fmt.Path, definition: Fmt.Definition): HLMUtils {
     let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(path.parentPath);
-    return new HLMUtils(definition, libraryDataAccessor);
+    return new HLMUtils(definition, libraryDataAccessor, this.supportPlaceholders);
   }
 
   private followSetTermWithPath(term: Fmt.Expression, path: Fmt.Path, definition: Fmt.Definition): CachedPromise<Fmt.Expression> {
@@ -1328,7 +1363,6 @@ export class HLMUtils extends GenericUtils {
   createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
     if (param.type.arrayDimensions) {
       let result = new Fmt.ArrayExpression;
-      // TODO add items if they are required for type correctness
       result.items = [];
       return result;
     }

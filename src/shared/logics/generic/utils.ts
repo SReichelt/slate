@@ -6,7 +6,7 @@ import { LibraryDataAccessor, LibraryDefinition, LibraryItemInfo } from '../../d
 import CachedPromise from '../../data/cachedPromise';
 
 export class GenericUtils {
-  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected supportPlaceholders: boolean) {}
 
   getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
     if (path.parentPath instanceof Fmt.Path) {

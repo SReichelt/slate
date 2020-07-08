@@ -873,7 +873,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.PlaceholderExpression) {
       className += ' placeholder';
       if (expression instanceof Notation.InsertPlaceholderExpression) {
-        let enabled = expression.action !== undefined || !this.props.interactionHandler;
+        let enabled = (expression.action !== undefined || onMenuOpened !== undefined || this.props.interactionHandler === undefined);
         result = getButtonIcon(ButtonType.Insert, enabled);
       } else {
         result = getDefinitionIcon(expression.placeholderType);

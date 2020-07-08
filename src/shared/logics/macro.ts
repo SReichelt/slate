@@ -12,7 +12,20 @@ export interface Macro<T extends MacroInstance<MacroInvocation, GenericUtils>> {
 
 export interface MacroInstance<T extends MacroInvocation, Utils extends GenericUtils> {
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]>;
-  invoke(utils: Utils, expression: Fmt.DefinitionRefExpression): T;
+  invoke(utils: Utils, expression: Fmt.DefinitionRefExpression, config: MacroInvocationConfig): T;
+}
+
+export interface MacroInvocationConfig {
+  getNumberExpression(value: number, onSetValue?: (newValue: number) => void): Fmt.Expression;
+  createArgumentExpression?(param: Fmt.Parameter): Fmt.Expression | undefined;
+}
+
+export class DefaultMacroInvocationConfig implements MacroInvocationConfig {
+  getNumberExpression(value: number): Fmt.Expression {
+    let result = new Fmt.IntegerExpression;
+    result.value = new Fmt.BN(value);
+    return result;
+  }
 }
 
 export interface MacroInvocation {
@@ -22,15 +35,15 @@ export interface MacroInvocation {
 }
 
 export interface ArrayArgumentOperations {
-  insertItem(onCreateItem: () => Fmt.Expression | undefined): Fmt.DefinitionRefExpression | undefined;
+  insertItem(): Fmt.DefinitionRefExpression | undefined;
 }
 
 export class DefaultArrayArgumentOperations implements ArrayArgumentOperations {
-  constructor(private expression: Fmt.DefinitionRefExpression, private subExpression: Fmt.ArrayExpression) {}
+  constructor(private config: MacroInvocationConfig, private param: Fmt.Parameter, private expression: Fmt.DefinitionRefExpression, private subExpression: Fmt.ArrayExpression) {}
 
-  insertItem(onCreateItem: () => Fmt.Expression | undefined): Fmt.DefinitionRefExpression | undefined {
-    // TODO display placeholder menu if applicable, instead of inserting placeholder
-    let newItem = onCreateItem();
+  insertItem(): Fmt.DefinitionRefExpression | undefined {
+    // TODO (low priority) display placeholder menu if applicable, instead of inserting placeholder
+    let newItem = this.config.createArgumentExpression?.(this.param);
     if (newItem) {
       let newSubExpression = new Fmt.ArrayExpression;
       newSubExpression.items = this.subExpression.items.concat(newItem);

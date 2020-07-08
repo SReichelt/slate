@@ -704,7 +704,13 @@ class App extends React.Component<AppProps, AppState> {
 
   private docLinkClicked = (uri: string): void => {
     this.navigate({
-      selectedDocURI: uri
+      selectedDocURI: uri,
+      selectedItemAbsolutePath: undefined,
+      selectedItemProvider: undefined,
+      selectedItemLocalPath: undefined,
+      selectedItemDefinition: undefined,
+      selectedItemInfo: undefined,
+      interactionHandler: undefined
     });
   };
 

@@ -29,13 +29,13 @@ export class HLMDisplay implements Logic.LogicDisplay {
   }
 
   getDefinitionRenderer(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, templates: Fmt.File, options: Logic.LogicRendererOptions): HLMRenderer {
-    let utils = new HLMUtils(definition, libraryDataAccessor);
+    let utils = new HLMUtils(definition, libraryDataAccessor, false);
     let renderUtils = new HLMRenderUtils(definition, utils, templates);
     return new HLMRenderer(definition, libraryDataAccessor, utils, renderUtils, templates, options);
   }
 
   getDefinitionEditor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, templates: Fmt.File, options: Logic.LogicRendererOptions, editing: boolean, mruList: MRUList): HLMRenderer {
-    let utils = new HLMUtils(definition, libraryDataProvider);
+    let utils = new HLMUtils(definition, libraryDataProvider, editing);
     let renderUtils = new HLMRenderUtils(definition, utils, templates);
     let editHandler = editing ? new HLMEditHandler(definition, libraryDataProvider, utils, renderUtils, templates, mruList) : undefined;
     return new HLMRenderer(definition, libraryDataProvider, utils, renderUtils, templates, options, editHandler);

@@ -916,7 +916,10 @@ export class ArrayExpression extends Expression {
 }
 
 export class PlaceholderExpression extends Expression {
-  constructor(public placeholderType: any, public isTemporary: boolean = false) {
+  public isTemporary: boolean = false;
+  public onFill?: (expression: Expression) => void;
+
+  constructor(public placeholderType: any) {
     super();
   }
 

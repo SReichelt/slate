@@ -1,7 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
-import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
 import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters } from './utils';
@@ -12,7 +11,7 @@ const debugRecheck = true;
 
 export class HLMChecker implements Logic.LogicChecker {
   checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, supportPlaceholders: boolean): CachedPromise<Logic.LogicCheckResult> {
-    let utils = new HLMUtils(definition, libraryDataAccessor);
+    let utils = new HLMUtils(definition, libraryDataAccessor, supportPlaceholders);
     let definitionChecker = new HLMDefinitionChecker(definition, libraryDataAccessor, utils, supportPlaceholders, false);
     return definitionChecker.checkDefinition();
   }
@@ -37,6 +36,7 @@ interface HLMCheckerContext {
   editData?: HLMCheckerEditData;
   currentRecheckFn?: HLMCheckerRecheckFn;
   currentPlaceholderCollection?: HLMCheckerPlaceholderCollection;
+  rechecking: boolean;
 }
 
 interface HLMCheckerCompatibilityStatus {
@@ -90,7 +90,8 @@ export class HLMDefinitionChecker {
   private rootContext: HLMCheckerContext = {
     parentBindingParameters: [],
     parentStructuralCases: [],
-    inAutoArgument: false
+    inAutoArgument: false,
+    rechecking: false
   };
   private result: Logic.LogicCheckResult = {
     diagnostics: [],
@@ -209,26 +210,30 @@ export class HLMDefinitionChecker {
 
   private getRecheckResult(expression: Fmt.Expression, recheckContext: HLMCheckerContext | undefined): CachedPromise<Logic.LogicCheckResultWithExpression> {
     return this.getPendingChecksPromise().then((result: Logic.LogicCheckResult) => {
-      if (result.hasErrors) {
-        return {
-          ...result,
-          expression: expression
-        };
-      } else {
-        let resultExpression = expression.substitute((subExpression: Fmt.Expression) => {
-          if (subExpression instanceof Fmt.PlaceholderExpression && recheckContext) {
-            let restriction = recheckContext.editData!.restrictions.get(subExpression);
-            if (restriction && restriction.exactValue) {
-              return restriction.exactValue;
+      let resultExpression = expression;
+      if (!result.hasErrors) {
+        let restrictions = recheckContext?.editData?.restrictions;
+        if (restrictions) {
+          resultExpression = resultExpression.substitute((subExpression: Fmt.Expression) => {
+            if (subExpression instanceof Fmt.PlaceholderExpression) {
+              let restriction = restrictions?.get(subExpression);
+              if (restriction && restriction.exactValue) {
+                return restriction.exactValue;
+              }
+            }
+            return subExpression;
+          });
+          for (let [placeholder, restriction] of restrictions) {
+            if (placeholder.onFill && restriction.exactValue) {
+              placeholder.onFill(restriction.exactValue);
             }
           }
-          return subExpression;
-        });
-        return {
-          ...result,
-          expression: resultExpression
         };
       }
+      return {
+        ...result,
+        expression: resultExpression
+      };
     });
   }
 
@@ -543,7 +548,7 @@ export class HLMDefinitionChecker {
   }
 
   private setCurrentRecheckFn(expression: Fmt.Expression, checkFn: (substitutedExpression: Fmt.Expression, recheckContext: HLMCheckerContext) => void, autoFillFn: AutoFillFn | undefined, context: HLMCheckerContext): HLMCheckerContext {
-    if (context.editData) {
+    if (context.editData && !context.rechecking) {
       let newContext: HLMCheckerContext = {
         ...context,
         currentRecheckFn: (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => {
@@ -577,7 +582,9 @@ export class HLMDefinitionChecker {
       ...context,
       editData: {
         restrictions: restrictions
-      }
+      },
+      currentPlaceholderCollection: undefined,
+      rechecking: true
     };
     fn(recheckContext);
     let lastSetsToCheckLength = 0;
@@ -1260,7 +1267,7 @@ export class HLMDefinitionChecker {
     }
     if (context.currentPlaceholderCollection && !expression.isTemporary) {
       if (context.currentPlaceholderCollection.placeholders) {
-        context.currentPlaceholderCollection.placeholders.push(expression);
+        context.currentPlaceholderCollection.placeholders = [...context.currentPlaceholderCollection.placeholders, expression];
       } else {
         context.currentPlaceholderCollection.placeholders = [expression];
       }
@@ -1538,9 +1545,6 @@ export class HLMDefinitionChecker {
   }
 
   private addCompatibleTermRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, expression: Fmt.Expression | undefined): Fmt.Expression | undefined {
-    if (placeholder.placeholderType === undefined) {
-      return undefined;
-    }
     let currentRestrictions = state.newRestrictions || state.context.editData!.restrictions;
     let restriction = currentRestrictions.get(placeholder);
     if (restriction && restriction.exactValue) {

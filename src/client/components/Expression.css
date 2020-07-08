@@ -325,6 +325,7 @@ div.display-math {
 
 .paren-round-body, .paren-square-body, .paren-curly-body, .paren-angle-body {
   display: table-cell;
+  min-width: 1pt;
 }
 
 .paren-left-hairline {
