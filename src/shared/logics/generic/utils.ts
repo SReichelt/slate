@@ -105,7 +105,7 @@ export class GenericUtils {
   }
 
   createParameter(type: Fmt.Expression, defaultName: string, context?: Ctx.Context): Fmt.Parameter {
-    if (context) {
+    if (context && defaultName !== '_') {
       defaultName = this.getUnusedDefaultName(defaultName, context);
     }
     let parameter = new Fmt.Parameter;

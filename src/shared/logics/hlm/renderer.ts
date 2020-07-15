@@ -2277,9 +2277,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.addSemanticLink(equality, equalityDefinition);
           let definitions = equalityDefinition.definition;
           let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, fullFormulaSelection);
-          let parameters: Fmt.Parameter[] = [];
-          parameters.push(...equalityDefinition.leftParameters);
-          parameters.push(...equalityDefinition.rightParameters);
+          let parameters = [...equalityDefinition.leftParameters, ...equalityDefinition.rightParameters];
           let singleCase: ExtractedStructuralCase = {
             caseParameters: parameters,
             definitions: definitions

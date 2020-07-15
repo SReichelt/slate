@@ -231,7 +231,7 @@ $setAssociative(term: $SetTerm): $SetTerm {}
 
 $cases(cases: $Case($ElementTerm)[], totalityProof?: $Proof): $ElementTerm {}
 $structuralCases(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($ElementTerm)[]): $ElementTerm {}
-$asElementOf(term: $ElementTerm, set: $SetTerm, proof?: $Proof): $ElementTerm {}
+$asElementOf(term: $ElementTerm, set: $SetTerm, proof?: $Proof): $ElementTerm {}  // TODO replace with better alternative
 $associative(term: $ElementTerm): $ElementTerm {}
 
 $not(formula: $Formula): $Formula {}

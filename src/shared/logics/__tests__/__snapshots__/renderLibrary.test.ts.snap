@@ -93,7 +93,7 @@ exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`]
 
 Equivalence.
 
-1⇒2. Assume |S| ∈ ℕ. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
+1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
 
 |S| = |ℕ_(<|S|)|
 
@@ -730,6 +730,15 @@ exports[`render hlm library: 1.2.8 data/libraries/hlm/Essentials/Properties/rest
 "Definition 1.2.8.  Let S be a set, p be a property on S, T ⊆ S. We define:
 
   p∣_T := [t is p]_(t ∈ T)"
+`;
+
+exports[`render hlm library: 1.2.9 data/libraries/hlm/Essentials/Properties/Equality%20is%20extensional 1`] = `
+"Proposition 1.2.9.  Let S be a set, s, t ∈ S. Then the following are equivalent:
+
+  1. s = t
+  2. ∀ p ∈ 𝓟𝓻𝓹(S) : [s is p  ⇔  t is p]
+
+No proof."
 `;
 
 exports[`render hlm library: 1.3.1 data/libraries/hlm/Essentials/Relations/Relations 1`] = `
@@ -2510,7 +2519,7 @@ s ∈ ℕ_(<0)
 2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
 
 ⇒^1.7.1.18 ∃ y ∈ M : ∀ z ∈ M : z ≤ y
-2⇒3. Assume M is empty or ∃ m ∈ M : ∀ n ∈ M : n ≤ m. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
+2⇒3. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
 
 1. Assume M is empty.
 
@@ -2559,7 +2568,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.1.21 data/libraries/hlm/Essentials/Numbers/Natural/difference 1`] = `
-"Definition 1.7.1.21.  Let n ∈ ℕ, m ∈ ℕ_(≤n). For x ∈ ℕ_(≤n), we define:
+"Definition 1.7.1.21.  Let n ∈ ℕ, m ∈ ℕ_(≤n). For x ∈ ℕ, we define:
 
   n − m = x  :⇔  n = x + m
 
@@ -2805,7 +2814,9 @@ exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natu
 
 Proof.
 
-1⇒2. ⊆. Trivial.
+1⇒2. Assume M is inductive.
+
+⊆. Trivial.
 ⊇. Let n ∈ ℕ. Then n ∈ M:
 
 1.7.1.36 ⇒ n ∈ M
@@ -3892,7 +3903,7 @@ exports[`render hlm library: 1.7.3.1 data/libraries/hlm/Essentials/Numbers/Ordin
 
   𝓞𝓻𝓭 :=: {[S, ⪯] | S is a set, ⪯ is a well-order on S}
 
-  [S, ⪯] = [T, ⊑]  :⇔  ∃ φ : S ↔ T : φ[⪯] = ⊑  (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
+  [S, ⪯] = [T, ⊑]  :⇔  ∃ φ : S ↔ T : ⪯ ≃^φ ⊑  (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
 
 ℕ ⊆: 𝓞𝓻𝓭 via
 n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
@@ -5698,91 +5709,97 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 2.1.1.1 data/libraries/hlm/Algebra/Generic/Isomorphisms/element%20transport 1`] = `
-"Definition 2.1.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X. We define:
+exports[`render hlm library: 2.1.1.1 data/libraries/hlm/Algebra/Generic/Isomorphisms/element%20condition 1`] = `
+"Definition 2.1.1.1.  Let X, Y be sets, φ : X ↔ Y be a bijection, x ∈ X, y ∈ Y. We define:
 
-  φ[x] := φ(x)
+  x ≃^φ y  :⇔  φ(x) = y
 
 Remarks.
 
-The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of \\"isomorphism\\" that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined.
-
-Each of the definitions transports an object defined on \`X\` to \`Y\` along the given bijection. The first definition is rather trivial. The other definitions are stated in such a way that the transformation can be identified as a mere relabeling of elements."
+The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of \\"isomorphism\\" that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined."
 `;
 
-exports[`render hlm library: 2.1.1.2 data/libraries/hlm/Algebra/Generic/Isomorphisms/function%20transport 1`] = `
-"Definition 2.1.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X be a function. We define
+exports[`render hlm library: 2.1.1.2 data/libraries/hlm/Algebra/Generic/Isomorphisms/function%20condition 1`] = `
+"Definition 2.1.1.2.  Let X, Y be sets, φ : X ↔ Y be a bijection, f : X → X, g : Y → Y be functions. We define
 
-  φ[f]
+  f ≃^φ g
 
 by:
 
-  φ[(X → X, x ↦ z_x)] := (Y → Y, y ↦ φ(z_(φ^-1(y))))  (z_x ∈ X for each x ∈ X)
-   = φ ∘ f ∘ φ^-1
+  (X → X, x ↦ a_x) ≃^φ (Y → Y, y ↦ b_y)  :⇔  ∀ x ∈ X : φ(a_x) = b_(φ(x))  (a_x ∈ X for each x ∈ X, b_y ∈ Y for each y ∈ Y)
+    ⇔  ∀ x ∈ X : φ(f(x)) = g(φ(x))
+    ⇔  φ ∘ f = g ∘ φ
 
-Equality.  No proof."
+Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.1.1.3 data/libraries/hlm/Algebra/Generic/Isomorphisms/inner%20operation%20transport 1`] = `
-"Definition 2.1.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X. We define
+exports[`render hlm library: 2.1.1.3 data/libraries/hlm/Algebra/Generic/Isomorphisms/inner%20operation%20condition 1`] = `
+"Definition 2.1.1.3.  Let X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × X → X be an operation on X, ⋆ : Y × Y → Y be an operation on Y. We define
 
-  φ[∗]
+  ∗ ≃^φ ⋆
 
 by:
 
-  φ[(X × X → X, (x_1, x_2) ↦ z_x_1,x_2)] := (Y × Y → Y, (y_1, y_2) ↦ φ(z_φ^-1(y_1),φ^-1(y_2)))  (z_x_1,x_2 ∈ X for each x_1 ∈ X and x_2 ∈ X)
-   = φ ∘ ∗ ∘ (φ × φ)^-1
+  (X × X → X, (x_1, x_2) ↦ a_x_1,x_2) ≃^φ (Y × Y → Y, (y_1, y_2) ↦ b_y_1,y_2)  :⇔  ∀ x_1, x_2 ∈ X : φ(a_x_1,x_2) = b_φ(x_1),φ(x_2)  (a_x_1,x_2 ∈ X for each x_1 ∈ X and x_2 ∈ X, b_y_1,y_2 ∈ Y for each y_1 ∈ Y and y_2 ∈ Y)
+    ⇔  ∀ x_1, x_2 ∈ X : φ(x_1 ∗ x_2) = φ(x_1) ⋆ φ(x_2)
+    ⇔  φ ∘ ∗ = ⋆ ∘ (φ × φ)
 
-Equality.  No proof."
+Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.1.1.4 data/libraries/hlm/Algebra/Generic/Isomorphisms/left%20operation%20transport 1`] = `
-"Definition 2.1.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X be an operation. We define
+exports[`render hlm library: 2.1.1.4 data/libraries/hlm/Algebra/Generic/Isomorphisms/left%20operation%20condition 1`] = `
+"Definition 2.1.1.4.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : S × X → X, ⋆ : S × Y → Y be operations. We define
 
-  φ[∗]
+  ∗ ≃^φ ⋆
 
 by:
 
-  φ[(S × X → X, (s, x) ↦ z_s,x)] := (S × Y → Y, (s, y) ↦ φ(z_s,φ^-1(y)))  (z_s,x ∈ X for each s ∈ S and x ∈ X)
-   = φ ∘ ∗ ∘ (id_S × φ)^-1
+  (S × X → X, (s, x) ↦ a_s,x) ≃^φ (S × Y → Y, (s, y) ↦ b_s,y)  :⇔  ∀ s ∈ S, x ∈ X : φ(a_s,x) = b_s,φ(x)  (a_s,x ∈ X for each s ∈ S and x ∈ X, b_s,y ∈ Y for each s ∈ S and y ∈ Y)
+    ⇔  ∀ s ∈ S, x ∈ X : φ(s ∗ x) = s ⋆ φ(x)
+    ⇔  φ ∘ ∗ = ⋆ ∘ (id_S × φ)
 
-Equality.  No proof."
+Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.1.1.5 data/libraries/hlm/Algebra/Generic/Isomorphisms/right%20operation%20transport 1`] = `
-"Definition 2.1.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X be an operation. We define
+exports[`render hlm library: 2.1.1.5 data/libraries/hlm/Algebra/Generic/Isomorphisms/right%20operation%20condition 1`] = `
+"Definition 2.1.1.5.  Let S, X, Y be sets, φ : X ↔ Y be a bijection, ∗ : X × S → X, ⋆ : Y × S → Y be operations. We define
 
-  φ[∗]
+  ∗ ≃^φ ⋆
 
 by:
 
-  φ[(X × S → X, (x, s) ↦ z_x,s)] := (Y × S → Y, (y, s) ↦ φ(z_φ^-1(y),s))  (z_x,s ∈ X for each x ∈ X and s ∈ S)
-   = φ ∘ ∗ ∘ (φ × id_S)^-1
+  (X × S → X, (x, s) ↦ a_x,s) ≃^φ (Y × S → Y, (y, s) ↦ b_y,s)  :⇔  ∀ x ∈ X, s ∈ S : φ(a_x,s) = b_φ(x),s  (a_x,s ∈ X for each x ∈ X and s ∈ S, b_y,s ∈ Y for each y ∈ Y and s ∈ S)
+    ⇔  ∀ x ∈ X, s ∈ S : φ(x ∗ s) = φ(x) ⋆ s
+    ⇔  φ ∘ ∗ = ⋆ ∘ (φ × id_S)
 
-Equality.  No proof."
+Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.1.1.6 data/libraries/hlm/Algebra/Generic/Isomorphisms/relation%20transport 1`] = `
-"Definition 2.1.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X. We define
+exports[`render hlm library: 2.1.1.6 data/libraries/hlm/Algebra/Generic/Isomorphisms/relation%20condition 1`] = `
+"Definition 2.1.1.6.  Let X, Y be sets, φ : X ↔ Y be a bijection, ≺ be a relation on X, ⊂ be a relation on Y. We define
 
-  φ[≺]
+  ≺ ≃^φ ⊂
 
 by:
 
-  φ[[p_x_1,x_2]_(x_1,x_2 ∈ X)] := [p_φ^-1(y_1),φ^-1(y_2)]_(y_1,y_2 ∈ Y)  (p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)"
+  [p_x_1,x_2]_(x_1,x_2 ∈ X) ≃^φ [q_y_1,y_2]_(y_1,y_2 ∈ Y)  :⇔  ∀ x_1, x_2 ∈ X : [p_x_1,x_2  ⇔  q_φ(x_1),φ(x_2)]  (q_y_1,y_2 is a proposition for each y_1, y_2 ∈ Y, p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)
+    ⇔  ∀ x_1, x_2 ∈ X : [x_1 ≺ x_2  ⇔  φ(x_1) ⊂ φ(x_2)]
+
+Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 2.1.1.7 data/libraries/hlm/Algebra/Generic/Isomorphisms/morphism%20transport 1`] = `
-"Definition 2.1.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∙ : X_1 × X_2 → X_3 be an operation. We define
+exports[`render hlm library: 2.1.1.7 data/libraries/hlm/Algebra/Generic/Isomorphisms/morphism%20condition 1`] = `
+"Definition 2.1.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∗ : X_1 × X_2 → X_3, ⋆ : Y_1 × Y_2 → Y_3 be operations. We define
 
-  (φ_1, φ_2, φ_3)[∙]
+  ∗ ≃^φ_1,φ_2,φ_3 ⋆
 
 by:
 
-  (φ_1, φ_2, φ_3)[(X_1 × X_2 → X_3, (x_1, x_2) ↦ z_x_1,x_2)] := (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ φ_3(z_(φ_1)^-1(y_1),(φ_2)^-1(y_2)))  (z_x_1,x_2 ∈ X_3 for each x_1 ∈ X_1 and x_2 ∈ X_2)
-   = φ_3 ∘ ∙ ∘ (φ_1 × φ_2)^-1
+  (X_1 × X_2 → X_3, (x_1, x_2) ↦ a_x_1,x_2) ≃^φ_1,φ_2,φ_3 (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ b_y_1,y_2)  :⇔  ∀ x_1 ∈ X_1, x_2 ∈ X_2 : φ_3(a_x_1,x_2) = b_φ_1(x_1),φ_2(x_2)  (a_x_1,x_2 ∈ X_3 for each x_1 ∈ X_1 and x_2 ∈ X_2, b_y_1,y_2 ∈ Y_3 for each y_1 ∈ Y_1 and y_2 ∈ Y_2)
+    ⇔  ∀ x_1 ∈ X_1, x_2 ∈ X_2 : φ_3(x_1 ∗ x_2) = φ_1(x_1) ⋆ φ_2(x_2)
+    ⇔  φ_3 ∘ ∗ = ⋆ ∘ (φ_1 × φ_2)
 
-Equality.  No proof."
+Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 2.2.1 data/libraries/hlm/Algebra/Pointed%20sets/Pointed%20sets 1`] = `
@@ -5790,7 +5807,7 @@ exports[`render hlm library: 2.2.1 data/libraries/hlm/Algebra/Pointed%20sets/Poi
 
   𝓟𝓽𝓢𝓮𝓽 :=: {[S, s] | S is a set, s ∈ S}
 
-  [S, s] = [T, t]  :⇔  ∃ φ : S ↔ T : φ[s] = t  (S is a set, s ∈ S, T is a set, t ∈ T)
+  [S, s] = [T, t]  :⇔  ∃ φ : S ↔ T : s ≃^φ t  (S is a set, s ∈ S, T is a set, t ∈ T)
 
 We write “let 𝐒 be a pointed set” for “let 𝐒 ∈ 𝓟𝓽𝓢𝓮𝓽.”
 
@@ -5945,7 +5962,7 @@ exports[`render hlm library: 2.3.1 data/libraries/hlm/Algebra/Magmas/Magmas 1`] 
 
   𝓜𝓪𝓰 :=: {[M, ∗] | M is a set, ∗ : M × M → M is an operation on M}
 
-  [M, ∗] = [N, ⋆]  :⇔  ∃ φ : M ↔ N : φ[∗] = ⋆  (M is a set, ∗ : M × M → M is an operation on M, N is a set, ⋆ : N × N → N is an operation on N)
+  [M, ∗] = [N, ⋆]  :⇔  ∃ φ : M ↔ N : ∗ ≃^φ ⋆  (M is a set, ∗ : M × M → M is an operation on M, N is a set, ⋆ : N × N → N is an operation on N)
 
 We write “let 𝐌 be a magma” for “let 𝐌 ∈ 𝓜𝓪𝓰.”
 
@@ -6295,7 +6312,7 @@ exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/Monoids 1`
 
   𝓜𝓸𝓷 :=: {[M, ∗, e] | M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid}
 
-  [M, ∗, e] = [N, ⋆, f]  :⇔  ∃ φ : M ↔ N : [φ[∗] = ⋆ and φ[e] = f]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M, N is a set, ⋆ : N × N → N is an operation on N, f ∈ N with suitable conditions)
+  [M, ∗, e] = [N, ⋆, f]  :⇔  ∃ φ : M ↔ N : [∗ ≃^φ ⋆ and e ≃^φ f]  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M, N is a set, ⋆ : N × N → N is an operation on N, f ∈ N with suitable conditions)
 
 We write “let 𝐌 be a monoid” for “let 𝐌 ∈ 𝓜𝓸𝓷.”
 
@@ -6609,7 +6626,7 @@ exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/Groups 1`] 
 
   𝓖𝓻𝓹 :=: {[G, ∗, e, i] | G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group}
 
-  [G, ∗, e, i] = [H, ⋆, f, j]  :⇔  ∃ φ : G ↔ H : [φ[∗] = ⋆ and φ[e] = f and φ[i] = j]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function, H is a set, ⋆ : H × H → H is an operation on H, f ∈ H, j : H → H is a function with suitable conditions)
+  [G, ∗, e, i] = [H, ⋆, f, j]  :⇔  ∃ φ : G ↔ H : [∗ ≃^φ ⋆ and e ≃^φ f and i ≃^φ j]  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function, H is a set, ⋆ : H × H → H is an operation on H, f ∈ H, j : H → H is a function with suitable conditions)
 
 We write “let 𝐆 be a group” for “let 𝐆 ∈ 𝓖𝓻𝓹.”
 
@@ -7202,7 +7219,7 @@ exports[`render hlm library: 2.7.2 data/libraries/hlm/Algebra/Semirings/Semiring
 
   𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰 :=: {[R, ⊕, 0, ⊙, 1] | R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊙, 1) forms a semiring}
 
-  [R, ⊕, 0, ⊙, 1] = [S, ⋆, 𝟢, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊙] = ∗ and φ[1] = 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
+  [R, ⊕, 0, ⊙, 1] = [S, ⋆, 𝟢, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [⊕ ≃^φ ⋆ and 0 ≃^φ 𝟢 and ⊙ ≃^φ ∗ and 1 ≃^φ 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
 
 We write “let 𝐑 be a semiring” for “let 𝐑 ∈ 𝓢𝓮𝓶𝓲𝓡𝓲𝓷𝓰.”
 
@@ -7540,7 +7557,7 @@ exports[`render hlm library: 2.8.2 data/libraries/hlm/Algebra/Rings/Rings 1`] = 
 
   𝓡𝓲𝓷𝓰 :=: {[R, ⊕, 0, ⊖, ⊙, 1] | R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R such that (R, ⊕, 0, ⊖, ⊙, 1) forms a ring}
 
-  [R, ⊕, 0, ⊖, ⊙, 1] = [S, ⋆, 𝟢, ∼, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗ and φ[1] = 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∼ : S → S is a function, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
+  [R, ⊕, 0, ⊖, ⊙, 1] = [S, ⋆, 𝟢, ∼, ∗, 𝟣]  :⇔  ∃ φ : R ↔ S : [⊕ ≃^φ ⋆ and 0 ≃^φ 𝟢 and ⊖ ≃^φ ∼ and ⊙ ≃^φ ∗ and 1 ≃^φ 𝟣]  (R is a set, ⊕ : R × R → R is an operation on R, 0 ∈ R, ⊖ : R → R is a function, ⊙ : R × R → R is an operation on R, 1 ∈ R, S is a set, ⋆ : S × S → S is an operation on S, 𝟢 ∈ S, ∼ : S → S is a function, ∗ : S × S → S is an operation on S, 𝟣 ∈ S with suitable conditions)
 
 We write “let 𝐑 be a ring” for “let 𝐑 ∈ 𝓡𝓲𝓷𝓰.”
 
@@ -8365,7 +8382,7 @@ exports[`render hlm library: 2.8.29.1.2 data/libraries/hlm/Algebra/Rings/Modules
 
   𝓛𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙]_𝐑 | M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a left 𝐑-module}
 
-  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : (𝐑) × N → N is an operation with suitable conditions)
+  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [⊕ ≃^φ ⋆ and 0 ≃^φ 𝟢 and ⊖ ≃^φ ∼ and ⊙ ≃^φ ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : (𝐑) × M → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : (𝐑) × N → N is an operation with suitable conditions)
 
 We write “let 𝐌 be a left 𝐑-module” for “let 𝐌 ∈ 𝓛𝓜𝓸𝓭(𝐑).”
 
@@ -8813,7 +8830,7 @@ exports[`render hlm library: 2.8.29.2.2 data/libraries/hlm/Algebra/Rings/Modules
 
   𝓡𝓜𝓸𝓭(𝐑) :=: {[M, ⊕, 0, ⊖, ⊙]_𝐑 | M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation such that (M, ⊕, 0, ⊖, ⊙) forms a right 𝐑-module}
 
-  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [φ[⊕] = ⋆ and φ[0] = 𝟢 and φ[⊖] = ∼ and φ[⊙] = ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × (𝐑) → N is an operation with suitable conditions)
+  [M, ⊕, 0, ⊖, ⊙]_𝐑 = [N, ⋆, 𝟢, ∼, ∗]_𝐑  :⇔  ∃ φ : M ↔ N : [⊕ ≃^φ ⋆ and 0 ≃^φ 𝟢 and ⊖ ≃^φ ∼ and ⊙ ≃^φ ∗]  (M is a set, ⊕ : M × M → M is an operation on M, 0 ∈ M, ⊖ : M → M is a function, ⊙ : M × (𝐑) → M is an operation, N is a set, ⋆ : N × N → N is an operation on N, 𝟢 ∈ N, ∼ : N → N is a function, ∗ : N × (𝐑) → N is an operation with suitable conditions)
 
 We write “let 𝐌 be a right 𝐑-module” for “let 𝐌 ∈ 𝓡𝓜𝓸𝓭(𝐑).”
 
@@ -9393,7 +9410,7 @@ exports[`render hlm library: 4.1 data/libraries/hlm/Category%20theory/Categories
 
   𝓒𝓪𝓽_u :=: {[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u | O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_𝐖,𝐗, g ∈ M_𝐗,𝐘, h ∈ M_𝐘,𝐙 : (h ∘_𝐗,𝐘,𝐙 g) ∘_𝐖,𝐗,𝐙 f = h ∘_𝐖,𝐘,𝐙 (g ∘_𝐖,𝐗,𝐘 f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘 : i_𝐘 ∘_𝐗,𝐘,𝐘 f = f ∘_𝐗,𝐗,𝐘 i_𝐗 = f], [∀ 𝐗, 𝐘 ∈ O s.t. [∃ f ∈ M_𝐗,𝐘, g ∈ M_𝐘,𝐗 : [f ∘_𝐘,𝐗,𝐘 g = i_𝐘 and g ∘_𝐗,𝐘,𝐗 f = i_𝐗]] : 𝐗 = 𝐘]}
 
-  [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ[𝐀],φ[𝐁] f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : ψ_𝐂,𝐂[i_𝐂] = j_(φ[𝐂])] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : (ψ_𝐄,𝐅, ψ_𝐃,𝐄, ψ_𝐃,𝐅)[∘_𝐃,𝐄,𝐅] = ∙_φ[𝐃],φ[𝐄],φ[𝐅]]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
+  [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ(𝐀),φ(𝐁) f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : i_𝐂 ≃^(ψ_𝐂,𝐂) j_(φ(𝐂))] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : ∘_𝐃,𝐄,𝐅 ≃^ψ_𝐄,𝐅,ψ_𝐃,𝐄,ψ_𝐃,𝐅 ∙_φ(𝐃),φ(𝐄),φ(𝐅)]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
 
 We write “let 𝓒 be a/an u-small category” for “let 𝓒 ∈ 𝓒𝓪𝓽_u.”
 

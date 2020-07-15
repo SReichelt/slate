@@ -213,27 +213,40 @@ export class HLMUtils extends GenericUtils {
       let constructorExpr = structuralCase._constructor as Fmt.DefinitionRefExpression;
       let constructorPath = constructorExpr.path;
       let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(constructorExpr.path.name);
-      let constructorDefinitionContents = constructorDefinition.contents as FmtHLM.ObjectContents_Constructor;
-      let result: Fmt.Expression;
-      if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorDefinitionContents.rewrite) {
-        result = constructorDefinitionContents.rewrite.value;
-        result = this.substitutePath(result, constructionPath, [constructionDefinition]);
-      } else {
-        let resultPath = new Fmt.Path;
-        resultPath.parentPath = constructionPath;
-        resultPath.name = constructorPath.name;
-        let context: HLMSubstitutionContext = {targetPath: constructionPath.parentPath};
-        this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
-        let resultRef = new Fmt.DefinitionRefExpression;
-        resultRef.path = resultPath;
-        result = resultRef;
-      }
-      if (constructorDefinition.parameters.length) {
-        result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!, markAsDefinition);
-      }
-      return result;
+      let constructorContents = constructorDefinition.contents as FmtHLM.ObjectContents_Constructor;
+      return this.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents, markAsDefinition);
     });
     return resultPromise;
+  }
+
+  getResolvedStructuralCaseTerm(constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorPath: Fmt.Path, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, markAsDefinition: boolean = false): Fmt.Expression {
+    let result: Fmt.Expression;
+    if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorContents.rewrite) {
+      result = constructorContents.rewrite.value;
+      result = this.substitutePath(result, constructionPath, [constructionDefinition]);
+    } else {
+      let resultPath = new Fmt.Path;
+      resultPath.parentPath = constructionPath;
+      resultPath.name = constructorPath.name;
+      let context: HLMSubstitutionContext = {targetPath: constructionPath.parentPath};
+      this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
+      let resultRef = new Fmt.DefinitionRefExpression;
+      resultRef.path = resultPath;
+      result = resultRef;
+    }
+    if (constructorDefinition.parameters.length) {
+      result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!, markAsDefinition);
+    }
+    return result;
+  }
+
+  createStructuralCaseConstraintParameter(term: Fmt.Expression, constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorPath: Fmt.Path, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor): Fmt.Parameter {
+    let caseTerm = this.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
+    let constraint = new FmtHLM.MetaRefExpression_equals;
+    constraint.terms = [term, caseTerm];
+    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
+    constraintType.formula = constraint;
+    return this.createParameter(constraintType, '_');
   }
 
   substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
@@ -359,17 +372,22 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
+  applySubstitutionContext(expression: Fmt.Expression, context: HLMSubstitutionContext): Fmt.Expression {
+    expression = this.substituteTargetPath(expression, context.targetPath);
+    if (context.parameterLists && context.argumentLists) {
+      expression = this.substituteAllArguments(expression, context.parameterLists, context.argumentLists, context.targetPath);
+    }
+    if (context.originalBindingParameters && context.substitutedBindingParameters) {
+      expression = this.substituteParameters(expression, context.originalBindingParameters, context.substitutedBindingParameters);
+    }
+    return expression;
+  }
+
   substituteParameterSet(term: Fmt.Expression, context: HLMSubstitutionContext, setAsPreviousSetTerm: boolean): Fmt.Expression {
     if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
       return context.previousSetTerm;
     } else {
-      term = this.substituteTargetPath(term, context.targetPath);
-      if (context.parameterLists && context.argumentLists) {
-        term = this.substituteAllArguments(term, context.parameterLists, context.argumentLists, context.targetPath);
-      }
-      if (context.originalBindingParameters && context.substitutedBindingParameters) {
-        term = this.substituteParameters(term, context.originalBindingParameters, context.substitutedBindingParameters);
-      }
+      term = this.applySubstitutionContext(term, context);
       if (setAsPreviousSetTerm) {
         context.previousSetTerm = term;
       }

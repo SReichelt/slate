@@ -672,6 +672,36 @@ $TransposableRelation(symbol: %Expr, negatedSymbol: %Expr, transposedSymbol: %Ex
 }
 
 /**
+ * Like `$SymbolicRelation`, but allows additional content above and below the symbol.
+ *
+ * @param symbol The relation symbol.
+ * @param negatedSymbol A symbol representing the negation of `symbol`.
+ * @param operands The list of operands. If more than two operands are given, the relation symbol is displayed between each pair of operands.
+ * @param space The space to use between the relation symbol and its operands.
+ * @param minParenLevel If this relation is used at a location with inner parentheses of level `minParenLevel` or greater (see `$InnerParens`), parentheses are added around the `$SymbolicRelation` expression. By default, parentheses are only added if the relation is used at an unusual location.
+ * @param maxParenLevel If an operand has outer parentheses of level `maxParenLevel` or less (see `$OuterParens`), parentheses are added around it. By default, parentheses are not added around any operands containing regular operators.
+ *
+ * @example `$OverUnderRelation(symbol = ≺, negatedSymbol = ⊀, over = f, operands = [a, b])`
+ * @example `$OverUnderRelation(symbol = ≺, negatedSymbol = ⊀, under = g, operands = [a, b])`
+ * @example `$OverUnderRelation(symbol = ≺, negatedSymbol = ⊀, over = f, under = g, operands = [a, b])`
+ */
+$OverUnderRelation(symbol: %Expr, negatedSymbol: %Expr, over?: %Expr, under?: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+  notation = $Relation(
+    symbol = $OverUnder(
+      body = %neg(symbol, negatedSymbol),
+      over = over,
+      under = under,
+      style = 'shallow'
+    ),
+    operands = operands,
+    space = space,
+    minParenLevel = minParenLevel,
+    maxParenLevel = maxParenLevel
+  ),
+  symbol = symbol
+}
+
+/**
  * Like `$Relation`, but used for cases where the symbol includes a definition colon.
  *
  * @param symbol The definition symbol.
@@ -1251,6 +1281,30 @@ $CanonicalIsomorphismRelation(operands: %Expr[]): %Template {
   notation = $SymbolicRelation(
     symbol = '≅',
     negatedSymbol = '≆',
+    operands = operands
+  )
+}
+
+/**
+ * @example `$SpecificIsomorphismRelation(operands = [𝐀, 𝐁], function = f)`
+ */
+$SpecificIsomorphismRelation(operands: %Expr[], function: %Expr): %Template {
+  notation = $OverUnderRelation(
+    symbol = '≃',
+    negatedSymbol = '≄',
+    over = function,
+    operands = operands
+  )
+}
+
+/**
+ * @example `$SpecificCanonicalIsomorphismRelation(operands = [𝐀, 𝐁], function = f)`
+ */
+$SpecificCanonicalIsomorphismRelation(operands: %Expr[], function: %Expr): %Template {
+  notation = $OverUnderRelation(
+    symbol = '≅',
+    negatedSymbol = '≆',
+    over = function,
     operands = operands
   )
 }
