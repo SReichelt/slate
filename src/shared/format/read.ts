@@ -331,54 +331,79 @@ export class Reader {
 
   readParameters(parameters: Fmt.ParameterList, context: Ctx.Context): void {
     this.skipWhitespace();
-    let parameter = this.tryReadParameter(context);
-    if (parameter) {
-      parameters.push(parameter);
+    let group = this.tryReadParameterGroup(context);
+    if (group) {
+      parameters.push(...group);
       this.skipWhitespace();
       while (this.tryReadChar(',')) {
-        context = context.metaModel.getNextParameterContext(parameter, context);
-        parameter = this.readParameter(context);
-        parameters.push(parameter);
+        for (let parameter of group) {
+          context = context.metaModel.getNextParameterContext(parameter, context);
+        }
+        group = this.readParameterGroup(context);
+        parameters.push(...group);
         this.skipWhitespace();
       }
     }
   }
 
-  tryReadParameter(context: Ctx.Context): Fmt.Parameter | undefined {
-    let parameterStart = this.markStart();
+  tryReadParameterGroup(context: Ctx.Context): Fmt.Parameter[] | undefined {
+    let previousParameter = context.getPreviousParameter();
+    let group: Fmt.Parameter[] = [];
+    let groupStart = this.markStart();
+    let nameStart = groupStart;
     let name = this.tryReadIdentifier();
     if (!name) {
       return undefined;
     }
-    let nameRange = this.markEnd(parameterStart);
-    let parameter = new Fmt.Parameter;
-    parameter.name = name;
-    this.skipWhitespace();
-    if (this.tryReadChar('[')) {
-      parameter.dependencies = this.readExpressions(context);
-      this.readChar(']');
+    let nameRanges: Range[] = [this.markEnd(nameStart)];
+    for (;;) {
+      let parameter = new Fmt.Parameter;
+      parameter.name = name;
       this.skipWhitespace();
-    }
-    if (parameter.list = this.tryReadChar('.')) {
-      this.readChar('.');
-      this.readChar('.');
+      if (this.tryReadChar('[')) {
+        parameter.dependencies = this.readExpressions(context);
+        this.readChar(']');
+        this.skipWhitespace();
+      }
+      if (parameter.list = this.tryReadChar('.')) {
+        this.readChar('.');
+        this.readChar('.');
+        this.skipWhitespace();
+      }
+      parameter.optional = this.tryReadChar('?');
+      parameter.previousParameter = previousParameter;
+      group.push(parameter);
+      previousParameter = parameter;
       this.skipWhitespace();
+      if (!this.tryReadChar(',')) {
+        break;
+      }
+      this.skipWhitespace();
+      nameStart = this.markStart();
+      name = this.readIdentifier();
+      nameRanges.push(this.markEnd(nameStart));
     }
-    parameter.optional = this.tryReadChar('?');
-    let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
-    parameter.type = this.readType(typeContext.metaModel.expressionTypes, typeContext);
+    let typeContext = context.metaModel.getParameterTypeContext(group[0], context);
+    let type = this.readType(typeContext.metaModel.expressionTypes, typeContext);
+    for (let parameter of group) {
+      parameter.type = type;
+    }
     this.skipWhitespace();
     if (this.tryReadChar('=')) {
-      parameter.defaultValue = this.readExpression(false, context.metaModel.functions, context);
+      let defaultValue = this.readExpression(false, context.metaModel.functions, context);
+      for (let parameter of group) {
+        parameter.defaultValue = defaultValue;
+      }
     }
-    parameter.previousParameter = context.getPreviousParameter();
-    this.markEnd(parameterStart, parameter, context, undefined, nameRange);
-    return parameter;
+    for (let index = 0; index < group.length; index++) {
+      this.markEnd(groupStart, group[index], context, undefined, nameRanges[index]);
+    }
+    return group;
   }
 
-  readParameter(context: Ctx.Context): Fmt.Parameter {
+  readParameterGroup(context: Ctx.Context): Fmt.Parameter[] {
     this.skipWhitespace();
-    return this.tryReadParameter(context) || this.error('Parameter expected') || new Fmt.Parameter;
+    return this.tryReadParameterGroup(context) || this.error('Parameter expected') || [];
   }
 
   tryReadArgumentList(args: Fmt.ArgumentList, context: Ctx.Context): boolean {

@@ -230,7 +230,7 @@ export class Parameter implements Comparable<Parameter> {
   optional: boolean;
   list: boolean;
   dependencies?: Expression[];
-  previousParameter?: Parameter;
+  previousParameter?: Parameter;  // TODO #65 remove
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;

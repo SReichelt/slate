@@ -54,7 +54,7 @@ $Parens(body: %Expr, style: %String): %Template {
  * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if the content surrounding the `$InnerParens` instance is sufficiently bounded on the left.
  * @param right Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `right` can be set to false if the content surrounding the `$InnerParens` instance is sufficiently bounded on the right.
  */
-$InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+$InnerParens(body: %Expr, maxLevel?: %Int, left,right: %Bool = %true): %Template {}
 
 /**
  * Ensures that parentheses are added around the given expression if necessary.  
@@ -81,7 +81,7 @@ $InnerParens(body: %Expr, maxLevel?: %Int, left: %Bool = %true, right: %Bool = %
  * @param left Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `left` can be set to false if inner expression is sufficiently bounded on the left.
  * @param right Parentheses will only be added if `left` is set in both `$InnerParens` and `$OuterParens`, or if `right` is set in both `$InnerParens` and `$OuterParens`. `right` can be set to false if the inner expression is sufficiently bounded on the right.
  */
-$OuterParens(body: %Expr, minLevel?: %Int, left: %Bool = %true, right: %Bool = %true): %Template {}
+$OuterParens(body: %Expr, minLevel?: %Int, left,right: %Bool = %true): %Template {}
 
 /**
  * The colon to use for ":=" and ":⇔". Used internally by other templates.
@@ -385,7 +385,7 @@ $DivisionOperator(symbol: %Expr = '∕', operands: %Expr[], space: %String = '')
  *
  * @example `$Fraction(numerator = a, denominator = b)`
  */
-$Fraction(numerator: %Expr, denominator: %Expr): %Template {
+$Fraction(numerator,denominator: %Expr): %Template {
   notation = $DivisionOperator(
     operands = [numerator, denominator]
   ),
@@ -515,7 +515,7 @@ $FunctionLikeOperator(symbol: %Expr, operand: %Expr, space: %String = ' ', min
  * @example `$OverUnderOperator(symbol = 'calc', operand = a, under = b, style = 'shallow')`
  * @example `$OverUnderOperator(symbol = 'calc', operand = a, over = c, under = b, style = 'shallow')`
  */
-$OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+$OverUnderOperator(symbol: %Expr, operand: %Expr, over?,under?: %Expr, style?: %String, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   notation = $FunctionLikeOperator(
     symbol = $OverUnder(
       body = symbol,
@@ -544,7 +544,7 @@ $OverUnderOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, s
  *
  * @example `$LargeOperator(symbol = ⨂, operand = a, over = c, under = b)`
  */
-$LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
+$LargeOperator(symbol: %Expr, operand: %Expr, over?,under?: %Expr, space: %String = ' ', minParenLevel: %Int = 0, maxParenLevel: %Int = 2): %Template {
   notation = $OverUnderOperator(
     symbol = $Style(
       body = symbol,
@@ -569,7 +569,7 @@ $LargeOperator(symbol: %Expr, operand: %Expr, over?: %Expr, under?: %Expr, space
  * @example `$Radical(radicand = a)`
  * @example `$Radical(radicand = a, degree = b)`
  */
-$Radical(radicand: %Expr, degree?: %Expr): %Template {
+$Radical(radicand,degree?: %Expr): %Template {
   notation = $OuterParens(
     body = [
       %opt(degree, $InnerParens(body = degree)),
@@ -595,7 +595,7 @@ $Radical(radicand: %Expr, degree?: %Expr): %Template {
  *
  * @example `$Relation(symbol = ≺, operands = [a, b])`
  */
-$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = $Operator(
     symbol = symbol,
     operands = operands,
@@ -623,7 +623,7 @@ $Relation(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLeve
  *
  * @example `$SymbolicRelation(symbol = ≺, negatedSymbol = ⊀, operands = [a, b])`
  */
-$SymbolicRelation(symbol: %Expr, negatedSymbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$SymbolicRelation(symbol,negatedSymbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = $Relation(
     symbol = %neg(symbol, negatedSymbol),
     operands = operands,
@@ -649,7 +649,7 @@ $SymbolicRelation(symbol: %Expr, negatedSymbol: %Expr, operands: %Expr[], space:
  *
  * @example `$TransposableRelation(symbol = ≺, negatedSymbol = ⊀, transposedSymbol = ≻, negatedTransposedSymbol = ⊁, operands = [a, b])`
  */
-$TransposableRelation(symbol: %Expr, negatedSymbol: %Expr, transposedSymbol: %Expr, negatedTransposedSymbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$TransposableRelation(symbol,negatedSymbol,transposedSymbol,negatedTransposedSymbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = %sel(
     $SymbolicRelation(
       symbol = symbol,
@@ -685,7 +685,7 @@ $TransposableRelation(symbol: %Expr, negatedSymbol: %Expr, transposedSymbol: %Ex
  * @example `$OverUnderRelation(symbol = ≺, negatedSymbol = ⊀, under = g, operands = [a, b])`
  * @example `$OverUnderRelation(symbol = ≺, negatedSymbol = ⊀, over = f, under = g, operands = [a, b])`
  */
-$OverUnderRelation(symbol: %Expr, negatedSymbol: %Expr, over?: %Expr, under?: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$OverUnderRelation(symbol,negatedSymbol: %Expr, over?,under?: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = $Relation(
     symbol = $OverUnder(
       body = %neg(symbol, negatedSymbol),
@@ -712,7 +712,7 @@ $OverUnderRelation(symbol: %Expr, negatedSymbol: %Expr, over?: %Expr, under?: %E
  *
  * @example `$DefinitionRelation(symbol = [$DefinitionColon, ≈], operands = [a, b])`
  */
-$DefinitionRelation(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$DefinitionRelation(symbol: %Expr, operands: %Expr[], space: %String = ' ', minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = $Relation(
     symbol = symbol,
     operands = operands,
@@ -734,7 +734,7 @@ $DefinitionRelation(symbol: %Expr, operands: %Expr[], space: %String = ' ', mi
  *
  * @example `$Verb(verb = %neg('wobbles', 'does not wobble'), operand = a)`
  */
-$Verb(verb: %Expr, operand: %Expr, minParenLevel: %Int = -1, maxParenLevel: %Int = -1): %Template {
+$Verb(verb: %Expr, operand: %Expr, minParenLevel,maxParenLevel: %Int = -1): %Template {
   notation = $PostfixUnaryOperator(
     symbol = verb,
     operand = operand,
@@ -824,7 +824,7 @@ $RelationalProperty(operands: %Expr[], property: %Expr, article?: %String, prepo
  *
  * @example `$NounProperty(operand = a, singular = 'foo', plural = 'foos')`
  */
-$NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+$NounProperty(operand: %Expr, singular,plural: %Expr, article: %String = 'a'): %Template {
   notation = $Property(
     operand = operand,
     property = singular,
@@ -850,7 +850,7 @@ $NounProperty(operand: %Expr, singular: %Expr, plural: %Expr, article: %String =
  *
  * @example `$NounRelation(operands = [a, c], singular = 'foo', plural = 'foos')`
  */
-$NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a', preposition: %String = 'of'): %Template {
+$NounRelation(operands: %Expr[], singular,plural: %Expr, article: %String = 'a', preposition: %String = 'of'): %Template {
   notation = $RelationalProperty(
     operands = operands,
     property = singular,
@@ -875,7 +875,7 @@ $NounRelation(operands: %Expr[], singular: %Expr, plural: %Expr, article: %Strin
  *
  * @example `$Feature(operand = a, singular = 'foo', plural = 'foos')`
  */
-$Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+$Feature(operand: %Expr, singular,plural: %Expr, article: %String = 'a'): %Template {
   notation = $Verb(
     verb = [%neg('has', 'does not have'), ' ', article, ' ', singular],
     operand = operand
@@ -900,7 +900,7 @@ $Feature(operand: %Expr, singular: %Expr, plural: %Expr, article: %String = 'a')
  *
  * @example `$Structure(items = [a, b, c], singular = 'foo', plural = 'foos')`
  */
-$Structure(items: %Expr[], singular: %Expr, plural: %Expr, article: %String = 'a'): %Template {
+$Structure(items: %Expr[], singular,plural: %Expr, article: %String = 'a'): %Template {
   notation = $Verb(
     verb = [%neg('forms', 'does not form'), ' ', article, ' ', singular],
     operand = $Tuple(
@@ -1587,7 +1587,7 @@ $FunctionDeclaration(function: %Expr, symbol: %Expr = '→', operands: %Expr[]):
  *
  * @example `$FunctionBody(domain = X, codomain = Y, parameter = x, value = y)`
  */
-$FunctionBody(domain: %Expr, codomain: %Expr, parameter: %Expr, value: %Expr): %Template {
+$FunctionBody(domain,codomain: %Expr, parameter,value: %Expr): %Template {
   notation = $Table(
     items = [
       [
@@ -1626,7 +1626,7 @@ $FunctionBody(domain: %Expr, codomain: %Expr, parameter: %Expr, value: %Expr): %
  *
  * @example `$FunctionDefinition(function = f, domain = X, codomain = Y, parameter = x, value = y)`
  */
-$FunctionDefinition(function: %Expr, domain: %Expr, codomain: %Expr, parameter: %Expr, value: %Expr): %Template {
+$FunctionDefinition(function: %Expr, domain,codomain: %Expr, parameter,value: %Expr): %Template {
   notation = $FunctionPrefix(
     function = function,
     body = [
@@ -1657,7 +1657,7 @@ $FunctionDefinition(function: %Expr, domain: %Expr, codomain: %Expr, parameter: 
  *
  * @example `$FunctorBody(domain = 𝓒, codomain = 𝓓, objectParameter = 𝐗, objectValue = 𝐘, morphismParameter = f, morphismValue = g)`
  */
-$FunctorBody(domain: %Expr, codomain: %Expr, objectParameter: %Expr, objectValue: %Expr, morphismParameter: %Expr, morphismValue: %Expr): %Template {
+$FunctorBody(domain,codomain: %Expr, objectParameter,objectValue: %Expr, morphismParameter,morphismValue: %Expr): %Template {
   notation = $Table(
     items = [
       [
@@ -1702,7 +1702,7 @@ $FunctorBody(domain: %Expr, codomain: %Expr, objectParameter: %Expr, objectValue
  *
  * @example `$FunctorDefinition(functor = F, domain = 𝓒, codomain = 𝓓, objectParameter = 𝐗, objectValue = 𝐘, morphismParameter = f, morphismValue = g)`
  */
-$FunctorDefinition(functor: %Expr, domain: %Expr, codomain: %Expr, objectParameter: %Expr, objectValue: %Expr, morphismParameter: %Expr, morphismValue: %Expr): %Template {
+$FunctorDefinition(functor: %Expr, domain,codomain: %Expr, objectParameter,objectValue: %Expr, morphismParameter,morphismValue: %Expr): %Template {
   notation = $FunctionPrefix(
     function = functor,
     body = [
@@ -1729,7 +1729,7 @@ $FunctorDefinition(functor: %Expr, domain: %Expr, codomain: %Expr, objectParamet
  * @param variable The bound variable.
  * @param value The dependent value(s).
  */
-$Binding(variable: %Expr, value: %Expr): %Template {
+$Binding(variable,value: %Expr): %Template {
   notation = $Operator(
     symbol = '↦',
     operands = [variable, value],
@@ -1887,7 +1887,7 @@ $Script(body: %Expr): %Template {
  * @example `$SubSup(body = a, sub = b, sup = c)`
  * @example `$SubSup(body = a, sub = b, sup = c, preSub = d, preSup = e)`
  */
-$SubSup(body: %Expr, sub?: %Expr, sup?: %Expr, preSub?: %Expr, preSup?: %Expr): %Template {
+$SubSup(body: %Expr, sub?,sup?,preSub?,preSup?: %Expr): %Template {
   notation = $OuterParens(
     body = [
       %opt(preSup, [$Script(body = preSup), '^']),
@@ -1961,7 +1961,7 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
  * @example `$OverUnder(body = a, over = b, under = c, style = 'shallow')`
  * @example `$OverUnder(body = A, over = b, under = c)`
  */
-$OverUnder(body: %Expr, over?: %Expr, under?: %Expr, style?: %String): %Template {
+$OverUnder(body: %Expr, over?,under?: %Expr, style?: %String): %Template {
   notation = $OuterParens(
     body = [
       $InnerParens(body = body),
@@ -2132,7 +2132,7 @@ $SourceProofStep(result: %Expr, source: %Expr): %Template {
  *
  * @example `$LambdaAbstraction(variable = a, term = b)`
  */
-$LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
+$LambdaAbstraction(variable,term: %Expr): %Template {
   notation = $OuterParens(
     body = [
       'λ',
@@ -2162,7 +2162,7 @@ $LambdaAbstraction(variable: %Expr, term: %Expr): %Template {
  *
  * @example `$LambdaApplication(function = a, argument = b)`
  */
-$LambdaApplication(function: %Expr, argument: %Expr): %Template {
+$LambdaApplication(function,argument: %Expr): %Template {
   notation = $OuterParens(
     body = [
       $InnerParens(
@@ -2192,7 +2192,7 @@ $LambdaApplication(function: %Expr, argument: %Expr): %Template {
  *
  * @example `$LambdaSubstitution(term = a, variable = b, replacement = c)`
  */
-$LambdaSubstitution(term: %Expr, variable: %Expr, replacement: %Expr): %Template {
+$LambdaSubstitution(term: %Expr, variable,replacement: %Expr): %Template {
   notation = $Function(
     function = term,
     arguments = [$EqualityDefinition(

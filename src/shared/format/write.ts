@@ -166,31 +166,29 @@ export class Writer {
   }
 
   writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
-    let paramIndent = indent;
-    let lastParamIndent = indent;
+    let groupIndent = indent;
+    let lastGroupIndent = indent;
     if (parameters.length <= 1 || !this.newLineStr) {
       multiLine = false;
     } else {
-      paramIndent = this.indent(paramIndent);
-      lastParamIndent = this.indent(lastParamIndent, !multiLine);
+      groupIndent = this.indent(groupIndent);
+      lastGroupIndent = this.indent(lastGroupIndent, !multiLine);
     }
-    let index = 0;
+    let currentGroup: Fmt.Parameter[] = [];
+    let groupIndex = 0;
     for (let parameter of parameters) {
       if (this.skipHiddenParameters && parameter.name.startsWith('_')) {
         continue;
       }
-      if (index) {
-        this.write(',');
-        if (!multiLine) {
-          this.writeOptionalSpace();
-        }
+      if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
+        this.writeParameterGroupWithPrefix(currentGroup, groupIndent, multiLine, groupIndex > 0);
+        currentGroup.length = 0;
+        groupIndex++;
       }
-      if (multiLine) {
-        this.writeNewLine();
-        this.writeIndent(paramIndent);
-      }
-      this.writeParameter(parameter, index === parameters.length - 1 ? lastParamIndent : paramIndent);
-      index++;
+      currentGroup.push(parameter);
+    }
+    if (currentGroup.length) {
+      this.writeParameterGroupWithPrefix(currentGroup, lastGroupIndent, multiLine, groupIndex > 0);
     }
     if (multiLine) {
       this.writeNewLine();
@@ -200,28 +198,52 @@ export class Writer {
     }
   }
 
-  writeParameter(parameter: Fmt.Parameter, indent?: IndentInfo): void {
-    this.writeRange(parameter, false, false, false, false, () => {
-      this.writeIdentifier(parameter.name, parameter, false);
-      if (parameter.dependencies) {
-        this.write('[');
-        this.writeExpressions(parameter.dependencies, indent);
-        this.write(']');
-      }
-      if (parameter.list) {
-        this.write('...');
-      }
-      if (parameter.optional) {
-        this.write('?');
-      }
-      this.writeType(parameter.type, indent);
-      if (parameter.defaultValue) {
+  writeParameterGroupWithPrefix(parameters: Fmt.Parameter[], indent?: IndentInfo, multiLine: boolean = false, prependComma: boolean = false): void {
+    if (prependComma) {
+      this.write(',');
+      if (!multiLine) {
         this.writeOptionalSpace();
-        this.write('=');
-        this.writeOptionalSpace();
-        this.writeExpression(parameter.defaultValue, indent);
       }
+    }
+    if (multiLine) {
+      this.writeNewLine();
+      this.writeIndent(indent);
+    }
+    this.writeParameterGroup(parameters, indent);
+  }
+
+  writeParameterGroup(parameters: Fmt.Parameter[], indent?: IndentInfo): void {
+    this.writeRanges(parameters, () => {
+      parameters.forEach((parameter: Fmt.Parameter, index: number) => {
+        this.writeIdentifier(parameter.name, parameter, false);
+        if (parameter.dependencies) {
+          this.write('[');
+          this.writeExpressions(parameter.dependencies, indent);
+          this.write(']');
+        }
+        if (parameter.list) {
+          this.write('...');
+        }
+        if (parameter.optional) {
+          this.write('?');
+        }
+        if (index === parameters.length - 1) {
+          this.writeType(parameter.type, indent);
+          if (parameter.defaultValue) {
+            this.writeOptionalSpace();
+            this.write('=');
+            this.writeOptionalSpace();
+            this.writeExpression(parameter.defaultValue, indent);
+          }
+        } else {
+          this.write(',');
+        }
+      });
     });
+  }
+
+  writeParameter(parameter: Fmt.Parameter, indent?: IndentInfo): void {
+    this.writeParameterGroup([parameter], indent);
   }
 
   writeArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo, multiLine: boolean = false): void {
@@ -598,6 +620,15 @@ export class Writer {
       if (this.stream.endRange) {
         this.stream.endRange();
       }
+    }
+  }
+
+  private writeRanges(objects: Object[], fn: () => void): void {
+    if (objects.length) {
+      this.writeRange(objects[0], false, false, false, false, () =>
+        this.writeRanges(objects.slice(1), fn));
+    } else {
+      fn();
     }
   }
 

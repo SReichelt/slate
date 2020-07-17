@@ -54,7 +54,7 @@ $Constructor: %DefinitionType($ElementTerm) {
 $EqualityDefinition: %ExpressionType {
   members = #(
     leftParameters: %ParameterList,
-    rightParameters[leftParameters]: %ParameterList,
+    rightParameters[leftParameters]: %ParameterList,  // TODO #65 remove dependency, combine
     definition[leftParameters, rightParameters]: $Formula[],
     equivalenceProofs[leftParameters, rightParameters]: $Proof[] = [],
     reflexivityProof?: $Proof,
@@ -247,12 +247,12 @@ $associative(term: $ElementTerm): $ElementTerm {}
 $not(formula: $Formula): $Formula {}
 $and(formulas...?: $Formula): $Formula {}
 $or(formulas...?: $Formula): $Formula {}
-$equiv(left: $Formula, right: $Formula): $Formula {}
+$equiv(left,right: $Formula): $Formula {}
 $forall(parameters: %ParameterList, formula[parameters]: $Formula): $Formula {}
 $exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $existsUnique(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
-$in(element: $ElementTerm, set: $SetTerm): $Formula {}
-$sub(subset: $SetTerm, superset: $SetTerm): $Formula {}
+$in(element,set: $SetTerm): $Formula {}
+$sub(subset,superset: $SetTerm): $Formula {}
 $setEquals(terms...: $SetTerm): $Formula {}
 $equals(terms...: $ElementTerm): $Formula {}
 $structural(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Formula)[]): $Formula {}

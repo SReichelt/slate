@@ -7,7 +7,7 @@ export abstract class Context {
   abstract getVariables(): VariableInfo[];
   abstract getVariable(name: string): VariableInfo;
 
-  abstract getPreviousParameter(): Fmt.Parameter | undefined;
+  abstract getPreviousParameter(): Fmt.Parameter | undefined;  // TODO #65 remove
 }
 
 export class EmptyContext extends Context {
@@ -19,7 +19,7 @@ export class EmptyContext extends Context {
     throw new Error(`Variable "${name}" not found`);
   }
 
-  getPreviousParameter(): Fmt.Parameter | undefined {
+  getPreviousParameter(): Fmt.Parameter | undefined {  // TODO #65 remove
     return undefined;
   }
 }
@@ -37,7 +37,7 @@ export class DerivedContext extends Context {
     return this.parentContext.getVariable(name);
   }
 
-  getPreviousParameter(): Fmt.Parameter | undefined {
+  getPreviousParameter(): Fmt.Parameter | undefined {  // TODO #65 remove
     return this.parentContext.getPreviousParameter();
   }
 }
@@ -65,7 +65,7 @@ export class ParameterContext extends DerivedContext implements VariableInfo {
     return this.parentContext.getVariable(name);
   }
 
-  getPreviousParameter(): Fmt.Parameter | undefined {
+  getPreviousParameter(): Fmt.Parameter | undefined {  // TODO #65 remove
     return this.parameter;
   }
 }
@@ -81,7 +81,7 @@ export class DummyContext extends Context {
     return {parameter: param};
   }
 
-  getPreviousParameter(): Fmt.Parameter | undefined {
+  getPreviousParameter(): Fmt.Parameter | undefined {  // TODO #65 remove
     return undefined;
   }
 }
