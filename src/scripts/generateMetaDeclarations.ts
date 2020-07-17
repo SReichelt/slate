@@ -718,7 +718,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
   return outFileStr;
 }
 
-function outputExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+function outputExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   if (remainingArrayDimensions) {
     let item = 'item';
@@ -726,14 +726,18 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
       item += remainingArrayDimensions - 1;
     }
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputExportValueCode(inFile, argName, item, context, type, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputExportValueCode(inFile, argName, item, context, indexParameterLists, type, remainingArrayDimensions - 1, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     if (type.expression instanceof Fmt.MetaRefExpression) {
+      let indices = 'indexParameterLists';
+      if (indexParameterLists) {
+        indices = `${indices} ? [...${[indices, ...indexParameterLists].join(', ')}] : [${indexParameterLists.join(', ')}]`;
+      }
       if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-        outFileStr += `${indent}${context} = this.getParameterContext(${source}, ${context});\n`;
+        outFileStr += `${indent}${context} = this.getParameterContext(${source}, ${context}, ${indices});\n`;
       } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
-        outFileStr += `${indent}${context} = this.getParameterListContext(${source}, ${context});\n`;
+        outFileStr += `${indent}${context} = this.getParameterListContext(${source}, ${context}, ${indices});\n`;
       }
     } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
       let path = type.expression.path;
@@ -741,7 +745,7 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
         let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
         if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
           for (; definition; definition = getSuperDefinition(inFile, definition)) {
-            outFileStr += outputDefinitionExportCode(inFile, definition, source, context, indent);
+            outFileStr += outputDefinitionExportCode(inFile, definition, source, context, indexParameterLists, indent);
           }
         }
       }
@@ -750,7 +754,7 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
   return outFileStr;
 }
 
-function outputExportCode(inFile: Fmt.File, argName: string, source: string, context: string, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
+function outputExportCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
   let outFileStr = '';
   let arrayDimensions = getMemberContentType(inFile, type) ? type.arrayDimensions : 0;
   if (list) {
@@ -758,15 +762,15 @@ function outputExportCode(inFile: Fmt.File, argName: string, source: string, con
   }
   if (optional) {
     outFileStr += `${indent}if (${source} !== undefined) {\n`;
-    outFileStr += outputExportValueCode(inFile, argName, source, context, type, arrayDimensions, `${indent}  `);
+    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, type, arrayDimensions, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
-    outFileStr += outputExportValueCode(inFile, argName, source, context, type, arrayDimensions, indent);
+    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, type, arrayDimensions, indent);
   }
   return outFileStr;
 }
 
-function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition, source: string, context: string, indent: string): string {
+function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition, source: string, context: string, indexParameterLists: string[] | undefined, indent: string): string {
   let outFileStr = '';
   if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
     let exports = definition.contents.exports;
@@ -776,7 +780,20 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
           let member = item.variable;
           let memberName = translateMemberName(member.name);
           let optional = member.optional || member.defaultValue !== undefined;
-          outFileStr += outputExportCode(inFile, member.name, `${source}.${memberName}`, context, member.type, optional, member.list, indent);
+          let itemIndexParameterLists: string[] | undefined = undefined;
+          if (item.indices) {
+            itemIndexParameterLists = indexParameterLists ? indexParameterLists.slice() : [];
+            for (let indexArgs of item.indices) {
+              for (let indexArg of indexArgs) {
+                if (indexArg.value instanceof Fmt.VariableRefExpression) {
+                  let index = indexArg.value.variable;
+                  let indexName = translateMemberName(index.name);
+                  itemIndexParameterLists.push(`${source}.${indexName}`);
+                }
+              }
+            }
+          }
+          outFileStr += outputExportCode(inFile, member.name, `${source}.${memberName}`, context, itemIndexParameterLists, member.type, optional, member.list, indent);
         }
       }
     }
@@ -1147,11 +1164,11 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
         continue;
       }
       if (isVisibleType(visibleTypeNames, definition)) {
-        let definitionExportCode = outputDefinitionExportCode(inFile, definition, 'expression', 'context', '      ');
+        let definitionExportCode = outputDefinitionExportCode(inFile, definition, 'expression', 'context', undefined, '      ');
         if (definitionExportCode) {
           if (!hasExports) {
             outFileStr += `\n`;
-            outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {\n`;
+            outFileStr += `  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {\n`;
             outFileStr += `    let context = parentContext;\n`;
             hasExports = true;
           }

@@ -205,7 +205,7 @@ export class Writer {
       this.writeIdentifier(parameter.name, parameter, false);
       if (parameter.dependencies) {
         this.write('[');
-        this.writeExpressions(parameter.dependencies, indent, 0, false);
+        this.writeExpressions(parameter.dependencies, indent);
         this.write(']');
       }
       if (parameter.list) {
@@ -294,17 +294,13 @@ export class Writer {
     this.writeOptionalSpace();
     this.writeRange(type, false, false, false, false, () => {
       this.writeExpression(type.expression, indent);
-      if (type.arrayDimensions) {
-        this.write('[');
-        for (let i = 1; i < type.arrayDimensions; i++) {
-          this.write(',');
-        }
-        this.write(']');
+      for (let i = 0; i < type.arrayDimensions; i++) {
+        this.write('[]');
       }
     });
   }
 
-  writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, maxLineLength: number = 0, squeeze: boolean = false): void {
+  writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, maxLineLength: number = 0): void {
     let expressionIndent = indent;
     let lastExpressionIndent = indent;
     if (expressions.length <= 1 || !this.newLineStr) {
@@ -318,7 +314,7 @@ export class Writer {
     for (let expression of expressions) {
       if (index) {
         this.write(',');
-        if (remainingLineLength && !squeeze) {
+        if (remainingLineLength) {
           this.writeOptionalSpace();
         }
       }
@@ -339,7 +335,7 @@ export class Writer {
     }
   }
 
-  writeExpressionList(expressions: Fmt.Expression[], indent?: IndentInfo, squeeze: boolean = false): void {
+  writeExpressionList(expressions: Fmt.Expression[], indent?: IndentInfo): void {
     let maxLineLength = expressions.length > 10 ? 10 : 0;
     for (let item of expressions) {
       if (this.isLargeExpression(item)) {
@@ -348,14 +344,8 @@ export class Writer {
       }
     }
     this.write('[');
-    this.writeExpressions(expressions, indent, maxLineLength, squeeze);
+    this.writeExpressions(expressions, indent, maxLineLength);
     this.write(']');
-  }
-
-  writeOptionalExpressionList(expressions: Fmt.Expression[] | undefined, indent?: IndentInfo, squeeze: boolean = false): void {
-    if (expressions && expressions.length) {
-      this.writeExpressionList(expressions, indent, squeeze);
-    }
   }
 
   writeExpression(expression: Fmt.Expression, indent?: IndentInfo): void {
@@ -367,7 +357,15 @@ export class Writer {
       } else if (expression instanceof Fmt.VariableRefExpression) {
         // TODO disallow references to shadowed variables
         this.writeIdentifier(expression.variable.name, expression, true);
-        this.writeOptionalExpressionList(expression.indices, indent, true);
+        if (expression.indices) {
+          for (let index of expression.indices) {
+            this.writeRange(index, false, false, false, false, () => {
+              this.write('[');
+              this.writeArguments(index, indent);
+              this.write(']');
+            });
+          }
+        }
       } else if (expression instanceof Fmt.MetaRefExpression) {
         this.writeRange(expression, false, false, true, false, () => {
           this.write('%');
@@ -394,7 +392,7 @@ export class Writer {
         this.writeArguments(expression.arguments, indent, false, true);
         this.write('}');
       } else if (expression instanceof Fmt.ArrayExpression) {
-        this.writeExpressionList(expression.items, indent, false);
+        this.writeExpressionList(expression.items, indent);
       } else if (expression instanceof Fmt.PlaceholderExpression) {
         if (this.allowPlaceholders) {
           this.write('?');

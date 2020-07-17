@@ -31,7 +31,11 @@ export interface ReplacedParameter {
   replacement: Parameter;
 }
 
-export abstract class PathItem {
+export interface Comparable<T> {
+  isEquivalentTo(object: T, fn?: ExpressionUnificationFn, replacedParameters?: ReplacedParameter[]): boolean;
+}
+
+export abstract class PathItem implements Comparable<PathItem> {
   parentPath?: PathItem;
 
   clone(replacedParameters: ReplacedParameter[] = []): PathItem {
@@ -219,7 +223,7 @@ export class DefinitionList extends Array<Definition> {
   }
 }
 
-export class Parameter {
+export class Parameter implements Comparable<Parameter> {
   name: string;
   type: Type;
   defaultValue?: Expression;
@@ -308,8 +312,8 @@ export class Parameter {
       let origReplacedParametersLength = replacedParameters.length;
       replacedParameters.push({original: this, replacement: parameter});
       if (this.type.isEquivalentTo(parameter.type, fn, replacedParameters)
-          && Expression.areExpressionsEquivalent(this.defaultValue, parameter.defaultValue, fn, replacedParameters)
-          && Expression.areExpressionListsEquivalent(this.dependencies, parameter.dependencies, fn, replacedParameters)) {
+          && areObjectsEquivalent(this.defaultValue, parameter.defaultValue, fn, replacedParameters)
+          && areListsEquivalent(this.dependencies, parameter.dependencies, fn, replacedParameters)) {
         return true;
       }
       replacedParameters.length = origReplacedParametersLength;
@@ -322,7 +326,7 @@ export class Parameter {
   }
 }
 
-export class ParameterList extends Array<Parameter> {
+export class ParameterList extends Array<Parameter> implements Comparable<ParameterList> {
   getParameter(name?: string, index?: number): Parameter {
     if (name !== undefined) {
       for (let param of this) {
@@ -388,7 +392,7 @@ export class ParameterList extends Array<Parameter> {
   }
 }
 
-export class Argument {
+export class Argument implements Comparable<Argument> {
   name?: string;
   value: Expression;
   optional?: boolean;
@@ -427,7 +431,7 @@ export class Argument {
   }
 }
 
-export class ArgumentList extends Array<Argument> {
+export class ArgumentList extends Array<Argument> implements Comparable<ArgumentList> {
   get(name?: string, index?: number): Argument | undefined {
     let curIndex = 0;
     for (let arg of this) {
@@ -564,8 +568,8 @@ export class ArgumentList extends Array<Argument> {
   }
 }
 
-export class Type {
-  expression: ObjectRefExpression;
+export class Type implements Comparable<Type> {
+  expression: Expression;
   arrayDimensions: number;
 
   clone(replacedParameters: ReplacedParameter[] = []): Type {
@@ -652,7 +656,7 @@ export class GenericObjectContents extends ObjectContents {
   }
 }
 
-export abstract class Expression {
+export abstract class Expression implements Comparable<Expression> {
   clone(replacedParameters: ReplacedParameter[] = []): Expression {
     return this.substitute(undefined, replacedParameters);
   }
@@ -692,33 +696,6 @@ export abstract class Expression {
   }
 
   protected abstract matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean;
-
-  static areExpressionsEquivalent(left: Expression | undefined, right: Expression | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
-    if (!left && !right) {
-      return true;
-    }
-    if (left && right) {
-      return left.isEquivalentTo(right, fn, replacedParameters);
-    }
-    return false;
-  }
-
-  static areExpressionListsEquivalent(left: Expression[] | undefined, right: Expression[] | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
-    if (!left && !right) {
-      return true;
-    }
-    if (left && right && left.length === right.length) {
-      let origReplacedParametersLength = replacedParameters.length;
-      for (let i = 0; i < left.length; i++) {
-        if (!left[i].isEquivalentTo(right[i], fn, replacedParameters)) {
-          replacedParameters.length = origReplacedParametersLength;
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
 
   toString(): string {
     return writeToString((writer: FmtWriter.Writer) => writer.writeExpression(this));
@@ -765,7 +742,8 @@ export class StringExpression extends Expression {
 
 export class VariableRefExpression extends Expression {
   variable: Parameter;
-  indices?: Expression[];
+  indexParameterLists?: ParameterList[];
+  indices?: ArgumentList[];
 
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new VariableRefExpression;
@@ -774,11 +752,12 @@ export class VariableRefExpression extends Expression {
     if (result.variable !== this.variable) {
       changed = true;
     }
+    result.indexParameterLists = this.indexParameterLists;
     if (this.indices) {
       result.indices = [];
       for (let index of this.indices) {
-        let newIndex = index.substitute(fn, replacedParameters);
-        if (newIndex !== index) {
+        let newIndex: ArgumentList = Object.create(ArgumentList);
+        if (index.substituteExpression(fn, newIndex, replacedParameters)) {
           changed = true;
         }
         result.indices.push(newIndex);
@@ -790,14 +769,11 @@ export class VariableRefExpression extends Expression {
   protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
     return expression instanceof VariableRefExpression
            && this.variable.findReplacement(replacedParameters) === expression.variable
-           && Expression.areExpressionListsEquivalent(this.indices, expression.indices, fn, replacedParameters);
+           && areListsEquivalent(this.indices, expression.indices, fn, replacedParameters);
   }
 }
 
-export abstract class ObjectRefExpression extends Expression {
-}
-
-export abstract class MetaRefExpression extends ObjectRefExpression {
+export abstract class MetaRefExpression extends Expression {
   abstract getName(): string;
   abstract fromArgumentList(argumentList: ArgumentList): void;
   abstract toArgumentList(argumentList: ArgumentList): void;
@@ -846,7 +822,7 @@ export class GenericMetaRefExpression extends MetaRefExpression {
   }
 }
 
-export class DefinitionRefExpression extends ObjectRefExpression {
+export class DefinitionRefExpression extends Expression {
   path: Path;
 
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
@@ -911,7 +887,7 @@ export class ArrayExpression extends Expression {
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
     return expression instanceof ArrayExpression
-           && Expression.areExpressionListsEquivalent(this.items, expression.items, fn, replacedParameters);
+           && areListsEquivalent(this.items, expression.items, fn, replacedParameters);
   }
 }
 
@@ -1005,6 +981,33 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
   allowArbitraryReferences(): boolean {
     return true;
   }
+}
+
+function areObjectsEquivalent<T extends Comparable<T>>(left: T | undefined, right: T | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+  if (!left && !right) {
+    return true;
+  }
+  if (left && right) {
+    return left.isEquivalentTo(right, fn, replacedParameters);
+  }
+  return false;
+}
+
+function areListsEquivalent<T extends Comparable<T>>(left: T[] | undefined, right: T[] | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+  if (!left && !right) {
+    return true;
+  }
+  if (left && right && left.length === right.length) {
+    let origReplacedParametersLength = replacedParameters.length;
+    for (let i = 0; i < left.length; i++) {
+      if (!left[i].isEquivalentTo(right[i], fn, replacedParameters)) {
+        replacedParameters.length = origReplacedParametersLength;
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 function writeToString(doWrite: (writer: FmtWriter.Writer) => void): string {

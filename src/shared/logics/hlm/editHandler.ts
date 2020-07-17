@@ -253,10 +253,10 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       {
-        let onGetExpressions = (variable: Fmt.Parameter) => {
-          let type = variable.type.expression;
+        let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
+          let type = variableInfo.parameter.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef) {
-            return this.getVariableRefExpressions(expressionEditInfo, variable, true);
+            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
           }
           return CachedPromise.resolve([]);
         };
@@ -315,10 +315,10 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       {
-        let onGetExpressions = (variable: Fmt.Parameter) => {
-          let type = variable.type.expression;
+        let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
+          let type = variableInfo.parameter.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
-            return this.getVariableRefExpressions(expressionEditInfo, variable, true);
+            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
           }
           return CachedPromise.resolve([]);
         };
@@ -372,10 +372,10 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       {
-        let onGetExpressions = (variable: Fmt.Parameter) => {
-          let type = variable.type.expression;
+        let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
+          let type = variableInfo.parameter.type.expression;
           if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-            return this.getVariableRefExpressions(expressionEditInfo, variable, false)
+            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, false)
               .then(addNegations);
           }
           return CachedPromise.resolve([]);
@@ -638,15 +638,19 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  private getVariableRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, variable: Fmt.Parameter, checkType: boolean): CachedPromise<Fmt.Expression[]> {
+  private getVariableRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, variableInfo: Ctx.VariableInfo, checkType: boolean): CachedPromise<Fmt.Expression[]> {
     let expression = new Fmt.VariableRefExpression;
-    expression.variable = variable;
-    for (let bindingParameter = this.utils.getParentBinding(variable); bindingParameter; bindingParameter = this.utils.getParentBinding(bindingParameter)) {
-      let placeholder = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
-      if (expression.indices) {
-        expression.indices.unshift(placeholder);
-      } else {
-        expression.indices = [placeholder];
+    expression.variable = variableInfo.parameter;
+    if (variableInfo.indexParameterLists) {
+      expression.indexParameterLists = variableInfo.indexParameterLists;
+      for (let indexParameterList of variableInfo.indexParameterLists) {
+        let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+        this.utils.fillDefaultPlaceholderArguments(indexParameterList, args, expressionEditInfo.context);
+        if (expression.indices) {
+          expression.indices.unshift(args);
+        } else {
+          expression.indices = [args];
+        }
       }
     }
     if (checkType && expressionEditInfo.expression) {
@@ -731,9 +735,7 @@ export class HLMEditHandler extends GenericEditHandler {
       for (let parentPath of parentPaths) {
         let resultPath = new Fmt.Path;
         resultPath.name = path.name;
-        let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-        let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName, context);
-        this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, createPlaceholder, createElementParameter);
+        this.utils.fillDefaultPlaceholderArguments(definition.parameters, resultPath.arguments, context);
         resultPath.parentPath = parentPath;
         if (notationAlternative) {
           this.utils.reorderArguments(resultPath.arguments, notationAlternative);
@@ -813,12 +815,12 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private findResultPathArgument(resultPath: Fmt.Path, param: Fmt.Parameter): Fmt.Expression | undefined {
-    let parentBinding = this.utils.getParentBinding(param);
-    if (parentBinding) {
-      let rawBindingArg = this.findResultPathArgument(resultPath, parentBinding);
-      if (rawBindingArg) {
-        let bindingArg = this.utils.convertArgument(rawBindingArg, FmtHLM.ObjectContents_BindingArg);
-        return this.utils.getRawArgument([bindingArg.arguments], param);
+    let parentBinder = this.utils.getParentBinder(param);
+    if (parentBinder) {
+      let rawBinderArg = this.findResultPathArgument(resultPath, parentBinder);
+      if (rawBinderArg) {
+        let binderArg = this.utils.convertArgument(rawBinderArg, FmtHLM.ObjectContents_BinderArg);
+        return this.utils.getRawArgument([binderArg.targetArguments], param);
       } else {
         return undefined;
       }
@@ -846,11 +848,11 @@ export class HLMEditHandler extends GenericEditHandler {
 
     let result = CachedPromise.resolve<Menu.ExpressionMenuItem[]>([]);
     let variables = expressionEditInfo.context.getVariables();
-    for (let variable of variables) {
-      let type = variable.type.expression;
+    for (let variableInfo of variables) {
+      let type = variableInfo.parameter.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
         result = result.then((menuItems: Menu.ExpressionMenuItem[]) =>
-          this.getVariableRefExpressions(expressionEditInfo, variable, false).then((variableRefExpressions: Fmt.Expression[]) => {
+          this.getVariableRefExpressions(expressionEditInfo, variableInfo, false).then((variableRefExpressions: Fmt.Expression[]) => {
             let currentMenuItems = CachedPromise.resolve(menuItems);
             for (let variableRefExpression of variableRefExpressions) {
               currentMenuItems = currentMenuItems.then((items: Menu.ExpressionMenuItem[]) => {
@@ -1186,10 +1188,10 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
     let result = new FmtHLM.ObjectContents_EqualityDefinition;
-    let leftParameters = new Fmt.ParameterList;
+    let leftParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
     parameters.clone(leftParameters);
     result.leftParameters = leftParameters;
-    let rightParameters = new Fmt.ParameterList;
+    let rightParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
     parameters.clone(rightParameters);
     this.addApostrophes(rightParameters);
     result.rightParameters = rightParameters;

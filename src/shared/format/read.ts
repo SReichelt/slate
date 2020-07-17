@@ -456,14 +456,14 @@ export class Reader {
     }
     let typeStart = this.markStart();
     let type = new Fmt.Type;
-    type.expression = this.readExpression(true, metaDefinitions, context) as Fmt.ObjectRefExpression;
+    type.expression = this.readExpression(true, metaDefinitions, context);
     type.arrayDimensions = 0;
     this.skipWhitespace();
-    if (this.tryReadChar('[')) {
+    while (this.tryReadChar('[')) {
       do {
         type.arrayDimensions++;
         this.skipWhitespace();
-      } while (this.tryReadChar(','));
+      } while (this.tryReadChar(','));  // TODO #65 remove
       this.readChar(']');
     }
     this.markEnd(typeStart, type, context, metaDefinitions);
@@ -578,14 +578,25 @@ export class Reader {
   private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): Fmt.Expression {
     let expression = new Fmt.VariableRefExpression;
     try {
-      expression.variable = context.getVariable(identifier);
+      let variableInfo = context.getVariable(identifier);
+      expression.variable = variableInfo.parameter;
+      expression.indexParameterLists = variableInfo.indexParameterLists;
     } catch (error) {
       this.error(error.message, identifierRange);
     }
     this.skipWhitespace();
-    if (this.tryReadChar('[')) {
-      expression.indices = this.readExpressions(context);
+    let indexStart = this.markStart();
+    while (this.tryReadChar('[')) {
+      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      this.readArguments(args, context);
+      if (expression.indices) {
+        expression.indices.push(args);
+      } else {
+        expression.indices = [args];
+      }
       this.readChar(']');
+      this.markEnd(indexStart, args, context);
+      indexStart = this.markStart();
     }
     return expression;
   }

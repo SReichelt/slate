@@ -119,7 +119,9 @@ export class EditAnalysis {
     context = new Ctx.ParentInfoContext(expression, context);
     if (expression instanceof Fmt.VariableRefExpression) {
       if (expression.indices) {
-        this.analyzeExpressions(expression.indices, expression.indices.length, undefined, context);
+        for (let index of expression.indices) {
+          this.analyzeArgumentList(index, onApplyConvertedArgument, context);
+        }
       }
     } else if (expression instanceof Fmt.MetaRefExpression) {
       this.analyzeMetaRefExpression(expression, context);

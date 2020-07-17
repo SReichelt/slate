@@ -5,7 +5,7 @@ import * as Fmt from '../../../shared/format/format';
 import * as FmtDynamic from '../../../shared/format/dynamic';
 import * as FmtMeta from '../../../shared/format/meta';
 import { ParsedDocument } from './parsedDocument';
-import { findReferencedDefinition, getArgumentTypeOfReferencedDefinitionParameter, ReferencedDefinition } from './navigate';
+import { findReferencedDefinition, getArgumentType, ReferencedDefinition } from './navigate';
 
 class ReferenceChecker {
     referencedDefinition?: ReferencedDefinition;
@@ -37,7 +37,7 @@ class ReferenceChecker {
     }
 
     checkArgumentValueOfReferencedDefinition(param: Fmt.Parameter, value: Fmt.Expression): void {
-        let argumentTypeExpression = getArgumentTypeOfReferencedDefinitionParameter(param);
+        let argumentTypeExpression = getArgumentType(param);
         if (argumentTypeExpression) {
             let argumentType = new Fmt.Type;
             argumentType.expression = argumentTypeExpression;
@@ -127,18 +127,34 @@ class ReferenceChecker {
 export function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagnostics: vscode.Diagnostic[] | undefined, sourceDocument?: vscode.TextDocument): void {
     parsedDocument.hasBrokenReferences = false;
     for (let rangeInfo of parsedDocument.rangeList) {
-        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.context && rangeInfo.context.metaModel instanceof FmtDynamic.DynamicMetaModel) {
-            let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, rangeInfo.context.metaModel, rangeInfo.range, sourceDocument);
-            let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument);
-            if (referencedDefinition === undefined) {
-                referenceChecker.error(`Definition "${rangeInfo.object.name}" not found`);
-            }
-            if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
-                referenceChecker.referencedDefinition = referencedDefinition;
-                try {
-                    referenceChecker.checkArgumentsOfReferencedDefinition(referencedDefinition.definition.parameters, referencedDefinition.arguments);
-                } catch (error) {
-                    referenceChecker.error(error.message);
+        let metaModel = rangeInfo.context?.metaModel;
+        if (metaModel instanceof FmtDynamic.DynamicMetaModel) {
+            if (rangeInfo.object instanceof Fmt.Path) {
+                let path = rangeInfo.object;
+                let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
+                let referencedDefinition = findReferencedDefinition(parsedDocument, path, rangeInfo.context, sourceDocument);
+                if (referencedDefinition === undefined) {
+                    referenceChecker.error(`Definition "${path.name}" not found`);
+                }
+                if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
+                    referenceChecker.referencedDefinition = referencedDefinition;
+                    try {
+                        referenceChecker.checkArgumentsOfReferencedDefinition(referencedDefinition.definition.parameters, referencedDefinition.arguments);
+                    } catch (error) {
+                        referenceChecker.error(error.message);
+                    }
+                }
+            } else if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
+                let expression = rangeInfo.object;
+                if (expression.indexParameterLists && expression.indices) {
+                    let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
+                    for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
+                        try {
+                            referenceChecker.checkArgumentsOfReferencedDefinition(expression.indexParameterLists[indexIndex], expression.indices[indexIndex]);
+                        } catch (error) {
+                            referenceChecker.error(error.message);
+                        }
+                    }
                 }
             }
         }

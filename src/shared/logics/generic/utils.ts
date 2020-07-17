@@ -62,7 +62,7 @@ export class GenericUtils {
     return FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
   }
 
-  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (indices?: Fmt.Expression[]) => Fmt.Expression): Fmt.Expression {
+  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (indices?: Fmt.ArgumentList[]) => Fmt.Expression): Fmt.Expression {
     return FmtUtils.substituteVariable(expression, variable, substitution);
   }
 
@@ -86,7 +86,7 @@ export class GenericUtils {
   }
 
   private static adjustPath<PathItemType extends Fmt.PathItem>(path: PathItemType, targetPath: Fmt.PathItem | undefined): PathItemType {
-    let newPath = Object.create(path);
+    let newPath: PathItemType = Object.create(path);
     newPath.parentPath = path.parentPath ? GenericUtils.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
   }
@@ -94,7 +94,7 @@ export class GenericUtils {
   getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
     let newName = defaultName;
     let suffix = '';
-    let variableNames = context.getVariables().map((param: Fmt.Parameter) => param.name);
+    let variableNames = context.getVariables().map((variable: Ctx.VariableInfo) => variable.parameter.name);
     while (variableNames.indexOf(newName + suffix) >= 0) {
       newName = getNextDefaultName(newName);
       if (newName === defaultName) {

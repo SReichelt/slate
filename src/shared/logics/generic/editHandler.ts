@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as Ctx from '../../format/context';
 import * as FmtUtils from '../../format/utils';
 import * as Edit from '../../format/edit';
 import * as Logic from '../logic';
@@ -666,20 +667,20 @@ export abstract class GenericEditHandler {
     return item;
   }
 
-  protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variable: Fmt.Parameter) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
+  protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variableInfo: Ctx.VariableInfo) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
     let variables = expressionEditInfo.context.getVariables();
     let variableItems: CachedPromise<Menu.ExpressionMenuItem[]> = CachedPromise.resolve([]);
     let variableNames = new Set<string>();
     for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
-      let variable = variables[variableIndex];
-      if (variableNames.has(variable.name)) {
+      let variableInfo = variables[variableIndex];
+      if (variableNames.has(variableInfo.parameter.name)) {
         // Cannot reference shadowed variable.
         continue;
       } else {
-        variableNames.add(variable.name);
+        variableNames.add(variableInfo.parameter.name);
       }
       variableItems = variableItems.then((items: Menu.ExpressionMenuItem[]) =>
-        onGetExpressions(variable).then((expressions: Fmt.Expression[]) => {
+        onGetExpressions(variableInfo).then((expressions: Fmt.Expression[]) => {
           let newItems = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
           return newItems.concat(items);
         })

@@ -2547,6 +2547,75 @@ export class MetaRefExpression_Binding extends Fmt.MetaRefExpression {
   }
 }
 
+export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
+  sourceParameters: Fmt.ParameterList;
+  targetParameters: Fmt.ParameterList;
+
+  getName(): string {
+    return 'Binder';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    let sourceParametersRaw = argumentList.getValue('sourceParameters', 0);
+    if (sourceParametersRaw instanceof Fmt.ParameterExpression) {
+      this.sourceParameters = sourceParametersRaw.parameters;
+    } else {
+      throw new Error('sourceParameters: Parameter expression expected');
+    }
+    let targetParametersRaw = argumentList.getValue('targetParameters', 1);
+    if (targetParametersRaw instanceof Fmt.ParameterExpression) {
+      this.targetParameters = targetParametersRaw.parameters;
+    } else {
+      throw new Error('targetParameters: Parameter expression expected');
+    }
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList): void {
+    argumentList.length = 0;
+    let sourceParametersExpr = new Fmt.ParameterExpression;
+    sourceParametersExpr.parameters.push(...this.sourceParameters);
+    argumentList.add(sourceParametersExpr, undefined, false);
+    let targetParametersExpr = new Fmt.ParameterExpression;
+    targetParametersExpr.parameters.push(...this.targetParameters);
+    argumentList.add(targetParametersExpr, undefined, false);
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    let result = new MetaRefExpression_Binder;
+    let changed = false;
+    if (this.sourceParameters) {
+      result.sourceParameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.targetParameters) {
+      result.targetParameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.targetParameters.substituteExpression(fn, result.targetParameters!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_Binder)) {
+      return false;
+    }
+    if (this.sourceParameters || expression.sourceParameters) {
+      if (!this.sourceParameters || !expression.sourceParameters || !this.sourceParameters.isEquivalentTo(expression.sourceParameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.targetParameters || expression.targetParameters) {
+      if (!this.targetParameters || !expression.targetParameters || !this.targetParameters.isEquivalentTo(expression.targetParameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
   _set: Fmt.Expression;
 
@@ -3014,6 +3083,85 @@ export class ObjectContents_BindingArg extends Fmt.ObjectContents {
     }
     if (this.arguments || objectContents.arguments) {
       if (!this.arguments || !objectContents.arguments || !this.arguments.isEquivalentTo(objectContents.arguments, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+export class ObjectContents_BinderArg extends Fmt.ObjectContents {
+  sourceParameters: Fmt.ParameterList;
+  targetArguments: Fmt.ArgumentList;
+
+  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+    let sourceParametersRaw = argumentList.getValue('sourceParameters', 0);
+    if (sourceParametersRaw instanceof Fmt.ParameterExpression) {
+      this.sourceParameters = sourceParametersRaw.parameters;
+    } else {
+      throw new Error('sourceParameters: Parameter expression expected');
+    }
+    let targetArgumentsRaw = argumentList.getValue('targetArguments', 1);
+    if (targetArgumentsRaw instanceof Fmt.CompoundExpression) {
+      this.targetArguments = targetArgumentsRaw.arguments;
+    } else {
+      throw new Error('targetArguments: Compound expression expected');
+    }
+  }
+
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+    argumentList.length = 0;
+    let sourceParametersExpr = new Fmt.ParameterExpression;
+    sourceParametersExpr.parameters.push(...this.sourceParameters);
+    argumentList.add(sourceParametersExpr, outputAllNames ? 'sourceParameters' : undefined, false);
+    let targetArgumentsExpr = new Fmt.CompoundExpression;
+    targetArgumentsExpr.arguments = this.targetArguments;
+    argumentList.add(targetArgumentsExpr, outputAllNames ? 'targetArguments' : undefined, false);
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BinderArg {
+    let result = new ObjectContents_BinderArg;
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.sourceParameters) {
+      this.sourceParameters.traverse(fn);
+    }
+    if (this.targetArguments) {
+      this.targetArguments.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_BinderArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.sourceParameters) {
+      result.sourceParameters = Object.create(Fmt.ParameterList.prototype);
+      if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.targetArguments) {
+      result.targetArguments = Object.create(Fmt.ArgumentList.prototype);
+      if (this.targetArguments.substituteExpression(fn, result.targetArguments!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_BinderArg, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (this.sourceParameters || objectContents.sourceParameters) {
+      if (!this.sourceParameters || !objectContents.sourceParameters || !this.sourceParameters.isEquivalentTo(objectContents.sourceParameters, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.targetArguments || objectContents.targetArguments) {
+      if (!this.targetArguments || !objectContents.targetArguments || !this.targetArguments.isEquivalentTo(objectContents.targetArguments, fn, replacedParameters)) {
         return false;
       }
     }
@@ -6146,7 +6294,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binding': MetaRefExpression_Binding, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Meta.MetaModel {
@@ -6442,6 +6590,14 @@ export class MetaModel extends Meta.MetaModel {
               }
             }
           }
+          if (currentContext.objectContentsClass === ObjectContents_BinderArg) {
+            if (argument.name === 'targetArguments' || (argument.name === undefined && argumentIndex === 1)) {
+              let sourceParametersValue = previousArguments.getOptionalValue('sourceParameters', 0);
+              if (sourceParametersValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(sourceParametersValue.parameters, context);
+              }
+            }
+          }
           if (currentContext.objectContentsClass === ObjectContents_Proof) {
             if (argument.name === 'goal' || (argument.name === undefined && argumentIndex === 3)) {
               let parametersValue = previousArguments.getOptionalValue('parameters', 2);
@@ -6486,6 +6642,14 @@ export class MetaModel extends Meta.MetaModel {
               context = new Ctx.ParameterContext(currentContext.parameter, context);
               break;
             }
+          }
+        }
+      }
+      if (parent instanceof MetaRefExpression_Binder) {
+        if (argument.name === 'targetParameters' || (argument.name === undefined && argumentIndex === 1)) {
+          let sourceParametersValue = previousArguments.getOptionalValue('sourceParameters', 0);
+          if (sourceParametersValue instanceof Fmt.ParameterExpression) {
+            context = this.getParameterListContext(sourceParametersValue.parameters, context);
           }
         }
       }
@@ -6609,13 +6773,17 @@ export class MetaModel extends Meta.MetaModel {
     return context;
   }
 
-  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
+  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     let context = parentContext;
     if (expression instanceof MetaRefExpression_Binding) {
-      context = this.getParameterListContext(expression.parameters, context);
+      context = this.getParameterListContext(expression.parameters, context, indexParameterLists);
+    }
+    if (expression instanceof MetaRefExpression_Binder) {
+      context = this.getParameterListContext(expression.sourceParameters, context, indexParameterLists);
+      context = this.getParameterListContext(expression.targetParameters, context, indexParameterLists ? [...indexParameterLists, expression.sourceParameters] : [expression.sourceParameters]);
     }
     if (expression instanceof MetaRefExpression_UseExists) {
-      context = this.getParameterListContext(expression.parameters, context);
+      context = this.getParameterListContext(expression.parameters, context, indexParameterLists);
     }
     return context;
   }

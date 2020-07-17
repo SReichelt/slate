@@ -10,7 +10,7 @@ import * as FmtDynamic from '../../../../shared/format/dynamic';
 import * as FmtMeta from '../../../../shared/format/meta';
 import { getFileNameFromPath, fileExtension, getFileNameFromPathStr } from '../../../../fs/format/dynamic';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
-import { ReferencedDefinition, findReferencedDefinition, SignatureInfo, getSignatureInfo, getArgumentTypeOfReferencedDefinitionParameter } from '../navigate';
+import { ReferencedDefinition, findReferencedDefinition, SignatureInfo, getSignatureInfo, getArgumentType } from '../navigate';
 import { readRange } from '../utils';
 import { RangeInfo } from '../../utils';
 import { parseFile } from '../parse';
@@ -340,7 +340,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
             if (paramCode) {
                 let assignment = paramCode + ' = ';
                 let insertText: vscode.SnippetString | undefined = undefined;
-                let type = signatureInfo.isMetaModel ? param.type.expression : getArgumentTypeOfReferencedDefinitionParameter(param);
+                let type = signatureInfo.isMetaModel ? param.type.expression : getArgumentType(param);
                 if (type) {
                     if (param.type.arrayDimensions) {
                         insertText = new vscode.SnippetString(assignment + '[$0]');
@@ -388,7 +388,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         if (rangeInfo.context) {
             let variables = rangeInfo.context.getVariables();
             for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
-                let param = variables[variableIndex];
+                let param = variables[variableIndex].parameter;
                 if (variableNames.has(param.name)) {
                     // Cannot reference shadowed variable.
                     continue;

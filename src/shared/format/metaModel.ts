@@ -36,20 +36,20 @@ export class MetaModel {
     return parentContext;
   }
 
-  getParameterContext(parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
-    let typeContext = this.getExports(parameter.type.expression, parentContext);
-    return new Ctx.ParameterContext(parameter, typeContext);
+  getParameterContext(parameter: Fmt.Parameter, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
+    let innerContext = this.getExports(parameter.type.expression, parentContext, indexParameterLists);
+    return new Ctx.ParameterContext(parameter, innerContext, indexParameterLists);
   }
 
-  getParameterListContext(parameters: Fmt.ParameterList, parentContext: Ctx.Context): Ctx.Context {
+  getParameterListContext(parameters: Fmt.ParameterList, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     let context = parentContext;
     for (let param of parameters) {
-      context = this.getParameterContext(param, context);
+      context = this.getParameterContext(param, context, indexParameterLists);
     }
     return context;
   }
 
-  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
+  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     return parentContext;
   }
 }

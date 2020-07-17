@@ -4,18 +4,18 @@ import { MetaModel } from './metaModel';
 export abstract class Context {
   constructor(public metaModel: MetaModel, public parentObject?: Object) {}
 
-  abstract getVariables(): Fmt.Parameter[];
-  abstract getVariable(name: string): Fmt.Parameter;
+  abstract getVariables(): VariableInfo[];
+  abstract getVariable(name: string): VariableInfo;
 
   abstract getPreviousParameter(): Fmt.Parameter | undefined;
 }
 
 export class EmptyContext extends Context {
-  getVariables(): Fmt.Parameter[] {
+  getVariables(): VariableInfo[] {
     return [];
   }
 
-  getVariable(name: string): Fmt.Parameter {
+  getVariable(name: string): VariableInfo {
     throw new Error(`Variable "${name}" not found`);
   }
 
@@ -29,11 +29,11 @@ export class DerivedContext extends Context {
     super(parentContext.metaModel, parentContext.parentObject);
   }
 
-  getVariables(): Fmt.Parameter[] {
+  getVariables(): VariableInfo[] {
     return this.parentContext.getVariables();
   }
 
-  getVariable(name: string): Fmt.Parameter {
+  getVariable(name: string): VariableInfo {
     return this.parentContext.getVariable(name);
   }
 
@@ -49,18 +49,18 @@ export class ParentInfoContext extends DerivedContext {
   }
 }
 
-export class ParameterContext extends DerivedContext {
-  constructor(public parameter: Fmt.Parameter, parentContext: Context) {
+export class ParameterContext extends DerivedContext implements VariableInfo {
+  constructor(public parameter: Fmt.Parameter, parentContext: Context, public indexParameterLists?: Fmt.ParameterList[]) {
     super(parentContext);
   }
 
-  getVariables(): Fmt.Parameter[] {
-    return this.parentContext.getVariables().concat(this.parameter);
+  getVariables(): VariableInfo[] {
+    return this.parentContext.getVariables().concat(this);
   }
 
-  getVariable(name: string): Fmt.Parameter {
+  getVariable(name: string): VariableInfo {
     if (this.parameter.name === name) {
-      return this.parameter;
+      return this;
     }
     return this.parentContext.getVariable(name);
   }
@@ -71,17 +71,22 @@ export class ParameterContext extends DerivedContext {
 }
 
 export class DummyContext extends Context {
-  getVariables(): Fmt.Parameter[] {
+  getVariables(): VariableInfo[] {
     return [];
   }
 
-  getVariable(name: string): Fmt.Parameter {
+  getVariable(name: string): VariableInfo {
     let param = new Fmt.Parameter;
     param.name = name;
-    return param;
+    return {parameter: param};
   }
 
   getPreviousParameter(): Fmt.Parameter | undefined {
     return undefined;
   }
+}
+
+export interface VariableInfo {
+  parameter: Fmt.Parameter;
+  indexParameterLists?: Fmt.ParameterList[];
 }

@@ -461,30 +461,30 @@ export class HLMDefinitionChecker {
       this.checkIsomorphicProperty(equalityDefinition.leftParameters, equalityDefinition.rightParameters, equalityDefinition.definition[0], context);
     }
     if (!isomorphic || equalityDefinition.reflexivityProof) {
-      let parameters = new Fmt.ParameterList;
+      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters);
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters, parameters);
       this.checkProof(equalityDefinition.reflexivityProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.symmetryProof) {
-      let parameters1 = new Fmt.ParameterList;
+      let parameters1: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters1);
-      let parameters2 = new Fmt.ParameterList;
+      let parameters2: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters2);
       let constraintType = new FmtHLM.MetaRefExpression_Constraint;
       constraintType.formula = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2);
       let constraint = this.utils.createParameter(constraintType, '_1');
-      let parameters = new Fmt.ParameterList;
+      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       parameters.push(...parameters1, ...parameters2, constraint);
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition.symmetryProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.transitivityProof) {
-      let parameters1 = new Fmt.ParameterList;
+      let parameters1: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters1);
-      let parameters2 = new Fmt.ParameterList;
+      let parameters2: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters2);
-      let parameters3 = new Fmt.ParameterList;
+      let parameters3: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       innerDefinition.parameters.clone(parameters3);
       let constraint1Type = new FmtHLM.MetaRefExpression_Constraint;
       constraint1Type.formula = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2);
@@ -492,7 +492,7 @@ export class HLMDefinitionChecker {
       let constraint2Type = new FmtHLM.MetaRefExpression_Constraint;
       constraint2Type.formula = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3);
       let constraint2 = this.utils.createParameter(constraint2Type, '_2');
-      let parameters = new Fmt.ParameterList;
+      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       parameters.push(...parameters1, ...parameters2, ...parameters3, constraint1, constraint2);
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters3);
       this.checkProof(equalityDefinition.transitivityProof, parameters, goal, context);
@@ -566,7 +566,7 @@ export class HLMDefinitionChecker {
     let constraintType = new FmtHLM.MetaRefExpression_Constraint;
     constraintType.formula = constraint;
     let constraintParam = this.utils.createParameter(constraintType, '_1');
-    let parameters = new Fmt.ParameterList;
+    let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
     parameters.push(leftParam, rightParam, constraintParam);
     let leftVariableRef = new Fmt.VariableRefExpression;
     leftVariableRef.variable = leftParam;
@@ -596,7 +596,7 @@ export class HLMDefinitionChecker {
   private checkImplicitOperatorWellDefinednessProof(contents: FmtHLM.ObjectContents_ImplicitOperator, context: HLMCheckerContext): void {
     let param = contents.parameter.clone();
     let goal = new FmtHLM.MetaRefExpression_existsUnique;
-    goal.parameters = new Fmt.ParameterList;
+    goal.parameters = Object.create(Fmt.ParameterList.prototype);
     goal.parameters.push(param);
     goal.formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
     this.checkProof(contents.wellDefinednessProof, undefined, goal, context);
@@ -902,25 +902,22 @@ export class HLMDefinitionChecker {
         let constraint = this.utils.applySubstitutionContext(type.formula, substitutionContext);
         let constraintArg = rawArg ? this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ConstraintArg) : undefined;
         this.checkProof(constraintArg?.proof, undefined, constraint, context);
-      } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         if (rawArg) {
-          let bindingArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BindingArg);
-          let [bindingParameterSet, innerContext] = this.checkElementParameter(bindingArg.parameter, context);
-          if (bindingParameterSet) {
-            let expectedSet = this.utils.substituteParameterSet(type._set, substitutionContext, false);
-            if (!this.checkSetTermEquivalence(bindingParameterSet, expectedSet, innerContext)) {
-              this.error(bindingArg.parameter, 'Parameter declaration does not match binding');
-            }
-            let innerSubstitutionContext: HLMSubstitutionContext = {
-              ...substitutionContext,
-              previousSetTerm: expectedSet,
-              parameterLists: [...substitutionContext.parameterLists!, type.parameters],
-              argumentLists: [...substitutionContext.argumentLists!, bindingArg.arguments],
-              originalBindingParameters: substitutionContext.originalBindingParameters ? [...substitutionContext.originalBindingParameters, param] : [param],
-              substitutedBindingParameters: substitutionContext.substitutedBindingParameters ? [...substitutionContext.substitutedBindingParameters, bindingArg.parameter] : [bindingArg.parameter]
-            };
-            this.checkLastArgumentList(context, innerSubstitutionContext);
+          let binderArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BinderArg);
+          let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
+          if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
+            this.error(binderArg.sourceParameters, 'Parameter list does not match binder');
           }
+          let innerSubstitutionContext: HLMSubstitutionContext = {
+            ...substitutionContext,
+            previousSetTerm: undefined,
+            parameterLists: [...substitutionContext.parameterLists!, type.targetParameters],
+            argumentLists: [...substitutionContext.argumentLists!, binderArg.targetArguments],
+            originalBinders: substitutionContext.originalBinders ? [...substitutionContext.originalBinders, ...type.sourceParameters] : type.sourceParameters,
+            substitutedBinders: substitutionContext.substitutedBinders ? [...substitutionContext.substitutedBinders, ...binderArg.sourceParameters] : binderArg.sourceParameters
+          };
+          this.checkLastArgumentList(context, innerSubstitutionContext);
         } else {
           missingArgument = true;
         }
@@ -1046,7 +1043,7 @@ export class HLMDefinitionChecker {
         exclusivityConstraint.formulas = formulas.slice();
         let exclusivityConstraintType = new FmtHLM.MetaRefExpression_Constraint;
         exclusivityConstraintType.formula = exclusivityConstraint;
-        let exclusivityParameters = new Fmt.ParameterList;
+        let exclusivityParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
         exclusivityParameters.push(this.utils.createParameter(exclusivityConstraintType, '_1'));
         let exclusivityGoal = new FmtHLM.MetaRefExpression_not;
         exclusivityGoal.formula = item.formula;
@@ -1140,10 +1137,7 @@ export class HLMDefinitionChecker {
             constraintType.formula = item;
           }
           let constraintParam = this.utils.createParameter(constraintType, '_');
-          checkContext = {
-            ...checkContext,
-            context: new Ctx.ParameterContext(constraintParam, checkContext.context)
-          };
+          checkContext = this.getParameterContext(constraintParam, checkContext);
         }
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
@@ -1196,7 +1190,8 @@ export class HLMDefinitionChecker {
   }
 
   private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
-    let bindingParameters: Fmt.Parameter[] = [];
+    // TODO #65
+/*    let bindingParameters: Fmt.Parameter[] = [];
     if (expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
       if (context.parentBindingParameters.indexOf(expression.variable) < 0) {
         this.error(expression, 'Invalid reference to binding parameter');
@@ -1230,7 +1225,7 @@ export class HLMDefinitionChecker {
       }
     } else if (bindingParameters.length) {
       this.error(expression, `Indices required`);
-    }
+    }*/
   }
 
   private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], context: HLMCheckerContext): void {
@@ -1302,7 +1297,7 @@ export class HLMDefinitionChecker {
               caseContext = this.getParameterContext(constraintParam, caseContext);
               checkCase(structuralCase.value, caseContext);
               if ((constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
-                let clonedParameters = new Fmt.ParameterList;
+                let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
                 let replacedParameters: Fmt.ReplacedParameter[] = [];
                 let clonedValue = structuralCase.value;
                 if (structuralCase.parameters) {
@@ -1556,9 +1551,9 @@ export class HLMDefinitionChecker {
           } else if (toIndex < 0 || toIndex >= items.length) {
             this.error(proof, 'invalid to index');
           } else {
-            let proofParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
-            let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters);
-            if (!proofParameters.length) {
+            let proofParameters: Fmt.ParameterList | undefined = Object.create(Fmt.ParameterList.prototype);
+            let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters!);
+            if (!proofParameters!.length) {
               proofParameters = undefined;
             }
             this.checkProof(proof, proofParameters, goal, context);

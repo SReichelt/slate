@@ -1753,7 +1753,7 @@ $Binding(variable: %Expr, value: %Expr): %Template {
  *
  * @example `$Table(items = [[a, b], [c, d]], style = 'matrix')`
  */
-$Table(items: %Expr[,], style: %String): %Template {}
+$Table(items: %Expr[][], style: %String): %Template {}
 
 /**
  * A group of expressions separated by a character and surrounded by parentheses.
@@ -1813,7 +1813,7 @@ $VerticalTuple(items: %Expr[], style: %String = '()'): %Template {
  *
  * @example `$Matrix(items = [[a, b], [c, d]])`
  */
-$Matrix(items: %Expr[,]): %Template {
+$Matrix(items: %Expr[][]): %Template {
   notation = $Parens(
     body = $Table(
       items = items,
@@ -2038,7 +2038,7 @@ $SetBuilder(element: %Expr, constraint: %Expr): %Template {
  *
  * @param constructors A two-dimensional array where each row represents a constructor with optional parameters.
  */
-$Construction(constructors: %Expr[,]): %Template {
+$Construction(constructors: %Expr[][]): %Template {
   notation = $Set(
     body = $Table(
       items = constructors,
@@ -2074,7 +2074,7 @@ $SingleCase(case: %Expr[]): %Template {
  *
  * @example `$Cases(cases = [[a, p], [b, q]])`
  */
-$Cases(cases: %Expr[,]): %Template {
+$Cases(cases: %Expr[][]): %Template {
   notation = $OuterParens(
     body = $Parens(
       body = $Table(

@@ -187,18 +187,41 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
             };
         }
     }
-    if (rangeInfo.object instanceof Fmt.CompoundExpression) {
-        let nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(rangeInfo.object.arguments);
+    if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
+        let expression = rangeInfo.object;
+        if (expression.indexParameterLists && expression.indices && position) {
+            for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
+                let index = expression.indices[indexIndex];
+                let indexRangeInfo = parsedDocument.rangeMap.get(index);
+                if (indexRangeInfo && indexRangeInfo.range.contains(position)) {
+                    let indexParameters = expression.indexParameterLists[indexIndex];
+                    let indexParametersRangeInfo = parsedDocument.rangeMap.get(indexParameters);
+                    if (indexParametersRangeInfo) {
+                        let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, indexParametersRangeInfo.range, true, sourceDocument) : undefined;
+                        return {
+                            signatureCode: signatureCode,
+                            parsedDocument: parsedDocument,
+                            isMetaModel: false,
+                            parameters: indexParameters,
+                            arguments: index
+                        };
+                    }
+                }
+            }
+        }
+    } else if (rangeInfo.object instanceof Fmt.CompoundExpression) {
+        let expression = rangeInfo.object;
+        let nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(expression.arguments);
         if (nestedArgumentListInfo) {
-            let parameterListRangeInfo = nestedArgumentListInfo.targetDocument.rangeMap.get(nestedArgumentListInfo.parameterExpression);
-            if (parameterListRangeInfo) {
-                let signatureCode = readSignatureCode ? readRange(nestedArgumentListInfo.targetDocument.uri, parameterListRangeInfo.range, true, sourceDocument) : undefined;
+            let parameterExpressionRangeInfo = nestedArgumentListInfo.targetDocument.rangeMap.get(nestedArgumentListInfo.parameterExpression);
+            if (parameterExpressionRangeInfo) {
+                let signatureCode = readSignatureCode ? readRange(nestedArgumentListInfo.targetDocument.uri, parameterExpressionRangeInfo.range, true, sourceDocument) : undefined;
                 return {
                     signatureCode: signatureCode,
                     parsedDocument: nestedArgumentListInfo.targetDocument,
                     isMetaModel: false,
                     parameters: nestedArgumentListInfo.parameterExpression.parameters,
-                    arguments: rangeInfo.object.arguments
+                    arguments: expression.arguments
                 };
             }
         }
@@ -386,7 +409,7 @@ export function getNameDefinitionLocation(parsedDocument: ParsedDocument, positi
     return undefined;
 }
 
-export function getArgumentTypeOfReferencedDefinitionParameter(param: Fmt.Parameter): Fmt.Expression | undefined {
+export function getArgumentType(param: Fmt.Parameter): Fmt.Expression | undefined {
     if (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression) {
         let metaContents = param.type.expression.metaDefinition.contents;
         if (metaContents instanceof FmtMeta.ObjectContents_ParameterType) {

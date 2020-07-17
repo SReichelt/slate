@@ -96,7 +96,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
                 }
               }
             } else if (dependency instanceof Fmt.VariableRefExpression) {
-              context = this.getArgumentExports(previousArguments, parent.metaDefinition.parameters, dependency.variable, context);
+              context = this.getArgumentExports(previousArguments, parent.metaDefinition.parameters, dependency, context);
             }
           }
         }
@@ -140,14 +140,14 @@ export class DynamicMetaModel extends Meta.MetaModel {
     return parentContext;
   }
 
-  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
+  protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     let context = parentContext;
     if (expression instanceof DynamicMetaRefExpression) {
       let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
       if (metaContents.exports) {
         for (let metaExport of metaContents.exports) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
-            context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport.variable, context);
+            context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport, context, indexParameterLists);
           }
         }
       }
@@ -155,14 +155,25 @@ export class DynamicMetaModel extends Meta.MetaModel {
     return context;
   }
 
-  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, parentContext: Ctx.Context): Ctx.Context {
+  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameterExpression: Fmt.VariableRefExpression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[], indexOffset: number = 0): Ctx.Context {
     let context = parentContext;
-    let index = parameterList.indexOf(parameter);
-    if (index >= 0) {
-      let value = argumentList.getOptionalValue(parameter.name, index);
-      if (value) {
-        context = this.getValueExports(value, parameter.type.expression, context);
+    let parameter = parameterExpression.variable;
+    let value = this.getArgumentValue(argumentList, parameterList, parameter, indexOffset);
+    if (value) {
+      if (parameterExpression.indices) {
+        indexParameterLists = indexParameterLists ? indexParameterLists.slice() : [];
+        for (let indexArgs of parameterExpression.indices) {
+          for (let indexArg of indexArgs) {
+            if (indexArg.value instanceof Fmt.VariableRefExpression) {
+              let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
+              if (indexValue instanceof Fmt.ParameterExpression) {
+                indexParameterLists.push(indexValue.parameters);
+              }
+            }
+          }
+        }
       }
+      context = this.getValueExports(value, parameter.type.expression, context, indexParameterLists);
     }
     return context;
   }
@@ -178,42 +189,39 @@ export class DynamicMetaModel extends Meta.MetaModel {
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
-      let index = metaContents.members.indexOf(member);
-      if (index >= 0) {
-        let value = argumentList.getOptionalValue(member.name, parentMemberCount + index);
-        if (value) {
-          context = this.getValueExports(value, member.type.expression, context);
-        }
+      let value = this.getArgumentValue(argumentList, metaContents.members, member, parentMemberCount);
+      if (value) {
+        context = this.getValueExports(value, member.type.expression, context);
       }
       parentMemberCount += metaContents.members.length;
     }
     return {result: context, memberCount: parentMemberCount};
   }
 
-  private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
+  private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     if (expression instanceof Fmt.ArrayExpression) {
       let context = parentContext;
       for (let item of expression.items) {
-        context = this.getValueExports(item, metaType, context);
+        context = this.getValueExports(item, metaType, context, indexParameterLists);
       }
       return context;
     } else if (expression instanceof Fmt.ParameterExpression) {
-      return this.getParameterListContext(expression.parameters, parentContext);
+      return this.getParameterListContext(expression.parameters, parentContext, indexParameterLists);
     } else if (expression instanceof Fmt.CompoundExpression && metaType instanceof Fmt.DefinitionRefExpression) {
       let [metaModel, metaDefinition] = this.getMetaDefinition(metaType.path);
-      return metaModel.getTypeExports(expression.arguments, metaDefinition, parentContext).result;
+      return metaModel.getTypeExports(expression.arguments, metaDefinition, parentContext, indexParameterLists).result;
     } else {
       return parentContext;
     }
   }
 
-  private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Ctx.Context): {result: Ctx.Context, memberCount: number} {
+  private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): {result: Ctx.Context, memberCount: number} {
     let context = parentContext;
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
       let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
-      let parentExports = parentMetaModel.getTypeExports(argumentList, parentMetaDefinition, context);
+      let parentExports = parentMetaModel.getTypeExports(argumentList, parentMetaDefinition, context, indexParameterLists);
       context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
@@ -221,19 +229,22 @@ export class DynamicMetaModel extends Meta.MetaModel {
       if (metaContents.exports) {
         for (let metaExport of metaContents.exports) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
-            let index = metaContents.members.indexOf(metaExport.variable);
-            if (index >= 0) {
-              let value = argumentList.getOptionalValue(metaExport.variable.name, parentMemberCount + index);
-              if (value) {
-                context = this.getValueExports(value, metaExport.variable.type.expression, context);
-              }
-            }
+            context = this.getArgumentExports(argumentList, metaContents.members, metaExport, context, indexParameterLists, parentMemberCount);
           }
         }
       }
       parentMemberCount += metaContents.members.length;
     }
     return {result: context, memberCount: parentMemberCount};
+  }
+
+  private getArgumentValue(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, indexOffset: number = 0): Fmt.Expression | undefined {
+    let index = parameterList.indexOf(parameter);
+    if (index >= 0) {
+      return argumentList.getOptionalValue(parameter.name, indexOffset + index);
+    } else {
+      return undefined;
+    }
   }
 
   hasObjectContents(metaDefinition: Fmt.Definition): boolean {
