@@ -74,7 +74,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 }
             }
         }
-        if ((context.triggerCharacter === '(' || context.triggerCharacter === ' ' || context.triggerCharacter === '\n') && argNameRange !== null) {
+        if ((context.triggerCharacter === '(' || context.triggerCharacter === '[' || context.triggerCharacter === ' ' || context.triggerCharacter === '\n') && argNameRange !== null) {
             return false;
         }
         if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || signatureInfo) {

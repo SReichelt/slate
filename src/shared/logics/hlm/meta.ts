@@ -6780,7 +6780,7 @@ export class MetaModel extends Meta.MetaModel {
     }
     if (expression instanceof MetaRefExpression_Binder) {
       context = this.getParameterListContext(expression.sourceParameters, context, indexParameterLists);
-      context = this.getParameterListContext(expression.targetParameters, context, indexParameterLists ? [...indexParameterLists, expression.sourceParameters] : [expression.sourceParameters]);
+      context = this.getParameterListContext(expression.targetParameters, context, indexParameterLists ? [expression.sourceParameters, ...indexParameterLists] : [expression.sourceParameters]);
     }
     if (expression instanceof MetaRefExpression_UseExists) {
       context = this.getParameterListContext(expression.parameters, context, indexParameterLists);

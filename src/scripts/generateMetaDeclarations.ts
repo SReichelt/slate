@@ -732,7 +732,7 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
     if (type.expression instanceof Fmt.MetaRefExpression) {
       let indices = 'indexParameterLists';
       if (indexParameterLists) {
-        indices = `${indices} ? [...${[indices, ...indexParameterLists].join(', ')}] : [${indexParameterLists.join(', ')}]`;
+        indices = `${indices} ? [${[...indexParameterLists, `...${indices}`].join(', ')}] : [${indexParameterLists.join(', ')}]`;
       }
       if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
         outFileStr += `${indent}${context} = this.getParameterContext(${source}, ${context}, ${indices});\n`;

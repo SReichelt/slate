@@ -724,8 +724,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         noun.article = undefined;
         this.addExtractedProperties(properties, singular, plural);
       }
-      // TODO remove the condition that we are not inside a binding parameter; requires #65
-      if (this.editHandler && state.associatedParameterList && !state.inDefinitionNotationGroup && !remainingParameters?.length && !indices) {
+      if (this.editHandler && state.associatedParameterList && !state.inDefinitionNotationGroup && !remainingParameters?.length) {
         let firstObjectParam = parameters[0];
         let onRenderFormulas = (expressions: Fmt.Expression[]) => this.renderConstraintMenuItem(expressions, firstObjectParam);
         let parameterList = state.associatedParameterList;
@@ -1414,8 +1413,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression | undefined {
     if (expression instanceof Fmt.VariableRefExpression) {
-      // TODO #65
-      let indices = /*expression.indices ? expression.indices.map((index: Fmt.ArgumentList) => this.renderArgumentList(index)) :*/ undefined;
+      let indices: Notation.RenderedExpression[] | undefined = undefined;
+      if (expression.indexParameterLists && expression.indices) {
+        indices = [];
+        for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
+          indices.push(this.renderArgumentList(expression.indexParameterLists[indexIndex], expression.indices[indexIndex]));
+        }
+      }
       let isDefinition = expression instanceof DefinitionVariableRefExpression;
       let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
       return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);

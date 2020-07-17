@@ -165,6 +165,7 @@ export class HLMUtils extends GenericUtils {
       } else {
         let varExpr = new Fmt.VariableRefExpression;
         varExpr.variable = param;
+        // TODO #65 set indexParameterLists
         varExpr.indices = indices;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
