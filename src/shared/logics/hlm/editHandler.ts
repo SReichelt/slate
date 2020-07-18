@@ -763,7 +763,7 @@ export class HLMEditHandler extends GenericEditHandler {
         case HLMExpressionType.Formula:
           if (type instanceof FmtHLM.MetaRefExpression_Prop) {
             newResultPath = resultPath.clone() as Fmt.Path;
-            let resultArg = this.findResultPathArgument(newResultPath, param);
+            let resultArg = this.findResultPathArgument(newResultPath, definition.parameters, param);
             if (resultArg instanceof Fmt.CompoundExpression) {
               let newArg = new FmtHLM.ObjectContents_PropArg;
               newArg.formula = preFillExpression;
@@ -774,7 +774,7 @@ export class HLMEditHandler extends GenericEditHandler {
         case HLMExpressionType.SetTerm:
           if (type instanceof FmtHLM.MetaRefExpression_Set) {
             newResultPath = resultPath.clone() as Fmt.Path;
-            let resultArg = this.findResultPathArgument(newResultPath, param);
+            let resultArg = this.findResultPathArgument(newResultPath, definition.parameters, param);
             if (resultArg instanceof Fmt.CompoundExpression) {
               let newArg = new FmtHLM.ObjectContents_SetArg;
               newArg._set = preFillExpression;
@@ -782,7 +782,7 @@ export class HLMEditHandler extends GenericEditHandler {
             }
           } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
             newResultPath = resultPath.clone() as Fmt.Path;
-            let resultArg = this.findResultPathArgument(newResultPath, param);
+            let resultArg = this.findResultPathArgument(newResultPath, definition.parameters, param);
             if (resultArg instanceof Fmt.CompoundExpression) {
               let newArg = new FmtHLM.ObjectContents_SubsetArg;
               newArg._set = preFillExpression;
@@ -793,7 +793,7 @@ export class HLMEditHandler extends GenericEditHandler {
         case HLMExpressionType.ElementTerm:
           if (type instanceof FmtHLM.MetaRefExpression_Element) {
             newResultPath = resultPath.clone() as Fmt.Path;
-            let resultArg = this.findResultPathArgument(newResultPath, param);
+            let resultArg = this.findResultPathArgument(newResultPath, definition.parameters, param);
             if (resultArg instanceof Fmt.CompoundExpression) {
               let newArg = new FmtHLM.ObjectContents_ElementArg;
               newArg.element = preFillExpression;
@@ -814,18 +814,11 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  private findResultPathArgument(resultPath: Fmt.Path, param: Fmt.Parameter): Fmt.Expression | undefined {
-    let parentBinder = this.utils.getParentBinder(param);
-    if (parentBinder) {
-      let rawBinderArg = this.findResultPathArgument(resultPath, parentBinder);
-      if (rawBinderArg) {
-        let binderArg = this.utils.convertArgument(rawBinderArg, FmtHLM.ObjectContents_BinderArg);
-        return this.utils.getRawArgument([binderArg.targetArguments], param);
-      } else {
-        return undefined;
-      }
-    } else {
+  private findResultPathArgument(resultPath: Fmt.Path, parameterList: Fmt.ParameterList, param: Fmt.Parameter): Fmt.Expression | undefined {
+    if (parameterList.indexOf(param) >= 0) {
       return this.utils.getRawArgument([resultPath.arguments], param);
+    } else {
+      return undefined;
     }
   }
 

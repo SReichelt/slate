@@ -1617,7 +1617,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private fillArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
-    let type = (param ?? replacementParam).type.expression;
+    let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Binding) {
       this.fillBindingArgument(param, replacementParam, type, options, resultParams, resultArgs);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
@@ -1639,7 +1639,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         bindingArgumentList = arg.arguments;
       }
     } else {
-      parameter = replacementParam || param;
+      parameter = replacementParam ?? param;
       newIndices = options.indices ? options.indices.slice() : [];
       newIndices.push(this.renderVariable(parameter, undefined, false, !!options.omitArguments));
     }
@@ -1684,6 +1684,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private fillBinderArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: FmtHLM.MetaRefExpression_Binder, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     let sourceParameters: Fmt.ParameterList | undefined = undefined;
+    let targetParameters: Fmt.ParameterList | undefined = undefined;
     let targetArguments: Fmt.ArgumentList | undefined = undefined;
     let newIndices = options.indices;
     if (options.argumentLists) {
@@ -1692,9 +1693,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         sourceParameters = arg.sourceParameters;
         targetArguments = arg.targetArguments;
       }
+      targetParameters = type.targetParameters;
     } else {
-      sourceParameters = type.sourceParameters;
-      newIndices = this.addIndices(type, options.indices, !!options.omitArguments);
+      let replacementType = (replacementParam ?? param).type.expression as FmtHLM.MetaRefExpression_Binder;
+      sourceParameters = replacementType.sourceParameters;
+      targetParameters = replacementType.targetParameters;
+      newIndices = this.addIndices(replacementType, options.indices, !!options.omitArguments);
     }
     if (resultParams) {
       resultParams.push(param);
@@ -1713,16 +1717,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       resultArgs.push(this.renderTemplate('Binding', {
                                             // TODO #65 honor rendering options corresponding to renderVariable
                                             'variable': this.renderArgumentList(sourceParameters),
-                                            'value': this.renderArgumentList(type.targetParameters, targetArguments, newIndices)
+                                            'value': this.renderArgumentList(targetParameters, targetArguments, newIndices)
                                           }));
       let sourceOptions: ArgumentRenderingOptions = {
         ...options,
+        replacementParameters: options.replacementParameters ? {...options.replacementParameters, parameters: sourceParameters} : undefined,
         argumentLists: undefined,
         indices: undefined
       };
-      this.fillArguments(sourceParameters, sourceOptions, resultParams, resultArgs);
+      this.fillArguments(type.sourceParameters, sourceOptions, resultParams, resultArgs);
       let targetOptions: ArgumentRenderingOptions = {
         ...options,
+        replacementParameters: options.replacementParameters ? {...options.replacementParameters, parameters: targetParameters} : undefined,
         elementParameterOverrides: elementParameterOverrides,
         argumentLists: targetArguments ? [targetArguments] : undefined,
         indices: newIndices
@@ -1737,7 +1743,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (resultParams) {
       resultParams.push(param);
     }
-    let paramToDisplay = replacementParam || param;
+    let paramToDisplay = replacementParam ?? param;
     let elementParameterOverrides = options.elementParameterOverrides;
     if (elementParameterOverrides) {
       let variableOverride = elementParameterOverrides.get(paramToDisplay);

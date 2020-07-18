@@ -316,16 +316,11 @@ export class HLMUtils extends GenericUtils {
   }
 
   substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
-    if (variable.indices) {
-      let binder: Fmt.Parameter | undefined = variable.variable;
-      for (let indexIndex = variable.indices.length - 1; indexIndex >= 0; indexIndex--) {
-        binder = this.getParentBinder(binder);
-        if (!binder) {
-          throw new Error('Too many indices');
-        }
-        let binderType = binder.type.expression as FmtHLM.MetaRefExpression_Binder;
+    if (variable.indices && variable.indexParameterLists) {
+      for (let indexIndex = 0; indexIndex < variable.indices.length && indexIndex < variable.indexParameterLists.length; indexIndex++) {
+        let indexParameterList = variable.indexParameterLists[indexIndex];
         let index = variable.indices[indexIndex];
-        expression = this.substituteArguments(expression, binderType.sourceParameters, index);
+        expression = this.substituteArguments(expression, indexParameterList, index);
       }
     }
     return expression;
@@ -428,19 +423,6 @@ export class HLMUtils extends GenericUtils {
       });
     }
     return referencesCaseParameter;
-  }
-
-  // TODO #65 remove?
-  getParentBinder(param: Fmt.Parameter): Fmt.Parameter | undefined {
-    for (let previousParam = param.previousParameter; previousParam; previousParam = previousParam.previousParameter) {
-      let type = previousParam.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-        if (type.targetParameters.indexOf(param) >= 0) {
-          return previousParam;
-        }
-      }
-    }
-    return undefined;
   }
 
   getMacroInvocation(expression: Fmt.DefinitionRefExpression, definition: Fmt.Definition): HLMMacro.HLMMacroInvocation {

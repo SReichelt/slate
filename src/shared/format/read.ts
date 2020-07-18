@@ -485,10 +485,7 @@ export class Reader {
     type.arrayDimensions = 0;
     this.skipWhitespace();
     while (this.tryReadChar('[')) {
-      do {
-        type.arrayDimensions++;
-        this.skipWhitespace();
-      } while (this.tryReadChar(','));  // TODO #65 remove
+      type.arrayDimensions++;
       this.readChar(']');
     }
     this.markEnd(typeStart, type, context, metaDefinitions);
