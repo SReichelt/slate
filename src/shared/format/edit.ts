@@ -120,7 +120,7 @@ export class EditAnalysis {
     if (expression instanceof Fmt.VariableRefExpression) {
       if (expression.indices) {
         for (let index of expression.indices) {
-          this.analyzeArgumentList(index, onApplyConvertedArgument, context);
+          this.analyzeArgumentList(index.arguments, onApplyConvertedArgument, context);
         }
       }
     } else if (expression instanceof Fmt.MetaRefExpression) {

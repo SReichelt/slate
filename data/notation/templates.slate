@@ -1724,12 +1724,12 @@ $FunctorDefinition(functor: %Expr, domain,codomain: %Expr, objectParameter,objec
 }
 
 /**
- * The HLM-specific default notation for a binding argument.
+ * The HLM-specific default notation for a binder.
  *
- * @param variable The bound variable.
+ * @param variable The bound variable(s).
  * @param value The dependent value(s).
  */
-$Binding(variable,value: %Expr): %Template {
+$Binder(variable,value: %Expr): %Template {
   notation = $Operator(
     symbol = '↦',
     operands = [variable, value],

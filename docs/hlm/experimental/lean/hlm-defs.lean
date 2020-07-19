@@ -61,7 +61,7 @@
 -- in the structure BaseSet. (Equivalently, we could define BaseSet as a set of quotients.)
 -- Each translated definitions must also respect the equality definition "in the obvious way".
 --
--- This file is known to compile in Lean 3.4.2, but has not been checked in any other version.
+-- This file is known to compile in Lean 3.4.2 and 3.17.1.
 
 namespace hlm
 

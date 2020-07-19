@@ -3,7 +3,7 @@
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
   expressionTypes = [$Bool, $Nat,
-                     $Prop, $Set, $Subset, $Element, $Constraint, $Binding, $Binder,
+                     $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
                      $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false,
@@ -169,11 +169,8 @@ $Element(set: $SetTerm, auto: $Bool = $false): %ParameterType($ElementTerm) {
 }
 $Constraint(formula: $Formula): %ParameterType {
   optional = %true,
-  argumentType = $ConstraintArg
-}
-$Binding(set: $SetTerm, parameters[%self]: %ParameterList): %ParameterType {
-  argumentType = $BindingArg,
-  exports = [parameters]
+  argumentType = $ConstraintArg,
+  canOmit = %true
 }
 $Binder(sourceParameters: %ParameterList, targetParameters[sourceParameters]: %ParameterList): %ParameterType {
   argumentType = $BinderArg,
@@ -213,12 +210,6 @@ $ElementArg: %ExpressionType {
 $ConstraintArg: %ExpressionType {
   members = #(
     proof?: $Proof
-  )
-}
-$BindingArg: %ExpressionType {
-  members = #(
-    parameter: %SingleParameter($Element),
-    arguments[parameter]: %ArgumentList
   )
 }
 $BinderArg: %ExpressionType {

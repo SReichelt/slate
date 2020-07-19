@@ -5,18 +5,15 @@
  *
  * @expectedError Type mismatch
  */
-$FAIL_indices(i: %Binding(
-  $../Essentials/"Pointed sets",
-  #(j: %Binding(
-    $../Essentials/"Natural numbers",
-    #(a: %Element($../Essentials/"Pointed sets"))
-  ))
+$FAIL_indices(_i: %Binder(
+  #(
+    i: %Element($../Essentials/"Natural numbers"),
+    j: %Element($../Essentials/"Pointed sets")
+  ),
+  #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
-  definition = [a[
-    $../Essentials/"Natural numbers".zero,
-    $../Essentials/"Pointed sets"."pointed set"(
-        S = {$../Essentials/"Natural numbers"},
-        s = {$../Essentials/"Natural numbers".zero}
-    )
-  ]]
+  definition = [a[i = {$../Essentials/"Natural numbers".zero}, j = {$../Essentials/"Pointed sets"."pointed set"(
+      S = {$../Essentials/"Natural numbers"},
+      s = {$../Essentials/"Natural numbers".zero}
+  )}]]
 }

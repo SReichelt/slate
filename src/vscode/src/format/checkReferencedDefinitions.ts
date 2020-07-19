@@ -51,7 +51,9 @@ class ReferenceChecker {
                 let paramType = param.type.expression;
                 let parameterListIndex = 0;
                 onMemberFound = (member: Fmt.Parameter, memberValue: Fmt.Expression) => {
-                    if (member.type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList && memberValue instanceof Fmt.CompoundExpression) {
+                    if (member.type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
+                        parameterListIndex++;
+                    } else if (member.type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList && memberValue instanceof Fmt.CompoundExpression) {
                         try {
                             this.checkNestedArgumentList(paramType, parameterListIndex++, memberValue.arguments);
                         } catch (error) {
@@ -146,13 +148,15 @@ export function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagn
                 }
             } else if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
                 let expression = rangeInfo.object;
-                if (expression.indexParameterLists && expression.indices) {
+                if (expression.indices) {
                     let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
-                    for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
-                        try {
-                            referenceChecker.checkArgumentsOfReferencedDefinition(expression.indexParameterLists[indexIndex], expression.indices[indexIndex]);
-                        } catch (error) {
-                            referenceChecker.error(error.message);
+                    for (let index of expression.indices) {
+                        if (index.parameters) {
+                            try {
+                                referenceChecker.checkArgumentsOfReferencedDefinition(index.parameters, index.arguments);
+                            } catch (error) {
+                                referenceChecker.error(error.message);
+                            }
                         }
                     }
                 }

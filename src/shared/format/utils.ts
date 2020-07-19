@@ -51,10 +51,10 @@ export function substituteExpression(expression: Fmt.Expression, originalExpress
   });
 }
 
-export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (indices?: Fmt.ArgumentList[]) => Fmt.Expression): Fmt.Expression {
+export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression): Fmt.Expression {
   return expression.substitute((subExpression: Fmt.Expression) => {
     if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {
-      return substitution(subExpression.indices);
+      return substitution(subExpression);
     } else {
       return subExpression;
     }

@@ -17,11 +17,11 @@ $value(
     ),
     [{
       constructor = $Functions.function,
-      parameters = #(z: %Binding(
-        X,
+      parameters = #(_z: %Binder(
+        #(z: %Element(X)),
         #(y: %Element(Y))
       )),
-      value = y[x]
+      value = y[z = {x}]
     }]
   )]
 }

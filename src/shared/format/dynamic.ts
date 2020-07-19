@@ -162,8 +162,8 @@ export class DynamicMetaModel extends Meta.MetaModel {
     if (value) {
       if (parameterExpression.indices) {
         let newIndexParameterLists: Fmt.ParameterList[] = [];
-        for (let indexArgs of parameterExpression.indices) {
-          for (let indexArg of indexArgs) {
+        for (let index of parameterExpression.indices) {
+          for (let indexArg of index.arguments) {
             if (indexArg.value instanceof Fmt.VariableRefExpression) {
               let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
               if (indexValue instanceof Fmt.ParameterExpression) {
@@ -475,6 +475,13 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
     } else {
       return super.createDefinitionContents();
     }
+  }
+
+  canOmit(): boolean {
+    if (this.metaDefinition.contents instanceof FmtMeta.ObjectContents_ParameterType) {
+      return this.metaDefinition.contents.canOmit instanceof FmtMeta.MetaRefExpression_true;
+    }
+    return false;
   }
 }
 

@@ -740,10 +740,14 @@ export class StringExpression extends Expression {
   }
 }
 
+export interface Index {
+  parameters?: ParameterList;
+  arguments: ArgumentList;
+}
+
 export class VariableRefExpression extends Expression {
   variable: Parameter;
-  indexParameterLists?: ParameterList[];
-  indices?: ArgumentList[];
+  indices?: Index[];
 
   substitute(fn: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new VariableRefExpression;
@@ -752,24 +756,75 @@ export class VariableRefExpression extends Expression {
     if (result.variable !== this.variable) {
       changed = true;
     }
-    result.indexParameterLists = this.indexParameterLists;
     if (this.indices) {
       result.indices = [];
       for (let index of this.indices) {
-        let newIndex: ArgumentList = Object.create(ArgumentList);
-        if (index.substituteExpression(fn, newIndex, replacedParameters)) {
+        let newIndex: Index = {
+          parameters: index.parameters,
+          arguments: Object.create(ArgumentList.prototype)
+        };
+        if (index.arguments.substituteExpression(fn, newIndex.arguments, replacedParameters)) {
           changed = true;
         }
         result.indices.push(newIndex);
       }
     }
+    let newIndices = result.replaceIndexParameters(replacedParameters);
+    if (newIndices) {
+      this.indices = newIndices;
+      changed = true;
+    }
     return this.getSubstitutionResult(fn, result, changed);
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn, replacedParameters: ReplacedParameter[]): boolean {
-    return expression instanceof VariableRefExpression
-           && this.variable.findReplacement(replacedParameters) === expression.variable
-           && areListsEquivalent(this.indices, expression.indices, fn, replacedParameters);
+    if (expression instanceof VariableRefExpression
+        && this.variable.findReplacement(replacedParameters) === expression.variable) {
+      let newIndices = this.replaceIndexParameters(replacedParameters);
+      let compareFn = (leftItem: Index, rightItem: Index) => leftItem.arguments.isEquivalentTo(rightItem.arguments, fn, replacedParameters);
+      return compareLists(newIndices ?? this.indices, expression.indices, compareFn, replacedParameters);
+    } else {
+      return false;
+    }
+  }
+
+  private replaceIndexParameters(replacedParameters: ReplacedParameter[]): Index[] | undefined {
+    let newIndices: Index[] | undefined = undefined;
+    if (this.indices && replacedParameters.length) {
+      for (let indexIndex = 0; indexIndex < this.indices.length; indexIndex++) {
+        let index = this.indices[indexIndex];
+        let newIndex: Index | undefined = undefined;
+        for (let replacedParameter of replacedParameters) {
+          if (index.parameters) {
+            let paramIndex = index.parameters.indexOf(replacedParameter.original);
+            if (paramIndex >= 0) {
+              if (!newIndex) {
+                newIndex = {
+                  parameters: Object.create(ParameterList.prototype),
+                  arguments: Object.create(ArgumentList.prototype)
+                };
+                newIndex.parameters!.push(...index.parameters);
+                newIndex.arguments.push(...index.arguments);
+                if (!newIndices) {
+                  newIndices = this.indices!.slice();
+                }
+                newIndices[indexIndex] = newIndex;
+              }
+              newIndex.parameters![paramIndex] = replacedParameter.replacement;
+              for (let argIndex = 0; argIndex < newIndex.arguments.length; argIndex++) {
+                let arg = newIndex.arguments[argIndex];
+                if (arg.name === replacedParameter.original.name) {
+                  let newArg = arg.clone();
+                  newArg.name = replacedParameter.replacement.name;
+                  newIndex.arguments[argIndex] = newArg;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return newIndices;
   }
 }
 
@@ -780,6 +835,7 @@ export abstract class MetaRefExpression extends Expression {
 
   getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined { return undefined; }
   createDefinitionContents(): ObjectContents | undefined { return undefined; }
+  canOmit(): boolean { return false; }
 }
 
 export class GenericMetaRefExpression extends MetaRefExpression {
@@ -994,13 +1050,18 @@ function areObjectsEquivalent<T extends Comparable<T>>(left: T | undefined, righ
 }
 
 function areListsEquivalent<T extends Comparable<T>>(left: T[] | undefined, right: T[] | undefined, fn: ExpressionUnificationFn = undefined, replacedParameters: ReplacedParameter[] = []): boolean {
+  let compareFn = (leftItem: T, rightItem: T) => leftItem.isEquivalentTo(rightItem, fn, replacedParameters);
+  return compareLists(left, right, compareFn, replacedParameters);
+}
+
+function compareLists<T>(left: T[] | undefined, right: T[] | undefined, compareFn: (leftItem: T, rightItem: T) => boolean, replacedParameters: ReplacedParameter[] = []): boolean {
   if (!left && !right) {
     return true;
   }
   if (left && right && left.length === right.length) {
     let origReplacedParametersLength = replacedParameters.length;
     for (let i = 0; i < left.length; i++) {
-      if (!left[i].isEquivalentTo(right[i], fn, replacedParameters)) {
+      if (!compareFn(left[i], right[i])) {
         replacedParameters.length = origReplacedParametersLength;
         return false;
       }

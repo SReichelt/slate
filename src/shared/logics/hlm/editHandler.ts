@@ -21,7 +21,7 @@ export interface ParameterSelection {
   allowConstraint: boolean;
   allowProposition: boolean;
   allowDefinition: boolean;
-  allowBinding: boolean;
+  allowBinder: boolean;
 }
 
 export interface SetTermSelection {
@@ -122,12 +122,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private adaptNewParameterLists(newParameterLists: Fmt.ParameterList[], expressionEditInfo: Edit.ExpressionEditInfo): void {
-    for (let parameters of newParameterLists) {
-      let context = expressionEditInfo.context;
-      for (let param of parameters) {
-        param.name = this.utils.getUnusedDefaultName(param.name, context);
-        context = context.metaModel.getNextParameterContext(param, context);
-      }
+    for (let parameterList of newParameterLists) {
+      this.utils.adaptParameterNames(parameterList, expressionEditInfo.context);
     }
   }
 
@@ -158,12 +154,14 @@ export class HLMEditHandler extends GenericEditHandler {
     semanticLink.alwaysShowMenu = true;
   }
 
+  // TODO #65 display "and" in "for each A and B"
   addParameterMenu(semanticLink: Notation.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
       let elementType = new FmtHLM.MetaRefExpression_Element;
       elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      // TODO #65 use 'i' as default name inside binder
       rows.push(this.getParameterPlaceholderItem(elementType, 'x', parameterList, onRenderParam, onInsertParam));
 
       let subsetType = new FmtHLM.MetaRefExpression_Subset;
@@ -178,7 +176,7 @@ export class HLMEditHandler extends GenericEditHandler {
         rows.push(this.getParameterPlaceholderItem(constraintType, '_1', parameterList, onRenderParam, onInsertParam));
       }
 
-      if (parameterSelection.allowProposition || parameterSelection.allowDefinition || parameterSelection.allowBinding) {
+      if (parameterSelection.allowProposition || parameterSelection.allowDefinition || parameterSelection.allowBinder) {
         let advancedSubMenuRows: Menu.ExpressionMenuRow[] = [];
 
         if (parameterSelection.allowProposition) {
@@ -200,11 +198,11 @@ export class HLMEditHandler extends GenericEditHandler {
           advancedSubMenuRows.push(new Menu.ExpressionMenuSeparator);
         }
 
-        if (parameterSelection.allowBinding) {
-          let bindingType = new FmtHLM.MetaRefExpression_Binding;
-          bindingType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-          bindingType.parameters = Object.create(Fmt.ParameterList.prototype);
-          advancedSubMenuRows.push(this.getParameterPlaceholderItem(bindingType, 'i', parameterList, onRenderParam, onInsertParam));
+        if (parameterSelection.allowBinder) {
+          let binderType = new FmtHLM.MetaRefExpression_Binder;
+          binderType.sourceParameters = Object.create(Fmt.ParameterList.prototype);
+          binderType.targetParameters = Object.create(Fmt.ParameterList.prototype);
+          advancedSubMenuRows.push(this.getParameterPlaceholderItem(binderType, '_1', parameterList, onRenderParam, onInsertParam));
         }
 
         let advanced = new Menu.StandardExpressionMenuRow('Advanced');
@@ -221,7 +219,6 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {
-    // TODO also support creation of bindings with multiple parameters
     let paramClone = super.addParameterToGroup(param, parameterList);
     if (paramClone) {
       let type = paramClone.type.expression;
@@ -642,14 +639,16 @@ export class HLMEditHandler extends GenericEditHandler {
     let expression = new Fmt.VariableRefExpression;
     expression.variable = variableInfo.parameter;
     if (variableInfo.indexParameterLists) {
-      expression.indexParameterLists = variableInfo.indexParameterLists;
       for (let indexParameterList of variableInfo.indexParameterLists) {
-        let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-        this.utils.fillDefaultPlaceholderArguments(indexParameterList, args, expressionEditInfo.context);
+        let index: Fmt.Index = {
+          parameters: indexParameterList,
+          arguments: Object.create(Fmt.ArgumentList.prototype)
+        };
+        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments, undefined, expressionEditInfo.context);
         if (expression.indices) {
-          expression.indices.unshift(args);
+          expression.indices.unshift(index);
         } else {
-          expression.indices = [args];
+          expression.indices = [index];
         }
       }
     }
@@ -735,7 +734,7 @@ export class HLMEditHandler extends GenericEditHandler {
       for (let parentPath of parentPaths) {
         let resultPath = new Fmt.Path;
         resultPath.name = path.name;
-        this.utils.fillDefaultPlaceholderArguments(definition.parameters, resultPath.arguments, context);
+        this.utils.fillDefaultPlaceholderArguments(definition.parameters, resultPath.arguments, parentPath, context);
         resultPath.parentPath = parentPath;
         if (notationAlternative) {
           this.utils.reorderArguments(resultPath.arguments, notationAlternative);
@@ -1195,8 +1194,8 @@ export class HLMEditHandler extends GenericEditHandler {
   private addApostrophes(parameters: Fmt.ParameterList): void {
     for (let param of parameters) {
       let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-        this.addApostrophes(type.parameters);
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        this.addApostrophes(type.targetParameters);
       } else {
         param.name += '\'';
       }

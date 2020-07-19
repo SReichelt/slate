@@ -599,25 +599,31 @@ export class Reader {
 
   private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): Fmt.Expression {
     let expression = new Fmt.VariableRefExpression;
+    let indexParameterLists: Fmt.ParameterList[] | undefined = undefined;
     try {
       let variableInfo = context.getVariable(identifier);
       expression.variable = variableInfo.parameter;
-      expression.indexParameterLists = variableInfo.indexParameterLists;
+      indexParameterLists = variableInfo.indexParameterLists;
     } catch (error) {
       this.error(error.message, identifierRange);
     }
     this.skipWhitespace();
+    let indexIndex = 0;
     let indexStart = this.markStart();
     while (this.tryReadChar('[')) {
-      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-      this.readArguments(args, context);
+      let index: Fmt.Index = {
+        parameters: indexParameterLists && indexIndex < indexParameterLists.length ? indexParameterLists[indexIndex] : undefined,
+        arguments: Object.create(Fmt.ArgumentList.prototype)
+      };
+      this.readArguments(index.arguments, context);
       if (expression.indices) {
-        expression.indices.push(args);
+        expression.indices.push(index);
       } else {
-        expression.indices = [args];
+        expression.indices = [index];
       }
       this.readChar(']');
-      this.markEnd(indexStart, args, context);
+      this.markEnd(indexStart, index.arguments, context);
+      indexIndex++;
       indexStart = this.markStart();
     }
     return expression;

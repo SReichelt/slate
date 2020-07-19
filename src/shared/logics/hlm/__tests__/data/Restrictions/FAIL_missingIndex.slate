@@ -3,8 +3,8 @@
 /**
  * @expectedError Indices required
  */
-$FAIL_missingIndex(i: %Binding(
-  $../Essentials/"Natural numbers",
+$FAIL_missingIndex(_i: %Binder(
+  #(i: %Element($../Essentials/"Natural numbers")),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
   definition = [a]

@@ -535,11 +535,13 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
 export class ObjectContents_ParameterType extends ObjectContents_ExpressionType {
   optional?: Fmt.Expression;
   argumentType?: Fmt.Expression;
+  canOmit?: Fmt.Expression;
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     super.fromArgumentList(argumentList);
     this.optional = argumentList.getOptionalValue('optional', 3);
     this.argumentType = argumentList.getOptionalValue('argumentType', 4);
+    this.canOmit = argumentList.getOptionalValue('canOmit', 5);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
@@ -549,6 +551,9 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     }
     if (this.argumentType !== undefined) {
       argumentList.add(this.argumentType, 'argumentType', true);
+    }
+    if (this.canOmit !== undefined) {
+      argumentList.add(this.canOmit, 'canOmit', true);
     }
   }
 
@@ -564,6 +569,9 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     }
     if (this.argumentType) {
       this.argumentType.traverse(fn);
+    }
+    if (this.canOmit) {
+      this.canOmit.traverse(fn);
     }
   }
 
@@ -581,6 +589,12 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
         changed = true;
       }
     }
+    if (this.canOmit) {
+      result.canOmit = this.canOmit.substitute(fn, replacedParameters);
+      if (result.canOmit !== this.canOmit) {
+        changed = true;
+      }
+    }
     return changed;
   }
 
@@ -595,6 +609,11 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     }
     if (this.argumentType || objectContents.argumentType) {
       if (!this.argumentType || !objectContents.argumentType || !this.argumentType.isEquivalentTo(objectContents.argumentType, fn, replacedParameters)) {
+        return false;
+      }
+    }
+    if (this.canOmit || objectContents.canOmit) {
+      if (!this.canOmit || !objectContents.canOmit || !this.canOmit.isEquivalentTo(objectContents.canOmit, fn, replacedParameters)) {
         return false;
       }
     }

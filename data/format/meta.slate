@@ -39,7 +39,8 @@ $ParameterType(variableType?: $Type): %DefinitionType {
   superType = $ExpressionType,
   members = #(
     optional: $Bool = $false,
-    argumentType?: $ExpressionType
+    argumentType?: $ExpressionType,
+    canOmit: $Bool = $false
   )
 }
 

@@ -62,7 +62,7 @@ export class GenericUtils {
     return FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
   }
 
-  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (indices?: Fmt.ArgumentList[]) => Fmt.Expression): Fmt.Expression {
+  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression): Fmt.Expression {
     return FmtUtils.substituteVariable(expression, variable, substitution);
   }
 
@@ -120,6 +120,13 @@ export class GenericUtils {
       parameter.previousParameter = context.getPreviousParameter();
     }
     return parameter;
+  }
+
+  adaptParameterNames(parameterList: Fmt.ParameterList, context: Ctx.Context): void {
+    for (let param of parameterList) {
+      param.name = this.getUnusedDefaultName(param.name, context);
+      context = context.metaModel.getNextParameterContext(param, context);
+    }
   }
 
   containsSubExpression(expression: Fmt.Expression, fn: (subExpression: Fmt.Expression) => boolean): boolean {

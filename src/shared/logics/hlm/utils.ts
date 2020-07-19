@@ -40,17 +40,17 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
 };
 
 type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
-type CreateParameterFn = (defaultName: string) => Fmt.Parameter;  // TODO #65 remove?
+type CreateParameterListFn = (source: Fmt.ParameterList) => Fmt.ParameterList;
 
 class HLMMacroInvocationConfig extends Macro.DefaultMacroInvocationConfig {
-  constructor(protected utils: HLMUtils) {
+  constructor(protected utils: HLMUtils, protected parentPath: Fmt.PathItem | undefined) {
     super();
   }
 
   createArgumentExpression?(param: Fmt.Parameter): Fmt.Expression | undefined {
     let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createElementParameter = (defaultName: string) => this.utils.createElementParameter(defaultName);
-    return this.utils.createArgumentItemValue(param, createPlaceholder, createElementParameter);
+    let createParameterList = (source: Fmt.ParameterList) => this.utils.createParameterList(source, this.parentPath);
+    return this.utils.createArgumentItemValue(param, createPlaceholder, createParameterList);
   }
 }
 
@@ -140,24 +140,28 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, indices?: Fmt.ArgumentList[]): Fmt.Argument | undefined {
+  getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, indices?: Fmt.Index[]): Fmt.Argument | undefined {
     let type = param.type.expression;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
       let arg = new Fmt.Argument;
       arg.name = param.name;
       let argValue = new Fmt.CompoundExpression;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        let targetType = targetParam ? targetParam.type.expression as FmtHLM.MetaRefExpression_Binder : undefined;
         let binderArg = new FmtHLM.ObjectContents_BinderArg;
-        binderArg.sourceParameters = this.applySubstitutionContextToParameterList(type.sourceParameters, context);
+        binderArg.sourceParameters = targetType ? targetType.sourceParameters : this.applySubstitutionContextToParameterList(type.sourceParameters, context);
         let newContext: HLMSubstitutionContext = {
           ...context,
           previousSetTerm: undefined,
           originalBinders: context.originalBinders ? [...context.originalBinders, ...type.sourceParameters] : type.sourceParameters,
           substitutedBinders: context.substitutedBinders ? [...context.substitutedBinders, ...binderArg.sourceParameters] : binderArg.sourceParameters
         };
-        let targetInnerParameters = targetParam ? (targetParam.type.expression as FmtHLM.MetaRefExpression_Binder).targetParameters : undefined;
-        let index: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
-        this.getParameterArguments(index, type.sourceParameters, context, binderArg.sourceParameters, indices);
+        let targetInnerParameters = targetType?.targetParameters;
+        let index: Fmt.Index = {
+          parameters: binderArg.sourceParameters,
+          arguments: Object.create(Fmt.ArgumentList.prototype)
+        };
+        this.getParameterArguments(index.arguments, binderArg.sourceParameters, context, undefined, indices);
         let newIndices = indices ? [...indices, index] : [index];
         binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, newIndices);
@@ -165,7 +169,6 @@ export class HLMUtils extends GenericUtils {
       } else {
         let varExpr = new Fmt.VariableRefExpression;
         varExpr.variable = param;
-        // TODO #65 set indexParameterLists
         varExpr.indices = indices;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
@@ -193,7 +196,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext = {}, targetParameters?: Fmt.Parameter[], indices?: Fmt.ArgumentList[]): void {
+  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext = {}, targetParameters?: Fmt.Parameter[], indices?: Fmt.Index[]): void {
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
       let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
@@ -255,21 +258,30 @@ export class HLMUtils extends GenericUtils {
   }
 
   substituteParameter(expression: Fmt.Expression, originalParam: Fmt.Parameter, substitutedParam: Fmt.Parameter, markAsDefinition: boolean = false): Fmt.Expression {
-    expression = this.substituteVariable(expression, originalParam, (indices?: Fmt.ArgumentList[]) => {
+    expression = this.substituteVariable(expression, originalParam, (variableRef: Fmt.VariableRefExpression) => {
       let substitutedExpression = markAsDefinition ? new DefinitionVariableRefExpression : new Fmt.VariableRefExpression;
       substitutedExpression.variable = substitutedParam;
-      substitutedExpression.indices = indices;
+      substitutedExpression.indices = variableRef.indices;
       return substitutedExpression;
     });
     let originalType = originalParam.type.expression;
     let substitutedType = substitutedParam.type.expression;
-    if (originalType instanceof FmtHLM.MetaRefExpression_Binding && substitutedType instanceof FmtHLM.MetaRefExpression_Binding) {
-      expression = this.substituteParameters(expression, originalType.parameters, substitutedType.parameters, markAsDefinition);
+    if (originalType instanceof FmtHLM.MetaRefExpression_Binder && substitutedType instanceof FmtHLM.MetaRefExpression_Binder) {
+      expression = this.substituteParameters(expression, originalType.targetParameters, substitutedType.targetParameters, markAsDefinition);
+      let replacedParameters: Fmt.ReplacedParameter[] = [];
+      for (let paramIndex = 0; paramIndex < originalType.sourceParameters.length && paramIndex < substitutedType.sourceParameters.length; paramIndex++) {
+        replacedParameters.push({
+          original: originalType.sourceParameters[paramIndex],
+          replacement: substitutedType.sourceParameters[paramIndex]
+        });
+      }
+      let identityFn = (subExpression: Fmt.Expression) => subExpression;
+      expression = expression.substitute(identityFn, replacedParameters);
     }
     return expression;
   }
 
-  substituteArguments(expression: Fmt.Expression, parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath?: Fmt.PathItem, indexVariables?: Fmt.ParameterList[]): Fmt.Expression {
+  substituteArguments(expression: Fmt.Expression, parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath?: Fmt.PathItem): Fmt.Expression {
     let previousParameters: Fmt.Parameter[] = [];
     for (let param of parameters) {
       let type = param.type.expression;
@@ -282,22 +294,22 @@ export class HLMUtils extends GenericUtils {
         if (this.isValueParamType(type)) {
           let argValue = this.getArgValue(args, param);
           if (argValue) {
-            expression = this.substituteVariableWithIndices(expression, param, argValue, indexVariables);
+            expression = this.substituteVariableWithIndices(expression, param, argValue);
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
           let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
           if (argValue) {
-            let newIndexVariables = indexVariables ? [...indexVariables, argValue.sourceParameters] : [argValue.sourceParameters];
-            expression = this.substituteArguments(expression, type.targetParameters, argValue.targetArguments, targetPath, newIndexVariables);
+            expression = this.substituteParameters(expression, type.sourceParameters, argValue.sourceParameters);
+            expression = this.substituteArguments(expression, type.targetParameters, argValue.targetArguments, targetPath);
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
           let value = this.substituteTargetPath(type._set, targetPath);
-          value = this.substituteArguments(value, previousParameters, args, targetPath, indexVariables);
-          expression = this.substituteVariableWithIndices(expression, param, value, indexVariables);
+          value = this.substituteArguments(value, previousParameters, args, targetPath);
+          expression = this.substituteVariableWithIndices(expression, param, value);
         } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
           let value = this.substituteTargetPath(type.element, targetPath);
-          value = this.substituteArguments(value, previousParameters, args, targetPath, indexVariables);
-          expression = this.substituteVariableWithIndices(expression, param, value, indexVariables);
+          value = this.substituteArguments(value, previousParameters, args, targetPath);
+          expression = this.substituteVariableWithIndices(expression, param, value);
         }
       }
       previousParameters.push(param);
@@ -305,36 +317,30 @@ export class HLMUtils extends GenericUtils {
     return expression;
   }
 
-  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], targetPath?: Fmt.PathItem, indexVariables?: Fmt.ParameterList[]): Fmt.Expression {
+  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], targetPath?: Fmt.PathItem): Fmt.Expression {
     if (parameterLists.length !== argumentLists.length) {
       throw new Error('Number of parameter and argument lists do not match');
     }
     for (let index = 0; index < parameterLists.length; index++) {
-      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], targetPath, indexVariables);
+      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], targetPath);
     }
     return expression;
   }
 
   substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
-    if (variable.indices && variable.indexParameterLists) {
-      for (let indexIndex = 0; indexIndex < variable.indices.length && indexIndex < variable.indexParameterLists.length; indexIndex++) {
-        let indexParameterList = variable.indexParameterLists[indexIndex];
-        let index = variable.indices[indexIndex];
-        expression = this.substituteArguments(expression, indexParameterList, index);
+    if (variable.indices) {
+      for (let index of variable.indices) {
+        if (index.parameters) {
+          expression = this.substituteArguments(expression, index.parameters, index.arguments);
+        }
       }
     }
     return expression;
   }
 
-  substituteVariableWithIndices(expression: Fmt.Expression, variable: Fmt.Parameter, value: Fmt.Expression, indexVariables?: Fmt.ParameterList[]): Fmt.Expression {
-    return this.substituteVariable(expression, variable, (indices?: Fmt.ArgumentList[]) => {
-      let substitutedArg = value;
-      if (indexVariables) {
-        for (let index = 0; index < indexVariables.length; index++) {
-          substitutedArg = this.substituteArguments(substitutedArg, indexVariables[index], indices![index]);
-        }
-      }
-      return substitutedArg;
+  substituteVariableWithIndices(expression: Fmt.Expression, variable: Fmt.Parameter, value: Fmt.Expression): Fmt.Expression {
+    return this.substituteVariable(expression, variable, (variableRef: Fmt.VariableRefExpression) => {
+      return this.substituteIndices(value, variableRef);
     });
   }
 
@@ -379,10 +385,10 @@ export class HLMUtils extends GenericUtils {
 
   applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: HLMSubstitutionContext): Fmt.ParameterList {
     let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-    let substitutionFn = (expression: Fmt.Expression) => {
-      return this.applySubstitutionContext(expression, context);
-    };
-    parameters.substituteExpression(substitutionFn, result);
+    parameters.clone(result);
+    for (let param of result) {
+      param.type.expression = this.applySubstitutionContext(param.type.expression, context);
+    }
     return result;
   }
 
@@ -405,8 +411,10 @@ export class HLMUtils extends GenericUtils {
         return true;
       }
       let type = currentParam.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binding && this.parameterListContainsParameter(type.parameters, param)) {
-        return true;
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        if (this.parameterListContainsParameter(type.sourceParameters, param) || this.parameterListContainsParameter(type.targetParameters, param)) {
+          return true;
+        }
       }
     }
     return false;
@@ -426,9 +434,10 @@ export class HLMUtils extends GenericUtils {
   }
 
   getMacroInvocation(expression: Fmt.DefinitionRefExpression, definition: Fmt.Definition): HLMMacro.HLMMacroInvocation {
-    let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(expression.path.parentPath);
+    let parentPath = expression.path.parentPath;
+    let libraryDataAccessor = this.libraryDataAccessor.getAccessorForSection(parentPath);
     let macroInstance = HLMMacros.instantiateMacro(libraryDataAccessor, definition);
-    let config = this.supportPlaceholders ? new HLMMacroInvocationConfigWithPlaceholders(this) : new HLMMacroInvocationConfig(this);
+    let config = this.supportPlaceholders ? new HLMMacroInvocationConfigWithPlaceholders(this, parentPath) : new HLMMacroInvocationConfig(this, parentPath);
     return macroInstance.invoke(this, expression, config);
   }
 
@@ -671,8 +680,8 @@ export class HLMUtils extends GenericUtils {
                     result.isTemporary = true;
                     return result;
                   };
-                  let createElementParameter = (defaultName: string) => this.createElementParameter(defaultName);
-                  this.fillPlaceholderArguments(structuralCase.parameters, args, createPlaceholder, createElementParameter);
+                  let createParameterList = (source: Fmt.ParameterList) => this.createParameterList(source, undefined);
+                  this.fillPlaceholderArguments(structuralCase.parameters, args, createPlaceholder, createParameterList);
                   return this.substituteArguments(structuralCase.value, structuralCase.parameters, args);
                 } else if (term.cases.length === 1 && term.term instanceof Fmt.DefinitionRefExpression && term.term.path.parentPath instanceof Fmt.Path && term.construction instanceof Fmt.DefinitionRefExpression && structuralCase._constructor instanceof Fmt.DefinitionRefExpression && structuralCase._constructor.path.parentPath instanceof Fmt.Path) {
                   if (term.term.path.parentPath.isEquivalentTo(term.construction.path) && term.term.path.name === structuralCase._constructor.path.name) {
@@ -725,43 +734,44 @@ export class HLMUtils extends GenericUtils {
   }
 
   private getNextIndices(term: Fmt.VariableRefExpression, expressionType: HLMExpressionType, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
-    // TODO #65
-    return CachedPromise.resolve(undefined);
-/*    if (term.indices && (unfoldParameters.unfoldFixedSubterms || unfoldParameters.extractStructuralCasesFromFixedSubterms)) {
-      let newIndicesPromise: CachedPromise<Fmt.Expression[][]> = CachedPromise.resolve([[]]);
+    if (term.indices && (unfoldParameters.unfoldFixedSubterms || unfoldParameters.extractStructuralCasesFromFixedSubterms)) {
+      // TODO #65 merge with unfoldConstructionArguments
+/*      let newIndicesPromise: CachedPromise<Fmt.ArgumentList[][]> = CachedPromise.resolve([[]]);
       let indicesChanged = false;
       let extractedStructuralCases: FmtHLM.MetaRefExpression_structuralCases | undefined = undefined;
       for (let index of term.indices) {
-        newIndicesPromise = newIndicesPromise.then((newIndices: Fmt.Expression[][]) => {
-          if (!indicesChanged) {
-            if (unfoldParameters.extractStructuralCasesFromFixedSubterms && index instanceof FmtHLM.MetaRefExpression_structuralCases && index.cases.length === 1) {
-              indicesChanged = true;
-              extractedStructuralCases = index;
-              let structuralCase = index.cases[0];
-              return newIndices.map((prevIndices: Fmt.Expression[]) => prevIndices.concat(structuralCase.value));
-            } else if (unfoldParameters.unfoldFixedSubterms) {
-              return this.getNextElementTerms(index, unfoldParameters).then((unfoldedTerms: Fmt.Expression[] | undefined) => {
-                if (unfoldedTerms) {
-                  indicesChanged = true;
-                  let changedIndices: Fmt.Expression[][] = [];
-                  for (let prevIndices of newIndices) {
-                    for (let unfolddTerm of unfoldedTerms) {
-                      changedIndices.push(prevIndices.concat(unfolddTerm));
+        for (let indexArg of index) {
+          newIndicesPromise = newIndicesPromise.then((newIndices: Fmt.ArgumentList[][]) => {
+            if (!indicesChanged) {
+              if (unfoldParameters.extractStructuralCasesFromFixedSubterms && index instanceof FmtHLM.MetaRefExpression_structuralCases && index.cases.length === 1) {
+                indicesChanged = true;
+                extractedStructuralCases = index;
+                let structuralCase = index.cases[0];
+                return newIndices.map((prevIndices: Fmt.ArgumentList[]) => prevIndices.concat(structuralCase.value));
+              } else if (unfoldParameters.unfoldFixedSubterms) {
+                return this.getNextElementTerms(index, unfoldParameters).then((unfoldedTerms: Fmt.Expression[] | undefined) => {
+                  if (unfoldedTerms) {
+                    indicesChanged = true;
+                    let changedIndices: Fmt.ArgumentList[][] = [];
+                    for (let prevIndices of newIndices) {
+                      for (let unfoldedTerm of unfoldedTerms) {
+                        changedIndices.push(prevIndices.concat(unfoldedTerm));
+                      }
                     }
+                    return changedIndices;
+                  } else {
+                    return newIndices.map((prevIndices: Fmt.ArgumentList[]) => prevIndices.concat(index));
                   }
-                  return changedIndices;
-                } else {
-                  return newIndices.map((prevIndices: Fmt.Expression[]) => prevIndices.concat(index));
-                }
-              });
+                });
+              }
             }
-          }
-          return newIndices.map((prevIndices: Fmt.Expression[]) => prevIndices.concat(index));
-        });
+            return newIndices.map((prevIndices: Fmt.ArgumentList[]) => prevIndices.concat(index));
+          });
+        }
       }
-      return newIndicesPromise.then((newIndices: Fmt.Expression[][]) => {
+      return newIndicesPromise.then((newIndices: Fmt.ArgumentList[][]) => {
         if (indicesChanged) {
-          return newIndices.map((indices: Fmt.Expression[]) => {
+          return newIndices.map((indices: Fmt.ArgumentList[]) => {
             let newTerm = new Fmt.VariableRefExpression;
             newTerm.variable = term.variable;
             newTerm.indices = indices;
@@ -775,9 +785,9 @@ export class HLMUtils extends GenericUtils {
         } else {
           return undefined;
         }
-      });
+      });*/
     }
-    return CachedPromise.resolve(undefined);*/
+    return CachedPromise.resolve(undefined);
   }
 
   private unfoldConstructionArguments(term: Fmt.DefinitionRefExpression, definition: Fmt.Definition, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
@@ -924,7 +934,7 @@ export class HLMUtils extends GenericUtils {
     for (;;) {
       if (term instanceof Fmt.VariableRefExpression) {
         let type = term.variable.type.expression;
-        if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
+        if (type instanceof FmtHLM.MetaRefExpression_Element) {
           let set = type._set;
           let parameter: Fmt.Parameter | undefined = term.variable;
           while (set instanceof FmtHLM.MetaRefExpression_previous) {
@@ -933,7 +943,7 @@ export class HLMUtils extends GenericUtils {
               break;
             }
             type = parameter.type.expression;
-            if (!(type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding)) {
+            if (!(type instanceof FmtHLM.MetaRefExpression_Element)) {
               break;
             }
             set = type._set;
@@ -1360,9 +1370,9 @@ export class HLMUtils extends GenericUtils {
     return left.isEquivalentTo(right, fn);
   }
 
-  fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): void {
+  fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): void {
     for (let param of params) {
-      let argValue = this.createArgumentValue(param, createPlaceholder, createElementParameter);
+      let argValue = this.createArgumentValue(param, createPlaceholder, createParameterList);
       if (argValue) {
         let argument = new Fmt.Argument;
         argument.name = param.name;
@@ -1372,23 +1382,27 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  fillDefaultPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, context?: Ctx.Context): void {
+  fillDefaultPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): void {
     let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createElementParameter = (defaultName: string) => this.createElementParameter(defaultName, context);
-    this.fillPlaceholderArguments(params, args, createPlaceholder, createElementParameter);
+    let createParameterList = (source: Fmt.ParameterList) => {
+      let result = Object.create(Fmt.ParameterList.prototype);
+      source.substituteExpression((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath), result);
+      return result;
+    };
+    this.fillPlaceholderArguments(params, args, createPlaceholder, createParameterList);
   }
 
-  createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
+  createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.Expression | undefined {
     if (param.type.arrayDimensions) {
       let result = new Fmt.ArrayExpression;
       result.items = [];
       return result;
     }
-    return this.createArgumentItemValue(param, createPlaceholder, createElementParameter);
+    return this.createArgumentItemValue(param, createPlaceholder, createParameterList);
   }
 
-  createArgumentItemValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.Expression | undefined {
-    let contents = this.createArgumentContents(param, createPlaceholder, createElementParameter);
+  createArgumentItemValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.Expression | undefined {
+    let contents = this.createArgumentContents(param, createPlaceholder, createParameterList);
     if (contents) {
       let argValue = new Fmt.CompoundExpression;
       contents.toCompoundExpression(argValue, false);
@@ -1401,7 +1415,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  private createArgumentContents(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createElementParameter: CreateParameterFn): Fmt.ObjectContents | undefined {
+  private createArgumentContents(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.ObjectContents | undefined {
     let paramType = param.type.expression;
     if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
       let propArg = new FmtHLM.ObjectContents_PropArg;
@@ -1419,12 +1433,12 @@ export class HLMUtils extends GenericUtils {
       let elementArg = new FmtHLM.ObjectContents_ElementArg;
       elementArg.element = createPlaceholder(HLMExpressionType.ElementTerm);
       return elementArg;
-    } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
-      let bindingArg = new FmtHLM.ObjectContents_BindingArg;
-      bindingArg.parameter = createElementParameter(param.name);
-      bindingArg.arguments = Object.create(Fmt.ArgumentList.prototype);
-      this.fillPlaceholderArguments(paramType.parameters, bindingArg.arguments, createPlaceholder, createElementParameter);
-      return bindingArg;
+    } else if (paramType instanceof FmtHLM.MetaRefExpression_Binder) {
+      let binderArg = new FmtHLM.ObjectContents_BinderArg;
+      binderArg.sourceParameters = createParameterList(paramType.sourceParameters);
+      binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
+      this.fillPlaceholderArguments(paramType.targetParameters, binderArg.targetArguments, createPlaceholder, createParameterList);
+      return binderArg;
     } else {
       return undefined;
     }
@@ -1436,14 +1450,20 @@ export class HLMUtils extends GenericUtils {
     return this.createParameter(elementType, defaultName, context);
   }
 
+  createParameterList(source: Fmt.ParameterList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): Fmt.ParameterList {
+    let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    source.substituteExpression((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath), result);
+    if (context) {
+      this.adaptParameterNames(result, context);
+    }
+    return result;
+  }
+
   canAutoFillParameter(param: Fmt.Parameter, dependentParams: Fmt.Parameter[]): boolean {
     for (let dependentParam of dependentParams) {
       let type = dependentParam.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-        if (this.referencesParameter(type._set, param)) {
-          return true;
-        }
-        if (this.canAutoFillParameter(param, type.parameters)) {
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        if (this.canAutoFillParameter(param, type.sourceParameters) || this.canAutoFillParameter(param, type.targetParameters)) {
           return true;
         }
       } else if (this.isValueParamType(type)) {
@@ -1458,8 +1478,8 @@ export class HLMUtils extends GenericUtils {
   markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Fmt.Parameter[]): void {
     for (let param of params) {
       let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-        this.markUnreferencedParametersAsAuto(type.parameters, referencedParams);
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        this.markUnreferencedParametersAsAuto(type.targetParameters, referencedParams);
       } else if (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element) {
         if (referencedParams.indexOf(param) < 0) {
           type.auto = new FmtHLM.MetaRefExpression_true;

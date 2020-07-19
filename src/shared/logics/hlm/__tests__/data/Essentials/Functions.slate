@@ -4,22 +4,22 @@ $Functions(
   X: %Set,
   Y: %Set
 ): %Construction {
-  $function(x: %Binding(
-    X,
+  $function(_x: %Binder(
+    #(x: %Element(X)),
     #(y: %Element(Y))
   )): %Constructor {
     equalityDefinition = {
-      leftParameters = #(x: %Binding(
-        X,
+      leftParameters = #(_x: %Binder(
+        #(x: %Element(X)),
         #(y: %Element(Y))
       )),
-      rightParameters = #(x: %Binding(
-        X,
+      rightParameters = #(_x: %Binder(
+        #(x: %Element(X)),
         #("y'": %Element(Y))
       )),
       definition = [%forall(
         #(x: %Element(X)),
-        %equals(y[x], "y'"[x])
+        %equals(y[x = {x}], "y'"[x = {x}])
       )],
       isomorphic = %true
     }

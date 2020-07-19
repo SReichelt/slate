@@ -27,7 +27,6 @@ interface ParameterOverrides {
 interface ArgumentRenderingOptions extends ParameterOverrides {
   argumentLists?: Fmt.ArgumentList[];
   indices?: Notation.RenderedExpression[];
-  combineBindings?: boolean;  // TODO #65 remove
   omitArguments?: number;
   replaceAssociativeArg?: Notation.RenderedExpression;
   macroInvocation?: HLMMacro.HLMMacroInvocation;
@@ -46,6 +45,7 @@ interface ParameterListState {
   inConstraint: boolean;
   inDefinition: boolean;
   inDefinitionNotationGroup: boolean;
+  inForEach: boolean;
   associatedParameterList?: Fmt.ParameterList;
   associatedDefinition?: Fmt.Definition;
 }
@@ -315,6 +315,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inConstraint: false,
       inDefinition: false,
       inDefinitionNotationGroup: false,
+      inForEach: false,
       associatedParameterList: parameters,
       associatedDefinition: associatedDefinition
     };
@@ -334,7 +335,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inLetExpr: false,
       inConstraint: false,
       inDefinition: false,
-      inDefinitionNotationGroup: false
+      inDefinitionNotationGroup: false,
+      inForEach: false
     };
     return this.renderParametersWithInitialState(parameters, initialState, undefined);
   }
@@ -352,7 +354,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inLetExpr: false,
       inConstraint: false,
       inDefinition: false,
-      inDefinitionNotationGroup: false
+      inDefinitionNotationGroup: false,
+      inForEach: false
     };
     return this.renderParametersWithInitialState([parameter], initialState);
   }
@@ -371,7 +374,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
         expression = type.superset;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
         expression = type._set;
       } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
         expression = type.formula;
@@ -391,11 +394,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return constraintDefinitions.concat(undefined);
         }
       });
-      if (type instanceof FmtHLM.MetaRefExpression_Binding
-          && type.parameters.length === 1
-          && type.parameters[0].type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
-        resolveDefinitions = this.extractParameterDefinitions(type.parameters, resolveDefinitions);
-      }
     }
     return resolveDefinitions;
   }
@@ -469,7 +467,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowConstraint: state.fullSentence || !isEmpty,
         allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
         allowDefinition: state.fullSentence,
-        allowBinding: state.associatedDefinition !== undefined
+        allowBinder: state.associatedDefinition !== undefined
       };
       this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection);
       insertButton.semanticLinks = [semanticLink];
@@ -489,81 +487,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
     let type = parameters[0].type.expression;
 
-    if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-      this.addBindingParameterGroup(parameters, type, definition, remainingDefinitions, state, indices, row);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+    if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       this.addBinder(type, state, indices, row);
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
       this.addConstraint(type, remainingParameters, remainingDefinitions, state, row);
     } else {
       this.addRegularParameterGroup(parameters, type, definition, remainingParameters, remainingDefinitions, state, indices, row);
     }
-  }
-
-  private addBindingParameterGroup(parameters: Fmt.Parameter[], type: FmtHLM.MetaRefExpression_Binding, definition: Fmt.Definition | undefined, remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
-    state.inLetExpr = false;
-    state.inConstraint = false;
-    state.inDefinition = false;
-
-    for (let param of parameters) {
-      let forEachRow: Notation.RenderedExpression[] = [new Notation.TextExpression(state.abbreviate ? ' f.e. ' : ' for each ')];
-      let forEachState: ParameterListState = {
-        fullSentence: false,
-        sentence: false,
-        abbreviate: true,
-        forcePlural: false,
-        enableSpecializations: state.enableSpecializations,
-        markAsDummy: state.markAsDummy,
-        started: false,
-        inLetExpr: false,
-        inConstraint: false,
-        inDefinition: false,
-        inDefinitionNotationGroup: false,
-        associatedDefinition: state.associatedDefinition
-      };
-
-      let variables: Fmt.Parameter[] = [param];
-      let currentVariableGroup: Fmt.Parameter[] = [param];
-      let currentVariableGroupType = type;
-      let innerParameters = type.parameters;
-      let currentDefinition = definition;
-      while (innerParameters.length === 1) {
-        let innerParameter = innerParameters[0];
-        let innerBindingType: Fmt.Expression = innerParameter.type.expression;
-        if (innerBindingType instanceof FmtHLM.MetaRefExpression_Binding) {
-          if (innerBindingType._set instanceof FmtHLM.MetaRefExpression_previous) {
-            remainingDefinitions.shift();
-          } else {
-            this.addRegularParameterGroup(currentVariableGroup, currentVariableGroupType, currentDefinition, undefined, undefined, forEachState, undefined, forEachRow);
-            currentVariableGroup.length = 0;
-            currentVariableGroupType = innerBindingType;
-            forEachRow.push(new Notation.TextExpression(' and '));
-            forEachState.started = false;
-            currentDefinition = remainingDefinitions.shift();
-          }
-          variables.push(innerParameter);
-          currentVariableGroup.push(innerParameter);
-          innerParameters = innerBindingType.parameters;
-        } else {
-          break;
-        }
-      }
-      this.addRegularParameterGroup(currentVariableGroup, currentVariableGroupType, currentDefinition, undefined, undefined, forEachState, undefined, forEachRow);
-
-      let innerState = {
-        ...state,
-        associatedParameterList: innerParameters
-      };
-      let innerIndices: Notation.RenderedExpression[] = indices ? indices.slice() : [];
-      for (let variable of variables) {
-        innerIndices.push(this.renderVariable(variable));
-      }
-      row.push(this.renderParametersWithInitialState(innerParameters, innerState, innerIndices));
-
-      row.push(...forEachRow);
-    }
-
-    state.started = true;
   }
 
   private addBinder(type: FmtHLM.MetaRefExpression_Binder, state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
@@ -586,7 +516,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       sentence: false,
       abbreviate: true,
       forcePlural: false,
-      started: false
+      started: false,
+      inForEach: true,
+      associatedParameterList: type.sourceParameters
     };
     row.push(this.renderParametersWithInitialState(type.sourceParameters, sourceState, indices));
 
@@ -645,7 +577,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addRegularParameterGroup(parameters: Fmt.Parameter[], type: Fmt.Expression, definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
     if (state.started) {
-      row.push(new Notation.TextExpression(', '));
+      row.push(new Notation.TextExpression(state.inForEach ? ' and ' : ', '));
     }
     if (state.sentence && !state.inLetExpr) {
       row.push(new Notation.TextExpression(state.fullSentence && !state.started ? 'Let ' : 'let '));
@@ -761,7 +693,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                      'variable': variableDefinitions,
                                      'superset': this.renderSetTerm(type.superset, termSelection)
                                    }));
-    } else if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
       let termSelection: SetTermSelection = {
         allowEnumeration: true,
         allowSubset: false,
@@ -968,7 +900,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getNotationDefinitionRef(type: Fmt.Expression): Fmt.Expression | undefined {
-    if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Binding) {
+    if (type instanceof FmtHLM.MetaRefExpression_Element) {
       return type._set;
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       return type.element;
@@ -1414,10 +1346,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression | undefined {
     if (expression instanceof Fmt.VariableRefExpression) {
       let indices: Notation.RenderedExpression[] | undefined = undefined;
-      if (expression.indexParameterLists && expression.indices) {
+      if (expression.indices) {
         indices = [];
-        for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
-          indices.push(this.renderArgumentList(expression.indexParameterLists[indexIndex], expression.indices[indexIndex]));
+        for (let index of expression.indices) {
+          if (index.parameters) {
+            indices.push(this.renderArgumentList(index.parameters, index.arguments, undefined, false));
+          }
         }
       }
       let isDefinition = expression instanceof DefinitionVariableRefExpression;
@@ -1572,29 +1506,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return args;
   }
 
-  private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Notation.RenderedExpression[]): Notation.RenderedExpression {
+  private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Notation.RenderedExpression[], addParentheses: boolean = true): Notation.RenderedExpression {
     let options: ArgumentRenderingOptions = {
       argumentLists: argumentList ? [argumentList] : undefined,
-      indices: indices,
-      combineBindings: true
+      indices: indices
     };
     let args: RenderedTemplateArgument[] = [];
     this.fillArguments(parameters, options, undefined, args);
+    return this.renderArgumentTuple(args, addParentheses);
+  }
+
+  private renderArgumentTuple(args: RenderedTemplateArgument[], addParentheses: boolean = true): Notation.RenderedExpression {
     if (args.length === 1) {
       return ArgumentWithInfo.getValue(args[0]);
     } else {
-      return this.renderTemplate('Tuple', {'items': args});
+      return this.renderTemplate(addParentheses ? 'Tuple' : 'Group', {'items': args});
     }
   }
 
   private renderArgumentDefinitionList(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList): Notation.RenderedExpression {
     let options: ArgumentRenderingOptions = {
-      argumentLists: [argumentList],
-      combineBindings: true
+      argumentLists: [argumentList]
     };
     let params: Fmt.Parameter[] = [];
     let args: RenderedTemplateArgument[] = [];
-    // TODO handle bindings better
+    // TODO handle binders better
     this.fillArguments(parameters, options, params, args);
     let items = params.map((param: Fmt.Parameter, index: number) =>
       this.renderTemplate('EqualityDefinition', {
@@ -1618,67 +1554,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private fillArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
     let type = param.type.expression;
-    if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-      this.fillBindingArgument(param, replacementParam, type, options, resultParams, resultArgs);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+    if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       this.fillBinderArgument(param, replacementParam, type, options, resultParams, resultArgs);
     } else if (this.utils.isValueParamType(type)
                || type instanceof FmtHLM.MetaRefExpression_Nat) {
       this.fillRegularArgument(param, replacementParam, type, options, resultParams, resultArgs);
-    }
-  }
-
-  private fillBindingArgument(param: Fmt.Parameter, replacementParam: Fmt.Parameter | undefined, type: FmtHLM.MetaRefExpression_Binding, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
-    let parameter: Fmt.Parameter | undefined = undefined;
-    let bindingArgumentList: Fmt.ArgumentList | undefined = undefined;
-    let newIndices = options.indices;
-    if (options.argumentLists) {
-      let arg = this.utils.getArgument(options.argumentLists, param, FmtHLM.ObjectContents_BindingArg);
-      if (arg) {
-        parameter = arg.parameter;
-        bindingArgumentList = arg.arguments;
-      }
-    } else {
-      parameter = replacementParam ?? param;
-      newIndices = options.indices ? options.indices.slice() : [];
-      newIndices.push(this.renderVariable(parameter, undefined, false, !!options.omitArguments));
-    }
-    if (resultParams) {
-      resultParams.push(param);
-    }
-    if (parameter && (bindingArgumentList || !options.argumentLists)) {
-      let elementParameterOverrides = options.elementParameterOverrides;
-      if (bindingArgumentList && !options.indices) {
-        if (!elementParameterOverrides) {
-          elementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
-        }
-        bindingArgumentList = this.renderUtils.convertBoundStructuralCasesToOverrides([parameter], bindingArgumentList, elementParameterOverrides);
-      }
-      let variableDefinition = this.renderVariable(parameter, undefined, options.argumentLists !== undefined, !!options.omitArguments, undefined, elementParameterOverrides);
-      if (options.combineBindings) {
-        resultArgs.push(this.renderTemplate('Binding', {
-                                              'variable': variableDefinition,
-                                              'value': this.renderArgumentList(type.parameters, bindingArgumentList, newIndices)
-                                            }));
-      } else {
-        resultArgs.push(variableDefinition);
-        let bindingRenderingOptions: ArgumentRenderingOptions = {
-          ...options,
-          elementParameterOverrides: elementParameterOverrides,
-          argumentLists: bindingArgumentList ? [bindingArgumentList] : undefined,
-          indices: newIndices
-        };
-        if (replacementParam) {
-          let replacementParamType = replacementParam.type.expression as FmtHLM.MetaRefExpression_Binding;
-          bindingRenderingOptions.replacementParameters = {
-            parameters: replacementParamType.parameters,
-            isDefinition: options.replacementParameters!.isDefinition
-          };
-        }
-        this.fillArguments(type.parameters, bindingRenderingOptions, resultParams, resultArgs);
-      }
-    } else {
-      resultArgs.push(new Notation.ErrorExpression('Undefined argument'));
     }
   }
 
@@ -1698,10 +1578,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let replacementType = (replacementParam ?? param).type.expression as FmtHLM.MetaRefExpression_Binder;
       sourceParameters = replacementType.sourceParameters;
       targetParameters = replacementType.targetParameters;
-      newIndices = this.addIndices(replacementType, options.indices, !!options.omitArguments);
-    }
-    if (resultParams) {
-      resultParams.push(param);
+      newIndices = this.addIndices(replacementType, options.indices);
     }
     if (sourceParameters && (targetArguments || !options.argumentLists)) {
       let elementParameterOverrides = options.elementParameterOverrides;
@@ -1709,23 +1586,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (!elementParameterOverrides) {
           elementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
         }
-        // TODO #65
-        //targetArguments = this.renderUtils.convertBoundStructuralCasesToOverrides([parameter], targetArguments, elementParameterOverrides);
+        targetArguments = this.renderUtils.convertBoundStructuralCasesToOverrides(sourceParameters, targetArguments, elementParameterOverrides);
       }
-      // TODO #65
-      //let variableDefinition = this.renderVariable(parameter, undefined, options.argumentLists !== undefined, !!options.omitArguments, undefined, elementParameterOverrides);
-      resultArgs.push(this.renderTemplate('Binding', {
-                                            // TODO #65 honor rendering options corresponding to renderVariable
-                                            'variable': this.renderArgumentList(sourceParameters),
-                                            'value': this.renderArgumentList(targetParameters, targetArguments, newIndices)
-                                          }));
+      let sourceArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
+      let targetArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
       let sourceOptions: ArgumentRenderingOptions = {
         ...options,
-        replacementParameters: options.replacementParameters ? {...options.replacementParameters, parameters: sourceParameters} : undefined,
+        replacementParameters: {parameters: sourceParameters, isDefinition: options.argumentLists !== undefined},
+        elementParameterOverrides: elementParameterOverrides,
         argumentLists: undefined,
         indices: undefined
       };
-      this.fillArguments(type.sourceParameters, sourceOptions, resultParams, resultArgs);
+      this.fillArguments(type.sourceParameters, sourceOptions, resultParams, sourceArgs);
       let targetOptions: ArgumentRenderingOptions = {
         ...options,
         replacementParameters: options.replacementParameters ? {...options.replacementParameters, parameters: targetParameters} : undefined,
@@ -1733,8 +1605,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         argumentLists: targetArguments ? [targetArguments] : undefined,
         indices: newIndices
       };
-      this.fillArguments(type.targetParameters, targetOptions, resultParams, resultArgs);
-    } else {
+      this.fillArguments(type.targetParameters, targetOptions, resultParams, targetArgs);
+      if (!resultParams) {
+        resultArgs.push(this.renderTemplate('Binder', {
+                                              'variable': this.renderArgumentTuple(sourceArgs),
+                                              'value': this.renderArgumentTuple(targetArgs)
+                                            }));
+      }
+    } else if (!resultParams) {
       resultArgs.push(new Notation.ErrorExpression('Undefined argument'));
     }
   }
@@ -1854,14 +1732,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addIndices(type: FmtHLM.MetaRefExpression_Binder, indices: Notation.RenderedExpression[] | undefined, markAsDummy: boolean = false): Notation.RenderedExpression[] {
-    let result: Notation.RenderedExpression[] = indices ? indices.slice() : [];
-    for (let sourceParam of type.sourceParameters) {
-      if (this.utils.isValueParamType(sourceParam.type.expression)) {
-        result.push(this.renderVariable(sourceParam, undefined, false, markAsDummy));
-      }
-    }
-    return result;
+  private addIndices(type: FmtHLM.MetaRefExpression_Binder, indices: Notation.RenderedExpression[] | undefined): Notation.RenderedExpression[] {
+    let index = this.renderArgumentList(type.sourceParameters, undefined, undefined, false);
+    return indices ? indices.concat(index) : [index];
   }
 
   private hasAssociativeArg(expression: Fmt.Expression): boolean {
@@ -2294,7 +2167,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           inLetExpr: false,
           inConstraint: false,
           inDefinition: false,
-          inDefinitionNotationGroup: false
+          inDefinitionNotationGroup: false,
+          inForEach: false
         };
         row.push(this.renderParametersWithInitialState([parameter], initialState));
         row.push(new Notation.TextExpression('” for “'));
@@ -2334,7 +2208,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             inLetExpr: false,
             inConstraint: false,
             inDefinition: false,
-            inDefinitionNotationGroup: false
+            inDefinitionNotationGroup: false,
+            inForEach: false
           };
           row.push(this.renderParametersWithInitialState([parameter], initialState));
           row.push(new Notation.TextExpression('” for “'));
@@ -2627,6 +2502,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     for (let step of proof.steps) {
       if (originalParameters.length && substitutedParameters.length) {
         // TODO this breaks the connection between the source code and the rendered version
+        // TODO also, it calls substituteParameters way too often
         step = step.substituteExpression((expression: Fmt.Expression) => this.utils.substituteParameters(expression, originalParameters, substitutedParameters));
       }
       currentResult = this.addProofStep(step, goal, currentResult, originalParameters, substitutedParameters, startRow, startRowSpacing, paragraphs);
@@ -2964,6 +2840,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inConstraint: false,
       inDefinition: false,
       inDefinitionNotationGroup: false,
+      inForEach: false,
       associatedDefinition: associatedDefinition
     };
     let currentGroup: Fmt.Parameter[] = [];
@@ -3103,16 +2980,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           notation: renderedVariable,
           canAutoFill: this.utils.canAutoFillParameter(param, remainingParameters)
         });
-      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binding) {
-        let renderedVariable = this.renderVariable(param);
-        variables.push({
-          param: param,
-          notation: renderedVariable,
-          canAutoFill: false
-        });
+      } else if (paramType instanceof FmtHLM.MetaRefExpression_Binder) {
         let newIndices: Notation.RenderedExpression[] = indices ? indices.slice() : [];
-        newIndices.push(renderedVariable);
-        this.addRenderedVariables(paramType.parameters, variables, newIndices);
+        for (let sourceParam of paramType.sourceParameters) {
+          let renderedVariable = this.renderVariable(sourceParam);
+          variables.push({
+            param: sourceParam,
+            notation: renderedVariable,
+            canAutoFill: false
+          });
+          newIndices.push(renderedVariable);
+        }
+        this.addRenderedVariables(paramType.targetParameters, variables, newIndices);
       }
     }
   }

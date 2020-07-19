@@ -28,7 +28,7 @@ interface IndentInfo {
 export class Writer {
   private lineLength = 0;
 
-  constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private skipHiddenParameters: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
+  constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private skipOmittableParameters: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
 
   writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
     this.writeRange(file, false, false, false, false, () => {
@@ -177,7 +177,7 @@ export class Writer {
     let currentGroup: Fmt.Parameter[] = [];
     let groupIndex = 0;
     for (let parameter of parameters) {
-      if (this.skipHiddenParameters && parameter.name.startsWith('_')) {
+      if (this.skipOmittableParameters && parameter.type.expression instanceof Fmt.MetaRefExpression && parameter.type.expression.canOmit()) {
         continue;
       }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
@@ -381,9 +381,9 @@ export class Writer {
         this.writeIdentifier(expression.variable.name, expression, true);
         if (expression.indices) {
           for (let index of expression.indices) {
-            this.writeRange(index, false, false, false, false, () => {
+            this.writeRange(index.arguments, false, false, false, false, () => {
               this.write('[');
-              this.writeArguments(index, indent);
+              this.writeArguments(index.arguments, indent);
               this.write(']');
             });
           }

@@ -3,12 +3,12 @@
 /**
  * @expectedError Too few indices
  */
-$FAIL_tooFewIndices(i: %Binding(
-  $../Essentials/"Natural numbers",
-  #(j: %Binding(
-    $../Essentials/"Natural numbers",
+$FAIL_tooFewIndices(_i: %Binder(
+  #(i: %Element($../Essentials/"Natural numbers")),
+  #(_j: %Binder(
+    #(j: %Element($../Essentials/"Natural numbers")),
     #(a: %Element($../Essentials/"Pointed sets"))
   ))
 )): %ExplicitOperator {
-  definition = [a[$../Essentials/"Natural numbers".zero]]
+  definition = [a[j = {$../Essentials/"Natural numbers".zero}]]
 }

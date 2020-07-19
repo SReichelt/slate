@@ -3,9 +3,11 @@
 $Restrictions: %Section {
   logic = 'hlm',
   items = [
-    %item($FAIL_invalidBindingReference),
+    %item($FAIL_invalidBinderReference),
     %item($FAIL_missingIndex),
+    %item($FAIL_missingBinderArgument),
     %item($FAIL_tooFewIndices),
+    %item($FAIL_superfluousIndex),
     %item($FAIL_tooManyIndices),
     %item($FAIL_EqualityDefinitionParameters),
     %item($FAIL_InvalidEmbedding),

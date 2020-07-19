@@ -1,0 +1,8 @@
+%../../../../../../../data/logics/hlm%
+
+/**
+ * @expectedError Superfluous index
+ */
+$FAIL_superfluousIndex(a: %Element($../Essentials/"Pointed sets")): %ExplicitOperator {
+  definition = [a[]]
+}

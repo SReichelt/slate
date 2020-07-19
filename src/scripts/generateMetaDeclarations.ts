@@ -711,6 +711,10 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    return new ObjectContents_${definition.name};\n`;
         outFileStr += `  }\n`;
       }
+      if (definition.contents instanceof FmtMeta.ObjectContents_ParameterType && definition.contents.canOmit instanceof FmtMeta.MetaRefExpression_true) {
+        outFileStr += `\n`;
+        outFileStr += `  canOmit(): boolean { return true; }\n`;
+      }
       outFileStr += `}\n\n`;
     }
   }
@@ -783,8 +787,8 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
           let itemIndexParameterLists: string[] | undefined = undefined;
           if (item.indices) {
             itemIndexParameterLists = indexParameterLists ? indexParameterLists.slice() : [];
-            for (let indexArgs of item.indices) {
-              for (let indexArg of indexArgs) {
+            for (let index of item.indices) {
+              for (let indexArg of index.arguments) {
                 if (indexArg.value instanceof Fmt.VariableRefExpression) {
                   let index = indexArg.value.variable;
                   let indexName = translateMemberName(index.name);

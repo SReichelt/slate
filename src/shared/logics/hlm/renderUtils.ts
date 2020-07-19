@@ -174,25 +174,25 @@ export class HLMRenderUtils extends GenericRenderUtils {
     return expressionPromise;
   }
 
-  convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], bindingArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {
-    let newBindingArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+  convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], binderArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {
+    let newBinderArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
     let changed = false;
-    for (let bindingArg of bindingArgumentList) {
-      if (bindingArg.value instanceof Fmt.CompoundExpression && bindingArg.value.arguments.length) {
-        let expression = bindingArg.value.arguments[0].value;
+    for (let binderArg of binderArgumentList) {
+      if (binderArg.value instanceof Fmt.CompoundExpression && binderArg.value.arguments.length) {
+        let expression = binderArg.value.arguments[0].value;
         if (expression instanceof Fmt.ParameterExpression) {
-          // Looks like a nested binding argument; recurse into it.
-          if (bindingArg.value.arguments.length > 1) {
-            let nestedArgumentsExpression = bindingArg.value.arguments[1].value;
+          // Looks like a nested binder argument; recurse into it.
+          if (binderArg.value.arguments.length > 1) {
+            let nestedArgumentsExpression = binderArg.value.arguments[1].value;
             if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
               let allParameters: Fmt.Parameter[] = [];
               allParameters.push(...parameters);
               allParameters.push(...expression.parameters);
               let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
               if (newNestedArguments !== nestedArgumentsExpression.arguments) {
-                bindingArg = bindingArg.clone();
-                (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = expression;
-                ((bindingArg.value as Fmt.CompoundExpression).arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
+                binderArg = binderArg.clone();
+                (binderArg.value as Fmt.CompoundExpression).arguments[0].value = expression;
+                ((binderArg.value as Fmt.CompoundExpression).arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
                 changed = true;
               }
             }
@@ -201,18 +201,18 @@ export class HLMRenderUtils extends GenericRenderUtils {
           // We expect this to be a regular argument.
           let newExpression = this.convertStructuralCaseToOverride(parameters, expression, elementParameterOverrides);
           if (newExpression !== expression) {
-            bindingArg = bindingArg.clone();
-            (bindingArg.value as Fmt.CompoundExpression).arguments[0].value = newExpression;
+            binderArg = binderArg.clone();
+            (binderArg.value as Fmt.CompoundExpression).arguments[0].value = newExpression;
             changed = true;
           }
         }
       }
-      newBindingArgumentList.push(bindingArg);
+      newBinderArgumentList.push(binderArg);
     }
     if (changed) {
-      return newBindingArgumentList;
+      return newBinderArgumentList;
     }
-    return bindingArgumentList;
+    return binderArgumentList;
   }
 
   getDefinitionNotation(definition: Fmt.Definition): FmtNotation.ObjectContents_DefinitionNotation | undefined {

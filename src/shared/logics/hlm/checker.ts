@@ -32,7 +32,7 @@ type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExp
 interface HLMCheckerContext {
   context: Ctx.Context;
   previousSetTerm?: Fmt.Expression;
-  parentBindingParameters: Fmt.Parameter[];
+  parentBinderSourceParameterLists: Fmt.ParameterList[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
   inAutoArgument: boolean;
   editData?: HLMCheckerEditData;
@@ -100,7 +100,7 @@ export class HLMDefinitionChecker {
   constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private supportPlaceholders: boolean, private supportRechecking: boolean) {
     this.rootContext = {
       context: new Ctx.EmptyContext(FmtHLM.metaModel),
-      parentBindingParameters: [],
+      parentBinderSourceParameterLists: [],
       parentStructuralCases: [],
       inAutoArgument: false,
       rechecking: false
@@ -771,20 +771,16 @@ export class HLMDefinitionChecker {
       this.checkSetTerm(type._set, typeContext);
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       this.checkElementTerm(type.element, typeContext);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Binding) {
-      this.checkSetTerm(type._set, typeContext);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       let innerContext: HLMCheckerContext = {
         ...context,
-        parentBindingParameters: context.parentBindingParameters.concat(param)
+        parentBinderSourceParameterLists: [...context.parentBinderSourceParameterLists, type.sourceParameters]
       };
-      if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-        innerContext.previousSetTerm = type._set;
-      }
-      let resultContext = this.checkParameterList(type.parameters, innerContext);
+      let sourceContext = this.checkParameterList(type.sourceParameters, innerContext);
+      let resultContext = this.checkParameterList(type.targetParameters, sourceContext);
       return {
         ...resultContext,
-        parentBindingParameters: context.parentBindingParameters,
-        previousSetTerm: undefined
+        parentBinderSourceParameterLists: context.parentBinderSourceParameterLists
       };
     } else {
       this.error(type, 'Invalid parameter type');
@@ -907,7 +903,22 @@ export class HLMDefinitionChecker {
           let binderArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BinderArg);
           let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
           if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
-            this.error(binderArg.sourceParameters, 'Parameter list does not match binder');
+            // Retry with %previous.
+            // TODO #65 remove
+            let prevParam = undefined;
+            for (let expectedParam of expectedSourceParameters) {
+              if (prevParam && expectedParam.type.expression.isEquivalentTo(prevParam.type.expression)) {
+                if (expectedParam.type.expression instanceof FmtHLM.MetaRefExpression_Subset) {
+                  expectedParam.type.expression.superset = new FmtHLM.MetaRefExpression_previous;
+                } else if (expectedParam.type.expression instanceof FmtHLM.MetaRefExpression_Element) {
+                  expectedParam.type.expression._set = new FmtHLM.MetaRefExpression_previous;
+                }
+              }
+              prevParam = expectedParam;
+            }
+            if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
+              this.error(binderArg.sourceParameters, 'Parameter list must match binder');
+            }
           }
           let innerSubstitutionContext: HLMSubstitutionContext = {
             ...substitutionContext,
@@ -1017,7 +1028,7 @@ export class HLMDefinitionChecker {
 
   private checkElementTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
     this.handleExpression(term, context);
-    if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding)) {
+    if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def)) {
       this.checkVariableRefExpression(term, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
       let checkDefinitionRef = this.utils.getOuterDefinition(term)

@@ -1255,9 +1255,9 @@ We write “f :  X → Y, x ↦ y_x” for “f := (X → 
 
 Remarks.
 
-This definition uses a feature of the HLM logic called \\"bindings.\\" It is equivalent to the usual set-theoretic definition, which is called \\"mapping\\" in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
+This definition uses binders as a built-in feature of the HLM logic. It is equivalent to the usual set-theoretic definition, which is called \\"mapping\\" in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
 
-The major advantage of the definition using bindings is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
+The major advantage of the definition using binders is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
 
 Function [extensionality](https://en.wikipedia.org/wiki/Extensionality) is a consequence of the requirement to specify an equality definition for the constructor.
 
@@ -2484,8 +2484,9 @@ exports[`render hlm library: 1.7.1.19 data/libraries/hlm/Essentials/Numbers/Natu
 
   1. M is finite
   2. M is empty or ∃ m ∈ M : m is a ≤-greatest element of M
-  3. ∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
-  4. ∃ b ∈ ℕ : M ⊆ ℕ_(<b)
+  3. M is empty or ∃! m ∈ M : m is a ≤-greatest element of M
+  4. ∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
+  5. ∃ b ∈ ℕ : M ⊆ ℕ_(<b)
 
 Proof.
 
@@ -2519,7 +2520,7 @@ s ∈ ℕ_(<0)
 2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
 
 ⇒^1.7.1.18 ∃ y ∈ M : ∀ z ∈ M : z ≤ y
-2⇒3. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
+2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
 
 1. Assume M is empty.
 
@@ -2541,14 +2542,14 @@ We show that x ≤ m:
 ∀ n ∈ M : n ≤ m
 
 ⇒ x ≤ m
-3⇒4. Assume ∃ a ∈ ℕ : M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
+4⇒5. Assume ∃ a ∈ ℕ : M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
 
 ∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
 
 ⇒^def M ⊆ ℕ_(<(a+1))
 
 Choose b := (a+1).
-4⇒1. Assume ∃ b ∈ ℕ : M ⊆ ℕ_(<b). Then M is finite:
+5⇒1. Assume ∃ b ∈ ℕ : M ⊆ ℕ_(<b). Then M is finite:
 
 ⇒^1.7.1.17.7 ℕ_(<b) is finite
 
@@ -2896,35 +2897,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#min"
 `;
 
-exports[`render hlm library: 1.7.1.42 data/libraries/hlm/Essentials/Numbers/Natural/bounded 1`] = `
-"Definition 1.7.1.42.  Let M ⊆ ℕ. We define:
-
-  M is bounded  :⇔  ∃ n ∈ ℕ : ∀ m ∈ M : m ≤ n
-    ⇔  ∃ u ∈ ℕ : ∀ m ∈ M : m < u
-    ⇔  M is empty or ∃! n ∈ M : ∀ m ∈ M : m ≤ n
-
-  M is unbounded  :⇔  M is not bounded
-
-Equivalence.  No proof.
-
-References.
-
-* https://en.wikipedia.org/wiki/Bounded_set
-* https://mathworld.wolfram.com/Bounded.html
-* https://proofwiki.org/wiki/Definition:Bounded_Above_Set
-* https://ncatlab.org/nlab/show/bounded+set"
-`;
-
-exports[`render hlm library: 1.7.1.43 data/libraries/hlm/Essentials/Numbers/Natural/Finite%20subsets%20are%20bounded 1`] = `
-"Proposition 1.7.1.43.  Let M ⊆ ℕ such that M is finite. Then:
-
-  M is bounded
-
-No proof."
-`;
-
-exports[`render hlm library: 1.7.1.44 data/libraries/hlm/Essentials/Numbers/Natural/maximum 1`] = `
-"Definition 1.7.1.44.  Let M ⊆ ℕ such that M is nonempty and M is bounded. For m ∈ M, we define:
+exports[`render hlm library: 1.7.1.42 data/libraries/hlm/Essentials/Numbers/Natural/maximum 1`] = `
+"Definition 1.7.1.42.  Let M ⊆ ℕ such that M is finite and M is nonempty. For m ∈ M, we define:
 
   max(M) = m  :⇔  ∀ n ∈ M : m ≥ n
     ⇔  ∀ l ∈ M s.t. l ≥ m : l = m
@@ -2941,8 +2915,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Maximal/Ordered_Set"
 `;
 
-exports[`render hlm library: 1.7.1.45 data/libraries/hlm/Essentials/Numbers/Natural/maximum%20of%20two%20numbers 1`] = `
-"Definition 1.7.1.45.  Let m, n ∈ ℕ. We define:
+exports[`render hlm library: 1.7.1.43 data/libraries/hlm/Essentials/Numbers/Natural/maximum%20of%20two%20numbers 1`] = `
+"Definition 1.7.1.43.  Let m, n ∈ ℕ. We define:
 
   max(m, n) := max({m, n})
    = {m if m ≥ n, n if m < n
@@ -2957,8 +2931,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#max"
 `;
 
-exports[`render hlm library: 1.7.1.46.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/indexed%20element 1`] = `
-"Definition 1.7.1.46.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
+exports[`render hlm library: 1.7.1.44.1 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/indexed%20element 1`] = `
+"Definition 1.7.1.44.1.  Let M ⊆ ℕ, n ∈ ℕ such that n < |M|, m := min(M). We define
 
   M[n]
 
@@ -2972,8 +2946,8 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`), and to provide a way of obtaining a sequence from a finite set of natural numbers (see \`$\\"sequence from subset\\"\`)."
 `;
 
-exports[`render hlm library: 1.7.1.46.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
-"Definition 1.7.1.46.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
+exports[`render hlm library: 1.7.1.44.2 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
+"Definition 1.7.1.44.2.  Let M ⊆ ℕ, n ∈ ℕ. We define
 
   |M|_≤n
 
@@ -2987,10 +2961,10 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.7.1.46.3 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.7.1.46.3 (Tuple)."`;
+exports[`render hlm library: 1.7.1.44.3 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.7.1.44.3 (Tuple)."`;
 
-exports[`render hlm library: 1.7.1.46.4 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/sequence%20from%20subset 1`] = `
-"Definition 1.7.1.46.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
+exports[`render hlm library: 1.7.1.44.4 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/sequence%20from%20subset 1`] = `
+"Definition 1.7.1.44.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
 
   seq(M) := seq_(≤∣_M)(M)
    = ((M[n])_(n < α))_(M^α)
@@ -3002,8 +2976,8 @@ Remarks.
 This definition produces a sorted finite sequence from a finite subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.7.1.46.5 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence%20from%20subset 1`] = `
-"Definition 1.7.1.46.5.  Let M ⊆ ℕ such that M is infinite. We define:
+exports[`render hlm library: 1.7.1.44.5 data/libraries/hlm/Essentials/Numbers/Natural/Sequences/infinite%20sequence%20from%20subset 1`] = `
+"Definition 1.7.1.44.5.  Let M ⊆ ℕ such that M is infinite. We define:
 
   seq_ω(M) := (M[n])_(n ∈ ℕ)
 
@@ -3012,8 +2986,8 @@ Remarks.
 This definition produces a sorted infinite sequence from an infinite subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.7.1.47 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
-"Definition 1.7.1.47.  Let n ∈ ℕ. We define:
+exports[`render hlm library: 1.7.1.45 data/libraries/hlm/Essentials/Numbers/Natural/factorial 1`] = `
+"Definition 1.7.1.45.  Let n ∈ ℕ. We define:
 
   n! := {1 if n = 0, x! ⋅ n if n = x + 1 (x ∈ ℕ)
 
@@ -3027,8 +3001,8 @@ References.
 * http://oeis.org/A000142"
 `;
 
-exports[`render hlm library: 1.7.1.48 data/libraries/hlm/Essentials/Numbers/Natural/Small%20factorials 1`] = `
-"Proposition 1.7.1.48.
+exports[`render hlm library: 1.7.1.46 data/libraries/hlm/Essentials/Numbers/Natural/Small%20factorials 1`] = `
+"Proposition 1.7.1.46.
 
   (n!)_(n ∈ ℕ) starts with (1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 355687428096000, 6402373705728000, 121645100408832000, 2432902008176640000, 51090942171709440000, 1124000727777607680000)
 
@@ -3039,8 +3013,8 @@ References.
 * http://oeis.org/A000142"
 `;
 
-exports[`render hlm library: 1.7.1.49 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
-"Definition 1.7.1.49.  Let n, k ∈ ℕ. We define
+exports[`render hlm library: 1.7.1.47 data/libraries/hlm/Essentials/Numbers/Natural/binomial%20coefficient 1`] = `
+"Definition 1.7.1.47.  Let n, k ∈ ℕ. We define
 
   (n, k)
 
@@ -3060,8 +3034,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose"
 `;
 
-exports[`render hlm library: 1.7.1.50 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
-"Proposition 1.7.1.50.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.7.1.48 data/libraries/hlm/Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
+"Proposition 1.7.1.48.  Let n ∈ ℕ, k ∈ ℕ_(≤n). Then:
 
   (n, k) = n!∕(k! ⋅ (n − k)!)
 
@@ -3076,8 +3050,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose_eq_fact_div_fact"
 `;
 
-exports[`render hlm library: 1.7.1.51.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
-"Definition 1.7.1.51.1.  We define:
+exports[`render hlm library: 1.7.1.49.1 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
+"Definition 1.7.1.49.1.  We define:
 
   ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℕ
 
@@ -3092,40 +3066,40 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.7.1.51.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
-"Proposition 1.7.1.51.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.7.1.49.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
+"Proposition 1.7.1.49.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∑_(j < m) a_j ≤ ∑_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.7.1.51.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.7.1.49.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.7.1.49.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.4 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20constant 1`] = `
-"Proposition 1.7.1.51.4.  Let n, a ∈ ℕ. Then:
+exports[`render hlm library: 1.7.1.49.4 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20constant 1`] = `
+"Proposition 1.7.1.49.4.  Let n, a ∈ ℕ. Then:
 
   ∑_(i < n) a = n ⋅ a
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
-"Proposition 1.7.1.51.5.  Let n ∈ ℕ. Then:
+exports[`render hlm library: 1.7.1.49.5 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20over%20variable 1`] = `
+"Proposition 1.7.1.49.5.  Let n ∈ ℕ. Then:
 
   ∑_(i < n) i = (n, 2) = {(n ⋅ (n − 1))∕2 if n ≠ 0, 0 if n = 0
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
-"Definition 1.7.1.51.6.  We define:
+exports[`render hlm library: 1.7.1.49.6 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
+"Definition 1.7.1.49.6.  We define:
 
   ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℕ
 
@@ -3140,40 +3114,40 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.7.1.51.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
-"Proposition 1.7.1.51.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.7.1.49.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
+"Proposition 1.7.1.49.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   (∏_(j < m) a_j) ∣ (∏_(k < n) a_k)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
-"Proposition 1.7.1.51.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+exports[`render hlm library: 1.7.1.49.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
+"Proposition 1.7.1.49.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
 
   ∏_(j < m) a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
-"Proposition 1.7.1.51.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.7.1.49.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
+"Proposition 1.7.1.49.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ∣ (∏_(k < n) a_k)
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.51.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.7.1.51.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+exports[`render hlm library: 1.7.1.49.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
+"Proposition 1.7.1.49.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
 
   a_j ≤ ∏_(k < n) a_k
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.1.52.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
-"Definition 1.7.1.52.1.  Let n ∈ ℕ_(>1). We define:
+exports[`render hlm library: 1.7.1.50.1 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime 1`] = `
+"Definition 1.7.1.50.1.  Let n ∈ ℕ_(>1). We define:
 
   n is prime  :⇔  ∀ m ∈ ℕ_+ s.t. m ∣ n : [m = 1 or m = n]
     ⇔  ∀ l ∈ ℕ_(>1) s.t. l ∣ n : l = n
@@ -3206,8 +3180,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime"
 `;
 
-exports[`render hlm library: 1.7.1.52.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
-"Example 1.7.1.52.2.
+exports[`render hlm library: 1.7.1.50.2 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Two%20is%20prime 1`] = `
+"Example 1.7.1.50.2.
 
   2 is prime
 
@@ -3219,8 +3193,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.prime_two"
 `;
 
-exports[`render hlm library: 1.7.1.52.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
-"Definition 1.7.1.52.3.  We define:
+exports[`render hlm library: 1.7.1.50.3 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20numbers 1`] = `
+"Definition 1.7.1.50.3.  We define:
 
   ℙ := {n ∈ ℕ_(>1) : n is prime}
 
@@ -3234,8 +3208,8 @@ References.
 * http://oeis.org/A000040"
 `;
 
-exports[`render hlm library: 1.7.1.52.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Small%20primes 1`] = `
-"Proposition 1.7.1.52.4.
+exports[`render hlm library: 1.7.1.50.4 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Small%20primes 1`] = `
+"Proposition 1.7.1.50.4.
 
   seq_ω(ℙ) starts with (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271)
 
@@ -3247,8 +3221,8 @@ References.
 * http://oeis.org/A000040"
 `;
 
-exports[`render hlm library: 1.7.1.52.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
-"Proposition 1.7.1.52.5.  Let n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.7.1.50.5 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Every%20number%20greater%20than%20one%20has%20a%20prime%20factor 1`] = `
+"Proposition 1.7.1.50.5.  Let n ∈ ℕ_(>1). Then:
 
   ∃ prime p : p ∣ n
 
@@ -3259,8 +3233,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_prime_and_dvd"
 `;
 
-exports[`render hlm library: 1.7.1.52.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
-"Theorem 1.7.1.52.6 (Euclid's theorem).
+exports[`render hlm library: 1.7.1.50.6 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Euclids%20theorem 1`] = `
+"Theorem 1.7.1.50.6 (Euclid's theorem).
 
   ℙ is infinite
 
@@ -3270,7 +3244,7 @@ Proof.  Assume ℙ is finite.
 
 Let a := ∏_(i < n) f(i).
 
-1.7.1.51.8 ⇒ 1 ≤ a
+1.7.1.49.8 ⇒ 1 ≤ a
 
 Let b := a + 1.
 
@@ -3278,11 +3252,11 @@ Let b := a + 1.
 
 ⇒^1.7.1.13 b > 1
 
-⇒^1.7.1.52.5 ∃ prime p : p ∣ b
+⇒^1.7.1.50.5 ∃ prime p : p ∣ b
 
 ⇒^def p ∣ (a + 1)
 
-⇒^1.7.1.51.9 f(f^-1(p)) ∣ a
+⇒^1.7.1.49.9 f(f^-1(p)) ∣ a
 
 ⇒^1.4.25 p ∣ a
 
@@ -3302,8 +3276,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
 
-exports[`render hlm library: 1.7.1.52.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.7.1.52.7.  Let p be a prime, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
+exports[`render hlm library: 1.7.1.50.7 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.7.1.50.7.  Let p be a prime, m ∈ ℕ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ m
   2. p ∣ m^n
@@ -3317,8 +3291,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.dvd_prime_pow"
 `;
 
-exports[`render hlm library: 1.7.1.52.8 data/libraries/hlm/Essentials/Numbers/Natural/Prime/multiplicity 1`] = `
-"Definition 1.7.1.52.8.  Let n ∈ ℕ_+, p be a prime. For x ∈ ℕ, we define:
+exports[`render hlm library: 1.7.1.50.8 data/libraries/hlm/Essentials/Numbers/Natural/Prime/multiplicity 1`] = `
+"Definition 1.7.1.50.8.  Let n ∈ ℕ_+, p be a prime. For x ∈ ℕ, we define:
 
   mult(p, n) = x  :⇔  ∃ m ∈ ℕ_+ : [p^x ⋅ m = n and p ∤ m]
     ⇔  p^x ∣ n and p ∤ n∕p^x
@@ -3340,14 +3314,14 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/ring_theory/multiplicity.html#multiplicity"
 `;
 
-exports[`render hlm library: 1.7.1.52.9 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime%20factors 1`] = `
-"Definition 1.7.1.52.9.  Let n ∈ ℕ. We define:
+exports[`render hlm library: 1.7.1.50.9 data/libraries/hlm/Essentials/Numbers/Natural/Prime/prime%20factors 1`] = `
+"Definition 1.7.1.50.9.  Let n ∈ ℕ. We define:
 
   PrimeFactors(n) := {p^(mult(p,n))} is a/an ℙ-multiset"
 `;
 
-exports[`render hlm library: 1.7.1.52.10 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20factorization 1`] = `
-"Theorem 1.7.1.52.10 (Prime factorization).  Let n ∈ ℕ_+. Then:
+exports[`render hlm library: 1.7.1.50.10 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Prime%20factorization 1`] = `
+"Theorem 1.7.1.50.10 (Prime factorization).  Let n ∈ ℕ_+. Then:
 
   n = ∏_(p ∈ ℙ) p^(mult(p,n)) = ∏_(p ∈ PrimeFactors(n)) p
 
@@ -3368,8 +3342,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.factors"
 `;
 
-exports[`render hlm library: 1.7.1.52.11 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
-"Theorem 1.7.1.52.11 (Fundamental theorem of arithmetic).  Let n ∈ ℕ_+. Then:
+exports[`render hlm library: 1.7.1.50.11 data/libraries/hlm/Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
+"Theorem 1.7.1.50.11 (Fundamental theorem of arithmetic).  Let n ∈ ℕ_+. Then:
 
   ∃! 𝑷 ∈ 𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(ℙ) s.t. 𝑷 is finite : n = ∏_(p ∈ 𝑷) p
 
@@ -3390,8 +3364,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.factors"
 `;
 
-exports[`render hlm library: 1.7.1.53 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
-"Definition 1.7.1.53.  Let m, n ∈ ℕ. We define:
+exports[`render hlm library: 1.7.1.51 data/libraries/hlm/Essentials/Numbers/Natural/coprime 1`] = `
+"Definition 1.7.1.51.  Let m, n ∈ ℕ. We define:
 
   m and n are coprime  :⇔  ∀ a ∈ ℕ_+ s.t. a ∣ m and a ∣ n : a = 1
     ⇔  ∄ b ∈ ℕ_(>1) : [b ∣ m and b ∣ n]
@@ -3414,8 +3388,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/gcd.html#nat.coprime"
 `;
 
-exports[`render hlm library: 1.7.1.54 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
-"Proposition 1.7.1.54.  Let m, n ∈ ℕ_(>1). Then:
+exports[`render hlm library: 1.7.1.52 data/libraries/hlm/Essentials/Numbers/Natural/Coprime%20test 1`] = `
+"Proposition 1.7.1.52.  Let m, n ∈ ℕ_(>1). Then:
 
   m and m ⋅ n are not coprime
 
@@ -5511,7 +5485,7 @@ exports[`render hlm library: 1.7.6.19 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.
 
-1.7.1.52.2 ⇒ 2 is prime
+1.7.1.50.2 ⇒ 2 is prime
 
 ⇒^1.7.6.18 2√2 is irrational
 

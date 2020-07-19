@@ -189,21 +189,19 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
     }
     if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
         let expression = rangeInfo.object;
-        if (expression.indexParameterLists && expression.indices && position) {
-            for (let indexIndex = 0; indexIndex < expression.indexParameterLists.length && indexIndex < expression.indices.length; indexIndex++) {
-                let index = expression.indices[indexIndex];
-                let indexRangeInfo = parsedDocument.rangeMap.get(index);
-                if (indexRangeInfo && indexRangeInfo.range.contains(position)) {
-                    let indexParameters = expression.indexParameterLists[indexIndex];
-                    let indexParametersRangeInfo = parsedDocument.rangeMap.get(indexParameters);
+        if (expression.indices && position) {
+            for (let index of expression.indices) {
+                let indexRangeInfo = parsedDocument.rangeMap.get(index.arguments);
+                if (indexRangeInfo && indexRangeInfo.range.contains(position) && index.parameters) {
+                    let indexParametersRangeInfo = parsedDocument.rangeMap.get(index.parameters);
                     if (indexParametersRangeInfo) {
                         let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, indexParametersRangeInfo.range, true, sourceDocument) : undefined;
                         return {
                             signatureCode: signatureCode,
                             parsedDocument: parsedDocument,
                             isMetaModel: false,
-                            parameters: indexParameters,
-                            arguments: index
+                            parameters: index.parameters,
+                            arguments: index.arguments
                         };
                     }
                 }
