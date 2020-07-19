@@ -191,18 +191,20 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
         let expression = rangeInfo.object;
         if (expression.indices && position) {
             for (let index of expression.indices) {
-                let indexRangeInfo = parsedDocument.rangeMap.get(index.arguments);
-                if (indexRangeInfo && indexRangeInfo.range.contains(position) && index.parameters) {
-                    let indexParametersRangeInfo = parsedDocument.rangeMap.get(index.parameters);
-                    if (indexParametersRangeInfo) {
-                        let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, indexParametersRangeInfo.range, true, sourceDocument) : undefined;
-                        return {
-                            signatureCode: signatureCode,
-                            parsedDocument: parsedDocument,
-                            isMetaModel: false,
-                            parameters: index.parameters,
-                            arguments: index.arguments
-                        };
+                if (index.parameters && index.arguments) {
+                    let indexRangeInfo = parsedDocument.rangeMap.get(index.arguments);
+                    if (indexRangeInfo && indexRangeInfo.range.contains(position)) {
+                        let indexParametersRangeInfo = parsedDocument.rangeMap.get(index.parameters);
+                        if (indexParametersRangeInfo) {
+                            let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, indexParametersRangeInfo.range, true, sourceDocument) : undefined;
+                            return {
+                                signatureCode: signatureCode,
+                                parsedDocument: parsedDocument,
+                                isMetaModel: false,
+                                parameters: index.parameters,
+                                arguments: index.arguments
+                            };
+                        }
                     }
                 }
             }

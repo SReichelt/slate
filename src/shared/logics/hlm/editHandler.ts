@@ -644,7 +644,7 @@ export class HLMEditHandler extends GenericEditHandler {
           parameters: indexParameterList,
           arguments: Object.create(Fmt.ArgumentList.prototype)
         };
-        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments, undefined, expressionEditInfo.context);
+        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments!, undefined, expressionEditInfo.context);
         if (expression.indices) {
           expression.indices.unshift(index);
         } else {

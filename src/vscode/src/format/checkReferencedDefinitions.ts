@@ -151,7 +151,7 @@ export function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagn
                 if (expression.indices) {
                     let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
                     for (let index of expression.indices) {
-                        if (index.parameters) {
+                        if (index.parameters && index.arguments) {
                             try {
                                 referenceChecker.checkArgumentsOfReferencedDefinition(index.parameters, index.arguments);
                             } catch (error) {

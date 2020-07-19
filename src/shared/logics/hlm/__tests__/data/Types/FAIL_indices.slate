@@ -7,8 +7,8 @@
  */
 $FAIL_indices(_i: %Binder(
   #(
-    i: %Element($../Essentials/"Natural numbers"),
-    j: %Element($../Essentials/"Pointed sets")
+    i: %Element($../Essentials/"Pointed sets"),
+    j: %Element($../Essentials/"Natural numbers")
   ),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {

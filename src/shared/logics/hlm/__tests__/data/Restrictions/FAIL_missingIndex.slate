@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Indices required
+ * @expectedError Too few indices
  */
 $FAIL_missingIndex(_i: %Binder(
   #(i: %Element($../Essentials/"Natural numbers")),

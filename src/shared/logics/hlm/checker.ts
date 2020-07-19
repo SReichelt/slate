@@ -32,7 +32,7 @@ type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExp
 interface HLMCheckerContext {
   context: Ctx.Context;
   previousSetTerm?: Fmt.Expression;
-  parentBinderSourceParameterLists: Fmt.ParameterList[];
+  binderSourceParameters: Fmt.Parameter[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
   inAutoArgument: boolean;
   editData?: HLMCheckerEditData;
@@ -100,7 +100,7 @@ export class HLMDefinitionChecker {
   constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private supportPlaceholders: boolean, private supportRechecking: boolean) {
     this.rootContext = {
       context: new Ctx.EmptyContext(FmtHLM.metaModel),
-      parentBinderSourceParameterLists: [],
+      binderSourceParameters: [],
       parentStructuralCases: [],
       inAutoArgument: false,
       rechecking: false
@@ -703,14 +703,14 @@ export class HLMDefinitionChecker {
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
         if (!(type.superset instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {...context, previousSetTerm: type.superset};
+          currentContext = {...currentContext, previousSetTerm: type.superset};
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
         if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {...context, previousSetTerm: type._set};
+          currentContext = {...currentContext, previousSetTerm: type._set};
         }
       } else {
-        currentContext = context;
+        currentContext = {...currentContext, previousSetTerm: undefined};
       }
     }
     currentContext = {...currentContext, previousSetTerm: undefined};
@@ -772,15 +772,11 @@ export class HLMDefinitionChecker {
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       this.checkElementTerm(type.element, typeContext);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-      let innerContext: HLMCheckerContext = {
-        ...context,
-        parentBinderSourceParameterLists: [...context.parentBinderSourceParameterLists, type.sourceParameters]
-      };
-      let sourceContext = this.checkParameterList(type.sourceParameters, innerContext);
+      let sourceContext = this.checkParameterList(type.sourceParameters, context);
       let resultContext = this.checkParameterList(type.targetParameters, sourceContext);
       return {
         ...resultContext,
-        parentBinderSourceParameterLists: context.parentBinderSourceParameterLists
+        binderSourceParameters: [...resultContext.binderSourceParameters, ...type.sourceParameters]
       };
     } else {
       this.error(type, 'Invalid parameter type');
@@ -1201,42 +1197,20 @@ export class HLMDefinitionChecker {
   }
 
   private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
-    // TODO #65
-/*    let bindingParameters: Fmt.Parameter[] = [];
-    if (expression.variable.type.expression instanceof FmtHLM.MetaRefExpression_Binding) {
-      if (context.parentBindingParameters.indexOf(expression.variable) < 0) {
-        this.error(expression, 'Invalid reference to binding parameter');
-      }
-    } else {
-      for (let bindingParameter = this.utils.getParentBinding(expression.variable); bindingParameter; bindingParameter = this.utils.getParentBinding(bindingParameter)) {
-        bindingParameters.unshift(bindingParameter);
-      }
+    if (context.binderSourceParameters.indexOf(expression.variable) >= 0) {
+      this.error(expression, 'Invalid reference to binder');
     }
     if (expression.indices) {
-      let indexIndex = 0;
-      let currentSet: Fmt.Expression | undefined = undefined;
       for (let index of expression.indices) {
-        if (indexIndex < bindingParameters.length) {
-          this.checkElementTerm(index, context);
-          let type = bindingParameters[indexIndex].type.expression as FmtHLM.MetaRefExpression_Binding;
-          if (!(currentSet && type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-            currentSet = type._set;
-            for (let substitutionIndex = 0; substitutionIndex < indexIndex; substitutionIndex++) {
-              currentSet = this.utils.substituteVariable(currentSet, bindingParameters[substitutionIndex], () => expression.indices![substitutionIndex]);
-            }
-          }
-          this.checkCompatibility(index, [currentSet], [index], context);
-          indexIndex++;
+        if (index.parameters && index.arguments) {
+          this.checkArgumentLists([index.arguments], [index.parameters], undefined, context);
+        } else if (index.parameters) {
+          this.error(expression, `Too few indices`);
         } else {
-          this.error(index, `Superfluous index`);
+          this.error(index.arguments ?? expression, `Superfluous index`);
         }
       }
-      if (indexIndex < bindingParameters.length) {
-        this.error(expression, `Too few indices`);
-      }
-    } else if (bindingParameters.length) {
-      this.error(expression, `Indices required`);
-    }*/
+    }
   }
 
   private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], context: HLMCheckerContext): void {

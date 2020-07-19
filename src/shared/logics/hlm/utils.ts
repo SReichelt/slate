@@ -161,7 +161,7 @@ export class HLMUtils extends GenericUtils {
           parameters: binderArg.sourceParameters,
           arguments: Object.create(Fmt.ArgumentList.prototype)
         };
-        this.getParameterArguments(index.arguments, binderArg.sourceParameters, context, undefined, indices);
+        this.getParameterArguments(index.arguments!, binderArg.sourceParameters, context, undefined, indices);
         let newIndices = indices ? [...indices, index] : [index];
         binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, newIndices);
@@ -330,7 +330,7 @@ export class HLMUtils extends GenericUtils {
   substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
     if (variable.indices) {
       for (let index of variable.indices) {
-        if (index.parameters) {
+        if (index.parameters && index.arguments) {
           expression = this.substituteArguments(expression, index.parameters, index.arguments);
         }
       }

@@ -615,7 +615,7 @@ export class Reader {
         parameters: indexParameterLists && indexIndex < indexParameterLists.length ? indexParameterLists[indexIndex] : undefined,
         arguments: Object.create(Fmt.ArgumentList.prototype)
       };
-      this.readArguments(index.arguments, context);
+      this.readArguments(index.arguments!, context);
       if (expression.indices) {
         expression.indices.push(index);
       } else {
@@ -625,6 +625,18 @@ export class Reader {
       this.markEnd(indexStart, index.arguments, context);
       indexIndex++;
       indexStart = this.markStart();
+    }
+    if (indexParameterLists) {
+      for (; indexIndex < indexParameterLists.length; indexIndex++) {
+        let index: Fmt.Index = {
+          parameters: indexParameterLists[indexIndex]
+        };
+        if (expression.indices) {
+          expression.indices.push(index);
+        } else {
+          expression.indices = [index];
+        }
+      }
     }
     return expression;
   }

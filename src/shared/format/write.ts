@@ -381,11 +381,15 @@ export class Writer {
         this.writeIdentifier(expression.variable.name, expression, true);
         if (expression.indices) {
           for (let index of expression.indices) {
-            this.writeRange(index.arguments, false, false, false, false, () => {
-              this.write('[');
-              this.writeArguments(index.arguments, indent);
-              this.write(']');
-            });
+            if (index.arguments) {
+              this.writeRange(index.arguments, false, false, false, false, () => {
+                this.write('[');
+                this.writeArguments(index.arguments!, indent);
+                this.write(']');
+              });
+            } else {
+              break;
+            }
           }
         }
       } else if (expression instanceof Fmt.MetaRefExpression) {

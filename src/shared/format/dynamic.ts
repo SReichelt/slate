@@ -163,11 +163,13 @@ export class DynamicMetaModel extends Meta.MetaModel {
       if (parameterExpression.indices) {
         let newIndexParameterLists: Fmt.ParameterList[] = [];
         for (let index of parameterExpression.indices) {
-          for (let indexArg of index.arguments) {
-            if (indexArg.value instanceof Fmt.VariableRefExpression) {
-              let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
-              if (indexValue instanceof Fmt.ParameterExpression) {
-                newIndexParameterLists.push(indexValue.parameters);
+          if (index.arguments) {
+            for (let indexArg of index.arguments) {
+              if (indexArg.value instanceof Fmt.VariableRefExpression) {
+                let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
+                if (indexValue instanceof Fmt.ParameterExpression) {
+                  newIndexParameterLists.push(indexValue.parameters);
+                }
               }
             }
           }

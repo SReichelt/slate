@@ -742,7 +742,7 @@ export class StringExpression extends Expression {
 
 export interface Index {
   parameters?: ParameterList;
-  arguments: ArgumentList;
+  arguments?: ArgumentList;
 }
 
 export class VariableRefExpression extends Expression {
@@ -759,14 +759,18 @@ export class VariableRefExpression extends Expression {
     if (this.indices) {
       result.indices = [];
       for (let index of this.indices) {
-        let newIndex: Index = {
-          parameters: index.parameters,
-          arguments: Object.create(ArgumentList.prototype)
-        };
-        if (index.arguments.substituteExpression(fn, newIndex.arguments, replacedParameters)) {
-          changed = true;
+        if (index.arguments) {
+          let newIndex: Index = {
+            parameters: index.parameters,
+            arguments: Object.create(ArgumentList.prototype)
+          };
+          if (index.arguments.substituteExpression(fn, newIndex.arguments!, replacedParameters)) {
+            changed = true;
+          }
+          result.indices.push(newIndex);
+        } else {
+          result.indices.push(index);
         }
-        result.indices.push(newIndex);
       }
     }
     let newIndices = result.replaceIndexParameters(replacedParameters);
@@ -781,7 +785,7 @@ export class VariableRefExpression extends Expression {
     if (expression instanceof VariableRefExpression
         && this.variable.findReplacement(replacedParameters) === expression.variable) {
       let newIndices = this.replaceIndexParameters(replacedParameters);
-      let compareFn = (leftItem: Index, rightItem: Index) => leftItem.arguments.isEquivalentTo(rightItem.arguments, fn, replacedParameters);
+      let compareFn = (leftItem: Index, rightItem: Index) => areObjectsEquivalent(leftItem.arguments, rightItem.arguments, fn, replacedParameters);
       return compareLists(newIndices ?? this.indices, expression.indices, compareFn, replacedParameters);
     } else {
       return false;
@@ -800,23 +804,27 @@ export class VariableRefExpression extends Expression {
             if (paramIndex >= 0) {
               if (!newIndex) {
                 newIndex = {
-                  parameters: Object.create(ParameterList.prototype),
-                  arguments: Object.create(ArgumentList.prototype)
+                  parameters: Object.create(ParameterList.prototype)
                 };
                 newIndex.parameters!.push(...index.parameters);
-                newIndex.arguments.push(...index.arguments);
+                if (index.arguments) {
+                  newIndex.arguments = Object.create(ArgumentList.prototype);
+                  newIndex.arguments!.push(...index.arguments);
+                }
                 if (!newIndices) {
                   newIndices = this.indices!.slice();
                 }
                 newIndices[indexIndex] = newIndex;
               }
               newIndex.parameters![paramIndex] = replacedParameter.replacement;
-              for (let argIndex = 0; argIndex < newIndex.arguments.length; argIndex++) {
-                let arg = newIndex.arguments[argIndex];
-                if (arg.name === replacedParameter.original.name) {
-                  let newArg = arg.clone();
-                  newArg.name = replacedParameter.replacement.name;
-                  newIndex.arguments[argIndex] = newArg;
+              if (newIndex.arguments) {
+                for (let argIndex = 0; argIndex < newIndex.arguments.length; argIndex++) {
+                  let arg = newIndex.arguments[argIndex];
+                  if (arg.name === replacedParameter.original.name) {
+                    let newArg = arg.clone();
+                    newArg.name = replacedParameter.replacement.name;
+                    newIndex.arguments[argIndex] = newArg;
+                  }
                 }
               }
             }
