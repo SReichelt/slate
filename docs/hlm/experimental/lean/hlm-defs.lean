@@ -1,67 +1,72 @@
--- This file experimentally maps the primitives of the HLM logic to the Lean proof assistant.
--- In particular, for HLM parameters of type "Set", "Subset", and "Element", we provide three
--- Lean types with the same names. Some usage examples are included at the bottom.
---
--- The translation serves several purposes:
--- * It gives HLM expressions an unambiguous meaning via their corresponding Lean expressions
---   (even in cases like homomorphisms between equivalence classes of structures, where the
---   mathematical meaning could be in doubt).
--- * It can serve as a basis for independent checking of the library.
--- * If a theorem has been proved in HLM, the corresponding Lean theorem and proof can be
---   used in other Lean libraries. (However, complicated structures are always difficult to
---   translate between libraries.)
--- * Conversely, a Lean proof of a translated statement could be accepted as a proof of the
---   original statement.
--- * The definitions in this file provide an alternative way of dealing with sets in Lean,
---   which could be useful in itself. (Unfortunately, it requires many trivial proofs, which
---   can be generated automatically when translating from HLM, but which need to be written
---   manually otherwise. Perhaps it is possible to write Lean tactics for them.)
---
--- The most idiomatic translation of HLM sets to Lean would be as follows:
--- * An HLM parameter S: Set ("let S be a set") is simply translated to S : Type*, with the
---   intention of translating subsets as subtypes wherever applicable.
--- * An HLM parameter T: Subset(S) ("let T ⊆ S") is translated to T : set S if S is of (HLM)
---   type Set, or T : set (subtype S) if S if of (HLM) type Subset.
--- * An HLM parameter x: Element(S) ("let x ∈ S") is translated to x : S if S is of (HLM) type
---   Set, or x : subtype S if S if of (HLM) type Subset. (An alternative translation for the
---   second case would simply be x ∈ S, which uses special Lean syntactic sugar.)
---
--- However, the following (pseudocode) translation more closely matches the HLM-specific
--- concept of sets:
--- * An HLM parameter S: Set ("let S be a set") is translated to S : Set, where
---     structure Set := (α : Type u) (s : set α).
---   That is, Set bundles a Lean type with a Lean set of that type.
--- * An HLM parameter T: Subset(S) ("let T ⊆ S") is translated to T : Subset S, where
---     structure Subset (S : {Set | Subset ?}) := (s : set S.α) (is_subset : s ⊆ S.s).
---   That is, Subset inherits the type α from the given superset. (In reality, S.α does not
---   work if S is itself of type Subset; this is solved using type classes.) It bundles a
---   set of that type with a proof that this set is indeed a subset of the given argument.
--- * An HLM parameter x: Element(S) ("let x ∈ S") is translated to x : Element S, where
---     structure Element (S : {Set | Subset ?}) := (a : S.α) (is_element : a ∈ S.s).
---   The Element structure simply bundles an element of the required type with a proof that it
---   is indeed an element of the given set. Note that this is exactly the same as subtype S.s.
---
--- These definitions translate the type system of HLM, in the sense that a translated
--- expression is well-typed in Lean if and only if the original expression is well-typed in
--- HLM.
---
--- These definitions would be sufficient to translate simple definitions, but not HLM
--- constructions that contain sets: Their custom equality definition in HLM necessarily
--- identifies isomorphic elements, but it is still possible to obtain "arbitrary
--- representatives" of such sets and even return them (or elements of them, etc.) from
--- definitions. When working with concrete instances of such structures, one can then infer
--- information about specific sets, not just equivalence classes.
--- Therefore, when translating a construction with a custom equality definition, we cannot
--- immediately take the quotient with respect to that equality definition (as that would lose
--- too much information), but we need to bundle the equality definition together with the type
--- (as a setoid), and use it whenever we translate a formula containing "=". Specifically, in
--- the pseudo-definitions above, we replace α with a new structure called BaseType.
--- Sets of a given BaseType must respect the equality definition, in the sense that two
--- HLM-equal objects must either both be in the set or both not be in the set. This is encoded
--- in the structure BaseSet. (Equivalently, we could define BaseSet as a set of quotients.)
--- Each translated definitions must also respect the equality definition "in the obvious way".
---
--- This file is known to compile in Lean 3.4.2 and 3.17.1.
+/-
+This file experimentally maps the primitives of the HLM logic to the Lean proof assistant.
+In particular, for HLM parameters of type `Set`, `Subset`, and `Element`, we provide three
+Lean types with the same names. Some usage examples are included at the bottom.
+
+The translation serves several purposes:
+* It gives HLM expressions an unambiguous meaning via their corresponding Lean expressions
+  (even in cases like homomorphisms between equivalence classes of structures, where the
+  mathematical meaning could be in doubt).
+* It can serve as a basis for independent checking of the library.
+* If a theorem has been proved in HLM, the corresponding Lean theorem and proof can be
+  used in other Lean libraries. (However, complicated structures are always difficult to
+  translate between libraries.)
+* Conversely, a Lean proof of a translated statement could be accepted as a proof of the
+  original statement.
+* The definitions in this file provide an alternative way of dealing with sets in Lean,
+  which could be useful in itself. (Unfortunately, it requires many trivial proofs, which
+  can be generated automatically when translating from HLM, but which need to be written
+  manually otherwise. Perhaps it is possible to write Lean tactics for them.)
+
+The most idiomatic translation of HLM sets to Lean would be as follows:
+* An HLM parameter `S: Set` ("let S be a set") is simply translated to `S : Type*`, with
+  the intention of translating subsets as subtypes wherever applicable.
+* An HLM parameter `T: Subset(S)` ("let T ⊆ S") is translated to `T : set S` if `S` is of
+  (HLM) type `Set`, or `T : set (subtype S)` if `S` if of (HLM) type `Subset`.
+* An HLM parameter `x: Element(S)` ("let x ∈ S") is translated to `x : S` if `S` is of
+  (HLM) type `Set`, or `x : subtype S` if `S` if of (HLM) type `Subset`. (An alternative
+  translation for the second case would simply be `x ∈ S`, which uses special Lean
+  syntactic sugar.)
+
+However, the following (pseudocode) translation more closely matches the HLM-specific
+concept of sets:
+* An HLM parameter `S: Set` ("let S be a set") is translated to `S : Set`, where
+    `structure Set := (α : Type u) (s : set α)`.
+  That is, `Set` bundles a Lean type with a Lean set of that type.
+* An HLM parameter `T: Subset(S)` ("let T ⊆ S") is translated to `T : Subset S`, where
+    `structure Subset (S : {Set | Subset ?}) := (s : set S.α) (is_subset : s ⊆ S.s)`.
+  That is, `Subset` inherits the type `α` from the given superset. (In reality, `S.α` does
+  not work if `S` is itself of type `Subset`; this is solved using type classes.) It
+  bundles a set of that type with a proof that this set is indeed a subset of the given
+  argument.
+* An HLM parameter `x: Element(S)` ("let x ∈ S") is translated to `x : Element S`, where
+    `structure Element (S : {Set | Subset ?}) := (a : S.α) (is_element : a ∈ S.s)`.
+  The `Element` structure simply bundles an element of the required type with a proof that
+  it is indeed an element of the given set. Note that this is exactly the same as
+  `subtype S.s`.
+
+These definitions translate the type system of HLM, in the sense that a translated
+expression is well-typed in Lean if and only if the original expression is well-typed in
+HLM.
+
+These definitions would be sufficient to translate simple definitions, but not HLM
+constructions that contain sets: Their custom equality definition in HLM necessarily
+identifies isomorphic elements, but it is still possible to obtain "arbitrary
+representatives" of such sets and even return them (or elements of them, etc.) from
+definitions. When working with concrete instances of such structures, one can then infer
+information about specific sets, not just equivalence classes.
+Therefore, when translating a construction with a custom equality definition, we cannot
+immediately take the quotient with respect to that equality definition (as that would lose
+too much information), but we need to bundle the equality definition together with the type
+(as a setoid), and use it whenever we translate a formula containing "=". Specifically, in
+the pseudo-definitions above, we replace α with a new structure called `BaseType`.
+Sets of a given `BaseType` must respect the equality definition, in the sense that two
+HLM-equal objects must either both be in the set or both not be in the set. This is encoded
+in the structure `BaseSet`. (Equivalently, we could define `BaseSet` as a set of quotients.)
+Each translated definitions must also respect the equality definition "in the obvious way".
+
+This file is known to compile in Lean 3.4.2 and 3.17.1.
+-/
 
 namespace hlm
 
@@ -113,7 +118,7 @@ class has_base_set (H : Sort v) extends has_base_type H := (base_set : Π S : H,
 def lean_type_of {H : Sort v} [h : has_base_type H] (S : H) := (has_base_type.base_type S).α
 def lean_set_of {H : Sort v} [has_base_set H] (S : H) := (has_base_set.base_set S).lean_set
 
--- The coercions do not seem to work within definitions, even with ↑. Need to figure out why.
+-- The coercions do not seem to work within definitions, even with `↑`. Need to figure out why.
 -- However, they seem to be used implicitly in proofs, as can be seen by commenting them out.
 
 structure Set := (base_type : BaseType) (base_set : BaseSet base_type)
