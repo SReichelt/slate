@@ -1392,13 +1392,12 @@ export class HLMDefinitionChecker {
         if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {
           for (let constructorDefinition of constructionDefinition.innerDefinitions) {
             if (constructorDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
-              let substitutedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-              let substitutionFn = (expression: Fmt.Expression) => {
-                expression = this.utils.substituteImmediatePath(expression, construction.path.parentPath);
-                expression = this.utils.substituteArguments(expression, constructionDefinition.parameters, construction.path.arguments);
-                return expression;
+              let substitutionContext: HLMSubstitutionContext = {
+                targetPath: construction.path.parentPath,
+                parameterLists: [constructionDefinition.parameters],
+                argumentLists: [construction.path.arguments]
               };
-              constructorDefinition.parameters.substituteExpression(substitutionFn, substitutedParameters);
+              let substitutedParameters = this.utils.applySubstitutionContextToParameterList(constructorDefinition.parameters, substitutionContext);
               callbackFn(constructionDefinition, constructionDefinition.contents, constructorDefinition, constructorDefinition.contents, substitutedParameters);
             }
           }
