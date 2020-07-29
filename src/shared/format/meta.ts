@@ -252,7 +252,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
     if (this.members !== undefined) {
       let membersExpr = new Fmt.ParameterExpression;
-      membersExpr.parameters.push(...this.members);
+      membersExpr.parameters = this.members;
       argumentList.add(membersExpr, 'members', true);
     }
     if (this.exports !== undefined) {

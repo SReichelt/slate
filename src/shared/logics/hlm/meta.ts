@@ -574,10 +574,10 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     let leftParametersExpr = new Fmt.ParameterExpression;
-    leftParametersExpr.parameters.push(...this.leftParameters);
+    leftParametersExpr.parameters = this.leftParameters;
     argumentList.add(leftParametersExpr, outputAllNames ? 'leftParameters' : undefined, false);
     let rightParametersExpr = new Fmt.ParameterExpression;
-    rightParametersExpr.parameters.push(...this.rightParameters);
+    rightParametersExpr.parameters = this.rightParameters;
     argumentList.add(rightParametersExpr, outputAllNames ? 'rightParameters' : undefined, false);
     let definitionExpr = new Fmt.ArrayExpression;
     definitionExpr.items = [];
@@ -1546,7 +1546,7 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     super.toArgumentList(argumentList, outputAllNames);
     if (this.variables !== undefined) {
       let variablesExpr = new Fmt.ParameterExpression;
-      variablesExpr.parameters.push(...this.variables);
+      variablesExpr.parameters = this.variables;
       argumentList.add(variablesExpr, 'variables', true);
     }
     if (this.references !== undefined) {
@@ -2513,10 +2513,10 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let sourceParametersExpr = new Fmt.ParameterExpression;
-    sourceParametersExpr.parameters.push(...this.sourceParameters);
+    sourceParametersExpr.parameters = this.sourceParameters;
     argumentList.add(sourceParametersExpr, undefined, false);
     let targetParametersExpr = new Fmt.ParameterExpression;
-    targetParametersExpr.parameters.push(...this.targetParameters);
+    targetParametersExpr.parameters = this.targetParameters;
     argumentList.add(targetParametersExpr, undefined, false);
   }
 
@@ -2973,7 +2973,7 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     let sourceParametersExpr = new Fmt.ParameterExpression;
-    sourceParametersExpr.parameters.push(...this.sourceParameters);
+    sourceParametersExpr.parameters = this.sourceParameters;
     argumentList.add(sourceParametersExpr, outputAllNames ? 'sourceParameters' : undefined, false);
     let targetArgumentsExpr = new Fmt.CompoundExpression;
     targetArgumentsExpr.arguments = this.targetArguments;
@@ -3241,7 +3241,7 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, undefined, false);
     argumentList.add(this.term, undefined, false);
   }
@@ -4015,7 +4015,7 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, undefined, false);
     argumentList.add(this.formula, undefined, false);
   }
@@ -4077,7 +4077,7 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, undefined, false);
     if (this.formula !== undefined) {
       argumentList.add(this.formula, 'formula', true);
@@ -4141,7 +4141,7 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, undefined, false);
     if (this.formula !== undefined) {
       argumentList.add(this.formula, 'formula', true);
@@ -4582,14 +4582,14 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     }
     if (this.parameters !== undefined) {
       let parametersExpr = new Fmt.ParameterExpression;
-      parametersExpr.parameters.push(...this.parameters);
+      parametersExpr.parameters = this.parameters;
       argumentList.add(parametersExpr, 'parameters', true);
     }
     if (this.goal !== undefined) {
       argumentList.add(this.goal, 'goal', true);
     }
     let stepsExpr = new Fmt.ParameterExpression;
-    stepsExpr.parameters.push(...this.steps);
+    stepsExpr.parameters = this.steps;
     argumentList.add(stepsExpr, 'steps', false);
   }
 
@@ -5021,7 +5021,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, undefined, false);
   }
 
@@ -6030,7 +6030,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     argumentList.add(this._constructor, outputAllNames ? 'constructor' : undefined, false);
     if (this.parameters !== undefined) {
       let parametersExpr = new Fmt.ParameterExpression;
-      parametersExpr.parameters.push(...this.parameters);
+      parametersExpr.parameters = this.parameters;
       argumentList.add(parametersExpr, 'parameters', true);
     }
     argumentList.add(this.value, 'value', false);

@@ -38,7 +38,7 @@ interface ParameterListState {
   abbreviate: boolean;
   forcePlural: boolean;
   enableSpecializations: boolean;
-  markAsDummy: boolean;
+  inInsertMenu: boolean;
   elementParameterOverrides?: ElementParameterOverrides;
   started: boolean;
   inLetExpr: boolean;
@@ -308,7 +308,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       abbreviate: abbreviate,
       forcePlural: forcePlural,
       enableSpecializations: true,
-      markAsDummy: false,
+      inInsertMenu: false,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -329,7 +329,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       abbreviate: abbreviate,
       forcePlural: forcePlural,
       enableSpecializations: true,
-      markAsDummy: false,
+      inInsertMenu: false,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -348,7 +348,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       abbreviate: true,
       forcePlural: forcePlural,
       enableSpecializations: true,
-      markAsDummy: markAsDummy,
+      inInsertMenu: markAsDummy,
       elementParameterOverrides: elementParameterOverrides,
       started: false,
       inLetExpr: false,
@@ -436,7 +436,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (this.editHandler && state.associatedParameterList) {
       if (row.length) {
         row.push(new Notation.TextExpression(' '));
-      } else if (state.started) {
+      } else if (state.started && !state.inInsertMenu) {
         // Occurs if bound parameter list is empty.
         row.push(new Notation.TextExpression(', '));
       }
@@ -445,11 +445,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let stateCopy: ParameterListState = {
         ...state,
         associatedParameterList: undefined,
-        markAsDummy: true
+        inInsertMenu: true
       };
       if (stateCopy.started) {
         stateCopy.fullSentence = false;
-        stateCopy.started = false;
       }
       let onRenderParam = (parameter: Fmt.Parameter) => this.renderParametersWithInitialState([parameter], stateCopy, indices);
       let onInsertParam = (parameter: Fmt.Parameter) => {
@@ -467,9 +466,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowConstraint: state.fullSentence || !isEmpty,
         allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
         allowDefinition: state.fullSentence,
-        allowBinder: state.associatedDefinition !== undefined
+        allowBinder: state.associatedDefinition !== undefined && !state.inForEach
       };
-      this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection);
+      this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection, state.inForEach);
       insertButton.semanticLinks = [semanticLink];
       row.push(insertButton);
     }
@@ -520,7 +519,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inForEach: true,
       associatedParameterList: type.sourceParameters
     };
-    row.push(this.renderParametersWithInitialState(type.sourceParameters, sourceState, indices));
+    row.push(this.renderParametersWithInitialState(type.sourceParameters, sourceState));
 
     state.started = true;
   }
@@ -533,12 +532,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else {
         connective = state.abbreviate ? 's.t. ' : 'such that ';
       }
-      if (state.started) {
+      if (!state.inInsertMenu) {
         connective = ' ' + connective;
       }
       row.push(new Notation.TextExpression(connective));
     } else {
-      if (state.started) {
+      if (state.started && !state.inInsertMenu) {
         row.push(new Notation.TextExpression(', '));
       }
       if (state.sentence) {
@@ -577,7 +576,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addRegularParameterGroup(parameters: Fmt.Parameter[], type: Fmt.Expression, definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[] | undefined, remainingDefinitions: (Fmt.Definition | undefined)[] | undefined, state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
     if (state.started) {
-      row.push(new Notation.TextExpression(state.inForEach ? ' and ' : ', '));
+      if (state.inForEach) {
+        let connective = 'and ';
+        if (!state.inInsertMenu) {
+          connective = ' ' + connective;
+        }
+        row.push(new Notation.TextExpression(connective));
+      } else if (!state.inInsertMenu) {
+        row.push(new Notation.TextExpression(', '));
+      }
     }
     if (state.sentence && !state.inLetExpr) {
       row.push(new Notation.TextExpression(state.fullSentence && !state.started ? 'Let ' : 'let '));
@@ -586,7 +593,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.inConstraint = false;
     state.inDefinition = false;
 
-    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.markAsDummy, state.associatedParameterList, state.elementParameterOverrides);
+    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.inInsertMenu, state.associatedParameterList, state.elementParameterOverrides);
     let variableNotation: Notation.RenderedExpression | undefined;
     let noun: PropertyInfo = {
       isFeature: false,
@@ -2172,7 +2179,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           abbreviate: false,
           forcePlural: false,
           enableSpecializations: true,
-          markAsDummy: false,
+          inInsertMenu: false,
           started: false,
           inLetExpr: false,
           inConstraint: false,
@@ -2214,7 +2221,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             abbreviate: false,
             forcePlural: false,
             enableSpecializations: true,
-            markAsDummy: false,
+            inInsertMenu: false,
             started: false,
             inLetExpr: false,
             inConstraint: false,
@@ -2845,7 +2852,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       abbreviate: false,
       forcePlural: false,
       enableSpecializations: true,
-      markAsDummy: false,
+      inInsertMenu: false,
       started: false,
       inLetExpr: false,
       inConstraint: false,

@@ -1118,7 +1118,7 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters.push(...this.parameters);
+    parametersExpr.parameters = this.parameters;
     argumentList.add(parametersExpr, outputAllNames ? 'parameters' : undefined, false);
     argumentList.add(this.originalParameter, outputAllNames ? 'originalParameter' : undefined, false);
     argumentList.add(this.originalParameterValue, outputAllNames ? 'originalParameterValue' : undefined, false);

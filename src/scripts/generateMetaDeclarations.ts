@@ -295,7 +295,7 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
           outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
-          outFileStr += `${indent}${variableName}.parameters.push(...${source});\n`;
+          outFileStr += `${indent}${variableName}.parameters = ${source};\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList) {
           outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;

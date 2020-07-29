@@ -154,15 +154,13 @@ export class HLMEditHandler extends GenericEditHandler {
     semanticLink.alwaysShowMenu = true;
   }
 
-  // TODO #65 display "and" in "for each A and B"
-  addParameterMenu(semanticLink: Notation.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection): void {
+  addParameterMenu(semanticLink: Notation.SemanticLink, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection, inForEach: boolean): void {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
       let elementType = new FmtHLM.MetaRefExpression_Element;
       elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-      // TODO #65 use 'i' as default name inside binder
-      rows.push(this.getParameterPlaceholderItem(elementType, 'x', parameterList, onRenderParam, onInsertParam));
+      rows.push(this.getParameterPlaceholderItem(elementType, inForEach ? 'i' : 'x', parameterList, onRenderParam, onInsertParam));
 
       let subsetType = new FmtHLM.MetaRefExpression_Subset;
       subsetType.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
