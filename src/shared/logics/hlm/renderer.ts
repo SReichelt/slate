@@ -1351,6 +1351,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         for (let index of expression.indices) {
           if (index.parameters) {
             indices.push(this.renderArgumentList(index.parameters, index.arguments, undefined, false));
+          } else if (index.arguments) {
+            // Fallback when rendering code within markdown.
+            for (let arg of index.arguments) {
+              let value = arg.value;
+              if (value instanceof Fmt.CompoundExpression && value.arguments.length) {
+                value = value.arguments[0].value;
+              }
+              indices.push(this.renderExpression(value));
+            }
           }
         }
       }
