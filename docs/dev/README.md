@@ -1,6 +1,8 @@
 # Slate development
 
-This document describes how to build and run Slate locally, and how to deploy it to Heroku.
+This document describes
+* how to build and run Slate locally, and
+* how to make it publicly accessible by deploying to Heroku.
 
 ## Building Slate
 

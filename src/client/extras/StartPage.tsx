@@ -168,7 +168,10 @@ function StartPage(props: StartPageProps) {
       <p>
         Existing theorem provers can potentially be integrated into Slate, reusing its rendering and editing mechanisms.
       </p>
-      <h2>Third-Party Software</h2>
+      <h2>Development</h2>
+      <p>
+        All relevant code and documentation is contained in the <a href="https://github.com/SReichelt/slate" target="_blank">GitHub repository</a>.
+      </p>
       <p>
         For a list of third-party software used in Slate, see <DocLink href="docs/dependencies" onDocLinkClicked={props.onDocLinkClicked}>here</DocLink>.
       </p>
