@@ -151,7 +151,7 @@ function StartPage(props: StartPageProps) {
       </p>
       <p>
         The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
-        In particular, it supports side-by-side textual and graphical editing, combining the best of both worlds.
+        In particular, it provides side-by-side textual and graphical editing, combining the best of both worlds.
       </p>
       <h2>Foundations</h2>
       <p>

@@ -1,6 +1,6 @@
 # Slate
 
-This extension integrates the [Slate interactive theorem prover](https://sreichelt.github.io/slate) into Microsoft Visual Studio Code.
+This extension integrates the [Slate interactive theorem prover](http://www.slate-prover.org/) into Microsoft Visual Studio Code.
 
 ![Screenshot](https://raw.githubusercontent.com/SReichelt/slate/master/src/vscode/media/screenshot.png)
 
@@ -33,4 +33,4 @@ To let Slate adapt references when moving files or directories, consider increas
 
 ## Download
 
-Continuously updated builds of the Slate VSCode extension are available at https://slate-prover.herokuapp.com/public/download/slate.vsix. That file is guaranteed to match the online version of the theorem prover.
+Continuously updated builds of the Slate VSCode extension are available at http://slate-prover.org/public/download/slate.vsix. That file is guaranteed to match the online version of the theorem prover.

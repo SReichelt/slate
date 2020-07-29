@@ -1,6 +1,6 @@
 {
   "name": "slate",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Slate Proof Assistant",
   "license": "MIT",
   "author": "Sebastian Reichelt",
@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/SReichelt/slate.git"
   },
-  "homepage": "https://sreichelt.github.io/slate",
+  "homepage": "http://www.slate-prover.org/",
   "main": "index.js",
   "scripts": {
     "postinstall": "NODE_ENV= npm install --prefix ./src/vscode",
