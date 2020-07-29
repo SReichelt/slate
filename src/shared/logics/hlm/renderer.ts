@@ -1354,7 +1354,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         }
       }
-      let isDefinition = false; // TODO #65
+      let isDefinition = (expression as any).isDefinition === true;
       let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
       return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {

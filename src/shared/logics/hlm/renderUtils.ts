@@ -2,7 +2,7 @@ import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as FmtNotation from '../../notation/meta';
 import { GenericRenderUtils } from '../generic/renderUtils';
-import { HLMUtils } from './utils';
+import { HLMUtils, HLMSubstitutionContext } from './utils';
 import CachedPromise from '../../data/cachedPromise';
 
 export interface ExtractedStructuralCase {
@@ -157,7 +157,13 @@ export class HLMRenderUtils extends GenericRenderUtils {
       for (let index = 0; index < extractedCase.structuralCases.length; index++) {
         let structuralCase = extractedCase.structuralCases[index];
         let caseTermPromise = this.utils.getStructuralCaseTerm(extractedCase.constructions![index].path, structuralCase);
-        // TODO #65 restore isDefinition functionality
+        if (isDefinition && extractedCase.caseParameters) {
+          caseTermPromise = caseTermPromise.then((caseTerm: Fmt.Expression) => {
+            let substitutionContext = new HLMSubstitutionContext;
+            this.markParametersAsDefinition(extractedCase.caseParameters!, substitutionContext);
+            return this.utils.applySubstitutionContext(caseTerm, substitutionContext);
+          });
+        }
         caseTermPromise = this.applyElementParameterOverrides(caseTermPromise, elementParameterOverrides);
         elementParameterOverrides.set(extractedCase.affectedParameters![index], caseTermPromise);
       }
@@ -173,6 +179,22 @@ export class HLMRenderUtils extends GenericRenderUtils {
       });
     }
     return expressionPromise;
+  }
+
+  private markParametersAsDefinition(parameters: Fmt.Parameter[], substitutionContext: HLMSubstitutionContext): void {
+    let substitutionFn = (variableRef: Fmt.VariableRefExpression) => {
+      let result = variableRef.clone();
+      (result as any).isDefinition = true;
+      return result;
+    };
+    for (let param of parameters) {
+      this.utils.addVariableSubstitution(param, substitutionFn, substitutionContext);
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        this.markParametersAsDefinition(type.sourceParameters, substitutionContext);
+        this.markParametersAsDefinition(type.targetParameters, substitutionContext);
+      }
+    }
   }
 
   convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], binderArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {

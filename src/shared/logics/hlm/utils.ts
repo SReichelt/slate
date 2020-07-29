@@ -251,8 +251,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
-    // TODO #65 mark as definition
+  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[]): Fmt.Expression {
     let context = new SubstitutionContext;
     this.addParameterListSubstitution(originalParameters, substitutedParameters, context);
     return this.applySubstitutionContext(expression, context);
@@ -417,6 +416,17 @@ export class HLMUtils extends GenericUtils {
       });
     }
     return referencesCaseParameter;
+  }
+
+  addAllParametersToSet(parameters: Fmt.Parameter[], result: Set<Fmt.Parameter>): void {
+    for (let param of parameters) {
+      result.add(param);
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        this.addAllParametersToSet(type.sourceParameters, result);
+        this.addAllParametersToSet(type.targetParameters, result);
+      }
+    }
   }
 
   getMacroInvocation(expression: Fmt.DefinitionRefExpression, definition: Fmt.Definition): HLMMacro.HLMMacroInvocation {
