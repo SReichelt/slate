@@ -927,8 +927,8 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private getAutoArgumentContext(auto: Fmt.Expression | undefined, context: HLMCheckerContext): HLMCheckerContext {
-    if (auto instanceof FmtHLM.MetaRefExpression_true && !context.inAutoArgument) {
+  private getAutoFillContext(context: HLMCheckerContext, condition: boolean = true): HLMCheckerContext {
+    if (condition && !context.inAutoArgument) {
       return {
         ...context,
         inAutoArgument: true
@@ -936,6 +936,10 @@ export class HLMDefinitionChecker {
     } else {
       return context;
     }
+  }
+
+  private getAutoArgumentContext(auto: Fmt.Expression | undefined, context: HLMCheckerContext): HLMCheckerContext {
+    return this.getAutoFillContext(context, auto instanceof FmtHLM.MetaRefExpression_true);
   }
 
   private handleExpression(expression: Fmt.Expression, context: HLMCheckerContext): void {
@@ -1355,7 +1359,7 @@ export class HLMDefinitionChecker {
     }
     context = this.setCurrentRecheckFn(term, recheckFn, autoFillFn, context);
     this.checkElementTerm(term, context);
-    this.checkSetTerm(construction, context);
+    this.checkSetTerm(construction, this.getAutoFillContext(context));
     let typeSearchParameters: HLMTypeSearchParameters = {
       followDefinitions: true,
       followSupersets: true,
