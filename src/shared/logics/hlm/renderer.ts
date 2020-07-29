@@ -8,7 +8,7 @@ import * as Notation from '../../notation/notation';
 import { HLMExpressionType } from './hlm';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection } from './editHandler';
 import { GenericEditHandler } from '../generic/editHandler';
-import { HLMUtils, DefinitionVariableRefExpression } from './utils';
+import { HLMUtils, HLMSubstitutionContext } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, ElementParameterOverrides } from './renderUtils';
 import { PropertyInfo, AbbreviationParamExpression } from '../generic/renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
@@ -1354,7 +1354,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         }
       }
-      let isDefinition = expression instanceof DefinitionVariableRefExpression;
+      let isDefinition = false; // TODO #65
       let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
       return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
@@ -2146,9 +2146,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
       let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
       if (definitionNotation) {
+          let substitutionContext = new HLMSubstitutionContext;
         let path = new Fmt.Path;
         path.name = definition.name;
-        this.utils.getParameterArguments(path.arguments, definition.parameters);
+        this.utils.getParameterArguments(path.arguments, definition.parameters, substitutionContext);
         let term = new Fmt.DefinitionRefExpression;
         term.path = path;
         let type = new FmtHLM.MetaRefExpression_Element;
@@ -2183,12 +2184,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       for (let constructorDefinition of definition.innerDefinitions) {
         let constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
         if (constructorDefinitionNotation) {
+          let substitutionContext = new HLMSubstitutionContext;
           let parentPath = new Fmt.Path;
           parentPath.name = definition.name;
-          this.utils.getParameterArguments(parentPath.arguments, definition.parameters);
+          this.utils.getParameterArguments(parentPath.arguments, definition.parameters, substitutionContext);
           let path = new Fmt.Path;
           path.name = constructorDefinition.name;
-          this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters);
+          this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters, substitutionContext);
           path.parentPath = parentPath;
           let term = new Fmt.DefinitionRefExpression;
           term.path = path;

@@ -92,7 +92,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.definitionTypes) {
       result.definitionTypes = [];
@@ -133,7 +133,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_MetaModel, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_MetaModel, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -200,7 +200,7 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -208,7 +208,7 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_MetaModel)) {
       return false;
     }
@@ -285,7 +285,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinedType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinedType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.superType) {
       result.superType = this.superType.substitute(fn, replacedParameters);
@@ -312,7 +312,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_DefinedType, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_DefinedType, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -385,7 +385,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.innerDefinitionTypes) {
       result.innerDefinitionTypes = [];
@@ -400,7 +400,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_DefinitionType, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_DefinitionType, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -440,7 +440,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     }
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_DefinitionType;
     let changed = false;
     if (this.resultType) {
@@ -452,7 +452,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     return this.getSubstitutionResult(fn, result, changed);
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_DefinitionType)) {
       return false;
     }
@@ -487,12 +487,12 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   traverse(fn: Fmt.ExpressionTraversalFn): void {
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_ExpressionType, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_ExpressionType, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -512,7 +512,7 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -520,7 +520,7 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_ExpressionType)) {
       return false;
     }
@@ -575,7 +575,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.optional) {
       result.optional = this.optional.substitute(fn, replacedParameters);
@@ -598,7 +598,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_ParameterType, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_ParameterType, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -639,7 +639,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
     }
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_ParameterType;
     let changed = false;
     if (this.variableType) {
@@ -651,7 +651,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
     return this.getSubstitutionResult(fn, result, changed);
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_ParameterType)) {
       return false;
     }
@@ -680,7 +680,7 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -688,7 +688,7 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_Any)) {
       return false;
     }
@@ -708,7 +708,7 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -716,7 +716,7 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_self)) {
       return false;
     }
@@ -736,7 +736,7 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -744,7 +744,7 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_Type)) {
       return false;
     }
@@ -764,7 +764,7 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -772,7 +772,7 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_true)) {
       return false;
     }
@@ -792,7 +792,7 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -800,7 +800,7 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_false)) {
       return false;
     }
@@ -820,7 +820,7 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -828,7 +828,7 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_Int)) {
       return false;
     }
@@ -848,7 +848,7 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -856,7 +856,7 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_String)) {
       return false;
     }
@@ -876,7 +876,7 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -884,7 +884,7 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_ParameterList)) {
       return false;
     }
@@ -910,7 +910,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
     }
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_SingleParameter;
     let changed = false;
     if (this.type) {
@@ -922,7 +922,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
     return this.getSubstitutionResult(fn, result, changed);
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_SingleParameter)) {
       return false;
     }
@@ -947,7 +947,7 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
     argumentList.length = 0;
   }
 
-  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     if (fn) {
       return fn(this);
     } else {
@@ -955,7 +955,7 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
     }
   }
 
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
     if (!(expression instanceof MetaRefExpression_ArgumentList)) {
       return false;
     }

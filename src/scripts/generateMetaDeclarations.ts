@@ -571,7 +571,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
-      outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+      outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
       if (superDefinition) {
         outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
       } else {
@@ -593,7 +593,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `    return changed;\n`;
       outFileStr += `  }\n`;
       outFileStr += `\n`;
-      outFileStr += `  isEquivalentTo(objectContents: ObjectContents_${definition.name}, fn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+      outFileStr += `  isEquivalentTo(objectContents: ObjectContents_${definition.name}, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
       outFileStr += `    if (this === objectContents && !replacedParameters.length) {\n`;
       outFileStr += `      return true;\n`;
       outFileStr += `    }\n`;
@@ -654,7 +654,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
-      outFileStr += `  substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
+      outFileStr += `  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
       if (definition.parameters.length) {
         outFileStr += `    let result = new MetaRefExpression_${definition.name};\n`;
         outFileStr += `    let changed = false;\n`;
@@ -683,7 +683,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       }
       outFileStr += `  }\n`;
       outFileStr += `\n`;
-      outFileStr += `  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[]): boolean {\n`;
+      outFileStr += `  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {\n`;
       outFileStr += `    if (!(expression instanceof MetaRefExpression_${definition.name})) {\n`;
       outFileStr += `      return false;\n`;
       outFileStr += `    }\n`;
@@ -788,11 +788,13 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
           if (item.indices) {
             itemIndexParameterLists = indexParameterLists ? indexParameterLists.slice() : [];
             for (let index of item.indices) {
-              for (let indexArg of index.arguments) {
-                if (indexArg.value instanceof Fmt.VariableRefExpression) {
-                  let index = indexArg.value.variable;
-                  let indexName = translateMemberName(index.name);
-                  itemIndexParameterLists.push(`${source}.${indexName}`);
+              if (index.arguments) {
+                for (let indexArg of index.arguments) {
+                  if (indexArg.value instanceof Fmt.VariableRefExpression) {
+                    let indexValue = indexArg.value.variable;
+                    let indexName = translateMemberName(indexValue.name);
+                    itemIndexParameterLists.push(`${source}.${indexName}`);
+                  }
                 }
               }
             }

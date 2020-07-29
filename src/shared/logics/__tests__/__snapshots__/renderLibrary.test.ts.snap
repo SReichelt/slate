@@ -1221,11 +1221,11 @@ We write “let ≃ be a dependent equality on S_i (i ∈ I)” for “let �
 
 Remarks.
 
-This somewhat technical construction exposes the equality relation on \`S[i]\` in such a way that it becomes possible to ask whether \`%equals(s, t)\` for \`%in(s, S[a])\` and \`%in(t, S[b])\` whenever a \`%equals(a, b)\`.
+This somewhat technical construction exposes the equality relation on \`S[i = {i}]\` in such a way that it becomes possible to ask whether \`%equals(s, t)\` for \`%in(s, S[i = {a}])\` and \`%in(t, S[i = {b}])\` whenever a \`%equals(a, b)\`.
 
 It might seem that asking whether \`%equals(s, t)\` should simply be allowed in this case, but the type system of HLM restricts it to the case when \`a\` and \`b\` are literally the same expression. If \`%equals(a, b)\` is given as a proposition, the equality can carry information that needs to be transported from \`I\` to \`S\`.
 
-E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
+E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i = {i}]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
 
 Dependent equality is a prerequisite to formalizing arbitrary disjoint unions (see \`$../../Sets/\\"Generalized operators\\"/\\"Generalized disjoint union\\"\`).
 
@@ -9278,7 +9278,7 @@ References.
 * https://mathworld.wolfram.com/PrimeField.html
 * https://proofwiki.org/wiki/Ring_of_Integers_Modulo_Prime_is_Field
 * https://ncatlab.org/nlab/show/prime+field
-* https://leanprover-community.github.io/mathlib_docs/data/zmod/basic.html#zmodp.field"
+* https://leanprover-community.github.io/mathlib_docs/data/zmod/basic.html#zmod.field"
 `;
 
 exports[`render hlm library: 2.9.5.1 data/libraries/hlm/Algebra/Fields/Prime%20fields/Eulers%20criterion 1`] = `
@@ -9291,8 +9291,8 @@ No proof.
 
 References.
 
-* https://en.wikipedia.org/wiki/Euler's_criterion
-* https://proofwiki.org/wiki/Euler's_Criterion"
+* https://en.wikipedia.org/wiki/Euler%27s_criterion
+* https://proofwiki.org/wiki/Euler%27s_Criterion"
 `;
 
 exports[`render hlm library: 3.1.1 data/libraries/hlm/Linear%20algebra/Vector%20spaces/Vector%20spaces 1`] = `

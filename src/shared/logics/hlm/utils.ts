@@ -1,4 +1,4 @@
-import { GenericUtils } from '../generic/utils';
+import { GenericUtils, SubstitutionContext } from '../generic/utils';
 import * as Fmt from '../../format/format';
 import * as FmtHLM from './meta';
 import * as Ctx from '../../format/context';
@@ -9,15 +9,13 @@ import * as HLMMacros from './macros/macros';
 import { LibraryDefinition } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
-export class DefinitionVariableRefExpression extends Fmt.VariableRefExpression {}
-
-export interface HLMSubstitutionContext {
-  targetPath?: Fmt.PathItem;
+export class HLMSubstitutionContext extends SubstitutionContext {
   previousSetTerm?: Fmt.Expression;  // TODO #65 remove
-  parameterLists?: Fmt.ParameterList[];
-  argumentLists?: Fmt.ArgumentList[];
-  originalBinders?: Fmt.Parameter[];
-  substitutedBinders?: Fmt.Parameter[];
+
+  constructor(parentContext?: HLMSubstitutionContext) {
+    super(parentContext);
+    this.previousSetTerm = parentContext?.previousSetTerm;
+  }
 }
 
 export interface HLMUnfoldParameters {
@@ -150,12 +148,8 @@ export class HLMUtils extends GenericUtils {
         let targetType = targetParam ? targetParam.type.expression as FmtHLM.MetaRefExpression_Binder : undefined;
         let binderArg = new FmtHLM.ObjectContents_BinderArg;
         binderArg.sourceParameters = targetType ? targetType.sourceParameters : this.applySubstitutionContextToParameterList(type.sourceParameters, context);
-        let newContext: HLMSubstitutionContext = {
-          ...context,
-          previousSetTerm: undefined,
-          originalBinders: context.originalBinders ? [...context.originalBinders, ...type.sourceParameters] : type.sourceParameters,
-          substitutedBinders: context.substitutedBinders ? [...context.substitutedBinders, ...binderArg.sourceParameters] : binderArg.sourceParameters
-        };
+        let newContext = new HLMSubstitutionContext(context);
+        this.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, newContext);
         let targetInnerParameters = targetType?.targetParameters;
         let index: Fmt.Index = {
           parameters: binderArg.sourceParameters,
@@ -196,7 +190,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext = {}, targetParameters?: Fmt.Parameter[], indices?: Fmt.Index[]): void {
+  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], indices?: Fmt.Index[]): void {
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
       let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
@@ -207,7 +201,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase, markAsDefinition: boolean = false): CachedPromise<Fmt.Expression> {
+  getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase): CachedPromise<Fmt.Expression> {
     let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(constructionPath, false);
     let resultPromise = constructionDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
       let constructionDefinition = libraryDefinition.definition;
@@ -215,12 +209,12 @@ export class HLMUtils extends GenericUtils {
       let constructorPath = constructorExpr.path;
       let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(constructorExpr.path.name);
       let constructorContents = constructorDefinition.contents as FmtHLM.ObjectContents_Constructor;
-      return this.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents, markAsDefinition);
+      return this.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
     });
     return resultPromise;
   }
 
-  getResolvedStructuralCaseTerm(constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorPath: Fmt.Path, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, markAsDefinition: boolean = false): Fmt.Expression {
+  getResolvedStructuralCaseTerm(constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorPath: Fmt.Path, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor): Fmt.Expression {
     let result: Fmt.Expression;
     if (structuralCase.rewrite instanceof FmtHLM.MetaRefExpression_true && constructorContents.rewrite) {
       result = constructorContents.rewrite.value;
@@ -229,14 +223,15 @@ export class HLMUtils extends GenericUtils {
       let resultPath = new Fmt.Path;
       resultPath.parentPath = constructionPath;
       resultPath.name = constructorPath.name;
-      let context: HLMSubstitutionContext = {targetPath: constructionPath.parentPath};
+      let context = new SubstitutionContext;
+      this.addTargetPathSubstitution(constructionPath.parentPath, context);
       this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
       let resultRef = new Fmt.DefinitionRefExpression;
       resultRef.path = resultPath;
       result = resultRef;
     }
     if (constructorDefinition.parameters.length) {
-      result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!, markAsDefinition);
+      result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!);
     }
     return result;
   }
@@ -250,100 +245,106 @@ export class HLMUtils extends GenericUtils {
     return this.createParameter(constraintType, '_');
   }
 
-  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
+  addParameterListSubstitution(originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], context: SubstitutionContext): void {
     for (let paramIndex = 0; paramIndex < originalParameters.length && paramIndex < substitutedParameters.length; paramIndex++) {
-      expression = this.substituteParameter(expression, originalParameters[paramIndex], substitutedParameters[paramIndex], markAsDefinition);
+      this.addParameterSubstitution(originalParameters[paramIndex], substitutedParameters[paramIndex], context);
     }
-    return expression;
   }
 
-  substituteParameter(expression: Fmt.Expression, originalParam: Fmt.Parameter, substitutedParam: Fmt.Parameter, markAsDefinition: boolean = false): Fmt.Expression {
-    expression = this.substituteVariable(expression, originalParam, (variableRef: Fmt.VariableRefExpression) => {
-      let substitutedExpression = markAsDefinition ? new DefinitionVariableRefExpression : new Fmt.VariableRefExpression;
-      substitutedExpression.variable = substitutedParam;
-      substitutedExpression.indices = variableRef.indices;
-      return substitutedExpression;
+  substituteParameters(expression: Fmt.Expression, originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], markAsDefinition: boolean = false): Fmt.Expression {
+    // TODO #65 mark as definition
+    let context = new SubstitutionContext;
+    this.addParameterListSubstitution(originalParameters, substitutedParameters, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  addParameterSubstitution(originalParam: Fmt.Parameter, substitutedParam: Fmt.Parameter, context: SubstitutionContext): void {
+    context.replacedParameters.push({
+      original: originalParam,
+      replacement: substitutedParam
     });
     let originalType = originalParam.type.expression;
     let substitutedType = substitutedParam.type.expression;
     if (originalType instanceof FmtHLM.MetaRefExpression_Binder && substitutedType instanceof FmtHLM.MetaRefExpression_Binder) {
-      expression = this.substituteParameters(expression, originalType.targetParameters, substitutedType.targetParameters, markAsDefinition);
-      let replacedParameters: Fmt.ReplacedParameter[] = [];
-      for (let paramIndex = 0; paramIndex < originalType.sourceParameters.length && paramIndex < substitutedType.sourceParameters.length; paramIndex++) {
-        replacedParameters.push({
-          original: originalType.sourceParameters[paramIndex],
-          replacement: substitutedType.sourceParameters[paramIndex]
-        });
-      }
-      let identityFn = (subExpression: Fmt.Expression) => subExpression;
-      expression = expression.substitute(identityFn, replacedParameters);
+      this.addParameterListSubstitution(originalType.sourceParameters, substitutedType.sourceParameters, context);
+      this.addParameterListSubstitution(originalType.targetParameters, substitutedType.targetParameters, context);
     }
-    return expression;
   }
 
-  substituteArguments(expression: Fmt.Expression, parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath?: Fmt.PathItem): Fmt.Expression {
+  substituteParameter(expression: Fmt.Expression, originalParam: Fmt.Parameter, substitutedParam: Fmt.Parameter): Fmt.Expression {
+    let context = new SubstitutionContext;
+    this.addParameterSubstitution(originalParam, substitutedParam, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  addArgumentListSubstitution(parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context: SubstitutionContext): void {
     let previousParameters: Fmt.Parameter[] = [];
     for (let param of parameters) {
       let type = param.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
         let argValue = this.getRawArgument([args], param);
         if (argValue) {
-          expression = this.substituteVariable(expression, param, () => argValue!);
+          this.addVariableSubstitution(param, () => argValue!, context);
         }
       } else if (!param.type.arrayDimensions) {
         if (this.isValueParamType(type)) {
           let argValue = this.getArgValue(args, param);
           if (argValue) {
-            expression = this.substituteVariableWithIndices(expression, param, argValue);
+            this.addVariableSubstitutionWithIndices(param, argValue, context);
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
           let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
           if (argValue) {
-            expression = this.substituteParameters(expression, type.sourceParameters, argValue.sourceParameters);
-            expression = this.substituteArguments(expression, type.targetParameters, argValue.targetArguments, targetPath);
+            this.addParameterListSubstitution(type.sourceParameters, argValue.sourceParameters, context);
+            this.addArgumentListSubstitution(type.targetParameters, argValue.targetArguments, targetPath, context);
           }
-        } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
-          let value = this.substituteTargetPath(type._set, targetPath);
-          value = this.substituteArguments(value, previousParameters, args, targetPath);
-          expression = this.substituteVariableWithIndices(expression, param, value);
-        } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-          let value = this.substituteTargetPath(type.element, targetPath);
-          value = this.substituteArguments(value, previousParameters, args, targetPath);
-          expression = this.substituteVariableWithIndices(expression, param, value);
+        } else if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
+          let value = type instanceof FmtHLM.MetaRefExpression_SetDef ? type._set : type.element;
+          let valueContext = new SubstitutionContext;
+          this.addTargetPathSubstitution(targetPath, valueContext);
+          this.addArgumentListSubstitution(previousParameters, args, targetPath, valueContext);
+          value = this.applySubstitutionContext(value, valueContext);
+          this.addVariableSubstitutionWithIndices(param, value, context);
         }
       }
       previousParameters.push(param);
     }
-    return expression;
   }
 
-  substituteAllArguments(expression: Fmt.Expression, parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], targetPath?: Fmt.PathItem): Fmt.Expression {
+  addArgumentListsSubstitution(parameterLists: Fmt.ParameterList[], argumentLists: Fmt.ArgumentList[], targetPath: Fmt.PathItem | undefined, context: SubstitutionContext): void {
     if (parameterLists.length !== argumentLists.length) {
       throw new Error('Number of parameter and argument lists do not match');
     }
     for (let index = 0; index < parameterLists.length; index++) {
-      expression = this.substituteArguments(expression, parameterLists[index], argumentLists[index], targetPath);
+      this.addArgumentListSubstitution(parameterLists[index], argumentLists[index], targetPath, context);
     }
-    return expression;
   }
 
-  substituteIndices(expression: Fmt.Expression, variable: Fmt.VariableRefExpression): Fmt.Expression {
-    if (variable.indices) {
-      for (let index of variable.indices) {
+  substituteArguments(expression: Fmt.Expression, parameters: Fmt.ParameterList, args: Fmt.ArgumentList, targetPath?: Fmt.PathItem): Fmt.Expression {
+    let context = new SubstitutionContext;
+    this.addArgumentListSubstitution(parameters, args, targetPath, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  substituteIndices(expression: Fmt.Expression, variableRef: Fmt.VariableRefExpression): Fmt.Expression {
+    if (variableRef.indices) {
+      let context = new SubstitutionContext;
+      for (let index of variableRef.indices) {
         if (index.parameters && index.arguments) {
-          expression = this.substituteArguments(expression, index.parameters, index.arguments);
+          this.addArgumentListSubstitution(index.parameters, index.arguments, undefined, context);
         }
       }
+      expression = this.applySubstitutionContext(expression, context);
     }
     return expression;
   }
 
-  substituteVariableWithIndices(expression: Fmt.Expression, variable: Fmt.Parameter, value: Fmt.Expression): Fmt.Expression {
-    return this.substituteVariable(expression, variable, (variableRef: Fmt.VariableRefExpression) => {
-      return this.substituteIndices(value, variableRef);
-    });
+  addVariableSubstitutionWithIndices(variable: Fmt.Parameter, value: Fmt.Expression, context: SubstitutionContext): void {
+    let substitutionFn = (variableRef: Fmt.VariableRefExpression) => this.substituteIndices(value, variableRef);
+    this.addVariableSubstitution(variable, substitutionFn, context);
   }
 
+  // TODO #65 remove
   substitutePrevious(expression: Fmt.Expression, previous: Fmt.Expression): Fmt.Expression {
     return expression.substitute((subExpression: Fmt.Expression) => {
       if (subExpression instanceof FmtHLM.MetaRefExpression_previous) {
@@ -355,11 +356,17 @@ export class HLMUtils extends GenericUtils {
   }
 
   substitutePath(expression: Fmt.Expression, path: Fmt.Path, definitions: Fmt.Definition[]): Fmt.Expression {
+    let context = new SubstitutionContext;
+    this.addPathSubstitution(path, definitions, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  addPathSubstitution(path: Fmt.Path, definitions: Fmt.Definition[], context: SubstitutionContext): void {
     let parentPath = path.parentPath;
     while (parentPath instanceof Fmt.Path) {
       parentPath = parentPath.parentPath;
     }
-    expression = this.substituteTargetPath(expression, parentPath);
+    this.addTargetPathSubstitution(parentPath, context);
     let parameterLists: Fmt.ParameterList[] = [];
     for (let definition of definitions) {
       parameterLists.push(definition.parameters);
@@ -368,28 +375,7 @@ export class HLMUtils extends GenericUtils {
     for (let pathItem: Fmt.PathItem | undefined = path; pathItem instanceof Fmt.Path; pathItem = pathItem.parentPath) {
       argumentLists.unshift(pathItem.arguments);
     }
-    expression = this.substituteAllArguments(expression, parameterLists, argumentLists, parentPath);
-    return expression;
-  }
-
-  applySubstitutionContext(expression: Fmt.Expression, context: HLMSubstitutionContext): Fmt.Expression {
-    expression = this.substituteTargetPath(expression, context.targetPath);
-    if (context.parameterLists && context.argumentLists) {
-      expression = this.substituteAllArguments(expression, context.parameterLists, context.argumentLists, context.targetPath);
-    }
-    if (context.originalBinders && context.substitutedBinders) {
-      expression = this.substituteParameters(expression, context.originalBinders, context.substitutedBinders);
-    }
-    return expression;
-  }
-
-  applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: HLMSubstitutionContext): Fmt.ParameterList {
-    let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-    parameters.clone(result);
-    for (let param of result) {
-      param.type.expression = this.applySubstitutionContext(param.type.expression, context);
-    }
-    return result;
+    this.addArgumentListsSubstitution(parameterLists, argumentLists, parentPath, context);
   }
 
   // TODO #65 remove?
@@ -688,7 +674,7 @@ export class HLMUtils extends GenericUtils {
                     let constructorPath = term.term.path;
                     return this.getOuterDefinition(structuralCase._constructor).then((definition: Fmt.Definition) => {
                       let innerDefinition = definition.innerDefinitions.getDefinition(constructorPath.name);
-                      let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters, false);
+                      let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters);
                       return this.substituteArguments(substituted, innerDefinition.parameters, constructorPath.arguments);
                     });
                   }
@@ -1384,11 +1370,7 @@ export class HLMUtils extends GenericUtils {
 
   fillDefaultPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): void {
     let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createParameterList = (source: Fmt.ParameterList) => {
-      let result = Object.create(Fmt.ParameterList.prototype);
-      source.substituteExpression((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath), result);
-      return result;
-    };
+    let createParameterList = (source: Fmt.ParameterList) => this.createParameterList(source, targetPath, context);
     this.fillPlaceholderArguments(params, args, createPlaceholder, createParameterList);
   }
 
@@ -1451,8 +1433,11 @@ export class HLMUtils extends GenericUtils {
   }
 
   createParameterList(source: Fmt.ParameterList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): Fmt.ParameterList {
-    let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-    source.substituteExpression((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath), result);
+    let substitutionContext = new SubstitutionContext;
+    this.addTargetPathSubstitution(targetPath, substitutionContext);
+    let substitutedSource = this.applySubstitutionContextToParameterList(source, substitutionContext);
+    let result = Object.create(Fmt.ParameterList.prototype);
+    substitutedSource.clone(result);
     if (context) {
       this.adaptParameterNames(result, context);
     }

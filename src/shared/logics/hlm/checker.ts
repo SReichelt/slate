@@ -421,7 +421,7 @@ export class HLMDefinitionChecker {
       this.error(leftParameters, 'Parameters of equality definition must match constructor parameters');
     }
     let rightParameters = equalityDefinition.rightParameters;
-    let unificationFn = undefined;
+    let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
     if (constructorParameters.length && rightParameters.length) {
       let constructorFirstType = constructorParameters[0].type.expression;
       let rightFirstType = rightParameters[0].type.expression;
@@ -507,13 +507,14 @@ export class HLMDefinitionChecker {
 
   private checkRewriteDefinition(innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_RewriteDefinition, context: HLMCheckerContext): void {
     this.checkElementTerm(rewriteDefinition.value, context);
+    let substitutionContext = new HLMSubstitutionContext;
     let constructionPath = new Fmt.Path;
     constructionPath.name = this.definition.name;
-    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters);
+    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
     let constructorPath = new Fmt.Path;
     constructorPath.parentPath = constructionPath;
     constructorPath.name = innerDefinition.name;
-    this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters);
+    this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters, substitutionContext);
     let constructorExpression = new Fmt.DefinitionRefExpression;
     constructorExpression.path = constructorPath;
     this.checkElementCompatibility(rewriteDefinition.value, [constructorExpression, rewriteDefinition.value], context);
@@ -527,9 +528,10 @@ export class HLMDefinitionChecker {
       this.checkEmbeddability(subset);
     }
     this.checkElementTerm(embedding.target, innerContext);
+    let substitutionContext = new HLMSubstitutionContext;
     let constructionPath = new Fmt.Path;
     constructionPath.name = this.definition.name;
-    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters);
+    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
     let constructionExpression = new Fmt.DefinitionRefExpression;
     constructionExpression.path = constructionPath;
     this.checkCompatibility(embedding.target, [constructionExpression], [embedding.target], innerContext);
@@ -803,36 +805,30 @@ export class HLMDefinitionChecker {
   }
 
   private checkArgumentLists(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], targetPath: Fmt.PathItem | undefined, context: HLMCheckerContext): void {
-    let substitutionContext: HLMSubstitutionContext = {
-      targetPath: targetPath,
-      parameterLists: [],
-      argumentLists: []
-    };
+    let substitutionContext = new HLMSubstitutionContext;
+    this.utils.addTargetPathSubstitution(targetPath, substitutionContext);
     for (let listIndex = 0; listIndex < argumentLists.length; listIndex++) {
-      substitutionContext.parameterLists!.push(parameterLists[listIndex]);
-      substitutionContext.argumentLists!.push(argumentLists[listIndex]);
-      this.checkLastArgumentList(context, substitutionContext);
+      this.addAndCheckArgumentList(parameterLists[listIndex], argumentLists[listIndex], targetPath, context, substitutionContext);
     }
   }
 
-  private checkLastArgumentList(context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
-    let argumentList = substitutionContext.argumentLists![substitutionContext.argumentLists!.length - 1];
-    let parameterList = substitutionContext.parameterLists![substitutionContext.parameterLists!.length - 1];
+  private addAndCheckArgumentList(parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    this.utils.addArgumentListSubstitution(parameterList, argumentList, targetPath, substitutionContext);
     for (let param of parameterList) {
-      this.checkArgument(argumentList, param, context, substitutionContext);
+      this.checkArgument(param, argumentList, context, substitutionContext);
     }
   }
 
-  private checkArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+  private checkArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let rawArg = this.utils.getRawArgument([argumentList], param);
-    this.checkRawArgument(argumentList, param, rawArg, param.type.arrayDimensions, context, substitutionContext);
+    this.checkRawArgument(param, argumentList, rawArg, param.type.arrayDimensions, context, substitutionContext);
   }
 
-  private checkRawArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, remainingArrayDimensions: number, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+  private checkRawArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, rawArg: Fmt.Expression | undefined, remainingArrayDimensions: number, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     if (remainingArrayDimensions && rawArg) {
       if (rawArg instanceof Fmt.ArrayExpression) {
         for (let item of rawArg.items) {
-          this.checkRawArgument(argumentList, param, item, remainingArrayDimensions - 1, context, substitutionContext);
+          this.checkRawArgument(param, argumentList, item, remainingArrayDimensions - 1, context, substitutionContext);
         }
       } else {
         this.error(rawArg, 'Array expression expected');
@@ -916,15 +912,10 @@ export class HLMDefinitionChecker {
               this.error(binderArg.sourceParameters, 'Parameter list must match binder');
             }
           }
-          let innerSubstitutionContext: HLMSubstitutionContext = {
-            ...substitutionContext,
-            previousSetTerm: undefined,
-            parameterLists: [...substitutionContext.parameterLists!, type.targetParameters],
-            argumentLists: [...substitutionContext.argumentLists!, binderArg.targetArguments],
-            originalBinders: substitutionContext.originalBinders ? [...substitutionContext.originalBinders, ...type.sourceParameters] : type.sourceParameters,
-            substitutedBinders: substitutionContext.substitutedBinders ? [...substitutionContext.substitutedBinders, ...binderArg.sourceParameters] : binderArg.sourceParameters
-          };
-          this.checkLastArgumentList(context, innerSubstitutionContext);
+          let innerSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
+          innerSubstitutionContext.previousSetTerm = undefined;
+          this.utils.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, innerSubstitutionContext);
+          this.addAndCheckArgumentList(type.targetParameters, binderArg.targetArguments, undefined, context, innerSubstitutionContext);
         } else {
           missingArgument = true;
         }
@@ -1392,11 +1383,8 @@ export class HLMDefinitionChecker {
         if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {
           for (let constructorDefinition of constructionDefinition.innerDefinitions) {
             if (constructorDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
-              let substitutionContext: HLMSubstitutionContext = {
-                targetPath: construction.path.parentPath,
-                parameterLists: [constructionDefinition.parameters],
-                argumentLists: [construction.path.arguments]
-              };
+              let substitutionContext = new HLMSubstitutionContext;
+              this.utils.addPathSubstitution(construction.path, [constructionDefinition], substitutionContext);
               let substitutedParameters = this.utils.applySubstitutionContextToParameterList(constructorDefinition.parameters, substitutionContext);
               callbackFn(constructionDefinition, constructionDefinition.contents, constructorDefinition, constructorDefinition.contents, substitutedParameters);
             }
@@ -1692,7 +1680,7 @@ export class HLMDefinitionChecker {
       exactValueRequried: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
       context: context
     };
-    let unificationFn: Fmt.ExpressionUnificationFn = undefined;
+    let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
     let defaultUnificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
       // Make structural cases commute. I.e. when finding a nested structural case term on the right, also check other nesting possibilities.
       // Of course, this only works for inner cases that do not depend on parameters of outer cases.

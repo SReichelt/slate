@@ -279,7 +279,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return modified;
   }
 
-  arePathsEqual(left: Fmt.Path, right: Fmt.Path, unificationFn: Fmt.ExpressionUnificationFn = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  arePathsEqual(left: Fmt.Path, right: Fmt.Path, unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (left.name !== right.name) {
       return false;
     }

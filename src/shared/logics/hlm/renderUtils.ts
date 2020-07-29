@@ -156,7 +156,8 @@ export class HLMRenderUtils extends GenericRenderUtils {
     if (extractedCase.structuralCases) {
       for (let index = 0; index < extractedCase.structuralCases.length; index++) {
         let structuralCase = extractedCase.structuralCases[index];
-        let caseTermPromise = this.utils.getStructuralCaseTerm(extractedCase.constructions![index].path, structuralCase, isDefinition);
+        let caseTermPromise = this.utils.getStructuralCaseTerm(extractedCase.constructions![index].path, structuralCase);
+        // TODO #65 restore isDefinition functionality
         caseTermPromise = this.applyElementParameterOverrides(caseTermPromise, elementParameterOverrides);
         elementParameterOverrides.set(extractedCase.affectedParameters![index], caseTermPromise);
       }

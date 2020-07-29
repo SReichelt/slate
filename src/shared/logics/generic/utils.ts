@@ -5,6 +5,16 @@ import { getNextDefaultName } from '../../format/common';
 import { LibraryDataAccessor, LibraryDefinition, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
+export class SubstitutionContext {
+  replacedParameters: Fmt.ReplacedParameter[];
+  substitutionFns: Fmt.ExpressionSubstitutionFn[];
+
+  constructor(parentContext?: SubstitutionContext) {
+    this.replacedParameters = parentContext ? parentContext.replacedParameters.slice() : [];
+    this.substitutionFns = parentContext ? parentContext.substitutionFns.slice() : [];
+  }
+}
+
 export class GenericUtils {
   constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected supportPlaceholders: boolean) {}
 
@@ -58,30 +68,68 @@ export class GenericUtils {
     this.analyzeDefinitionRefPath(childPaths, outerDefinition, definitions, argumentLists);
   }
 
-  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
-    return FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
-  }
-
-  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression): Fmt.Expression {
-    return FmtUtils.substituteVariable(expression, variable, substitution);
-  }
-
-  substituteTargetPath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
-    if (targetPath) {
-      return expression.substitute((subExpression: Fmt.Expression) => this.substituteImmediatePath(subExpression, targetPath));
+  applySubstitutionContext(expression: Fmt.Expression, context: SubstitutionContext): Fmt.Expression {
+    if (context.replacedParameters.length || context.substitutionFns.length) {
+      return expression.substitute(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
     } else {
       return expression;
     }
   }
 
-  substituteImmediatePath(expression: Fmt.Expression, targetPath: Fmt.PathItem | undefined): Fmt.Expression {
-    if (targetPath && expression instanceof Fmt.DefinitionRefExpression) {
-      let newPath = GenericUtils.adjustPath(expression.path, targetPath);
-      let newExpression = new Fmt.DefinitionRefExpression;
-      newExpression.path = this.libraryDataAccessor.simplifyPath(newPath);
-      return newExpression;
+  applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: SubstitutionContext): Fmt.ParameterList {
+    if (context.replacedParameters.length || context.substitutionFns.length) {
+      let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      parameters.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), result, context.replacedParameters.slice());
+      return result;
     } else {
-      return expression;
+      return parameters;
+    }
+  }
+
+  addExpressionSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression, context: SubstitutionContext): void {
+    context.substitutionFns.push((subExpression: Fmt.Expression) => {
+      if (subExpression === originalExpression) {
+        return substitutedExpression;
+      } else {
+        return subExpression;
+      }
+    });
+  }
+
+  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
+    let context = new SubstitutionContext;
+    this.addExpressionSubstitution(originalExpression, substitutedExpression, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  addVariableSubstitution(variable: Fmt.Parameter, substitutionFn: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression, context: SubstitutionContext): void {
+    context.substitutionFns.push((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {
+        return substitutionFn(subExpression);
+      } else {
+        return subExpression;
+      }
+    });
+  }
+
+  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitutionFn: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression): Fmt.Expression {
+    let context = new SubstitutionContext;
+    this.addVariableSubstitution(variable, substitutionFn, context);
+    return this.applySubstitutionContext(expression, context);
+  }
+
+  addTargetPathSubstitution(targetPath: Fmt.PathItem | undefined, context: SubstitutionContext): void {
+    if (targetPath) {
+      context.substitutionFns.push((subExpression: Fmt.Expression) => {
+        if (subExpression instanceof Fmt.DefinitionRefExpression) {
+          let newExpression = new Fmt.DefinitionRefExpression;
+          let newPath = GenericUtils.adjustPath(subExpression.path, targetPath);
+          newExpression.path = this.libraryDataAccessor.simplifyPath(newPath);
+          return newExpression;
+        } else {
+          return subExpression;
+        }
+      });
     }
   }
 
