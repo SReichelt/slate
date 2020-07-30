@@ -6,7 +6,7 @@ There are three ways of working with Slate:
 
 ## Web access
 
-Slate can be accessed online at https://sreichelt.github.io/slate/. Users can browse and edit the library graphically. Additions and changes are either submitted anonymously or as GitHub pull requests.
+Slate can be accessed online at http://www.slate-prover.org/. Users can browse and edit the library graphically. Additions and changes are either submitted anonymously or as GitHub pull requests.
 
 ## VSCode extension
 
