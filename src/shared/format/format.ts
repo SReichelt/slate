@@ -4,6 +4,7 @@ export import BN = require('bn.js');
 
 export class File {
   metaModelPath: Path;
+  // TODO find a better way to initialize lists, especially since some of them are regularly overwritten
   definitions: DefinitionList = Object.create(DefinitionList.prototype);
 
   clone(): File {
