@@ -1,9 +1,6 @@
 %../../../../../../../data/logics/hlm%
 
-$less(
-  m: %Element($"Natural numbers"),
-  n: %Element(%previous)
-): %Predicate {
+$less(m,n: %Element($"Natural numbers")): %Predicate {
   properties = {negation = $"less or equal"(
     n = {m},
     m = {n}

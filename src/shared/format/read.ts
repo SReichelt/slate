@@ -347,7 +347,6 @@ export class Reader {
   }
 
   tryReadParameterGroup(context: Ctx.Context): Fmt.Parameter[] | undefined {
-    let previousParameter = context.getPreviousParameter();
     let group: Fmt.Parameter[] = [];
     let groupStart = this.markStart();
     let nameStart = groupStart;
@@ -371,9 +370,7 @@ export class Reader {
         this.skipWhitespace();
       }
       parameter.optional = this.tryReadChar('?');
-      parameter.previousParameter = previousParameter;
       group.push(parameter);
-      previousParameter = parameter;
       this.skipWhitespace();
       if (!this.tryReadChar(',')) {
         break;

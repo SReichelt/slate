@@ -1,9 +1,6 @@
 %../../../../../../../data/logics/hlm%
 
-$sum(
-  m: %Element($"Natural numbers"),
-  n: %Element(%previous)
-): %ExplicitOperator {
+$sum(m,n: %Element($"Natural numbers")): %ExplicitOperator {
   definition = [%structuralCases(
     n,
     $"Natural numbers",

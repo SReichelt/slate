@@ -231,7 +231,6 @@ export class Parameter implements Comparable<Parameter> {
   optional: boolean;
   list: boolean;
   dependencies?: Expression[];
-  previousParameter?: Parameter;  // TODO #65 remove
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;
@@ -244,8 +243,19 @@ export class Parameter implements Comparable<Parameter> {
     return result;
   }
 
-  clone(replacedParameters: ReplacedParameter[] = []): Parameter {
-    return this.substituteExpression(undefined, replacedParameters);
+  shallowClone(): Parameter {
+    let result = new Parameter;
+    result.name = this.name;
+    result.type = this.type;
+    result.defaultValue = this.defaultValue;
+    result.optional = this.optional;
+    result.list = this.list;
+    result.dependencies = this.dependencies;
+    return result;
+  }
+
+  clone(replacedParameters: ReplacedParameter[] = [], previousParameter?: ReplacedParameter): Parameter {
+    return this.substituteExpression(undefined, replacedParameters, previousParameter);
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -258,8 +268,15 @@ export class Parameter implements Comparable<Parameter> {
     }
   }
 
-  substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Parameter {
-    let newDefaultValue = this.defaultValue ? this.defaultValue.substitute(fn, replacedParameters) : undefined;
+  substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = [], previousParameter?: ReplacedParameter): Parameter {
+    let newDefaultValue: Expression | undefined = undefined;
+    if (this.defaultValue) {
+      if (previousParameter && this.defaultValue === previousParameter.original.defaultValue) {
+        newDefaultValue = previousParameter.replacement.defaultValue;
+      } else {
+        newDefaultValue = this.defaultValue.substitute(fn, replacedParameters);
+      }
+    }
     let newDependencies: Expression[] | undefined = undefined;
     if (this.dependencies) {
       newDependencies = [];
@@ -275,29 +292,34 @@ export class Parameter implements Comparable<Parameter> {
         newDependencies = this.dependencies;
       }
     }
-    let newPreviousParameter = this.previousParameter ? this.previousParameter.findReplacement(replacedParameters) : undefined;
-    let changed = (newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || newPreviousParameter !== this.previousParameter || !fn);
+    let changed = (newDefaultValue !== this.defaultValue || newDependencies !== this.dependencies || !fn);
     if (!changed) {
-      let origReplacedParametersLength = replacedParameters.length;
-      let newType = this.type.expression.substitute(fn, replacedParameters);
-      replacedParameters.length = origReplacedParametersLength;
-      if (newType !== this.type.expression) {
-        changed = true;
+      if (previousParameter && this.type === previousParameter.original.type) {
+        if (previousParameter.replacement.type !== this.type) {
+          changed = true;
+        }
+      } else {
+        let origReplacedParametersLength = replacedParameters.length;
+        let newType = this.type.expression.substitute(fn, replacedParameters);
+        replacedParameters.length = origReplacedParametersLength;
+        if (newType !== this.type.expression) {
+          changed = true;
+        }
       }
     }
     if (changed) {
-      let result = new Parameter;
+      let result = this.shallowClone();
       replacedParameters.push({original: this, replacement: result});
-      result.name = this.name;
-      result.type = new Type;
-      // Need to re-evaluate type because it can depend on the parameter itself.
-      result.type.expression = this.type.expression.substitute(fn, replacedParameters);
-      result.type.arrayDimensions = this.type.arrayDimensions;
+      if (previousParameter && this.type === previousParameter.original.type) {
+        result.type = previousParameter.replacement.type;
+      } else {
+        result.type = new Type;
+        // Need to re-evaluate type because it can depend on the parameter itself.
+        result.type.expression = this.type.expression.substitute(fn, replacedParameters);
+        result.type.arrayDimensions = this.type.arrayDimensions;
+      }
       result.defaultValue = newDefaultValue;
-      result.optional = this.optional;
-      result.list = this.list;
       result.dependencies = newDependencies;
-      result.previousParameter = newPreviousParameter;
       return result;
     } else {
       return this;
@@ -361,12 +383,17 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
 
   substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
+    let previousParameter: ReplacedParameter | undefined = undefined;
     for (let parameter of this) {
-      let newParameter = parameter.substituteExpression(fn, replacedParameters);
+      let newParameter = parameter.substituteExpression(fn, replacedParameters, previousParameter);
       if (newParameter !== parameter) {
         changed = true;
       }
       result.push(newParameter);
+      previousParameter = {
+        original: parameter,
+        replacement: newParameter
+      };
     }
     return changed;
   }
@@ -693,7 +720,6 @@ export abstract class Expression implements Comparable<Expression> {
       return true;
     }
     replacedParameters.length = origReplacedParametersLength;
-    this.matches(expression, fn, replacedParameters); // TODO #65 remove
     return false;
   }
 

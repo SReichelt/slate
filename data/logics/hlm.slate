@@ -5,9 +5,8 @@ $hlm: %MetaModel {
   expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $SetExtend, $Extend, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Embed, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
   functions = [$true, $false,
-               $empty, $previous,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
                $not, $and, $or, $equiv, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
@@ -53,8 +52,7 @@ $Constructor: %DefinitionType($ElementTerm) {
 
 $EqualityDefinition: %ExpressionType {
   members = #(
-    leftParameters: %ParameterList,
-    rightParameters[leftParameters]: %ParameterList,  // TODO #65 remove dependency, combine
+    leftParameters, rightParameters: %ParameterList,
     definition[leftParameters, rightParameters]: $Formula[],
     equivalenceProofs[leftParameters, rightParameters]: $Proof[] = [],
     reflexivityProof?: $Proof,
@@ -221,9 +219,6 @@ $BinderArg: %ExpressionType {
 
 /* Functions */
 
-$empty: %Any {}
-$previous: %Any {}
-
 $enumeration(terms...?: $ElementTerm): $SetTerm {}
 $subset(parameter: %SingleParameter($Element), formula[parameter]: $Formula): $SetTerm {}
 $extendedSubset(parameters: %ParameterList, term[parameters]: $ElementTerm): $SetTerm {}
@@ -283,12 +278,6 @@ $UseExists(parameters: %ParameterList): %ParameterType {
   exports = [parameters]
 }
 $Embed(construction: $Construction, input: $ElementTerm, output: $ElementTerm): %ParameterType($Formula) {
-  superType = $IntermediateProofStep
-}
-$SetExtend(term: $SetTerm): %ParameterType($Formula) {
-  superType = $IntermediateProofStep
-}
-$Extend(term: $ElementTerm): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result: $Formula): %ParameterType($Formula) {

@@ -3,7 +3,7 @@
 /**
  * @expectedError Incomplete casess
  */
-$FAIL_incompleteCases(m: %Element($../../Essentials/"Natural numbers"), n: %Element(%previous)): %ExplicitOperator {
+$FAIL_incompleteCases(m,n: %Element($../../Essentials/"Natural numbers")): %ExplicitOperator {
   definition = [%cases(
     [
       {

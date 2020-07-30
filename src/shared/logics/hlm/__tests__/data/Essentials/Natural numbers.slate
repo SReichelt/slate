@@ -6,7 +6,7 @@ $"Natural numbers": %Construction {
   $successor(n: %Element($"Natural numbers")): %Constructor {
     equalityDefinition = {
       leftParameters = #(m: %Element($"Natural numbers")),
-      rightParameters = #(n: %Element(%previous)),
+      rightParameters = #(n: %Element($"Natural numbers")),
       definition = [%equals(m, n)],
       isomorphic = %true
     }

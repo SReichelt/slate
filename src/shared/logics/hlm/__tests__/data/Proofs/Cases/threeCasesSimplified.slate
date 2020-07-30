@@ -1,9 +1,6 @@
 %../../../../../../../../data/logics/hlm%
 
-$threeCasesSimplified(
-  m: %Element($../../Essentials/"Natural numbers"),
-  n: %Element(%previous)
-): %ExplicitOperator {
+$threeCasesSimplified(m,n: %Element($../../Essentials/"Natural numbers")): %ExplicitOperator {
   definition = [%cases([
     {
       formula = $../../Essentials/less(

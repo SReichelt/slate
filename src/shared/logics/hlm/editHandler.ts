@@ -216,19 +216,6 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
-  protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {
-    let paramClone = super.addParameterToGroup(param, parameterList);
-    if (paramClone) {
-      let type = paramClone.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        type.superset = new FmtHLM.MetaRefExpression_previous;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        type._set = new FmtHLM.MetaRefExpression_previous;
-      }
-    }
-    return paramClone;
-  }
-
   addSetTermMenu(semanticLink: Notation.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {

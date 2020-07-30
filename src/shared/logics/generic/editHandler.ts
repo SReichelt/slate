@@ -843,18 +843,12 @@ export abstract class GenericEditHandler {
     if (parameterList) {
       let index = parameterList.indexOf(param);
       if (index >= 0) {
-        let paramClone = param.clone();
+        let paramClone = param.shallowClone();
         let context = this.editAnalysis.newParameterContext.get(parameterList);
         if (context) {
           paramClone.name = this.utils.getUnusedDefaultName(paramClone.name, context);
         }
-        paramClone.previousParameter = param;
-        let cloneIndex = index + 1;
-        parameterList.splice(cloneIndex, 0, paramClone);
-        let nextIndex = cloneIndex + 1;
-        if (nextIndex < parameterList.length) {
-          parameterList[nextIndex].previousParameter = paramClone;
-        }
+        parameterList.splice(index + 1, 0, paramClone);
         return paramClone;
       }
     }

@@ -5,7 +5,6 @@ $Syntax: %Section {
   items = [
     %item($FAIL_nonTerm),
     %item($FAIL_mismatchingTerm),
-    %item($FAIL_mismatchingVariableRef),
-    %item($FAIL_unexpectedPrevious)
+    %item($FAIL_mismatchingVariableRef)
   ]
 }

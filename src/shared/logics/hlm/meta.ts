@@ -3030,62 +3030,6 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   }
 }
 
-export class MetaRefExpression_empty extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'empty';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-
-  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_empty;
-    }
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_empty)) {
-      return false;
-    }
-    return true;
-  }
-}
-
-export class MetaRefExpression_previous extends Fmt.MetaRefExpression {
-  getName(): string {
-    return 'previous';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-  }
-
-  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    if (fn) {
-      return fn(this);
-    } else {
-      return new MetaRefExpression_previous;
-    }
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_previous)) {
-      return false;
-    }
-    return true;
-  }
-}
-
 export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
   terms?: Fmt.Expression[];
 
@@ -5119,88 +5063,6 @@ export class MetaRefExpression_Embed extends Fmt.MetaRefExpression {
   }
 }
 
-export class MetaRefExpression_SetExtend extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-
-  getName(): string {
-    return 'SetExtend';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.term = argumentList.getValue('term', 0);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-  }
-
-  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_SetExtend;
-    let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
-    }
-    return this.getSubstitutionResult(fn, result, changed);
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_SetExtend)) {
-      return false;
-    }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
-export class MetaRefExpression_Extend extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-
-  getName(): string {
-    return 'Extend';
-  }
-
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    this.term = argumentList.getValue('term', 0);
-  }
-
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
-    argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-  }
-
-  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Extend;
-    let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
-    }
-    return this.getSubstitutionResult(fn, result, changed);
-  }
-
-  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_Extend)) {
-      return false;
-    }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
 export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
   source: Fmt.Parameter;
   sourceSide: Fmt.BN;
@@ -6155,8 +6017,8 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'SetExtend': MetaRefExpression_SetExtend, 'Extend': MetaRefExpression_Extend, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
-const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'empty': MetaRefExpression_empty, 'previous': MetaRefExpression_previous, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Embed': MetaRefExpression_Embed, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {
@@ -6391,12 +6253,6 @@ export class MetaModel extends Meta.MetaModel {
             }
           }
           if (currentContext.objectContentsClass === ObjectContents_EqualityDefinition) {
-            if (argument.name === 'rightParameters' || (argument.name === undefined && argumentIndex === 1)) {
-              let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
-              if (leftParametersValue instanceof Fmt.ParameterExpression) {
-                context = this.getParameterListContext(leftParametersValue.parameters, context);
-              }
-            }
             if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 2)) {
               let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
               if (leftParametersValue instanceof Fmt.ParameterExpression) {

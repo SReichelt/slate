@@ -416,38 +416,11 @@ export class HLMDefinitionChecker {
 
   private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_EqualityDefinition, context: HLMCheckerContext): void {
     let constructorParameters = innerDefinition.parameters;
-    let leftParameters = equalityDefinition.leftParameters;
-    if (!leftParameters.isEquivalentTo(constructorParameters)) {
-      this.error(leftParameters, 'Parameters of equality definition must match constructor parameters');
+    if (!equalityDefinition.leftParameters.isEquivalentTo(constructorParameters)) {
+      this.error(equalityDefinition.leftParameters, 'Parameters of equality definition must match constructor parameters');
     }
-    let rightParameters = equalityDefinition.rightParameters;
-    let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
-    if (constructorParameters.length && rightParameters.length) {
-      let constructorFirstType = constructorParameters[0].type.expression;
-      let rightFirstType = rightParameters[0].type.expression;
-      if (constructorFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType instanceof FmtHLM.MetaRefExpression_Subset && rightFirstType.superset instanceof FmtHLM.MetaRefExpression_previous) {
-        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === constructorFirstType && actual === rightFirstType;
-        for (let constructorParam of constructorParameters.slice(1)) {
-          let constructorParamType = constructorParam.type.expression;
-          if (!(constructorParamType instanceof FmtHLM.MetaRefExpression_Subset && constructorParamType.superset instanceof FmtHLM.MetaRefExpression_previous)) {
-            unificationFn = undefined;
-            break;
-          }
-        }
-      }
-      if (constructorFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType instanceof FmtHLM.MetaRefExpression_Element && rightFirstType._set instanceof FmtHLM.MetaRefExpression_previous) {
-        unificationFn = (actual: Fmt.Expression, expected: Fmt.Expression) => expected === constructorFirstType && actual === rightFirstType;
-        for (let constructorParam of constructorParameters.slice(1)) {
-          let constructorParamType = constructorParam.type.expression;
-          if (!(constructorParamType instanceof FmtHLM.MetaRefExpression_Element && constructorParamType._set instanceof FmtHLM.MetaRefExpression_previous)) {
-            unificationFn = undefined;
-            break;
-          }
-        }
-      }
-    }
-    if (!rightParameters.isEquivalentTo(constructorParameters, unificationFn)) {
-      this.error(rightParameters, 'Parameters of equality definition must match constructor parameters');
+    if (!equalityDefinition.rightParameters.isEquivalentTo(constructorParameters)) {
+      this.error(equalityDefinition.rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
     this.checkFormulaEquivalenceList(innerDefinition, equalityDefinition.definition, equalityDefinition.equivalenceProofs, context);
     if (equalityDefinition.definition.length) {
@@ -558,9 +531,7 @@ export class HLMDefinitionChecker {
 
   private checkEmbeddingWellDefinednessProof(embedding: FmtHLM.ObjectContents_Embedding, context: HLMCheckerContext): void {
     let leftParam = embedding.parameter.clone();
-    let rightParamType = new FmtHLM.MetaRefExpression_Element;
-    rightParamType._set = new FmtHLM.MetaRefExpression_previous;
-    let rightParam = this.utils.createParameter(rightParamType, leftParam.name);
+    let rightParam = leftParam.shallowClone();
     let leftTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, leftParam);
     let rightTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, rightParam);
     let constraint = new FmtHLM.MetaRefExpression_equals;
@@ -702,20 +673,7 @@ export class HLMDefinitionChecker {
     let currentContext = context;
     for (let param of parameterList) {
       currentContext = this.checkParameter(param, currentContext);
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        if (!(type.superset instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {...currentContext, previousSetTerm: type.superset};
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        if (!(type._set instanceof FmtHLM.MetaRefExpression_previous)) {
-          currentContext = {...currentContext, previousSetTerm: type._set};
-        }
-      } else {
-        currentContext = {...currentContext, previousSetTerm: undefined};
-      }
     }
-    currentContext = {...currentContext, previousSetTerm: undefined};
     if (context.editData && context.editData.constraintCheckFns) {
       let constraintCheckFn = (formula: Fmt.Expression) => {
         let fn = (recheckContext: HLMCheckerContext) => this.checkFormula(formula, recheckContext);
@@ -847,7 +805,7 @@ export class HLMDefinitionChecker {
     let type = param.type.expression;
     if (type instanceof FmtHLM.MetaRefExpression_Subset) {
       if (rawArg) {
-        let superset = this.utils.substituteParameterSet(type.superset, substitutionContext, true);
+        let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
         let subsetArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
         this.checkSetTerm(subsetArg._set, this.getAutoArgumentContext(type.auto, context));
         this.checkSetCompatibility(subsetArg._set, [subsetArg._set, superset], context);
@@ -860,7 +818,7 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
       if (rawArg) {
-        let set = this.utils.substituteParameterSet(type._set, substitutionContext, true);
+        let set = this.utils.applySubstitutionContext(type._set, substitutionContext);
         let elementArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
         this.checkElementTerm(elementArg.element, this.getAutoArgumentContext(type.auto, context));
         this.checkCompatibility(elementArg.element, [set], [elementArg.element], context);
@@ -895,32 +853,15 @@ export class HLMDefinitionChecker {
           let binderArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BinderArg);
           let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
           if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
-            // Retry with %previous.
-            // TODO #65 remove
-            let prevParam = undefined;
-            for (let expectedParam of expectedSourceParameters) {
-              if (prevParam && expectedParam.type.expression.isEquivalentTo(prevParam.type.expression)) {
-                if (expectedParam.type.expression instanceof FmtHLM.MetaRefExpression_Subset) {
-                  expectedParam.type.expression.superset = new FmtHLM.MetaRefExpression_previous;
-                } else if (expectedParam.type.expression instanceof FmtHLM.MetaRefExpression_Element) {
-                  expectedParam.type.expression._set = new FmtHLM.MetaRefExpression_previous;
-                }
-              }
-              prevParam = expectedParam;
-            }
-            if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
-              this.error(binderArg.sourceParameters, 'Parameter list must match binder');
-            }
+            this.error(binderArg.sourceParameters, 'Parameter list must match binder');
           }
           let innerSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
-          innerSubstitutionContext.previousSetTerm = undefined;
           this.utils.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, innerSubstitutionContext);
           this.addAndCheckArgumentList(type.targetParameters, binderArg.targetArguments, undefined, context, innerSubstitutionContext);
         } else {
           missingArgument = true;
         }
       }
-      substitutionContext.previousSetTerm = undefined;
     }
     if (missingArgument) {
       throw Error(`Missing argument for parameter "${param.name}"`);
@@ -1001,8 +942,6 @@ export class HLMDefinitionChecker {
     } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
       this.checkSetTerm(term.term, context);
       // TODO check whether combination of inner and outer operations is really declared as associative
-    } else if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
-      // Nothing to check.
     } else if (term instanceof Fmt.PlaceholderExpression) {
       this.checkPlaceholderExpression(term, HLMExpressionType.SetTerm, context);
     } else {

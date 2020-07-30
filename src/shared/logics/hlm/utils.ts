@@ -9,14 +9,7 @@ import * as HLMMacros from './macros/macros';
 import { LibraryDefinition } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
-export class HLMSubstitutionContext extends SubstitutionContext {
-  previousSetTerm?: Fmt.Expression;  // TODO #65 remove
-
-  constructor(parentContext?: HLMSubstitutionContext) {
-    super(parentContext);
-    this.previousSetTerm = parentContext?.previousSetTerm;
-  }
-}
+export class HLMSubstitutionContext extends SubstitutionContext {}
 
 export interface HLMUnfoldParameters {
   followDefinitions: boolean;
@@ -191,8 +184,7 @@ export class HLMUtils extends GenericUtils {
       arg.value = argValue;
       return arg;
     }
-    // No need to adjust context according to parameter; it is only used for bindings.
-    context.previousSetTerm = undefined;
+    // No need to adjust context according to parameter; it is only used for binders.
     return undefined;
   }
 
@@ -349,17 +341,6 @@ export class HLMUtils extends GenericUtils {
     this.addVariableSubstitution(variable, substitutionFn, context);
   }
 
-  // TODO #65 remove
-  substitutePrevious(expression: Fmt.Expression, previous: Fmt.Expression): Fmt.Expression {
-    return expression.substitute((subExpression: Fmt.Expression) => {
-      if (subExpression instanceof FmtHLM.MetaRefExpression_previous) {
-        return previous;
-      } else {
-        return subExpression;
-      }
-    });
-  }
-
   substitutePath(expression: Fmt.Expression, path: Fmt.Path, definitions: Fmt.Definition[]): Fmt.Expression {
     let context = new SubstitutionContext;
     this.addPathSubstitution(path, definitions, context);
@@ -381,19 +362,6 @@ export class HLMUtils extends GenericUtils {
       argumentLists.unshift(pathItem.arguments);
     }
     this.addArgumentListsSubstitution(parameterLists, argumentLists, parentPath, context);
-  }
-
-  // TODO #65 remove?
-  substituteParameterSet(term: Fmt.Expression, context: HLMSubstitutionContext, setAsPreviousSetTerm: boolean): Fmt.Expression {
-    if (term instanceof FmtHLM.MetaRefExpression_previous && context.previousSetTerm) {
-      return context.previousSetTerm;
-    } else {
-      term = this.applySubstitutionContext(term, context);
-      if (setAsPreviousSetTerm) {
-        context.previousSetTerm = term;
-      }
-      return term;
-    }
   }
 
   parameterListContainsParameter(parameterList: Fmt.ParameterList, param: Fmt.Parameter): boolean {
@@ -475,15 +443,10 @@ export class HLMUtils extends GenericUtils {
       result.terms = [type.input, type.output];
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
-               || type instanceof FmtHLM.MetaRefExpression_UseForAll
-               || type instanceof FmtHLM.MetaRefExpression_SetExtend
-               || type instanceof FmtHLM.MetaRefExpression_Extend) {
-      if (!previousResult && step.previousParameter) {
-        previousResult = this.getParameterConstraint(step.previousParameter);
-      }
+               || type instanceof FmtHLM.MetaRefExpression_UseForAll) {
       if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
         if (previousResult instanceof FmtHLM.MetaRefExpression_exists || previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
-          return previousResult.formula;
+          return previousResult.formula ? this.substituteParameters(previousResult.formula, type.parameters, previousResult.parameters) : undefined;
         } else {
           throw new Error('Previous result is not an existentially quantified expression');
         }
@@ -492,24 +455,6 @@ export class HLMUtils extends GenericUtils {
           return this.substituteArguments(previousResult.formula, previousResult.parameters, type.arguments);
         } else {
           throw new Error('Previous result is not a universally quantified expression');
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
-        if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
-          let term = type.term;
-          let result = new FmtHLM.MetaRefExpression_setEquals;
-          result.terms = previousResult.terms.map((item) => this.substitutePrevious(term, item));
-          return result;
-        } else {
-          throw new Error('Previous result is not an equality expression');
-        }
-      } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
-        if (previousResult instanceof FmtHLM.MetaRefExpression_setEquals || previousResult instanceof FmtHLM.MetaRefExpression_equals) {
-          let term = type.term;
-          let result = new FmtHLM.MetaRefExpression_equals;
-          result.terms = previousResult.terms.map((item) => this.substitutePrevious(term, item));
-          return result;
-        } else {
-          throw new Error('Previous result is not an equality expression');
         }
       } else {
         throw new Error('Unknown proof step');
@@ -542,6 +487,7 @@ export class HLMUtils extends GenericUtils {
     } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
       return variableType.formula;
     } else {
+      // TODO result may depend on previous step
       return this.getProofStepResult(param);
     }
   }
@@ -589,20 +535,7 @@ export class HLMUtils extends GenericUtils {
         return this.getNextIndices(term, HLMExpressionType.SetTerm, typeSearchParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
         if (typeSearchParameters.followSupersets) {
-          let superset = type.superset;
-          let parameter: Fmt.Parameter | undefined = term.variable;
-          while (superset instanceof FmtHLM.MetaRefExpression_previous) {
-            parameter = parameter.previousParameter;
-            if (!parameter) {
-              break;
-            }
-            type = parameter.type.expression;
-            if (!(type instanceof FmtHLM.MetaRefExpression_Subset)) {
-              break;
-            }
-            superset = type.superset;
-          }
-          return CachedPromise.resolve([this.substituteIndices(superset, term)]);
+          return CachedPromise.resolve([this.substituteIndices(type.superset, term)]);
         }
         return CachedPromise.resolve(undefined);
       } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
@@ -968,20 +901,7 @@ export class HLMUtils extends GenericUtils {
       if (term instanceof Fmt.VariableRefExpression) {
         let type = term.variable.type.expression;
         if (type instanceof FmtHLM.MetaRefExpression_Element) {
-          let set = type._set;
-          let parameter: Fmt.Parameter | undefined = term.variable;
-          while (set instanceof FmtHLM.MetaRefExpression_previous) {
-            parameter = parameter.previousParameter;
-            if (!parameter) {
-              break;
-            }
-            type = parameter.type.expression;
-            if (!(type instanceof FmtHLM.MetaRefExpression_Element)) {
-              break;
-            }
-            set = type._set;
-          }
-          return CachedPromise.resolve(this.substituteIndices(set, term));
+          return CachedPromise.resolve(this.substituteIndices(type._set, term));
         } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
           term = this.substituteIndices(type.element, term);
         } else {

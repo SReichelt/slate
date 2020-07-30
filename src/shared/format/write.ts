@@ -168,27 +168,32 @@ export class Writer {
   writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
     let groupIndent = indent;
     let lastGroupIndent = indent;
-    if (parameters.length <= 1 || !this.newLineStr) {
-      multiLine = false;
-    } else {
-      groupIndent = this.indent(groupIndent);
-      lastGroupIndent = this.indent(lastGroupIndent, !multiLine);
-    }
     let currentGroup: Fmt.Parameter[] = [];
-    let groupIndex = 0;
+    let firstGroup = true;
     for (let parameter of parameters) {
       if (this.skipOmittableParameters && parameter.type.expression instanceof Fmt.MetaRefExpression && parameter.type.expression.canOmit()) {
         continue;
       }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
-        this.writeParameterGroupWithPrefix(currentGroup, groupIndent, multiLine, groupIndex > 0);
+        if (firstGroup) {
+          if (!this.newLineStr) {
+            multiLine = false;
+          } else {
+            groupIndent = this.indent(groupIndent);
+            lastGroupIndent = this.indent(lastGroupIndent, !multiLine);
+          }
+        }
+        this.writeParameterGroupWithPrefix(currentGroup, groupIndent, multiLine, !firstGroup);
         currentGroup.length = 0;
-        groupIndex++;
+        firstGroup = false;
       }
       currentGroup.push(parameter);
     }
     if (currentGroup.length) {
-      this.writeParameterGroupWithPrefix(currentGroup, lastGroupIndent, multiLine, groupIndex > 0);
+      if (firstGroup) {
+        multiLine = false;
+      }
+      this.writeParameterGroupWithPrefix(currentGroup, lastGroupIndent, multiLine, !firstGroup);
     }
     if (multiLine) {
       this.writeNewLine();

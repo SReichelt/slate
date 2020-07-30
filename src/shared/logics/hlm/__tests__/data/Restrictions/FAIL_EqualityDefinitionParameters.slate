@@ -3,7 +3,7 @@
 /**
  * @expectedError Parameters of equality definition must match constructor parameters
  */
-$FAIL_EqualityDefinitionParameters: %Construction {
+$FAIL_EqualityDefinitionParameters(S: %Set): %Construction {
   $ctor(
     S: %Set,
     s: %Element(S)

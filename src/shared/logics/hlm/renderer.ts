@@ -406,7 +406,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let currentGroupDefinition: Fmt.Definition | undefined = undefined;
     while (remainingParameters.length) {
       let param = remainingParameters[0];
-      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
+      if (currentGroup.length && param.type !== currentGroup[0].type) {
         this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
         currentGroup.length = 0;
         currentGroupDefinition = undefined;
@@ -472,15 +472,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       insertButton.semanticLinks = [semanticLink];
       row.push(insertButton);
     }
-  }
-
-  private combineParameter(param: Fmt.Parameter, firstParam: Fmt.Parameter): boolean {
-    let paramType = param.type.expression;
-    let firstParamType = firstParam.type.expression;
-    return ((paramType instanceof FmtHLM.MetaRefExpression_Prop && firstParamType instanceof FmtHLM.MetaRefExpression_Prop)
-            || (paramType instanceof FmtHLM.MetaRefExpression_Set && firstParamType instanceof FmtHLM.MetaRefExpression_Set)
-            || (paramType instanceof FmtHLM.MetaRefExpression_Subset && firstParamType instanceof FmtHLM.MetaRefExpression_Subset && paramType.superset instanceof FmtHLM.MetaRefExpression_previous)
-            || (paramType instanceof FmtHLM.MetaRefExpression_Element && firstParamType instanceof FmtHLM.MetaRefExpression_Element && paramType._set instanceof FmtHLM.MetaRefExpression_previous));
   }
 
   private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
@@ -1388,8 +1379,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderDefinitionRef(definitions, argumentLists, omitArguments, negationCount, parameterOverrides, replaceAssociativeArg, macroInvocation);
       });
       return new Notation.PromiseExpression(expressionPromise);
-    } else if (expression instanceof FmtHLM.MetaRefExpression_previous) {
-      return new Notation.TextExpression('…');
     } else if (expression instanceof Fmt.PlaceholderExpression) {
       return new Notation.PlaceholderExpression(expression.placeholderType);
     } else {
@@ -2578,8 +2567,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                  || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
                  || type instanceof FmtHLM.MetaRefExpression_UseForAll
                  || type instanceof FmtHLM.MetaRefExpression_Embed
-                 || type instanceof FmtHLM.MetaRefExpression_SetExtend
-                 || type instanceof FmtHLM.MetaRefExpression_Extend
                  || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                  || type instanceof FmtHLM.MetaRefExpression_Substitute) {
         let result = this.utils.getProofStepResult(step, previousResult);
@@ -2863,7 +2850,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     };
     let currentGroup: Fmt.Parameter[] = [];
     for (let param of parameters) {
-      if (currentGroup.length && !this.combineParameter(param, currentGroup[0])) {
+      if (currentGroup.length && param.type !== currentGroup[0].type) {
         let group = currentGroup;
         result.set(group[0], () => this.renderParametersWithInitialState(group, initialState));
         currentGroup = [];
@@ -2952,10 +2939,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addGenericExpressionParts(type.construction, result);
       this.addElementTermParts(type.input, result);
       this.addElementTermParts(type.output, result);
-    } else if (type instanceof FmtHLM.MetaRefExpression_SetExtend) {
-      this.addSetTermParts(type.term, result);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Extend) {
-      this.addElementTermParts(type.term, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       this.addGenericExpressionParts(type.theorem, result);
       this.addFormulaParts(type.result, result);

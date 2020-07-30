@@ -507,7 +507,7 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      this.addSetParameter(definition, 'T');
+      this.addParameterToGroup(definition, 'T');
     }
   };
 
@@ -5089,19 +5089,20 @@ class TutorialStates {
     };
   }
 
+  private addParameterWithType(definition: Fmt.Definition, name: string, type: Fmt.Type): void {
+    let param = new Fmt.Parameter;
+    param.name = name;
+    param.type = type;
+    param.optional = false;
+    param.list = false;
+    definition.parameters.push(param);
+  }
+
   private addParameter(definition: Fmt.Definition, name: string, type: Fmt.Expression): void {
     let paramType = new Fmt.Type;
     paramType.expression = type;
     paramType.arrayDimensions = 0;
-    let param = new Fmt.Parameter;
-    param.name = name;
-    param.type = paramType;
-    param.optional = false;
-    param.list = false;
-    if (definition.parameters.length) {
-      param.previousParameter = definition.parameters[definition.parameters.length - 1];
-    }
-    definition.parameters.push(param);
+    this.addParameterWithType(definition, name, paramType);
   }
 
   private addSetParameter(definition: Fmt.Definition, name: string): void {
@@ -5118,6 +5119,10 @@ class TutorialStates {
     let type = new FmtHLM.MetaRefExpression_Element;
     type._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
     this.addParameter(definition, name, type);
+  }
+
+  private addParameterToGroup(definition: Fmt.Definition, name: string): void {
+    this.addParameterWithType(definition, name, definition.parameters[definition.parameters.length - 1].type);
   }
 
   private changeParameterName(definition: Fmt.Definition, name: string): void {
