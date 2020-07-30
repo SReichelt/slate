@@ -4100,7 +4100,7 @@ class TutorialStates {
                         type: Expression,
                         key: 0,
                         toolTip: {
-                          contents: <p>Here, please select the definition you just created, which should be the one of the top items in the list of recently used definitions.</p>,
+                          contents: <p>Here, please select the definition you just created, which should be the first item in the list of recently used definitions.</p>,
                           position: 'bottom',
                           index: 0,
                           condition: (component) => !component.state.openMenu
@@ -4128,7 +4128,7 @@ class TutorialStates {
                                     children: [
                                       {
                                         type: ExpressionMenuRow,
-                                        key: 1,
+                                        key: 0,
                                         children: [
                                           {
                                             type: ExpressionMenuItem,
