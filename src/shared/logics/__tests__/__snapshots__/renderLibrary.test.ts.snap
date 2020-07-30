@@ -424,8 +424,14 @@ References.
 * https://ncatlab.org/nlab/show/truth+value"
 `;
 
-exports[`render hlm library: 1.1.21.1 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
-"Definition 1.1.21.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.21 data/libraries/hlm/Essentials/Sets/maximal%20subset 1`] = `
+"Definition 1.1.21.  Let S be a set, T ⊆ S, let p_I be a proposition for each I ⊆ S. We define:
+
+  T is a maximal subset I of S such that p_I  :⇔  p_T and ∀ I ⊆ S s.t. p_I and T ⊆ I : T = I"
+`;
+
+exports[`render hlm library: 1.1.22.1 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
+"Definition 1.1.22.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
 
@@ -439,8 +445,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.21.2 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
-"Definition 1.1.21.2.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.22.2 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.22.2.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋂S := ⋂_((T) ∈ S) T
 
@@ -449,8 +455,8 @@ References.
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
 `;
 
-exports[`render hlm library: 1.1.21.3 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
-"Definition 1.1.21.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.22.3 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
+"Definition 1.1.22.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
 
@@ -460,8 +466,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.21.4 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
-"Definition 1.1.21.4.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.22.4 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.22.4.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋃S := ⋃_((T) ∈ S) T
 
@@ -470,8 +476,8 @@ References.
 * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
 `;
 
-exports[`render hlm library: 1.1.21.5 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
-"Definition 1.1.21.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
+exports[`render hlm library: 1.1.22.5 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
+"Definition 1.1.22.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
 
   ⨄_(i ∈ I)^≃ S_i :=: {(j, s) | j ∈ I, s ∈ S_j}
 
@@ -487,8 +493,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sigma"
 `;
 
-exports[`render hlm library: 1.1.21.6 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
-"Definition 1.1.21.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+exports[`render hlm library: 1.1.22.6 data/libraries/hlm/Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.22.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
   ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
 
@@ -505,8 +511,8 @@ References.
 * https://ncatlab.org/nlab/show/cartesian+product#in_sets"
 `;
 
-exports[`render hlm library: 1.1.22.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
-"Definition 1.1.22.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.23.1 data/libraries/hlm/Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.23.1.  Let S be a set. We define:
 
   𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
@@ -517,14 +523,14 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
 `;
 
-exports[`render hlm library: 1.1.22.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
-"Definition 1.1.22.2.  Let S be a set. We define:
+exports[`render hlm library: 1.1.23.2 data/libraries/hlm/Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.23.2.  Let S be a set. We define:
 
   S has a choice function  :⇔  𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
 `;
 
-exports[`render hlm library: 1.1.22.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
-"Axiom 1.1.22.3 (Axiom of choice).  We define:
+exports[`render hlm library: 1.1.23.3 data/libraries/hlm/Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.23.3 (Axiom of choice).  We define:
 
   AC  :⇔  ∀ sets S : S has a choice function
 
@@ -556,8 +562,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
-exports[`render hlm library: 1.1.23.1 data/libraries/hlm/Essentials/Sets/Multisets/Multisets 1`] = `
-"Definition 1.1.23.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.24.1 data/libraries/hlm/Essentials/Sets/Multisets/Multisets 1`] = `
+"Definition 1.1.24.1.  Let S be a set. We define:
 
   𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(S) :=: {{s^(m_s)} | m_s ∈ ℕ for each s ∈ S}
 
@@ -581,8 +587,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/multiset.html#multiset"
 `;
 
-exports[`render hlm library: 1.1.23.2 data/libraries/hlm/Essentials/Sets/Multisets/multiplicity 1`] = `
-"Definition 1.1.23.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
+exports[`render hlm library: 1.1.24.2 data/libraries/hlm/Essentials/Sets/Multisets/multiplicity 1`] = `
+"Definition 1.1.24.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
 
   mult_𝑻(t)
 
@@ -591,22 +597,22 @@ by:
   mult_{s^(m_s)}(t) := m_t  (m_s ∈ ℕ for each s ∈ S)"
 `;
 
-exports[`render hlm library: 1.1.23.3 data/libraries/hlm/Essentials/Sets/Multisets/Set 1`] = `
-"Definition 1.1.23.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.24.3 data/libraries/hlm/Essentials/Sets/Multisets/Set 1`] = `
+"Definition 1.1.24.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Set(𝑻) := {s ∈ S : mult_𝑻(s) ≠ 0}
 
 We write “let t ∈ 𝑻” for “let t ∈ Set(𝑻).”"
 `;
 
-exports[`render hlm library: 1.1.23.4 data/libraries/hlm/Essentials/Sets/Multisets/Items 1`] = `
-"Definition 1.1.23.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
+exports[`render hlm library: 1.1.24.4 data/libraries/hlm/Essentials/Sets/Multisets/Items 1`] = `
+"Definition 1.1.24.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
 
   Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<(mult_𝑻(t)))}"
 `;
 
-exports[`render hlm library: 1.1.23.5 data/libraries/hlm/Essentials/Sets/Multisets/Elements 1`] = `
-"Definition 1.1.23.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.24.5 data/libraries/hlm/Essentials/Sets/Multisets/Elements 1`] = `
+"Definition 1.1.24.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<(mult_𝑻(t)))}
    = ⋃_(t ∈ S) Items_𝑻(t)
@@ -614,8 +620,8 @@ exports[`render hlm library: 1.1.23.5 data/libraries/hlm/Essentials/Sets/Multise
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.23.6 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
-"Definition 1.1.23.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.24.6 data/libraries/hlm/Essentials/Sets/Multisets/cardinality 1`] = `
+"Definition 1.1.24.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   |𝑻| := |Elems(𝑻)|
    = {∑_(i ∈ Set(𝑻)) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
@@ -624,8 +630,8 @@ exports[`render hlm library: 1.1.23.6 data/libraries/hlm/Essentials/Sets/Multise
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.23.7 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
-"Definition 1.1.23.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.24.7 data/libraries/hlm/Essentials/Sets/Multisets/finite 1`] = `
+"Definition 1.1.24.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   𝑻 is finite  :⇔  |𝑻| is finite
     ⇔  Elems(𝑻) is finite
@@ -7132,7 +7138,7 @@ exports[`render hlm library: 2.6.17.7.3 data/libraries/hlm/Algebra/Groups/Order/
 exports[`render hlm library: 2.6.18.1 data/libraries/hlm/Algebra/Groups/Sylow/sylow%20subgroup 1`] = `
 "Definition 2.6.18.1.  Let 𝐆 be a group, H ⊆ (𝐆), p be a prime. We define:
 
-  H is a Sylow p-subgroup of 𝐆  :⇔  H is a p-subgroup of 𝐆 and ∀ I ⊆ (𝐆) s.t. I is a p-subgroup of 𝐆 and H ⊆ I : H = I
+  H is a Sylow p-subgroup of 𝐆  :⇔  H is a maximal subset I of (𝐆) such that I is a p-subgroup of 𝐆
 
 References.
 
