@@ -52,6 +52,7 @@ interface ParameterListState {
 
 export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer {
   protected readOnlyRenderer: HLMRenderer;
+  private additionalIndices = new Map<Fmt.Parameter, Notation.RenderedExpression[]>();
 
   constructor(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, protected utils: HLMUtils, protected renderUtils: HLMRenderUtils, templates: Fmt.File, options: Logic.LogicRendererOptions, protected editHandler?: HLMEditHandler) {
     super(definition, libraryDataAccessor, utils, templates, options, editHandler);
@@ -361,10 +362,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderParametersWithInitialState(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Notation.RenderedExpression[]): Notation.RenderedExpression {
+    let renderer: HLMRenderer = this;
+    if (indices) {
+      renderer = Object.create(this);
+      renderer.additionalIndices = new Map(renderer.additionalIndices);
+      for (let param of parameters) {
+        renderer.additionalIndices.set(param, indices);
+      }
+    }
+
     let state: ParameterListState = {...initialState};
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
-    resolveDefinitions = this.extractParameterDefinitions(parameters, resolveDefinitions);
-    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => this.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
+    resolveDefinitions = renderer.extractParameterDefinitions(parameters, resolveDefinitions);
+    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => renderer.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
     return new Notation.PromiseExpression(render);
   }
 
@@ -1343,9 +1353,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression | undefined {
     if (expression instanceof Fmt.VariableRefExpression) {
-      let indices: Notation.RenderedExpression[] | undefined = undefined;
+      let indices: Notation.RenderedExpression[] | undefined = this.additionalIndices.get(expression.variable);
       if (expression.indices) {
-        indices = [];
+        indices = indices ? indices.slice() : [];
         for (let index of expression.indices) {
           if (index.parameters) {
             indices.push(this.renderArgumentList(index.parameters, index.arguments, undefined, false));
