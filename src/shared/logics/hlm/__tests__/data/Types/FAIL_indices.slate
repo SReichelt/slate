@@ -5,7 +5,7 @@
  *
  * @expectedError Type mismatch
  */
-$FAIL_indices(_i: %Binder(
+$FAIL_indices(_1: %Binder(
   #(
     i: %Element($../Essentials/"Pointed sets"),
     j: %Element($../Essentials/"Natural numbers")

@@ -139,6 +139,7 @@ export class GenericUtils {
     return newPath;
   }
 
+  // TODO scan entire definition instead of relying on context
   getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
     let newName = defaultName;
     let suffix = '';

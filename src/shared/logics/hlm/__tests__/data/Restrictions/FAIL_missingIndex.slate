@@ -3,7 +3,7 @@
 /**
  * @expectedError Too few indices
  */
-$FAIL_missingIndex(_i: %Binder(
+$FAIL_missingIndex(_1: %Binder(
   #(i: %Element($../Essentials/"Natural numbers")),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {

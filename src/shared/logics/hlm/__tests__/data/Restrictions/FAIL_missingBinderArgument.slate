@@ -3,7 +3,7 @@
 /**
  * @expectedError Missing argument for parameter "j"
  */
-$FAIL_missingBinderArgument(_i: %Binder(
+$FAIL_missingBinderArgument(_1: %Binder(
   #(i,j: %Element($../Essentials/"Natural numbers")),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {

@@ -3,7 +3,7 @@
 /**
  * @expectedError Superfluous index
  */
-$FAIL_tooManyIndices(_i: %Binder(
+$FAIL_tooManyIndices(_1: %Binder(
   #(i: %Element($../Essentials/"Natural numbers")),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
