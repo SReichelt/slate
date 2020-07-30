@@ -665,7 +665,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
       this.setState({opened: false});
     }
 
-    let needsFiltering = this.initializeFilterState(props);
+    let needsFiltering = this.initializeFilterState(props, true);
 
     if (props.libraryDefinition) {
       this.libraryDefinitionPromise = CachedPromise.resolve(props.libraryDefinition);
@@ -702,24 +702,27 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     this.clicked = false;
   }
 
-  private initializeFilterState(props: LibraryTreeItemProps): boolean {
+  private initializeFilterState(props: LibraryTreeItemProps, initializingItem: boolean): boolean {
     if (props.visibleSiblings) {
       props.visibleSiblings.add(this);
     }
     let needsFiltering = props.onFilter !== undefined || (props.isSubsection && props.searchWords.length > 0);
     let clickable = (props.isSubsection || !needsFiltering) && !props.positionSelectionMode;
     if (this.state.clickable !== clickable || this.state.filtering !== needsFiltering || this.state.filtered) {
-      this.setState({
+      let newState: any = {
         clickable: clickable,
-        filtering: needsFiltering,
-        filtered: needsFiltering && !props.isSubsection
-      });
+        filtering: needsFiltering
+      };
+      if (initializingItem || !needsFiltering) {
+        newState.filtered = needsFiltering && !props.isSubsection;
+      }
+      this.setState(newState);
     }
     return needsFiltering;
   }
 
   private updateFilter(props: LibraryTreeItemProps): void {
-    if (this.initializeFilterState(props)) {
+    if (this.initializeFilterState(props, false)) {
       if (props.libraryDefinition) {
         if (this.state.definition) {
           this.triggerFilterStateUpdate(props, props.libraryDefinition, this.state.definition);
