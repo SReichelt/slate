@@ -429,13 +429,13 @@ class App extends React.Component<AppProps, AppState> {
             if (this.state.tutorialState) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
             } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
-              mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href={'https://github.com/'}>GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
+              mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href="https://github.com/" target="_blank">GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
             } else if (this.state.selectedItemRepository) {
               let repository = this.state.selectedItemRepository;
               if (!repository.hasWriteAccess) {
-                mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)}>library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
+                mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)} target="_blank">library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
               } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
-                mainContentsResult = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContentsResult];
+                mainContentsResult = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)} target="_blank">forked library repository</a> has local changes. No pull request will be created after editing.</Message>, mainContentsResult];
               }
             }
           }
@@ -467,9 +467,9 @@ class App extends React.Component<AppProps, AppState> {
       let repository = this.state.selectedItemRepository;
       if (repository) {
         if (repository.hasPullRequest) {
-          mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)}>personal fork</a> on GitHub.</Message>, mainContents];
+          mainContents = [<Message type={'info'} key="message">Your pull request has not been integrated yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)} target="_blank">personal fork</a> on GitHub.</Message>, mainContents];
         } else if (repository.hasLocalChanges) {
-          mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)}>forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
+          mainContents = [<Message type={'info'} key="message">Your <a href={GitHub.getRepositoryURL(repository)} target="_blank">forked library repository</a> has local changes but no pull request. It will not be updated automatically, and no pull request will be created after making further changes. To fix this, manually create a pull request or revert your local changes on GitHub.</Message>, mainContents];
         }
       }
     }
