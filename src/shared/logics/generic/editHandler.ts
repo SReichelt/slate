@@ -36,8 +36,17 @@ export abstract class GenericEditHandler {
   constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File, protected mruList: MRUList) {}
 
   update(): CachedPromise<void> {
+    this.editAnalysis.clear();
     this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
     return CachedPromise.resolve();
+  }
+
+  protected getUsedParameterNames(): Set<string> {
+    return new Set<string>(this.editAnalysis.usedParameterNames);
+  }
+
+  isTemporaryExpression(expression: Fmt.Expression): boolean {
+    return this.editAnalysis.expressionEditInfo.get(expression) === undefined;
   }
 
   protected getTypeRow(type: string | undefined, onRenderType: RenderTypeFn, info: LibraryItemInfo): Menu.ExpressionMenuRow {
@@ -658,9 +667,8 @@ export abstract class GenericEditHandler {
     return renderedTemplateArguments;
   }
 
-  protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, parameterList: Fmt.ParameterList, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
-    let context = this.editAnalysis.newParameterContext.get(parameterList);
-    let parameter = this.utils.createParameter(type, defaultName, context);
+  protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
+    let parameter = this.utils.createParameter(type, defaultName, this.getUsedParameterNames());
 
     let item = new Menu.ExpressionMenuItem(onRenderParam(parameter));
     item.action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
@@ -844,10 +852,7 @@ export abstract class GenericEditHandler {
       let index = parameterList.indexOf(param);
       if (index >= 0) {
         let paramClone = param.shallowClone();
-        let context = this.editAnalysis.newParameterContext.get(parameterList);
-        if (context) {
-          paramClone.name = this.utils.getUnusedDefaultName(paramClone.name, context);
-        }
+        paramClone.name = this.utils.getUnusedDefaultName(paramClone.name, this.getUsedParameterNames());
         parameterList.splice(index + 1, 0, paramClone);
         return paramClone;
       }

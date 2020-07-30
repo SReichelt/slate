@@ -139,26 +139,27 @@ export class GenericUtils {
     return newPath;
   }
 
-  // TODO scan entire definition instead of relying on context
-  getUnusedDefaultName(defaultName: string, context: Ctx.Context): string {
+  getUnusedDefaultName(defaultName: string, usedNames: Set<string>): string {
+    if (defaultName === '_') {
+      return defaultName;
+    }
     let newName = defaultName;
+    let newResultName = defaultName;
     let suffix = '';
-    let variableNames = context.getVariables().map((variable: Ctx.VariableInfo) => variable.parameter.name);
-    while (variableNames.indexOf(newName + suffix) >= 0) {
+    while (usedNames.has(newResultName)) {
       newName = getNextDefaultName(newName);
       if (newName === defaultName) {
         suffix += '\'';
       }
+      newResultName = newName + suffix;
     }
-    return newName + suffix;
+    usedNames.add(newResultName);
+    return newResultName;
   }
 
-  createParameter(type: Fmt.Expression, defaultName: string, context?: Ctx.Context): Fmt.Parameter {
-    if (context && defaultName !== '_') {
-      defaultName = this.getUnusedDefaultName(defaultName, context);
-    }
+  createParameter(type: Fmt.Expression, defaultName: string, usedNames?: Set<string>): Fmt.Parameter {
     let parameter = new Fmt.Parameter;
-    parameter.name = defaultName;
+    parameter.name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
     let parameterType = new Fmt.Type;
     parameterType.expression = type;
     parameterType.arrayDimensions = 0;
@@ -166,13 +167,6 @@ export class GenericUtils {
     parameter.optional = false;
     parameter.list = false;
     return parameter;
-  }
-
-  adaptParameterNames(parameterList: Fmt.ParameterList, context: Ctx.Context): void {
-    for (let param of parameterList) {
-      param.name = this.getUnusedDefaultName(param.name, context);
-      context = context.metaModel.getNextParameterContext(param, context);
-    }
   }
 
   containsSubExpression(expression: Fmt.Expression, fn: (subExpression: Fmt.Expression) => boolean): boolean {

@@ -2,6 +2,10 @@ import * as FmtWriter from './write';
 
 export import BN = require('bn.js');
 
+export type ExpressionTraversalFn = (subExpression: Expression) => void;
+export type ExpressionSubstitutionFn = (subExpression: Expression) => Expression;
+export type ExpressionUnificationFn = (left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean;
+
 export class File {
   metaModelPath: Path;
   // TODO find a better way to initialize lists, especially since some of them are regularly overwritten
@@ -22,10 +26,6 @@ export class File {
     return writeToString((writer: FmtWriter.Writer) => writer.writeFile(this));
   }
 }
-
-export type ExpressionTraversalFn = (subExpression: Expression) => void;
-export type ExpressionSubstitutionFn = (subExpression: Expression) => Expression;
-export type ExpressionUnificationFn = (left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean;
 
 export interface ReplacedParameter {
   original: Parameter;

@@ -1335,9 +1335,9 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  fillDefaultPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): void {
+  fillDefaultPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined): void {
     let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createParameterList = (source: Fmt.ParameterList) => this.createParameterList(source, targetPath, context);
+    let createParameterList = (source: Fmt.ParameterList) => this.createParameterList(source, targetPath);
     this.fillPlaceholderArguments(params, args, createPlaceholder, createParameterList);
   }
 
@@ -1393,22 +1393,33 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  createElementParameter(defaultName: string, context?: Ctx.Context): Fmt.Parameter {
+  createElementParameter(defaultName: string, usedNames: Set<string>): Fmt.Parameter {
     let elementType = new FmtHLM.MetaRefExpression_Element;
     elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    return this.createParameter(elementType, defaultName, context);
+    return this.createParameter(elementType, defaultName, usedNames);
   }
 
-  createParameterList(source: Fmt.ParameterList, targetPath: Fmt.PathItem | undefined, context?: Ctx.Context): Fmt.ParameterList {
+  createParameterList(source: Fmt.ParameterList, targetPath: Fmt.PathItem | undefined, usedNames?: Set<string>): Fmt.ParameterList {
     let substitutionContext = new SubstitutionContext;
     this.addTargetPathSubstitution(targetPath, substitutionContext);
     let substitutedSource = this.applySubstitutionContextToParameterList(source, substitutionContext);
     let result = Object.create(Fmt.ParameterList.prototype);
     substitutedSource.clone(result);
-    if (context) {
-      this.adaptParameterNames(result, context);
+    if (usedNames) {
+      this.adaptParameterNames(result, usedNames);
     }
     return result;
+  }
+
+  adaptParameterNames(parameterList: Fmt.ParameterList, usedNames: Set<string>): void {
+    for (let param of parameterList) {
+      param.name = this.getUnusedDefaultName(param.name, usedNames);
+      let type = param.type.expression;
+      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        this.adaptParameterNames(type.sourceParameters, usedNames);
+        this.adaptParameterNames(type.targetParameters, usedNames);
+      }
+    }
   }
 
   canAutoFillParameter(param: Fmt.Parameter, dependentParams: Fmt.Parameter[]): boolean {

@@ -15,6 +15,15 @@ export class EditAnalysis {
   newParameterContext = new Map<Fmt.ParameterList, Ctx.Context>();
   newArgumentContext = new Map<Fmt.ArgumentList, Ctx.Context>();
   expressionEditInfo = new Map<Fmt.Expression, ExpressionEditInfo>();
+  usedParameterNames = new Set<string>();
+
+  clear() {
+    this.definitionContentsContext.clear();
+    this.newParameterContext.clear();
+    this.newArgumentContext.clear();
+    this.expressionEditInfo.clear();
+    this.usedParameterNames.clear();
+  }
 
   analyzeFile(file: Fmt.File, context: Ctx.Context): void {
     this.analyzeDefinitions(file.definitions, context);
@@ -55,6 +64,9 @@ export class EditAnalysis {
   }
 
   analyzeParameter(parameter: Fmt.Parameter, context: Ctx.Context): void {
+    if (parameter.name !== '_') {
+      this.usedParameterNames.add(parameter.name);
+    }
     let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
     this.analyzeType(parameter.type, typeContext);
     if (parameter.defaultValue) {

@@ -478,7 +478,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowDefinition: state.fullSentence,
         allowBinder: state.associatedDefinition !== undefined && !state.inForEach
       };
-      this.editHandler.addParameterMenu(semanticLink, state.associatedParameterList, onRenderParam, onInsertParam, paramSelection, state.inForEach);
+      this.editHandler.addParameterMenu(semanticLink, onRenderParam, onInsertParam, paramSelection, state.inForEach);
       insertButton.semanticLinks = [semanticLink];
       row.push(insertButton);
     }
