@@ -32,7 +32,7 @@ function manipulateExpression(expression: Fmt.Expression): void {
 
 function manipulateParameterList(parameterList: Fmt.ParameterList): void {
   for (let param of parameterList) {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       manipulateParameterList(type.sourceParameters);
       manipulateParameterList(type.targetParameters);

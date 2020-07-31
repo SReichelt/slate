@@ -705,10 +705,7 @@ export class HLMDefinitionChecker {
     if (param.dependencies) {
       this.error(param, 'Parameters with dependencies are not supported in HLM');
     }
-    if (param.type.arrayDimensions) {
-      this.error(param, 'Array parameters are not supported in HLM');
-    }
-    return this.checkParameterType(param, param.type.expression, context);
+    return this.checkParameterType(param, param.type, context);
   }
 
   private checkParameterType(param: Fmt.Parameter, type: Fmt.Expression, context: HLMCheckerContext): HLMCheckerContext {
@@ -753,7 +750,7 @@ export class HLMDefinitionChecker {
   }
 
   private checkElementParameter(param: Fmt.Parameter, context: HLMCheckerContext): [Fmt.Expression | undefined, HLMCheckerContext] {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Element) {
       let resultContext = this.checkParameter(param, context);
       return [type._set, resultContext];
@@ -780,14 +777,14 @@ export class HLMDefinitionChecker {
 
   private checkArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let rawArg = this.utils.getRawArgument([argumentList], param);
-    this.checkRawArgument(param, argumentList, rawArg, param.type.arrayDimensions, context, substitutionContext);
+    this.checkRawArgument(param, argumentList, rawArg, param.type, context, substitutionContext);
   }
 
-  private checkRawArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, rawArg: Fmt.Expression | undefined, remainingArrayDimensions: number, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
-    if (remainingArrayDimensions && rawArg) {
+  private checkRawArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, rawArg: Fmt.Expression | undefined, type: Fmt.Expression, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+    if (type instanceof Fmt.IndexedExpression && rawArg) {
       if (rawArg instanceof Fmt.ArrayExpression) {
         for (let item of rawArg.items) {
-          this.checkRawArgument(param, argumentList, item, remainingArrayDimensions - 1, context, substitutionContext);
+          this.checkRawArgument(param, argumentList, item, type.body, context, substitutionContext);
         }
       } else {
         this.error(rawArg, 'Array expression expected');
@@ -803,7 +800,7 @@ export class HLMDefinitionChecker {
 
   private checkArgumentValue(param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let missingArgument = false;
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Subset) {
       if (rawArg) {
         let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
@@ -1153,7 +1150,7 @@ export class HLMDefinitionChecker {
     if (context.binderSourceParameters.indexOf(expression.variable) >= 0) {
       this.error(expression, 'Invalid reference to binder');
     }
-    if (!checkType(expression.variable.type.expression)) {
+    if (!checkType(expression.variable.type)) {
       this.error(expression, 'Referenced variable has incorrect type');
     }
   }

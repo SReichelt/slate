@@ -521,9 +521,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     file.metaModelPath = metaModelPath;
     let definition = new Fmt.Definition;
     definition.name = this.childName;
-    definition.type = new Fmt.Type;
-    definition.type.expression = new FmtLibrary.MetaRefExpression_Section;
-    definition.type.arrayDimensions = 0;
+    definition.type = new FmtLibrary.MetaRefExpression_Section;
     let contents = new FmtLibrary.ObjectContents_Section;
     contents.logic = this.logic.name;
     contents.items = [];

@@ -103,7 +103,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   getParameterExpressionType(param: Fmt.Parameter): HLMExpressionType | undefined {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       return HLMExpressionType.Formula;
     } else if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef) {
@@ -119,7 +119,7 @@ export class HLMUtils extends GenericUtils {
   private getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
     let arg = this.getRawArgument([argumentList], param);
     if (arg) {
-      let type = param.type.expression;
+      let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Prop) {
         let propArg = this.convertArgument(arg, FmtHLM.ObjectContents_PropArg);
         return propArg.formula;
@@ -138,13 +138,13 @@ export class HLMUtils extends GenericUtils {
   }
 
   getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
-    let type = param.type.expression;
+    let type = param.type;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
       let arg = new Fmt.Argument;
       arg.name = param.name;
       let argValue = new Fmt.CompoundExpression;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-        let targetType = targetParam ? targetParam.type.expression as FmtHLM.MetaRefExpression_Binder : undefined;
+        let targetType = targetParam ? targetParam.type as FmtHLM.MetaRefExpression_Binder : undefined;
         let binderArg = new FmtHLM.ObjectContents_BinderArg;
         binderArg.sourceParameters = targetType ? targetType.sourceParameters : this.applySubstitutionContextToParameterList(type.sourceParameters, context);
         let newContext = new HLMSubstitutionContext(context);
@@ -262,8 +262,8 @@ export class HLMUtils extends GenericUtils {
       original: originalParam,
       replacement: substitutedParam
     });
-    let originalType = originalParam.type.expression;
-    let substitutedType = substitutedParam.type.expression;
+    let originalType = originalParam.type;
+    let substitutedType = substitutedParam.type;
     if (originalType instanceof FmtHLM.MetaRefExpression_Binder && substitutedType instanceof FmtHLM.MetaRefExpression_Binder) {
       this.addParameterListSubstitution(originalType.sourceParameters, substitutedType.sourceParameters, context);
       this.addParameterListSubstitution(originalType.targetParameters, substitutedType.targetParameters, context);
@@ -279,31 +279,34 @@ export class HLMUtils extends GenericUtils {
   addArgumentListSubstitution(parameters: Fmt.Parameter[], args: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context: SubstitutionContext): void {
     let previousParameters: Fmt.Parameter[] = [];
     for (let param of parameters) {
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
-        let argValue = this.getRawArgument([args], param);
+      let type = param.type;
+      if (this.isValueParamType(type)) {
+        let argValue = this.getArgValue(args, param);
         if (argValue) {
           this.addVariableSubstitution(param, argValue, context);
         }
-      } else if (!param.type.arrayDimensions) {
-        if (this.isValueParamType(type)) {
-          let argValue = this.getArgValue(args, param);
+      } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+        let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
+        if (argValue) {
+          this.addParameterListSubstitution(type.sourceParameters, argValue.sourceParameters, context);
+          this.addArgumentListSubstitution(type.targetParameters, argValue.targetArguments, targetPath, context);
+        }
+      } else if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
+        let value = type instanceof FmtHLM.MetaRefExpression_SetDef ? type._set : type.element;
+        let valueContext = new SubstitutionContext;
+        this.addTargetPathSubstitution(targetPath, valueContext);
+        this.addArgumentListSubstitution(previousParameters, args, targetPath, valueContext);
+        value = this.applySubstitutionContext(value, valueContext);
+        this.addVariableSubstitution(param, value, context);
+      } else {
+        while (type instanceof Fmt.IndexedExpression) {
+          type = type.body;
+        }
+        if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
+          let argValue = this.getRawArgument([args], param);
           if (argValue) {
             this.addVariableSubstitution(param, argValue, context);
           }
-        } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-          let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
-          if (argValue) {
-            this.addParameterListSubstitution(type.sourceParameters, argValue.sourceParameters, context);
-            this.addArgumentListSubstitution(type.targetParameters, argValue.targetArguments, targetPath, context);
-          }
-        } else if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
-          let value = type instanceof FmtHLM.MetaRefExpression_SetDef ? type._set : type.element;
-          let valueContext = new SubstitutionContext;
-          this.addTargetPathSubstitution(targetPath, valueContext);
-          this.addArgumentListSubstitution(previousParameters, args, targetPath, valueContext);
-          value = this.applySubstitutionContext(value, valueContext);
-          this.addVariableSubstitution(param, value, context);
         }
       }
       previousParameters.push(param);
@@ -383,7 +386,7 @@ export class HLMUtils extends GenericUtils {
       if (currentParam === param) {
         return true;
       }
-      let type = currentParam.type.expression;
+      let type = currentParam.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         if (this.parameterListContainsParameter(type.sourceParameters, param) || this.parameterListContainsParameter(type.targetParameters, param)) {
           return true;
@@ -409,7 +412,7 @@ export class HLMUtils extends GenericUtils {
   addAllParametersToSet(parameters: Fmt.Parameter[], result: Set<Fmt.Parameter>): void {
     for (let param of parameters) {
       result.add(param);
-      let type = param.type.expression;
+      let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         this.addAllParametersToSet(type.sourceParameters, result);
         this.addAllParametersToSet(type.targetParameters, result);
@@ -426,7 +429,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   getProofStepResult(step: Fmt.Parameter, previousResult?: Fmt.Expression): Fmt.Expression | undefined {
-    let type = step.type.expression;
+    let type = step.type;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
       let result = new FmtHLM.MetaRefExpression_setEquals;
       let left = new Fmt.VariableRefExpression;
@@ -480,7 +483,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   getParameterConstraint(param: Fmt.Parameter, variableRefExpression?: Fmt.VariableRefExpression, indexContext?: SubstitutionContext): Fmt.Expression | undefined {
-    let variableType = param.type.expression;
+    let variableType = param.type;
     if (variableType instanceof FmtHLM.MetaRefExpression_Subset) {
       if (!variableRefExpression) {
         variableRefExpression = new Fmt.VariableRefExpression;
@@ -510,7 +513,7 @@ export class HLMUtils extends GenericUtils {
   getNextElementTerms(term: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
     let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
     if (variableRefExpression) {
-      let type = variableRefExpression.variable.type.expression;
+      let type = variableRefExpression.variable.type;
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
         return this.unfoldIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
@@ -548,7 +551,7 @@ export class HLMUtils extends GenericUtils {
   getNextSetTerms(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
     let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
     if (variableRefExpression) {
-      let type = variableRefExpression.variable.type.expression;
+      let type = variableRefExpression.variable.type;
       if (type instanceof FmtHLM.MetaRefExpression_Set) {
         return this.unfoldIndices(term, HLMExpressionType.SetTerm, typeSearchParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
@@ -568,7 +571,7 @@ export class HLMUtils extends GenericUtils {
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression[] | undefined | CachedPromise<Fmt.Expression[] | undefined> => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
           if (typeSearchParameters.followEmbeddings && definition.contents.embedding) {
-            let type = definition.contents.embedding.parameter.type.expression;
+            let type = definition.contents.embedding.parameter.type;
             if (type instanceof FmtHLM.MetaRefExpression_Element) {
               return this.followSetTermWithPath(type._set, term.path, definition).then((superset: Fmt.Expression) => [superset]);
             } else {
@@ -601,7 +604,7 @@ export class HLMUtils extends GenericUtils {
       return CachedPromise.resolve(undefined);
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
       if (typeSearchParameters.followSupersets) {
-        let type = term.parameter.type.expression;
+        let type = term.parameter.type;
         if (type instanceof FmtHLM.MetaRefExpression_Element) {
           return CachedPromise.resolve([type._set]);
         } else {
@@ -746,7 +749,7 @@ export class HLMUtils extends GenericUtils {
     let result: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
     if (unfoldParameters.unfoldFixedSubterms || unfoldParameters.extractStructuralCasesFromFixedSubterms) {
       for (let param of parameters) {
-        let type = param.type.expression;
+        let type = param.type;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           result = result.then((currentResult: Fmt.Expression[] | undefined): Fmt.Expression[] | undefined | CachedPromise<Fmt.Expression[] | undefined> => {
             if (currentResult) {
@@ -840,7 +843,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private replacePropArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_PropArg;
@@ -850,7 +853,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private replaceSetArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Set) {
       let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_SetArg;
@@ -865,7 +868,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private replaceElementArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
-    let type = param.type.expression;
+    let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Element) {
       let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_ElementArg;
@@ -922,7 +925,7 @@ export class HLMUtils extends GenericUtils {
     for (;;) {
       let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
       if (variableRefExpression) {
-        let type = variableRefExpression.variable.type.expression;
+        let type = variableRefExpression.variable.type;
         if (type instanceof FmtHLM.MetaRefExpression_Element) {
           return CachedPromise.resolve(this.applySubstitutionContext(type._set, indexContext));
         } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
@@ -952,7 +955,7 @@ export class HLMUtils extends GenericUtils {
                 return this.getWildcardFinalSet();
               }
             } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-              let type = definition.contents.parameter.type.expression;
+              let type = definition.contents.parameter.type;
               if (type instanceof FmtHLM.MetaRefExpression_Element) {
                 return this.followSetTermWithPath(type._set, definitionRefExpression.path, definition);
               } else {
@@ -1365,7 +1368,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.Expression | undefined {
-    if (param.type.arrayDimensions) {
+    if (param.type instanceof Fmt.IndexedExpression) {
       let result = new Fmt.ArrayExpression;
       result.items = [];
       return result;
@@ -1380,7 +1383,7 @@ export class HLMUtils extends GenericUtils {
       contents.toCompoundExpression(argValue, false);
       return argValue;
     }
-    let paramType = param.type.expression;
+    let paramType = param.type;
     if (paramType instanceof FmtHLM.MetaRefExpression_Nat) {
       return new Fmt.PlaceholderExpression(undefined);
     }
@@ -1388,7 +1391,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private createArgumentContents(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.ObjectContents | undefined {
-    let paramType = param.type.expression;
+    let paramType = param.type;
     if (paramType instanceof FmtHLM.MetaRefExpression_Prop) {
       let propArg = new FmtHLM.ObjectContents_PropArg;
       propArg.formula = createPlaceholder(HLMExpressionType.Formula);
@@ -1437,7 +1440,7 @@ export class HLMUtils extends GenericUtils {
   adaptParameterNames(parameterList: Fmt.ParameterList, usedNames: Set<string>): void {
     for (let param of parameterList) {
       param.name = this.getUnusedDefaultName(param.name, usedNames);
-      let type = param.type.expression;
+      let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         this.adaptParameterNames(type.sourceParameters, usedNames);
         this.adaptParameterNames(type.targetParameters, usedNames);
@@ -1447,7 +1450,7 @@ export class HLMUtils extends GenericUtils {
 
   canAutoFillParameter(param: Fmt.Parameter, dependentParams: Fmt.Parameter[]): boolean {
     for (let dependentParam of dependentParams) {
-      let type = dependentParam.type.expression;
+      let type = dependentParam.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         if (this.canAutoFillParameter(param, type.sourceParameters) || this.canAutoFillParameter(param, type.targetParameters)) {
           return true;
@@ -1463,7 +1466,7 @@ export class HLMUtils extends GenericUtils {
 
   markUnreferencedParametersAsAuto(params: Fmt.ParameterList, referencedParams: Fmt.Parameter[]): void {
     for (let param of params) {
-      let type = param.type.expression;
+      let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         this.markUnreferencedParametersAsAuto(type.targetParameters, referencedParams);
       } else if (type instanceof FmtHLM.MetaRefExpression_Prop || type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_Element) {

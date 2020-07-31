@@ -10,7 +10,7 @@ import { MRUList } from '../../data/mostRecentlyUsedList';
 
 export class HLMDisplay implements Logic.LogicDisplay {
   getDefinitionType(definition: Fmt.Definition): Logic.LogicDefinitionType {
-    let type = definition.type.expression;
+    let type = definition.type;
     if (type instanceof FmtHLM.MetaRefExpression_Construction) {
       return Logic.LogicDefinitionType.Construction;
     } else if (type instanceof FmtHLM.MetaRefExpression_Constructor) {

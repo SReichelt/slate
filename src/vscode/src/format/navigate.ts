@@ -409,8 +409,8 @@ export function getNameDefinitionLocation(parsedDocument: ParsedDocument, positi
 }
 
 export function getArgumentType(param: Fmt.Parameter): Fmt.Expression | undefined {
-    if (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression) {
-        let metaContents = param.type.expression.metaDefinition.contents;
+    if (param.type instanceof FmtDynamic.DynamicMetaRefExpression) {
+        let metaContents = param.type.metaDefinition.contents;
         if (metaContents instanceof FmtMeta.ObjectContents_ParameterType) {
             return metaContents.argumentType;
         }

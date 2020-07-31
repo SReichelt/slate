@@ -32,8 +32,8 @@ export class HLMRenderUtils extends GenericRenderUtils {
   protected getConstraint(param: Fmt.Parameter): [Fmt.Expression | undefined, number] {
     let constraint = undefined;
     let negationCount = 0;
-    if (param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
-      constraint = param.type.expression.formula;
+    if (param.type instanceof FmtHLM.MetaRefExpression_Constraint) {
+      constraint = param.type.formula;
       while (constraint instanceof FmtHLM.MetaRefExpression_not) {
         negationCount++;
         constraint = constraint.formula;
@@ -45,7 +45,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   extractConstraints(parameters: Fmt.Parameter[], extractedConstraints: Fmt.Parameter[]): Fmt.Parameter[] {
     let result: Fmt.Parameter[] = [];
     for (let param of parameters) {
-      if (param.type.expression instanceof FmtHLM.MetaRefExpression_Constraint) {
+      if (param.type instanceof FmtHLM.MetaRefExpression_Constraint) {
         extractedConstraints.push(param);
       } else {
         result.push(param);
@@ -113,8 +113,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   private findExtractableInductionParameterOrigin(param: Fmt.Parameter, parameters: Fmt.Parameter[], parentCases: FmtHLM.ObjectContents_StructuralCase[] | undefined): FmtHLM.ObjectContents_StructuralCase | null | undefined {
-    let type = param.type.expression;
-    if (!(type instanceof FmtHLM.MetaRefExpression_Element) || type.auto) {
+    if (!(param.type instanceof FmtHLM.MetaRefExpression_Element) || param.type.auto) {
       return undefined;
     }
     if (parameters.indexOf(param) >= 0) {

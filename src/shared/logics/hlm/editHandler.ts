@@ -234,7 +234,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
       {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
-          let type = variableInfo.parameter.type.expression;
+          let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef) {
             return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
           }
@@ -266,7 +266,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getSetTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
     let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
-      let type = definition.type.expression;
+      let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
         return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.SetTerm);
       } else {
@@ -296,7 +296,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
       {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
-          let type = variableInfo.parameter.type.expression;
+          let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
             return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
           }
@@ -320,7 +320,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getElementTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, allowConstructors: boolean): Menu.ExpressionMenuRow {
     let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
-      let type = definition.type.expression;
+      let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
           || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
           || type instanceof FmtHLM.MetaRefExpression_MacroOperator
@@ -353,7 +353,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
       {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
-          let type = variableInfo.parameter.type.expression;
+          let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Prop) {
             return this.getVariableRefExpressions(expressionEditInfo, variableInfo, false)
               .then(addNegations);
@@ -384,7 +384,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getFormulaDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
-      let type = definition.type.expression;
+      let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
         return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false, HLMExpressionType.Formula)
           .then(addNegations);
@@ -736,7 +736,7 @@ export class HLMEditHandler extends GenericEditHandler {
         visibleParameters = this.utils.findReferencedParameters(definition.contents.notation);
       }
       for (let param of visibleParameters) {
-        let type = param.type.expression;
+        let type = param.type;
         let newResultPath: Fmt.Path | undefined = undefined;
         switch (preFillExpressionType) {
         case HLMExpressionType.Formula:
@@ -821,7 +821,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let result = CachedPromise.resolve<Menu.ExpressionMenuItem[]>([]);
     let variables = expressionEditInfo.context.getVariables();
     for (let variableInfo of variables) {
-      let type = variableInfo.parameter.type.expression;
+      let type = variableInfo.parameter.type;
       if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
         result = result.then((menuItems: Menu.ExpressionMenuItem[]) =>
           this.getVariableRefExpressions(expressionEditInfo, variableInfo, false).then((variableRefExpressions: Fmt.Expression[]) => {
@@ -912,7 +912,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, full: boolean, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Menu.ExpressionMenuRow {
     let parameter = this.utils.createElementParameter('x', this.getUsedParameterNames());
-    let parameterType = parameter.type.expression as FmtHLM.MetaRefExpression_Element;
+    let parameterType = parameter.type as FmtHLM.MetaRefExpression_Element;
     let item = new Menu.ExpressionMenuItem(onRenderEmbedding(parameterType._set, full));
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
       let embedding = new FmtHLM.ObjectContents_Embedding;
@@ -976,7 +976,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  addArrayArgumentInsertButton(renderedItems: Notation.ExpressionValue[], param: Fmt.Parameter, macroInvocation: HLMMacro.HLMMacroInvocation, subExpression: Fmt.ArrayExpression, remainingArrayDimensions: number): void {
+  addArrayArgumentInsertButton(renderedItems: Notation.ExpressionValue[], param: Fmt.Parameter, innerType: Fmt.Expression, macroInvocation: HLMMacro.HLMMacroInvocation, subExpression: Fmt.ArrayExpression): void {
     let arrayArgumentOperations = macroInvocation.getArrayArgumentOperations?.(subExpression);
     let originalExpression = macroInvocation.expression;
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
@@ -986,7 +986,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onInsertItem = () => expressionEditInfo!.onSetValue(substitutedExpression);
         let enabledPromise = this.checker.recheckWithSubstitution(originalExpression, substitutedExpression)
           .then((checkResult: Logic.LogicCheckResultWithExpression) => !checkResult.hasErrors);
-        this.addListItemInsertButton(renderedItems, onInsertItem, remainingArrayDimensions, enabledPromise);
+        this.addListItemInsertButton(renderedItems, innerType, onInsertItem, enabledPromise);
       }
     }
   }
@@ -1045,7 +1045,7 @@ export class HLMEditHandler extends GenericEditHandler {
         });
       };
       let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
-        let type = definition.type.expression;
+        let type = definition.type;
         if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
           return this.getValidDefinitionRefExpressions(path, outerDefinition, definition, context!, checkResultPath, firstObjectExpression, objectExpressionType, true)
             .then(addNegations);
@@ -1085,7 +1085,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let item = new Menu.ExpressionMenuItem(onRenderExplicitIntro());
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
-      this.definition.type.expression = new FmtHLM.MetaRefExpression_ExplicitOperator;
+      this.definition.type = new FmtHLM.MetaRefExpression_ExplicitOperator;
       let explicitOperatorContents = new FmtHLM.ObjectContents_ExplicitOperator;
       explicitOperatorContents.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
       explicitOperatorContents.properties = originalContents.properties;
@@ -1105,7 +1105,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let item = new Menu.ExpressionMenuItem(onRenderImplicitIntro(parameter));
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
-      this.definition.type.expression = new FmtHLM.MetaRefExpression_ImplicitOperator;
+      this.definition.type = new FmtHLM.MetaRefExpression_ImplicitOperator;
       let implicitOperatorContents = new FmtHLM.ObjectContents_ImplicitOperator;
       implicitOperatorContents.parameter = parameter;
       implicitOperatorContents.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)];
@@ -1135,7 +1135,7 @@ export class HLMEditHandler extends GenericEditHandler {
   private getStandardTheoremRow(onRenderStandardIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
     let item = new Menu.ExpressionMenuItem(onRenderStandardIntro());
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
-      this.definition.type.expression = new FmtHLM.MetaRefExpression_StandardTheorem;
+      this.definition.type = new FmtHLM.MetaRefExpression_StandardTheorem;
       let standardTheoremContents = new FmtHLM.ObjectContents_StandardTheorem;
       standardTheoremContents.claim = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
       this.definition.contents = standardTheoremContents;
@@ -1147,7 +1147,7 @@ export class HLMEditHandler extends GenericEditHandler {
   private getEquivalenceTheoremRow(onRenderEquivalenceIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
     let item = new Menu.ExpressionMenuItem(onRenderEquivalenceIntro());
     item.action = new Menu.ImmediateExpressionMenuAction(() => {
-      this.definition.type.expression = new FmtHLM.MetaRefExpression_EquivalenceTheorem;
+      this.definition.type = new FmtHLM.MetaRefExpression_EquivalenceTheorem;
       let equivalenceTheoremContents = new FmtHLM.ObjectContents_EquivalenceTheorem;
       equivalenceTheoremContents.conditions = [new Fmt.PlaceholderExpression(HLMExpressionType.Formula), new Fmt.PlaceholderExpression(HLMExpressionType.Formula)];
       this.definition.contents = equivalenceTheoremContents;
@@ -1171,7 +1171,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private addApostrophes(parameters: Fmt.ParameterList): void {
     for (let param of parameters) {
-      let type = param.type.expression;
+      let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         this.addApostrophes(type.targetParameters);
       } else {

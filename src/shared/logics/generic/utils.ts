@@ -127,10 +127,7 @@ export class GenericUtils {
   createParameter(type: Fmt.Expression, defaultName: string, usedNames?: Set<string>): Fmt.Parameter {
     let parameter = new Fmt.Parameter;
     parameter.name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
-    let parameterType = new Fmt.Type;
-    parameterType.expression = type;
-    parameterType.arrayDimensions = 0;
-    parameter.type = parameterType;
+    parameter.type = type;
     parameter.optional = false;
     parameter.list = false;
     return parameter;

@@ -834,7 +834,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -930,7 +930,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
       this.setSetArgValue(functions.path.arguments, 'X', variableRef);
@@ -1020,7 +1020,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'T');
       this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
@@ -1241,7 +1241,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('g');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -1332,7 +1332,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('g');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
       this.setSetArgValue(functions.path.arguments, 'X', variableRef);
@@ -1422,7 +1422,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('g');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
       this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
@@ -1757,7 +1757,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('n');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
     }
   };
@@ -3090,10 +3090,10 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param1 = definition.parameters.getParameter('S');
-      let paramType1 = param1.type.expression as FmtHLM.MetaRefExpression_Set;
+      let paramType1 = param1.type as FmtHLM.MetaRefExpression_Set;
       paramType1.auto = new FmtHLM.MetaRefExpression_true;
       let param2 = definition.parameters.getParameter('T');
-      let paramType2 = param2.type.expression as FmtHLM.MetaRefExpression_Set;
+      let paramType2 = param2.type as FmtHLM.MetaRefExpression_Set;
       paramType2.auto = new FmtHLM.MetaRefExpression_true;
       let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
       let body = this.createVariableRefExpression(definition, 'g');
@@ -3611,7 +3611,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -3712,7 +3712,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setSetArgValue(functions.path.arguments, 'X', naturalNumbers);
@@ -3796,7 +3796,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('f');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setSetArgValue(functions.path.arguments, 'Y', naturalNumbers);
@@ -4001,7 +4001,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let param = definition.parameters.getParameter('n');
-      let type = param.type.expression as FmtHLM.MetaRefExpression_Element;
+      let type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
     }
   };
@@ -5089,20 +5089,13 @@ class TutorialStates {
     };
   }
 
-  private addParameterWithType(definition: Fmt.Definition, name: string, type: Fmt.Type): void {
+  private addParameter(definition: Fmt.Definition, name: string, type: Fmt.Expression): void {
     let param = new Fmt.Parameter;
     param.name = name;
     param.type = type;
     param.optional = false;
     param.list = false;
     definition.parameters.push(param);
-  }
-
-  private addParameter(definition: Fmt.Definition, name: string, type: Fmt.Expression): void {
-    let paramType = new Fmt.Type;
-    paramType.expression = type;
-    paramType.arrayDimensions = 0;
-    this.addParameterWithType(definition, name, paramType);
   }
 
   private addSetParameter(definition: Fmt.Definition, name: string): void {
@@ -5122,7 +5115,7 @@ class TutorialStates {
   }
 
   private addParameterToGroup(definition: Fmt.Definition, name: string): void {
-    this.addParameterWithType(definition, name, definition.parameters[definition.parameters.length - 1].type);
+    this.addParameter(definition, name, definition.parameters[definition.parameters.length - 1].type);
   }
 
   private changeParameterName(definition: Fmt.Definition, name: string): void {

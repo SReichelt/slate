@@ -46,7 +46,7 @@ export class EditAnalysis {
     context = new Ctx.ParentInfoContext(definition, context);
     this.analyzeParameterList(definition.parameters, context);
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
-    this.analyzeType(definition.type, typeContext);
+    this.analyzeExpression(definition.type, false, (newValue) => (definition.type = newValue!), undefined, typeContext);
     let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
     this.definitionContentsContext.set(definition, contentsContext);
     this.analyzeDefinitions(definition.innerDefinitions, contentsContext);
@@ -68,7 +68,7 @@ export class EditAnalysis {
       this.usedParameterNames.add(parameter.name);
     }
     let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
-    this.analyzeType(parameter.type, typeContext);
+    this.analyzeExpression(parameter.type, false, (newValue) => (parameter.type = newValue!), undefined, typeContext);
     if (parameter.defaultValue) {
       this.analyzeExpression(parameter.defaultValue, true, (newValue) => (parameter.defaultValue = newValue), undefined, context);
     }
@@ -102,10 +102,6 @@ export class EditAnalysis {
       onApplyConvertedArgument?.();
     };
     this.analyzeExpression(arg.value, arg.optional ?? false, onSetValue, onApplyConvertedArgument, valueContext);
-  }
-
-  analyzeType(type: Fmt.Type, context: Ctx.Context): void {
-    this.analyzeExpression(type.expression, false, (newValue) => (type.expression = newValue!), undefined, context);
   }
 
   analyzeObjectContents(contents: Fmt.ObjectContents, context: Ctx.Context): void {

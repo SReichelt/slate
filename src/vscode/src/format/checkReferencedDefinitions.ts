@@ -15,7 +15,7 @@ class ReferenceChecker {
     checkNestedArgumentList(outerParamType: FmtDynamic.DynamicMetaRefExpression, parameterListIndex: number, argumentList: Fmt.ArgumentList): void {
         let paramTypeParamIndex = 0;
         for (let paramTypeParam of outerParamType.metaDefinition.parameters) {
-            if (paramTypeParam.type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
+            if (paramTypeParam.type instanceof FmtMeta.MetaRefExpression_ParameterList) {
                 let paramTypeArg = outerParamType.arguments.getOptionalValue(paramTypeParam.name, paramTypeParamIndex);
                 if (paramTypeArg instanceof Fmt.ParameterExpression) {
                     if (parameterListIndex) {
@@ -37,23 +37,20 @@ class ReferenceChecker {
     }
 
     checkArgumentValueOfReferencedDefinition(param: Fmt.Parameter, value: Fmt.Expression): void {
-        let argumentTypeExpression = getArgumentType(param);
-        if (argumentTypeExpression) {
-            let argumentType = new Fmt.Type;
-            argumentType.expression = argumentTypeExpression;
-            argumentType.arrayDimensions = param.type.arrayDimensions;
+        let argumentType = getArgumentType(param);
+        if (argumentType) {
             let onObjectContentsCreated: FmtDynamic.ObjectContentsCallbackFn | undefined = undefined;
             if (this.parsedDocument.objectContentsMap) {
                 onObjectContentsCreated = (expression: Fmt.CompoundExpression, objectContents: FmtDynamic.DynamicObjectContents) => this.parsedDocument.objectContentsMap?.set(expression, objectContents);
             }
             let onMemberFound: FmtDynamic.MemberCallbackFn | undefined = undefined;
-            if (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression) {
-                let paramType = param.type.expression;
+            if (param.type instanceof FmtDynamic.DynamicMetaRefExpression) {
+                let paramType = param.type;
                 let parameterListIndex = 0;
                 onMemberFound = (member: Fmt.Parameter, memberValue: Fmt.Expression) => {
-                    if (member.type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
+                    if (member.type instanceof FmtMeta.MetaRefExpression_ParameterList) {
                         parameterListIndex++;
-                    } else if (member.type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList && memberValue instanceof Fmt.CompoundExpression) {
+                    } else if (member.type instanceof FmtMeta.MetaRefExpression_ArgumentList && memberValue instanceof Fmt.CompoundExpression) {
                         try {
                             this.checkNestedArgumentList(paramType, parameterListIndex++, memberValue.arguments);
                         } catch (error) {
@@ -75,7 +72,7 @@ class ReferenceChecker {
         for (let param of parameterList) {
             let paramName = param.list ? undefined : param.name;
             let value: Fmt.Expression | undefined;
-            if (param.optional || param.defaultValue || (param.type.expression instanceof FmtDynamic.DynamicMetaRefExpression && param.type.expression.metaDefinition.contents instanceof FmtMeta.ObjectContents_ParameterType && param.type.expression.metaDefinition.contents.optional instanceof FmtMeta.MetaRefExpression_true)) {
+            if (param.optional || param.defaultValue || (param.type instanceof FmtDynamic.DynamicMetaRefExpression && param.type.metaDefinition.contents instanceof FmtMeta.ObjectContents_ParameterType && param.type.metaDefinition.contents.optional instanceof FmtMeta.MetaRefExpression_true)) {
                 value = argumentList.getOptionalValue(paramName, paramIndex);
             } else {
                 value = argumentList.getValue(paramName, paramIndex);

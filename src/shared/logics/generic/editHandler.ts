@@ -97,11 +97,12 @@ export abstract class GenericEditHandler {
     return this.getActionInsertButton(action);
   }
 
-  protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], onInsertItem: () => void, remainingArrayDimensions: number, enabledPromise: CachedPromise<boolean>): void {
+  protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], innerType: Fmt.Expression, onInsertItem: () => void, enabledPromise: CachedPromise<boolean>): void {
     let insertButtonPromise = enabledPromise.then((enabled: boolean) => this.getImmediateInsertButton(onInsertItem, enabled));
     let insertButton: Notation.ExpressionValue = new Notation.PromiseExpression(insertButtonPromise);
-    for (let i = 0; i < remainingArrayDimensions; i++) {
+    while (innerType instanceof Fmt.IndexedExpression) {
       insertButton = [insertButton];
+      innerType = innerType.body;
     }
     renderedItems.push(insertButton);
   }
@@ -381,7 +382,7 @@ export abstract class GenericEditHandler {
           onUpdateParamNotation();
         };
         let canRemove = param.optional && value !== undefined;
-        return this.renderArgumentValue(value, param.type.expression, param.type.arrayDimensions, param.defaultValue, onSetParamNotation, onUpdateParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
+        return this.renderArgumentValue(value, param.type, param.defaultValue, onSetParamNotation, onUpdateParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
       paramItem.info = this.getDocumentation(template, param);
       dialog.items.push(paramItem);
@@ -462,8 +463,8 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, arrayDimensions: number, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onUpdateNotation: UpdateNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
-    if (arrayDimensions) {
+  private renderArgumentValue(value: Fmt.Expression | undefined, type: Fmt.Expression, defaultValue: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onUpdateNotation: UpdateNotationFn, variables: RenderedVariable[], renderedTemplateArguments: RenderedTemplateArguments, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): Notation.RenderedExpression {
+    if (type instanceof Fmt.IndexedExpression) {
       let arrayExpression: Fmt.ArrayExpression;
       if (value instanceof Fmt.ArrayExpression) {
         arrayExpression = value;
@@ -483,15 +484,15 @@ export abstract class GenericEditHandler {
           }
           onUpdateNotation();
         };
-        let argValue = this.renderArgumentValue(item, type, arrayDimensions - 1, undefined, onSetItem, onUpdateNotation, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
-        if (arrayDimensions > 1) {
+        let argValue = this.renderArgumentValue(item, type.body, undefined, onSetItem, onUpdateNotation, variables, renderedTemplateArguments, isTopLevel, true, isPredicate, renderer);
+        if (type.body instanceof Fmt.IndexedExpression) {
           argValue = new Notation.ParenExpression(argValue, '[]');
         }
         items.push(argValue);
       }
       let group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
       let insertButton = new Notation.InsertPlaceholderExpression;
-      if (arrayDimensions > 1) {
+      if (type.body instanceof Fmt.IndexedExpression) {
         let onInsertItem = () => {
           let newItem = new Fmt.ArrayExpression;
           newItem.items = [];
@@ -589,10 +590,10 @@ export abstract class GenericEditHandler {
   private preFillArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, variables: RenderedVariable[]): void {
     let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
     for (let param of params) {
-      if (param.type.arrayDimensions) {
+      if (param.type instanceof Fmt.IndexedExpression) {
         let arrayValue = new Fmt.ArrayExpression;
         arrayValue.items = [];
-        if (param.type.arrayDimensions === 1 && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
+        if (!(param.type.body instanceof Fmt.IndexedExpression) && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
           for (let variable of requiredVariables) {
             let value = new Fmt.VariableRefExpression;
             value.variable = variable.param;
@@ -651,7 +652,7 @@ export abstract class GenericEditHandler {
       };
       paramItem.onGetValue = () => {
         let regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
-        return this.renderArgumentValue(regular, type, 0, undefined, onSetItem, () => {}, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
+        return this.renderArgumentValue(regular, type, undefined, onSetItem, () => {}, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
       };
       dialog.items.push(paramItem);
     }

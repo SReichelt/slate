@@ -340,16 +340,16 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
             if (paramCode) {
                 let assignment = paramCode + ' = ';
                 let insertText: vscode.SnippetString | undefined = undefined;
-                let type = signatureInfo.isMetaModel ? param.type.expression : getArgumentType(param);
+                let type = signatureInfo.isMetaModel ? param.type : getArgumentType(param);
                 if (type) {
-                    if (param.type.arrayDimensions) {
+                    if (type instanceof Fmt.IndexedExpression) {
                         insertText = new vscode.SnippetString(assignment + '[$0]');
                     } else if (type instanceof Fmt.DefinitionRefExpression) {
                         if (!type.path.parentPath && rangeInfo.context && rangeInfo.context.metaModel instanceof FmtDynamic.DynamicMetaModel) {
                             let metaModel = rangeInfo.context.metaModel;
                             try {
                                 let metaDefinition = metaModel.definitions.getDefinition(type.path.name);
-                                if (metaDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition)) {
+                                if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition)) {
                                     insertText = new vscode.SnippetString(assignment + '{$0}');
                                 }
                             } catch (error) {
