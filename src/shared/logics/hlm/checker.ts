@@ -517,8 +517,8 @@ export class HLMDefinitionChecker {
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: true,
-      unfoldFixedSubterms: false,
-      extractStructuralCasesFromFixedSubterms: false
+      unfoldArguments: false,
+      extractStructuralCasesFromArguments: false
     };
     let checkSubset = this.utils.getFinalSuperset(subset, typeSearchParameters)
       .then((superset: Fmt.Expression) => {
@@ -1311,8 +1311,8 @@ export class HLMDefinitionChecker {
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: false,
-      unfoldFixedSubterms: false,
-      extractStructuralCasesFromFixedSubterms: false
+      unfoldArguments: false,
+      extractStructuralCasesFromArguments: false
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters)
       .then((finalSet: Fmt.Expression) => {
@@ -1486,6 +1486,11 @@ export class HLMDefinitionChecker {
     }
   }
 
+  // TODO when checking expressions for equality, ignore certain aspects:
+  // * existence of constraint arguments
+  // * proofs in arguments
+  // * different variants of associative expressions
+
   private checkUnfolding(source: Fmt.Expression, target: Fmt.Expression, context: HLMCheckerContext): void {
     // TODO
   }
@@ -1569,8 +1574,8 @@ export class HLMDefinitionChecker {
           followDefinitions: true,
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings,
-          unfoldFixedSubterms: nextStatus.followedEmbeddings,
-          extractStructuralCasesFromFixedSubterms: nextStatus.followedEmbeddings
+          unfoldArguments: nextStatus.followedEmbeddings,
+          extractStructuralCasesFromArguments: nextStatus.followedEmbeddings
         };
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
           for (let index = 0; index < setTerms.length; index++) {
