@@ -1,7 +1,7 @@
 import { GenericUtils, SubstitutionContext } from '../generic/utils';
 import * as Fmt from '../../format/format';
+import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
-import * as Ctx from '../../format/context';
 import { HLMExpressionType } from './hlm';
 import * as Macro from '../macro';
 import * as HLMMacro from './macro';
@@ -137,7 +137,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, indices?: Fmt.Index[]): Fmt.Argument | undefined {
+  getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
     let type = param.type.expression;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
       let arg = new Fmt.Argument;
@@ -150,34 +150,36 @@ export class HLMUtils extends GenericUtils {
         let newContext = new HLMSubstitutionContext(context);
         this.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, newContext);
         let targetInnerParameters = targetType?.targetParameters;
-        let index: Fmt.Index = {
-          parameters: binderArg.sourceParameters,
-          arguments: Object.create(Fmt.ArgumentList.prototype)
+        let addNewIndices = (expression: Fmt.Expression) => {
+          let indexedExpression = new Fmt.IndexedExpression;
+          indexedExpression.body = addIndices ? addIndices(expression) : expression;
+          indexedExpression.parameters = binderArg.sourceParameters;
+          indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+          this.getParameterArguments(indexedExpression.arguments!, binderArg.sourceParameters, context, undefined, addIndices);
+          return indexedExpression;
         };
-        this.getParameterArguments(index.arguments!, binderArg.sourceParameters, context, undefined, indices);
-        let newIndices = indices ? [...indices, index] : [index];
         binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
-        this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, newIndices);
+        this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
         binderArg.toCompoundExpression(argValue, false);
       } else {
-        let varExpr = new Fmt.VariableRefExpression;
-        varExpr.variable = param;
-        varExpr.indices = indices;
+        let variableRefExpression = new Fmt.VariableRefExpression;
+        variableRefExpression.variable = param;
+        let expression = addIndices ? addIndices(variableRefExpression) : variableRefExpression;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
-          propArg.formula = varExpr;
+          propArg.formula = expression;
           propArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = new FmtHLM.ObjectContents_SetArg;
-          setArg._set = varExpr;
+          setArg._set = expression;
           setArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
           let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
-          subsetArg._set = varExpr;
+          subsetArg._set = expression;
           subsetArg.toCompoundExpression(argValue, false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           let elementArg = new FmtHLM.ObjectContents_ElementArg;
-          elementArg.element = varExpr;
+          elementArg.element = expression;
           elementArg.toCompoundExpression(argValue, false);
         }
       }
@@ -188,11 +190,11 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], indices?: Fmt.Index[]): void {
+  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): void {
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
       let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
-      let arg = this.getParameterArgument(param, context, targetParam, indices);
+      let arg = this.getParameterArgument(param, context, targetParam, addIndices);
       if (arg) {
         args.push(arg);
       }
@@ -281,13 +283,13 @@ export class HLMUtils extends GenericUtils {
       if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
         let argValue = this.getRawArgument([args], param);
         if (argValue) {
-          this.addVariableSubstitution(param, () => argValue!, context);
+          this.addVariableSubstitution(param, argValue, context);
         }
       } else if (!param.type.arrayDimensions) {
         if (this.isValueParamType(type)) {
           let argValue = this.getArgValue(args, param);
           if (argValue) {
-            this.addVariableSubstitutionWithIndices(param, argValue, context);
+            this.addVariableSubstitution(param, argValue, context);
           }
         } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
           let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
@@ -301,7 +303,7 @@ export class HLMUtils extends GenericUtils {
           this.addTargetPathSubstitution(targetPath, valueContext);
           this.addArgumentListSubstitution(previousParameters, args, targetPath, valueContext);
           value = this.applySubstitutionContext(value, valueContext);
-          this.addVariableSubstitutionWithIndices(param, value, context);
+          this.addVariableSubstitution(param, value, context);
         }
       }
       previousParameters.push(param);
@@ -323,22 +325,34 @@ export class HLMUtils extends GenericUtils {
     return this.applySubstitutionContext(expression, context);
   }
 
-  substituteIndices(expression: Fmt.Expression, variableRef: Fmt.VariableRefExpression): Fmt.Expression {
-    if (variableRef.indices) {
-      let context = new SubstitutionContext;
-      for (let index of variableRef.indices) {
-        if (index.parameters && index.arguments) {
-          this.addArgumentListSubstitution(index.parameters, index.arguments, undefined, context);
+  extractVariableRefExpression(expression: Fmt.Expression): [Fmt.VariableRefExpression | undefined, SubstitutionContext | undefined] {
+    let context: SubstitutionContext | undefined = undefined;
+    while (expression instanceof Fmt.IndexedExpression) {
+      if (expression.parameters && expression.arguments) {
+        if (!context) {
+          context = new SubstitutionContext;
         }
+        this.addArgumentListSubstitution(expression.parameters, expression.arguments, undefined, context);
       }
-      expression = this.applySubstitutionContext(expression, context);
+      expression = expression.body;
     }
-    return expression;
+    if (expression instanceof Fmt.VariableRefExpression) {
+      return [expression, context];
+    } else {
+      return [undefined, undefined];
+    }
   }
 
-  addVariableSubstitutionWithIndices(variable: Fmt.Parameter, value: Fmt.Expression, context: SubstitutionContext): void {
-    let substitutionFn = (variableRef: Fmt.VariableRefExpression) => this.substituteIndices(value, variableRef);
-    this.addVariableSubstitution(variable, substitutionFn, context);
+  addVariableSubstitution(variable: Fmt.Parameter, value: Fmt.Expression, context: SubstitutionContext): void {
+    context.substitutionFns.push((subExpression: Fmt.Expression, indices?: Fmt.Index[]) => {
+      if (!indices) {
+        let [variableRefExpression, indexContext] = this.extractVariableRefExpression(subExpression);
+        if (variableRefExpression && variableRefExpression.variable === variable) {
+          return this.applySubstitutionContext(value, indexContext);
+        }
+      }
+      return subExpression;
+    });
   }
 
   substitutePath(expression: Fmt.Expression, path: Fmt.Path, definitions: Fmt.Definition[]): Fmt.Expression {
@@ -364,8 +378,8 @@ export class HLMUtils extends GenericUtils {
     this.addArgumentListsSubstitution(parameterLists, argumentLists, parentPath, context);
   }
 
-  parameterListContainsParameter(parameterList: Fmt.ParameterList, param: Fmt.Parameter): boolean {
-    for (let currentParam of parameterList) {
+  parameterListContainsParameter(parameters: Fmt.Parameter[], param: Fmt.Parameter): boolean {
+    for (let currentParam of parameters) {
       if (currentParam === param) {
         return true;
       }
@@ -426,8 +440,9 @@ export class HLMUtils extends GenericUtils {
       result.terms = [left, type.element];
       return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
-      if (type.variable instanceof Fmt.VariableRefExpression) {
-        return this.getParameterConstraint(type.variable.variable, type.variable);
+      let [variableRefExpression, indexContext] = this.extractVariableRefExpression(type.variable);
+      if (variableRefExpression) {
+        return this.getParameterConstraint(variableRefExpression.variable, variableRefExpression, indexContext);
       } else {
         throw new Error('Variable reference expected');
       }
@@ -464,7 +479,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getParameterConstraint(param: Fmt.Parameter, variableRefExpression?: Fmt.VariableRefExpression): Fmt.Expression | undefined {
+  getParameterConstraint(param: Fmt.Parameter, variableRefExpression?: Fmt.VariableRefExpression, indexContext?: SubstitutionContext): Fmt.Expression | undefined {
     let variableType = param.type.expression;
     if (variableType instanceof FmtHLM.MetaRefExpression_Subset) {
       if (!variableRefExpression) {
@@ -473,7 +488,7 @@ export class HLMUtils extends GenericUtils {
       }
       let result = new FmtHLM.MetaRefExpression_sub;
       result.subset = variableRefExpression;
-      result.superset = this.substituteIndices(variableType.superset, variableRefExpression);
+      result.superset = this.applySubstitutionContext(variableType.superset, indexContext);
       return result;
     } else if (variableType instanceof FmtHLM.MetaRefExpression_Element) {
       if (!variableRefExpression) {
@@ -482,7 +497,7 @@ export class HLMUtils extends GenericUtils {
       }
       let result = new FmtHLM.MetaRefExpression_in;
       result.element = variableRefExpression;
-      result._set = this.substituteIndices(variableType._set, variableRefExpression);
+      result._set = this.applySubstitutionContext(variableType._set, indexContext);
       return result;
     } else if (variableType instanceof FmtHLM.MetaRefExpression_Constraint) {
       return variableType.formula;
@@ -493,12 +508,13 @@ export class HLMUtils extends GenericUtils {
   }
 
   getNextElementTerms(term: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
-    if (term instanceof Fmt.VariableRefExpression) {
-      let type = term.variable.type.expression;
+    let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
+    if (variableRefExpression) {
+      let type = variableRefExpression.variable.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        return this.getNextIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
+        return this.unfoldIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-        return CachedPromise.resolve([this.substituteIndices(type.element, term)]);
+        return CachedPromise.resolve([this.applySubstitutionContext(type.element, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Element variable expected'));
       }
@@ -520,8 +536,9 @@ export class HLMUtils extends GenericUtils {
       return CachedPromise.resolve([term.term]);
     } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
       return CachedPromise.resolve([term.term]);
+    } else {
+      return CachedPromise.resolve(undefined);
     }
-    return CachedPromise.resolve(undefined);
   }
 
   getNextElementTerm(term: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression | undefined> {
@@ -529,17 +546,18 @@ export class HLMUtils extends GenericUtils {
   }
 
   getNextSetTerms(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression[] | undefined> {
-    if (term instanceof Fmt.VariableRefExpression) {
-      let type = term.variable.type.expression;
+    let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
+    if (variableRefExpression) {
+      let type = variableRefExpression.variable.type.expression;
       if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        return this.getNextIndices(term, HLMExpressionType.SetTerm, typeSearchParameters);
+        return this.unfoldIndices(term, HLMExpressionType.SetTerm, typeSearchParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
         if (typeSearchParameters.followSupersets) {
-          return CachedPromise.resolve([this.substituteIndices(type.superset, term)]);
+          return CachedPromise.resolve([this.applySubstitutionContext(type.superset, indexContext)]);
         }
         return CachedPromise.resolve(undefined);
       } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
-        return CachedPromise.resolve([this.substituteIndices(type._set, term)]);
+        return CachedPromise.resolve([this.applySubstitutionContext(type._set, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Set variable expected'));
       }
@@ -669,28 +687,32 @@ export class HLMUtils extends GenericUtils {
     return this.getNextSetTerms(term, typeSearchParameters).then((resultTerms: Fmt.Expression[] | undefined) => (resultTerms?.length ? resultTerms[0] : undefined));
   }
 
-  private getNextIndices(expression: Fmt.VariableRefExpression, expressionType: HLMExpressionType, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
+  private unfoldIndices(expression: Fmt.Expression, expressionType: HLMExpressionType, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
     let result: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
-    if (expression.indices) {
-      for (let indexIndex = 0; indexIndex < expression.indices.length; indexIndex++) {
-        let index = expression.indices[indexIndex];
-        if (index.parameters && index.arguments) {
-          result = result.then((currentResult: Fmt.Expression[] | undefined): Fmt.Expression[] | undefined | CachedPromise<Fmt.Expression[] | undefined> => {
-            if (currentResult) {
-              return currentResult;
-            } else {
-              let cloneExpression = (): ClonedExpressionInfo => {
-                let clonedExpression = expression.clone() as Fmt.VariableRefExpression;
-                return {
-                  clonedExpression: clonedExpression,
-                  expressionType: expressionType,
-                  args: clonedExpression.indices![indexIndex].arguments!
-                };
+    for (let innerExpression: Fmt.Expression = expression, innerExpressionIndex = 0; innerExpression instanceof Fmt.IndexedExpression; innerExpression = innerExpression.body, innerExpressionIndex++) {
+      if (innerExpression.parameters && innerExpression.arguments) {
+        let curParameters = innerExpression.parameters;
+        let curArguments = innerExpression.arguments;
+        let curInnerExpressionIndex = innerExpressionIndex;
+        result = result.then((currentResult: Fmt.Expression[] | undefined): Fmt.Expression[] | undefined | CachedPromise<Fmt.Expression[] | undefined> => {
+          if (currentResult) {
+            return currentResult;
+          } else {
+            let cloneExpression = (): ClonedExpressionInfo => {
+              let clonedExpression = expression.clone();
+              let clonedInnerExpression = clonedExpression as Fmt.IndexedExpression;
+              for (let i = 0; i < curInnerExpressionIndex; i++) {
+                clonedInnerExpression = clonedInnerExpression.body as Fmt.IndexedExpression;
+              }
+              return {
+                clonedExpression: clonedExpression,
+                expressionType: expressionType,
+                args: clonedInnerExpression.arguments!
               };
-              return this.unfoldArguments(index.parameters!, index.arguments!, unfoldParameters, cloneExpression);
-            }
-          });
-        }
+            };
+            return this.unfoldArguments(curParameters, curArguments, unfoldParameters, cloneExpression);
+          }
+        });
       }
     }
     return result;
@@ -861,7 +883,7 @@ export class HLMUtils extends GenericUtils {
         let innerStructuralCase = innerTerm.cases[0];
         if (term.term.isEquivalentTo(innerTerm.term)) {
           let newInnerValue = innerStructuralCase.parameters && structuralCase.parameters ? this.substituteParameters(innerStructuralCase.value, innerStructuralCase.parameters, structuralCase.parameters) : innerStructuralCase.value;
-          return this.substituteExpression(term, innerTerm, newInnerValue);
+          return FmtUtils.substituteExpression(term, innerTerm, newInnerValue);
         }
         currentStructuralCase = innerStructuralCase;
         innerTerm = innerStructuralCase.value;
@@ -898,12 +920,13 @@ export class HLMUtils extends GenericUtils {
 
   private getDeclaredSetInternal(term: Fmt.Expression, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
     for (;;) {
-      if (term instanceof Fmt.VariableRefExpression) {
-        let type = term.variable.type.expression;
+      let [variableRefExpression, indexContext] = this.extractVariableRefExpression(term);
+      if (variableRefExpression) {
+        let type = variableRefExpression.variable.type.expression;
         if (type instanceof FmtHLM.MetaRefExpression_Element) {
-          return CachedPromise.resolve(this.substituteIndices(type._set, term));
+          return CachedPromise.resolve(this.applySubstitutionContext(type._set, indexContext));
         } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-          term = this.substituteIndices(type.element, term);
+          term = this.applySubstitutionContext(type.element, indexContext);
         } else {
           return CachedPromise.reject(new Error('Element variable expected'));
         }

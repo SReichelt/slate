@@ -604,35 +604,34 @@ export class Reader {
     } catch (error) {
       this.error(error.message, identifierRange);
     }
+    // TODOidx support indices unconditionally
+    return this.readExpressionIndices(expression, indexParameterLists, context);
+  }
+
+  private readExpressionIndices(expression: Fmt.Expression, indexParameterLists: Fmt.ParameterList[] | undefined, context: Ctx.Context): Fmt.Expression {
     this.skipWhitespace();
     let indexIndex = 0;
     let indexStart = this.markStart();
     while (this.tryReadChar('[')) {
-      let index: Fmt.Index = {
-        parameters: indexParameterLists && indexIndex < indexParameterLists.length ? indexParameterLists[indexIndex] : undefined,
-        arguments: Object.create(Fmt.ArgumentList.prototype)
-      };
-      this.readArguments(index.arguments!, context);
-      if (expression.indices) {
-        expression.indices.push(index);
-      } else {
-        expression.indices = [index];
+      let indexedExpression = new Fmt.IndexedExpression;
+      indexedExpression.body = expression;
+      if (indexParameterLists && indexIndex < indexParameterLists.length) {
+        indexedExpression.parameters = indexParameterLists[indexIndex];
       }
+      indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+      this.readArguments(indexedExpression.arguments!, context);
       this.readChar(']');
-      this.markEnd(indexStart, index.arguments, context);
+      this.markEnd(indexStart, indexedExpression, context);
+      expression = indexedExpression;
       indexIndex++;
       indexStart = this.markStart();
     }
     if (indexParameterLists) {
       for (; indexIndex < indexParameterLists.length; indexIndex++) {
-        let index: Fmt.Index = {
-          parameters: indexParameterLists[indexIndex]
-        };
-        if (expression.indices) {
-          expression.indices.push(index);
-        } else {
-          expression.indices = [index];
-        }
+        let indexedExpression = new Fmt.IndexedExpression;
+        indexedExpression.body = expression;
+        indexedExpression.parameters = indexParameterLists[indexIndex];
+        expression = indexedExpression;
       }
     }
     return expression;

@@ -70,7 +70,7 @@ export class EditAnalysis {
     let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
     this.analyzeType(parameter.type, typeContext);
     if (parameter.defaultValue) {
-      this.analyzeExpression(parameter.defaultValue, true, (newValue) => parameter.defaultValue = newValue, undefined, context);
+      this.analyzeExpression(parameter.defaultValue, true, (newValue) => (parameter.defaultValue = newValue), undefined, context);
     }
     if (parameter.dependencies) {
       this.analyzeExpressions(parameter.dependencies, 0, undefined, context);
@@ -99,15 +99,13 @@ export class EditAnalysis {
       } else {
         onRemove();
       }
-      if (onApplyConvertedArgument) {
-        onApplyConvertedArgument();
-      }
+      onApplyConvertedArgument?.();
     };
     this.analyzeExpression(arg.value, arg.optional ?? false, onSetValue, onApplyConvertedArgument, valueContext);
   }
 
   analyzeType(type: Fmt.Type, context: Ctx.Context): void {
-    this.analyzeExpression(type.expression, false, (newValue) => type.expression = newValue!, undefined, context);
+    this.analyzeExpression(type.expression, false, (newValue) => (type.expression = newValue!), undefined, context);
   }
 
   analyzeObjectContents(contents: Fmt.ObjectContents, context: Ctx.Context): void {
@@ -129,15 +127,7 @@ export class EditAnalysis {
       context: context
     });
     context = new Ctx.ParentInfoContext(expression, context);
-    if (expression instanceof Fmt.VariableRefExpression) {
-      if (expression.indices) {
-        for (let index of expression.indices) {
-          if (index.arguments) {
-            this.analyzeArgumentList(index.arguments, onApplyConvertedArgument, context);
-          }
-        }
-      }
-    } else if (expression instanceof Fmt.MetaRefExpression) {
+    if (expression instanceof Fmt.MetaRefExpression) {
       this.analyzeMetaRefExpression(expression, context);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
       this.analyzePath(expression.path, context);
@@ -147,6 +137,11 @@ export class EditAnalysis {
       this.analyzeArgumentList(expression.arguments, onApplyConvertedArgument, context);
     } else if (expression instanceof Fmt.ArrayExpression) {
       this.analyzeExpressions(expression.items, 0, onApplyConvertedArgument, context);
+    } else if (expression instanceof Fmt.IndexedExpression) {
+      this.analyzeExpression(expression.body, false, (newValue) => (expression.body = newValue!), undefined, context);
+      if (expression.arguments) {
+        this.analyzeArgumentList(expression.arguments, undefined, context);
+      }
     }
   }
 
@@ -170,9 +165,7 @@ export class EditAnalysis {
         } else {
           expressions.splice(index, 1);
         }
-        if (onApplyConvertedArgument) {
-          onApplyConvertedArgument();
-        }
+        onApplyConvertedArgument?.();
       };
       this.analyzeExpression(expressions[index], canRemove, onSetValue, onApplyConvertedArgument, context);
     }

@@ -1,6 +1,7 @@
 import * as Fmt from '../../format/format';
 import * as Ctx from '../../format/context';
 import * as Edit from '../../format/edit';
+import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacro from './macro';
@@ -618,20 +619,17 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getVariableRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, variableInfo: Ctx.VariableInfo, checkType: boolean): CachedPromise<Fmt.Expression[]> {
-    let expression = new Fmt.VariableRefExpression;
-    expression.variable = variableInfo.parameter;
+    let variableRefExpression = new Fmt.VariableRefExpression;
+    variableRefExpression.variable = variableInfo.parameter;
+    let expression: Fmt.Expression = variableRefExpression;
     if (variableInfo.indexParameterLists) {
       for (let indexParameterList of variableInfo.indexParameterLists) {
-        let index: Fmt.Index = {
-          parameters: indexParameterList,
-          arguments: Object.create(Fmt.ArgumentList.prototype)
-        };
-        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments!, undefined);
-        if (expression.indices) {
-          expression.indices.unshift(index);
-        } else {
-          expression.indices = [index];
-        }
+        let indexedExpression = new Fmt.IndexedExpression;
+        indexedExpression.body = expression;
+        indexedExpression.parameters = indexParameterList;
+        indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+        this.utils.fillDefaultPlaceholderArguments(indexParameterList, indexedExpression.arguments!, undefined);
+        expression = indexedExpression;
       }
     }
     if (checkType && expressionEditInfo.expression) {
@@ -842,7 +840,7 @@ export class HLMEditHandler extends GenericEditHandler {
                     } else {
                       let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
                         this.adaptNewParameterLists(newParameterLists);
-                        inductionExpression = this.utils.substituteExpression(inductionExpression, originalExpression, filledExpression);
+                        inductionExpression = FmtUtils.substituteExpression(inductionExpression, originalExpression, filledExpression);
                       };
                       return structuralChecker.autoFill(onFillExpression).then(() =>
                         items.concat(this.getInductionItem(inductionExpression, variableRefExpression, (inductionExpression as any).cases, expressionEditInfo, onRenderExpression)));
@@ -1013,7 +1011,7 @@ export class HLMEditHandler extends GenericEditHandler {
       let getPropertyFormulas = (formula: Fmt.Expression) => objectParams.map((objectParam: Fmt.Parameter) => {
         let objectExpression = new Fmt.VariableRefExpression;
         objectExpression.variable = objectParam;
-        return this.utils.substituteExpression(formula, firstObjectExpression, objectExpression);
+        return FmtUtils.substituteExpression(formula, firstObjectExpression, objectExpression);
       });
       let onInsertProperty = (formula: Fmt.Expression | undefined) => {
         if (formula) {

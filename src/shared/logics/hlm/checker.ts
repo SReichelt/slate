@@ -1,5 +1,6 @@
 import * as Fmt from '../../format/format';
 import * as Ctx from '../../format/context';
+import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
@@ -323,7 +324,7 @@ export class HLMDefinitionChecker {
     if (placeholderCollection.autoFillFn && !placeholderCollection.unfilledPlaceholderCount) {
       let onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
         let onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
-          filledExpression = this.utils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
+          filledExpression = FmtUtils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
         };
         this.autoFillPlaceholders(placeholderValues, onFillInnerPlaceholder);
         onFillExpression(originalExpression, filledExpression, newParameterLists);
@@ -610,7 +611,7 @@ export class HLMDefinitionChecker {
       let newContext: HLMCheckerContext = {
         ...context,
         currentRecheckFn: (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => {
-          let substituted = this.utils.substituteExpression(expression, originalExpression, substitutedExpression);
+          let substituted = FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
           let fn = (recheckContext: HLMCheckerContext) => checkFn(substituted, recheckContext);
           return this.recheck(substitutedExpression, fn, context, originalExpression);
         },
@@ -891,8 +892,9 @@ export class HLMDefinitionChecker {
 
   private checkSetTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
     this.handleExpression(term, context);
-    if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Set || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Subset || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_SetDef)) {
-      this.checkVariableRefExpression(term, context);
+    if (term instanceof Fmt.VariableRefExpression || term instanceof Fmt.IndexedExpression) {
+      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef);
+      this.checkVariableRefExpression(term, checkType, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
       let checkDefinitionRef = this.utils.getOuterDefinition(term)
         .then((definition: Fmt.Definition) => {
@@ -958,8 +960,9 @@ export class HLMDefinitionChecker {
 
   private checkElementTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
     this.handleExpression(term, context);
-    if (term instanceof Fmt.VariableRefExpression && (term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Element || term.variable.type.expression instanceof FmtHLM.MetaRefExpression_Def)) {
-      this.checkVariableRefExpression(term, context);
+    if (term instanceof Fmt.VariableRefExpression || term instanceof Fmt.IndexedExpression) {
+      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def);
+      this.checkVariableRefExpression(term, checkType, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
       let checkDefinitionRef = this.utils.getOuterDefinition(term)
         .then((definition: Fmt.Definition) => {
@@ -1049,8 +1052,9 @@ export class HLMDefinitionChecker {
     let recheckFn = (substitutedFormula: Fmt.Expression, recheckContext: HLMCheckerContext) => this.checkFormula(substitutedFormula, recheckContext);
     context = this.setCurrentRecheckFn(formula, recheckFn, undefined, context);
     this.handleExpression(formula, context);
-    if (formula instanceof Fmt.VariableRefExpression && formula.variable.type.expression instanceof FmtHLM.MetaRefExpression_Prop) {
-      this.checkVariableRefExpression(formula, context);
+    if (formula instanceof Fmt.VariableRefExpression || formula instanceof Fmt.IndexedExpression) {
+      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Prop);
+      this.checkVariableRefExpression(formula, checkType, context);
     } else if (formula instanceof Fmt.DefinitionRefExpression) {
       let checkDefinitionRef = this.utils.getOuterDefinition(formula)
         .then((definition: Fmt.Definition) => {
@@ -1130,20 +1134,27 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkVariableRefExpression(expression: Fmt.VariableRefExpression, context: HLMCheckerContext): void {
+  private checkVariableRefExpression(expression: Fmt.VariableRefExpression | Fmt.IndexedExpression, checkType: (type: Fmt.Expression) => boolean, context: HLMCheckerContext): void {
+    while (expression instanceof Fmt.IndexedExpression) {
+      if (expression.parameters && expression.arguments) {
+        this.checkArgumentLists([expression.arguments], [expression.parameters], undefined, context);
+      } else if (expression.parameters) {
+        this.error(expression, `Too few indices`);
+      } else {
+        this.error(expression, `Superfluous index`);
+      }
+      if (expression.body instanceof Fmt.VariableRefExpression || expression.body instanceof Fmt.IndexedExpression) {
+        expression = expression.body;
+      } else {
+        this.error(expression, 'Unexpected index');
+        return;
+      }
+    }
     if (context.binderSourceParameters.indexOf(expression.variable) >= 0) {
       this.error(expression, 'Invalid reference to binder');
     }
-    if (expression.indices) {
-      for (let index of expression.indices) {
-        if (index.parameters && index.arguments) {
-          this.checkArgumentLists([index.arguments], [index.parameters], undefined, context);
-        } else if (index.parameters) {
-          this.error(expression, `Too few indices`);
-        } else {
-          this.error(index.arguments ?? expression, `Superfluous index`);
-        }
-      }
+    if (!checkType(expression.variable.type.expression)) {
+      this.error(expression, 'Referenced variable has incorrect type');
     }
   }
 

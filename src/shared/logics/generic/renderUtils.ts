@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as FmtUtils from '../../format/utils';
 import * as FmtNotation from '../../notation/meta';
 import * as Notation from '../../notation/notation';
 import { GenericUtils } from './utils';
@@ -69,7 +70,7 @@ export abstract class GenericRenderUtils {
           if (templateArg) {
             if (args) {
               for (let [param, arg] of args) {
-                templateArg = this.utils.substituteVariable(templateArg, param, () => arg);
+                templateArg = FmtUtils.substituteVariable(templateArg, param, arg);
               }
             }
             templateArgs.set(templateParam, templateArg);

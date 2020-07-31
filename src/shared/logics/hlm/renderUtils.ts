@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
 import * as FmtNotation from '../../notation/meta';
 import { GenericRenderUtils } from '../generic/renderUtils';
@@ -72,8 +73,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
               && currentCaseDefinition.construction instanceof Fmt.DefinitionRefExpression
               && currentCaseDefinition.cases.length
               && (currentCaseDefinition.cases.length === 1 || (expressions.length === 1 && allowMultipleCases))
-              && currentCaseDefinition.term instanceof Fmt.VariableRefExpression
-              && !currentCaseDefinition.term.indices) {
+              && currentCaseDefinition.term instanceof Fmt.VariableRefExpression) {
             let currentParameter = currentCaseDefinition.term.variable;
             let currentParameterStructuralCase = this.findExtractableInductionParameterOrigin(currentParameter, parameters, currentCase.structuralCases);
             if (currentParameterStructuralCase !== undefined && this.mayExtractStructuralCases(currentParameter, currentCaseDefinition.cases)) {
@@ -175,26 +175,22 @@ export class HLMRenderUtils extends GenericRenderUtils {
   applyElementParameterOverrides(expressionPromise: CachedPromise<Fmt.Expression>, elementParameterOverrides: ElementParameterOverrides): CachedPromise<Fmt.Expression> {
     for (let [param, paramOverridePromise] of elementParameterOverrides) {
       expressionPromise = expressionPromise.then((expression) => {
-        return paramOverridePromise.then((paramOverride) => this.utils.substituteVariable(expression, param, () => paramOverride));
+        return paramOverridePromise.then((paramOverride) => FmtUtils.substituteVariable(expression, param, paramOverride));
       });
     }
     return expressionPromise;
   }
 
   private markParametersAsDefinition(parameters: Fmt.Parameter[], substitutionContext: HLMSubstitutionContext): void {
-    let substitutionFn = (variableRef: Fmt.VariableRefExpression) => {
-      let result = variableRef.clone();
-      (result as any).isDefinition = true;
-      return result;
-    };
-    for (let param of parameters) {
-      this.utils.addVariableSubstitution(param, substitutionFn, substitutionContext);
-      let type = param.type.expression;
-      if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-        this.markParametersAsDefinition(type.sourceParameters, substitutionContext);
-        this.markParametersAsDefinition(type.targetParameters, substitutionContext);
+    substitutionContext.substitutionFns.push((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.VariableRefExpression && this.utils.parameterListContainsParameter(parameters, subExpression.variable)) {
+        let result = subExpression.clone();
+        (result as any).isDefinition = true;
+        return result;
+      } else {
+        return subExpression;
       }
-    }
+    });
   }
 
   convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], binderArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {

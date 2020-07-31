@@ -780,25 +780,26 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
     let exports = definition.contents.exports;
     if (exports) {
       for (let item of exports) {
+        let itemIndexParameterLists = indexParameterLists?.slice();
+        while (item instanceof Fmt.IndexedExpression) {
+          if (item.arguments) {
+            if (!itemIndexParameterLists) {
+              itemIndexParameterLists = [];
+            }
+            for (let indexArg of item.arguments) {
+              if (indexArg.value instanceof Fmt.VariableRefExpression) {
+                let indexValue = indexArg.value.variable;
+                let indexName = translateMemberName(indexValue.name);
+                itemIndexParameterLists.unshift(`${source}.${indexName}`);
+              }
+            }
+          }
+          item = item.body;
+        }
         if (item instanceof Fmt.VariableRefExpression) {
           let member = item.variable;
           let memberName = translateMemberName(member.name);
           let optional = member.optional || member.defaultValue !== undefined;
-          let itemIndexParameterLists: string[] | undefined = undefined;
-          if (item.indices) {
-            itemIndexParameterLists = indexParameterLists ? indexParameterLists.slice() : [];
-            for (let index of item.indices) {
-              if (index.arguments) {
-                for (let indexArg of index.arguments) {
-                  if (indexArg.value instanceof Fmt.VariableRefExpression) {
-                    let indexValue = indexArg.value.variable;
-                    let indexName = translateMemberName(indexValue.name);
-                    itemIndexParameterLists.push(`${source}.${indexName}`);
-                  }
-                }
-              }
-            }
-          }
           outFileStr += outputExportCode(inFile, member.name, `${source}.${memberName}`, context, itemIndexParameterLists, member.type, optional, member.list, indent);
         }
       }

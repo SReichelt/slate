@@ -1105,6 +1105,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     while (formula instanceof FmtHLM.MetaRefExpression_not) {
       let innerFormula = formula.formula;
       if (innerFormula instanceof Fmt.VariableRefExpression
+          || innerFormula instanceof Fmt.IndexedExpression
           || innerFormula instanceof Fmt.PlaceholderExpression
           || ((innerFormula instanceof FmtHLM.MetaRefExpression_setEquals || innerFormula instanceof FmtHLM.MetaRefExpression_equals)
               && innerFormula.terms.length !== 2)
@@ -1352,31 +1353,42 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderGenericExpression(expression: Fmt.Expression, omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression | undefined {
-    if (expression instanceof Fmt.VariableRefExpression) {
-      let indices: Notation.RenderedExpression[] | undefined = this.additionalIndices.get(expression.variable);
-      if (expression.indices) {
-        indices = indices ? indices.slice() : [];
-        for (let index of expression.indices) {
-          if (index.parameters) {
-            indices.push(this.renderArgumentList(index.parameters, index.arguments, undefined, false));
-          } else if (index.arguments) {
-            // Fallback when rendering code within markdown.
-            for (let arg of index.arguments) {
-              let value = arg.value;
-              if (value instanceof Fmt.CompoundExpression && value.arguments.length) {
-                value = value.arguments[0].value;
-              }
-              indices.push(this.renderExpression(value));
+    if (expression instanceof Fmt.VariableRefExpression || expression instanceof Fmt.IndexedExpression) {
+      let indices: Notation.RenderedExpression[] | undefined = undefined;
+      while (expression instanceof Fmt.IndexedExpression) {
+        if (!indices) {
+          indices = [];
+        }
+        if (expression.parameters) {
+          indices.unshift(this.renderArgumentList(expression.parameters, expression.arguments, undefined, false));
+        } else if (expression.arguments) {
+          // Fallback when rendering code within markdown.
+          for (let argIndex = expression.arguments.length - 1; argIndex >= 0; argIndex--) {
+            let arg = expression.arguments[argIndex];
+            let value = arg.value;
+            if (value instanceof Fmt.CompoundExpression && value.arguments.length) {
+              value = value.arguments[0].value;
             }
+            indices.unshift(this.renderExpression(value));
           }
         }
+        expression = expression.body;
       }
-      let isDefinition = (expression as any).isDefinition === true;
-      let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
-      return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
+      if (expression instanceof Fmt.VariableRefExpression) {
+        let additionalIndices = this.additionalIndices.get(expression.variable);
+        if (additionalIndices) {
+          indices = indices ? [...additionalIndices, ...indices] : additionalIndices;
+        }
+        let isDefinition = (expression as any).isDefinition === true;
+        let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
+        return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
+      } else {
+        return undefined;
+      }
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
+      let definitionRefExpression = expression;
       let childPaths: Fmt.Path[] = [];
-      this.utils.splitPath(expression.path, childPaths);
+      this.utils.splitPath(definitionRefExpression.path, childPaths);
       let definitionPromise = this.utils.getDefinition(childPaths[0]);
       let expressionPromise = definitionPromise.then((definition) => {
         let definitions: Fmt.Definition[] = [];
@@ -1384,7 +1396,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.utils.analyzeDefinitionRefPath(childPaths, definition, definitions, argumentLists);
         let macroInvocation: HLMMacro.HLMMacroInvocation | undefined = undefined;
         if (definitions.length === 1 && definitions[0].contents instanceof FmtHLM.ObjectContents_MacroOperator) {
-          macroInvocation = this.utils.getMacroInvocation(expression, definitions[0]);
+          macroInvocation = this.utils.getMacroInvocation(definitionRefExpression, definitions[0]);
         }
         return this.renderDefinitionRef(definitions, argumentLists, omitArguments, negationCount, parameterOverrides, replaceAssociativeArg, macroInvocation);
       });
@@ -1778,12 +1790,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (abbreviationExpression instanceof Fmt.CompoundExpression) {
             let abbreviation = new FmtNotation.ObjectContents_NotationAbbreviation;
             abbreviation.fromCompoundExpression(abbreviationExpression);
-            if (abbreviation.originalParameter instanceof Fmt.VariableRefExpression) {
+            let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
+            if (variableRefExpression && !indexContext) {
               let abbreviationArgs: RenderedTemplateArguments = {...args};
               for (let abbreviationParam of abbreviation.parameters) {
                 abbreviationArgs[abbreviationParam.name] = new AbbreviationParamExpression(abbreviationParam);
               }
-              let param = abbreviation.originalParameter.variable;
+              let param = variableRefExpression.variable;
               let arg = ArgumentWithInfo.getValue(args[param.name]);
               let notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
               let originalExpression = expression;

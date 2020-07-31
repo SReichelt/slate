@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Element term expected
+ * @expectedError Referenced variable has incorrect type
  */
 $FAIL_mismatchingVariableRef(V: %Set): %ExplicitOperator {
   definition = [V]

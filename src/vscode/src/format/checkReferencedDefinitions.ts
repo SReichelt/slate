@@ -146,18 +146,14 @@ export function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagn
                         referenceChecker.error(error.message);
                     }
                 }
-            } else if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
+            } else if (rangeInfo.object instanceof Fmt.IndexedExpression) {
                 let expression = rangeInfo.object;
-                if (expression.indices) {
+                if (expression.parameters && expression.arguments) {
                     let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
-                    for (let index of expression.indices) {
-                        if (index.parameters && index.arguments) {
-                            try {
-                                referenceChecker.checkArgumentsOfReferencedDefinition(index.parameters, index.arguments);
-                            } catch (error) {
-                                referenceChecker.error(error.message);
-                            }
-                        }
+                    try {
+                        referenceChecker.checkArgumentsOfReferencedDefinition(expression.parameters, expression.arguments);
+                    } catch (error) {
+                        referenceChecker.error(error.message);
                     }
                 }
             }

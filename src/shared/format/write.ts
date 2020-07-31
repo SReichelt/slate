@@ -384,19 +384,6 @@ export class Writer {
       } else if (expression instanceof Fmt.VariableRefExpression) {
         // TODO disallow references to shadowed variables
         this.writeIdentifier(expression.variable.name, expression, true);
-        if (expression.indices) {
-          for (let index of expression.indices) {
-            if (index.arguments) {
-              this.writeRange(index.arguments, false, false, false, false, () => {
-                this.write('[');
-                this.writeArguments(index.arguments!, indent);
-                this.write(']');
-              });
-            } else {
-              break;
-            }
-          }
-        }
       } else if (expression instanceof Fmt.MetaRefExpression) {
         this.writeRange(expression, false, false, true, false, () => {
           this.write('%');
@@ -424,6 +411,13 @@ export class Writer {
         this.write('}');
       } else if (expression instanceof Fmt.ArrayExpression) {
         this.writeExpressionList(expression.items, indent);
+      } else if (expression instanceof Fmt.IndexedExpression) {
+        this.writeExpression(expression.body);
+        if (expression.arguments) {
+          this.write('[');
+          this.writeArguments(expression.arguments, indent);
+          this.write(']');
+        }
       } else if (expression instanceof Fmt.PlaceholderExpression) {
         if (this.allowPlaceholders) {
           this.write('?');
@@ -437,11 +431,11 @@ export class Writer {
   }
 
   private isLargeExpression(expression: Fmt.Expression): boolean {
-    return (expression instanceof Fmt.MetaRefExpression
-            || expression instanceof Fmt.DefinitionRefExpression
-            || expression instanceof Fmt.ParameterExpression
-            || expression instanceof Fmt.CompoundExpression
-            || expression instanceof Fmt.ArrayExpression);
+    return expression instanceof Fmt.MetaRefExpression
+           || expression instanceof Fmt.DefinitionRefExpression
+           || expression instanceof Fmt.ParameterExpression
+           || expression instanceof Fmt.CompoundExpression
+           || expression instanceof Fmt.ArrayExpression;
   }
 
   writeString(str: string, quoteChar: string, breakLines: boolean): void {

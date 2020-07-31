@@ -1,6 +1,5 @@
 import * as Fmt from '../../format/format';
 import * as FmtUtils from '../../format/utils';
-import * as Ctx from '../../format/context';
 import { getNextDefaultName } from '../../format/common';
 import { LibraryDataAccessor, LibraryDefinition, LibraryItemInfo } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
@@ -68,8 +67,8 @@ export class GenericUtils {
     this.analyzeDefinitionRefPath(childPaths, outerDefinition, definitions, argumentLists);
   }
 
-  applySubstitutionContext(expression: Fmt.Expression, context: SubstitutionContext): Fmt.Expression {
-    if (context.replacedParameters.length || context.substitutionFns.length) {
+  applySubstitutionContext(expression: Fmt.Expression, context: SubstitutionContext | undefined): Fmt.Expression {
+    if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
       return expression.substitute(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
     } else {
       return expression;
@@ -84,38 +83,6 @@ export class GenericUtils {
     } else {
       return parameters;
     }
-  }
-
-  addExpressionSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression, context: SubstitutionContext): void {
-    context.substitutionFns.push((subExpression: Fmt.Expression) => {
-      if (subExpression === originalExpression) {
-        return substitutedExpression;
-      } else {
-        return subExpression;
-      }
-    });
-  }
-
-  substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
-    let context = new SubstitutionContext;
-    this.addExpressionSubstitution(originalExpression, substitutedExpression, context);
-    return this.applySubstitutionContext(expression, context);
-  }
-
-  addVariableSubstitution(variable: Fmt.Parameter, substitutionFn: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression, context: SubstitutionContext): void {
-    context.substitutionFns.push((subExpression: Fmt.Expression) => {
-      if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {
-        return substitutionFn(subExpression);
-      } else {
-        return subExpression;
-      }
-    });
-  }
-
-  substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitutionFn: (variableRef: Fmt.VariableRefExpression) => Fmt.Expression): Fmt.Expression {
-    let context = new SubstitutionContext;
-    this.addVariableSubstitution(variable, substitutionFn, context);
-    return this.applySubstitutionContext(expression, context);
   }
 
   addTargetPathSubstitution(targetPath: Fmt.PathItem | undefined, context: SubstitutionContext): void {

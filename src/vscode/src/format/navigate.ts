@@ -167,7 +167,7 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
     let checkUri = restrictToUri ? (uri: vscode.Uri) => areUrisEqual(restrictToUri, uri) : () => true;
     let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument, checkUri);
     if (referencedDefinition) {
-        if (position && rangeInfo.linkRange && rangeInfo.linkRange.end.isAfterOrEqual(position)) {
+        if (position && rangeInfo.linkRange?.end.isAfterOrEqual(position)) {
             return {
                 parsedDocument: referencedDefinition.parsedDocument,
                 isMetaModel: referencedDefinition.isMetaModel,
@@ -187,29 +187,7 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
             };
         }
     }
-    if (rangeInfo.object instanceof Fmt.VariableRefExpression) {
-        let expression = rangeInfo.object;
-        if (expression.indices && position) {
-            for (let index of expression.indices) {
-                if (index.parameters && index.arguments) {
-                    let indexRangeInfo = parsedDocument.rangeMap.get(index.arguments);
-                    if (indexRangeInfo && indexRangeInfo.range.contains(position)) {
-                        let indexParametersRangeInfo = parsedDocument.rangeMap.get(index.parameters);
-                        if (indexParametersRangeInfo) {
-                            let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, indexParametersRangeInfo.range, true, sourceDocument) : undefined;
-                            return {
-                                signatureCode: signatureCode,
-                                parsedDocument: parsedDocument,
-                                isMetaModel: false,
-                                parameters: index.parameters,
-                                arguments: index.arguments
-                            };
-                        }
-                    }
-                }
-            }
-        }
-    } else if (rangeInfo.object instanceof Fmt.CompoundExpression) {
+    if (rangeInfo.object instanceof Fmt.CompoundExpression) {
         let expression = rangeInfo.object;
         let nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(expression.arguments);
         if (nestedArgumentListInfo) {
@@ -221,6 +199,27 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
                     parsedDocument: nestedArgumentListInfo.targetDocument,
                     isMetaModel: false,
                     parameters: nestedArgumentListInfo.parameterExpression.parameters,
+                    arguments: expression.arguments
+                };
+            }
+        }
+    } else if (rangeInfo.object instanceof Fmt.IndexedExpression) {
+        let expression = rangeInfo.object;
+        if (expression.parameters && expression.arguments) {
+            if (position) {
+                let bodyRangeInfo = parsedDocument.rangeMap.get(expression.body);
+                if (bodyRangeInfo?.range.contains(position)) {
+                    return undefined;
+                }
+            }
+            let parametersRangeInfo = parsedDocument.rangeMap.get(expression.parameters);
+            if (parametersRangeInfo) {
+                let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, parametersRangeInfo.range, true, sourceDocument) : undefined;
+                return {
+                    signatureCode: signatureCode,
+                    parsedDocument: parsedDocument,
+                    isMetaModel: false,
+                    parameters: expression.parameters,
                     arguments: expression.arguments
                 };
             }

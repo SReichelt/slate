@@ -50,7 +50,7 @@ class MatrixMacroInstance implements HLMMacro.HLMMacroInstance {
         }
       }
     };
-    matricesRef = utils.substituteVariable(matricesRef, this.rows, () => config.getNumberExpression(items.items.length, onSetRowCount));
+    matricesRef = FmtUtils.substituteVariable(matricesRef, this.rows, config.getNumberExpression(items.items.length, onSetRowCount));
     let columnCount = 0;
     if (items.items.length) {
       let firstRow = items.items[0] as Fmt.ArrayExpression;
@@ -79,7 +79,7 @@ class MatrixMacroInstance implements HLMMacro.HLMMacroInstance {
         }
       }
     };
-    matricesRef = utils.substituteVariable(matricesRef, this.columns, () => config.getNumberExpression(columnCount, onSetColumnCount));
+    matricesRef = FmtUtils.substituteVariable(matricesRef, this.columns, config.getNumberExpression(columnCount, onSetColumnCount));
     return new MatrixMacroInvocation(expression, config, this.itemsParam, matricesRef, items);
   }
 }

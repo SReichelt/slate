@@ -49,7 +49,7 @@ class TupleMacroInstance implements HLMMacro.HLMMacroInstance {
         }
       }
     };
-    tuplesRef = utils.substituteVariable(tuplesRef, this.length, () => config.getNumberExpression(items.items.length, onSetLength));
+    tuplesRef = FmtUtils.substituteVariable(tuplesRef, this.length, config.getNumberExpression(items.items.length, onSetLength));
     return new TupleMacroInvocation(expression, config, this.itemsParam, items, tuplesRef);
   }
 }

@@ -3,7 +3,7 @@ import * as FmtWriter from './write';
 export import BN = require('bn.js');
 
 export type ExpressionTraversalFn = (subExpression: Expression) => void;
-export type ExpressionSubstitutionFn = (subExpression: Expression) => Expression;
+export type ExpressionSubstitutionFn = (subExpression: Expression, indices?: Index[]) => Expression;
 export type ExpressionUnificationFn = (left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean;
 
 export class File {
@@ -768,14 +768,8 @@ export class StringExpression extends Expression {
   }
 }
 
-export interface Index {
-  parameters?: ParameterList;
-  arguments?: ArgumentList;
-}
-
 export class VariableRefExpression extends Expression {
   variable: Parameter;
-  indices?: Index[];
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new VariableRefExpression;
@@ -784,83 +778,12 @@ export class VariableRefExpression extends Expression {
     if (result.variable !== this.variable) {
       changed = true;
     }
-    if (this.indices) {
-      result.indices = [];
-      for (let index of this.indices) {
-        if (index.arguments) {
-          let newIndex: Index = {
-            parameters: index.parameters,
-            arguments: Object.create(ArgumentList.prototype)
-          };
-          if (index.arguments.substituteExpression(fn, newIndex.arguments!, replacedParameters)) {
-            changed = true;
-          }
-          result.indices.push(newIndex);
-        } else {
-          result.indices.push(index);
-        }
-      }
-    }
-    let newIndices = result.replaceIndexParameters(replacedParameters);
-    if (newIndices) {
-      result.indices = newIndices;
-      changed = true;
-    }
     return this.getSubstitutionResult(fn, result, changed);
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
-    if (expression instanceof VariableRefExpression
-        && this.variable.findReplacement(replacedParameters) === expression.variable) {
-      let newIndices = this.replaceIndexParameters(replacedParameters);
-      let compareFn = (leftItem: Index, rightItem: Index) => areObjectsEquivalent(leftItem.arguments, rightItem.arguments, fn, replacedParameters);
-      return compareLists(newIndices ?? this.indices, expression.indices, compareFn, replacedParameters);
-    } else {
-      return false;
-    }
-  }
-
-  private replaceIndexParameters(replacedParameters: ReplacedParameter[]): Index[] | undefined {
-    let newIndices: Index[] | undefined = undefined;
-    if (this.indices && replacedParameters.length) {
-      for (let indexIndex = 0; indexIndex < this.indices.length; indexIndex++) {
-        let index = this.indices[indexIndex];
-        let newIndex: Index | undefined = undefined;
-        for (let replacedParameter of replacedParameters) {
-          if (index.parameters) {
-            let paramIndex = index.parameters.indexOf(replacedParameter.original);
-            if (paramIndex >= 0) {
-              if (!newIndex) {
-                newIndex = {
-                  parameters: Object.create(ParameterList.prototype)
-                };
-                newIndex.parameters!.push(...index.parameters);
-                if (index.arguments) {
-                  newIndex.arguments = Object.create(ArgumentList.prototype);
-                  newIndex.arguments!.push(...index.arguments);
-                }
-                if (!newIndices) {
-                  newIndices = this.indices!.slice();
-                }
-                newIndices[indexIndex] = newIndex;
-              }
-              newIndex.parameters![paramIndex] = replacedParameter.replacement;
-              if (newIndex.arguments) {
-                for (let argIndex = 0; argIndex < newIndex.arguments.length; argIndex++) {
-                  let arg = newIndex.arguments[argIndex];
-                  if (arg.name === replacedParameter.original.name) {
-                    let newArg = arg.clone();
-                    newArg.name = replacedParameter.replacement.name;
-                    newIndex.arguments[argIndex] = newArg;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return newIndices;
+    return expression instanceof VariableRefExpression
+           && this.variable.findReplacement(replacedParameters) === expression.variable;
   }
 }
 
@@ -980,6 +903,102 @@ export class ArrayExpression extends Expression {
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
     return expression instanceof ArrayExpression
            && areListsEquivalent(this.items, expression.items, fn, replacedParameters);
+  }
+}
+
+export interface Index {
+  parameters?: ParameterList;
+  arguments?: ArgumentList;
+}
+
+export class IndexedExpression extends Expression implements Index {
+  body: Expression;
+  parameters?: ParameterList;
+  arguments?: ArgumentList;
+
+  substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
+    let result = new IndexedExpression;
+    let changed = !fn;
+    if (this.arguments) {
+      result.arguments = Object.create(ArgumentList.prototype);
+      if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.assignParameters(result, replacedParameters)) {
+      changed = true;
+    }
+    let bodyFn = fn ? (subExpression: Expression, indices?: Index[]) => fn(subExpression, indices ? [result, ...indices] : [result]) : undefined;
+    result.body = this.body.substitute(bodyFn, replacedParameters);
+    if (result.body !== this.body) {
+      changed = true;
+    }
+    return this.getSubstitutionResult(fn, result, changed);
+  }
+
+  protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
+    if (expression instanceof IndexedExpression) {
+      let origReplacedParametersLength = replacedParameters.length;
+      let testExpression: IndexedExpression = this;
+      if (this.isAffectedByReplacedParameters(replacedParameters)) {
+        testExpression = new IndexedExpression;
+        testExpression.body = this.body;
+        if (this.arguments) {
+          testExpression.arguments = Object.create(ArgumentList.prototype);
+          testExpression.arguments!.push(...this.arguments);
+        }
+        this.assignParameters(testExpression, replacedParameters);
+      }
+      if (!testExpression.body.isEquivalentTo(expression.body, fn, replacedParameters)) {
+        replacedParameters.length = origReplacedParametersLength;
+        return false;
+      }
+      return areObjectsEquivalent(testExpression.arguments, expression.arguments, fn, replacedParameters);
+    } else {
+      return false;
+    }
+  }
+
+  private assignParameters(result: IndexedExpression, replacedParameters: ReplacedParameter[]): boolean {
+    if (this.parameters) {
+      for (let replacedParameter of replacedParameters) {
+        let paramIndex = this.parameters.indexOf(replacedParameter.original);
+        if (paramIndex >= 0) {
+          if (!result.parameters) {
+            result.parameters = Object.create(ParameterList.prototype);
+            result.parameters!.push(...this.parameters);
+          }
+          result.parameters![paramIndex] = replacedParameter.replacement;
+          if (result.arguments) {
+            for (let argIndex = 0; argIndex < result.arguments.length; argIndex++) {
+              let arg = result.arguments[argIndex];
+              if (arg.name === replacedParameter.original.name) {
+                let newArg = arg.clone();
+                newArg.name = replacedParameter.replacement.name;
+                result.arguments[argIndex] = newArg;
+              }
+            }
+          }
+        }
+      }
+      if (result.parameters) {
+        return true;
+      } else {
+        result.parameters = this.parameters;
+      }
+    }
+    return false;
+  }
+
+  private isAffectedByReplacedParameters(replacedParameters: ReplacedParameter[]): boolean {
+    if (this.parameters) {
+      for (let replacedParameter of replacedParameters) {
+        if (this.parameters.indexOf(replacedParameter.original) >= 0) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 
@@ -1111,9 +1130,9 @@ export function composeSubstitutionFns(fns: ExpressionSubstitutionFn[]): Express
   if (fns.length === 1) {
     return fns[0];
   } else {
-    return (subExpression: Expression) => {
+    return (subExpression: Expression, indices?: Index[]) => {
       for (let fn of fns) {
-        subExpression = fn(subExpression);
+        subExpression = fn(subExpression, indices);
       }
       return subExpression;
     };

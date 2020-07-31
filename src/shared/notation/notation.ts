@@ -627,6 +627,8 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       let part: ExpressionValue[] = [];
       this.translateExpressionList(expression.items, loopData, part);
       result.push(part);
+    } else if (expression instanceof Fmt.IndexedExpression && !expression.arguments) {
+      this.translateExpression(expression.body, loopData, result, isTopLevel);
     } else {
       throw new Error('Unsupported expression');
     }

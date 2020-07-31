@@ -146,37 +146,38 @@ export class DynamicMetaModel extends Meta.MetaModel {
       let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
       if (metaContents.exports) {
         for (let metaExport of metaContents.exports) {
-          if (metaExport instanceof Fmt.VariableRefExpression) {
-            context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport, context, indexParameterLists);
-          }
+          context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport, context, indexParameterLists);
         }
       }
     }
     return context;
   }
 
-  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameterExpression: Fmt.VariableRefExpression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[], indexOffset: number = 0): Ctx.Context {
+  private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameterExpression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[], indexOffset: number = 0): Ctx.Context {
     let context = parentContext;
-    let parameter = parameterExpression.variable;
-    let value = this.getArgumentValue(argumentList, parameterList, parameter, indexOffset);
-    if (value) {
-      if (parameterExpression.indices) {
-        let newIndexParameterLists: Fmt.ParameterList[] = [];
-        for (let index of parameterExpression.indices) {
-          if (index.arguments) {
-            for (let indexArg of index.arguments) {
-              if (indexArg.value instanceof Fmt.VariableRefExpression) {
-                let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
-                if (indexValue instanceof Fmt.ParameterExpression) {
-                  newIndexParameterLists.push(indexValue.parameters);
-                }
-              }
+    indexParameterLists = indexParameterLists?.slice();
+    while (parameterExpression instanceof Fmt.IndexedExpression) {
+      if (parameterExpression.arguments) {
+        if (!indexParameterLists) {
+          indexParameterLists = [];
+        }
+        for (let indexArg of parameterExpression.arguments) {
+          if (indexArg.value instanceof Fmt.VariableRefExpression) {
+            let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
+            if (indexValue instanceof Fmt.ParameterExpression) {
+              indexParameterLists.unshift(indexValue.parameters);
             }
           }
         }
-        indexParameterLists = indexParameterLists ? newIndexParameterLists.concat(indexParameterLists) : newIndexParameterLists;
       }
-      context = this.getValueExports(value, parameter.type.expression, context, indexParameterLists);
+      parameterExpression = parameterExpression.body;
+    }
+    if (parameterExpression instanceof Fmt.VariableRefExpression) {
+      let parameter = parameterExpression.variable;
+      let value = this.getArgumentValue(argumentList, parameterList, parameter, indexOffset);
+      if (value) {
+        context = this.getValueExports(value, parameter.type.expression, context, indexParameterLists);
+      }
     }
     return context;
   }
