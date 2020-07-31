@@ -155,20 +155,18 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   private getArgumentExports(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameterExpression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[], indexOffset: number = 0): Ctx.Context {
     let context = parentContext;
-    indexParameterLists = indexParameterLists?.slice();
     while (parameterExpression instanceof Fmt.IndexedExpression) {
       if (parameterExpression.arguments) {
-        if (!indexParameterLists) {
-          indexParameterLists = [];
-        }
+        let newIndexParameterLists: Fmt.ParameterList[] = [];
         for (let indexArg of parameterExpression.arguments) {
           if (indexArg.value instanceof Fmt.VariableRefExpression) {
             let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
             if (indexValue instanceof Fmt.ParameterExpression) {
-              indexParameterLists.unshift(indexValue.parameters);
+              newIndexParameterLists.push(indexValue.parameters);
             }
           }
         }
+        indexParameterLists = indexParameterLists ? newIndexParameterLists.concat(indexParameterLists) : newIndexParameterLists;
       }
       parameterExpression = parameterExpression.body;
     }

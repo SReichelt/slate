@@ -780,19 +780,18 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
     let exports = definition.contents.exports;
     if (exports) {
       for (let item of exports) {
-        let itemIndexParameterLists = indexParameterLists?.slice();
+        let itemIndexParameterLists = indexParameterLists;
         while (item instanceof Fmt.IndexedExpression) {
           if (item.arguments) {
-            if (!itemIndexParameterLists) {
-              itemIndexParameterLists = [];
-            }
+            let newIndexParameterLists: string[] = [];
             for (let indexArg of item.arguments) {
               if (indexArg.value instanceof Fmt.VariableRefExpression) {
                 let indexValue = indexArg.value.variable;
                 let indexName = translateMemberName(indexValue.name);
-                itemIndexParameterLists.unshift(`${source}.${indexName}`);
+                newIndexParameterLists.push(`${source}.${indexName}`);
               }
             }
+            itemIndexParameterLists = itemIndexParameterLists ? newIndexParameterLists.concat(itemIndexParameterLists) : newIndexParameterLists;
           }
           item = item.body;
         }
