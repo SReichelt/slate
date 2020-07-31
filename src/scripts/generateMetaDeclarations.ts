@@ -82,21 +82,21 @@ function getAllMembers(inFile: Fmt.File, definition: Fmt.Definition): Fmt.Parame
   return result;
 }
 
-function getMemberContentType(inFile: Fmt.File, type: Fmt.Type): string | undefined {
-  if (type.expression instanceof Fmt.MetaRefExpression) {
-    if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
+function getMemberContentType(inFile: Fmt.File, type: Fmt.Expression): string | undefined {
+  if (type instanceof Fmt.MetaRefExpression) {
+    if (type instanceof FmtMeta.MetaRefExpression_Int) {
       return 'Fmt.BN';
-    } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
+    } else if (type instanceof FmtMeta.MetaRefExpression_String) {
       return 'string';
-    } else if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+    } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
       return 'Fmt.Parameter';
-    } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
+    } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
       return 'Fmt.ParameterList';
-    } else if (type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+    } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
       return 'Fmt.ArgumentList';
     }
-  } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
-    let path = type.expression.path;
+  } else if (type instanceof Fmt.DefinitionRefExpression) {
+    let path = type.path;
     if (!path.parentPath) {
       let definition = inFile.definitions.getDefinition(path.name);
       if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
@@ -108,7 +108,7 @@ function getMemberContentType(inFile: Fmt.File, type: Fmt.Type): string | undefi
 }
 
 function getMemberType(inFile: Fmt.File, type: Fmt.Type): string {
-  let contentType = getMemberContentType(inFile, type);
+  let contentType = getMemberContentType(inFile, type.expression);
   if (!contentType) {
     contentType = 'Fmt.Expression';
   }
@@ -118,13 +118,13 @@ function getMemberType(inFile: Fmt.File, type: Fmt.Type): string {
   return contentType;
 }
 
-function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, contentType: string | undefined, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   let outputBegin = targetIsList ? `${target}.push(` : `${target} = `;
   let outputEnd = targetIsList ? `)` : '';
   if (remainingArrayDimensions) {
     outFileStr += `${indent}if (${source} instanceof Fmt.ArrayExpression) {\n`;
-    if (remainingArrayDimensions > 1 || contentType) {
+    if (remainingArrayDimensions > 1 || getMemberContentType(inFile, type.expression)) {
       let subTarget = target;
       if (targetIsList) {
         subTarget = 'newItem' + remainingArrayDimensions;
@@ -137,7 +137,7 @@ function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, t
         item += remainingArrayDimensions - 1;
       }
       outFileStr += `${indent}  for (let ${item} of ${source}.items) {\n`;
-      outFileStr += outputReadConvCode(inFile, argName, item, subTarget, type, contentType, true, remainingArrayDimensions - 1, `${indent}    `);
+      outFileStr += outputReadConvCode(inFile, argName, item, subTarget, type, true, remainingArrayDimensions - 1, `${indent}    `);
       outFileStr += `${indent}  }\n`;
       if (targetIsList) {
         outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
@@ -210,7 +210,6 @@ function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, t
 function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, memberName: string, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
   let outFileStr = '';
   let variableName = argName + 'Raw';
-  let contentType = getMemberContentType(inFile, type);
   if (list) {
     if (optional) {
       outFileStr += `${indent}if (this.${memberName}) {\n`;
@@ -230,18 +229,18 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
       outFileStr += `${indent}    this.${memberName} = [];\n`;
       outFileStr += `${indent}  }\n`;
     }
-    outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}!`, type, contentType, true, type.arrayDimensions, `${indent}  `);
+    outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}!`, type, true, type.arrayDimensions, `${indent}  `);
     outFileStr += `${indent}  index++;\n`;
     outFileStr += `${indent}}\n`;
   } else {
-    if (contentType || type.arrayDimensions) {
+    if (getMemberContentType(inFile, type.expression) || type.arrayDimensions) {
       outFileStr += `${indent}let ${variableName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
       if (optional) {
         outFileStr += `${indent}if (${variableName} !== undefined) {\n`;
-        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, contentType, false, type.arrayDimensions, `${indent}  `);
+        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, type.arrayDimensions, `${indent}  `);
         outFileStr += `${indent}}\n`;
       } else {
-        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, contentType, false, type.arrayDimensions, indent);
+        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, type.arrayDimensions, indent);
       }
     } else {
       outFileStr += `${indent}this.${memberName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
@@ -333,7 +332,7 @@ function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type
   return outFileStr;
 }
 
-function outputTraversalCode(inFile: Fmt.File, source: string, contentType: string | undefined, remainingArrayDimensions: number, indent: string): string {
+function outputTraversalCode(inFile: Fmt.File, source: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   if (remainingArrayDimensions) {
     let item = 'item';
@@ -341,7 +340,7 @@ function outputTraversalCode(inFile: Fmt.File, source: string, contentType: stri
       item += remainingArrayDimensions - 1;
     }
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputTraversalCode(inFile, item, contentType, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputTraversalCode(inFile, item, type, remainingArrayDimensions - 1, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     outFileStr += `${indent}${source}.traverse(fn);\n`;
@@ -349,7 +348,7 @@ function outputTraversalCode(inFile: Fmt.File, source: string, contentType: stri
   return outFileStr;
 }
 
-function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string, contentType: string | undefined, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string, type: Fmt.Type, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   let subTarget = target;
   let init = target;
@@ -367,9 +366,10 @@ function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string
       item += remainingArrayDimensions - 1;
     }
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputSubstitutionCode(inFile, item, subTarget, contentType, true, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputSubstitutionCode(inFile, item, subTarget, type, true, remainingArrayDimensions - 1, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
+    let contentType = getMemberContentType(inFile, type.expression);
     if (contentType && (!contentType.startsWith('Fmt.') || contentType.endsWith('List'))) {
       if (contentType.startsWith('Fmt.') && contentType.endsWith('List')) {
         outFileStr += `${indent}${init} = Object.create(${contentType}.prototype);\n`;
@@ -396,7 +396,7 @@ function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string
   return outFileStr;
 }
 
-function outputComparisonCode(inFile: Fmt.File, left: string, right: string, contentType: string | undefined, remainingArrayDimensions: number, indent: string): string {
+function outputComparisonCode(inFile: Fmt.File, left: string, right: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
   let outFileStr = '';
   if (remainingArrayDimensions) {
     let index = 'i';
@@ -414,17 +414,17 @@ function outputComparisonCode(inFile: Fmt.File, left: string, right: string, con
     outFileStr += `${indent}  for (let ${index} = 0; ${index} < ${left}.length; ${index}++) {\n`;
     outFileStr += `${indent}    let ${leftItem} = ${left}[${index}];\n`;
     outFileStr += `${indent}    let ${rightItem} = ${right}[${index}];\n`;
-    outFileStr += outputComparisonCode(inFile, leftItem, rightItem, contentType, remainingArrayDimensions - 1, `${indent}    `);
+    outFileStr += outputComparisonCode(inFile, leftItem, rightItem, type, remainingArrayDimensions - 1, `${indent}    `);
     outFileStr += `${indent}  }\n`;
     outFileStr += `${indent}}\n`;
   } else {
-    if (contentType === 'Fmt.BN') {
+    if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
       outFileStr += `${indent}if (${left} !== undefined || ${right} !== undefined) {\n`;
       outFileStr += `${indent}  if (${left} === undefined || ${right} === undefined || !${left}.eq(${right})) {\n`;
       outFileStr += `${indent}    return false;\n`;
       outFileStr += `${indent}  }\n`;
       outFileStr += `${indent}}\n`;
-    } else if (contentType === 'string') {
+    } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
       outFileStr += `${indent}if (${left} !== ${right}) {\n`;
       outFileStr += `${indent}  return false;\n`;
       outFileStr += `${indent}}\n`;
@@ -562,9 +562,8 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
           if (!(member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String)) {
-            let contentType = getMemberContentType(inFile, member.type);
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputTraversalCode(inFile, `this.${memberName}`, contentType, member.type.arrayDimensions, '      ');
+            outFileStr += outputTraversalCode(inFile, `this.${memberName}`, member.type, member.type.arrayDimensions, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -583,9 +582,8 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
           if (member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String) {
             outFileStr += `    result.${memberName} = this.${memberName};\n`;
           } else {
-            let contentType = getMemberContentType(inFile, member.type);
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, member.type.arrayDimensions, '      ');
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, member.type, false, member.type.arrayDimensions, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -600,8 +598,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
-          let contentType = getMemberContentType(inFile, member.type);
-          outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `objectContents.${memberName}`, contentType, member.type.arrayDimensions, '    ');
+          outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `objectContents.${memberName}`, member.type, member.type.arrayDimensions, '    ');
         }
       }
       if (superDefinition) {
@@ -663,13 +660,12 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
           if ((parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) && !parameter.list) {
             outFileStr += `    result.${memberName} = this.${memberName};\n`;
           } else {
-            let contentType = getMemberContentType(inFile, parameter.type);
-            let arrayDimensions = contentType ? parameter.type.arrayDimensions : 0;
+            let arrayDimensions = getMemberContentType(inFile, parameter.type.expression) ? parameter.type.arrayDimensions : 0;
             if (parameter.list) {
               arrayDimensions++;
             }
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, contentType, false, arrayDimensions, '      ');
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, parameter.type, false, arrayDimensions, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -689,12 +685,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `    }\n`;
       for (let parameter of definition.parameters) {
         let memberName = translateMemberName(parameter.name);
-        let contentType = getMemberContentType(inFile, parameter.type);
-        let arrayDimensions = contentType ? parameter.type.arrayDimensions : 0;
+        let arrayDimensions = getMemberContentType(inFile, parameter.type.expression) ? parameter.type.arrayDimensions : 0;
         if (parameter.list) {
           arrayDimensions++;
         }
-        outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `expression.${memberName}`, contentType, arrayDimensions, '    ');
+        outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `expression.${memberName}`, parameter.type, arrayDimensions, '    ');
       }
       outFileStr += `    return true;\n`;
       outFileStr += `  }\n`;
@@ -760,7 +755,7 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
 
 function outputExportCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
   let outFileStr = '';
-  let arrayDimensions = getMemberContentType(inFile, type) ? type.arrayDimensions : 0;
+  let arrayDimensions = getMemberContentType(inFile, type.expression) ? type.arrayDimensions : 0;
   if (list) {
     arrayDimensions++;
   }
@@ -851,7 +846,7 @@ function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: str
 
 function outputRawExportCode(inFile: Fmt.File, argName: string, argIndex: number, source: string, context: string, type: Fmt.Type, list: boolean, indent: string): string {
   let outFileStr = '';
-  let arrayDimensions = getMemberContentType(inFile, type) ? type.arrayDimensions : 0;
+  let arrayDimensions = getMemberContentType(inFile, type.expression) ? type.arrayDimensions : 0;
   if (list) {
     arrayDimensions++;
   }
