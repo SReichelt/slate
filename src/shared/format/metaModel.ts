@@ -37,7 +37,7 @@ export class MetaModel {
   }
 
   getParameterContext(parameter: Fmt.Parameter, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
-    let innerContext = this.getExports(parameter.type.expression, parentContext, indexParameterLists);
+    let innerContext = this.getExports(parameter.type, parentContext, indexParameterLists);
     return new Ctx.ParameterContext(parameter, innerContext, indexParameterLists);
   }
 

@@ -278,7 +278,7 @@ export class Reader {
     this.readChar('{');
     let metaInnerDefinitionTypes: Fmt.MetaDefinitionFactory | undefined = undefined;
     let contents: Fmt.ObjectContents | undefined;
-    let type = definition.type.expression;
+    let type = definition.type;
     if (type instanceof Fmt.MetaRefExpression) {
       metaInnerDefinitionTypes = type.getMetaInnerDefinitionTypes();
       contents = type.createDefinitionContents();
@@ -452,8 +452,10 @@ export class Reader {
         arg.value = this.readExpression(false, valueContext.metaModel.functions, valueContext);
       } else {
         let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
-        arg.value = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
-        this.markEnd(argStart, arg.value, valueContext, valueContext.metaModel.functions, identifierRange);
+        let [expression, indexParameterLists] = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
+        expression = this.readExpressionIndices(expression, indexParameterLists, argStart, context);
+        this.markEnd(argStart, expression, valueContext, valueContext.metaModel.functions, identifierRange);
+        arg.value = expression;
       }
     } else {
       let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
@@ -472,26 +474,9 @@ export class Reader {
     return this.tryReadArgument(argIndex, previousArguments, context) || this.error('Argument expected') || new Fmt.Argument;
   }
 
-  tryReadType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Type | undefined {
-    if (!this.tryReadChar(':')) {
-      return undefined;
-    }
-    let typeStart = this.markStart();
-    let type = new Fmt.Type;
-    type.expression = this.readExpression(true, metaDefinitions, context);
-    type.arrayDimensions = 0;
-    this.skipWhitespace();
-    while (this.tryReadChar('[')) {
-      type.arrayDimensions++;
-      this.readChar(']');
-    }
-    this.markEnd(typeStart, type, context, metaDefinitions);
-    return type;
-  }
-
-  readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Type {
-    this.skipWhitespace();
-    return this.tryReadType(metaDefinitions, context) || this.error('Type expected') || new Fmt.Type;
+  readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Expression {
+    this.readChar(':');
+    return this.readExpression(true, metaDefinitions, context);
   }
 
   readExpressions(context: Ctx.Context): Fmt.Expression[] {
@@ -512,6 +497,7 @@ export class Reader {
   tryReadExpression(isType: boolean, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Expression | undefined {
     let expressionStart = this.markStart();
     let expression: Fmt.Expression | undefined = undefined;
+    let indexParameterLists: Fmt.ParameterList[] | undefined = undefined;
     let nameRange: Range | undefined = undefined;
     if (this.tryReadChar('%')) {
       let nameStart = this.markStart();
@@ -548,7 +534,7 @@ export class Reader {
       let identifier = this.tryReadIdentifier();
       if (identifier) {
         nameRange = this.markEnd(expressionStart);
-        expression = this.readExpressionAfterIdentifier(identifier, nameRange, context);
+        [expression, indexParameterLists] = this.readExpressionAfterIdentifier(identifier, nameRange, context);
       } else if (isType) {
         // Other expressions not allowed in this case.
       } else if (this.tryReadChar('{')) {
@@ -589,12 +575,13 @@ export class Reader {
       }
     }
     if (expression) {
+      expression = this.readExpressionIndices(expression, indexParameterLists, expressionStart, context);
       this.markEnd(expressionStart, expression, context, metaDefinitions, nameRange, nameRange);
     }
     return expression;
   }
 
-  private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): Fmt.Expression {
+  private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): [Fmt.Expression, Fmt.ParameterList[] | undefined] {
     let expression = new Fmt.VariableRefExpression;
     let indexParameterLists: Fmt.ParameterList[] | undefined = undefined;
     try {
@@ -604,14 +591,12 @@ export class Reader {
     } catch (error) {
       this.error(error.message, identifierRange);
     }
-    // TODOidx support indices unconditionally
-    return this.readExpressionIndices(expression, indexParameterLists, context);
+    return [expression, indexParameterLists];
   }
 
-  private readExpressionIndices(expression: Fmt.Expression, indexParameterLists: Fmt.ParameterList[] | undefined, context: Ctx.Context): Fmt.Expression {
+  private readExpressionIndices(expression: Fmt.Expression, indexParameterLists: Fmt.ParameterList[] | undefined, expressionStart: Location, context: Ctx.Context): Fmt.Expression {
     this.skipWhitespace();
     let indexIndex = 0;
-    let indexStart = this.markStart();
     while (this.tryReadChar('[')) {
       let indexedExpression = new Fmt.IndexedExpression;
       indexedExpression.body = expression;
@@ -621,10 +606,9 @@ export class Reader {
       indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
       this.readArguments(indexedExpression.arguments!, context);
       this.readChar(']');
-      this.markEnd(indexStart, indexedExpression, context);
+      this.markEnd(expressionStart, indexedExpression, context);
       expression = indexedExpression;
       indexIndex++;
-      indexStart = this.markStart();
     }
     if (indexParameterLists) {
       for (; indexIndex < indexParameterLists.length; indexIndex++) {

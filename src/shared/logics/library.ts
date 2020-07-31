@@ -353,7 +353,7 @@ export class MetaModel extends Meta.MetaModel {
   getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
     let parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type.expression;
+      let type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Library
             || type instanceof MetaRefExpression_Section) {

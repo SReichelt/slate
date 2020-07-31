@@ -163,7 +163,7 @@ export class Path extends NamedPathItem {
 
 export class Definition {
   name: string;
-  type: Type;
+  type: Expression;
   parameters: ParameterList = Object.create(ParameterList.prototype);
   innerDefinitions: DefinitionList = Object.create(DefinitionList.prototype);
   contents?: ObjectContents;
@@ -226,7 +226,7 @@ export class DefinitionList extends Array<Definition> {
 
 export class Parameter implements Comparable<Parameter> {
   name: string;
-  type: Type;
+  type: Expression;
   defaultValue?: Expression;
   optional: boolean;
   list: boolean;
@@ -300,9 +300,9 @@ export class Parameter implements Comparable<Parameter> {
         }
       } else {
         let origReplacedParametersLength = replacedParameters.length;
-        let newType = this.type.expression.substitute(fn, replacedParameters);
+        let newType = this.type.substitute(fn, replacedParameters);
         replacedParameters.length = origReplacedParametersLength;
-        if (newType !== this.type.expression) {
+        if (newType !== this.type) {
           changed = true;
         }
       }
@@ -313,10 +313,8 @@ export class Parameter implements Comparable<Parameter> {
       if (previousParameter && this.type === previousParameter.original.type) {
         result.type = previousParameter.replacement.type;
       } else {
-        result.type = new Type;
         // Need to re-evaluate type because it can depend on the parameter itself.
-        result.type.expression = this.type.expression.substitute(fn, replacedParameters);
-        result.type.arrayDimensions = this.type.arrayDimensions;
+        result.type = this.type.substitute(fn, replacedParameters);
       }
       result.defaultValue = newDefaultValue;
       result.dependencies = newDependencies;
@@ -593,43 +591,6 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
 
   toString(): string {
     return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(this));
-  }
-}
-
-export class Type implements Comparable<Type> {
-  expression: Expression;
-  arrayDimensions: number;
-
-  clone(replacedParameters: ReplacedParameter[] = []): Type {
-    return this.substituteExpression(undefined, replacedParameters);
-  }
-
-  traverse(fn: ExpressionTraversalFn): void {
-    this.expression.traverse(fn);
-  }
-
-  substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Type {
-    let newExpression = this.expression.substitute(fn, replacedParameters);
-    if (newExpression !== this.expression || !fn) {
-      let result = new Type;
-      result.expression = newExpression;
-      result.arrayDimensions = this.arrayDimensions;
-      return result;
-    } else {
-      return this;
-    }
-  }
-
-  isEquivalentTo(type: Type, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
-    if (this === type && !replacedParameters.length) {
-      return true;
-    }
-    return this.arrayDimensions === type.arrayDimensions
-           && this.expression.isEquivalentTo(type.expression, fn, replacedParameters);
-  }
-
-  toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeType(this));
   }
 }
 

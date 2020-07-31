@@ -5763,7 +5763,7 @@ export class MetaModel extends Meta.MetaModel {
   getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
     let parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type.expression;
+      let type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Construction
             || type instanceof MetaRefExpression_SetOperator
@@ -5796,7 +5796,7 @@ export class MetaModel extends Meta.MetaModel {
     let context = parentContext;
     let parent = context.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type.expression;
+      let type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Construction) {
           if (argument.name === 'notation' || (argument.name === undefined && argumentIndex === 1)) {
@@ -5830,7 +5830,7 @@ export class MetaModel extends Meta.MetaModel {
           }
           if (argument.name === 'equalityDefinition' || (argument.name === undefined && argumentIndex === 4)) {
             for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
-              if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_Construction) {
+              if (context instanceof DefinitionContentsContext && context.definition.type instanceof MetaRefExpression_Construction) {
                 break;
               }
               if (context instanceof ArgumentTypeContext && context.objectContentsClass === ObjectContents_Construction) {

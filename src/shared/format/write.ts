@@ -171,7 +171,7 @@ export class Writer {
     let currentGroup: Fmt.Parameter[] = [];
     let firstGroup = true;
     for (let parameter of parameters) {
-      if (this.skipOmittableParameters && parameter.type.expression instanceof Fmt.MetaRefExpression && parameter.type.expression.canOmit()) {
+      if (this.skipOmittableParameters && parameter.type instanceof Fmt.MetaRefExpression && parameter.type.canOmit()) {
         continue;
       }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
@@ -316,15 +316,10 @@ export class Writer {
     });
   }
 
-  writeType(type: Fmt.Type, indent?: IndentInfo): void {
+  writeType(type: Fmt.Expression, indent?: IndentInfo): void {
     this.write(':');
     this.writeOptionalSpace();
-    this.writeRange(type, false, false, false, false, () => {
-      this.writeExpression(type.expression, indent);
-      for (let i = 0; i < type.arrayDimensions; i++) {
-        this.write('[]');
-      }
-    });
+    this.writeExpression(type, indent);
   }
 
   writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, maxLineLength: number = 0): void {

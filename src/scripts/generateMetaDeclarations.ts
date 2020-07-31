@@ -99,7 +99,7 @@ function getMemberContentType(inFile: Fmt.File, type: Fmt.Expression): string | 
     let path = type.path;
     if (!path.parentPath) {
       let definition = inFile.definitions.getDefinition(path.name);
-      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+      if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
         return `ObjectContents_${definition.name}`;
       }
     }
@@ -107,37 +107,61 @@ function getMemberContentType(inFile: Fmt.File, type: Fmt.Expression): string | 
   return undefined;
 }
 
-function getMemberType(inFile: Fmt.File, type: Fmt.Type): string {
-  let contentType = getMemberContentType(inFile, type.expression);
-  if (!contentType) {
-    contentType = 'Fmt.Expression';
+function getMemberType(inFile: Fmt.File, type: Fmt.Expression): string {
+  if (type instanceof Fmt.IndexedExpression) {
+    return getMemberType(inFile, type.body) + '[]';
+  } else {
+    return getMemberContentType(inFile, type) ?? 'Fmt.Expression';
   }
-  for (let i = 0; i < type.arrayDimensions; i++) {
-    contentType += `[]`;
-  }
-  return contentType;
 }
 
-function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function getEffectiveType(inFile: Fmt.File, type: Fmt.Expression, list: boolean = false): Fmt.Expression {
+  if (type instanceof Fmt.IndexedExpression) {
+    let bodyType = getEffectiveType(inFile, type.body);
+    if (bodyType instanceof Fmt.PlaceholderExpression) {
+      type = bodyType;
+    }
+  }
+  if (list) {
+    let listType = new Fmt.IndexedExpression;
+    listType.body = type;
+    listType.arguments = Object.create(Fmt.ArgumentList.prototype);
+    return listType;
+  } else {
+    return type;
+  }
+}
+
+function makeUniqueName(name: string, type: Fmt.Expression) {
+  if (type instanceof Fmt.IndexedExpression) {
+    let index = 0;
+    do {
+      index++;
+      type = type.body;
+    } while (type instanceof Fmt.IndexedExpression);
+    return name + index;
+  } else {
+    return name;
+  }
+}
+
+function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Expression, targetIsList: boolean, indent: string): string {
   let outFileStr = '';
   let outputBegin = targetIsList ? `${target}.push(` : `${target} = `;
   let outputEnd = targetIsList ? `)` : '';
-  if (remainingArrayDimensions) {
+  if (type instanceof Fmt.IndexedExpression) {
     outFileStr += `${indent}if (${source} instanceof Fmt.ArrayExpression) {\n`;
-    if (remainingArrayDimensions > 1 || getMemberContentType(inFile, type.expression)) {
+    if (type.body instanceof Fmt.IndexedExpression || getMemberContentType(inFile, type.body)) {
       let subTarget = target;
       if (targetIsList) {
-        subTarget = 'newItem' + remainingArrayDimensions;
+        subTarget = makeUniqueName('newItem', type);
         outFileStr += `${indent}  let ${subTarget} = [];\n`;
       } else {
         outFileStr += `${indent}  ${target} = [];\n`;
       }
-      let item = 'item';
-      if (remainingArrayDimensions - 1) {
-        item += remainingArrayDimensions - 1;
-      }
+      let item = makeUniqueName('item', type.body);
       outFileStr += `${indent}  for (let ${item} of ${source}.items) {\n`;
-      outFileStr += outputReadConvCode(inFile, argName, item, subTarget, type, true, remainingArrayDimensions - 1, `${indent}    `);
+      outFileStr += outputReadConvCode(inFile, argName, item, subTarget, type.body, true, `${indent}    `);
       outFileStr += `${indent}  }\n`;
       if (targetIsList) {
         outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
@@ -148,56 +172,51 @@ function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, t
     outFileStr += `${indent}} else {\n`;
     outFileStr += `${indent}  throw new Error('${argName}: Array expression expected');\n`;
     outFileStr += `${indent}}\n`;
-  } else {
-    if (type.expression instanceof Fmt.MetaRefExpression) {
-      if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
-        outFileStr += `${indent}if (${source} instanceof Fmt.IntegerExpression) {\n`;
-        outFileStr += `${indent}  ${outputBegin}${source}.value${outputEnd};\n`;
-        outFileStr += `${indent}} else {\n`;
-        outFileStr += `${indent}  throw new Error('${argName}: Integer expected');\n`;
-        outFileStr += `${indent}}\n`;
-      } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
-        outFileStr += `${indent}if (${source} instanceof Fmt.StringExpression) {\n`;
-        outFileStr += `${indent}  ${outputBegin}${source}.value${outputEnd};\n`;
-        outFileStr += `${indent}} else {\n`;
-        outFileStr += `${indent}  throw new Error('${argName}: String expected');\n`;
-        outFileStr += `${indent}}\n`;
-      } else if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-        outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression && ${source}.parameters.length === 1) {\n`;
-        outFileStr += `${indent}  ${outputBegin}${source}.parameters[0]${outputEnd};\n`;
-        outFileStr += `${indent}} else {\n`;
-        outFileStr += `${indent}  throw new Error('${argName}: Parameter expression with single parameter expected');\n`;
-        outFileStr += `${indent}}\n`;
-      } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
-        outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression) {\n`;
-        outFileStr += `${indent}  ${outputBegin}${source}.parameters${outputEnd};\n`;
-        outFileStr += `${indent}} else {\n`;
-        outFileStr += `${indent}  throw new Error('${argName}: Parameter expression expected');\n`;
-        outFileStr += `${indent}}\n`;
-      } else if (type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+  } else if (type instanceof Fmt.MetaRefExpression) {
+    if (type instanceof FmtMeta.MetaRefExpression_Int) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.IntegerExpression) {\n`;
+      outFileStr += `${indent}  ${outputBegin}${source}.value${outputEnd};\n`;
+      outFileStr += `${indent}} else {\n`;
+      outFileStr += `${indent}  throw new Error('${argName}: Integer expected');\n`;
+      outFileStr += `${indent}}\n`;
+    } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.StringExpression) {\n`;
+      outFileStr += `${indent}  ${outputBegin}${source}.value${outputEnd};\n`;
+      outFileStr += `${indent}} else {\n`;
+      outFileStr += `${indent}  throw new Error('${argName}: String expected');\n`;
+      outFileStr += `${indent}}\n`;
+    } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression && ${source}.parameters.length === 1) {\n`;
+      outFileStr += `${indent}  ${outputBegin}${source}.parameters[0]${outputEnd};\n`;
+      outFileStr += `${indent}} else {\n`;
+      outFileStr += `${indent}  throw new Error('${argName}: Parameter expression with single parameter expected');\n`;
+      outFileStr += `${indent}}\n`;
+    } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression) {\n`;
+      outFileStr += `${indent}  ${outputBegin}${source}.parameters${outputEnd};\n`;
+      outFileStr += `${indent}} else {\n`;
+      outFileStr += `${indent}  throw new Error('${argName}: Parameter expression expected');\n`;
+      outFileStr += `${indent}}\n`;
+    } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
+      outFileStr += `${indent}  ${outputBegin}${source}.arguments${outputEnd};\n`;
+      outFileStr += `${indent}} else {\n`;
+      outFileStr += `${indent}  throw new Error('${argName}: Compound expression expected');\n`;
+      outFileStr += `${indent}}\n`;
+    }
+  } else if (type instanceof Fmt.DefinitionRefExpression) {
+    let path = type.path;
+    if (!path.parentPath) {
+      let definition = inFile.definitions.getDefinition(path.name);
+      if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+        let subTarget = makeUniqueName('newItem', type);
         outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
-        outFileStr += `${indent}  ${outputBegin}${source}.arguments${outputEnd};\n`;
+        outFileStr += `${indent}  let ${subTarget} = new ObjectContents_${definition.name};\n`;
+        outFileStr += `${indent}  ${subTarget}.fromCompoundExpression(${source});\n`;
+        outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
         outFileStr += `${indent}} else {\n`;
         outFileStr += `${indent}  throw new Error('${argName}: Compound expression expected');\n`;
         outFileStr += `${indent}}\n`;
-      }
-    } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
-      let path = type.expression.path;
-      if (!path.parentPath) {
-        let definition = inFile.definitions.getDefinition(path.name);
-        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
-          let subTarget = 'newItem';
-          if (remainingArrayDimensions) {
-            subTarget += remainingArrayDimensions;
-          }
-          outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
-          outFileStr += `${indent}  let ${subTarget} = new ObjectContents_${definition.name};\n`;
-          outFileStr += `${indent}  ${subTarget}.fromCompoundExpression(${source});\n`;
-          outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
-          outFileStr += `${indent}} else {\n`;
-          outFileStr += `${indent}  throw new Error('${argName}: Compound expression expected');\n`;
-          outFileStr += `${indent}}\n`;
-        }
       }
     }
   }
@@ -207,7 +226,7 @@ function outputReadConvCode(inFile: Fmt.File, argName: string, source: string, t
   return outFileStr;
 }
 
-function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, memberName: string, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
+function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, memberName: string, type: Fmt.Expression, optional: boolean, list: boolean, indent: string): string {
   let outFileStr = '';
   let variableName = argName + 'Raw';
   if (list) {
@@ -229,18 +248,18 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
       outFileStr += `${indent}    this.${memberName} = [];\n`;
       outFileStr += `${indent}  }\n`;
     }
-    outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}!`, type, true, type.arrayDimensions, `${indent}  `);
+    outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}!`, type, true, `${indent}  `);
     outFileStr += `${indent}  index++;\n`;
     outFileStr += `${indent}}\n`;
   } else {
-    if (getMemberContentType(inFile, type.expression) || type.arrayDimensions) {
+    if (type instanceof Fmt.IndexedExpression || getMemberContentType(inFile, type)) {
       outFileStr += `${indent}let ${variableName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
       if (optional) {
         outFileStr += `${indent}if (${variableName} !== undefined) {\n`;
-        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, type.arrayDimensions, `${indent}  `);
+        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, `${indent}  `);
         outFileStr += `${indent}}\n`;
       } else {
-        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, type.arrayDimensions, indent);
+        outFileStr += outputReadConvCode(inFile, argName, variableName, `this.${memberName}`, type, false, indent);
       }
     } else {
       outFileStr += `${indent}this.${memberName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
@@ -249,67 +268,59 @@ function outputReadCode(inFile: Fmt.File, argName: string, argIndex: number, mem
   return outFileStr;
 }
 
-function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Type, optional: boolean, list: boolean, named: number, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, target: string, type: Fmt.Expression, optional: boolean, list: boolean, named: number, targetIsList: boolean, indent: string): string {
   let outFileStr = '';
   if (list) {
     let item = argName + 'Arg';
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, true, false, 0, targetIsList, remainingArrayDimensions, `${indent}  `);
+    outFileStr += outputWriteConvCode(inFile, argName, item, target, type, true, false, 0, targetIsList, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     let outputBegin = targetIsList ? `${target}.push(` : `${target}.add(`;
     let outputEnd = targetIsList ? `)` : named > 1 ? `, '${argName}', ${optional})` : named > 0 ? `, outputAllNames ? '${argName}' : undefined, ${optional})` : `, undefined, ${optional})`;
     let variableName = argName + 'Expr';
     if (targetIsList) {
-      variableName = 'newItem';
-      if (remainingArrayDimensions) {
-        variableName += remainingArrayDimensions;
-      }
+      variableName = makeUniqueName('newItem', type);
     }
-    if (remainingArrayDimensions) {
+    if (type instanceof Fmt.IndexedExpression) {
       outFileStr += `${indent}let ${variableName} = new Fmt.ArrayExpression;\n`;
       let subTarget = `${variableName}.items`;
       outFileStr += `${indent}${subTarget} = [];\n`;
-      let item = 'item';
-      if (remainingArrayDimensions - 1) {
-        item += remainingArrayDimensions - 1;
-      }
+      let item = makeUniqueName('item', type.body);
       outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-      outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type, true, false, 0, true, remainingArrayDimensions - 1, `${indent}  `);
+      outFileStr += outputWriteConvCode(inFile, argName, item, subTarget, type.body, true, false, 0, true, `${indent}  `);
       outFileStr += `${indent}}\n`;
       outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-    } else {
-      if (type.expression instanceof Fmt.MetaRefExpression) {
-        if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.IntegerExpression;\n`;
-          outFileStr += `${indent}${variableName}.value = ${source};\n`;
-          outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-        } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression;\n`;
-          outFileStr += `${indent}${variableName}.value = ${source};\n`;
-          outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-        } else if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
-          outFileStr += `${indent}${variableName}.parameters.push(${source});\n`;
-          outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-        } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
-          outFileStr += `${indent}${variableName}.parameters = ${source};\n`;
-          outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-        } else if (type.expression instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+    } else if (type instanceof Fmt.MetaRefExpression) {
+      if (type instanceof FmtMeta.MetaRefExpression_Int) {
+        outFileStr += `${indent}let ${variableName} = new Fmt.IntegerExpression;\n`;
+        outFileStr += `${indent}${variableName}.value = ${source};\n`;
+        outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+      } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+        outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression;\n`;
+        outFileStr += `${indent}${variableName}.value = ${source};\n`;
+        outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+      } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+        outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
+        outFileStr += `${indent}${variableName}.parameters.push(${source});\n`;
+        outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+      } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+        outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
+        outFileStr += `${indent}${variableName}.parameters = ${source};\n`;
+        outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+      } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
+        outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
+        outFileStr += `${indent}${variableName}.arguments = ${source};\n`;
+        outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+      }
+    } else if (type instanceof Fmt.DefinitionRefExpression) {
+      let path = type.path;
+      if (!path.parentPath) {
+        let definition = inFile.definitions.getDefinition(path.name);
+        if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
           outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-          outFileStr += `${indent}${variableName}.arguments = ${source};\n`;
+          outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true);\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-        }
-      } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
-        let path = type.expression.path;
-        if (!path.parentPath) {
-          let definition = inFile.definitions.getDefinition(path.name);
-          if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
-            outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-            outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true);\n`;
-            outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
-          }
         }
       }
     }
@@ -320,27 +331,24 @@ function outputWriteConvCode(inFile: Fmt.File, argName: string, source: string, 
   return outFileStr;
 }
 
-function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type: Fmt.Type, optional: boolean, list: boolean, named: number, indent: string): string {
+function outputWriteCode(inFile: Fmt.File, argName: string, source: string, type: Fmt.Expression, optional: boolean, list: boolean, named: number, indent: string): string {
   let outFileStr = '';
   if (optional) {
     outFileStr += `${indent}if (${source} !== undefined) {\n`;
-    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, false, type.arrayDimensions, `${indent}  `);
+    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, false, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
-    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, false, type.arrayDimensions, indent);
+    outFileStr += outputWriteConvCode(inFile, argName, source, 'argumentList', type, optional, list, named, false, indent);
   }
   return outFileStr;
 }
 
-function outputTraversalCode(inFile: Fmt.File, source: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+function outputTraversalCode(inFile: Fmt.File, source: string, type: Fmt.Expression, indent: string): string {
   let outFileStr = '';
-  if (remainingArrayDimensions) {
-    let item = 'item';
-    if (remainingArrayDimensions - 1) {
-      item += remainingArrayDimensions - 1;
-    }
+  if (type instanceof Fmt.IndexedExpression) {
+    let item = makeUniqueName('item', type.body);
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputTraversalCode(inFile, item, type, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputTraversalCode(inFile, item, type.body, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
     outFileStr += `${indent}${source}.traverse(fn);\n`;
@@ -348,28 +356,22 @@ function outputTraversalCode(inFile: Fmt.File, source: string, type: Fmt.Type, r
   return outFileStr;
 }
 
-function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string, type: Fmt.Type, targetIsList: boolean, remainingArrayDimensions: number, indent: string): string {
+function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string, type: Fmt.Expression, targetIsList: boolean, indent: string): string {
   let outFileStr = '';
   let subTarget = target;
   let init = target;
   if (targetIsList) {
-    subTarget = 'newItem';
-    if (remainingArrayDimensions) {
-      subTarget += remainingArrayDimensions;
-    }
+    subTarget = makeUniqueName('newItem', type);
     init = `let ${subTarget}`;
   }
-  if (remainingArrayDimensions) {
+  if (type instanceof Fmt.IndexedExpression) {
     outFileStr += `${indent}${init} = [];\n`;
-    let item = 'item';
-    if (remainingArrayDimensions - 1) {
-      item += remainingArrayDimensions - 1;
-    }
+    let item = makeUniqueName('item', type.body);
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputSubstitutionCode(inFile, item, subTarget, type, true, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputSubstitutionCode(inFile, item, subTarget, type.body, true, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
-    let contentType = getMemberContentType(inFile, type.expression);
+    let contentType = getMemberContentType(inFile, type);
     if (contentType && (!contentType.startsWith('Fmt.') || contentType.endsWith('List'))) {
       if (contentType.startsWith('Fmt.') && contentType.endsWith('List')) {
         outFileStr += `${indent}${init} = Object.create(${contentType}.prototype);\n`;
@@ -396,17 +398,12 @@ function outputSubstitutionCode(inFile: Fmt.File, source: string, target: string
   return outFileStr;
 }
 
-function outputComparisonCode(inFile: Fmt.File, left: string, right: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+function outputComparisonCode(inFile: Fmt.File, left: string, right: string, type: Fmt.Expression, indent: string): string {
   let outFileStr = '';
-  if (remainingArrayDimensions) {
-    let index = 'i';
-    let leftItem = 'leftItem';
-    let rightItem = 'rightItem';
-    if (remainingArrayDimensions - 1) {
-      index += remainingArrayDimensions - 1;
-      leftItem += remainingArrayDimensions - 1;
-      rightItem += remainingArrayDimensions - 1;
-    }
+  if (type instanceof Fmt.IndexedExpression) {
+    let index = makeUniqueName('i', type.body);
+    let leftItem = makeUniqueName('leftItem', type.body);
+    let rightItem = makeUniqueName('rightItem', type.body);
     outFileStr += `${indent}if (${left} || ${right}) {\n`;
     outFileStr += `${indent}  if (!${left} || !${right} || ${left}.length !== ${right}.length) {\n`;
     outFileStr += `${indent}    return false;\n`;
@@ -414,25 +411,23 @@ function outputComparisonCode(inFile: Fmt.File, left: string, right: string, typ
     outFileStr += `${indent}  for (let ${index} = 0; ${index} < ${left}.length; ${index}++) {\n`;
     outFileStr += `${indent}    let ${leftItem} = ${left}[${index}];\n`;
     outFileStr += `${indent}    let ${rightItem} = ${right}[${index}];\n`;
-    outFileStr += outputComparisonCode(inFile, leftItem, rightItem, type, remainingArrayDimensions - 1, `${indent}    `);
+    outFileStr += outputComparisonCode(inFile, leftItem, rightItem, type.body, `${indent}    `);
     outFileStr += `${indent}  }\n`;
     outFileStr += `${indent}}\n`;
+  } else if (type instanceof FmtMeta.MetaRefExpression_Int) {
+    outFileStr += `${indent}if (${left} !== undefined || ${right} !== undefined) {\n`;
+    outFileStr += `${indent}  if (${left} === undefined || ${right} === undefined || !${left}.eq(${right})) {\n`;
+    outFileStr += `${indent}    return false;\n`;
+    outFileStr += `${indent}  }\n`;
+    outFileStr += `${indent}}\n`;
+  } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+    outFileStr += `${indent}if (${left} !== ${right}) {\n`;
+    outFileStr += `${indent}  return false;\n`;
+    outFileStr += `${indent}}\n`;
   } else {
-    if (type.expression instanceof FmtMeta.MetaRefExpression_Int) {
-      outFileStr += `${indent}if (${left} !== undefined || ${right} !== undefined) {\n`;
-      outFileStr += `${indent}  if (${left} === undefined || ${right} === undefined || !${left}.eq(${right})) {\n`;
-      outFileStr += `${indent}    return false;\n`;
-      outFileStr += `${indent}  }\n`;
-      outFileStr += `${indent}}\n`;
-    } else if (type.expression instanceof FmtMeta.MetaRefExpression_String) {
-      outFileStr += `${indent}if (${left} !== ${right}) {\n`;
-      outFileStr += `${indent}  return false;\n`;
-      outFileStr += `${indent}}\n`;
-    } else {
-      outFileStr += `${indent}if (!Fmt.areObjectsEquivalent(${left}, ${right}, fn, replacedParameters)) {\n`;
-      outFileStr += `${indent}  return false;\n`;
-      outFileStr += `${indent}}\n`;
-    }
+    outFileStr += `${indent}if (!Fmt.areObjectsEquivalent(${left}, ${right}, fn, replacedParameters)) {\n`;
+    outFileStr += `${indent}  return false;\n`;
+    outFileStr += `${indent}}\n`;
   }
   return outFileStr;
 }
@@ -492,7 +487,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
   let metaModel = inFile.definitions[0];
 
   for (let definition of inFile.definitions) {
-    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+    if (definition.type instanceof FmtMeta.MetaRefExpression_MetaModel) {
       continue;
     }
 
@@ -559,9 +554,9 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
-          if (!(member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String)) {
+          if (!(member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String)) {
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputTraversalCode(inFile, `this.${memberName}`, member.type, member.type.arrayDimensions, '      ');
+            outFileStr += outputTraversalCode(inFile, `this.${memberName}`, member.type, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -577,11 +572,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
-          if (member.type.expression instanceof FmtMeta.MetaRefExpression_Int || member.type.expression instanceof FmtMeta.MetaRefExpression_String) {
+          if (member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String) {
             outFileStr += `    result.${memberName} = this.${memberName};\n`;
           } else {
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, member.type, false, member.type.arrayDimensions, '      ');
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, member.type, false, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -596,7 +591,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
         for (let member of definition.contents.members) {
           let memberName = translateMemberName(member.name);
-          outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `objectContents.${memberName}`, member.type, member.type.arrayDimensions, '    ');
+          outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `objectContents.${memberName}`, member.type, '    ');
         }
       }
       if (superDefinition) {
@@ -655,15 +650,11 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
         outFileStr += `    let changed = false;\n`;
         for (let parameter of definition.parameters) {
           let memberName = translateMemberName(parameter.name);
-          if ((parameter.type.expression instanceof FmtMeta.MetaRefExpression_Int || parameter.type.expression instanceof FmtMeta.MetaRefExpression_String) && !parameter.list) {
+          if ((parameter.type instanceof FmtMeta.MetaRefExpression_Int || parameter.type instanceof FmtMeta.MetaRefExpression_String) && !parameter.list) {
             outFileStr += `    result.${memberName} = this.${memberName};\n`;
           } else {
-            let arrayDimensions = getMemberContentType(inFile, parameter.type.expression) ? parameter.type.arrayDimensions : 0;
-            if (parameter.list) {
-              arrayDimensions++;
-            }
             outFileStr += `    if (this.${memberName}) {\n`;
-            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, parameter.type, false, arrayDimensions, '      ');
+            outFileStr += outputSubstitutionCode(inFile, `this.${memberName}`, `result.${memberName}`, getEffectiveType(inFile, parameter.type, parameter.list), false, '      ');
             outFileStr += `    }\n`;
           }
         }
@@ -683,11 +674,7 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
       outFileStr += `    }\n`;
       for (let parameter of definition.parameters) {
         let memberName = translateMemberName(parameter.name);
-        let arrayDimensions = getMemberContentType(inFile, parameter.type.expression) ? parameter.type.arrayDimensions : 0;
-        if (parameter.list) {
-          arrayDimensions++;
-        }
-        outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `expression.${memberName}`, parameter.type, arrayDimensions, '    ');
+        outFileStr += outputComparisonCode(inFile, `this.${memberName}`, `expression.${memberName}`, getEffectiveType(inFile, parameter.type, parameter.list), '    ');
       }
       outFileStr += `    return true;\n`;
       outFileStr += `  }\n`;
@@ -715,35 +702,30 @@ function outputDeclarations(inFile: Fmt.File, visibleTypeNames: string[]): strin
   return outFileStr;
 }
 
-function outputExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+function outputExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Expression, indent: string): string {
   let outFileStr = '';
-  if (remainingArrayDimensions) {
-    let item = 'item';
-    if (remainingArrayDimensions - 1) {
-      item += remainingArrayDimensions - 1;
-    }
+  if (type instanceof Fmt.IndexedExpression) {
+    let item = makeUniqueName('item', type.body);
     outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-    outFileStr += outputExportValueCode(inFile, argName, item, context, indexParameterLists, type, remainingArrayDimensions - 1, `${indent}  `);
+    outFileStr += outputExportValueCode(inFile, argName, item, context, indexParameterLists, type.body, `${indent}  `);
     outFileStr += `${indent}}\n`;
-  } else {
-    if (type.expression instanceof Fmt.MetaRefExpression) {
-      let indices = 'indexParameterLists';
-      if (indexParameterLists) {
-        indices = `${indices} ? [${[...indexParameterLists, `...${indices}`].join(', ')}] : [${indexParameterLists.join(', ')}]`;
-      }
-      if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-        outFileStr += `${indent}${context} = this.getParameterContext(${source}, ${context}, ${indices});\n`;
-      } else if (type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
-        outFileStr += `${indent}${context} = this.getParameterListContext(${source}, ${context}, ${indices});\n`;
-      }
-    } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
-      let path = type.expression.path;
-      if (!path.parentPath) {
-        let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
-        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
-          for (; definition; definition = getSuperDefinition(inFile, definition)) {
-            outFileStr += outputDefinitionExportCode(inFile, definition, source, context, indexParameterLists, indent);
-          }
+  } else if (type instanceof Fmt.MetaRefExpression) {
+    let indices = 'indexParameterLists';
+    if (indexParameterLists) {
+      indices = `${indices} ? [${[...indexParameterLists, `...${indices}`].join(', ')}] : [${indexParameterLists.join(', ')}]`;
+    }
+    if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
+      outFileStr += `${indent}${context} = this.getParameterContext(${source}, ${context}, ${indices});\n`;
+    } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+      outFileStr += `${indent}${context} = this.getParameterListContext(${source}, ${context}, ${indices});\n`;
+    }
+  } else if (type instanceof Fmt.DefinitionRefExpression) {
+    let path = type.path;
+    if (!path.parentPath) {
+      let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
+      if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+        for (; definition; definition = getSuperDefinition(inFile, definition)) {
+          outFileStr += outputDefinitionExportCode(inFile, definition, source, context, indexParameterLists, indent);
         }
       }
     }
@@ -751,18 +733,15 @@ function outputExportValueCode(inFile: Fmt.File, argName: string, source: string
   return outFileStr;
 }
 
-function outputExportCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Type, optional: boolean, list: boolean, indent: string): string {
+function outputExportCode(inFile: Fmt.File, argName: string, source: string, context: string, indexParameterLists: string[] | undefined, type: Fmt.Expression, optional: boolean, list: boolean, indent: string): string {
   let outFileStr = '';
-  let arrayDimensions = getMemberContentType(inFile, type.expression) ? type.arrayDimensions : 0;
-  if (list) {
-    arrayDimensions++;
-  }
+  let effectiveType = getEffectiveType(inFile, type, list);
   if (optional) {
     outFileStr += `${indent}if (${source} !== undefined) {\n`;
-    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, type, arrayDimensions, `${indent}  `);
+    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, effectiveType, `${indent}  `);
     outFileStr += `${indent}}\n`;
   } else {
-    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, type, arrayDimensions, indent);
+    outFileStr += outputExportValueCode(inFile, argName, source, context, indexParameterLists, effectiveType, indent);
   }
   return outFileStr;
 }
@@ -800,14 +779,11 @@ function outputDefinitionExportCode(inFile: Fmt.File, definition: Fmt.Definition
   return outFileStr;
 }
 
-function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, type: Fmt.Type, remainingArrayDimensions: number, indent: string): string {
+function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: string, context: string, type: Fmt.Expression, indent: string): string {
   let outFileStr = '';
-  if (remainingArrayDimensions) {
-    let item = 'item';
-    if (remainingArrayDimensions - 1) {
-      item += remainingArrayDimensions - 1;
-    }
-    let exportValueCode = outputRawExportValueCode(inFile, argName, item, context, type, remainingArrayDimensions - 1, `${indent}    `);
+  if (type instanceof Fmt.IndexedExpression) {
+    let item = makeUniqueName('item', type.body);
+    let exportValueCode = outputRawExportValueCode(inFile, argName, item, context, type.body, `${indent}    `);
     if (exportValueCode) {
       outFileStr += `${indent}if (${source} instanceof Fmt.ArrayExpression) {\n`;
       outFileStr += `${indent}  for (let ${item} of ${source}.items) {\n`;
@@ -815,25 +791,23 @@ function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: str
       outFileStr += `${indent}  }\n`;
       outFileStr += `${indent}}\n`;
     }
-  } else {
-    if (type.expression instanceof Fmt.MetaRefExpression) {
-      if (type.expression instanceof FmtMeta.MetaRefExpression_SingleParameter || type.expression instanceof FmtMeta.MetaRefExpression_ParameterList) {
-        outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression) {\n`;
-        outFileStr += `${indent}  ${context} = this.getParameterListContext(${source}.parameters, ${context});\n`;
-        outFileStr += `${indent}}\n`;
-      }
-    } else if (type.expression instanceof Fmt.DefinitionRefExpression) {
-      let path = type.expression.path;
-      if (!path.parentPath) {
-        let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
-        if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
-          for (; definition; definition = getSuperDefinition(inFile, definition)) {
-            let definitionExportCode = outputRawDefinitionExportCode(inFile, definition, `${source}.arguments`, context, `${indent}  `);
-            if (definitionExportCode) {
-              outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
-              outFileStr += definitionExportCode;
-              outFileStr += `${indent}}\n`;
-            }
+  } else if (type instanceof Fmt.MetaRefExpression) {
+    if (type instanceof FmtMeta.MetaRefExpression_SingleParameter || type instanceof FmtMeta.MetaRefExpression_ParameterList) {
+      outFileStr += `${indent}if (${source} instanceof Fmt.ParameterExpression) {\n`;
+      outFileStr += `${indent}  ${context} = this.getParameterListContext(${source}.parameters, ${context});\n`;
+      outFileStr += `${indent}}\n`;
+    }
+  } else if (type instanceof Fmt.DefinitionRefExpression) {
+    let path = type.path;
+    if (!path.parentPath) {
+      let definition: Fmt.Definition | undefined = inFile.definitions.getDefinition(path.name);
+      if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+        for (; definition; definition = getSuperDefinition(inFile, definition)) {
+          let definitionExportCode = outputRawDefinitionExportCode(inFile, definition, `${source}.arguments`, context, `${indent}  `);
+          if (definitionExportCode) {
+            outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
+            outFileStr += definitionExportCode;
+            outFileStr += `${indent}}\n`;
           }
         }
       }
@@ -842,14 +816,11 @@ function outputRawExportValueCode(inFile: Fmt.File, argName: string, source: str
   return outFileStr;
 }
 
-function outputRawExportCode(inFile: Fmt.File, argName: string, argIndex: number, source: string, context: string, type: Fmt.Type, list: boolean, indent: string): string {
+function outputRawExportCode(inFile: Fmt.File, argName: string, argIndex: number, source: string, context: string, type: Fmt.Expression, list: boolean, indent: string): string {
   let outFileStr = '';
-  let arrayDimensions = getMemberContentType(inFile, type.expression) ? type.arrayDimensions : 0;
-  if (list) {
-    arrayDimensions++;
-  }
   let value = `${argName}Value`;
-  let exportValueCode = outputRawExportValueCode(inFile, argName, value, context, type, arrayDimensions, indent);
+  let effectiveType = getEffectiveType(inFile, type, list);
+  let exportValueCode = outputRawExportValueCode(inFile, argName, value, context, effectiveType, indent);
   if (exportValueCode) {
     outFileStr += `${indent}let ${value} = ${source}.getOptionalValue('${argName}', ${argIndex});\n`;
     outFileStr += exportValueCode;
@@ -893,7 +864,7 @@ function outputMemberDependencyCode(inFile: Fmt.File, visibleTypeNames: string[]
             }
             let dependencyDefinition = inFile.definitions.getDefinition(dependency.path.name);
             if (isVisibleType(visibleTypeNames, dependencyDefinition)) {
-              outFileStr += `${indent}    if (context instanceof DefinitionContentsContext && context.definition.type.expression instanceof MetaRefExpression_${dependency.path.name}) {\n`;
+              outFileStr += `${indent}    if (context instanceof DefinitionContentsContext && context.definition.type instanceof MetaRefExpression_${dependency.path.name}) {\n`;
               outFileStr += `${indent}      break;\n`;
               outFileStr += `${indent}    }\n`;
             }
@@ -982,7 +953,7 @@ function outputDefinitionMemberDependencyCode(inFile: Fmt.File, definitionTypes:
 function outputExpressionMemberDependencyCode(inFile: Fmt.File, visibleTypeNames: string[], indent: string): string {
   let outFileStr = '';
   for (let definition of inFile.definitions) {
-    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
+    if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, definition)) {
       let memberDependencyCode = outputMemberDependencyCode(inFile, visibleTypeNames, definition, 'argument', 'argumentIndex', 'previousArguments', 'context', `${indent}  `);
       if (memberDependencyCode) {
         outFileStr += `${indent}if (currentContext.objectContentsClass === ObjectContents_${definition.name}) {\n`;
@@ -997,7 +968,7 @@ function outputExpressionMemberDependencyCode(inFile: Fmt.File, visibleTypeNames
 function outputDefinitionParameterDependencyCode(inFile: Fmt.File, visibleTypeNames: string[], indent: string): string {
   let outFileStr = '';
   for (let definition of inFile.definitions) {
-    if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+    if (definition.type instanceof FmtMeta.MetaRefExpression_MetaModel) {
       continue;
     }
     if (isVisibleType(visibleTypeNames, definition)) {
@@ -1014,8 +985,12 @@ function outputDefinitionParameterDependencyCode(inFile: Fmt.File, visibleTypeNa
 
 function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, indent: string): string {
   let outFileStr = '';
-  if (param.type.expression instanceof Fmt.DefinitionRefExpression) {
-    let path = param.type.expression.path;
+  let type = param.type;
+  while (type instanceof Fmt.IndexedExpression) {
+    type = type.body;
+  }
+  if (type instanceof Fmt.DefinitionRefExpression) {
+    let path = type.path;
     if (path.parentPath) {
       if (path.parentPath instanceof Fmt.NamedPathItem) {
         outFileStr += `${indent}context = new Ctx.DerivedContext(context);\n`;
@@ -1027,7 +1002,7 @@ function outputArgumentTypeContext(inFile: Fmt.File, param: Fmt.Parameter, inden
       }
     } else {
       let typeDefinition = inFile.definitions.getDefinition(path.name);
-      if (typeDefinition.type.expression instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, typeDefinition)) {
+      if (typeDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && hasObjectContents(inFile, typeDefinition)) {
         outFileStr += `${indent}context = new ArgumentTypeContext(ObjectContents_${path.name}, context);\n`;
       }
     }
@@ -1097,7 +1072,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
         if (hasDefinitionTypes) {
           outFileStr += `\n            || `;
         } else {
-          outFileStr += `      let type = parent.type.expression;\n`;
+          outFileStr += `      let type = parent.type;\n`;
           outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
           outFileStr += `        if (`;
           hasDefinitionTypes = true;
@@ -1133,7 +1108,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     let definitionMemberDependencyCode = outputDefinitionMemberDependencyCode(inFile, metaModel.contents.definitionTypes, visibleTypeNames, '        ');
     if (definitionMemberDependencyCode) {
       outFileStr += `    if (parent instanceof Fmt.Definition) {\n`;
-      outFileStr += `      let type = parent.type.expression;\n`;
+      outFileStr += `      let type = parent.type;\n`;
       outFileStr += `      if (type instanceof Fmt.MetaRefExpression) {\n`;
       outFileStr += definitionMemberDependencyCode;
       outFileStr += `      }\n`;
@@ -1159,7 +1134,7 @@ function outputMetaDefinitions(inFile: Fmt.File, visibleTypeNames: string[]): st
     outFileStr += `  }\n`;
     let hasExports = false;
     for (let definition of inFile.definitions) {
-      if (definition.type.expression instanceof FmtMeta.MetaRefExpression_MetaModel) {
+      if (definition.type instanceof FmtMeta.MetaRefExpression_MetaModel) {
         continue;
       }
       if (isVisibleType(visibleTypeNames, definition)) {
