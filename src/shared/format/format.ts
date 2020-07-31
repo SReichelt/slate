@@ -1094,7 +1094,7 @@ export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
   }
 }
 
-function areObjectsEquivalent<T extends Comparable<T>>(left: T | undefined, right: T | undefined, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
+export function areObjectsEquivalent<T extends Comparable<T>>(left: T | undefined, right: T | undefined, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
   if (!left && !right) {
     return true;
   }
@@ -1104,7 +1104,7 @@ function areObjectsEquivalent<T extends Comparable<T>>(left: T | undefined, righ
   return false;
 }
 
-function areListsEquivalent<T extends Comparable<T>>(left: T[] | undefined, right: T[] | undefined, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
+export function areListsEquivalent<T extends Comparable<T>>(left: T[] | undefined, right: T[] | undefined, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
   let compareFn = (leftItem: T, rightItem: T) => leftItem.isEquivalentTo(rightItem, fn, replacedParameters);
   return compareLists(left, right, compareFn, replacedParameters);
 }

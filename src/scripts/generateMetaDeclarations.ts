@@ -429,10 +429,8 @@ function outputComparisonCode(inFile: Fmt.File, left: string, right: string, typ
       outFileStr += `${indent}  return false;\n`;
       outFileStr += `${indent}}\n`;
     } else {
-      outFileStr += `${indent}if (${left} || ${right}) {\n`;
-      outFileStr += `${indent}  if (!${left} || !${right} || !${left}.isEquivalentTo(${right}, fn, replacedParameters)) {\n`;
-      outFileStr += `${indent}    return false;\n`;
-      outFileStr += `${indent}  }\n`;
+      outFileStr += `${indent}if (!Fmt.areObjectsEquivalent(${left}, ${right}, fn, replacedParameters)) {\n`;
+      outFileStr += `${indent}  return false;\n`;
       outFileStr += `${indent}}\n`;
     }
   }

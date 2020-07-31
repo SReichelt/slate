@@ -123,30 +123,20 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.notation, objectContents.notation, fn, replacedParameters)) {
+      return false;
     }
-    if (this.symbol || objectContents.symbol) {
-      if (!this.symbol || !objectContents.symbol || !this.symbol.isEquivalentTo(objectContents.symbol, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.symbol, objectContents.symbol, fn, replacedParameters)) {
+      return false;
     }
-    if (this.useSymbol || objectContents.useSymbol) {
-      if (!this.useSymbol || !objectContents.useSymbol || !this.useSymbol.isEquivalentTo(objectContents.useSymbol, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.useSymbol, objectContents.useSymbol, fn, replacedParameters)) {
+      return false;
     }
-    if (this.elements || objectContents.elements) {
-      if (!this.elements || !objectContents.elements || !this.elements.isEquivalentTo(objectContents.elements, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.elements, objectContents.elements, fn, replacedParameters)) {
+      return false;
     }
-    if (this.context || objectContents.context) {
-      if (!this.context || !objectContents.context || !this.context.isEquivalentTo(objectContents.context, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.context, objectContents.context, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -295,35 +285,23 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.operand || objectContents.operand) {
-      if (!this.operand || !objectContents.operand || !this.operand.isEquivalentTo(objectContents.operand, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.operand, objectContents.operand, fn, replacedParameters)) {
+      return false;
     }
-    if (this.property || objectContents.property) {
-      if (!this.property || !objectContents.property || !this.property.isEquivalentTo(objectContents.property, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.property, objectContents.property, fn, replacedParameters)) {
+      return false;
     }
-    if (this.singular || objectContents.singular) {
-      if (!this.singular || !objectContents.singular || !this.singular.isEquivalentTo(objectContents.singular, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.singular, objectContents.singular, fn, replacedParameters)) {
+      return false;
     }
-    if (this.plural || objectContents.plural) {
-      if (!this.plural || !objectContents.plural || !this.plural.isEquivalentTo(objectContents.plural, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.plural, objectContents.plural, fn, replacedParameters)) {
+      return false;
     }
-    if (this.article || objectContents.article) {
-      if (!this.article || !objectContents.article || !this.article.isEquivalentTo(objectContents.article, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.article, objectContents.article, fn, replacedParameters)) {
+      return false;
     }
-    if (this.isFeature || objectContents.isFeature) {
-      if (!this.isFeature || !objectContents.isFeature || !this.isFeature.isEquivalentTo(objectContents.isFeature, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.isFeature, objectContents.isFeature, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -412,25 +390,17 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.operator || objectContents.operator) {
-      if (!this.operator || !objectContents.operator || !this.operator.isEquivalentTo(objectContents.operator, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.operator, objectContents.operator, fn, replacedParameters)) {
+      return false;
     }
-    if (this.predicate || objectContents.predicate) {
-      if (!this.predicate || !objectContents.predicate || !this.predicate.isEquivalentTo(objectContents.predicate, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.predicate, objectContents.predicate, fn, replacedParameters)) {
+      return false;
     }
-    if (this.definitionNotation || objectContents.definitionNotation) {
-      if (!this.definitionNotation || !objectContents.definitionNotation || !this.definitionNotation.isEquivalentTo(objectContents.definitionNotation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.definitionNotation, objectContents.definitionNotation, fn, replacedParameters)) {
+      return false;
     }
-    if (this.argument || objectContents.argument) {
-      if (!this.argument || !objectContents.argument || !this.argument.isEquivalentTo(objectContents.argument, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.argument, objectContents.argument, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -636,10 +606,8 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_not)) {
       return false;
     }
-    if (this.condition || expression.condition) {
-      if (!this.condition || !expression.condition || !this.condition.isEquivalentTo(expression.condition, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.condition, expression.condition, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -699,20 +667,14 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_opt)) {
       return false;
     }
-    if (this.param || expression.param) {
-      if (!this.param || !expression.param || !this.param.isEquivalentTo(expression.param, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.param, expression.param, fn, replacedParameters)) {
+      return false;
     }
-    if (this.valueIfPresent || expression.valueIfPresent) {
-      if (!this.valueIfPresent || !expression.valueIfPresent || !this.valueIfPresent.isEquivalentTo(expression.valueIfPresent, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.valueIfPresent, expression.valueIfPresent, fn, replacedParameters)) {
+      return false;
     }
-    if (this.valueIfMissing || expression.valueIfMissing) {
-      if (!this.valueIfMissing || !expression.valueIfMissing || !this.valueIfMissing.isEquivalentTo(expression.valueIfMissing, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.valueIfMissing, expression.valueIfMissing, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -772,10 +734,8 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.items.length; i++) {
         let leftItem = this.items[i];
         let rightItem = expression.items[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -846,25 +806,19 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_for)) {
       return false;
     }
-    if (this.param || expression.param) {
-      if (!this.param || !expression.param || !this.param.isEquivalentTo(expression.param, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.param, expression.param, fn, replacedParameters)) {
+      return false;
     }
     if (this.dimension !== undefined || expression.dimension !== undefined) {
       if (this.dimension === undefined || expression.dimension === undefined || !this.dimension.eq(expression.dimension)) {
         return false;
       }
     }
-    if (this.item || expression.item) {
-      if (!this.item || !expression.item || !this.item.isEquivalentTo(expression.item, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.item, expression.item, fn, replacedParameters)) {
+      return false;
     }
-    if (this.separator || expression.separator) {
-      if (!this.separator || !expression.separator || !this.separator.isEquivalentTo(expression.separator, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.separator, expression.separator, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -958,10 +912,8 @@ export class MetaRefExpression_rev extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_rev)) {
       return false;
     }
-    if (this.list || expression.list) {
-      if (!this.list || !expression.list || !this.list.isEquivalentTo(expression.list, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.list, expression.list, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -1021,10 +973,8 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.items.length; i++) {
         let leftItem = this.items[i];
         let rightItem = expression.items[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1086,10 +1036,8 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.items.length; i++) {
         let leftItem = this.items[i];
         let rightItem = expression.items[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1179,25 +1127,17 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.parameters || objectContents.parameters) {
-      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, objectContents.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.originalParameter || objectContents.originalParameter) {
-      if (!this.originalParameter || !objectContents.originalParameter || !this.originalParameter.isEquivalentTo(objectContents.originalParameter, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.originalParameter, objectContents.originalParameter, fn, replacedParameters)) {
+      return false;
     }
-    if (this.originalParameterValue || objectContents.originalParameterValue) {
-      if (!this.originalParameterValue || !objectContents.originalParameterValue || !this.originalParameterValue.isEquivalentTo(objectContents.originalParameterValue, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.originalParameterValue, objectContents.originalParameterValue, fn, replacedParameters)) {
+      return false;
     }
-    if (this.abbreviation || objectContents.abbreviation) {
-      if (!this.abbreviation || !objectContents.abbreviation || !this.abbreviation.isEquivalentTo(objectContents.abbreviation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.abbreviation, objectContents.abbreviation, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -1305,30 +1245,20 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.parameter || objectContents.parameter) {
-      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameter, objectContents.parameter, fn, replacedParameters)) {
+      return false;
     }
-    if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.notation, objectContents.notation, fn, replacedParameters)) {
+      return false;
     }
-    if (this.singularName || objectContents.singularName) {
-      if (!this.singularName || !objectContents.singularName || !this.singularName.isEquivalentTo(objectContents.singularName, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.singularName, objectContents.singularName, fn, replacedParameters)) {
+      return false;
     }
-    if (this.pluralName || objectContents.pluralName) {
-      if (!this.pluralName || !objectContents.pluralName || !this.pluralName.isEquivalentTo(objectContents.pluralName, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.pluralName, objectContents.pluralName, fn, replacedParameters)) {
+      return false;
     }
-    if (this.nameOptional || objectContents.nameOptional) {
-      if (!this.nameOptional || !objectContents.nameOptional || !this.nameOptional.isEquivalentTo(objectContents.nameOptional, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.nameOptional, objectContents.nameOptional, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }

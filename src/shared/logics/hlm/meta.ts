@@ -115,15 +115,11 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.properties || objectContents.properties) {
-      if (!this.properties || !objectContents.properties || !this.properties.isEquivalentTo(objectContents.properties, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.properties, objectContents.properties, fn, replacedParameters)) {
+      return false;
     }
-    if (this.notation || objectContents.notation) {
-      if (!this.notation || !objectContents.notation || !this.notation.isEquivalentTo(objectContents.notation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.notation, objectContents.notation, fn, replacedParameters)) {
+      return false;
     }
     if (this.abbreviations || objectContents.abbreviations) {
       if (!this.abbreviations || !objectContents.abbreviations || this.abbreviations.length !== objectContents.abbreviations.length) {
@@ -132,17 +128,13 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       for (let i = 0; i < this.abbreviations.length; i++) {
         let leftItem = this.abbreviations[i];
         let rightItem = objectContents.abbreviations[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.definitionNotation || objectContents.definitionNotation) {
-      if (!this.definitionNotation || !objectContents.definitionNotation || !this.definitionNotation.isEquivalentTo(objectContents.definitionNotation, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.definitionNotation, objectContents.definitionNotation, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -201,10 +193,8 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.embedding || objectContents.embedding) {
-      if (!this.embedding || !objectContents.embedding || !this.embedding.isEquivalentTo(objectContents.embedding, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.embedding, objectContents.embedding, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -344,25 +334,17 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.parameter || objectContents.parameter) {
-      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameter, objectContents.parameter, fn, replacedParameters)) {
+      return false;
     }
-    if (this.target || objectContents.target) {
-      if (!this.target || !objectContents.target || !this.target.isEquivalentTo(objectContents.target, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.target, objectContents.target, fn, replacedParameters)) {
+      return false;
     }
-    if (this.full || objectContents.full) {
-      if (!this.full || !objectContents.full || !this.full.isEquivalentTo(objectContents.full, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.full, objectContents.full, fn, replacedParameters)) {
+      return false;
     }
-    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
-      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.wellDefinednessProof, objectContents.wellDefinednessProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -446,15 +428,11 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.equalityDefinition || objectContents.equalityDefinition) {
-      if (!this.equalityDefinition || !objectContents.equalityDefinition || !this.equalityDefinition.isEquivalentTo(objectContents.equalityDefinition, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.equalityDefinition, objectContents.equalityDefinition, fn, replacedParameters)) {
+      return false;
     }
-    if (this.rewrite || objectContents.rewrite) {
-      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.rewrite, objectContents.rewrite, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -717,15 +695,11 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.leftParameters || objectContents.leftParameters) {
-      if (!this.leftParameters || !objectContents.leftParameters || !this.leftParameters.isEquivalentTo(objectContents.leftParameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.leftParameters, objectContents.leftParameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.rightParameters || objectContents.rightParameters) {
-      if (!this.rightParameters || !objectContents.rightParameters || !this.rightParameters.isEquivalentTo(objectContents.rightParameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.rightParameters, objectContents.rightParameters, fn, replacedParameters)) {
+      return false;
     }
     if (this.definition || objectContents.definition) {
       if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
@@ -734,10 +708,8 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       for (let i = 0; i < this.definition.length; i++) {
         let leftItem = this.definition[i];
         let rightItem = objectContents.definition[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -748,32 +720,22 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       for (let i = 0; i < this.equivalenceProofs.length; i++) {
         let leftItem = this.equivalenceProofs[i];
         let rightItem = objectContents.equivalenceProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.reflexivityProof || objectContents.reflexivityProof) {
-      if (!this.reflexivityProof || !objectContents.reflexivityProof || !this.reflexivityProof.isEquivalentTo(objectContents.reflexivityProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.reflexivityProof, objectContents.reflexivityProof, fn, replacedParameters)) {
+      return false;
     }
-    if (this.symmetryProof || objectContents.symmetryProof) {
-      if (!this.symmetryProof || !objectContents.symmetryProof || !this.symmetryProof.isEquivalentTo(objectContents.symmetryProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.symmetryProof, objectContents.symmetryProof, fn, replacedParameters)) {
+      return false;
     }
-    if (this.transitivityProof || objectContents.transitivityProof) {
-      if (!this.transitivityProof || !objectContents.transitivityProof || !this.transitivityProof.isEquivalentTo(objectContents.transitivityProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.transitivityProof, objectContents.transitivityProof, fn, replacedParameters)) {
+      return false;
     }
-    if (this.isomorphic || objectContents.isomorphic) {
-      if (!this.isomorphic || !objectContents.isomorphic || !this.isomorphic.isEquivalentTo(objectContents.isomorphic, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.isomorphic, objectContents.isomorphic, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -832,15 +794,11 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.value || objectContents.value) {
-      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.value, objectContents.value, fn, replacedParameters)) {
+      return false;
     }
-    if (this.theorem || objectContents.theorem) {
-      if (!this.theorem || !objectContents.theorem || !this.theorem.isEquivalentTo(objectContents.theorem, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.theorem, objectContents.theorem, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -991,10 +949,8 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       for (let i = 0; i < this.definition.length; i++) {
         let leftItem = this.definition[i];
         let rightItem = objectContents.definition[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1005,22 +961,16 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       for (let i = 0; i < this.equalityProofs.length; i++) {
         let leftItem = this.equalityProofs[i];
         let rightItem = objectContents.equalityProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.setRestriction || objectContents.setRestriction) {
-      if (!this.setRestriction || !objectContents.setRestriction || !this.setRestriction.isEquivalentTo(objectContents.setRestriction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.setRestriction, objectContents.setRestriction, fn, replacedParameters)) {
+      return false;
     }
-    if (this.setRestrictionProof || objectContents.setRestrictionProof) {
-      if (!this.setRestrictionProof || !objectContents.setRestrictionProof || !this.setRestrictionProof.isEquivalentTo(objectContents.setRestrictionProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.setRestrictionProof, objectContents.setRestrictionProof, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -1234,10 +1184,8 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       for (let i = 0; i < this.definition.length; i++) {
         let leftItem = this.definition[i];
         let rightItem = objectContents.definition[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1248,22 +1196,16 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       for (let i = 0; i < this.equalityProofs.length; i++) {
         let leftItem = this.equalityProofs[i];
         let rightItem = objectContents.equalityProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.setRestriction || objectContents.setRestriction) {
-      if (!this.setRestriction || !objectContents.setRestriction || !this.setRestriction.isEquivalentTo(objectContents.setRestriction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.setRestriction, objectContents.setRestriction, fn, replacedParameters)) {
+      return false;
     }
-    if (this.setRestrictionProof || objectContents.setRestrictionProof) {
-      if (!this.setRestrictionProof || !objectContents.setRestrictionProof || !this.setRestrictionProof.isEquivalentTo(objectContents.setRestrictionProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.setRestrictionProof, objectContents.setRestrictionProof, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -1444,10 +1386,8 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.parameter || objectContents.parameter) {
-      if (!this.parameter || !objectContents.parameter || !this.parameter.isEquivalentTo(objectContents.parameter, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameter, objectContents.parameter, fn, replacedParameters)) {
+      return false;
     }
     if (this.definition || objectContents.definition) {
       if (!this.definition || !objectContents.definition || this.definition.length !== objectContents.definition.length) {
@@ -1456,10 +1396,8 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       for (let i = 0; i < this.definition.length; i++) {
         let leftItem = this.definition[i];
         let rightItem = objectContents.definition[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1470,17 +1408,13 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       for (let i = 0; i < this.equivalenceProofs.length; i++) {
         let leftItem = this.equivalenceProofs[i];
         let rightItem = objectContents.equivalenceProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
-      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.wellDefinednessProof, objectContents.wellDefinednessProof, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -1592,15 +1526,11 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.variables || objectContents.variables) {
-      if (!this.variables || !objectContents.variables || !this.variables.isEquivalentTo(objectContents.variables, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.variables, objectContents.variables, fn, replacedParameters)) {
+      return false;
     }
-    if (this.references || objectContents.references) {
-      if (!this.references || !objectContents.references || !this.references.isEquivalentTo(objectContents.references, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.references, objectContents.references, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -1744,10 +1674,8 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       for (let i = 0; i < this.definition.length; i++) {
         let leftItem = this.definition[i];
         let rightItem = objectContents.definition[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1758,10 +1686,8 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       for (let i = 0; i < this.equivalenceProofs.length; i++) {
         let leftItem = this.equivalenceProofs[i];
         let rightItem = objectContents.equivalenceProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -1883,10 +1809,8 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.claim || objectContents.claim) {
-      if (!this.claim || !objectContents.claim || !this.claim.isEquivalentTo(objectContents.claim, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.claim, objectContents.claim, fn, replacedParameters)) {
+      return false;
     }
     if (this.proofs || objectContents.proofs) {
       if (!this.proofs || !objectContents.proofs || this.proofs.length !== objectContents.proofs.length) {
@@ -1895,10 +1819,8 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       for (let i = 0; i < this.proofs.length; i++) {
         let leftItem = this.proofs[i];
         let rightItem = objectContents.proofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -2043,10 +1965,8 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       for (let i = 0; i < this.conditions.length; i++) {
         let leftItem = this.conditions[i];
         let rightItem = objectContents.conditions[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -2057,10 +1977,8 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       for (let i = 0; i < this.equivalenceProofs.length; i++) {
         let leftItem = this.equivalenceProofs[i];
         let rightItem = objectContents.equivalenceProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -2246,10 +2164,8 @@ export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Prop)) {
       return false;
     }
-    if (this.auto || expression.auto) {
-      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.auto, expression.auto, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2300,15 +2216,11 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Set)) {
       return false;
     }
-    if (this.auto || expression.auto) {
-      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.auto, expression.auto, fn, replacedParameters)) {
+      return false;
     }
-    if (this.embedSubsets || expression.embedSubsets) {
-      if (!this.embedSubsets || !expression.embedSubsets || !this.embedSubsets.isEquivalentTo(expression.embedSubsets, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.embedSubsets, expression.embedSubsets, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2368,20 +2280,14 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Subset)) {
       return false;
     }
-    if (this.superset || expression.superset) {
-      if (!this.superset || !expression.superset || !this.superset.isEquivalentTo(expression.superset, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.superset, expression.superset, fn, replacedParameters)) {
+      return false;
     }
-    if (this.auto || expression.auto) {
-      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.auto, expression.auto, fn, replacedParameters)) {
+      return false;
     }
-    if (this.embedSubsets || expression.embedSubsets) {
-      if (!this.embedSubsets || !expression.embedSubsets || !this.embedSubsets.isEquivalentTo(expression.embedSubsets, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.embedSubsets, expression.embedSubsets, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2430,15 +2336,11 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Element)) {
       return false;
     }
-    if (this._set || expression._set) {
-      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, expression._set, fn, replacedParameters)) {
+      return false;
     }
-    if (this.auto || expression.auto) {
-      if (!this.auto || !expression.auto || !this.auto.isEquivalentTo(expression.auto, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.auto, expression.auto, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2476,10 +2378,8 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Constraint)) {
       return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2542,15 +2442,11 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Binder)) {
       return false;
     }
-    if (this.sourceParameters || expression.sourceParameters) {
-      if (!this.sourceParameters || !expression.sourceParameters || !this.sourceParameters.isEquivalentTo(expression.sourceParameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.sourceParameters, expression.sourceParameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.targetParameters || expression.targetParameters) {
-      if (!this.targetParameters || !expression.targetParameters || !this.targetParameters.isEquivalentTo(expression.targetParameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.targetParameters, expression.targetParameters, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2588,10 +2484,8 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_SetDef)) {
       return false;
     }
-    if (this._set || expression._set) {
-      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, expression._set, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2629,10 +2523,8 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Def)) {
       return false;
     }
-    if (this.element || expression.element) {
-      if (!this.element || !expression.element || !this.element.isEquivalentTo(expression.element, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.element, expression.element, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2677,10 +2569,8 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.formula || objectContents.formula) {
-      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, objectContents.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2725,10 +2615,8 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this._set || objectContents._set) {
-      if (!this._set || !objectContents._set || !this._set.isEquivalentTo(objectContents._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, objectContents._set, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2798,15 +2686,11 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this._set || objectContents._set) {
-      if (!this._set || !objectContents._set || !this._set.isEquivalentTo(objectContents._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, objectContents._set, fn, replacedParameters)) {
+      return false;
     }
-    if (this.subsetProof || objectContents.subsetProof) {
-      if (!this.subsetProof || !objectContents.subsetProof || !this.subsetProof.isEquivalentTo(objectContents.subsetProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.subsetProof, objectContents.subsetProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2876,15 +2760,11 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.element || objectContents.element) {
-      if (!this.element || !objectContents.element || !this.element.isEquivalentTo(objectContents.element, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.element, objectContents.element, fn, replacedParameters)) {
+      return false;
     }
-    if (this.elementProof || objectContents.elementProof) {
-      if (!this.elementProof || !objectContents.elementProof || !this.elementProof.isEquivalentTo(objectContents.elementProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.elementProof, objectContents.elementProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -2942,10 +2822,8 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.proof || objectContents.proof) {
-      if (!this.proof || !objectContents.proof || !this.proof.isEquivalentTo(objectContents.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, objectContents.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3016,15 +2894,11 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.sourceParameters || objectContents.sourceParameters) {
-      if (!this.sourceParameters || !objectContents.sourceParameters || !this.sourceParameters.isEquivalentTo(objectContents.sourceParameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.sourceParameters, objectContents.sourceParameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.targetArguments || objectContents.targetArguments) {
-      if (!this.targetArguments || !objectContents.targetArguments || !this.targetArguments.isEquivalentTo(objectContents.targetArguments, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.targetArguments, objectContents.targetArguments, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3091,10 +2965,8 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.terms.length; i++) {
         let leftItem = this.terms[i];
         let rightItem = expression.terms[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -3150,15 +3022,11 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_subset)) {
       return false;
     }
-    if (this.parameter || expression.parameter) {
-      if (!this.parameter || !expression.parameter || !this.parameter.isEquivalentTo(expression.parameter, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameter, expression.parameter, fn, replacedParameters)) {
+      return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3212,15 +3080,11 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_extendedSubset)) {
       return false;
     }
-    if (this.parameters || expression.parameters) {
-      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, expression.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3301,15 +3165,11 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     if (!(expression instanceof MetaRefExpression_setStructuralCases)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
-    if (this.construction || expression.construction) {
-      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.construction, expression.construction, fn, replacedParameters)) {
+      return false;
     }
     if (this.cases || expression.cases) {
       if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
@@ -3318,10 +3178,8 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
       for (let i = 0; i < this.cases.length; i++) {
         let leftItem = this.cases[i];
         let rightItem = expression.cases[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -3361,10 +3219,8 @@ export class MetaRefExpression_setAssociative extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_setAssociative)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3456,17 +3312,13 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.cases.length; i++) {
         let leftItem = this.cases[i];
         let rightItem = expression.cases[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.totalityProof || expression.totalityProof) {
-      if (!this.totalityProof || !expression.totalityProof || !this.totalityProof.isEquivalentTo(expression.totalityProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.totalityProof, expression.totalityProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3547,15 +3399,11 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_structuralCases)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
-    if (this.construction || expression.construction) {
-      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.construction, expression.construction, fn, replacedParameters)) {
+      return false;
     }
     if (this.cases || expression.cases) {
       if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
@@ -3564,10 +3412,8 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.cases.length; i++) {
         let leftItem = this.cases[i];
         let rightItem = expression.cases[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -3638,20 +3484,14 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_asElementOf)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
-    if (this._set || expression._set) {
-      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, expression._set, fn, replacedParameters)) {
+      return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3689,10 +3529,8 @@ export class MetaRefExpression_associative extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_associative)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3730,10 +3568,8 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_not)) {
       return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3800,10 +3636,8 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.formulas.length; i++) {
         let leftItem = this.formulas[i];
         let rightItem = expression.formulas[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -3872,10 +3706,8 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.formulas.length; i++) {
         let leftItem = this.formulas[i];
         let rightItem = expression.formulas[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -3924,15 +3756,11 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_equiv)) {
       return false;
     }
-    if (this.left || expression.left) {
-      if (!this.left || !expression.left || !this.left.isEquivalentTo(expression.left, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.left, expression.left, fn, replacedParameters)) {
+      return false;
     }
-    if (this.right || expression.right) {
-      if (!this.right || !expression.right || !this.right.isEquivalentTo(expression.right, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.right, expression.right, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -3986,15 +3814,11 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_forall)) {
       return false;
     }
-    if (this.parameters || expression.parameters) {
-      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, expression.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4050,15 +3874,11 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_exists)) {
       return false;
     }
-    if (this.parameters || expression.parameters) {
-      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, expression.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4114,15 +3934,11 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_existsUnique)) {
       return false;
     }
-    if (this.parameters || expression.parameters) {
-      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, expression.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.formula || expression.formula) {
-      if (!this.formula || !expression.formula || !this.formula.isEquivalentTo(expression.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, expression.formula, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4169,15 +3985,11 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_in)) {
       return false;
     }
-    if (this.element || expression.element) {
-      if (!this.element || !expression.element || !this.element.isEquivalentTo(expression.element, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.element, expression.element, fn, replacedParameters)) {
+      return false;
     }
-    if (this._set || expression._set) {
-      if (!this._set || !expression._set || !this._set.isEquivalentTo(expression._set, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._set, expression._set, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4224,15 +4036,11 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_sub)) {
       return false;
     }
-    if (this.subset || expression.subset) {
-      if (!this.subset || !expression.subset || !this.subset.isEquivalentTo(expression.subset, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.subset, expression.subset, fn, replacedParameters)) {
+      return false;
     }
-    if (this.superset || expression.superset) {
-      if (!this.superset || !expression.superset || !this.superset.isEquivalentTo(expression.superset, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.superset, expression.superset, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4292,10 +4100,8 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.terms.length; i++) {
         let leftItem = this.terms[i];
         let rightItem = expression.terms[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -4357,10 +4163,8 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.terms.length; i++) {
         let leftItem = this.terms[i];
         let rightItem = expression.terms[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -4443,15 +4247,11 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_structural)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
-    if (this.construction || expression.construction) {
-      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.construction, expression.construction, fn, replacedParameters)) {
+      return false;
     }
     if (this.cases || expression.cases) {
       if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
@@ -4460,10 +4260,8 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.cases.length; i++) {
         let leftItem = this.cases[i];
         let rightItem = expression.cases[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -4594,20 +4392,14 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
         return false;
       }
     }
-    if (this.parameters || objectContents.parameters) {
-      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, objectContents.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.goal || objectContents.goal) {
-      if (!this.goal || !objectContents.goal || !this.goal.isEquivalentTo(objectContents.goal, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.goal, objectContents.goal, fn, replacedParameters)) {
+      return false;
     }
-    if (this.steps || objectContents.steps) {
-      if (!this.steps || !objectContents.steps || !this.steps.isEquivalentTo(objectContents.steps, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.steps, objectContents.steps, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4660,10 +4452,8 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Consider)) {
       return false;
     }
-    if (this.variable || expression.variable) {
-      if (!this.variable || !expression.variable || !this.variable.isEquivalentTo(expression.variable, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.variable, expression.variable, fn, replacedParameters)) {
+      return false;
     }
     if (this.index !== undefined || expression.index !== undefined) {
       if (this.index === undefined || expression.index === undefined || !this.index.eq(expression.index)) {
@@ -4728,15 +4518,11 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_State)) {
       return false;
     }
-    if (this.statement || expression.statement) {
-      if (!this.statement || !expression.statement || !this.statement.isEquivalentTo(expression.statement, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.statement, expression.statement, fn, replacedParameters)) {
+      return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4794,10 +4580,8 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
         return false;
       }
     }
-    if (this.result || expression.result) {
-      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4887,10 +4671,8 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.caseProofs.length; i++) {
         let leftItem = this.caseProofs[i];
         let rightItem = expression.caseProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -4937,10 +4719,8 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseForAll)) {
       return false;
     }
-    if (this.arguments || expression.arguments) {
-      if (!this.arguments || !expression.arguments || !this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.arguments, expression.arguments, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -4985,10 +4765,8 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseExists)) {
       return false;
     }
-    if (this.parameters || expression.parameters) {
-      if (!this.parameters || !expression.parameters || !this.parameters.isEquivalentTo(expression.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, expression.parameters, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5044,20 +4822,14 @@ export class MetaRefExpression_Embed extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Embed)) {
       return false;
     }
-    if (this.construction || expression.construction) {
-      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.construction, expression.construction, fn, replacedParameters)) {
+      return false;
     }
-    if (this.input || expression.input) {
-      if (!this.input || !expression.input || !this.input.isEquivalentTo(expression.input, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.input, expression.input, fn, replacedParameters)) {
+      return false;
     }
-    if (this.output || expression.output) {
-      if (!this.output || !expression.output || !this.output.isEquivalentTo(expression.output, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.output, expression.output, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5122,20 +4894,16 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_Substitute)) {
       return false;
     }
-    if (this.source || expression.source) {
-      if (!this.source || !expression.source || !this.source.isEquivalentTo(expression.source, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.source, expression.source, fn, replacedParameters)) {
+      return false;
     }
     if (this.sourceSide !== undefined || expression.sourceSide !== undefined) {
       if (this.sourceSide === undefined || expression.sourceSide === undefined || !this.sourceSide.eq(expression.sourceSide)) {
         return false;
       }
     }
-    if (this.result || expression.result) {
-      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5173,10 +4941,8 @@ export class MetaRefExpression_UnfoldDef extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UnfoldDef)) {
       return false;
     }
-    if (this.result || expression.result) {
-      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5223,15 +4989,11 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseTheorem)) {
       return false;
     }
-    if (this.theorem || expression.theorem) {
-      if (!this.theorem || !expression.theorem || !this.theorem.isEquivalentTo(expression.theorem, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.theorem, expression.theorem, fn, replacedParameters)) {
+      return false;
     }
-    if (this.result || expression.result) {
-      if (!this.result || !expression.result || !this.result.isEquivalentTo(expression.result, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5298,10 +5060,8 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
         return false;
       }
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5348,10 +5108,8 @@ export class MetaRefExpression_ProveNeg extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveNeg)) {
       return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5398,10 +5156,8 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveForAll)) {
       return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5468,15 +5224,11 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveExists)) {
       return false;
     }
-    if (this.arguments || expression.arguments) {
-      if (!this.arguments || !expression.arguments || !this.arguments.isEquivalentTo(expression.arguments, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.arguments, expression.arguments, fn, replacedParameters)) {
+      return false;
     }
-    if (this.proof || expression.proof) {
-      if (!this.proof || !expression.proof || !this.proof.isEquivalentTo(expression.proof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5549,15 +5301,11 @@ export class MetaRefExpression_ProveSetEquals extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveSetEquals)) {
       return false;
     }
-    if (this.subsetProof || expression.subsetProof) {
-      if (!this.subsetProof || !expression.subsetProof || !this.subsetProof.isEquivalentTo(expression.subsetProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.subsetProof, expression.subsetProof, fn, replacedParameters)) {
+      return false;
     }
-    if (this.supersetProof || expression.supersetProof) {
-      if (!this.supersetProof || !expression.supersetProof || !this.supersetProof.isEquivalentTo(expression.supersetProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.supersetProof, expression.supersetProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5647,10 +5395,8 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.caseProofs.length; i++) {
         let leftItem = this.caseProofs[i];
         let rightItem = expression.caseProofs[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -5733,15 +5479,11 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveByInduction)) {
       return false;
     }
-    if (this.term || expression.term) {
-      if (!this.term || !expression.term || !this.term.isEquivalentTo(expression.term, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.term, expression.term, fn, replacedParameters)) {
+      return false;
     }
-    if (this.construction || expression.construction) {
-      if (!this.construction || !expression.construction || !this.construction.isEquivalentTo(expression.construction, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.construction, expression.construction, fn, replacedParameters)) {
+      return false;
     }
     if (this.cases || expression.cases) {
       if (!this.cases || !expression.cases || this.cases.length !== expression.cases.length) {
@@ -5750,10 +5492,8 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
       for (let i = 0; i < this.cases.length; i++) {
         let leftItem = this.cases[i];
         let rightItem = expression.cases[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -5837,20 +5577,14 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.formula || objectContents.formula) {
-      if (!this.formula || !objectContents.formula || !this.formula.isEquivalentTo(objectContents.formula, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.formula, objectContents.formula, fn, replacedParameters)) {
+      return false;
     }
-    if (this.value || objectContents.value) {
-      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.value, objectContents.value, fn, replacedParameters)) {
+      return false;
     }
-    if (this.exclusivityProof || objectContents.exclusivityProof) {
-      if (!this.exclusivityProof || !objectContents.exclusivityProof || !this.exclusivityProof.isEquivalentTo(objectContents.exclusivityProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.exclusivityProof, objectContents.exclusivityProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -5969,30 +5703,20 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this._constructor || objectContents._constructor) {
-      if (!this._constructor || !objectContents._constructor || !this._constructor.isEquivalentTo(objectContents._constructor, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this._constructor, objectContents._constructor, fn, replacedParameters)) {
+      return false;
     }
-    if (this.parameters || objectContents.parameters) {
-      if (!this.parameters || !objectContents.parameters || !this.parameters.isEquivalentTo(objectContents.parameters, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.parameters, objectContents.parameters, fn, replacedParameters)) {
+      return false;
     }
-    if (this.value || objectContents.value) {
-      if (!this.value || !objectContents.value || !this.value.isEquivalentTo(objectContents.value, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.value, objectContents.value, fn, replacedParameters)) {
+      return false;
     }
-    if (this.rewrite || objectContents.rewrite) {
-      if (!this.rewrite || !objectContents.rewrite || !this.rewrite.isEquivalentTo(objectContents.rewrite, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.rewrite, objectContents.rewrite, fn, replacedParameters)) {
+      return false;
     }
-    if (this.wellDefinednessProof || objectContents.wellDefinednessProof) {
-      if (!this.wellDefinednessProof || !objectContents.wellDefinednessProof || !this.wellDefinednessProof.isEquivalentTo(objectContents.wellDefinednessProof, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.wellDefinednessProof, objectContents.wellDefinednessProof, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }

@@ -80,10 +80,8 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
       for (let i = 0; i < this.items.length; i++) {
         let leftItem = this.items[i];
         let rightItem = objectContents.items[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -248,10 +246,8 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_item)) {
       return false;
     }
-    if (this.ref || expression.ref) {
-      if (!this.ref || !expression.ref || !this.ref.isEquivalentTo(expression.ref, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.ref, expression.ref, fn, replacedParameters)) {
+      return false;
     }
     if (this.type !== expression.type) {
       return false;
@@ -306,10 +302,8 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_subsection)) {
       return false;
     }
-    if (this.ref || expression.ref) {
-      if (!this.ref || !expression.ref || !this.ref.isEquivalentTo(expression.ref, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.ref, expression.ref, fn, replacedParameters)) {
+      return false;
     }
     if (this.title !== expression.title) {
       return false;

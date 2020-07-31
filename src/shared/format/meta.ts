@@ -144,10 +144,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       for (let i = 0; i < this.definitionTypes.length; i++) {
         let leftItem = this.definitionTypes[i];
         let rightItem = objectContents.definitionTypes[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -158,10 +156,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       for (let i = 0; i < this.expressionTypes.length; i++) {
         let leftItem = this.expressionTypes[i];
         let rightItem = objectContents.expressionTypes[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -172,17 +168,13 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       for (let i = 0; i < this.functions.length; i++) {
         let leftItem = this.functions[i];
         let rightItem = objectContents.functions[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
-    if (this.lookup || objectContents.lookup) {
-      if (!this.lookup || !objectContents.lookup || !this.lookup.isEquivalentTo(objectContents.lookup, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.lookup, objectContents.lookup, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -316,15 +308,11 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.superType || objectContents.superType) {
-      if (!this.superType || !objectContents.superType || !this.superType.isEquivalentTo(objectContents.superType, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.superType, objectContents.superType, fn, replacedParameters)) {
+      return false;
     }
-    if (this.members || objectContents.members) {
-      if (!this.members || !objectContents.members || !this.members.isEquivalentTo(objectContents.members, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.members, objectContents.members, fn, replacedParameters)) {
+      return false;
     }
     if (this.exports || objectContents.exports) {
       if (!this.exports || !objectContents.exports || this.exports.length !== objectContents.exports.length) {
@@ -333,10 +321,8 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       for (let i = 0; i < this.exports.length; i++) {
         let leftItem = this.exports[i];
         let rightItem = objectContents.exports[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -411,10 +397,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
       for (let i = 0; i < this.innerDefinitionTypes.length; i++) {
         let leftItem = this.innerDefinitionTypes[i];
         let rightItem = objectContents.innerDefinitionTypes[i];
-        if (leftItem || rightItem) {
-          if (!leftItem || !rightItem || !leftItem.isEquivalentTo(rightItem, fn, replacedParameters)) {
-            return false;
-          }
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
         }
       }
     }
@@ -456,10 +440,8 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_DefinitionType)) {
       return false;
     }
-    if (this.resultType || expression.resultType) {
-      if (!this.resultType || !expression.resultType || !this.resultType.isEquivalentTo(expression.resultType, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.resultType, expression.resultType, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -602,20 +584,14 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this.optional || objectContents.optional) {
-      if (!this.optional || !objectContents.optional || !this.optional.isEquivalentTo(objectContents.optional, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.optional, objectContents.optional, fn, replacedParameters)) {
+      return false;
     }
-    if (this.argumentType || objectContents.argumentType) {
-      if (!this.argumentType || !objectContents.argumentType || !this.argumentType.isEquivalentTo(objectContents.argumentType, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.argumentType, objectContents.argumentType, fn, replacedParameters)) {
+      return false;
     }
-    if (this.canOmit || objectContents.canOmit) {
-      if (!this.canOmit || !objectContents.canOmit || !this.canOmit.isEquivalentTo(objectContents.canOmit, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.canOmit, objectContents.canOmit, fn, replacedParameters)) {
+      return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
@@ -655,10 +631,8 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ParameterType)) {
       return false;
     }
-    if (this.variableType || expression.variableType) {
-      if (!this.variableType || !expression.variableType || !this.variableType.isEquivalentTo(expression.variableType, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.variableType, expression.variableType, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
@@ -926,10 +900,8 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_SingleParameter)) {
       return false;
     }
-    if (this.type || expression.type) {
-      if (!this.type || !expression.type || !this.type.isEquivalentTo(expression.type, fn, replacedParameters)) {
-        return false;
-      }
+    if (!Fmt.areObjectsEquivalent(this.type, expression.type, fn, replacedParameters)) {
+      return false;
     }
     return true;
   }
