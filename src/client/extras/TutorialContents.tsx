@@ -365,10 +365,42 @@ class TutorialStates {
           onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
             if (libraryDefinition) {
               this.operator = libraryDefinition;
-              this.changeState(this.insertOperatorParameters_ST, libraryDefinition);
+              this.changeState(this.insertOperator_libraryItemListHint, libraryDefinition);
             }
           }))
         })
+      }
+    ]
+  };
+
+  private insertOperator_libraryItemListHint: StaticTutorialState = {
+    manipulationEntries: [
+      {
+        type: LibraryItemList,
+        children: [
+          {
+            type: 'div',
+            toolTip: {
+              contents: (
+                <div>
+                  <p>This is the list of unsubmitted changes. While editing an item, you can browse the library and then return to the edited item by clicking on it.</p>
+                  <div className={'tutorial-tooltip-button-row'}>
+                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertOperatorParameters_ST)}>
+                      {getButtonIcon(ButtonType.OK)} Continue
+                    </Button>
+                  </div>
+                </div>
+              ),
+              position: 'bottom',
+              index: 0
+            },
+            elementAction: () => {
+              if (this.runAutomatically) {
+                this.changeState(this.insertOperatorParameters_ST);
+              }
+            }
+          }
+        ]
       }
     ]
   };
@@ -433,19 +465,6 @@ class TutorialStates {
                 ]
               }
             ]
-          }
-        ]
-      },
-      {
-        type: LibraryItemList,
-        children: [
-          {
-            type: 'div',
-            toolTip: {
-              contents: <p>This is the list of unsubmitted changes. While editing an item, you can browse the library and then return to the edited item by clicking on it.</p>,
-              position: 'bottom',
-              index: 1
-            }
           }
         ]
       }
@@ -3134,7 +3153,7 @@ class TutorialStates {
                             type: Expression,
                             toolTip: {
                               contents: (
-                                <div>
+                                <div className={'scrollable-tooltip'}>
                                   <p>Finally, you should add some documentation, including references to external material.</p>
                                   <p>At a minimum, please fill the given list of default references where applicable. Links to the corresponding definition/theorem in other theorem provers may become especially valuable in the future.</p>
                                   <p>For convenience, you can click on the "Search" button in the editor toolbar to search the default references for a given term, either one by one or (if your browser allows it) all at once. {this.withTouchWarning ? <>(Unfortunately, the markdown editor including this feature does not work on mobile devices.)</> : null}</p>
