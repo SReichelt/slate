@@ -1,0 +1,36 @@
+# This is an informal EBNF grammar (in W3C format) for .slate files.
+# Details about whitespace, identifiers, and strings are omitted.
+# .slate files are always encoded in UTF-8.
+
+Document                ::= MetaModelRef Definition*;
+
+MetaModelRef            ::= '%' Path '%';
+
+Path                    ::= ParentPath? Identifier ArgumentList?;
+ParentPath              ::= ((Identifier | '.' | '..') '/')* | Path '.';
+
+Definition              ::= '$' Identifier ParameterList? ':' Expression '{' Definition* NamedArguments '}';
+
+ParameterList           ::= '(' Parameters ')';
+Parameters              ::= (ParameterGroup (',' ParameterGroup)*)?;
+ParameterGroup          ::= ParameterIdentifier (',' ParameterIdentifier)* ':' Expression ('=' Expression)?;
+ParameterIdentifier     ::= Identifier ArrayExpression? '...'? '?'?;
+
+ArgumentList            ::= '(' Arguments ')';
+Arguments               ::= (Argument (',' Argument)*)?;
+Argument                ::= NamedArgument | Expression;
+NamedArguments          ::= (NamedArgument (',' NamedArgument)*)?;
+NamedArgument           ::= Identifier '=' Expression;
+
+Expression              ::= IntegerExpression | StringExpression | VariableRefExpression | MetaRefExpression | DefinitionRefExpression | ParameterExpression | CompoundExpression | ArrayExpression | IndexedExpression | '?';
+IntegerExpression       ::= ('+' | '-')? [0-9]+;
+StringExpression        ::= <C-style string enclosed in single quotes>;
+VariableRefExpression   ::= Identifier;
+MetaRefExpression       ::= '%' Identifier ArgumentList?;
+DefinitionRefExpression ::= '$' Path;
+ParameterExpression     ::= '#' ParameterList;
+CompoundExpression      ::= '{' Arguments '}';
+ArrayExpression         ::= '[' (Expression (',' Expression)*)? ']';
+IndexedExpression       ::= Expression '[' Arguments ']';
+
+Identifier              ::= <nonempty string of characters except whitespace and punctuation (see isSpecialCharacter)> | <C-style string enclosed in double quotes>;
