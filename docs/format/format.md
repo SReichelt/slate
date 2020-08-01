@@ -6,9 +6,9 @@ Although the Slate file format is primarily designed to hold mathematical conten
 * *Variables* can be declared using a specific syntax, and then simply be referenced by name, as in any programming language.
 * The top-level entries in a file are called *definitions*, and there is a specific syntax to declare them and to reference them both from the same file and from other files.
 * A definition has a signature consisting of *parameters*. Inside the definition, these act as variables. When referencing the definition, an *argument* can be specified for each parameter.
-* Each file references a *metamodel*, which is itself a `.slate` file that acts as a DTD or schema. Definitions in the metamodel can be exported to files that reference the metamodel; where they take the role of keywords.
+* Each file references a *metamodel*, which is itself a `.slate` file that acts as a DTD or schema. Definitions in the metamodel can be exported to files that reference the metamodel, where they take the role of keywords.
 
-Note that at the level of the Slate file format, no semantics are specified for these primitives: Although the file format offers the ability to reference definitions and variables, there is no general answer to the question what it _means_ to reference a definition or variable.
+Note that at the level of the Slate file format, no semantics are specified for these primitives: Although the file format offers the ability to reference definitions and variables, there is no general answer to the question what it _means_ to reference a definition or variable; the answer depends on the metamodel referenced by the file (see below).
 
 ## Language specification
 
