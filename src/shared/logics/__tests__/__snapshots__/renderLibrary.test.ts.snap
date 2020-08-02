@@ -584,7 +584,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Multiset
 * https://ncatlab.org/nlab/show/multiset
 * https://coq.inria.fr/library/Coq.Sets.Multiset.html
-* https://leanprover-community.github.io/mathlib_docs/data/multiset.html#multiset"
+* https://leanprover-community.github.io/mathlib_docs/data/multiset/basic.html#multiset"
 `;
 
 exports[`render hlm library: 1.1.24.2 data/libraries/hlm/Essentials/Sets/Multisets/multiplicity 1`] = `
@@ -1376,7 +1376,7 @@ References.
 * https://en.wikipedia.org/wiki/Restriction_(mathematics)
 * https://proofwiki.org/wiki/Definition:Restriction/Mapping
 * https://ncatlab.org/nlab/show/restriction
-* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.restrict"
+* https://leanprover-community.github.io/mathlib_docs/data/subtype.html#subtype.restrict"
 `;
 
 exports[`render hlm library: 1.4.10 data/libraries/hlm/Essentials/Functions/composition 1`] = `
@@ -1475,7 +1475,7 @@ References.
 * https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse
 * https://ncatlab.org/nlab/show/bijection
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.bijective
-* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.bijective_iff_has_inverse"
+* https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.bijective_iff_has_inverse"
 `;
 
 exports[`render hlm library: 1.4.16 data/libraries/hlm/Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
@@ -1553,7 +1553,7 @@ References.
 * https://mathworld.wolfram.com/InverseFunction.html
 * https://proofwiki.org/wiki/Definition:Inverse_Mapping
 * https://ncatlab.org/nlab/show/inverse
-* https://leanprover-community.github.io/mathlib_docs/logic/function.html#function.inv_fun"
+* https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.inv_fun"
 `;
 
 exports[`render hlm library: 1.4.23 data/libraries/hlm/Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
@@ -2817,7 +2817,7 @@ Structural induction on the natural numbers is a direct consequence of their def
 
 References.
 
-* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Set"
+* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Well-Ordered_Set"
 `;
 
 exports[`render hlm library: 1.7.1.38 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
@@ -2835,7 +2835,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Mathematical_induction
 * https://mathworld.wolfram.com/PrincipleofMathematicalInduction.html
-* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Predicate"
+* https://proofwiki.org/wiki/Principle_of_Mathematical_Induction/Zero-Based"
 `;
 
 exports[`render hlm library: 1.7.1.39 data/libraries/hlm/Essentials/Numbers/Natural/Well-ordering%20principle 1`] = `
@@ -5097,7 +5097,7 @@ References.
 * https://mathworld.wolfram.com/RealNumber.html
 * https://proofwiki.org/wiki/Definition:Real_Number
 * https://ncatlab.org/nlab/show/real+number
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CReal
 * https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real"
 `;
 
@@ -5114,7 +5114,7 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_plus"
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CReal_plus"
 `;
 
 exports[`render hlm library: 1.7.6.3 data/libraries/hlm/Essentials/Numbers/Real/inverse 1`] = `
@@ -5130,7 +5130,7 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_opp"
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CReal_opp"
 `;
 
 exports[`render hlm library: 1.7.6.4 data/libraries/hlm/Essentials/Numbers/Real/difference 1`] = `
@@ -5149,7 +5149,7 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CReal_minus"
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CReal_minus"
 `;
 
 exports[`render hlm library: 1.7.6.5 data/libraries/hlm/Essentials/Numbers/Real/less%20or%20equal 1`] = `
@@ -5165,7 +5165,7 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CRealLe
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CRealLe
 * https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real.le"
 `;
 
@@ -5179,7 +5179,7 @@ Equivalence.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyReals.html#CRealLt
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyReals.html#CRealLt
 * https://leanprover-community.github.io/mathlib_docs/data/real/basic.html#real.has_lt"
 `;
 
@@ -5281,7 +5281,7 @@ Well-definedness.  No proof.
 
 References.
 
-* https://coq.inria.fr/library/Coq.Reals.ConstructiveCauchyRealsMult.html#CReal_mult"
+* https://coq.inria.fr/library/Coq.Reals.Cauchy.ConstructiveCauchyRealsMult.html#CReal_mult"
 `;
 
 exports[`render hlm library: 1.7.6.9 data/libraries/hlm/Essentials/Numbers/Real/quotient 1`] = `
@@ -6231,7 +6231,7 @@ References.
 * https://mathworld.wolfram.com/Semigroup.html
 * https://proofwiki.org/wiki/Definition:Semigroup
 * https://ncatlab.org/nlab/show/semigroup
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#semigroup"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#semigroup"
 `;
 
 exports[`render hlm library: 2.4.2 data/libraries/hlm/Algebra/Semigroups/Semigroups 1`] = `
@@ -6250,7 +6250,7 @@ References.
 * https://mathworld.wolfram.com/Semigroup.html
 * https://proofwiki.org/wiki/Definition:Semigroup
 * https://ncatlab.org/nlab/show/semigroup
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#semigroup"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#semigroup"
 `;
 
 exports[`render hlm library: 2.5.1 data/libraries/hlm/Algebra/Monoids/monoid 1`] = `
@@ -6267,7 +6267,7 @@ References.
 * https://mathworld.wolfram.com/Monoid.html
 * https://proofwiki.org/wiki/Definition:Monoid
 * https://ncatlab.org/nlab/show/monoid
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#monoid"
 `;
 
 exports[`render hlm library: 2.5.2 data/libraries/hlm/Algebra/Monoids/Monoids 1`] = `
@@ -6285,7 +6285,7 @@ References.
 * https://mathworld.wolfram.com/Monoid.html
 * https://proofwiki.org/wiki/Definition:Monoid
 * https://ncatlab.org/nlab/show/monoid
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#monoid"
 `;
 
 exports[`render hlm library: 2.5.3 data/libraries/hlm/Algebra/Monoids/semigroup%20with%20identity 1`] = `
@@ -6341,7 +6341,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#comm_monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#comm_monoid"
 `;
 
 exports[`render hlm library: 2.5.8 data/libraries/hlm/Algebra/Monoids/commutative%20monoid 1`] = `
@@ -6451,7 +6451,7 @@ References.
 * (https://mathworld.wolfram.com/Submonoid.html seems incorrect)
 * (https://proofwiki.org/wiki/Definition:Submonoid ditto)
 * https://ncatlab.org/nlab/show/submonoid
-* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid.html#is_submonoid"
+* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid/basic.html#submonoid"
 `;
 
 exports[`render hlm library: 2.5.10.2 data/libraries/hlm/Algebra/Monoids/Submonoids/subset%20monoid 1`] = `
@@ -6465,7 +6465,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid.html#subtype.monoid"
+* https://leanprover-community.github.io/mathlib_docs/group_theory/submonoid/basic.html#subtype.monoid"
 `;
 
 exports[`render hlm library: 2.5.10.3 data/libraries/hlm/Algebra/Monoids/Submonoids/submonoid 1`] = `
@@ -6512,7 +6512,7 @@ References.
 * https://mathworld.wolfram.com/Invertible.html
 * https://proofwiki.org/wiki/Definition:Invertible_Element
 * https://ncatlab.org/nlab/show/unit#units_in_monoids
-* https://leanprover-community.github.io/mathlib_docs/algebra/group/is_unit.html#is_unit"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/units.html#is_unit"
 `;
 
 exports[`render hlm library: 2.5.13 data/libraries/hlm/Algebra/Monoids/inverse 1`] = `
@@ -6581,7 +6581,7 @@ References.
 * https://mathworld.wolfram.com/Group.html
 * https://proofwiki.org/wiki/Definition:Group
 * https://ncatlab.org/nlab/show/group
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#group"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#group"
 `;
 
 exports[`render hlm library: 2.6.2 data/libraries/hlm/Algebra/Groups/Groups 1`] = `
@@ -6599,7 +6599,7 @@ References.
 * https://mathworld.wolfram.com/Group.html
 * https://proofwiki.org/wiki/Definition:Group
 * https://ncatlab.org/nlab/show/group
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#group"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#group"
 `;
 
 exports[`render hlm library: 2.6.3 data/libraries/hlm/Algebra/Groups/monoid%20with%20inverses 1`] = `
@@ -6665,7 +6665,7 @@ References.
 * https://mathworld.wolfram.com/Abelian.html
 * https://proofwiki.org/wiki/Definition:Abelian_Group
 * https://ncatlab.org/nlab/show/abelian+group
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#comm_group"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#comm_group"
 `;
 
 exports[`render hlm library: 2.6.9 data/libraries/hlm/Algebra/Groups/abelian%20group 1`] = `
@@ -6682,7 +6682,7 @@ References.
 * https://mathworld.wolfram.com/Abelian.html
 * https://proofwiki.org/wiki/Definition:Abelian_Group
 * https://ncatlab.org/nlab/show/abelian+group
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/group.html#comm_group"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/basic.html#comm_group"
 `;
 
 exports[`render hlm library: 2.6.10 data/libraries/hlm/Algebra/Groups/power%20to%20natural%20number 1`] = `
@@ -7174,7 +7174,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Rig#Also_defined_as
 * https://ncatlab.org/nlab/show/rig
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#semi_ring_theory
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#semiring"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#semiring"
 `;
 
 exports[`render hlm library: 2.7.2 data/libraries/hlm/Algebra/Semirings/Semirings 1`] = `
@@ -7192,7 +7192,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Rig#Also_defined_as
 * https://ncatlab.org/nlab/show/rig
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#semi_ring_theory
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#semiring"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#semiring"
 `;
 
 exports[`render hlm library: 2.7.3 data/libraries/hlm/Algebra/Semirings/Carrier 1`] = `
@@ -7242,7 +7242,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#semiring.to_add_comm_monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#semiring.to_add_comm_monoid"
 `;
 
 exports[`render hlm library: 2.7.7 data/libraries/hlm/Algebra/Semirings/product 1`] = `
@@ -7276,7 +7276,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#semiring.to_monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#semiring.to_monoid"
 `;
 
 exports[`render hlm library: 2.7.10.1 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Homomorphisms 1`] = `
@@ -7292,7 +7292,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Homomorphism_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/homomorphism
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#semi_morph
-* https://leanprover-community.github.io/mathlib_docs/algebra/ring.html#ring_hom"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring_hom"
 `;
 
 exports[`render hlm library: 2.7.10.2 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Isomorphisms 1`] = `
@@ -7356,7 +7356,7 @@ exports[`render hlm library: 2.7.10.6 data/libraries/hlm/Algebra/Semirings/Homom
 References.
 
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#IDphi
-* https://leanprover-community.github.io/mathlib_docs/algebra/ring.html#ring_hom.id"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring_hom.id"
 `;
 
 exports[`render hlm library: 2.7.10.7 data/libraries/hlm/Algebra/Semirings/Homomorphisms/Equality%20criterion 1`] = `
@@ -7512,7 +7512,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Ring_with_Unity
 * https://ncatlab.org/nlab/show/ring
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#ring_theory
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#ring"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring"
 `;
 
 exports[`render hlm library: 2.8.2 data/libraries/hlm/Algebra/Rings/Rings 1`] = `
@@ -7531,7 +7531,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Ring_with_Unity
 * https://ncatlab.org/nlab/show/ring
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#ring_theory
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#ring"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring"
 `;
 
 exports[`render hlm library: 2.8.3 data/libraries/hlm/Algebra/Rings/Carrier 1`] = `
@@ -7593,7 +7593,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#ring.to_add_comm_group"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring.to_add_comm_group"
 `;
 
 exports[`render hlm library: 2.8.9 data/libraries/hlm/Algebra/Rings/product 1`] = `
@@ -7637,7 +7637,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/ring.html#ring.to_monoid"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring.to_monoid"
 `;
 
 exports[`render hlm library: 2.8.13.1 data/libraries/hlm/Algebra/Rings/Homomorphisms/Homomorphisms 1`] = `
@@ -7656,7 +7656,7 @@ References.
 * https://mathworld.wolfram.com/RingHomomorphism.html
 * https://proofwiki.org/wiki/Definition:Unital_Ring_Homomorphism
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#ring_morph
-* https://leanprover-community.github.io/mathlib_docs/algebra/ring.html#ring_hom"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring_hom"
 `;
 
 exports[`render hlm library: 2.8.13.2 data/libraries/hlm/Algebra/Rings/Homomorphisms/Isomorphisms 1`] = `
@@ -7714,7 +7714,7 @@ exports[`render hlm library: 2.8.13.6 data/libraries/hlm/Algebra/Rings/Homomorph
 References.
 
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#IDphi
-* https://leanprover-community.github.io/mathlib_docs/algebra/ring.html#ring_hom.id"
+* https://leanprover-community.github.io/mathlib_docs/algebra/ring/basic.html#ring_hom.id"
 `;
 
 exports[`render hlm library: 2.8.13.7 data/libraries/hlm/Algebra/Rings/Homomorphisms/Equality%20criterion 1`] = `
@@ -7787,7 +7787,7 @@ References.
 * https://mathworld.wolfram.com/Unit.html
 * https://proofwiki.org/wiki/Definition:Unit_of_Ring
 * https://ncatlab.org/nlab/show/unit#units_in_rings
-* https://leanprover-community.github.io/mathlib_docs/algebra/group/is_unit.html#is_unit"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group/units.html#is_unit"
 `;
 
 exports[`render hlm library: 2.8.16 data/libraries/hlm/Algebra/Rings/Units 1`] = `
@@ -7900,7 +7900,7 @@ References.
 * https://mathworld.wolfram.com/Ideal.html
 * https://proofwiki.org/wiki/Definition:Ideal_of_Ring
 * https://ncatlab.org/nlab/show/ideal#in_rings_and_other_rigs
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#ideal"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#ideal"
 `;
 
 exports[`render hlm library: 2.8.23.1 data/libraries/hlm/Algebra/Rings/Quotients/quotient%20ring 1`] = `
@@ -7996,7 +7996,7 @@ References.
 * https://en.wikipedia.org/wiki/Polynomial#Abstract_algebra
 * https://proofwiki.org/wiki/Definition:Polynomial_over_Ring/One_Variable
 * https://ncatlab.org/nlab/show/polynomial
-* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial"
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial/basic.html#polynomial"
 `;
 
 exports[`render hlm library: 2.8.26.2 data/libraries/hlm/Algebra/Rings/Polynomials/normalized 1`] = `
@@ -8108,7 +8108,7 @@ References.
 * https://en.wikipedia.org/wiki/Polynomial_ring
 * https://proofwiki.org/wiki/Definition:Polynomial_Ring#One_Indeterminate
 * https://ncatlab.org/nlab/show/polynomial
-* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.comm_semiring"
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial/basic.html#polynomial.comm_semiring"
 `;
 
 exports[`render hlm library: 2.8.26.12 data/libraries/hlm/Algebra/Rings/Polynomials/value 1`] = `
@@ -8124,7 +8124,7 @@ by:
 References.
 
 * https://en.wikipedia.org/wiki/Polynomial_ring#Polynomial_evaluation
-* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.eval"
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial/basic.html#polynomial.eval"
 `;
 
 exports[`render hlm library: 2.8.26.13 data/libraries/hlm/Algebra/Rings/Polynomials/dimension 1`] = `
@@ -8154,7 +8154,7 @@ References.
 * https://en.wikipedia.org/wiki/Degree_of_a_polynomial
 * https://mathworld.wolfram.com/PolynomialDegree.html
 * https://proofwiki.org/wiki/Definition:Degree_of_Polynomial#One_variable
-* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.degree"
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial/basic.html#polynomial.degree"
 `;
 
 exports[`render hlm library: 2.8.27 data/libraries/hlm/Algebra/Rings/kronecker%20delta 1`] = `
@@ -8337,7 +8337,7 @@ References.
 * https://mathworld.wolfram.com/Module.html
 * https://proofwiki.org/wiki/Definition:Unitary_Module
 * https://ncatlab.org/nlab/show/module#ModulesOverARingInTermsOfStabilizedSlices
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#module"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#module"
 `;
 
 exports[`render hlm library: 2.8.29.1.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Left%20modules 1`] = `
@@ -8355,7 +8355,7 @@ References.
 * https://mathworld.wolfram.com/Module.html
 * https://proofwiki.org/wiki/Definition:Unitary_Module
 * https://ncatlab.org/nlab/show/module#ModulesOverARingInTermsOfStabilizedSlices
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#module"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#module"
 `;
 
 exports[`render hlm library: 2.8.29.1.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Carrier 1`] = `
@@ -8453,7 +8453,7 @@ References.
 * https://en.wikipedia.org/wiki/Module_homomorphism
 * https://proofwiki.org/wiki/Definition:Linear_Transformation
 * https://ncatlab.org/nlab/show/homomorphism
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#linear_map"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#linear_map"
 `;
 
 exports[`render hlm library: 2.8.29.1.11.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Isomorphisms 1`] = `
@@ -8522,7 +8522,7 @@ exports[`render hlm library: 2.8.29.1.11.6 data/libraries/hlm/Algebra/Rings/Modu
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#linear_map.id"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#linear_map.id"
 `;
 
 exports[`render hlm library: 2.8.29.1.11.7 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Homomorphisms/Equality%20criterion 1`] = `
@@ -8560,7 +8560,7 @@ References.
 * https://mathworld.wolfram.com/Submodule.html
 * https://proofwiki.org/wiki/Definition:Submodule
 * https://ncatlab.org/nlab/show/submodule
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#submodule"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#submodule"
 `;
 
 exports[`render hlm library: 2.8.29.1.12.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Submodules/subset%20module 1`] = `
@@ -8574,7 +8574,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#submodule.module"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#submodule.module"
 `;
 
 exports[`render hlm library: 2.8.29.1.12.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Submodules/submodule 1`] = `
@@ -8751,7 +8751,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
 * https://proofwiki.org/wiki/Left_Ideal_is_Left_Module_over_Ring
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#ideal (defined as submodule)"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#ideal (defined as submodule)"
 `;
 
 exports[`render hlm library: 2.8.29.1.14.2 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/polynomial%20module 1`] = `
@@ -8763,7 +8763,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Module_(mathematics)#Examples
 * https://proofwiki.org/wiki/Definition:Module_Structure_of_Polynomial_Ring
-* https://leanprover-community.github.io/mathlib_docs/data/polynomial.html#polynomial.module"
+* https://leanprover-community.github.io/mathlib_docs/data/polynomial/basic.html#polynomial.module"
 `;
 
 exports[`render hlm library: 2.8.29.1.14.3 data/libraries/hlm/Algebra/Rings/Modules/Left%20modules/Examples/matrix%20module 1`] = `
@@ -8903,8 +8903,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Module_homomorphism
 * https://proofwiki.org/wiki/Definition:Linear_Transformation
-* https://ncatlab.org/nlab/show/homomorphism
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#linear_map"
+* https://ncatlab.org/nlab/show/homomorphism"
 `;
 
 exports[`render hlm library: 2.8.29.2.11.2 data/libraries/hlm/Algebra/Rings/Modules/Right%20modules/Homomorphisms/Isomorphisms 1`] = `
@@ -9209,7 +9208,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Field_(Abstract_Algebra)
 * https://ncatlab.org/nlab/show/field
 * https://coq.inria.fr/library/Coq.setoid_ring.Field_theory.html#field_theory
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/field.html#field"
+* https://leanprover-community.github.io/mathlib_docs/algebra/field.html#field"
 `;
 
 exports[`render hlm library: 2.9.2 data/libraries/hlm/Algebra/Fields/quotient 1`] = `
@@ -9309,7 +9308,7 @@ References.
 * https://mathworld.wolfram.com/VectorSpace.html
 * https://proofwiki.org/wiki/Definition:Vector_Space
 * https://ncatlab.org/nlab/show/vector+space
-* https://leanprover-community.github.io/mathlib_docs/algebra/module.html#vector_space"
+* https://leanprover-community.github.io/mathlib_docs/algebra/module/basic.html#vector_space"
 `;
 
 exports[`render hlm library: 3.1.2 data/libraries/hlm/Linear%20algebra/Vector%20spaces/finite-dimensional 1`] = `

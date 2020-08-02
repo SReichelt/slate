@@ -83,6 +83,7 @@
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.2.0",
+    "link-check": "^4.5.0",
     "open-browser-webpack-plugin": "github:rodrigopandini/open-browser-webpack-plugin",
     "rimraf": "^3.0.2",
     "style-loader": "^1.2.1",
