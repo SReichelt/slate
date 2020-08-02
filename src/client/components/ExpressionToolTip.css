@@ -2,6 +2,12 @@
   max-width: 30em;
 }
 
+.tooltip.fixed-width {
+  width: 20em;
+  min-width: 20em;
+  max-width: 20em;
+}
+
 .tooltip.preview {
   max-height: 15em;
   overflow: hidden;

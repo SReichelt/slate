@@ -5,13 +5,13 @@ import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';
 import { SectionItemList } from './LibraryTree';
 
-interface InsertDialogProps {
+export interface InsertDialogProps {
   dialog: Dialog.InsertDialog;
   onOK: (result: Dialog.InsertDialogResult) => void;
   onCancel: () => void;
 }
 
-interface InsertDialogState {
+export interface InsertDialogState {
   okEnabled: boolean;
   name: string;
   nameError?: Error;

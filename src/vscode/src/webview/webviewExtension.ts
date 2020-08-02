@@ -123,7 +123,7 @@ function selectEditorUri(editor: vscode.TextEditor | undefined): Thenable<boolea
     return undefined;
 }
 
-function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: FileAccessor): void {
+function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): void {
     if (panel) {
         panel.reveal(vscode.ViewColumn.Two);
     } else {
@@ -189,7 +189,7 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
             if (panel && !initialMessageReceived) {
                 panel.dispose();
                 panel = undefined;
-                showGraphicalEditor(context, fileAccessor);
+                showGUI(context, fileAccessor);
             }
         };
 
@@ -210,10 +210,10 @@ function showGraphicalEditor(context: vscode.ExtensionContext, fileAccessor: Fil
 
 export function activate(context: vscode.ExtensionContext, fileAccessor: FileAccessor): void {
     context.subscriptions.push(
-        vscode.commands.registerCommand('slate.showGraphicalEditor', () => showGraphicalEditor(context, fileAccessor))
+        vscode.commands.registerCommand('slate.showGUI', () => showGUI(context, fileAccessor))
     );
 
-    showGraphicalEditor(context, fileAccessor);
+    showGUI(context, fileAccessor);
 
     let onActiveEditorChanged = (editor: vscode.TextEditor | undefined): any => {
         if (editor && editor.document.languageId === languageId) {

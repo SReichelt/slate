@@ -21,7 +21,7 @@ export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo: LibraryItemInfo) => void;
 export type OnInsertButtonClicked = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, sectionItemNumber: LibraryItemNumber, definitionType: Logic.LogicDefinitionTypeDescription | undefined) => void;
 
-interface SearchInputProps {
+export interface SearchInputProps {
   onSearch: (searchText: string) => void;
   autoFocus?: boolean;
 }

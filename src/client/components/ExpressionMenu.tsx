@@ -27,14 +27,14 @@ function getMainFontStyle(): React.CSSProperties {
   return result;
 }
 
-interface ExpressionMenuProps {
+export interface ExpressionMenuProps {
   menu: Menu.ExpressionMenu;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
   hoveredExternally?: boolean;
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-interface ExpressionMenuState {
+export interface ExpressionMenuState {
   openSubMenu?: Menu.ExpressionMenuRow;
 }
 
@@ -101,7 +101,7 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
   }
 }
 
-interface ExpressionMenuRowProps {
+export interface ExpressionMenuRowProps {
   row: Menu.ExpressionMenuRow;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
   onEnter?: (openSubMenu?: boolean) => void;
@@ -112,7 +112,7 @@ interface ExpressionMenuRowProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-interface ExpressionMenuRowState {
+export interface ExpressionMenuRowState {
   titleHovered: boolean;
   contentsHovered: boolean;
 }
@@ -364,7 +364,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
   }
 }
 
-interface ExpressionMenuItemProps {
+export interface ExpressionMenuItemProps {
   item: Menu.ExpressionMenuItem;
   colSpan?: number;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
@@ -374,7 +374,7 @@ interface ExpressionMenuItemProps {
   interactionHandler?: ExpressionInteractionHandler;
 }
 
-interface ExpressionMenuItemState {
+export interface ExpressionMenuItemState {
   hovered: boolean;
 }
 
@@ -460,7 +460,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
   }
 }
 
-interface ExpressionMenuTextInputProps {
+export interface ExpressionMenuTextInputProps {
   item: Menu.ExpressionMenuTextInput;
   colSpan?: number;
   onItemClicked: (action: Menu.ExpressionMenuAction) => void;
@@ -470,7 +470,7 @@ interface ExpressionMenuTextInputProps {
   inputRefHolder: ExpressionMenuInputRefHolder;
 }
 
-interface ExpressionMenuTextInputState {
+export interface ExpressionMenuTextInputState {
   hovered: boolean;
   editing: boolean;
   text: string;

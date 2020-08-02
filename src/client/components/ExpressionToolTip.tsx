@@ -158,9 +158,13 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
     if (this.props.active) {
       this.contents = this.props.getContents();
     }
+    let className = 'tooltip permanent';
+    if (this.props.arrow) {
+      className += ' fixed-width';
+    }
     return (
       <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} group={this.props.group} style={PermanentToolTip.toolTipStyle}>
-        <div className={'tooltip permanent'}>{this.contents}</div>
+        <div className={className}>{this.contents}</div>
       </ToolTip>
     );
   }

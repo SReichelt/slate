@@ -7,13 +7,13 @@ import ExpressionToolTip from './ExpressionToolTip';
 import LibraryTree from './LibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 
-interface ExpressionDialogProps {
+export interface ExpressionDialogProps {
   dialog: Dialog.ExpressionDialog;
   onOK: (result?: Dialog.DialogResultBase) => void;
   onCancel: () => void;
 }
 
-interface ExpressionDialogState {
+export interface ExpressionDialogState {
   okEnabled: boolean;
 }
 
@@ -74,7 +74,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
   };
 }
 
-interface ExpressionDialogItemProps {
+export interface ExpressionDialogItemProps {
   item: Dialog.ExpressionDialogItem;
   separated: boolean;
   separatedAbove: boolean;
@@ -83,7 +83,7 @@ interface ExpressionDialogItemProps {
   onItemChanged?: () => void;
 }
 
-interface ExpressionDialogItemState {
+export interface ExpressionDialogItemState {
   titleHovered: boolean;
 }
 

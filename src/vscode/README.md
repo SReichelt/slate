@@ -21,16 +21,20 @@ This extension integrates the [Slate interactive theorem prover](http://www.slat
 
 ## Usage
 
-At the moment, some features look for certain files in predefined locations inside the workspace. Therefore, please clone the [slate](https://github.com/SReichelt/slate) repository recursively, i.e.
-```
-git clone --recursive https://github.com/SReichelt/slate.git
-```
-If you have a personal fork of the [slate-hlm](https://github.com/SReichelt/slate-hlm) repository (e.g. created automatically by the web GUI), add it as a remote to the submodule `data/libraries/hlm`.
+Please follow these steps:
 
-Then open the workspace `Slate.code-workspace` in Visual Studio Code, and start editing `.slate` files in the `data/libraries/hlm` subdirectory.
+1. Please clone the [slate](https://github.com/SReichelt/slate) repository recursively, i.e.
+   ```
+   git clone --recursive https://github.com/SReichelt/slate.git
+   ```
+2. If you have a personal fork of the [slate-hlm](https://github.com/SReichelt/slate-hlm) repository (e.g. created automatically by the web GUI), add it as a remote to the submodule `data/libraries/hlm`.
+3. Open the workspace `Slate.code-workspace` in Visual Studio Code.
+4. Alternatively,
+   * either open a `.slate` file under `data/libraries/hlm`,
+   * or press Ctrl+Shift+P to execute a command, and enter "Slate: Show GUI".
 
 To let Slate adapt references when moving files or directories, consider increasing the `files.participants.timeout` setting in Visual Studio Code.
 
 ## Download
 
-Continuously updated builds of the Slate VSCode extension are available at http://slate-prover.org/public/download/slate.vsix. That file is guaranteed to match the online version of the theorem prover.
+Continuously updated builds of the Slate VSCode extension (matching the online version of the theorem prover) are available at http://slate-prover.org/public/download/slate.vsix.

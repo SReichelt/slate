@@ -9,6 +9,7 @@ import ExpressionToolTip, { ToolTipPosition } from './ExpressionToolTip';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
+import Button from './Button';
 import config from '../utils/config';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
 import { shrinkMathSpace } from '../../shared/format/common';
@@ -41,7 +42,7 @@ export interface ExpressionInteractionHandler {
   isBlocked(): boolean;
 }
 
-interface ExpressionProps {
+export interface ExpressionProps {
   expression: Notation.RenderedExpression;
   addInnerParens?: boolean;
   shrinkMathSpaces?: boolean;
@@ -50,7 +51,7 @@ interface ExpressionProps {
   toolTipPosition?: ToolTipPosition;
 }
 
-interface ExpressionState {
+export interface ExpressionState {
   hovered: boolean;
   showToolTip: boolean;
   clicking: boolean;
@@ -795,18 +796,29 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             this.props.interactionHandler.expressionChanged(false);
           }
         };
+        let onSearch = undefined;
+        if (expression.searchURLs) {
+          let searchURLs = expression.searchURLs;
+          onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
+        }
         if ('ontouchstart' in window) {
           // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
           markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+          if (onSearch) {
+            markdown = (
+              <div>
+                {markdown}
+                <Button className={'standalone'} onClick={onSearch}>Search default references...</Button>
+              </div>
+            );
+          }
         } else {
           let key = 'markdown-editor';
           let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
           if (!config.embedded) {
             toolbar.push('guide');
           }
-          if (expression.searchURLs) {
-            let searchURLs = expression.searchURLs;
-            let onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
+          if (onSearch) {
             let searchButton: EasyMDE.ToolbarIcon = {
               name: 'search',
               action: onSearch,

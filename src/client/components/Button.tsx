@@ -3,7 +3,7 @@ import './Button.css';
 
 const clickDelay = 500;
 
-interface ButtonProps {
+export interface ButtonProps {
   className?: string;
   toolTipText?: string;
   enabled?: boolean;
@@ -12,7 +12,7 @@ interface ButtonProps {
   onClick?: (wasTouched: boolean) => void;
 }
 
-interface ButtonState {
+export interface ButtonState {
   pressed: boolean;
 }
 

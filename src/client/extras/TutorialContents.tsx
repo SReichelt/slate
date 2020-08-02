@@ -13,15 +13,15 @@ import * as Logic from '../../shared/logics/logic';
 import * as Menu from '../../shared/notation/menu';
 
 import StartPage from './StartPage';
-import Button from '../components/Button';
+import Button, { ButtonProps } from '../components/Button';
 import MenuButton from '../components/MenuButton';
-import LibraryTree, { LibraryItemList, SearchInput, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeItemProps, LibraryTreeInsertionItem } from '../components/LibraryTree';
+import LibraryTree, { LibraryItemList, SearchInput, SearchInputProps, InnerLibraryTreeItems, LibraryTreeItem, LibraryTreeItemProps, LibraryTreeInsertionItem } from '../components/LibraryTree';
 import StandardDialog from '../components/StandardDialog';
-import InsertDialog from '../components/InsertDialog';
+import InsertDialog, { InsertDialogProps } from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
-import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuItem, ExpressionMenuTextInput } from '../components/ExpressionMenu';
-import ExpressionDialog, { ExpressionDialogItem } from '../components/ExpressionDialog';
+import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput, ExpressionMenuTextInputProps } from '../components/ExpressionMenu';
+import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
 import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
 
 export type TutorialStateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => DynamicTutorialState | undefined;
@@ -134,7 +134,7 @@ class TutorialStates {
               position: 'bottom',
               index: 0
             },
-            manipulateProps: (props) => ({
+            manipulateProps: (props: SearchInputProps) => ({
               ...props,
               onSearch: inject(props.onSearch, () => this.changeState(this.insertOperator_menu))
             }),
@@ -174,7 +174,7 @@ class TutorialStates {
                       contents: <p>Look in here.</p>,
                       position: 'right',
                       index: 1,
-                      condition: (component) => !component.state.opened
+                      condition: (component: LibraryTreeItem) => !component.state.opened
                     }
                   },
                   {
@@ -187,7 +187,7 @@ class TutorialStates {
                           {
                             key: 'display-span',
                             toolTip: {
-                              contents: (component) => (
+                              contents: (component: LibraryTreeItem) => (
                                 <div>
                                   <p>This is the section we are looking for.</p>
                                   {component.state.opened ? <p>Scroll down.</p> : null}
@@ -210,7 +210,7 @@ class TutorialStates {
                                       contents: <p>Click here to insert a new item.</p>,
                                       position: 'right',
                                       index: 2,
-                                      condition: (component) => !component.state.menuOpen
+                                      condition: (component: MenuButton) => !component.state.menuOpen
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -222,9 +222,9 @@ class TutorialStates {
                                           position: 'right',
                                           index: 2
                                         },
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ButtonProps) => ({
                                           ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.insertOperator_dialog_name))
+                                          onClick: inject(props.onClick!, () => this.changeState(this.insertOperator_dialog_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -299,7 +299,7 @@ class TutorialStates {
             ]
           }
         ],
-        componentAction: (component) => {
+        componentAction: (component: InsertDialog) => {
           if (component.state.name) {
             this.changeState(this.insertOperator_dialog_ok);
           }
@@ -360,7 +360,7 @@ class TutorialStates {
             ]
           }
         ],
-        manipulateProps: (props) => ({
+        manipulateProps: (props: InsertDialogProps) => ({
           ...props,
           onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
             if (libraryDefinition) {
@@ -430,7 +430,7 @@ class TutorialStates {
                           contents: <p>Most definitions require parameters. Click here to add one.</p>,
                           position: 'bottom',
                           index: 0,
-                          condition: (component) => !component.state.openMenu
+                          condition: (component: Expression) => !component.state.openMenu
                         },
                         elementAction: this.automateClick(),
                         children: [
@@ -448,7 +448,7 @@ class TutorialStates {
                                       position: 'right',
                                       index: 0
                                     },
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                       ...props,
                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_names))
                                     }),
@@ -569,7 +569,7 @@ class TutorialStates {
                               contents: <p>Add another parameter, which will be a function between these two sets.</p>,
                               position: 'bottom',
                               index: 1,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
                             elementAction: this.automateClick(),
                             children: [
@@ -587,7 +587,7 @@ class TutorialStates {
                                           position: 'right',
                                           index: 1
                                         },
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_name))
                                         }),
@@ -708,7 +708,7 @@ class TutorialStates {
                                   contents: <p>We need to fill this placeholder.</p>,
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
+                                  condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -730,7 +730,7 @@ class TutorialStates {
                                             elementAction: this.automateClick()
                                           }
                                         ],
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
                                             if (action instanceof Menu.ImmediateExpressionMenuAction) {
@@ -801,7 +801,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeAdditionalStateData(() => component.props.selected)
+                                                                        componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData(() => component.props.selected)
                                                                       }
                                                                     ]
                                                                   }
@@ -831,7 +831,7 @@ class TutorialStates {
                                         ]
                                       }
                                     ],
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionDialogProps) => ({
                                       ...props,
                                       onOK: inject(props.onOK, () => this.changeState(this.insertOperatorParameters_f_set_arg1))
                                     })
@@ -901,7 +901,7 @@ class TutorialStates {
                                       ),
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -918,7 +918,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 0,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_f_set_arg2))
                                                     }),
@@ -991,7 +991,7 @@ class TutorialStates {
                                       contents: <p>Select T here.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -1008,7 +1008,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 1,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g))
                                                     }),
@@ -1075,7 +1075,7 @@ class TutorialStates {
                               contents: <p>Add another function. (This will be a function from S to S.)</p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
                             elementAction: this.automateClick(),
                             children: [
@@ -1093,7 +1093,7 @@ class TutorialStates {
                                           position: 'right',
                                           index: 0
                                         },
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_name))
                                         }),
@@ -1214,7 +1214,7 @@ class TutorialStates {
                                   contents: <p>Click here.</p>,
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component: Expression) => !component.state.openMenu
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -1236,7 +1236,7 @@ class TutorialStates {
                                             elementAction: this.automateClick()
                                           }
                                         ],
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_set_arg1))
                                         })
@@ -1303,7 +1303,7 @@ class TutorialStates {
                                       contents: <p>Select S here. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertOperatorParameters_g_set_arg1, this.insertOperatorParameters_g_set_arg2], this.insertOperatorParameters_n)}>Skip</Button></p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -1320,7 +1320,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 0,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_g_set_arg2))
                                                     }),
@@ -1393,7 +1393,7 @@ class TutorialStates {
                                       contents: <p>Select S here as well.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -1410,7 +1410,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 0,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n))
                                                     }),
@@ -1477,7 +1477,7 @@ class TutorialStates {
                               contents: <p>Our last parameter will be a natural number.</p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
                             elementAction: this.automateClick(),
                             children: [
@@ -1495,7 +1495,7 @@ class TutorialStates {
                                           position: 'right',
                                           index: 0
                                         },
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_n_name))
                                         }),
@@ -1626,7 +1626,7 @@ class TutorialStates {
                                   contents: <p>Click here.</p>,
                                   position: 'bottom',
                                   index: 1,
-                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
+                                  condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -1673,7 +1673,7 @@ class TutorialStates {
                                                       index: 0,
                                                       condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                     },
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: SearchInputProps) => ({
                                                       ...props,
                                                       onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                     }),
@@ -1725,7 +1725,7 @@ class TutorialStates {
                                                                                     elementAction: this.automateClick()
                                                                                   }
                                                                                 ],
-                                                                                componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
+                                                                                componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                               }
                                                                             ]
                                                                           }
@@ -1754,7 +1754,7 @@ class TutorialStates {
                                         ]
                                       }
                                     ],
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionDialogProps) => ({
                                       ...props,
                                       onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition))
                                     })
@@ -1818,7 +1818,7 @@ class TutorialStates {
                                   ),
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !(component.state.openMenu || component.state.openDialog)
+                                  condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -1840,7 +1840,7 @@ class TutorialStates {
                                             elementAction: this.automateClick()
                                           }
                                         ],
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
                                             if (action instanceof Menu.ImmediateExpressionMenuAction) {
@@ -1873,7 +1873,7 @@ class TutorialStates {
                                                       index: 0,
                                                       condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                     },
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: SearchInputProps) => ({
                                                       ...props,
                                                       onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                     }),
@@ -1923,7 +1923,7 @@ class TutorialStates {
                                                                             elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
+                                                                        componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                       }
                                                                     ]
                                                                   }
@@ -1948,7 +1948,7 @@ class TutorialStates {
                                         ]
                                       }
                                     ],
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionDialogProps) => ({
                                       ...props,
                                       onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition_arg1))
                                     })
@@ -2018,9 +2018,9 @@ class TutorialStates {
                                       contents: <p>Select f here.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => {
+                                    componentAction: (component: Expression) => {
                                       (component as Expression).disableWindowClickListener();
                                       this.changeAdditionalStateData(() => component.state.openMenu);
                                     },
@@ -2039,7 +2039,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 0,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2))
                                                     }),
@@ -2124,9 +2124,9 @@ class TutorialStates {
                                       contents: <p>Select g here.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
-                                    componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
+                                    componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2142,7 +2142,7 @@ class TutorialStates {
                                                   {
                                                     type: ExpressionMenuItem,
                                                     key: 0,
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillOperatorDefinition_composition_arg2_reselection))
                                                     }),
@@ -2221,9 +2221,9 @@ class TutorialStates {
                                       contents: <p>It turns out we actually wanted to write "g<sup>n</sup>". This can be fixed easily by clicking here again. (But be careful to only overwrite "g" instead of the entire expression.)</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !(component.state.openMenu || component.state.openDialog)
+                                      condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
                                     },
-                                    componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
+                                    componentAction: (component: Expression) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
                                     elementAction: this.automateClick(),
                                     children: [
                                       {
@@ -2269,7 +2269,7 @@ class TutorialStates {
                                                           index: 0,
                                                           condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                         },
-                                                        manipulateProps: (props) => ({
+                                                        manipulateProps: (props: SearchInputProps) => ({
                                                           ...props,
                                                           onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                         }),
@@ -2314,7 +2314,7 @@ class TutorialStates {
                                                                                 elementAction: this.automateClick()
                                                                               }
                                                                             ],
-                                                                            componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
+                                                                            componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                           }
                                                                         ]
                                                                       }
@@ -2339,7 +2339,7 @@ class TutorialStates {
                                             ]
                                           }
                                         ],
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionDialogProps) => ({
                                           ...props,
                                           onOK: inject(props.onOK, () => this.changeState(this.fillOperatorDefinition_composition_arg2_arg2))
                                         })
@@ -2419,9 +2419,9 @@ class TutorialStates {
                                           contents: <p>Select n here.</p>,
                                           position: 'bottom',
                                           index: 0,
-                                          condition: (component) => !component.state.openMenu
+                                          condition: (component: Expression) => !component.state.openMenu
                                         },
-                                        componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
+                                        componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
                                         elementAction: this.automateClick(),
                                         children: [
                                           {
@@ -2437,7 +2437,7 @@ class TutorialStates {
                                                       {
                                                         type: ExpressionMenuItem,
                                                         key: 0,
-                                                        manipulateProps: (props) => ({
+                                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                           ...props,
                                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_openMenu))
                                                         }),
@@ -2515,7 +2515,7 @@ class TutorialStates {
                                       contents: <p>Now it is time for one of the most important tasks in Slate: finding a good notation.<br/>Since no standard notation exists for our definition, we will have to invent one.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -2554,7 +2554,7 @@ class TutorialStates {
                                                         elementAction: this.automateClick()
                                                       }
                                                     ],
-                                                    manipulateProps: (props) => ({
+                                                    manipulateProps: (props: ExpressionMenuRowProps) => ({
                                                       ...props,
                                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_body))
                                                     })
@@ -2637,7 +2637,7 @@ class TutorialStates {
                                                           contents: <p>Select g here.</p>,
                                                           position: 'bottom',
                                                           index: 0,
-                                                          condition: (component) => !component.state.openMenu
+                                                          condition: (component: Expression) => !component.state.openMenu
                                                         },
                                                         elementAction: this.automateClick(),
                                                         children: [
@@ -2654,7 +2654,7 @@ class TutorialStates {
                                                                       {
                                                                         type: ExpressionMenuItem,
                                                                         key: 3,
-                                                                        manipulateProps: (props) => ({
+                                                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                                           ...props,
                                                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_sup))
                                                                         }),
@@ -2748,7 +2748,7 @@ class TutorialStates {
                                                           contents: <p>Select n here.</p>,
                                                           position: 'bottom',
                                                           index: 0,
-                                                          condition: (component) => !component.state.openMenu
+                                                          condition: (component: Expression) => !component.state.openMenu
                                                         },
                                                         elementAction: this.automateClick(),
                                                         children: [
@@ -2765,7 +2765,7 @@ class TutorialStates {
                                                                       {
                                                                         type: ExpressionMenuItem,
                                                                         key: 4,
-                                                                        manipulateProps: (props) => ({
+                                                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                                           ...props,
                                                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_preSub))
                                                                         }),
@@ -2859,7 +2859,7 @@ class TutorialStates {
                                                           contents: <p>Select f here.</p>,
                                                           position: 'bottom',
                                                           index: 0,
-                                                          condition: (component) => !component.state.openMenu
+                                                          condition: (component: Expression) => !component.state.openMenu
                                                         },
                                                         elementAction: this.automateClick(),
                                                         children: [
@@ -2876,7 +2876,7 @@ class TutorialStates {
                                                                       {
                                                                         type: ExpressionMenuItem,
                                                                         key: 2,
-                                                                        manipulateProps: (props) => ({
+                                                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                                           ...props,
                                                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_arg_preSup))
                                                                         }),
@@ -2970,7 +2970,7 @@ class TutorialStates {
                                                           contents: <p>Enter the text "my" here, so you will recognize the definition more easily.</p>,
                                                           position: 'bottom',
                                                           index: 0,
-                                                          condition: (component) => !component.state.openMenu
+                                                          condition: (component: Expression) => !component.state.openMenu
                                                         },
                                                         elementAction: this.automateClick(),
                                                         children: [
@@ -3085,7 +3085,7 @@ class TutorialStates {
                                             ]
                                           }
                                         ],
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionDialogProps) => ({
                                           ...props,
                                           onOK: inject(props.onOK, () => this.changeState(this.submitOperator))
                                         })
@@ -3156,13 +3156,13 @@ class TutorialStates {
                                 <div className={'scrollable-tooltip'}>
                                   <p>Finally, you should add some documentation, including references to external material.</p>
                                   <p>At a minimum, please fill the given list of default references where applicable. Links to the corresponding definition/theorem in other theorem provers may become especially valuable in the future.</p>
-                                  <p>For convenience, you can click on the "Search" button in the editor toolbar to search the default references for a given term, either one by one or (if your browser allows it) all at once. {this.withTouchWarning ? <>(Unfortunately, the markdown editor including this feature does not work on mobile devices.)</> : null}</p>
+                                  <p>For convenience, you can click on the "Search" button in the editor toolbar to search for a given term in all default references, either one by one or (if your browser allows it) all at once.</p>
                                   <p>However, in tutorial mode, you can skip this and just hit "Submit".</p>
                                 </div>
                               ),
                               position: 'top',
                               index: 0,
-                              condition: (component) => !component.state.openDialog
+                              condition: (component: Expression) => !component.state.openDialog
                             }
                           }
                         ]
@@ -3187,9 +3187,77 @@ class TutorialStates {
               position: 'top',
               index: 1
             },
-            manipulateProps: (props) => ({
+            manipulateProps: (props: ButtonProps) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_menu, null))
+              onClick: inject(props.onClick!, () => this.changeState(this.openOperatorSourceCodeView, null))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
+  };
+
+  // View source.
+
+  private openOperatorSourceCodeView: StaticTutorialState = {
+    manipulationEntries: [
+      {
+        type: 'div',
+        key: 'toolbar',
+        children: [
+          {
+            type: Button,
+            key: 'view-source',
+            toolTip: {
+              contents: (
+                <div>
+                  <p>As you have seen, it is possible to create formal mathematical content without editing any source code.</p>
+                  <p>However, if you are interested, you can click here to see the exact details of what you have created. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertTheorem_menu)}>Skip</Button></p>
+                </div>
+              ),
+              position: 'top',
+              arrow: 'right',
+              index: 0
+            },
+            manipulateProps: (props: ButtonProps) => ({
+              ...props,
+              onClick: inject(props.onClick!, () => this.changeState(props.selected ? this.insertTheorem_menu : this.closeOperatorSourceCodeView))
+            }),
+            elementAction: this.automateClick()
+          }
+        ]
+      }
+    ]
+  };
+
+  private closeOperatorSourceCodeView: StaticTutorialState = {
+    manipulationEntries: [
+      {
+        type: 'div',
+        key: 'toolbar',
+        children: [
+          {
+            type: Button,
+            key: 'view-source',
+            toolTip: {
+              contents: (
+                <div>
+                  <p>If you would like to see how the source code is built up during the next steps of the tutorial, you can leave this view open and click "Continue". Otherwise, please close it again.</p>
+                  <div className={'tutorial-tooltip-button-row'}>
+                    <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertTheorem_menu)}>
+                      {getButtonIcon(ButtonType.OK)} Continue
+                    </Button>
+                  </div>
+                </div>
+              ),
+              position: 'top',
+              arrow: 'right',
+              index: 0
+            },
+            manipulateProps: (props: ButtonProps) => ({
+              ...props,
+              onClick: inject(props.onClick!, () => this.changeState(this.insertTheorem_menu))
             }),
             elementAction: this.automateClick()
           }
@@ -3223,7 +3291,7 @@ class TutorialStates {
                       contents: <p>Open this section.</p>,
                       position: 'right',
                       index: 1,
-                      condition: (component) => !component.state.opened
+                      condition: (component: LibraryTreeItem) => !component.state.opened
                     }
                   },
                   {
@@ -3236,7 +3304,7 @@ class TutorialStates {
                           {
                             key: 'display-span',
                             toolTip: {
-                              contents: (component) => component.state.opened ? <p>Scroll down again.</p> : <p>Open this section.</p>,
+                              contents: (component: LibraryTreeItem) => component.state.opened ? <p>Scroll down again.</p> : <p>Open this section.</p>,
                               position: 'right',
                               index: 1
                             }
@@ -3254,7 +3322,7 @@ class TutorialStates {
                                       contents: <p>Click here to insert a new item.</p>,
                                       position: 'right',
                                       index: 2,
-                                      condition: (component) => !component.state.menuOpen
+                                      condition: (component: MenuButton) => !component.state.menuOpen
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -3266,9 +3334,9 @@ class TutorialStates {
                                           position: 'right',
                                           index: 2
                                         },
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ButtonProps) => ({
                                           ...props,
-                                          onClick: inject(props.onClick, () => this.changeState(this.insertTheorem_dialog_name))
+                                          onClick: inject(props.onClick!, () => this.changeState(this.insertTheorem_dialog_name))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -3338,7 +3406,7 @@ class TutorialStates {
             ]
           }
         ],
-        componentAction: (component) => {
+        componentAction: (component: InsertDialog) => {
           if (component.state.name) {
             this.changeState(this.insertTheorem_dialog_ok);
           }
@@ -3399,7 +3467,7 @@ class TutorialStates {
             ]
           }
         ],
-        manipulateProps: (props) => ({
+        manipulateProps: (props: InsertDialogProps) => ({
           ...props,
           onOK: inject(props.onOK, (result: CachedPromise<LibraryDefinition | undefined>) => result.then((libraryDefinition: LibraryDefinition | undefined) => {
             if (libraryDefinition) {
@@ -3437,7 +3505,7 @@ class TutorialStates {
                           contents: <p>Add a parameter that is a function from the set of natural numbers to itself. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertTheoremParameters_f, this.insertTheoremParameters_f_name, this.insertTheoremParameters_f_set, this.insertTheoremParameters_f_set_arg1, this.insertTheoremParameters_f_set_arg2], this.insertTheoremParameters_n)}>Skip</Button></p>,
                           position: 'bottom',
                           index: 0,
-                          condition: (component) => !component.state.openMenu
+                          condition: (component: Expression) => !component.state.openMenu
                         },
                         elementAction: this.automateClick(),
                         children: [
@@ -3455,7 +3523,7 @@ class TutorialStates {
                                       position: 'right',
                                       index: 1
                                     },
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
                                       ...props,
                                       onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_name))
                                     }),
@@ -3574,7 +3642,7 @@ class TutorialStates {
                                   contents: <p>Select the set of functions, which should be in the list of recently used definitions.</p>,
                                   position: 'bottom',
                                   index: 0,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component: Expression) => !component.state.openMenu
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -3584,7 +3652,7 @@ class TutorialStates {
                                       {
                                         type: ExpressionMenuRow,
                                         key: 2,
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_set_arg1))
                                         }),
@@ -3673,7 +3741,7 @@ class TutorialStates {
                                       contents: <p>Select the set of natural numbers, which should also be in the list of recently used definitions.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -3683,7 +3751,7 @@ class TutorialStates {
                                           {
                                             type: ExpressionMenuRow,
                                             key: 4,
-                                            manipulateProps: (props) => ({
+                                            manipulateProps: (props: ExpressionMenuRowProps) => ({
                                               ...props,
                                               onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_set_arg2))
                                             }),
@@ -3773,7 +3841,7 @@ class TutorialStates {
                                       contents: <p>Same here.</p>,
                                       position: 'bottom',
                                       index: 0,
-                                      condition: (component) => !component.state.openMenu
+                                      condition: (component: Expression) => !component.state.openMenu
                                     },
                                     elementAction: this.automateClick(),
                                     children: [
@@ -3783,7 +3851,7 @@ class TutorialStates {
                                           {
                                             type: ExpressionMenuRow,
                                             key: 4,
-                                            manipulateProps: (props) => ({
+                                            manipulateProps: (props: ExpressionMenuRowProps) => ({
                                               ...props,
                                               onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n))
                                             }),
@@ -3851,7 +3919,7 @@ class TutorialStates {
                               contents: <p>Insert a natural number "n". <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.skipStates([this.insertTheoremParameters_n, this.insertTheoremParameters_n_name, this.insertTheoremParameters_n_set], this.fillTheoremClaim_equality)}>Skip</Button></p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
                             elementAction: this.automateClick(),
                             children: [
@@ -3864,7 +3932,7 @@ class TutorialStates {
                                     children: [
                                       {
                                         type: ExpressionMenuItem,
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_n_name))
                                         }),
@@ -3980,7 +4048,7 @@ class TutorialStates {
                                   contents: <p>Select the set of natural numbers.</p>,
                                   position: 'bottom',
                                   index: 1,
-                                  condition: (component) => !component.state.openMenu
+                                  condition: (component: Expression) => !component.state.openMenu
                                 },
                                 elementAction: this.automateClick(),
                                 children: [
@@ -3990,7 +4058,7 @@ class TutorialStates {
                                       {
                                         type: ExpressionMenuRow,
                                         key: 2,
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
                                           ...props,
                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality))
                                         }),
@@ -4046,7 +4114,7 @@ class TutorialStates {
                       contents: <p>Now we need to state the claim of the theorem, which will be an equality.</p>,
                       position: 'bottom',
                       index: 0,
-                      condition: (component) => !component.state.openMenu
+                      condition: (component: Expression) => !component.state.openMenu
                     },
                     elementAction: this.automateClick(),
                     children: [
@@ -4073,7 +4141,7 @@ class TutorialStates {
                                 ]
                               }
                             ],
-                            manipulateProps: (props) => ({
+                            manipulateProps: (props: ExpressionMenuRowProps) => ({
                               ...props,
                               onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1))
                             })
@@ -4122,7 +4190,7 @@ class TutorialStates {
                           contents: <p>Here, please select the definition you just created, which should be the first item in the list of recently used definitions.</p>,
                           position: 'bottom',
                           index: 0,
-                          condition: (component) => !component.state.openMenu
+                          condition: (component: Expression) => !component.state.openMenu
                         },
                         elementAction: this.automateClick(),
                         children: [
@@ -4132,7 +4200,7 @@ class TutorialStates {
                               {
                                 type: ExpressionMenuRow,
                                 key: 2,
-                                manipulateProps: (props) => ({
+                                manipulateProps: (props: ExpressionMenuRowProps) => ({
                                   ...props,
                                   onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg1))
                                 }),
@@ -4214,9 +4282,9 @@ class TutorialStates {
                               contents: <p>Select f here.</p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
-                            componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
+                            componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4232,7 +4300,7 @@ class TutorialStates {
                                           {
                                             type: ExpressionMenuItem,
                                             key: 0,
-                                            manipulateProps: (props) => ({
+                                            manipulateProps: (props: ExpressionMenuItemProps) => ({
                                               ...props,
                                               onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2))
                                             }),
@@ -4295,9 +4363,9 @@ class TutorialStates {
                               contents: <p>Here, please select the identity function, which is a definition in the library.</p>,
                               position: 'bottom',
                               index: 0,
-                              condition: (component) => !(component.state.openMenu || component.state.openDialog)
+                              condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
                             },
-                            componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
+                            componentAction: (component: Expression) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4313,7 +4381,7 @@ class TutorialStates {
                                         elementAction: this.automateClick()
                                       }
                                     ],
-                                    manipulateProps: (props) => ({
+                                    manipulateProps: (props: ExpressionMenuRowProps) => ({
                                       ...props,
                                       onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
                                         if (action instanceof Menu.ImmediateExpressionMenuAction) {
@@ -4348,7 +4416,7 @@ class TutorialStates {
                                                   index: 0,
                                                   condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
                                                 },
-                                                manipulateProps: (props) => ({
+                                                manipulateProps: (props: SearchInputProps) => ({
                                                   ...props,
                                                   onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
                                                 }),
@@ -4392,7 +4460,7 @@ class TutorialStates {
                                                                         elementAction: this.automateClick()
                                                                       }
                                                                     ],
-                                                                    componentAction: (component) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
+                                                                    componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                   }
                                                                 ]
                                                               }
@@ -4417,7 +4485,7 @@ class TutorialStates {
                                     ]
                                   }
                                 ],
-                                manipulateProps: (props) => ({
+                                manipulateProps: (props: ExpressionDialogProps) => ({
                                   ...props,
                                   onOK: inject(props.onOK, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
                                 })
@@ -4477,7 +4545,7 @@ class TutorialStates {
                               contents: <p>Note how Slate automatically figured out that this can only be the identity function on the natural numbers. Moreover, parentheses are displayed wherever the notation would cause ambiguities.</p>,
                               position: 'top',
                               index: 0,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             }
                           },
                           {
@@ -4487,9 +4555,9 @@ class TutorialStates {
                               contents: <p>Select n here.</p>,
                               position: 'bottom',
                               index: 1,
-                              condition: (component) => !component.state.openMenu
+                              condition: (component: Expression) => !component.state.openMenu
                             },
-                            componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
+                            componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
                             elementAction: this.automateClick(),
                             children: [
                               {
@@ -4505,7 +4573,7 @@ class TutorialStates {
                                           {
                                             type: ExpressionMenuItem,
                                             key: 0,
-                                            manipulateProps: (props) => ({
+                                            manipulateProps: (props: ExpressionMenuItemProps) => ({
                                               ...props,
                                               onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2))
                                             }),
@@ -4564,9 +4632,9 @@ class TutorialStates {
                           contents: <p>Select f here.</p>,
                           position: 'bottom',
                           index: 0,
-                          condition: (component) => !component.state.openMenu
+                          condition: (component: Expression) => !component.state.openMenu
                         },
-                        componentAction: (component) => this.changeAdditionalStateData(() => component.state.openMenu),
+                        componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
                         elementAction: this.automateClick(),
                         children: [
                           {
@@ -4582,9 +4650,9 @@ class TutorialStates {
                                       {
                                         type: ExpressionMenuItem,
                                         key: 0,
-                                        manipulateProps: (props) => ({
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
                                           ...props,
-                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.openSourceCodeView))
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.openTheoremSourceCodeView))
                                         }),
                                         elementAction: this.automateClick()
                                       }
@@ -4619,7 +4687,7 @@ class TutorialStates {
 
   // View source to see inferred arguments.
 
-  private openSourceCodeView: StaticTutorialState = {
+  private openTheoremSourceCodeView: StaticTutorialState = {
     manipulationEntries: [
       {
         type: 'div',
@@ -4632,16 +4700,16 @@ class TutorialStates {
               contents: (
                 <div>
                   <p>Now you have stated your first theorem.</p>
-                  <p>By the way, what about the parameters S and T? To see that they have been inferred automatically, you can take a look at the source code.</p>
+                  <p>By the way, what about the parameters S and T? To see that they have been inferred automatically, you can take a look at the source code. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertProof)}>Skip</Button></p>
                 </div>
               ),
               position: 'top',
               arrow: 'right',
               index: 0
             },
-            manipulateProps: (props) => ({
+            manipulateProps: (props: ButtonProps) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.closeSourceCodeView))
+              onClick: inject(props.onClick!, () => this.changeState(props.selected ? this.insertProof : this.closeTheoremSourceCodeView))
             }),
             elementAction: this.automateClick()
           }
@@ -4650,7 +4718,7 @@ class TutorialStates {
     ]
   };
 
-  private closeSourceCodeView: StaticTutorialState = {
+  private closeTheoremSourceCodeView: StaticTutorialState = {
     manipulationEntries: [
       {
         type: 'div',
@@ -4665,9 +4733,9 @@ class TutorialStates {
               arrow: 'right',
               index: 0
             },
-            manipulateProps: (props) => ({
+            manipulateProps: (props: ButtonProps) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.insertProof))
+              onClick: inject(props.onClick!, () => this.changeState(this.insertProof))
             }),
             elementAction: this.automateClick()
           }
@@ -4723,9 +4791,9 @@ class TutorialStates {
               position: 'top',
               index: 1
             },
-            manipulateProps: (props) => ({
+            manipulateProps: (props: ButtonProps) => ({
               ...props,
-              onClick: inject(props.onClick, () => this.changeState(this.checkDefinition, null))
+              onClick: inject(props.onClick!, () => this.changeState(this.checkDefinition, null))
             }),
             elementAction: this.automateClick()
           }
