@@ -18,14 +18,14 @@
     "test-accept": "src/scripts/tidyLibrary.sh && src/scripts/checkLibrary.sh && jest --updateSnapshot",
     "start": "node ./dist/server/server/server.js",
     "start:prod": "cross-env NODE_ENV=production node ./dist/server/server/server.js",
-    "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p && cd ../.. && rimraf src/vscode/webview && copyfiles -E -u 1 dist/public/* src/vscode/webview && copyfiles -E -u 2 node_modules/mathjax/fonts/HTML-CSS/TeX/woff/* src/vscode/webview",
+    "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p && cd ../.. && copyfiles -E -u 1 dist/public/* src/vscode/webview && copyfiles -E -u 2 node_modules/mathjax/fonts/HTML-CSS/TeX/woff/* src/vscode/webview",
     "dev-client": "cd src/client && webpack-dev-server -w",
     "build-server": "tsc -p ./src/server",
     "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server/server.js\"",
     "build-vscode": "cd src/vscode && npm run build",
     "package-vscode": "cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
-    "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\" && npm run package-vscode"
+    "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run build-vscode\" && npm run package-vscode"
   },
   "engines": {
     "node": ">=13.9.0"
