@@ -20,7 +20,7 @@ import StandardDialog from '../components/StandardDialog';
 import InsertDialog, { InsertDialogProps } from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
-import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput, ExpressionMenuTextInputProps } from '../components/ExpressionMenu';
+import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
 import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
 

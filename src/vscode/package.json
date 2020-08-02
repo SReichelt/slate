@@ -2,7 +2,7 @@
 	"name": "slate",
 	"displayName": "Slate",
 	"description": "Provides syntax highlighting, navigation, auto-completion, and GUI integration for the Slate proof assistant language.",
-	"version": "0.1.15",
+	"version": "0.1.16",
 	"publisher": "sreichelt",
 	"license": "MIT",
 	"author": "Sebastian Reichelt",
@@ -65,8 +65,8 @@
 	"main": "./out/vscode/src/extension",
 	"scripts": {
 		"clean": "rimraf out *.vsix",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
+		"build": "npm run clean && webpack --mode production",
+		"watch": "tsc --watch -p ./",
 		"package": "vsce package -o slate.vsix"
 	},
 	"engines": {
@@ -87,8 +87,11 @@
 		"@typescript-eslint/parser": "^3.7.1",
 		"eslint": "^7.5.0",
 		"rimraf": "^3.0.2",
+		"ts-loader": "^8.0.2",
 		"typescript": "^3.9.7",
-		"vsce": "^1.77.0"
+		"vsce": "^1.77.0",
+		"webpack": "^4.44.1",
+		"webpack-cli": "^3.3.12"
 	},
 	"__metadata": {
 		"id": "ea7b3c4b-a00f-4f95-a431-7a74aa78303c",

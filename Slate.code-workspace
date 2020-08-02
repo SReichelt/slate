@@ -3,10 +3,5 @@
 		{
 			"path": ".",
 		}
-	],
-	"extensions": {
-		"recommendations": [
-			"sreichelt.slate"
-		]
-	}
+	]
 }
