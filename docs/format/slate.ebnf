@@ -4,17 +4,14 @@
 
 Document                ::= MetaModelRef Definition*;
 
-MetaModelRef            ::= '%' Path '%';
-
-Path                    ::= ParentPath? Identifier ArgumentList?;
-ParentPath              ::= ((Identifier | '.' | '..') '/')* | Path '.';
+MetaModelRef            ::= '%' ParentPath Identifier '%';
 
 Definition              ::= '$' Identifier ParameterList? ':' Expression '{' Definition* NamedArguments '}';
 
 ParameterList           ::= '(' Parameters ')';
 Parameters              ::= (ParameterGroup (',' ParameterGroup)*)?;
-ParameterGroup          ::= ParameterIdentifier (',' ParameterIdentifier)* ':' Expression ('=' Expression)?;
-ParameterIdentifier     ::= Identifier ArrayExpression? '...'? '?'?;
+ParameterGroup          ::= ParameterSpecifier (',' ParameterSpecifier)* ':' Expression ('=' Expression)?;
+ParameterSpecifier      ::= Identifier ArrayExpression? '...'? '?'?;
 
 ArgumentList            ::= '(' Arguments ')';
 Arguments               ::= (Argument (',' Argument)*)?;
@@ -26,11 +23,14 @@ Expression              ::= IntegerExpression | StringExpression | VariableRefEx
 IntegerExpression       ::= ('+' | '-')? [0-9]+;
 StringExpression        ::= <C-style string enclosed in single quotes>;
 VariableRefExpression   ::= Identifier;
-MetaRefExpression       ::= '%' Identifier ArgumentList?;
+MetaRefExpression       ::= '%' IdentifierWithArguments;
 DefinitionRefExpression ::= '$' Path;
 ParameterExpression     ::= '#' ParameterList;
 CompoundExpression      ::= '{' Arguments '}';
 ArrayExpression         ::= '[' (Expression (',' Expression)*)? ']';
 IndexedExpression       ::= Expression '[' Arguments ']';
 
+Path                    ::= ParentPath IdentifierWithArguments ('.' IdentifierWithArguments)*;
+ParentPath              ::= ((Identifier | '.' | '..') '/')*
+IdentifierWithArguments ::= Identifier ArgumentList?
 Identifier              ::= <nonempty string of characters except whitespace and punctuation (see isSpecialCharacter)> | <C-style string enclosed in double quotes>;

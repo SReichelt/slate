@@ -74,7 +74,7 @@ export function apiRouter(rootPath: string): express.Router {
   let fontPath = path.join(rootPath, 'node_modules', 'mathjax', 'fonts');
 
   router.use(express.static(dataPath));
-
+  router.use('/data', express.static(dataPath));
   router.use('/docs', express.static(docPath));
   router.use('/fonts', express.static(fontPath));
 

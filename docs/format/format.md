@@ -19,10 +19,10 @@ The source code to read and write data in this format can be found in `src/share
 ## Metamodels
 
 The type, or purpose, of a `.slate` file is defined by the metamodel it references at the top. Currently, four metamodels have been defined:
-* The `hlm` metamodel defines the mathematical primitives of the HLM logic. Since HLM is currently the only logic implemented in Slate, all files with mathematical content reference this metamodel.
-* The `library` metamodel is used in files that specify the structure of a mathematical library.
-* The `notation` metamodel contains rendering primitives. It is referenced by `templates.slate`, which defines notation templates, and is also included in the `hlm` metamodel since each mathematical object can be equipped with a custom notation.
-* Finally, since the metamodels are `.slate` files themselves, they also need to reference a specific metamodel which is called `meta`.
+* The [`hlm`](../../data/logics/hlm.slate) metamodel defines the mathematical primitives of the HLM logic. Since HLM is currently the only logic implemented in Slate, all files with mathematical content reference this metamodel.
+* The [`library`](../../data/logics/library.slate) metamodel is used in files that specify the structure of a mathematical library.
+* The [`notation`](../../data/notation/notation.slate) metamodel contains rendering primitives. It is referenced by [`templates.slate`](../../data/notation/templates.slate), which defines notation templates, and is also included in the `hlm` metamodel since each mathematical object can be equipped with a custom notation.
+* Finally, since the metamodels are `.slate` files themselves, they also need to reference a specific metamodel which is called [`meta`](../../data/format/meta.slate).
 
 When reading a `.slate` file, the code typically expects a file of a specific type, i.e. a file that references a specific metamodel. In fact, the code in `read.ts` expects its caller to provide an "implementation" of the metamodel, of which there are three different kinds:
 * The *dummy* implementation ignores the metamodel specification of the file and accepts all files that match the grammar. The resulting objects are not really semantically meaningful. E.g. when reading a variable reference, the code cannot determine the referenced variable without knowing the metamodel. Therefore, all identifiers are accepted as variable names, and each reference simply points to a newly created parameter.
@@ -30,7 +30,7 @@ When reading a `.slate` file, the code typically expects a file of a specific ty
 * In all cases where a specific metamodel is expected, the metamodel implementation can be *generated* from the metamodel `.slate` file, using the code generation scripts in `src/scripts`. This has the advantage that a specific TypeScript class (with appropriate members) is generated for each definition in the metamodel. When reading a corresponding file, these classes are instantiated and filled appropriately, as if the metamodel defined a new domain-specific language.
 
 The functionality that is implemented by a metamodel is a little ad-hoc and has been extended somewhat frequently to fit specific needs, but in general it can be described as follows:
-* First, a metamodel exports certain definitions to be used as *meta references* in files. E.g. the metamodel file `library.slate` contains a definition `$Section`, and this definition is referenced as `%Section` in `_index.slate` files, which reference this metamodel. (Note that in the Visual Studio Code extension, "go to definition" also works on meta references, even though they are displayed as keywords.)
+* First, a metamodel exports certain definitions to be used as *meta references* in files. E.g. the metamodel file [`library.slate`](../../data/logics/library.slate) contains a definition `$Section`, and this definition is referenced as `%Section` in `_index.slate` files, which reference this metamodel. (Note that in the Visual Studio Code extension, "go to definition" also works on meta references, even though they are displayed as keywords.)
 * Then, depending on where a definition can be used as a meta reference, it can supply additional information regarding:
   * Contents: In the case of `%Section`, the metamodel specifies that it can be used as a definition type and that a definition of this type has the members `logic` and `items`.
   * Variables: In particular, the metamodel specifies which variables are in scope at which locations.
@@ -39,9 +39,9 @@ The functionality that is implemented by a metamodel is a little ad-hoc and has 
 
 ### HLM files
 
-HLM files are `.slate` files that reference the `hlm` metamodel. Beyond the constraints defined by the metamodel, these files are governed by the HLM *logic*, i.e. by mathematical rules that impose further restrictions. As with any theorem prover, a lot of these rules fall under the topic of *type checking*.
+HLM files are `.slate` files that reference the [`hlm`](../../data/logics/hlm.slate) metamodel. Beyond the constraints defined by the metamodel, these files are governed by the HLM *logic*, i.e. by mathematical rules that impose further restrictions. As with any theorem prover, a lot of these rules fall under the topic of *type checking*.
 
 An exact description of HLM files does not exist yet, and the details are still somewhat subject to change. However, there is a strong connection between the definitions in the `hlm` metamodel and the items of context-specific menus in the Slate GUI. E.g. consider the menu that appears when entering a formula. The items in this menu are, in that order:
 * Variable references (though formula variables are rare).
-* Meta references like `%and`, `%forall`, etc., which are defined in `hlm.slate`.
+* Meta references like `%and`, `%forall`, etc., which are defined in [`hlm.slate`](../../data/logics/hlm.slate).
 * Definition references.

@@ -3244,6 +3244,7 @@ class TutorialStates {
               contents: (
                 <div>
                   <p>If you would like to see how the source code is built up during the next steps of the tutorial, you can leave this view open and click "Continue". Otherwise, please close it again.</p>
+                  <p>For more information about the file format, <DocLink href="docs/format/format" onDocLinkClicked={this.onDocLinkClicked}>see here</DocLink></p>
                   <div className={'tutorial-tooltip-button-row'}>
                     <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertTheorem_menu)}>
                       {getButtonIcon(ButtonType.OK)} Continue
