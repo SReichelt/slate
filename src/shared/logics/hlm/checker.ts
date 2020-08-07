@@ -1435,13 +1435,18 @@ export class HLMDefinitionChecker {
       if (proof.parameters) {
         if (!parameters || !proof.parameters.isEquivalentTo(parameters)) {
           this.error(proof.parameters, 'Invalid proof parameters');
+          return;
         }
         innerContext = this.getParameterListContext(proof.parameters, context);
       } else if (parameters) {
         this.error(proof, 'Parameter list required');
+        return;
       }
       if (proof.goal) {
         this.checkFormula(proof.goal, innerContext);
+        if (parameters && proof.parameters) {
+          goal = this.utils.substituteParameters(goal, parameters, proof.parameters);
+        }
         this.checkUnfolding(goal, proof.goal, innerContext);
       }
       // TODO
@@ -1470,9 +1475,9 @@ export class HLMDefinitionChecker {
           let fromIndex = proof._from.toNumber() - 1;
           let toIndex = proof._to.toNumber() - 1;
           if (fromIndex < 0 || fromIndex >= items.length) {
-            this.error(proof, 'invalid from index');
+            this.error(proof, 'Invalid from index');
           } else if (toIndex < 0 || toIndex >= items.length) {
-            this.error(proof, 'invalid to index');
+            this.error(proof, 'Invalid to index');
           } else {
             let proofParameters: Fmt.ParameterList | undefined = Object.create(Fmt.ParameterList.prototype);
             let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters!);
@@ -1492,7 +1497,12 @@ export class HLMDefinitionChecker {
   // * different variants of associative expressions
 
   private checkUnfolding(source: Fmt.Expression, target: Fmt.Expression, context: HLMCheckerContext): void {
-    // TODO
+    let check = this.utils.unfoldsTo(source, target).then((result: boolean) => {
+      if (!result) {
+        this.error(target, `${source} does not unfold to ${target}`);
+      }
+    });
+    this.addPendingCheck(check);
   }
 
   private checkTrivialProvability(goal: Fmt.Expression, context: HLMCheckerContext): void {

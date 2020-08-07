@@ -66,6 +66,14 @@ class CachedPromise<T> implements PromiseLike<T> {
     }
   }
 
+  and(ontrue: () => T | PromiseLike<T>): CachedPromise<T> {
+    return this.then((value: T) => (value && ontrue()));
+  }
+
+  or(onfalse: () => T | PromiseLike<T>): CachedPromise<T> {
+    return this.then((value: T) => (value || onfalse()));
+  }
+
   isResolved(): boolean {
     return !this.promise;
   }

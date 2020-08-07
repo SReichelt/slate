@@ -407,29 +407,25 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
     let resultPromise = CachedPromise.resolve(false);
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
       for (let item of definition.contents.items) {
-        resultPromise = resultPromise.then((currentResult: boolean) => {
-          if (currentResult) {
-            return true;
-          } else {
-            if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
-              let itemIsSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
-              let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
-              let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
-              let filteredSearchWords = filterSearchWords(searchWords, [itemPath.name, title]);
-              let itemDefinitionPromise: CachedPromise<LibraryDefinition>;
-              if (itemIsSubsection) {
-                itemDefinitionPromise = innerLibraryDataProvider.fetchSubsection(itemPath, undefined, false);
-              } else if (filteredSearchWords.length) {
-                return false;
-              } else if (onFilter) {
-                itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false, false);
-              } else {
-                return true;
-              }
-              return itemDefinitionPromise.then((itemDefinition: LibraryDefinition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, itemDefinition.definition, filteredSearchWords, onFilter).visible);
-            } else {
+        resultPromise = resultPromise.or(() => {
+          if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
+            let itemIsSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
+            let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
+            let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
+            let filteredSearchWords = filterSearchWords(searchWords, [itemPath.name, title]);
+            let itemDefinitionPromise: CachedPromise<LibraryDefinition>;
+            if (itemIsSubsection) {
+              itemDefinitionPromise = innerLibraryDataProvider.fetchSubsection(itemPath, undefined, false);
+            } else if (filteredSearchWords.length) {
               return false;
+            } else if (onFilter) {
+              itemDefinitionPromise = innerLibraryDataProvider.fetchItem(itemPath, false, false);
+            } else {
+              return true;
             }
+            return itemDefinitionPromise.then((itemDefinition: LibraryDefinition) => checkVisibility(innerLibraryDataProvider, itemPath, itemIsSubsection, itemDefinition, itemDefinition.definition, filteredSearchWords, onFilter).visible);
+          } else {
+            return false;
           }
         });
       }
@@ -445,15 +441,11 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
       onFilter(libraryDataProvider, path, libraryDefinition, definition));
     let resultPromise = ownResultPromise;
     for (let innerDefinition of definition.innerDefinitions) {
-      resultPromise = resultPromise.then((currentResult: boolean) => {
-        if (currentResult) {
-          return true;
-        } else {
-          let innerPath = new Fmt.Path;
-          innerPath.name = innerDefinition.name;
-          innerPath.parentPath = path;
-          return checkVisibility(libraryDataProvider, innerPath, false, libraryDefinition, innerDefinition, searchWords, onFilter).visible;
-        }
+      resultPromise = resultPromise.or(() => {
+        let innerPath = new Fmt.Path;
+        innerPath.name = innerDefinition.name;
+        innerPath.parentPath = path;
+        return checkVisibility(libraryDataProvider, innerPath, false, libraryDefinition, innerDefinition, searchWords, onFilter).visible;
       });
     }
     return {

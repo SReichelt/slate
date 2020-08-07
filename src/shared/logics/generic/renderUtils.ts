@@ -223,8 +223,7 @@ export abstract class GenericRenderUtils {
         for (let index = 0; index < expression.length; index++) {
           let expressionItem = expression[index];
           let notationItem = notation[index];
-          result = result.then((currentResult: boolean) =>
-            currentResult && this.matchParameterizedNotation(expressionItem, notationItem, abbreviationArgs));
+          result = result.and(() => this.matchParameterizedNotation(expressionItem, notationItem, abbreviationArgs));
         }
         return result;
       }
@@ -246,8 +245,7 @@ export abstract class GenericRenderUtils {
             if (expressionArg === undefined) {
               return CachedPromise.resolve(false);
             }
-            result = result.then((currentResult: boolean) =>
-              currentResult && this.matchParameterizedNotation(expressionArg, notationArg, abbreviationArgs));
+            result = result.and(() => this.matchParameterizedNotation(expressionArg, notationArg, abbreviationArgs));
           }
         }
         return result;
