@@ -8,7 +8,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   logic: string;
   items: Fmt.Expression[];
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let logicRaw = argumentList.getValue('logic', 0);
     if (logicRaw instanceof Fmt.StringExpression) {
       this.logic = logicRaw.value;
@@ -23,7 +23,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let logicExpr = new Fmt.StringExpression;
     logicExpr.value = this.logic;
@@ -94,10 +94,10 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
     return 'Section';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -122,12 +122,12 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Library extends ObjectContents_Section {
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.fromArgumentList(argumentList);
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    super.toArgumentList(argumentList, outputAllNames);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
+    super.toArgumentList(argumentList, outputAllNames, reportFn);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
@@ -157,10 +157,10 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
     return 'Library';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -193,7 +193,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     return 'item';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.ref = argumentList.getValue('ref', 0);
     let typeRaw = argumentList.getOptionalValue('type', 1);
     if (typeRaw !== undefined) {
@@ -213,7 +213,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this.ref, undefined, false);
     if (this.type !== undefined) {
@@ -267,7 +267,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     return 'subsection';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.ref = argumentList.getValue('ref', 0);
     let titleRaw = argumentList.getValue('title', 1);
     if (titleRaw instanceof Fmt.StringExpression) {
@@ -277,7 +277,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this.ref, undefined, false);
     let titleExpr = new Fmt.StringExpression;

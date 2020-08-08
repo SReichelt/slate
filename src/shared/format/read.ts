@@ -100,7 +100,10 @@ export interface ObjectRangeInfo {
   signatureRange?: Range;
 }
 
-export type RangeHandler = (info: ObjectRangeInfo) => void;
+export interface RangeHandler {
+  reportRange(info: ObjectRangeInfo): void;
+  reportConversion?(raw: Fmt.CompoundExpression, converted: Fmt.ObjectContents): void;
+}
 
 export class EmptyExpression extends Fmt.Expression {
   substitute(fn: Fmt.ExpressionSubstitutionFn, replacedParameters?: Fmt.ReplacedParameter[]): Fmt.Expression {
@@ -132,7 +135,7 @@ export class Reader {
   private atError = false;
   private metaModel: Meta.MetaModel | undefined;
 
-  constructor(private stream: InputStream, private errorHandler: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private reportRange?: RangeHandler) {}
+  constructor(private stream: InputStream, private errorHandler: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private rangeHandler?: RangeHandler) {}
 
   readFile(): Fmt.File {
     let file = this.readPartialFile();
@@ -254,26 +257,22 @@ export class Reader {
           }
         }
         result.text = item.text;
-        if (this.reportRange !== undefined) {
-          this.reportRange({
-            object: result,
-            context: context,
-            metaDefinitions: metaDefinitions,
-            range: item.range,
-            nameRange: item.nameRange,
-            linkRange: item.nameRange
-          });
-        }
-        return result;
-      });
-      if (this.reportRange !== undefined) {
-        this.reportRange({
-          object: definition.documentation,
+        this.rangeHandler?.reportRange({
+          object: result,
           context: context,
           metaDefinitions: metaDefinitions,
-          range: documentationComment.range
+          range: item.range,
+          nameRange: item.nameRange,
+          linkRange: item.nameRange
         });
-      }
+        return result;
+      });
+      this.rangeHandler?.reportRange({
+        object: definition.documentation,
+        context: context,
+        metaDefinitions: metaDefinitions,
+        range: documentationComment.range
+      });
     }
     this.readChar('{');
     let metaInnerDefinitionTypes: Fmt.MetaDefinitionFactory | undefined = undefined;
@@ -294,7 +293,8 @@ export class Reader {
       let argumentsStart = this.markStart();
       this.readArguments(args, contentsContext);
       try {
-        contents.fromArgumentList(args);
+        let reportFn = this.rangeHandler?.reportConversion?.bind(this.rangeHandler);
+        contents.fromArgumentList(args, reportFn);
       } catch (error) {
         this.error(error.message, this.markEnd(argumentsStart));
       }
@@ -519,7 +519,8 @@ export class Reader {
       let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
       this.readOptionalArgumentList(args, context);
       try {
-        (expression as Fmt.MetaRefExpression).fromArgumentList(args);
+        let reportFn = this.rangeHandler?.reportConversion?.bind(this.rangeHandler);
+        (expression as Fmt.MetaRefExpression).fromArgumentList(args, reportFn);
       } catch (error) {
         this.error(error.message, this.markEnd(expressionStart));
       }
@@ -1039,7 +1040,7 @@ export class Reader {
       start: start,
       end: this.markedEnd
     });
-    if (object !== undefined && this.reportRange !== undefined) {
+    if (object !== undefined && this.rangeHandler) {
       if (nameRange) {
         nameRange = fixRange(nameRange);
       }
@@ -1049,7 +1050,7 @@ export class Reader {
       if (signatureRange) {
         signatureRange = fixRange(signatureRange);
       }
-      this.reportRange({
+      this.rangeHandler.reportRange({
         object: object,
         context: context,
         metaDefinitions: metaDefinitions,
@@ -1116,13 +1117,13 @@ export class DefaultErrorHandler implements ErrorHandler {
   }
 }
 
-export function readStream(stream: InputStream, errorHandler: ErrorHandler, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
-  let reader = new Reader(stream, errorHandler, getMetaModel, reportRange);
+export function readStream(stream: InputStream, errorHandler: ErrorHandler, getMetaModel: Meta.MetaModelGetter, rangeHandler?: RangeHandler): Fmt.File {
+  let reader = new Reader(stream, errorHandler, getMetaModel, rangeHandler);
   return reader.readFile();
 }
 
-export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, reportRange?: RangeHandler): Fmt.File {
+export function readString(str: string, fileName: string, getMetaModel: Meta.MetaModelGetter, rangeHandler?: RangeHandler): Fmt.File {
   let stream = new StringInputStream(str);
   let errorHandler = new DefaultErrorHandler(fileName);
-  return readStream(stream, errorHandler, getMetaModel, reportRange);
+  return readStream(stream, errorHandler, getMetaModel, rangeHandler);
 }

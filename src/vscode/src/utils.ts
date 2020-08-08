@@ -37,6 +37,24 @@ export function convertRangeInfo(info: FmtReader.ObjectRangeInfo): RangeInfo {
     };
 }
 
+export class RangeHandler implements FmtReader.RangeHandler {
+    rangeList: RangeInfo[] = [];
+    rangeMap: Map<Object, RangeInfo> = new Map<Object, RangeInfo>();
+
+    reportRange(info: FmtReader.ObjectRangeInfo): void {
+        let rangeInfo = convertRangeInfo(info);
+        this.rangeList.push(rangeInfo);
+        this.rangeMap.set(info.object, rangeInfo);
+    }
+
+    reportConversion(raw: Fmt.CompoundExpression, converted: Fmt.ObjectContents): void {
+        let rangeInfo = this.rangeMap.get(raw);
+        if (rangeInfo) {
+            this.rangeMap.set(converted, rangeInfo);
+        }
+    }
+}
+
 export function areUrisEqual(uri1: vscode.Uri, uri2: vscode.Uri): boolean {
     return uri1.toString() === uri2.toString();
 }

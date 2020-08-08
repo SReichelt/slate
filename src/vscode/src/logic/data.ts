@@ -9,7 +9,7 @@ import { FileAccessor } from '../../../shared/data/fileAccessor';
 import { LibraryDataProvider, LibraryDataProviderConfig } from '../../../shared/data/libraryDataProvider';
 import { languageId } from '../slate';
 import { ParseDocumentEvent } from '../events';
-import { RangeInfo, convertRangeInfo, deleteUrisFromDiagnosticCollection } from '../utils';
+import { RangeInfo, RangeHandler, deleteUrisFromDiagnosticCollection } from '../utils';
 
 export interface Library {
     libraryDataProvider: LibraryDataProvider;
@@ -47,15 +47,9 @@ export class LibraryDocumentProvider {
             return undefined;
         }
         let isSection = (event.file.metaModelPath.name === 'library');
-        let rangeList: RangeInfo[] = [];
-        let rangeMap = new Map<Object, RangeInfo>();
-        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
-            let rangeInfo = convertRangeInfo(info);
-            rangeList.push(rangeInfo);
-            rangeMap.set(info.object, rangeInfo);
-        };
+        let rangeHandler = new RangeHandler;
         if (isSection) {
-            event.file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel, reportRange);
+            event.file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel, rangeHandler);
         }
         let library = this.getLibrary(event, isSection);
         if (!library) {
@@ -75,7 +69,7 @@ export class LibraryDocumentProvider {
             try {
                 let stream = new FmtReader.StringInputStream(event.document.getText());
                 let errorHandler = new FmtReader.DefaultErrorHandler(event.document.fileName, false, true);
-                event.file = FmtReader.readStream(stream, errorHandler, library.libraryDataProvider.logic.getMetaModel, reportRange);
+                event.file = FmtReader.readStream(stream, errorHandler, library.libraryDataProvider.logic.getMetaModel, rangeHandler);
             } catch (error) {
                 library.diagnosticCollection.delete(event.document.uri);
                 return undefined;
@@ -87,8 +81,8 @@ export class LibraryDocumentProvider {
             documentLibraryDataProvider: documentLibraryDataProvider,
             file: event.file,
             isSection: isSection,
-            rangeList: rangeList,
-            rangeMap: rangeMap
+            rangeList: rangeHandler.rangeList,
+            rangeMap: rangeHandler.rangeMap
         };
     }
 

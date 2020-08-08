@@ -222,8 +222,9 @@ class MetaDeclarationGenerator {
           let subTarget = this.makeUniqueName('newItem', type);
           outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
           outFileStr += `${indent}  let ${subTarget} = new ObjectContents_${definition.name};\n`;
-          outFileStr += `${indent}  ${subTarget}.fromCompoundExpression(${source});\n`;
+          outFileStr += `${indent}  ${subTarget}.fromCompoundExpression(${source}, reportFn);\n`;
           outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
+          outFileStr += `${indent}  reportFn?.(${source}, ${subTarget});\n`;
           outFileStr += `${indent}} else {\n`;
           outFileStr += `${indent}  throw new Error('${argName}: Compound expression expected');\n`;
           outFileStr += `${indent}}\n`;
@@ -329,8 +330,9 @@ class MetaDeclarationGenerator {
           let definition = this.inFile.definitions.getDefinition(path.name);
           if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(definition)) {
             outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-            outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true);\n`;
+            outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true, reportFn);\n`;
             outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
+            outFileStr += `${indent}reportFn?.(${variableName}, ${source});\n`;
           }
         }
       }
@@ -517,9 +519,9 @@ class MetaDeclarationGenerator {
           }
           outFileStr += `\n`;
         }
-        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
+        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
         if (superDefinition) {
-          outFileStr += `    super.fromArgumentList(argumentList);\n`;
+          outFileStr += `    super.fromArgumentList(argumentList, reportFn);\n`;
         }
         if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
           let argIndex = 0;
@@ -535,9 +537,9 @@ class MetaDeclarationGenerator {
         }
         outFileStr += `  }\n`;
         outFileStr += `\n`;
-        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {\n`;
+        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {\n`;
         if (superDefinition) {
-          outFileStr += `    super.toArgumentList(argumentList, outputAllNames);\n`;
+          outFileStr += `    super.toArgumentList(argumentList, outputAllNames, reportFn);\n`;
         } else {
           outFileStr += `    argumentList.length = 0;\n`;
         }
@@ -631,7 +633,7 @@ class MetaDeclarationGenerator {
         outFileStr += `    return '${definition.name}';\n`;
         outFileStr += `  }\n`;
         outFileStr += `\n`;
-        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
+        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
         let argIndex = 0;
         for (let parameter of definition.parameters) {
           let memberName = translateMemberName(parameter.name);
@@ -641,7 +643,7 @@ class MetaDeclarationGenerator {
         }
         outFileStr += `  }\n`;
         outFileStr += `\n`;
-        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList): void {\n`;
+        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
         outFileStr += `    argumentList.length = 0;\n`;
         let named = 0;
         for (let parameter of definition.parameters) {

@@ -7,7 +7,7 @@ import * as FmtDynamic from '../../../shared/format/dynamic';
 import * as FmtMeta from '../../../shared/format/meta';
 import * as FmtReader from '../../../shared/format/read';
 import { getFileNameFromPath } from '../../../fs/format/dynamic';
-import { RangeInfo, convertRange, convertRangeInfo } from '../utils';
+import { RangeInfo, RangeHandler, convertRange } from '../utils';
 import { ParsedDocument, NestedArgumentListInfo } from './parsedDocument';
 import { readRange, readRangeRaw } from './utils';
 import { checkReferencedDefinitions } from './checkReferencedDefinitions';
@@ -65,13 +65,15 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
         fileContents = readRange(uri, undefined, false, sourceDocument) || '';
     }
 
+    let rangeHandler = new RangeHandler;
+
     let parsedDocument: ParsedDocument = {
         uri: uri,
         hasSyntaxErrors: false,
         hasUnfilledPlaceholders: false,
         hasBrokenReferences: false,
-        rangeList: [],
-        rangeMap: new Map<Object, RangeInfo>(),
+        rangeList: rangeHandler.rangeList,
+        rangeMap: rangeHandler.rangeMap,
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>(),
         objectContentsMap: needExtendedInfo ? new Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>() : undefined,
         nestedArgumentListsMap: needExtendedInfo ? new Map<Fmt.ArgumentList, NestedArgumentListInfo>() : undefined
@@ -93,21 +95,17 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             parsedMetaModel.metaModel.onObjectContentsCreated = onObjectContentsCreated;
             return parsedMetaModel.metaModel;
         }
+        let metaModelRangeHandler = new RangeHandler;
         let parsedMetaModelDocument: ParsedDocument = {
             uri: vscode.Uri.file(metaModelFileName),
             hasSyntaxErrors: false,
             hasUnfilledPlaceholders: false,
             hasBrokenReferences: false,
-            rangeList: [],
-            rangeMap: new Map<Object, RangeInfo>()
+            rangeList: metaModelRangeHandler.rangeList,
+            rangeMap: metaModelRangeHandler.rangeMap
         };
         let metaModelFileContents = readRangeRaw(parsedMetaModelDocument.uri);
-        let reportMetaModelRange = (info: FmtReader.ObjectRangeInfo) => {
-            let rangeInfo = convertRangeInfo(info);
-            parsedMetaModelDocument.rangeList.push(rangeInfo);
-            parsedMetaModelDocument.rangeMap.set(info.object, rangeInfo);
-        };
-        parsedMetaModelDocument.file = FmtReader.readString(metaModelFileContents, metaModelFileName, FmtMeta.getMetaModel, reportMetaModelRange);
+        parsedMetaModelDocument.file = FmtReader.readString(metaModelFileContents, metaModelFileName, FmtMeta.getMetaModel, metaModelRangeHandler);
         if (!parsedDocument.metaModelDocument) {
             parsedDocument.metaModelDocument = parsedMetaModelDocument;
         }
@@ -127,12 +125,14 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
     if (preCheck) {
         let preCheckCompleted = false;
         let stream = new FmtReader.StringInputStream(fileContents);
-        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
-            if (!preCheckCompleted && preCheck(parsedDocument, info)) {
-                preCheckCompleted = true;
+        let preCheckRangeHandler: FmtReader.RangeHandler = {
+            reportRange(info: FmtReader.ObjectRangeInfo): void {
+                if (!preCheckCompleted && preCheck(parsedDocument, info)) {
+                    preCheckCompleted = true;
+                }
             }
         };
-        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
+        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, preCheckRangeHandler);
         try {
             reader.readFile();
         } catch (error) {
@@ -144,12 +144,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
 
     {
         let stream = new FmtReader.StringInputStream(fileContents);
-        let reportRange = (info: FmtReader.ObjectRangeInfo) => {
-            let rangeInfo = convertRangeInfo(info);
-            parsedDocument.rangeList.push(rangeInfo);
-            parsedDocument.rangeMap.set(info.object, rangeInfo);
-        };
-        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, reportRange);
+        let reader = new FmtReader.Reader(stream, errorHandler, getDocumentMetaModel, rangeHandler);
         try {
             parsedDocument.file = reader.readFile();
             if (diagnostics || needExtendedInfo) {

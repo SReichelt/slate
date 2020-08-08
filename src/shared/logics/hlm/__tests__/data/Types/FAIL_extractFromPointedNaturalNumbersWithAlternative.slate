@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Type mismatch
+ * @expectedError Type mismatch: %setStructuralCases($../Essentials/"pointed natural numbers with alternative", $../Essentials/"Pointed sets", [{constructor = $../Essentials/"Pointed sets"."pointed set", parameters = #(S: %Set, s: %Element(S)), value = S}]) and S are incompatible
  */
 $FAIL_extractFromPointedNaturalNumbersWithAlternative(
   S: %Set,

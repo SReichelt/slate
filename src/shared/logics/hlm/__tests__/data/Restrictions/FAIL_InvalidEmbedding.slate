@@ -1,7 +1,9 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Type mismatch
+ * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $FAIL_InvalidEmbedding are incompatible
+ *
+ * @expectedWarning Proof of %equals(s, s) required
  */
 $FAIL_InvalidEmbedding: %Construction {
   $instance(

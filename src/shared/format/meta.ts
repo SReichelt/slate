@@ -10,7 +10,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   functions?: Fmt.Expression[];
   lookup?: Fmt.Expression;
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let definitionTypesRaw = argumentList.getValue('definitionTypes', 0);
     if (definitionTypesRaw instanceof Fmt.ArrayExpression) {
       this.definitionTypes = definitionTypesRaw.items;
@@ -36,7 +36,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     this.lookup = argumentList.getOptionalValue('lookup', 3);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let definitionTypesExpr = new Fmt.ArrayExpression;
     definitionTypesExpr.items = [];
@@ -185,10 +185,10 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
     return 'MetaModel';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -217,7 +217,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   members?: Fmt.ParameterList;
   exports?: Fmt.Expression[];
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.superType = argumentList.getOptionalValue('superType', 0);
     let membersRaw = argumentList.getOptionalValue('members', 1);
     if (membersRaw !== undefined) {
@@ -237,7 +237,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.superType !== undefined) {
       argumentList.add(this.superType, 'superType', true);
@@ -333,8 +333,8 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
 export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   innerDefinitionTypes?: Fmt.Expression[];
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.fromArgumentList(argumentList);
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
     let innerDefinitionTypesRaw = argumentList.getOptionalValue('innerDefinitionTypes', 3);
     if (innerDefinitionTypesRaw !== undefined) {
       if (innerDefinitionTypesRaw instanceof Fmt.ArrayExpression) {
@@ -345,8 +345,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    super.toArgumentList(argumentList, outputAllNames);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
+    super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.innerDefinitionTypes !== undefined) {
       let innerDefinitionTypesExpr = new Fmt.ArrayExpression;
       innerDefinitionTypesExpr.items = [];
@@ -413,11 +413,11 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     return 'DefinitionType';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.resultType = argumentList.getOptionalValue('resultType', 0);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.resultType !== undefined) {
       argumentList.add(this.resultType, 'resultType', true);
@@ -452,12 +452,12 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.fromArgumentList(argumentList);
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    super.toArgumentList(argumentList, outputAllNames);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
+    super.toArgumentList(argumentList, outputAllNames, reportFn);
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
@@ -487,10 +487,10 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
     return 'ExpressionType';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -519,15 +519,15 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   argumentType?: Fmt.Expression;
   canOmit?: Fmt.Expression;
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
-    super.fromArgumentList(argumentList);
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
     this.optional = argumentList.getOptionalValue('optional', 3);
     this.argumentType = argumentList.getOptionalValue('argumentType', 4);
     this.canOmit = argumentList.getOptionalValue('canOmit', 5);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean): void {
-    super.toArgumentList(argumentList, outputAllNames);
+  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
+    super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.optional !== undefined) {
       argumentList.add(this.optional, 'optional', true);
     }
@@ -604,11 +604,11 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
     return 'ParameterType';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.variableType = argumentList.getOptionalValue('variableType', 0);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.variableType !== undefined) {
       argumentList.add(this.variableType, 'variableType', true);
@@ -647,10 +647,10 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
     return 'Any';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -675,10 +675,10 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
     return 'self';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -703,10 +703,10 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
     return 'Type';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -731,10 +731,10 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
     return 'true';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -759,10 +759,10 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
     return 'false';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -787,10 +787,10 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
     return 'Int';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -815,10 +815,10 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
     return 'String';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -843,10 +843,10 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
     return 'ParameterList';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 
@@ -873,11 +873,11 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
     return 'SingleParameter';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.type = argumentList.getOptionalValue('type', 0);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.type !== undefined) {
       argumentList.add(this.type, 'type', true);
@@ -912,10 +912,10 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
     return 'ArgumentList';
   }
 
-  fromArgumentList(argumentList: Fmt.ArgumentList): void {
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList): void {
+  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
   }
 

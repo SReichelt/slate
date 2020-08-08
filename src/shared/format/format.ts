@@ -6,6 +6,8 @@ export type ExpressionTraversalFn = (subExpression: Expression) => void;
 export type ExpressionSubstitutionFn = (subExpression: Expression, indices?: Index[]) => Expression;
 export type ExpressionUnificationFn = (left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean;
 
+export type ReportConversionFn = (raw: CompoundExpression, converted: ObjectContents) => void;
+
 export class File {
   metaModelPath: Path;
   // TODO find a better way to initialize lists, especially since some of them are regularly overwritten
@@ -595,15 +597,15 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
 }
 
 export abstract class ObjectContents {
-  abstract fromArgumentList(argumentList: ArgumentList): void;
-  abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean): void;
+  abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
+  abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void;
 
-  fromCompoundExpression(expression: CompoundExpression): void {
-    this.fromArgumentList(expression.arguments);
+  fromCompoundExpression(expression: CompoundExpression, reportFn?: ReportConversionFn): void {
+    this.fromArgumentList(expression.arguments, reportFn);
   }
 
-  toCompoundExpression(expression: CompoundExpression, outputAllNames: boolean): void {
-    this.toArgumentList(expression.arguments, outputAllNames);
+  toCompoundExpression(expression: CompoundExpression, outputAllNames: boolean, reportFn?: ReportConversionFn): void {
+    this.toArgumentList(expression.arguments, outputAllNames, reportFn);
   }
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
@@ -620,12 +622,12 @@ export abstract class ObjectContents {
 export class GenericObjectContents extends ObjectContents {
   arguments: ArgumentList = Object.create(ArgumentList.prototype);
 
-  fromArgumentList(argumentList: ArgumentList): void {
+  fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void {
     this.arguments.length = 0;
     this.arguments.push(...argumentList);
   }
 
-  toArgumentList(argumentList: ArgumentList, outputAllNames: boolean): void {
+  toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.push(...this.arguments);
   }
@@ -750,8 +752,8 @@ export class VariableRefExpression extends Expression {
 
 export abstract class MetaRefExpression extends Expression {
   abstract getName(): string;
-  abstract fromArgumentList(argumentList: ArgumentList): void;
-  abstract toArgumentList(argumentList: ArgumentList): void;
+  abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
+  abstract toArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
 
   getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined { return undefined; }
   createDefinitionContents(): ObjectContents | undefined { return undefined; }
@@ -766,12 +768,12 @@ export class GenericMetaRefExpression extends MetaRefExpression {
     return this.name;
   }
 
-  fromArgumentList(argumentList: ArgumentList): void {
+  fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void {
     this.arguments.length = 0;
     this.arguments.push(...argumentList);
   }
 
-  toArgumentList(argumentList: ArgumentList): void {
+  toArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.push(...this.arguments);
   }

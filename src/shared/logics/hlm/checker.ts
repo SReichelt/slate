@@ -523,7 +523,7 @@ export class HLMDefinitionChecker {
     this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
     let constructionExpression = new Fmt.DefinitionRefExpression;
     constructionExpression.path = constructionPath;
-    this.checkCompatibility(embedding.target, [constructionExpression], [embedding.target], innerContext);
+    this.checkCompatibility(embedding.target, [embedding.target], [constructionExpression], innerContext);
     this.checkEmbeddingWellDefinednessProof(embedding, context);
   }
 
@@ -1045,7 +1045,7 @@ export class HLMDefinitionChecker {
     } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
       this.checkElementTerm(term.term, context);
       this.checkSetTerm(term._set, context);
-      this.checkCompatibility(term, [term._set], [term.term], context);
+      this.checkCompatibility(term, [term.term], [term._set], context);
       let goal = new FmtHLM.MetaRefExpression_in;
       goal.element = term.term;
       goal._set = term._set;
@@ -1113,7 +1113,7 @@ export class HLMDefinitionChecker {
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       this.checkElementTerm(formula.element, context);
       this.checkSetTerm(formula._set, context);
-      this.checkCompatibility(formula, [formula._set], [formula.element], context);
+      this.checkCompatibility(formula, [formula.element], [formula._set], context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       this.checkSetTerm(formula.subset, context);
       this.checkSetTerm(formula.superset, context);
@@ -1553,19 +1553,22 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkCompatibility(object: Object, setTerms: Fmt.Expression[], elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    let declaredSetsPromise = CachedPromise.resolve(setTerms);
+  private checkCompatibility(object: Object, elementTerms: Fmt.Expression[], setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
+    let declaredSetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let elementTerm of elementTerms) {
       declaredSetsPromise = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) =>
         this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet))
       );
     }
     let checkDeclaredSets = declaredSetsPromise
-      .then((declaredSets: Fmt.Expression[]) => this.checkSetCompatibilityInternal(object, declaredSets, false, context, initialCompatibilityStatus))
-      .then((result: Fmt.Expression | undefined) => {
-        if (!result) {
-          this.error(object, 'Type mismatch');
-        }
+      .then((declaredSets: Fmt.Expression[]) => {
+        declaredSets = declaredSets.concat(setTerms);
+        return this.checkSetCompatibilityInternal(object, declaredSets, false, context, initialCompatibilityStatus)
+          .then((result: Fmt.Expression | undefined) => {
+            if (!result) {
+              this.error(object, `Type mismatch: ${declaredSets.join(' and ')} are incompatible`);
+            }
+          });
       })
       .catch((error) => this.conditionalError(object, error.message));
     this.addPendingCheck(checkDeclaredSets);
@@ -1575,7 +1578,7 @@ export class HLMDefinitionChecker {
     let check = this.checkSetCompatibilityInternal(object, setTerms, false, context, initialCompatibilityStatusWithoutElements)
       .then((result: Fmt.Expression | undefined) => {
         if (!result) {
-          this.error(object, 'Type mismatch');
+          this.error(object, `Type mismatch: ${setTerms.join(' and ')} are incompatible`);
         }
       })
       .catch((error) => this.conditionalError(object, error.message));
@@ -1584,7 +1587,7 @@ export class HLMDefinitionChecker {
 
   private checkElementCompatibility(object: Object, elementTerms: Fmt.Expression[], context: HLMCheckerContext): void {
     if (elementTerms.length > 1) {
-      this.checkCompatibility(object, [], elementTerms, context);
+      this.checkCompatibility(object, elementTerms, [], context);
     }
   }
 
