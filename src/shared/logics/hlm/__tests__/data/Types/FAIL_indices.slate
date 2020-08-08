@@ -3,11 +3,7 @@
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Pointed sets" expected
  *
- * @expectedWarning Proof of %in($../Essentials/"Natural numbers".zero, $../Essentials/"Pointed sets") required
- *
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
- *
- * @expectedWarning Proof of %in($../Essentials/"Pointed sets"."pointed set"(S = {$../Essentials/"Natural numbers"}, s = {$../Essentials/"Natural numbers".zero}), $../Essentials/"Natural numbers") required
  */
 $FAIL_indices(_1: %Binder(
   #(

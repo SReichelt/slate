@@ -1,7 +1,7 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedWarning Proof of %equals(n, n) required
+ * @expectedWarning Proof required
  */
 $"Cardinal numbers": %Construction {
   $cardinality(S: %Set): %Constructor {

@@ -2,8 +2,6 @@
 
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
- *
- * @expectedWarning Proof of %in($../Essentials/"Pointed sets"."pointed set"(S = {$../Essentials/"Natural numbers"}, s = {$../Essentials/"Natural numbers".zero}), $../Essentials/"Natural numbers") required
  */
 $FAIL_invalidFunctionCall(f: %Element($../Essentials/Functions(
   X = {$../Essentials/"Natural numbers"},

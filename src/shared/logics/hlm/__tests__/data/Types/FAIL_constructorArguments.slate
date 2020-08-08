@@ -2,8 +2,6 @@
 
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
- *
- * @expectedWarning Proof of %in(s, $../Essentials/"Natural numbers") required
  */
 $FAIL_constructorArguments(
   S: %Set,

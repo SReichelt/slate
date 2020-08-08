@@ -11,7 +11,10 @@ import CachedPromise from '../shared/data/cachedPromise';
 
 let fileAccessor = new PhysicalFileAccessor;
 
-function checkLibrary(fileName: string): CachedPromise<boolean> {
+let errorCount = 0;
+let warningCount = 0;
+
+function checkLibrary(fileName: string): CachedPromise<void> {
   let fileStr = fs.readFileSync(fileName, 'utf8');
   let file = FmtReader.readString(fileStr, fileName, FmtLibrary.getMetaModel);
   let contents = file.definitions[0].contents as FmtLibrary.ObjectContents_Library;
@@ -28,41 +31,39 @@ function checkLibrary(fileName: string): CachedPromise<boolean> {
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 
-function checkSection(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
-  let promise = CachedPromise.resolve(true);
+function checkSection(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
+  let promise = CachedPromise.resolve();
   let contents = definition.definition.contents as FmtLibrary.ObjectContents_Section;
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
-      promise = promise.then((currentResult: boolean) =>
-        libraryDataProvider.fetchItem(ref.path, true)
-          .then((itemDefinition: LibraryDefinition) => checkItem(itemDefinition, libraryDataProvider))
-          .then((itemResult: boolean) => currentResult && itemResult));
+      promise = promise.then(() =>
+        libraryDataProvider.fetchItem(ref.path, true).then((itemDefinition: LibraryDefinition) =>
+          checkItem(itemDefinition, libraryDataProvider)));
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
       let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
-      promise = promise.then((currentResult: boolean) =>
-        subsectionDataProvider.fetchLocalSection()
-          .then((subsectionDefinition: LibraryDefinition) => checkSection(subsectionDefinition, subsectionDataProvider))
-          .then((itemResult: boolean) => currentResult && itemResult));
+      promise = promise.then(() =>
+        subsectionDataProvider.fetchLocalSection().then((subsectionDefinition: LibraryDefinition) =>
+          checkSection(subsectionDefinition, subsectionDataProvider)));
     }
   }
   return promise;
 }
 
-function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<boolean> {
+function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
   let checker = libraryDataProvider.logic.getChecker();
   return checker.checkDefinition(definition.definition, libraryDataProvider, false).then((checkResult: Logic.LogicCheckResult) => {
-    let result = true;
     for (let diagnostic of checkResult.diagnostics) {
       let message = diagnostic.message;
       switch (diagnostic.severity) {
       case Logic.DiagnosticSeverity.Error:
         message = `Error: ${message}`;
-        result = false;
+        errorCount++;
         break;
       case Logic.DiagnosticSeverity.Warning:
         message = `Warning: ${message}`;
+        warningCount++;
         break;
       case Logic.DiagnosticSeverity.Information:
         message = `Information: ${message}`;
@@ -76,7 +77,6 @@ function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDa
       }
       console.error(message);
     }
-    return result;
   });
 }
 
@@ -87,7 +87,10 @@ if (process.argv.length !== 3) {
 
 let libraryFileName = process.argv[2];
 checkLibrary(libraryFileName)
-  .then((result: boolean) => process.exit(result ? 0 : 1))
+  .then(() => {
+    console.error(`Found ${errorCount} error(s) and ${warningCount} warning(s).`);
+    process.exit(errorCount ? 1 : 0);
+  })
   .catch((error) => {
     console.error(error.message);
     process.exit(1);
