@@ -7918,7 +7918,7 @@ References.
 * https://mathworld.wolfram.com/QuotientRing.html
 * https://proofwiki.org/wiki/Definition:Quotient_Ring
 * https://ncatlab.org/nlab/show/quotient+ring
-* https://leanprover-community.github.io/mathlib_docs/ring_theory/ideals.html#ideal.quotient.comm_ring"
+* https://leanprover-community.github.io/mathlib_docs/ring_theory/ideal/basic.html#ideal.quotient.comm_ring"
 `;
 
 exports[`render hlm library: 2.8.24.1 data/libraries/hlm/Algebra/Rings/Examples/integers 1`] = `
