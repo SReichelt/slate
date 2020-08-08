@@ -4862,10 +4862,10 @@ class TutorialStates {
                           <p>If you would like to experiment a little without submitting your changes, you can continue in tutorial mode for a while.</p>
                           <p>Note that since the user interface is not finished yet, not everything will work as expected. As a workaround, you may want to switch to the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>, where you can always switch to the text editor as a fallback.</p>
                           <div className={'tutorial-tooltip-button-row'}>
-                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
+                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment, null)}>
                               Continue in tutorial mode
                             </Button>
-                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined)}>
+                            <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(undefined, null)}>
                               {getButtonIcon(ButtonType.Close)} Exit tutorial
                             </Button>
                           </div>
@@ -5027,7 +5027,7 @@ class TutorialStates {
                         <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.revertChanges()}>
                           Revert change
                         </Button>
-                        <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment)}>
+                        <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.experiment, null)}>
                           Continue experimenting
                         </Button>
                       </div>

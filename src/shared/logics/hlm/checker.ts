@@ -1741,15 +1741,6 @@ export class HLMDefinitionChecker {
     if (context.editData) {
       // Handle placeholders.
       unificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
-        if (leftExpression instanceof FmtHLM.MetaRefExpression_enumeration && leftExpression.terms && leftExpression.terms.length === 1) {
-          let leftElement = leftExpression.terms[0];
-          if (leftElement instanceof Fmt.PlaceholderExpression) {
-            if (!replacedParameters.length) {
-              this.addDeclaredSetRestriction(state, leftElement, rightExpression);
-            }
-            return true;
-          }
-        }
         if (rightExpression instanceof FmtHLM.MetaRefExpression_enumeration && rightExpression.terms && rightExpression.terms.length === 1) {
           let rightElement = rightExpression.terms[0];
           if (rightElement instanceof Fmt.PlaceholderExpression) {
@@ -1759,21 +1750,30 @@ export class HLMDefinitionChecker {
             return true;
           }
         }
+        if (leftExpression instanceof FmtHLM.MetaRefExpression_enumeration && leftExpression.terms && leftExpression.terms.length === 1) {
+          let leftElement = leftExpression.terms[0];
+          if (leftElement instanceof Fmt.PlaceholderExpression) {
+            if (!replacedParameters.length) {
+              this.addDeclaredSetRestriction(state, leftElement, rightExpression);
+            }
+            return true;
+          }
+        }
         let recheck = false;
         let isRoot = leftExpression === left && rightExpression === right;
-        while (leftExpression instanceof Fmt.PlaceholderExpression) {
-          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
-          if (newLeftExpression) {
-            leftExpression = newLeftExpression;
+        while (rightExpression instanceof Fmt.PlaceholderExpression) {
+          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
+          if (newRightExpression) {
+            rightExpression = newRightExpression;
             recheck = true;
           } else {
             return true;
           }
         }
-        while (rightExpression instanceof Fmt.PlaceholderExpression) {
-          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
-          if (newRightExpression) {
-            rightExpression = newRightExpression;
+        while (leftExpression instanceof Fmt.PlaceholderExpression) {
+          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
+          if (newLeftExpression) {
+            leftExpression = newLeftExpression;
             recheck = true;
           } else {
             return true;
