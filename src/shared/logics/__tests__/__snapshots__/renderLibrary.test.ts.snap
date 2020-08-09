@@ -1881,7 +1881,7 @@ Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.6.1 data/libraries/hlm/Essentials/Sequences/Tuples 1`] = `
-"Definition 1.6.1.  Let S be a set, α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.6.1.  Let S be a set, α be an ordinal number. We define:
 
   S^α :=: {(a_k)_(k < α) | a_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<α)}
 
@@ -1910,7 +1910,7 @@ References.
 exports[`render hlm library: 1.6.2 data/libraries/hlm/Essentials/Sequences/tuple 1`] = `"Definition 1.6.2 (Tuple)."`;
 
 exports[`render hlm library: 1.6.3 data/libraries/hlm/Essentials/Sequences/tuple%20from%20function 1`] = `
-"Definition 1.6.3.  Let S be a set, α ∈ 𝓞𝓻𝓭, f : 𝓞𝓻𝓭_(<α) → S be a function. We define:
+"Definition 1.6.3.  Let S be a set, α be an ordinal number, f : 𝓞𝓻𝓭_(<α) → S be a function. We define:
 
   tpl(f) := (f(k))_(k < α)
 
@@ -2002,9 +2002,9 @@ This definition produces an infinite sequence from a function."
 exports[`render hlm library: 1.6.8 data/libraries/hlm/Essentials/Sequences/Ordinal-indexed%20sequences 1`] = `
 "Definition 1.6.8.  Let S be a set. We define:
 
-  S^⋆ :=: {(𝐚)_(S^α) | α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S}
+  S^⋆ :=: {(𝐚)_(S^α) | α is an ordinal number, 𝐚 is a/an α-tuple on S}
 
-  (𝐚)_(S^α) = (𝐛)_(S^β)  :⇔  α = β and 𝐚 = (b_j)_(j < α) if 𝐛 = (b_k)_(k < β) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<β))  (α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S, β ∈ 𝓞𝓻𝓭, 𝐛 is a/an β-tuple on S)
+  (𝐚)_(S^α) = (𝐛)_(S^β)  :⇔  α = β and 𝐚 = (b_j)_(j < α) if 𝐛 = (b_k)_(k < β) (b_k ∈ S for each k ∈ 𝓞𝓻𝓭_(<β))  (α is an ordinal number, 𝐚 is a/an α-tuple on S, β is an ordinal number, 𝐛 is a/an β-tuple on S)
 
 S^∗ ⊆: S^⋆ via
 (𝐚)_(S^n) = (𝐚)_(S^n)
@@ -2025,7 +2025,7 @@ exports[`render hlm library: 1.6.9 data/libraries/hlm/Essentials/Sequences/ordin
 
 by:
 
-  |(𝐚)_(S^α)| := α  (α ∈ 𝓞𝓻𝓭, 𝐚 is a/an α-tuple on S)"
+  |(𝐚)_(S^α)| := α  (α is an ordinal number, 𝐚 is a/an α-tuple on S)"
 `;
 
 exports[`render hlm library: 1.6.10 data/libraries/hlm/Essentials/Sequences/finite 1`] = `
@@ -3353,6 +3353,8 @@ Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|.
 
 1.7.2.1 ⇒ m = n
 
+We write “let κ be a cardinal number” for “let κ ∈ 𝓒𝓻𝓭.”
+
 Remarks.
 
 In HLM, cardinal numbers have a very simple definition as a construction with one constructor, which can be conveniently equipped with a notation that matches mathematical practice.
@@ -3375,7 +3377,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Carrier 1`] = `
-"Definition 1.7.2.3.  Let κ ∈ 𝓒𝓻𝓭. We define
+"Definition 1.7.2.3.  Let κ be a cardinal number. We define
 
   (κ)
 
@@ -3391,7 +3393,7 @@ This definition retrieves a representative set from a cardinal number."
 `;
 
 exports[`render hlm library: 1.7.2.4.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Homomorphisms 1`] = `
-"Definition 1.7.2.4.1.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.4.1.  Let κ, μ be cardinal numbers. We define:
 
   Hom(κ, μ) := ((κ) → (μ))
 
@@ -3412,7 +3414,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.4.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Isomorphisms 1`] = `
-"Definition 1.7.2.4.2.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.4.2.  Let κ, μ be cardinal numbers. We define:
 
   Iso(κ, μ) := {φ : κ → μ : φ is bijective}
    = ((κ) ↔ (μ))
@@ -3434,7 +3436,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.4.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/Automorphisms 1`] = `
-"Definition 1.7.2.4.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.4.3.  Let κ be a cardinal number. We define:
 
   Aut(κ) := Iso(κ, κ)
 
@@ -3453,7 +3455,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.4.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/automorphism%20group 1`] = `
-"Definition 1.7.2.4.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.4.4.  Let κ be a cardinal number. We define:
 
   Aut(κ) := [Aut(κ)]_(𝑆_(κ))
 
@@ -3474,13 +3476,13 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.4.5 data/libraries/hlm/Essentials/Numbers/Cardinal/Homomorphisms/identity 1`] = `
-"Definition 1.7.2.4.5.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.4.5.  Let κ be a cardinal number. We define:
 
   id_κ := id_(κ)"
 `;
 
 exports[`render hlm library: 1.7.2.5 data/libraries/hlm/Essentials/Numbers/Cardinal/less%20or%20equal 1`] = `
-"Definition 1.7.2.5.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.5.  Let κ, μ be cardinal numbers. We define:
 
   κ ≤ μ  :⇔  ∃ φ : κ → μ : φ is injective
     ⇔  ∃ S ⊆ (μ) : |S| = κ
@@ -3494,7 +3496,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.6 data/libraries/hlm/Essentials/Numbers/Cardinal/less 1`] = `
-"Definition 1.7.2.6.  Let κ, μ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.6.  Let κ, μ be cardinal numbers. We define:
 
   κ < μ  :⇔  κ ≤ μ and κ ≠ μ
 
@@ -3504,31 +3506,31 @@ Note that without the axiom of choice, this is not equivalent to the negation of
 `;
 
 exports[`render hlm library: 1.7.2.7.1 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
-"Definition 1.7.2.7.1.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.7.1.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(<κ) := {μ ∈ 𝓒𝓻𝓭 : μ < κ}"
 `;
 
 exports[`render hlm library: 1.7.2.7.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
-"Definition 1.7.2.7.2.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.7.2.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(≤κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≤ κ}"
 `;
 
 exports[`render hlm library: 1.7.2.7.3 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
-"Definition 1.7.2.7.3.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.7.3.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(≥κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≥ κ}"
 `;
 
 exports[`render hlm library: 1.7.2.7.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Subsets/Segment%20(greater) 1`] = `
-"Definition 1.7.2.7.4.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.7.4.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
 `;
 
 exports[`render hlm library: 1.7.2.8 data/libraries/hlm/Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
-"Theorem 1.7.2.8 (Schröder-Bernstein).  Let κ, μ ∈ 𝓒𝓻𝓭. Then the following are equivalent:
+"Theorem 1.7.2.8 (Schröder-Bernstein).  Let κ, μ be cardinal numbers. Then the following are equivalent:
 
   1. κ ≤ μ and μ ≤ κ
   2. Iso(κ, μ) is nonempty
@@ -3574,7 +3576,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.11 data/libraries/hlm/Essentials/Numbers/Cardinal/sum 1`] = `
-"Definition 1.7.2.11.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+"Definition 1.7.2.11.  Let κ, μ be cardinal numbers. We define
 
   κ + μ
 
@@ -3591,7 +3593,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.12 data/libraries/hlm/Essentials/Numbers/Cardinal/product 1`] = `
-"Definition 1.7.2.12.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+"Definition 1.7.2.12.  Let κ, μ be cardinal numbers. We define
 
   κ ⋅ μ
 
@@ -3608,7 +3610,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.13 data/libraries/hlm/Essentials/Numbers/Cardinal/power 1`] = `
-"Definition 1.7.2.13.  Let κ, μ ∈ 𝓒𝓻𝓭. We define
+"Definition 1.7.2.13.  Let κ, μ be cardinal numbers. We define
 
   κ^μ
 
@@ -3677,7 +3679,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.16 data/libraries/hlm/Essentials/Numbers/Cardinal/finite 1`] = `
-"Definition 1.7.2.16.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.16.  Let κ be a cardinal number. We define:
 
   κ is finite  :⇔  κ ∈ ℕ
     ⇔  ∃ x ∈ ℕ : κ = x
@@ -3690,7 +3692,7 @@ Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.7.2.17 data/libraries/hlm/Essentials/Numbers/Cardinal/countable 1`] = `
-"Definition 1.7.2.17.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.17.  Let κ be a cardinal number. We define:
 
   κ is countable  :⇔  κ ≤ ℵ_0
     ⇔  ∃ M ⊆ ℕ : κ = |M|
@@ -3701,7 +3703,7 @@ Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.7.2.18 data/libraries/hlm/Essentials/Numbers/Cardinal/countably%20infinite 1`] = `
-"Definition 1.7.2.18.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 1.7.2.18.  Let κ be a cardinal number. We define:
 
   κ is countably infinite  :⇔  κ is countable and κ is infinite
     ⇔  κ = ℵ_0
@@ -3726,7 +3728,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.20 data/libraries/hlm/Essentials/Numbers/Cardinal/Cantors%20theorem%20generalized 1`] = `
-"Corollary 1.7.2.20.  Let κ ∈ 𝓒𝓻𝓭_(>1), μ ∈ 𝓒𝓻𝓭. Then:
+"Corollary 1.7.2.20.  Let κ ∈ 𝓒𝓻𝓭_(>1), μ be a cardinal number. Then:
 
   κ^μ > μ
 
@@ -3764,7 +3766,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.22.2 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20sum 1`] = `
-"Definition 1.7.2.22.2.  Let I be a set, let κ_i ∈ 𝓒𝓻𝓭 for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
+"Definition 1.7.2.22.2.  Let I be a set, let κ_i be a cardinal number for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
 
   ∑_(i ∈ I)^≃ κ_i := |⨄_(j ∈ I)^≃ (κ_j)|
 
@@ -3790,7 +3792,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.2.22.4 data/libraries/hlm/Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
-"Definition 1.7.2.22.4.  Let I be a set, let κ_i ∈ 𝓒𝓻𝓭 for each i ∈ I. We define:
+"Definition 1.7.2.22.4.  Let I be a set, let κ_i be a cardinal number for each i ∈ I. We define:
 
   ∏_(i ∈ I) κ_i := |∏_(j ∈ I) (κ_j)|
 
@@ -3811,6 +3813,8 @@ n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
 
 Well-definedness.  No proof.
 
+We write “let α be an ordinal number” for “let α ∈ 𝓞𝓻𝓭.”
+
 References.
 
 * https://en.wikipedia.org/wiki/Ordinal_number
@@ -3821,7 +3825,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Carrier 1`] = `
-"Definition 1.7.3.2.  Let α ∈ 𝓞𝓻𝓭. We define
+"Definition 1.7.3.2.  Let α be an ordinal number. We define
 
   (α)
 
@@ -3837,7 +3841,7 @@ This definition retrieves a representative set from an ordinal number."
 `;
 
 exports[`render hlm library: 1.7.3.3 data/libraries/hlm/Essentials/Numbers/Ordinal/before 1`] = `
-"Definition 1.7.3.3.  Let α ∈ 𝓞𝓻𝓭, a, b ∈ α. We define:
+"Definition 1.7.3.3.  Let α be an ordinal number, a, b ∈ α. We define:
 
   a ≤ b  :⇔  a ⪯ b if α = [A, ⪯] (A is a set, ⪯ is a well-order on A)
 
@@ -3847,7 +3851,7 @@ This definition can be used to access underlying well-ordering of a given ordina
 `;
 
 exports[`render hlm library: 1.7.3.4.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Homomorphisms 1`] = `
-"Definition 1.7.3.4.1.  Let α, β ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.4.1.  Let α, β be ordinal numbers. We define:
 
   Hom(α, β) := {f : (α) → (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
 
@@ -3861,7 +3865,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.4.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
-"Definition 1.7.3.4.2.  Let α, β ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.4.2.  Let α, β be ordinal numbers. We define:
 
   Iso(α, β) := {homomorphisms φ : α → β : φ is bijective}
    = {f : (α) ↔ (β) : ∀ a, b ∈ α : [a ≤ b  ⇔  f(a) ≤ f(b)]}
@@ -3878,7 +3882,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.4.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/Automorphisms 1`] = `
-"Definition 1.7.3.4.3.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.4.3.  Let α be an ordinal number. We define:
 
   Aut(α) := Iso(α, α)
 
@@ -3893,7 +3897,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.4.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/automorphism%20group 1`] = `
-"Definition 1.7.3.4.4.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.4.4.  Let α be an ordinal number. We define:
 
   Aut(α) := [Aut(α)]_(𝑆_(α))
 
@@ -3914,13 +3918,13 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.4.5 data/libraries/hlm/Essentials/Numbers/Ordinal/Homomorphisms/identity 1`] = `
-"Definition 1.7.3.4.5.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.4.5.  Let α be an ordinal number. We define:
 
   id_α := id_(α)"
 `;
 
 exports[`render hlm library: 1.7.3.5.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Ordered%20subsets/subset%20ordinal 1`] = `
-"Definition 1.7.3.5.1.  Let α ∈ 𝓞𝓻𝓭, S ⊆ (α). We define
+"Definition 1.7.3.5.1.  Let α be an ordinal number, S ⊆ (α). We define
 
   [S]_α
 
@@ -3930,7 +3934,7 @@ by:
 `;
 
 exports[`render hlm library: 1.7.3.6 data/libraries/hlm/Essentials/Numbers/Ordinal/less%20or%20equal 1`] = `
-"Definition 1.7.3.6.  Let α, β ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.6.  Let α, β be ordinal numbers. We define:
 
   α ≤ β  :⇔  ∃ homomorphism φ : α → β : φ is injective
     ⇔  ∃ S ⊆ (β) : α = [S]_β
@@ -3943,7 +3947,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.7 data/libraries/hlm/Essentials/Numbers/Ordinal/less 1`] = `
-"Definition 1.7.3.7.  Let α, β ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.7.  Let α, β be ordinal numbers. We define:
 
   α < β  :⇔  α ≤ β and α ≠ β
 
@@ -3953,31 +3957,31 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.8.1 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less) 1`] = `
-"Definition 1.7.3.8.1.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.8.1.  Let α be an ordinal number. We define:
 
   𝓞𝓻𝓭_(<α) := {β ∈ 𝓞𝓻𝓭 : β < α}"
 `;
 
 exports[`render hlm library: 1.7.3.8.2 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
-"Definition 1.7.3.8.2.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.8.2.  Let α be an ordinal number. We define:
 
   𝓞𝓻𝓭_(≤α) := {β ∈ 𝓞𝓻𝓭 : β ≤ α}"
 `;
 
 exports[`render hlm library: 1.7.3.8.3 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
-"Definition 1.7.3.8.3.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.8.3.  Let α be an ordinal number. We define:
 
   𝓞𝓻𝓭_(≥α) := {β ∈ 𝓞𝓻𝓭 : β ≥ α}"
 `;
 
 exports[`render hlm library: 1.7.3.8.4 data/libraries/hlm/Essentials/Numbers/Ordinal/Subsets/Segment%20(greater) 1`] = `
-"Definition 1.7.3.8.4.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.8.4.  Let α be an ordinal number. We define:
 
   𝓞𝓻𝓭_(>α) := {β ∈ 𝓞𝓻𝓭 : β > α}"
 `;
 
 exports[`render hlm library: 1.7.3.9 data/libraries/hlm/Essentials/Numbers/Ordinal/Equality%20criterion 1`] = `
-"Proposition 1.7.3.9.  Let α, β ∈ 𝓞𝓻𝓭. Then the following are equivalent:
+"Proposition 1.7.3.9.  Let α, β be ordinal numbers. Then the following are equivalent:
 
   1. α ≤ β and β ≤ α
   2. Iso(α, β) is nonempty
@@ -4005,7 +4009,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.11 data/libraries/hlm/Essentials/Numbers/Ordinal/sum 1`] = `
-"Definition 1.7.3.11.  Let α, β ∈ 𝓞𝓻𝓭. We define
+"Definition 1.7.3.11.  Let α, β be ordinal numbers. We define
 
   α + β
 
@@ -4023,7 +4027,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.12 data/libraries/hlm/Essentials/Numbers/Ordinal/product 1`] = `
-"Definition 1.7.3.12.  Let α, β ∈ 𝓞𝓻𝓭. We define
+"Definition 1.7.3.12.  Let α, β be ordinal numbers. We define
 
   α ⋅ β
 
@@ -4052,13 +4056,13 @@ References.
 `;
 
 exports[`render hlm library: 1.7.3.14 data/libraries/hlm/Essentials/Numbers/Ordinal/cardinality 1`] = `
-"Definition 1.7.3.14.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.14.  Let α be an ordinal number. We define:
 
   |α| := |(α)|"
 `;
 
 exports[`render hlm library: 1.7.3.15 data/libraries/hlm/Essentials/Numbers/Ordinal/finite 1`] = `
-"Definition 1.7.3.15.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.15.  Let α be an ordinal number. We define:
 
   α is finite  :⇔  |α| is finite
     ⇔  (α) is finite
@@ -4070,7 +4074,7 @@ Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.7.3.16 data/libraries/hlm/Essentials/Numbers/Ordinal/countable 1`] = `
-"Definition 1.7.3.16.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.16.  Let α be an ordinal number. We define:
 
   α is countable  :⇔  |α| is countable
     ⇔  (α) is countable
@@ -4081,7 +4085,7 @@ Equivalence.  No proof."
 `;
 
 exports[`render hlm library: 1.7.3.17 data/libraries/hlm/Essentials/Numbers/Ordinal/countably%20infinite 1`] = `
-"Definition 1.7.3.17.  Let α ∈ 𝓞𝓻𝓭. We define:
+"Definition 1.7.3.17.  Let α be an ordinal number. We define:
 
   α is countably infinite  :⇔  α is countable and α is infinite
     ⇔  |α| is countably infinite
@@ -6958,7 +6962,7 @@ References.
 `;
 
 exports[`render hlm library: 2.6.17.3.1 data/libraries/hlm/Algebra/Groups/Order/Number%20of%20groups/Groups%20with%20order 1`] = `
-"Definition 2.6.17.3.1.  Let κ ∈ 𝓒𝓻𝓭. We define:
+"Definition 2.6.17.3.1.  Let κ be a cardinal number. We define:
 
   𝓖𝓻𝓹_κ := {groups 𝐆 : |𝐆| = κ}
 
@@ -8581,7 +8585,7 @@ exports[`render hlm library: 2.8.29.1.13.3 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 
@@ -8615,7 +8619,7 @@ exports[`render hlm library: 2.8.29.1.13.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
+  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌))
    = {𝐚 ⋅ 𝒙 : 𝐚 is a coordinate sequence for 𝒙}
 
 Equality.  No proof.
@@ -9018,7 +9022,7 @@ exports[`render hlm library: 2.8.29.2.13.3 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 
@@ -9050,7 +9054,7 @@ exports[`render hlm library: 2.8.29.2.13.5 data/libraries/hlm/Algebra/Rings/Modu
 
 by:
 
-  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α ∈ 𝓞𝓻𝓭, (x_k)_(k < α) is a/an α-tuple on (𝐌))
+  〈((x_k)_(k < α))_((𝐌)^α)〉 := 〈{x_k : k ∈ 𝓞𝓻𝓭_(<α)}〉  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌))
    = {𝒙 ⋅ 𝐚 : 𝐚 is a coordinate sequence for 𝒙}
 
 Equality.  No proof."
