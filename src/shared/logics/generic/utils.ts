@@ -75,8 +75,16 @@ export class GenericUtils {
     }
   }
 
-  applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: SubstitutionContext): Fmt.ParameterList {
-    if (context.replacedParameters.length || context.substitutionFns.length) {
+  applySubstitutionContextToParameter(parameter: Fmt.Parameter, context: SubstitutionContext | undefined): Fmt.Parameter {
+    if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
+      return parameter.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
+    } else {
+      return parameter;
+    }
+  }
+
+  applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: SubstitutionContext | undefined): Fmt.ParameterList {
+    if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
       let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
       parameters.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), result, context.replacedParameters.slice());
       return result;

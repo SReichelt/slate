@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -1439,6 +1439,14 @@ export class HLMDefinitionChecker {
   }
 
   private checkProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
+    let stepContext: HLMProofStepContext = {
+      goal: goal,
+      stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
+    };
+    this.checkProofInternal(object, proof, parameters, stepContext, context);
+  }
+
+  private checkProofInternal(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, stepContext: HLMProofStepContext, context: HLMCheckerContext): void {
     let innerContext = context;
     if (proof) {
       if (proof.parameters) {
@@ -1453,17 +1461,22 @@ export class HLMDefinitionChecker {
       }
       if (proof.goal) {
         this.checkFormula(proof.goal, innerContext);
-        if (parameters && proof.parameters) {
-          goal = this.utils.substituteParameters(goal, parameters, proof.parameters);
+        let externalGoal = stepContext.goal;
+        if (externalGoal) {
+          if (parameters && proof.parameters) {
+            externalGoal = this.utils.substituteParameters(externalGoal, parameters, proof.parameters);
+          }
+          this.checkUnfolding(externalGoal, proof.goal);
         }
-        this.checkUnfolding(goal, proof.goal);
       }
-      // TODO
+      this.utils.updateInitialProofStepContext(proof, stepContext);
+      this.checkProofSteps(object, proof.steps, stepContext, innerContext);
     } else {
       if (parameters) {
         innerContext = this.getParameterListContext(parameters, context);
       }
-      this.checkTrivialProvability(object, goal, !parameters, innerContext);
+      let getMessage = () => stepContext.goal && !parameters ? `Proof of ${stepContext.goal} required` : 'Proof required';
+      this.checkTrivialProvability(object, stepContext, innerContext, getMessage);
     }
   }
 
@@ -1509,26 +1522,54 @@ export class HLMDefinitionChecker {
     this.addPendingCheck(target, check);
   }
 
-  private checkTrivialProvability(object: Object, goal: Fmt.Expression, reportGoal: boolean, context: HLMCheckerContext): void {
-    let resultPromise = this.utils.isTrivialTautology(goal, true);
-    for (let variableInfo of context.context.getVariables()) {
-      if (!variableInfo.indexParameterLists && context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
-        resultPromise = resultPromise.or(() => {
-          let constraint = this.utils.getParameterConstraint(variableInfo.parameter);
-          if (constraint) {
-            return this.utils.triviallyImplies(constraint, goal, true);
-          } else {
-            return false;
-          }
-        });
+  private checkTrivialProvability(object: Object, stepContext: HLMProofStepContext, context: HLMCheckerContext, getMessage: () => string): void {
+    if (stepContext.goal) {
+      let goal = stepContext.goal;
+      let resultPromise = this.utils.isTrivialTautology(goal, true);
+      for (let variableInfo of context.context.getVariables()) {
+        if (!variableInfo.indexParameterLists && context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
+          resultPromise = resultPromise.or(() => {
+            let constraint = this.utils.getParameterConstraint(variableInfo.parameter, stepContext);
+            if (constraint) {
+              return this.utils.triviallyImplies(constraint, goal, true);
+            } else {
+              return false;
+            }
+          });
+        }
       }
+      let check = resultPromise.then((result: boolean) => {
+        if (!result) {
+          this.message(object, getMessage(), Logic.DiagnosticSeverity.Warning);
+        }
+      });
+      this.addPendingCheck(object, check);
     }
-    let check = resultPromise.then((result: boolean) => {
-      if (!result) {
-        this.message(object, reportGoal ? `Proof of ${goal} required` : 'Proof required', Logic.DiagnosticSeverity.Warning);
+  }
+
+  private checkProofSteps(object: Object, steps: Fmt.ParameterList, stepContext: HLMProofStepContext, context: HLMCheckerContext): void {
+    for (let step of steps) {
+      let stepResult = this.checkProofStep(step, stepContext, context);
+      if (stepResult) {
+        stepContext.stepResults.set(step, stepResult);
       }
-    });
-    this.addPendingCheck(object, check);
+      stepContext = {
+        ...stepContext,
+        previousResult: stepResult
+      };
+      context = this.getParameterContext(step, context);
+    }
+    let getMessage = () => `Proof of ${stepContext.goal} incomplete`;
+    this.checkTrivialProvability(object, stepContext, context, getMessage);
+  }
+
+  private checkProofStep(step: Fmt.Parameter, stepContext: HLMProofStepContext, context: HLMCheckerContext): Fmt.Expression | undefined {
+    try {
+      return this.utils.getProofStepResult(step, stepContext);
+    } catch (error) {
+      this.error(step, error.message);
+      return undefined;
+    }
   }
 
   private checkBoolConstant(expression: Fmt.Expression | undefined): void {
@@ -1741,6 +1782,7 @@ export class HLMDefinitionChecker {
     if (context.editData) {
       // Handle placeholders.
       unificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
+        // TODO the order of handling left and right currently matters a lot, in fact the tutorial breaks if it is reversed -- this indicates some deeper problem
         if (rightExpression instanceof FmtHLM.MetaRefExpression_enumeration && rightExpression.terms && rightExpression.terms.length === 1) {
           let rightElement = rightExpression.terms[0];
           if (rightElement instanceof Fmt.PlaceholderExpression) {

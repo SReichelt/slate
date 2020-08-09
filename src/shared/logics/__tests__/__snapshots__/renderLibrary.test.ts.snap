@@ -5444,9 +5444,9 @@ p ⋅ a^n = b^n
 
 ⇒^def b^l ⋅ b ⋅ b = a^n ⋅ p
 
-[Error: Previous result is not an existentially quantified expression]
+⇒^[p⋅y = b] b^l ⋅ p ⋅ y ⋅ p ⋅ y = a^n ⋅ p
 
-1.7.4.20 ⇒ b^l ⋅ p ⋅ y ⋅ y = a^n
+⇒^1.7.4.20 b^l ⋅ p ⋅ y ⋅ y = a^n
 
 We have p ∣ a^n:
 
