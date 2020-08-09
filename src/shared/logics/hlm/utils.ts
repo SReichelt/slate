@@ -21,13 +21,8 @@ export interface HLMUnfoldParameters {
   followDefinitions: boolean;
   unfoldArguments: boolean;
   extractStructuralCasesFromArguments: boolean;
+  requiredUnfoldLocation?: Fmt.Expression;
 }
-
-const unfoldAll: HLMUnfoldParameters = {
-  followDefinitions: true,
-  unfoldArguments: true,
-  extractStructuralCasesFromArguments: true
-};
 
 export interface HLMTypeSearchParameters extends HLMUnfoldParameters {
   followSupersets?: boolean;
@@ -682,6 +677,9 @@ export class HLMUtils extends GenericUtils {
         }
         return CachedPromise.resolve(undefined);
       } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
+        if (typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term) {
+          return CachedPromise.resolve(undefined);
+        }
         return CachedPromise.resolve([this.applySubstitutionContext(type._set, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Set variable expected'));
@@ -709,10 +707,13 @@ export class HLMUtils extends GenericUtils {
               let item = definitionList[0];
               return this.followSetTermWithPath(item, term.path, definition).then((superset: Fmt.Expression) => [superset]);
             }
-          } else if (typeSearchParameters.followDefinitions) {
-            return definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
           } else {
-            return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.SetTerm, typeSearchParameters);
+            let result: Fmt.Expression[] | undefined = undefined;
+            if (typeSearchParameters.followDefinitions && !(typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term)) {
+              result = definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
+            }
+            return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.SetTerm, typeSearchParameters).then((argumentResult: Fmt.Expression[] | undefined) =>
+              (result && argumentResult ? result.concat(argumentResult) : result ?? argumentResult));
           }
         }
         return undefined;
@@ -801,12 +802,17 @@ export class HLMUtils extends GenericUtils {
         return resultPromise.then((currentResult: Fmt.Expression | undefined) => (currentResult ? [currentResult] : undefined));
       }
       return CachedPromise.resolve(undefined);
-    } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
-      return CachedPromise.resolve([term.term]);
-    } else if (term instanceof Fmt.PlaceholderExpression) {
-      return CachedPromise.resolve(undefined);
     } else {
-      return CachedPromise.reject(new Error('Set term expected'));
+      if (typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term) {
+        return CachedPromise.resolve(undefined);
+      }
+      if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+        return CachedPromise.resolve([term.term]);
+      } else if (term instanceof Fmt.PlaceholderExpression) {
+        return CachedPromise.resolve(undefined);
+      } else {
+        return CachedPromise.reject(new Error('Set term expected'));
+      }
     }
   }
 
@@ -821,6 +827,9 @@ export class HLMUtils extends GenericUtils {
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
         return this.unfoldIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
+        if (unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term) {
+          return CachedPromise.resolve(undefined);
+        }
         return CachedPromise.resolve([this.applySubstitutionContext(type.element, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Element variable expected'));
@@ -834,11 +843,12 @@ export class HLMUtils extends GenericUtils {
           let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
           return this.unfoldDefinitionArguments(term, [definition, innerDefinition], HLMExpressionType.ElementTerm, unfoldParameters);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-          if (unfoldParameters.followDefinitions) {
-            return definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
-          } else {
-            return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.ElementTerm, unfoldParameters);
+          let result: Fmt.Expression[] | undefined = undefined;
+          if (unfoldParameters.followDefinitions && !(unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term)) {
+            result = definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
           }
+          return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.ElementTerm, unfoldParameters).then((argumentResult: Fmt.Expression[] | undefined) =>
+            (result && argumentResult ? result.concat(argumentResult) : result ?? argumentResult));
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.ElementTerm, unfoldParameters);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
@@ -846,12 +856,19 @@ export class HLMUtils extends GenericUtils {
         }
         return undefined;
       });
-    } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
-      return CachedPromise.resolve([term.term]);
-    } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
-      return CachedPromise.resolve([term.term]);
     } else {
-      return CachedPromise.resolve(undefined);
+      if (unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term) {
+        return CachedPromise.resolve(undefined);
+      }
+      if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+        return CachedPromise.resolve([term.term]);
+      } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+        return CachedPromise.resolve([term.term]);
+      } else if (term instanceof Fmt.PlaceholderExpression) {
+        return CachedPromise.resolve(undefined);
+      } else {
+        return CachedPromise.reject(new Error('Element term expected'));
+      }
     }
   }
 
@@ -1227,39 +1244,45 @@ export class HLMUtils extends GenericUtils {
   }
 
   unfoldsTo(source: Fmt.Expression, target: Fmt.Expression): CachedPromise<boolean> {
-    if (!this.canPossiblyUnfoldTo(source, target)) {
-      return CachedPromise.resolve(false);
-    }
-
-    if (source.isEquivalentTo(target)) {
-      return CachedPromise.resolve(true);
-    }
-
-    return this.getNextFormulas(source, unfoldAll).then((formulas: Fmt.Expression[] | undefined) => {
-      let result = CachedPromise.resolve(false);
-      if (formulas) {
-        for (let formula of formulas) {
-          result = result.or(() => this.unfoldsTo(formula, target));
-        }
-      }
-      return result;
-    });
-  }
-
-  private canPossiblyUnfoldTo(source: Fmt.Expression, target: Fmt.Expression): boolean {
+    let requiredUnfoldLocation: Fmt.Expression | undefined = undefined;
     let preCheckFn = (left: Fmt.Expression, right: Fmt.Expression) => {
       if (left instanceof Fmt.VariableRefExpression) {
         let type = left.variable.type;
         if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
+          requiredUnfoldLocation = left;
           return true;
         }
       }
       if (left !== source && left instanceof Fmt.DefinitionRefExpression) {
+        requiredUnfoldLocation = left;
         return true;
       }
       return false;
     };
-    return source.isEquivalentTo(target, preCheckFn);
+
+    if (source.isEquivalentTo(target, preCheckFn)) {
+      if (!requiredUnfoldLocation) {
+        return CachedPromise.resolve(true);
+      }
+
+      let unfoldParameters: HLMUnfoldParameters = {
+        followDefinitions: true,
+        unfoldArguments: true,
+        extractStructuralCasesFromArguments: true,
+        requiredUnfoldLocation: requiredUnfoldLocation
+      };
+      return this.getNextFormulas(source, unfoldParameters).then((formulas: Fmt.Expression[] | undefined) => {
+        let result = CachedPromise.resolve(false);
+        if (formulas) {
+          for (let formula of formulas) {
+            result = result.or(() => this.unfoldsTo(formula, target));
+          }
+        }
+        return result;
+      });
+    }
+
+    return CachedPromise.resolve(false);
   }
 
   negateFormula(formula: Fmt.Expression, followDefinitions: boolean): CachedPromise<Fmt.Expression> {

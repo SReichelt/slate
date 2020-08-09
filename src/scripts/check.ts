@@ -14,6 +14,19 @@ let fileAccessor = new PhysicalFileAccessor;
 let errorCount = 0;
 let warningCount = 0;
 
+let libraryDataProviderConfig: LibraryDataProviderConfig = {
+  canPreload: false,
+  watchForChanges: false,
+  checkMarkdownCode: true,
+  allowPlaceholders: false
+};
+
+const logicCheckerOptions: Logic.LogicCheckerOptions = {
+  supportPlaceholders: false,
+  supportRechecking: false,
+  warnAboutMissingProofs: false
+};
+
 function checkLibrary(fileName: string): CachedPromise<void> {
   let fileStr = fs.readFileSync(fileName, 'utf8');
   let file = FmtReader.readString(fileStr, fileName, FmtLibrary.getMetaModel);
@@ -21,13 +34,7 @@ function checkLibrary(fileName: string): CachedPromise<void> {
   let logic = Logics.findLogic(contents.logic)!;
   let baseName = path.basename(fileName);
   let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
-  let config: LibraryDataProviderConfig = {
-    canPreload: false,
-    watchForChanges: false,
-    checkMarkdownCode: true,
-    allowPlaceholders: false
-  };
-  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), config, libraryName);
+  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, path.dirname(fileName), libraryDataProviderConfig, libraryName);
   return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
 }
 
@@ -53,12 +60,7 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
 
 function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
   let checker = libraryDataProvider.logic.getChecker();
-  let options: Logic.LogicCheckerOptions = {
-    supportPlaceholders: false,
-    supportRechecking: false,
-    warnAboutMissingProofs: false
-  };
-  return checker.checkDefinition(definition.definition, libraryDataProvider, options).then((checkResult: Logic.LogicCheckResult) => {
+  return checker.checkDefinition(definition.definition, libraryDataProvider, logicCheckerOptions).then((checkResult: Logic.LogicCheckResult) => {
     for (let diagnostic of checkResult.diagnostics) {
       let message = diagnostic.message;
       switch (diagnostic.severity) {
