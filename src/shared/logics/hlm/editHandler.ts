@@ -73,7 +73,12 @@ export class HLMEditHandler extends GenericEditHandler {
 
   constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, protected utils: HLMUtils, protected renderUtils: HLMRenderUtils, templates: Fmt.File, mruList: MRUList) {
     super(definition, libraryDataProvider, new HLMEditAnalysis, utils, templates, mruList);
-    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, utils, true, true);
+    let options: Logic.LogicCheckerOptions = {
+      supportPlaceholders: true,
+      supportRechecking: true,
+      warnAboutMissingProofs: false
+    };
+    this.checker = new HLMDefinitionChecker(definition, libraryDataProvider, utils, options);
     this.update();
   }
 
@@ -816,7 +821,12 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getStructuralCaseItems(createStructuralExpression: (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) => Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn, expressionType: HLMExpressionType): CachedPromise<Menu.ExpressionMenuItem[]> {
-    let structuralChecker = new HLMDefinitionChecker(this.definition, this.libraryDataProvider, this.utils, true, true);
+    let options: Logic.LogicCheckerOptions = {
+      supportPlaceholders: true,
+      supportRechecking: false,
+      warnAboutMissingProofs: false
+    };
+    let structuralChecker = new HLMDefinitionChecker(this.definition, this.libraryDataProvider, this.utils, options);
 
     let result = CachedPromise.resolve<Menu.ExpressionMenuItem[]>([]);
     let variables = expressionEditInfo.context.getVariables();

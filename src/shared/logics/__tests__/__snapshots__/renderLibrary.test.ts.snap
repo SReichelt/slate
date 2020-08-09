@@ -53,7 +53,7 @@ S = ∅
 ⇒^def S ⊆ ∅
 2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
 
-Assume ∃ x ∈ S.
+Let x ∈ S.
 
 S ⊆ ∅
 
@@ -100,14 +100,12 @@ Equivalence.
 ⇒^def ∃ r : S ↔ ℕ_(<|S|)
 
 Choose k := |S|, f := r.
-2⇒3. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
+2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
 
 Choose l := k, g := f^-1.
-3⇒1. Assume ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S. Then |S| is finite:
+3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
 
 We show that |S| ∈ ℕ:
-
-∃ l ∈ ℕ, g : ℕ_(<l) ↔ S
 
 We have |ℕ_(<l)| = |S|:
 
@@ -120,14 +118,14 @@ Choose s := g.
 l ∈ ℕ
 
 ⇒^[l = |S|] |S| ∈ ℕ
-2⇒4. Assume ∃ k ∈ ℕ, f : S ↔ ℕ_(<k). Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
+2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
 
 def ⇒ f is injective
 
 Choose m := k, h := f.
-4⇒5. Assume ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
+4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
 
-⇒^1.7.1.17.6 ℕ_(<m) ⊆ ℕ_(≤m)
+1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
 
 Choose n := m, i := h∣_S^(ℕ_(≤m)).
 
@@ -2465,22 +2463,22 @@ exports[`render hlm library: 1.7.1.18 data/libraries/hlm/Essentials/Numbers/Natu
 
   ∃ m ∈ M : ∀ n ∈ M : n ≤ m
 
-Proof.  We have {∃ a ∈ M : ∀ b ∈ M : b ≤ a if k = 0, ∃ c ∈ M : ∀ d ∈ M : d ≤ c if k = x + 1 (x ∈ ℕ):
+Proof.  By induction on k.
 
-1. Assume k = 0. Then ∃ a ∈ M : ∀ b ∈ M : b ≤ a:
+1. Assume k = 0.
 
-Choose a := f(0).
-2. Let x ∈ ℕ such that k = x + 1. Then ∃ c ∈ M : ∀ d ∈ M : d ≤ c:
+Choose m := f(0).
+2. Let x ∈ ℕ such that k = x + 1.
 
 Let S := ℕ_(≤x).
 
-1.7.1.18 ⇒ ∃ i ∈ M : ∀ j ∈ f(S) : j ≤ i
+1.7.1.18 ⇒ ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
 
-Choose c := {f(k) if f(k) > i, i if f(k) ≤ i.
+Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
 
 Remarks.
 
-This lemma is necessary to prove the following theorem. \`k\` and \`f\` do not appear in the result, but they enable a proof via structural induction on \`k\`."
+This lemma is necessary to prove the following theorem. \`k\` and \`f\` do not appear in the result, but they enable a proof via induction on \`k\`."
 `;
 
 exports[`render hlm library: 1.7.1.19 data/libraries/hlm/Essentials/Numbers/Natural/Finiteness%20criterion 1`] = `
@@ -2496,7 +2494,7 @@ Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
 
-⇒^def ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
+def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
 
 We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
 
@@ -2504,7 +2502,7 @@ We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j�
 
 We show that ∄ c ∈ M:
 
-Assume ∃ c ∈ M.
+Let c ∈ M.
 
 f ∈ (ℕ_(<l) ↔ M)
 
@@ -2523,7 +2521,7 @@ s ∈ ℕ_(<0)
 ⇒^1.7.1.14 s ≥ 0
 2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
 
-⇒^1.7.1.18 ∃ y ∈ M : ∀ z ∈ M : z ≤ y
+1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
 
 1. Assume M is empty.
@@ -2535,16 +2533,14 @@ Choose a := 0. We show that M ⊆ ℕ_(≤0):
 1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
 
 ⇒^[M = ∅] M ⊆ ℕ_(≤0)
-4⇒5. Assume ∃ a ∈ ℕ : M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
+4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
 
-∃ a ∈ ℕ : M ⊆ ℕ_(≤a)
-
-⇒^def M ⊆ ℕ_(<(a+1))
+def ⇒ M ⊆ ℕ_(<(a+1))
 
 Choose b := (a+1).
-5⇒1. Assume ∃ b ∈ ℕ : M ⊆ ℕ_(<b). Then M is finite:
+5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
 
-⇒^1.7.1.17.7 ℕ_(<b) is finite
+1.7.1.17.7 ⇒ ℕ_(<b) is finite
 
 ⇒^1.1.5 M is finite"
 `;
@@ -2782,7 +2778,7 @@ exports[`render hlm library: 1.7.1.36 data/libraries/hlm/Essentials/Numbers/Natu
 
   n ∈ M
 
-Proof.  We have {n ∈ M if n = 0, n ∈ M if n = x + 1 (x ∈ ℕ):
+Proof.  By induction on n.
 
 1. We show that 0 ∈ M:
 

@@ -23,7 +23,12 @@ async function checkSection(libraryDataProvider: LibraryDataProvider) {
 
 async function checkItem(libraryDataProvider: LibraryDataProvider, definition: LibraryDefinition) {
   let checker = libraryDataProvider.logic.getChecker();
-  let checkResult: Logic.LogicCheckResult = await checker.checkDefinition(definition.definition, libraryDataProvider, false);
+  let options: Logic.LogicCheckerOptions = {
+    supportPlaceholders: false,
+    supportRechecking: false,
+    warnAboutMissingProofs: true
+  };
+  let checkResult: Logic.LogicCheckResult = await checker.checkDefinition(definition.definition, libraryDataProvider, options);
   let expectedDiagnostics: Logic.LogicCheckDiagnostic[] = [];
   if (definition.definition.documentation) {
     for (let item of definition.definition.documentation.items) {

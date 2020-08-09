@@ -40,8 +40,14 @@ export function createDefinition(definitionType: LogicDefinitionTypeDescription,
   return definition;
 }
 
+export interface LogicCheckerOptions {
+  supportPlaceholders: boolean;
+  supportRechecking: boolean;
+  warnAboutMissingProofs: boolean;
+}
+
 export interface LogicChecker {
-  checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, supportPlaceholders: boolean): CachedPromise<LogicCheckResult>;
+  checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, options: LogicCheckerOptions): CachedPromise<LogicCheckResult>;
 }
 
 export interface LogicCheckResult {

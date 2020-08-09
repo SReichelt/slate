@@ -2609,6 +2609,35 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         this.addSubProof(type.proof, subProofContext, startRow, startRowSpacing, paragraphs);
         return undefined;
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
+        if (!startRow) {
+          startRow = [];
+        }
+        if (startRowSpacing) {
+          startRow.push(new Notation.TextExpression(startRowSpacing));
+        }
+        let termSelection: ElementTermSelection = {
+          allowCases: false,
+          allowConstructors: false
+        };
+        startRow.push(
+          new Notation.TextExpression('By induction on '),
+          this.readOnlyRenderer.renderElementTerm(type.term, termSelection),
+          new Notation.TextExpression('.')
+        );
+        paragraphs.push(new Notation.RowExpression(startRow));
+        let subProofs: FmtHLM.ObjectContents_Proof[] = [];
+        for (let structuralCase of type.cases) {
+          let subProof = new FmtHLM.ObjectContents_Proof;
+          subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+          subProofs.push(subProof);
+        }
+        let subProofContext: HLMProofStepContext = {
+          goal: context.goal,
+          stepResults: context.stepResults
+        };
+        this.addSubProofList(subProofs, undefined, subProofContext, paragraphs);
+        return undefined;
       }
       if (startRow) {
         paragraphs.push(new Notation.RowExpression(startRow));
@@ -2726,17 +2755,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           stepResults: context.stepResults
         };
         this.addSubProofList(subProofs, labels, subProofContext, paragraphs);
-      } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
-        let subProofs: FmtHLM.ObjectContents_Proof[] = [];
-        for (let structuralCase of type.cases) {
-          let subProof = new FmtHLM.ObjectContents_Proof;
-          subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
-          subProofs.push(subProof);
-        }
-        let subProofContext: HLMProofStepContext = {
-          stepResults: context.stepResults
-        };
-        this.addSubProofList(subProofs, undefined, subProofContext, paragraphs);
       } else {
         paragraphs.push(new Notation.ErrorExpression('Unknown proof step type'));
       }

@@ -53,7 +53,12 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
 
 function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
   let checker = libraryDataProvider.logic.getChecker();
-  return checker.checkDefinition(definition.definition, libraryDataProvider, false).then((checkResult: Logic.LogicCheckResult) => {
+  let options: Logic.LogicCheckerOptions = {
+    supportPlaceholders: false,
+    supportRechecking: false,
+    warnAboutMissingProofs: false
+  };
+  return checker.checkDefinition(definition.definition, libraryDataProvider, options).then((checkResult: Logic.LogicCheckResult) => {
     for (let diagnostic of checkResult.diagnostics) {
       let message = diagnostic.message;
       switch (diagnostic.severity) {

@@ -443,8 +443,7 @@ export class HLMUtils extends GenericUtils {
   updateInitialProofStepContext(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext): void {
     if (proof.goal) {
       context.goal = proof.goal;
-    };
-    if (proof.parameters && proof.parameters.length) {
+    } else if (proof.parameters && proof.parameters.length) {
       let lastParamType = proof.parameters[proof.parameters.length - 1].type;
       if (lastParamType instanceof FmtHLM.MetaRefExpression_Constraint) {
         context.previousResult = lastParamType.formula;
@@ -1313,12 +1312,12 @@ export class HLMUtils extends GenericUtils {
         result.cases = cases;
         return CachedPromise.resolve(result);
       });
-    } else if (formula instanceof Fmt.DefinitionRefExpression && !formula.path.parentPath && followDefinitions) {
+    } else if (formula instanceof Fmt.DefinitionRefExpression && !(formula.path.parentPath instanceof Fmt.Path) && followDefinitions) {
       return this.getDefinition(formula.path).then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.properties) {
           let negationArg = definition.contents.properties.getOptionalValue('negation');
           if (negationArg) {
-            return negationArg;
+            return this.substitutePath(negationArg, formula.path, [definition]);
           }
         }
         let result = new FmtHLM.MetaRefExpression_not;
@@ -1449,74 +1448,72 @@ export class HLMUtils extends GenericUtils {
     if (this.areFormulasSyntacticallyEquivalent(sourceFormula, targetFormula)) {
       return CachedPromise.resolve(true);
     }
+    if (sourceFormula instanceof FmtHLM.MetaRefExpression_or) {
+      let innerResultPromise = CachedPromise.resolve(true);
+      if (sourceFormula.formulas) {
+        for (let item of sourceFormula.formulas) {
+          innerResultPromise = innerResultPromise.and(() => this.triviallyImplies(item, targetFormula, followDefinitions));
+        }
+      }
+      return innerResultPromise;
+    }
+    if (targetFormula instanceof FmtHLM.MetaRefExpression_and) {
+      let innerResultPromise = CachedPromise.resolve(true);
+      if (targetFormula.formulas) {
+        for (let item of targetFormula.formulas) {
+          innerResultPromise = innerResultPromise.and(() => this.triviallyImplies(sourceFormula, item, followDefinitions));
+        }
+      }
+      return innerResultPromise;
+    }
+    let resultPromise = this.isTrivialContradiction(sourceFormula, followDefinitions)
+      .or(() => this.isTrivialTautology(targetFormula, followDefinitions));
     if (sourceFormula instanceof FmtHLM.MetaRefExpression_and) {
-      let resultPromise = this.isTrivialTautology(targetFormula, followDefinitions);
       if (sourceFormula.formulas) {
         for (let item of sourceFormula.formulas) {
           resultPromise = resultPromise.or(() => this.triviallyImplies(item, targetFormula, followDefinitions));
         }
       }
-      return resultPromise;
-    } else if (sourceFormula instanceof FmtHLM.MetaRefExpression_or) {
-      let resultPromise = CachedPromise.resolve(true);
-      if (sourceFormula.formulas) {
-        for (let item of sourceFormula.formulas) {
-          resultPromise = resultPromise.and(() => this.triviallyImplies(item, targetFormula, followDefinitions));
-        }
-      }
-      return resultPromise;
-    }
-    if (targetFormula instanceof FmtHLM.MetaRefExpression_and) {
-      let resultPromise = CachedPromise.resolve(true);
-      if (targetFormula.formulas) {
-        for (let item of targetFormula.formulas) {
-          resultPromise = resultPromise.and(() => this.triviallyImplies(sourceFormula, item, followDefinitions));
-        }
-      }
-      return resultPromise;
     } else if (targetFormula instanceof FmtHLM.MetaRefExpression_or) {
-      let resultPromise = this.isTrivialContradiction(sourceFormula, followDefinitions);
       if (targetFormula.formulas) {
         for (let item of targetFormula.formulas) {
           resultPromise = resultPromise.or(() => this.triviallyImplies(sourceFormula, item, followDefinitions));
         }
       }
-      return resultPromise;
     }
-    let finalResultPromise = CachedPromise.resolve(false);
     if (followDefinitions) {
       if (sourceFormula instanceof Fmt.DefinitionRefExpression && !sourceFormula.path.parentPath) {
-        finalResultPromise = finalResultPromise.or(() =>
+        resultPromise = resultPromise.or(() =>
           this.getDefinition(sourceFormula.path).then((definition: Fmt.Definition) => {
-            let resultPromise = CachedPromise.resolve(false);
+            let innerResultPromise = CachedPromise.resolve(false);
             if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
               for (let definitionFormula of definition.contents.definition) {
-                resultPromise = resultPromise.or(() => {
+                innerResultPromise = innerResultPromise.or(() => {
                   let substitutedDefinitionFormula = this.substitutePath(definitionFormula, sourceFormula.path, [definition]);
                   return this.triviallyImplies(substitutedDefinitionFormula, targetFormula, false);
                 });
               }
             }
-            return resultPromise;
+            return innerResultPromise;
           }));
       }
       if (targetFormula instanceof Fmt.DefinitionRefExpression && !targetFormula.path.parentPath) {
-        finalResultPromise = finalResultPromise.or(() =>
+        resultPromise = resultPromise.or(() =>
           this.getDefinition(targetFormula.path).then((definition: Fmt.Definition) => {
-            let resultPromise = CachedPromise.resolve(false);
+            let innerResultPromise = CachedPromise.resolve(false);
             if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
               for (let definitionFormula of definition.contents.definition) {
-                resultPromise = resultPromise.or(() => {
+                innerResultPromise = innerResultPromise.or(() => {
                   let substitutedDefinitionFormula = this.substitutePath(definitionFormula, targetFormula.path, [definition]);
                   return this.triviallyImplies(sourceFormula, substitutedDefinitionFormula, false);
                 });
               }
             }
-            return resultPromise;
+            return innerResultPromise;
           }));
       }
     }
-    return finalResultPromise;
+    return resultPromise;
   }
 
   // TODO when checking expressions for equality, ignore certain aspects:
