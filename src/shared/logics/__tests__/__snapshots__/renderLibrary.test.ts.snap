@@ -84,7 +84,7 @@ exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`]
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-|S| = |ℕ_(<|S|)|
+We have |S| = |ℕ_(<|S|)| by definition.
 ⇒^def ∃ r : S ↔ ℕ_(<|S|)
 Choose k := |S|, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:

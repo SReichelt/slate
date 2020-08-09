@@ -2583,13 +2583,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         startRow.push(this.renderFormula(type.statement, fullFormulaSelection));
         // TODO only omit proof if trivial
         if (type.proof) {
-          startRow.push(new Notation.TextExpression(':'));
-          paragraphs.push(new Notation.RowExpression(startRow));
-          let subProofContext: HLMProofStepContext = {
-            goal: type.statement,
-            stepResults: context.stepResults
-          };
-          this.addIndentedSubProof(type.proof, subProofContext, paragraphs);
+          let steps = type.proof.steps;
+          if (steps.length === 1 && steps[0].type instanceof FmtHLM.MetaRefExpression_ProveDef && !steps[0].type.proof) {
+            startRow.push(new Notation.TextExpression(' by definition.'));
+            paragraphs.push(new Notation.RowExpression(startRow));
+          } else {
+            startRow.push(new Notation.TextExpression(':'));
+            paragraphs.push(new Notation.RowExpression(startRow));
+            let subProofContext: HLMProofStepContext = {
+              goal: type.statement,
+              stepResults: context.stepResults
+            };
+            this.addIndentedSubProof(type.proof, subProofContext, paragraphs);
+          }
         } else {
           startRow.push(new Notation.TextExpression('.'));
           paragraphs.push(new Notation.RowExpression(startRow));
@@ -2644,8 +2650,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         paragraphs.push(this.renderParameter(step, true, false, false));
-      } else if (type instanceof FmtHLM.MetaRefExpression_Consider
-                 || type instanceof FmtHLM.MetaRefExpression_Embed) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
         let result = this.utils.getProofStepResult(step, context);
         if (result) {
           paragraphs.push(this.readOnlyRenderer.renderFormula(result, fullFormulaSelection));
@@ -2654,7 +2659,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
                  || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
                  || type instanceof FmtHLM.MetaRefExpression_UseForAll
-                 || type instanceof FmtHLM.MetaRefExpression_Embed
                  || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                  || type instanceof FmtHLM.MetaRefExpression_Substitute) {
         let result = this.utils.getProofStepResult(step, context);
@@ -2813,9 +2817,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let embedding = contents.embedding;
             result.set(embedding.parameter, () => this.renderParameter(embedding.parameter, false, false, false));
             result.set(embedding.target, () => this.renderElementTerm(embedding.target, fullElementTermSelection));
-            if (embedding.wellDefinednessProof) {
-              this.addProofParts(embedding.wellDefinednessProof, result);
-            }
+            this.addProofParts(embedding.wellDefinednessProof, result);
           }
         } else if (contents instanceof FmtHLM.ObjectContents_Constructor) {
           if (contents.equalityDefinition) {
@@ -2825,18 +2827,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             for (let item of equalityDefinition.definition) {
               this.addFormulaParts(item, result);
             }
-            if (equalityDefinition.equivalenceProofs) {
-              this.addProofListParts(equalityDefinition.equivalenceProofs, result);
-            }
-            if (equalityDefinition.reflexivityProof) {
-              this.addProofParts(equalityDefinition.reflexivityProof, result);
-            }
-            if (equalityDefinition.symmetryProof) {
-              this.addProofParts(equalityDefinition.symmetryProof, result);
-            }
-            if (equalityDefinition.transitivityProof) {
-              this.addProofParts(equalityDefinition.transitivityProof, result);
-            }
+            this.addProofListParts(equalityDefinition.equivalenceProofs, result);
+            this.addProofParts(equalityDefinition.reflexivityProof, result);
+            this.addProofParts(equalityDefinition.symmetryProof, result);
+            this.addProofParts(equalityDefinition.transitivityProof, result);
           }
           if (contents.rewrite) {
             let rewrite = contents.rewrite;
@@ -2849,48 +2843,34 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           for (let item of contents.definition) {
             this.addSetTermParts(item, result);
           }
-          if (contents.equalityProofs) {
-            this.addProofListParts(contents.equalityProofs, result);
-          }
+          this.addProofListParts(contents.equalityProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
           for (let item of contents.definition) {
             this.addElementTermParts(item, result);
           }
-          if (contents.equalityProofs) {
-            this.addProofListParts(contents.equalityProofs, result);
-          }
+          this.addProofListParts(contents.equalityProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           this.addParameterParts(contents.parameter, result);
           for (let item of contents.definition) {
             this.addFormulaParts(item, result);
           }
-          if (contents.wellDefinednessProof) {
-            this.addProofParts(contents.wellDefinednessProof, result);
-          }
-          if (contents.equivalenceProofs) {
-            this.addProofListParts(contents.equivalenceProofs, result);
-          }
+          this.addProofParts(contents.wellDefinednessProof, result);
+          this.addProofListParts(contents.equivalenceProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
           for (let item of contents.definition) {
             this.addFormulaParts(item, result);
           }
-          if (contents.equivalenceProofs) {
-            this.addProofListParts(contents.equivalenceProofs, result);
-          }
+          this.addProofListParts(contents.equivalenceProofs, result);
         }
       } else {
         if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
           this.addFormulaParts(contents.claim, result);
-          if (contents.proofs) {
-            this.addProofListParts(contents.proofs, result);
-          }
+          this.addProofListParts(contents.proofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
           for (let item of contents.conditions) {
             this.addFormulaParts(item, result);
           }
-          if (contents.equivalenceProofs) {
-            this.addProofListParts(contents.equivalenceProofs, result);
-          }
+          this.addProofListParts(contents.equivalenceProofs, result);
         }
       }
     }
@@ -2982,16 +2962,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addProofListParts(proofs: FmtHLM.ObjectContents_Proof[], result: Logic.ObjectRenderFns): void {
-    if (this.options.includeProofs) {
+  private addProofListParts(proofs: FmtHLM.ObjectContents_Proof[] | undefined, result: Logic.ObjectRenderFns): void {
+    if (proofs && this.options.includeProofs) {
       for (let proof of proofs) {
         this.addProofParts(proof, result);
       }
     }
   }
 
-  private addProofParts(proof: FmtHLM.ObjectContents_Proof, result: Logic.ObjectRenderFns): void {
-    if (this.options.includeProofs) {
+  private addProofParts(proof: FmtHLM.ObjectContents_Proof | undefined, result: Logic.ObjectRenderFns): void {
+    if (proof && this.options.includeProofs) {
       if (proof.parameters) {
         this.addParameterListParts(proof.parameters, undefined, result);
       }
@@ -3011,9 +2991,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addParameterParts(step, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.addFormulaParts(type.statement, result);
-      if (type.proof) {
-        this.addProofParts(type.proof, result);
-      }
+      this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
                || type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
       this.addFormulaParts(type.result, result);
@@ -3028,25 +3006,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                || type instanceof FmtHLM.MetaRefExpression_ProveNeg
                || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
       this.addProofParts(type.proof, result);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
-      this.addGenericExpressionParts(type.construction, result);
-      this.addElementTermParts(type.input, result);
-      this.addElementTermParts(type.output, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       this.addGenericExpressionParts(type.theorem, result);
       this.addFormulaParts(type.result, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
       this.addArgumentListParts(type.arguments, result);
-      if (type.proof) {
-        this.addProofParts(type.proof, result);
-      }
+      this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
-      if (type.subsetProof) {
-        this.addProofParts(type.subsetProof, result);
-      }
-      if (type.supersetProof) {
-        this.addProofParts(type.supersetProof, result);
-      }
+      this.addProofParts(type.subsetProof, result);
+      this.addProofParts(type.supersetProof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       this.addProofStepParts(type.source, result);
       this.addFormulaParts(type.result, result);

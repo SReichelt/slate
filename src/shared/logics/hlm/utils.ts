@@ -462,10 +462,6 @@ export class HLMUtils extends GenericUtils {
                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
       return type.result;
-    } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
-      let result = new FmtHLM.MetaRefExpression_equals;
-      result.terms = [type.input, type.output];
-      return result;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
                || type instanceof FmtHLM.MetaRefExpression_UseForAll) {
       if (type instanceof FmtHLM.MetaRefExpression_UseExists) {

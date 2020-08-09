@@ -1564,8 +1564,6 @@ export class HLMDefinitionChecker {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
       // TODO
-    } else if (type instanceof FmtHLM.MetaRefExpression_Embed) {
-      // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
