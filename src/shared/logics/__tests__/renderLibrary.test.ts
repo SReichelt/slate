@@ -1,5 +1,5 @@
 import { PhysicalFileAccessor } from '../../../fs/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, formatItemNumber, defaultLibraryDataProviderConfig } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, formatItemNumber, defaultLibraryDataProviderOptions } from '../../data/libraryDataProvider';
 import * as Fmt from '../../format/format';
 import * as FmtReader from '../../format/read';
 import * as FmtLibrary from '../library';
@@ -65,6 +65,6 @@ test('render hlm library', async () => {
   let templateFileReference = fileAccessor.openFile('data/notation/templates.slate', false);
   let templateFileContents = await templateFileReference.read();
   let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
-  let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', defaultLibraryDataProviderConfig, 'Library');
+  let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', defaultLibraryDataProviderOptions, 'Library');
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });

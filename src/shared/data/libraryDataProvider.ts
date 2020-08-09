@@ -60,13 +60,13 @@ export const defaultReferences: DefaultReference[] = [
 
 const defaultReferencesString = defaultReferences.map((ref) => `* ${ref.urlPrefix}...`).reduce((prev, cur) => `${prev}\n${cur}`);
 
-export interface LibraryDataProviderConfig {
+export interface LibraryDataProviderOptions {
   canPreload: boolean;
   watchForChanges: boolean;
   checkMarkdownCode: boolean;
   allowPlaceholders: boolean;
 }
-export const defaultLibraryDataProviderConfig: LibraryDataProviderConfig = {
+export const defaultLibraryDataProviderOptions: LibraryDataProviderOptions = {
   canPreload: false,
   watchForChanges: false,
   checkMarkdownCode: false,
@@ -102,7 +102,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
-  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderConfig, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
+  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderOptions, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
     if (this.uri && !this.uri.endsWith('/')) {
       this.uri += '/';
     }

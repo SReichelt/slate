@@ -30,7 +30,7 @@ import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
-import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderConfig, LibraryItemNumber } from '../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from '../shared/data/libraryDataProvider';
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
@@ -163,13 +163,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.logic = Logics.hlm;
     let selectedLibraryURI = librariesURIPrefix + selectedLibraryName;
-    let libraryDataProviderConfig: LibraryDataProviderConfig = {
+    let libraryDataProviderOptions: LibraryDataProviderOptions = {
       canPreload: canPreload,
       watchForChanges: true,
       checkMarkdownCode: false,
       allowPlaceholders: config.embedded
     };
-    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderConfig, 'Library');
+    this.libraryDataProvider = new LibraryDataProvider(this.logic, this.fileAccessor, selectedLibraryURI, libraryDataProviderOptions, 'Library');
 
     if (selectionURI) {
       this.updateSelectionState(state, selectionURI);

@@ -6,7 +6,7 @@ import * as FmtReader from '../../../shared/format/read';
 import * as FmtLibrary from '../../../shared/logics/library';
 import * as Logics from '../../../shared/logics/logics';
 import { FileAccessor } from '../../../shared/data/fileAccessor';
-import { LibraryDataProvider, LibraryDataProviderConfig } from '../../../shared/data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDataProviderOptions } from '../../../shared/data/libraryDataProvider';
 import { languageId } from '../slate';
 import { ParseDocumentEvent } from '../events';
 import { RangeInfo, RangeHandler, deleteUrisFromDiagnosticCollection } from '../utils';
@@ -101,14 +101,14 @@ export class LibraryDocumentProvider {
             if (!logic) {
                 return undefined;
             }
-            let config: LibraryDataProviderConfig = {
+            let options: LibraryDataProviderOptions = {
                 canPreload: false,
                 watchForChanges: true,
                 checkMarkdownCode: false,
                 allowPlaceholders: true
             };
             library = {
-                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, config, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, options, 'Library'),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);
