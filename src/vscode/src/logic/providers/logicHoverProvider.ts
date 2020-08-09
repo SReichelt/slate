@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as Fmt from '../../../../shared/format/format';
-import { renderAsText } from '../../../../shared/notation/textOutput';
+import { renderAsText, RenderAsTextOptions } from '../../../../shared/notation/textOutput';
 import * as Logic from '../../../../shared/logics/logic';
 import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
 import { HoverEvent } from '../../events';
@@ -33,7 +33,16 @@ export class SlateLogicHoverProvider {
                 };
                 let renderer = targetDataProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, targetDataProvider, templates, rendererOptions);
                 let renderedDefinition = renderer.renderDefinition(undefined, SlateLogicHoverProvider.renderedDefinitionOptions);
-                return renderedDefinition ? renderAsText(renderedDefinition, true, false) : CachedPromise.resolve('');
+                if (!renderedDefinition) {
+                    return CachedPromise.resolve('');
+                }
+                let renderAsTextOptions: RenderAsTextOptions = {
+                    outputMarkdown: true,
+                    singleLine: false,
+                    allowEmptyLines: true,
+                    indent: ''
+                };
+                return renderAsText(renderedDefinition, renderAsTextOptions);
             });
             event.hoverTexts = event.hoverTexts.then((hoverTexts: vscode.MarkdownString[]) => textPromise.then((text: string) => {
                 if (text) {

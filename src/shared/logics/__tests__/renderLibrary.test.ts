@@ -6,7 +6,7 @@ import * as FmtLibrary from '../library';
 import * as FmtNotation from '../../notation/meta';
 import * as Logic from '../logic';
 import * as Logics from '../logics';
-import { renderAsText } from '../../notation/textOutput';
+import { renderAsText, RenderAsTextOptions } from '../../notation/textOutput';
 import CachedPromise from '../../data/cachedPromise';
 
 async function checkSection(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, sectionItemInfo: LibraryItemInfo) {
@@ -48,7 +48,13 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
   let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, templates, rendererOptions);
   let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
   if (renderedDefinition) {
-    let renderedText = renderAsText(renderedDefinition, false, false);
+    let options: RenderAsTextOptions = {
+      outputMarkdown: false,
+      singleLine: false,
+      allowEmptyLines: true,
+      indent: ''
+    };
+    let renderedText = renderAsText(renderedDefinition, options);
     expect(renderedText).resolves.toMatchSnapshot(formatItemNumber(itemInfo.itemNumber) + ' ' + uri);
   }
 }

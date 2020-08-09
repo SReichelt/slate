@@ -4,28 +4,40 @@ import { shrinkMathSpaces } from '../format/common';
 
 const escapeForMarkdown = require('markdown-escape');
 
-export function renderAsText(expression: Notation.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, indent: string = '', optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
-  let result = renderAsTextInternal(expression, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+export interface RenderAsTextOptions {
+  outputMarkdown: boolean;
+  singleLine: boolean;
+  allowEmptyLines: boolean;
+  indent: string;
+}
+
+export function renderAsText(expression: Notation.RenderedExpression, options: RenderAsTextOptions, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
+  let result = renderAsTextInternal(expression, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
   if (expression.styleClasses && expression.styleClasses.indexOf('script') >= 0) {
     result = result.then((text: string) => shrinkMathSpaces(text));
   }
   return result;
 }
 
-function renderAsTextInternal(expression: Notation.RenderedExpression, outputMarkdown: boolean, singleLine: boolean, indent: string, optionalParenLeft: boolean, optionalParenRight: boolean, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
+function renderAsTextInternal(expression: Notation.RenderedExpression, options: RenderAsTextOptions, optionalParenLeft: boolean, optionalParenRight: boolean, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
   if ((optionalParenLeft || optionalParenRight)
       && optionalParenMaxLevel === undefined
       && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
-    return renderAsText(new Notation.ParenExpression(expression, optionalParenStyle), outputMarkdown, singleLine, indent);
+    return renderAsText(new Notation.ParenExpression(expression, optionalParenStyle), options);
   }
+  let singleLineOptions: RenderAsTextOptions = options.singleLine ? options : {
+    ...options,
+    singleLine: true,
+    allowEmptyLines: false
+  };
   if (expression instanceof Notation.EmptyExpression) {
     return CachedPromise.resolve('');
   } else if (expression instanceof Notation.TextExpression) {
     let text = expression.text;
-    if (outputMarkdown) {
+    if (options.outputMarkdown) {
       text = escapeForMarkdown(text);
       if (expression.styleClasses && expression.styleClasses.indexOf('var') >= 0) {
         text = '_' + text + '_';
@@ -34,20 +46,24 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, outputMar
     return CachedPromise.resolve(text);
   } else if (expression instanceof Notation.RowExpression) {
     if (expression.items.length === 1) {
-      return renderAsText(expression.items[0], outputMarkdown, true, undefined, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+      return renderAsText(expression.items[0], singleLineOptions, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else {
-      return renderList(expression.items.map((item) => renderAsText(item, outputMarkdown, true)), '');
+      return renderList(expression.items.map((item) => renderAsText(item, singleLineOptions)), '');
     }
   } else if (expression instanceof Notation.ParagraphExpression) {
     let paragraphs = expression.paragraphs.map((item) => {
       let ownIndent = '';
-      if (item.styleClasses && item.styleClasses.indexOf('display-math') >= 0 && !singleLine) {
-        ownIndent = outputMarkdown ? '\u2007' : '  ';
+      if (item.styleClasses && item.styleClasses.indexOf('display-math') >= 0 && !options.singleLine) {
+        ownIndent = options.outputMarkdown ? '\u2007' : '  ';
       }
-      return renderAsText(item, outputMarkdown, singleLine, indent + ownIndent)
+      let innerOptions = {
+        ...options,
+        indent: options.indent + ownIndent
+      };
+      return renderAsText(item, innerOptions)
         .then((result) => ownIndent + result);
     });
-    return renderList(paragraphs, singleLine ? ' ' : '\n\n' + indent);
+    return renderList(paragraphs, options.singleLine ? ' ' : (options.allowEmptyLines ? '\n\n' : '\n') + options.indent);
   } else if (expression instanceof Notation.ListExpression) {
     let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
       let prefix: string;
@@ -56,20 +72,24 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, outputMar
       } else {
         prefix = expression.style.replace('1', (index + 1).toString());
       }
-      return renderAsText(item, outputMarkdown, singleLine, indent).then((text) => prefix + ' ' + text);
+      let innerOptions = {
+        ...options,
+        allowEmptyLines: false
+      };
+      return renderAsText(item, innerOptions).then((text) => prefix + ' ' + text);
     });
-    return renderList(items, singleLine ? ', ' : (outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + indent);
+    return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + options.indent);
   } else if (expression instanceof Notation.TableExpression) {
     let isAligned = (expression.styleClasses && expression.styleClasses.indexOf('aligned') >= 0);
     let isDefinitionList = (expression.styleClasses && expression.styleClasses.indexOf('definitions') >= 0);
     let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
     let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
     let secondarySeparator = isDefinitionList ? '  ' : undefined;
-    let rows = expression.items.map((row: Notation.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, outputMarkdown, true)), separator, secondarySeparator));
-    return renderList(rows, singleLine ? ', ' : (outputMarkdown ? '\\\n' : '\n') + indent);
+    let rows = expression.items.map((row: Notation.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, singleLineOptions)), separator, secondarySeparator));
+    return renderList(rows, options.singleLine ? ', ' : (options.outputMarkdown ? '\\\n' : '\n') + options.indent);
   } else if (expression instanceof Notation.ParenExpression) {
     return expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
-      let body = renderAsText(expression.body, outputMarkdown, true);
+      let body = renderAsText(expression.body, singleLineOptions);
       if (surroundingParenStyle === expression.style) {
         return body;
       } else {
@@ -99,7 +119,7 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, outputMar
           closeParen = '〉';
           break;
         }
-        if (outputMarkdown) {
+        if (options.outputMarkdown) {
           openParen = escapeForMarkdown(openParen);
           closeParen = escapeForMarkdown(closeParen);
         }
@@ -109,26 +129,26 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, outputMar
   } else if (expression instanceof Notation.OuterParenExpression) {
     if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
         && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
-      return renderAsText(new Notation.ParenExpression(expression.body, optionalParenStyle), outputMarkdown, true);
+      return renderAsText(new Notation.ParenExpression(expression.body, optionalParenStyle), singleLineOptions);
     } else {
-      return renderAsText(expression.body, outputMarkdown, true);
+      return renderAsText(expression.body, singleLineOptions);
     }
   } else if (expression instanceof Notation.InnerParenExpression) {
-    return renderAsText(expression.body, outputMarkdown, true, undefined, expression.left, expression.right, expression.maxLevel);
+    return renderAsText(expression.body, singleLineOptions, expression.left, expression.right, expression.maxLevel);
   } else if (expression instanceof Notation.MarkdownExpression) {
     return CachedPromise.resolve(expression.text);
   } else if (expression instanceof Notation.IndirectExpression) {
     try {
-      return renderAsText(expression.resolve(), outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+      return renderAsText(expression.resolve(), options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } catch (error) {
       return CachedPromise.resolve(`[Error: ${error.message}]`);
     }
   } else if (expression instanceof Notation.PromiseExpression) {
-    return expression.promise.then((innerExpression: Notation.RenderedExpression) => renderAsText(innerExpression, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
+    return expression.promise.then((innerExpression: Notation.RenderedExpression) => renderAsText(innerExpression, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
   } else if (expression instanceof Notation.DecoratedExpression) {
-    return renderAsText(expression.body, outputMarkdown, singleLine, indent);
+    return renderAsText(expression.body, options);
   } else if (expression.fallback) {
-    return renderAsText(expression.fallback, outputMarkdown, singleLine, indent, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+    return renderAsText(expression.fallback, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve('?');
   } else {

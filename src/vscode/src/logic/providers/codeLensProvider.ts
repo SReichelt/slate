@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as Fmt from '../../../../shared/format/format';
 import * as FmtLibrary from '../../../../shared/logics/library';
 import * as Notation from '../../../../shared/notation/notation';
-import { renderAsText } from '../../../../shared/notation/textOutput';
+import { renderAsText, RenderAsTextOptions } from '../../../../shared/notation/textOutput';
 import * as Logic from '../../../../shared/logics/logic';
 import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
 import { LibraryDocumentProvider } from '../data';
@@ -77,7 +77,13 @@ export class SlateCodeLensProvider implements vscode.CodeLensProvider {
 
 	resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens> {
         if (codeLens instanceof SlateCodeLens) {
-            return renderAsText(codeLens.renderFn(), false, true).then((text: string) => {
+            let renderAsTextOptions: RenderAsTextOptions = {
+                outputMarkdown: false,
+                singleLine: true,
+                allowEmptyLines: false,
+                indent: ''
+            };
+            return renderAsText(codeLens.renderFn(), renderAsTextOptions).then((text: string) => {
                 return new vscode.CodeLens(codeLens.range, {
                     title: text,
                     command: ''

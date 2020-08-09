@@ -47,27 +47,17 @@ exports[`render hlm library: 1.1.3 data/libraries/hlm/Essentials/Sets/empty 1`] 
 Equivalence.
 
 1⇒2. Assume S = ∅. Then S ⊆ ∅:
-
 S = ∅
-
 ⇒^def S ⊆ ∅
 2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
-
 Let x ∈ S.
-
 S ⊆ ∅
-
 ⇒^def ∀ s ∈ S : s ∈ ∅
-
 ⇒ x ∈ ∅
-
 ⇒^def ⚡
 3⇒1. Assume ∄ x ∈ S. Then S = ∅:
-
 ⊆. Let a ∈ S. Then a ∈ ∅:
-
 We have ∃ x ∈ S:
-
 Choose x := a.
 ⊇. 1.1.2 ⇒ ∅ ⊆ S
 
@@ -94,39 +84,24 @@ exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`]
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-
 |S| = |ℕ_(<|S|)|
-
 ⇒^def ∃ r : S ↔ ℕ_(<|S|)
-
 Choose k := |S|, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
-
 Choose l := k, g := f^-1.
 3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
-
 We show that |S| ∈ ℕ:
-
 We have |ℕ_(<l)| = |S|:
-
 We show that ∃ s : S ↔ ℕ_(<l):
-
 Choose s := g.
-
 ⇒^[l = |ℕ_(<l)|] l = |S|
-
 l ∈ ℕ
-
 ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-
 def ⇒ f is injective
-
 Choose m := k, h := f.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
-
 1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
-
 Choose n := m, i := h∣_S^(ℕ_(≤m)).
 
 Remarks.
@@ -2215,7 +2190,6 @@ Proof.  We show that ({0 if n = (0), ((0 + x)+1) if n = (x+1) (x �
 
 1. We show that 0 = 0: Trivial.
 2. Let x ∈ ℕ. Then ((0 + x)+1) = (x+1):
-
 1.7.1.6 ⇒ 0 + x = x
 
 References.
@@ -2237,7 +2211,6 @@ Proof.  We show that ({(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1
 
 1. We show that (m+1) = (m+1): Trivial.
 2. Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
-
 1.7.1.7 ⇒ (m+1) + x = ((m + x)+1)
 
 References.
@@ -2466,14 +2439,10 @@ exports[`render hlm library: 1.7.1.18 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.  By induction on k.
 
 1. Assume k = 0.
-
 Choose m := f(0).
 2. Let x ∈ ℕ such that k = x + 1.
-
 Let S := ℕ_(≤x).
-
 1.7.1.18 ⇒ ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
-
 Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
 
 Remarks.
@@ -2493,55 +2462,32 @@ exports[`render hlm library: 1.7.1.19 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-
 def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
-
 We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
-
 1. Assume l = 0. Then M is empty:
-
 We show that ∄ c ∈ M:
-
 Let c ∈ M.
-
 f ∈ (ℕ_(<l) ↔ M)
-
 ⇒^def f is bijective
-
 ⇒^def f is surjective
-
 ⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
-
 ⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
-
 s ∈ ℕ_(<0)
-
 ⇒^def s < 0
-
 ⇒^1.7.1.14 s ≥ 0
 2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
-
 1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
-
 1. Assume M is empty.
-
 ⇒^def M = ∅
-
 Choose a := 0. We show that M ⊆ ℕ_(≤0):
-
 1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-
 ⇒^[M = ∅] M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
-
 def ⇒ M ⊆ ℕ_(<(a+1))
-
 Choose b := (a+1).
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
-
 1.7.1.17.7 ⇒ ℕ_(<b) is finite
-
 ⇒^1.1.5 M is finite"
 `;
 
@@ -2781,18 +2727,12 @@ exports[`render hlm library: 1.7.1.36 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.  By induction on n.
 
 1. We show that 0 ∈ M:
-
 M is inductive
-
 ⇒^def 0 ∈ M
 2. Let x ∈ ℕ. Then x + 1 ∈ M:
-
 1.7.1.36 ⇒ x ∈ M
-
 M is inductive
-
 ⇒^def ∀ m ∈ M : m + 1 ∈ M
-
 ⇒ x + 1 ∈ M"
 `;
 
@@ -2805,10 +2745,8 @@ exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.
 
 1⇒2. Assume M is inductive.
-
 ⊆. Trivial.
 ⊇. Let n ∈ ℕ. Then n ∈ M:
-
 1.7.1.36 ⇒ n ∈ M
 
 Remarks.
