@@ -1073,24 +1073,23 @@ export class HLMDefinitionChecker {
       this.addPendingCheck(formula, checkDefinitionRef);
     } else if (formula instanceof FmtHLM.MetaRefExpression_not) {
       this.checkFormula(formula.formula, context);
-    } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
+    } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or || formula instanceof FmtHLM.MetaRefExpression_equiv) {
       if (formula.formulas) {
         let checkContext = context;
         for (let item of formula.formulas) {
           this.checkFormula(item, checkContext);
-          let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-          if (formula instanceof FmtHLM.MetaRefExpression_or) {
-            constraintType.formula = this.utils.negateFormula(item, false).getImmediateResult()!;
-          } else {
-            constraintType.formula = item;
+          if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
+            let constraintType = new FmtHLM.MetaRefExpression_Constraint;
+            if (formula instanceof FmtHLM.MetaRefExpression_or) {
+              constraintType.formula = this.utils.negateFormula(item, false).getImmediateResult()!;
+            } else {
+              constraintType.formula = item;
+            }
+            let constraintParam = this.utils.createParameter(constraintType, '_');
+            checkContext = this.getParameterContext(constraintParam, checkContext);
           }
-          let constraintParam = this.utils.createParameter(constraintType, '_');
-          checkContext = this.getParameterContext(constraintParam, checkContext);
         }
       }
-    } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
-      this.checkFormula(formula.left, context);
-      this.checkFormula(formula.right, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall || formula instanceof FmtHLM.MetaRefExpression_exists || formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       let innerContext = this.checkParameterList(formula.parameters, context);
       if (formula.formula) {
@@ -1430,44 +1429,52 @@ export class HLMDefinitionChecker {
   }
 
   private checkProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
-    let stepContext: HLMCheckerProofStepContext = {
-      ...context,
-      parameters: parameters,
-      goal: goal
-    };
-    this.checkProofInternal(object, proof, stepContext);
+    this.checkProofInternal(object, proof, parameters, [goal], context);
   }
 
-  private checkProofInternal(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMCheckerProofStepContext): void {
+  private checkProofInternal(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goals: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (!goals.length) {
+      this.error(proof ?? object, 'Proof goal not known');
+      return;
+    }
     if (proof) {
       if (proof.parameters) {
-        if (!context.parameters || !proof.parameters.isEquivalentTo(context.parameters)) {
+        if (!parameters || !proof.parameters.isEquivalentTo(parameters)) {
           this.error(proof.parameters, 'Invalid proof parameters');
           return;
         }
         context = this.getParameterListContext(proof.parameters, context);
-      } else if (context.parameters) {
+      } else if (parameters) {
         this.error(proof, 'Parameter list required');
         return;
       }
       if (proof.goal) {
         this.checkFormula(proof.goal, context);
-        if (context.goal) {
-          if (context.parameters && proof.parameters) {
-            context.goal = this.utils.substituteParameters(context.goal, context.parameters, proof.parameters);
-          }
-          this.checkUnfolding(context.goal, proof.goal);
+        if (parameters && proof.parameters) {
+          goals = goals.map((goal: Fmt.Expression) => this.utils.substituteParameters(goal, parameters, proof.parameters!));
         }
+        this.checkUnfolding(goals, proof.goal);
       }
-      context.parameters = proof.parameters;
-      this.utils.updateInitialProofStepContext(proof, context);
-      this.checkProofSteps(object, proof.steps, context);
+      let stepContext: HLMCheckerProofStepContext = {
+        ...context,
+        parameters: proof.parameters,
+        goal: proof.goal ?? goals[0],
+        previousResult: undefined
+      };
+      this.utils.updateInitialProofStepContext(proof, stepContext);
+      this.checkProofSteps(proof, proof.steps, stepContext);
     } else if (this.options.warnAboutMissingProofs) {
-      if (context.parameters) {
-        context = this.getParameterListContext(context.parameters, context);
+      if (parameters) {
+        context = this.getParameterListContext(parameters, context);
       }
-      let getMessage = () => context.goal && !context.parameters ? `Proof of ${context.goal} required` : 'Proof required';
-      this.checkTrivialProvability(object, context, getMessage);
+      let stepContext: HLMCheckerProofStepContext = {
+        ...context,
+        parameters: parameters,
+        goal: goals[0],
+        previousResult: undefined
+      };
+      let getMessage = () => goals.length === 1 && !parameters ? `Proof of ${goals[0]} required` : 'Proof required';
+      this.checkTrivialProvability(object, stepContext, getMessage);
     }
   }
 
@@ -1504,10 +1511,14 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkUnfolding(source: Fmt.Expression, target: Fmt.Expression): void {
-    let check = this.utils.unfoldsTo(source, target).then((result: boolean) => {
+  private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression): void {
+    let resultPromise = CachedPromise.resolve(false);
+    for (let source of sources) {
+      resultPromise = resultPromise.or(() => this.utils.unfoldsTo(source, target));
+    }
+    let check = resultPromise.then((result: boolean) => {
       if (!result) {
-        this.error(target, `${source} does not unfold to ${target}`);
+        this.error(target, sources.length === 1 ? `${sources[0]} does not unfold to ${target}` : `None of the possible goals unfold to ${target}`);
       }
     });
     this.addPendingCheck(target, check);
@@ -1548,67 +1559,91 @@ export class HLMDefinitionChecker {
       this.checkVariableRefExpression(type.variable, checkType, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.checkFormula(type.statement, context);
-      let innerContext: HLMCheckerProofStepContext = {
-        ...context,
-        parameters: undefined,
-        goal: type.statement,
-        previousResult: undefined
-      };
-      this.checkProofInternal(step, type.proof, innerContext);
+      this.checkProof(step, type.proof, undefined, type.statement, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef) {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
       // TODO
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
-      // TODO
+      if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
+        this.checkArgumentLists([type.arguments], [context.previousResult.parameters], undefined, context);
+      } else {
+        this.error(step, 'Previous result is not a universally quantified expression');
+        return undefined;
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
-      // TODO
+      if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists) {
+        if (!type.parameters.isEquivalentTo(context.previousResult.parameters)) {
+          this.error(type.parameters, 'Proof step parameters must match existential quantifier');
+        }
+      } else {
+        this.error(step, 'Previous result is not an existentially quantified expression');
+        return undefined;
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
-      // TODO
+      if (context.previousResult) {
+        this.checkUnfolding([context.previousResult], type.result);
+      } else {
+        this.error(step, 'Previous result not set');
+        return undefined;
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
-      // TODO
+      // TODO can prove: in, sub, equals (implicit definition, embedding), existsUnique
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveNeg) {
+      // TODO if goal is disjunction and type.proof.to is set, negate everything except that term
       let proveNeg = type;
       let check = this.utils.negateFormula(context.goal!, true).then((negatedGoal: Fmt.Expression) => {
         let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
         this.addProofConstraint(parameters, negatedGoal);
-        let innerContext: HLMCheckerProofStepContext = {
-          ...context,
-          parameters: parameters,
-          goal: new FmtHLM.MetaRefExpression_or,
-          previousResult: undefined
-        };
-        this.checkProofInternal(step, proveNeg.proof, innerContext);
+        this.checkProof(step, proveNeg.proof, parameters, new FmtHLM.MetaRefExpression_or, context);
       });
       this.addPendingCheck(step, check);
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
       if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
-        let innerContext: HLMCheckerProofStepContext = {
-          ...context,
-          parameters: context.goal.parameters,
-          goal: context.goal.formula,
-          previousResult: undefined
-        };
-        this.checkProofInternal(step, type.proof, innerContext);
+        this.checkProof(step, type.proof, context.goal.parameters, context.goal.formula, context);
       } else {
         this.error(step, 'Goal is not a universally quantified expression');
       }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
-      // TODO
+      if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
+        this.checkArgumentLists([type.arguments], [context.goal.parameters], undefined, context);
+        if (context.goal.formula) {
+          let substitutedFormula = this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments);
+          this.checkProof(step, type.proof, undefined, substitutedFormula, context);
+        }
+      } else {
+        this.error(step, 'Goal is not an existentially quantified expression');
+      }
       return undefined;
-    } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
-      // TODO
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
+      if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals) {
+        let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression) => {
+          let goal = new FmtHLM.MetaRefExpression_sub;
+          goal.subset = from;
+          goal.superset = to;
+          return goal;
+        };
+        this.checkEquivalenceProofs(type.proofs, context.goal.terms, getEquivalenceGoal, context);
+      } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
+        let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
+          this.addProofConstraint(proofParameters, from);
+          return to;
+        };
+        this.checkEquivalenceProofs(type.proofs, context.goal.formulas, getEquivalenceGoal, context);
+      } else {
+        this.error(step, 'Goal is not an equivalence');
+      }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
-      // TODO
+      // TODO can prove: conjunction, structural cases, regular cases, equality with more than 2 terms, maybe disjunction
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
       // TODO

@@ -1181,11 +1181,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowEquiv: false,
         allowCases: true
       };
+      let operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
       return this.renderTemplate('EquivalenceRelation', {
-                                   'operands': [
-                                     this.renderFormula(formula.left, formulaSelection),
-                                     this.renderFormula(formula.right, formulaSelection)
-                                   ]
+                                   'operands': operands
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       let formulaSelection: FormulaSelection = {
@@ -2523,19 +2521,30 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, symbol: string, paragraphs: Notation.RenderedExpression[]): void {
     if (this.options.includeProofs) {
       if (proofs && proofs.length) {
-        let labels: string[] = [];
-        for (let proof of proofs) {
-          let label = '?';
-          if (proof._from !== undefined && proof._to !== undefined) {
-            label = `${proof._from}${symbol}${proof._to}`;
-          }
-          labels.push(label);
-        }
+        let labels = this.getEquivalenceProofLabels(proofs, symbol);
         this.addProofList(proofs, heading, labels, undefined, paragraphs);
       } else {
         this.addNoProofPlaceholder(heading, undefined, undefined, paragraphs);
       }
     }
+  }
+
+  private getEquivalenceProofLabels(proofs: FmtHLM.ObjectContents_Proof[], symbol: string, reverseSymbol?: string): string[] {
+    return proofs.map((proof: FmtHLM.ObjectContents_Proof) => {
+      let label = '?';
+      if (proof._from !== undefined && proof._to !== undefined) {
+        if (reverseSymbol) {
+          if (proof._from.eqn(1) && proof._to.eqn(2)) {
+            label = symbol;
+          } else if (proof._from.eqn(2) && proof._to.eqn(1)) {
+            label = reverseSymbol;
+          }
+        } else {
+          label = `${proof._from}${symbol}${proof._to}`;
+        }
+      }
+      return label;
+    });
   }
 
   private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, context: HLMProofStepContext, paragraphs: Notation.RenderedExpression[]): void {
@@ -2581,7 +2590,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         startRow.push(new Notation.TextExpression('We have '));
         startRow.push(this.renderFormula(type.statement, fullFormulaSelection));
-        // TODO only omit proof if trivial
         if (type.proof) {
           let steps = type.proof.steps;
           if (steps.length === 1 && steps[0].type instanceof FmtHLM.MetaRefExpression_ProveDef && !steps[0].type.proof) {
@@ -2744,21 +2752,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             };
             this.addSubProof(type.proof, subProofContext, row, ' ', paragraphs);
           } else {
-            // TODO only omit proof if trivial
             paragraphs.push(new Notation.RowExpression(row));
           }
         } else {
           paragraphs.push(new Notation.ErrorExpression('Goal is not existentially quantified'));
         }
-      } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
-        // TODO omit proofs if missing but trivial
-        let subProofs = [type.subsetProof, type.supersetProof];
-        let labels = ['⊆', '⊇'];
-        // TODO set external goals
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
+        let labels: string[];
+        if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals) {
+          labels = this.getEquivalenceProofLabels(type.proofs, '⊆', context.goal.terms.length === 2 ? '⊇' : undefined);
+        } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
+          labels = this.getEquivalenceProofLabels(type.proofs, '⇒', context.goal.formulas.length === 2 ? '⇐' : undefined);
+        } else {
+          labels = this.getEquivalenceProofLabels(type.proofs, '⇒');
+        }
         let subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
-        this.addSubProofList(subProofs, labels, subProofContext, paragraphs);
+        this.addSubProofList(type.proofs, labels, subProofContext, paragraphs);
       } else {
         paragraphs.push(new Notation.ErrorExpression('Unknown proof step type'));
       }
@@ -3012,9 +3023,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
       this.addArgumentListParts(type.arguments, result);
       this.addProofParts(type.proof, result);
-    } else if (type instanceof FmtHLM.MetaRefExpression_ProveSetEquals) {
-      this.addProofParts(type.subsetProof, result);
-      this.addProofParts(type.supersetProof, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
+      this.addProofListParts(type.proofs, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       this.addProofStepParts(type.source, result);
       this.addFormulaParts(type.result, result);

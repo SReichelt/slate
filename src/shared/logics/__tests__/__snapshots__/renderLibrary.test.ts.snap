@@ -2744,8 +2744,7 @@ exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natu
 
 Proof.
 
-1⇒2. Assume M is inductive.
-⊆. Trivial.
+1⇒2. Assume M is inductive. Then M = ℕ:
 ⊇. Let n ∈ ℕ. Then n ∈ M:
 1.7.1.36 ⇒ n ∈ M
 

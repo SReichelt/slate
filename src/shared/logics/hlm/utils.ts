@@ -550,13 +550,13 @@ export class HLMUtils extends GenericUtils {
           resultFormula.formula = nextFormula;
           return resultFormula;
         }));
-    } else if ((formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) && formula.formulas) {
+    } else if ((formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or || formula instanceof FmtHLM.MetaRefExpression_equiv) && formula.formulas) {
       let result: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
       formula.formulas.forEach((innerFormula: Fmt.Expression, index: number) => {
         result = this.concatExpressions(result, () =>
           this.getNextFormulas(innerFormula, unfoldParameters).then((nextInnerFormulas: Fmt.Expression[] | undefined) =>
             nextInnerFormulas?.map((nextInnerFormula: Fmt.Expression) => {
-              let resultFormula = formula instanceof FmtHLM.MetaRefExpression_or ? new FmtHLM.MetaRefExpression_or : new FmtHLM.MetaRefExpression_and;
+              let resultFormula = formula instanceof FmtHLM.MetaRefExpression_or ? new FmtHLM.MetaRefExpression_or : formula instanceof FmtHLM.MetaRefExpression_and ? new FmtHLM.MetaRefExpression_and : new FmtHLM.MetaRefExpression_equiv;
               resultFormula.formulas = formula.formulas!.map((originalInnerFormula: Fmt.Expression, currentIndex: number) => {
                 if (currentIndex === index) {
                   return nextInnerFormula;
@@ -568,21 +568,6 @@ export class HLMUtils extends GenericUtils {
             })));
       });
       return result;
-    } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
-      let leftResult = this.getNextFormulas(formula.left, unfoldParameters).then((nextLeftFormulas: Fmt.Expression[] | undefined) =>
-        nextLeftFormulas?.map((nextLeftFormula: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_equiv;
-          resultFormula.left = nextLeftFormula;
-          resultFormula.right = formula.right;
-          return resultFormula;
-        }));
-      return this.concatExpressions(leftResult, () => this.getNextFormulas(formula.right, unfoldParameters).then((nextRightFormulas: Fmt.Expression[] | undefined) =>
-        nextRightFormulas?.map((nextRightFormula: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_equiv;
-          resultFormula.left = formula.left;
-          resultFormula.right = nextRightFormula;
-          return resultFormula;
-        })));
     } else if ((formula instanceof FmtHLM.MetaRefExpression_forall || formula instanceof FmtHLM.MetaRefExpression_exists || formula instanceof FmtHLM.MetaRefExpression_existsUnique) && formula.formula) {
       return this.getNextFormulas(formula.formula, unfoldParameters).then((nextFormulas: Fmt.Expression[] | undefined) =>
         nextFormulas?.map((nextFormula: Fmt.Expression) => {
@@ -1403,9 +1388,12 @@ export class HLMUtils extends GenericUtils {
       }
       return resultPromise;
     } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
-      if (formula.left.isEquivalentTo(formula.right)) {
-        return CachedPromise.resolve(true);
+      for (let index = 0; index + 1 < formula.formulas.length; index++) {
+        if (!formula.formulas[index].isEquivalentTo(formula.formulas[formula.formulas.length - 1])) {
+          return CachedPromise.resolve(false);
+        }
       }
+      return CachedPromise.resolve(true);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
       return this.isTrivialTautology(formula.formula, followDefinitions);
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {

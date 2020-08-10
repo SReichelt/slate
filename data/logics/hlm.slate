@@ -5,7 +5,7 @@ $hlm: %MetaModel {
   expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveSetEquals, $ProveCases, $ProveByInduction],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction],
   functions = [$true, $false,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
@@ -233,7 +233,7 @@ $associative(term: $ElementTerm): $ElementTerm {}
 $not(formula: $Formula): $Formula {}
 $and(formulas...?: $Formula): $Formula {}
 $or(formulas...?: $Formula): $Formula {}
-$equiv(left,right: $Formula): $Formula {}
+$equiv(formulas...: $Formula): $Formula {}
 $forall(parameters: %ParameterList, formula[parameters]: $Formula): $Formula {}
 $exists(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
 $existsUnique(parameters: %ParameterList, formula[parameters]?: $Formula): $Formula {}
@@ -298,7 +298,7 @@ $ProveForAll(proof: $Proof): %ParameterType {
 $ProveExists(arguments: %ArgumentList, proof?: $Proof): %ParameterType {
   superType = $FinalProofStep
 }
-$ProveSetEquals(subsetProof?: $Proof, supersetProof?: $Proof): %ParameterType {
+$ProveEquivalence(proofs: $Proof[]): %ParameterType {
   superType = $FinalProofStep
 }
 $ProveCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {

@@ -3766,37 +3766,43 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
-  left: Fmt.Expression;
-  right: Fmt.Expression;
+  formulas: Fmt.Expression[];
 
   getName(): string {
     return 'equiv';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    this.left = argumentList.getValue('left', 0);
-    this.right = argumentList.getValue('right', 1);
+    this.formulas = [];
+    let index = 0;
+    for (;;) {
+      let formulasRaw = argumentList.getOptionalValue(undefined, index);
+      if (formulasRaw === undefined) {
+        break;
+      }
+      this.formulas!.push(formulasRaw);
+      index++;
+    }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.left, undefined, false);
-    argumentList.add(this.right, undefined, false);
+    for (let formulasArg of this.formulas) {
+      argumentList.add(formulasArg, undefined, true);
+    }
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let result = new MetaRefExpression_equiv;
     let changed = false;
-    if (this.left) {
-      result.left = this.left.substitute(fn, replacedParameters);
-      if (result.left !== this.left) {
-        changed = true;
-      }
-    }
-    if (this.right) {
-      result.right = this.right.substitute(fn, replacedParameters);
-      if (result.right !== this.right) {
-        changed = true;
+    if (this.formulas) {
+      result.formulas = [];
+      for (let item of this.formulas) {
+        let newItem = item.substitute(fn, replacedParameters);
+        if (newItem !== item) {
+          changed = true;
+        }
+        result.formulas.push(newItem);
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
@@ -3806,11 +3812,17 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_equiv)) {
       return false;
     }
-    if (!Fmt.areObjectsEquivalent(this.left, expression.left, fn, replacedParameters)) {
-      return false;
-    }
-    if (!Fmt.areObjectsEquivalent(this.right, expression.right, fn, replacedParameters)) {
-      return false;
+    if (this.formulas || expression.formulas) {
+      if (!this.formulas || !expression.formulas || this.formulas.length !== expression.formulas.length) {
+        return false;
+      }
+      for (let i = 0; i < this.formulas.length; i++) {
+        let leftItem = this.formulas[i];
+        let rightItem = expression.formulas[i];
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -5239,82 +5251,76 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
   }
 }
 
-export class MetaRefExpression_ProveSetEquals extends Fmt.MetaRefExpression {
-  subsetProof?: ObjectContents_Proof;
-  supersetProof?: ObjectContents_Proof;
+export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
+  proofs: ObjectContents_Proof[];
 
   getName(): string {
-    return 'ProveSetEquals';
+    return 'ProveEquivalence';
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let subsetProofRaw = argumentList.getOptionalValue('subsetProof', 0);
-    if (subsetProofRaw !== undefined) {
-      if (subsetProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(subsetProofRaw, reportFn);
-        this.subsetProof = newItem;
-        reportFn?.(subsetProofRaw, newItem);
-      } else {
-        throw new Error('subsetProof: Compound expression expected');
+    let proofsRaw = argumentList.getValue('proofs', 0);
+    if (proofsRaw instanceof Fmt.ArrayExpression) {
+      this.proofs = [];
+      for (let item of proofsRaw.items) {
+        if (item instanceof Fmt.CompoundExpression) {
+          let newItem = new ObjectContents_Proof;
+          newItem.fromCompoundExpression(item, reportFn);
+          this.proofs.push(newItem);
+          reportFn?.(item, newItem);
+        } else {
+          throw new Error('proofs: Compound expression expected');
+        }
       }
-    }
-    let supersetProofRaw = argumentList.getOptionalValue('supersetProof', 1);
-    if (supersetProofRaw !== undefined) {
-      if (supersetProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(supersetProofRaw, reportFn);
-        this.supersetProof = newItem;
-        reportFn?.(supersetProofRaw, newItem);
-      } else {
-        throw new Error('supersetProof: Compound expression expected');
-      }
+    } else {
+      throw new Error('proofs: Array expression expected');
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    if (this.subsetProof !== undefined) {
-      let subsetProofExpr = new Fmt.CompoundExpression;
-      this.subsetProof.toCompoundExpression(subsetProofExpr, true, reportFn);
-      argumentList.add(subsetProofExpr, 'subsetProof', true);
-      reportFn?.(subsetProofExpr, this.subsetProof);
+    let proofsExpr = new Fmt.ArrayExpression;
+    proofsExpr.items = [];
+    for (let item of this.proofs) {
+      let newItem = new Fmt.CompoundExpression;
+      item.toCompoundExpression(newItem, true, reportFn);
+      proofsExpr.items.push(newItem);
+      reportFn?.(newItem, item);
     }
-    if (this.supersetProof !== undefined) {
-      let supersetProofExpr = new Fmt.CompoundExpression;
-      this.supersetProof.toCompoundExpression(supersetProofExpr, true, reportFn);
-      argumentList.add(supersetProofExpr, 'supersetProof', true);
-      reportFn?.(supersetProofExpr, this.supersetProof);
-    }
+    argumentList.add(proofsExpr, undefined, false);
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveSetEquals;
+    let result = new MetaRefExpression_ProveEquivalence;
     let changed = false;
-    if (this.subsetProof) {
-      result.subsetProof = new ObjectContents_Proof;
-      if (this.subsetProof.substituteExpression(fn, result.subsetProof!, replacedParameters)) {
-        changed = true;
-      }
-    }
-    if (this.supersetProof) {
-      result.supersetProof = new ObjectContents_Proof;
-      if (this.supersetProof.substituteExpression(fn, result.supersetProof!, replacedParameters)) {
-        changed = true;
+    if (this.proofs) {
+      result.proofs = [];
+      for (let item of this.proofs) {
+        let newItem = new ObjectContents_Proof;
+        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+          changed = true;
+        }
+        result.proofs.push(newItem);
       }
     }
     return this.getSubstitutionResult(fn, result, changed);
   }
 
   protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
-    if (!(expression instanceof MetaRefExpression_ProveSetEquals)) {
+    if (!(expression instanceof MetaRefExpression_ProveEquivalence)) {
       return false;
     }
-    if (!Fmt.areObjectsEquivalent(this.subsetProof, expression.subsetProof, fn, replacedParameters)) {
-      return false;
-    }
-    if (!Fmt.areObjectsEquivalent(this.supersetProof, expression.supersetProof, fn, replacedParameters)) {
-      return false;
+    if (this.proofs || expression.proofs) {
+      if (!this.proofs || !expression.proofs || this.proofs.length !== expression.proofs.length) {
+        return false;
+      }
+      for (let i = 0; i < this.proofs.length; i++) {
+        let leftItem = this.proofs[i];
+        let rightItem = expression.proofs[i];
+        if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -5758,7 +5764,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveSetEquals': MetaRefExpression_ProveSetEquals, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Substitute': MetaRefExpression_Substitute, 'UnfoldDef': MetaRefExpression_UnfoldDef, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveNeg': MetaRefExpression_ProveNeg, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveEquivalence': MetaRefExpression_ProveEquivalence, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': Fmt.GenericMetaRefExpression};
 
 export class MetaModel extends Meta.MetaModel {
@@ -6191,11 +6197,8 @@ export class MetaModel extends Meta.MetaModel {
           context = new ArgumentTypeContext(ObjectContents_Proof, context);
         }
       }
-      if (parent instanceof MetaRefExpression_ProveSetEquals) {
-        if (argument.name === 'subsetProof' || (argument.name === undefined && argumentIndex === 0)) {
-          context = new ArgumentTypeContext(ObjectContents_Proof, context);
-        }
-        if (argument.name === 'supersetProof' || (argument.name === undefined && argumentIndex === 1)) {
+      if (parent instanceof MetaRefExpression_ProveEquivalence) {
+        if (argument.name === 'proofs' || (argument.name === undefined && argumentIndex === 0)) {
           context = new ArgumentTypeContext(ObjectContents_Proof, context);
         }
       }

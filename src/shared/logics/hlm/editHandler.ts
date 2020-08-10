@@ -497,8 +497,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
     if (formulaSelection.allowEquiv) {
       let equivExpression = new FmtHLM.MetaRefExpression_equiv;
-      equivExpression.left = leftPlaceholder;
-      equivExpression.right = rightPlaceholder;
+      equivExpression.formulas = [leftPlaceholder, rightPlaceholder];
       let equivList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
         this.getExpressionItem(equivExpression, expressionEditInfo, onRenderFormula)
       ]));
