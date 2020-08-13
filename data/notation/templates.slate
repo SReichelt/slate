@@ -2105,7 +2105,7 @@ $DependentProofStep(result: %Expr, source?: %Expr): %Template {
       ),
       '⇒'
     ),
-    ' ',
+    ' ',
     result
   ]
 }
@@ -2122,6 +2122,13 @@ $SourceProofStep(result: %Expr, source: %Expr): %Template {
     ' ⇒ ',
     result
   ]
+}
+
+/**
+ * The symbol used to denote "contradiction" in proofs.
+ */
+$Contradiction: %Template {
+  notation = '⭍'
 }
 
 /**

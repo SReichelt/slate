@@ -27,7 +27,7 @@ Proof.  Let x ∈ ∅. Then x ∈ S:
 
 x ∈ ∅
 
-⇒^def ⚡
+⇒^def ⭍
 
 References.
 
@@ -48,13 +48,13 @@ Equivalence.
 
 1⇒2. Assume S = ∅. Then S ⊆ ∅:
 S = ∅
-⇒^def S ⊆ ∅
+⇒^def S ⊆ ∅
 2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
 Let x ∈ S.
 S ⊆ ∅
-⇒^def ∀ s ∈ S : s ∈ ∅
-⇒ x ∈ ∅
-⇒^def ⚡
+⇒^def ∀ s ∈ S : s ∈ ∅
+⇒ x ∈ ∅
+⇒^def ⭍
 3⇒1. Assume ∄ x ∈ S. Then S = ∅:
 ⊆. Let a ∈ S. Then a ∈ ∅:
 We have ∃ x ∈ S:
@@ -85,7 +85,7 @@ Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
 We have |S| = |ℕ_(<|S|)| by definition.
-⇒^def ∃ r : S ↔ ℕ_(<|S|)
+⇒^def ∃ r : S ↔ ℕ_(<|S|)
 Choose k := |S|, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
 Choose l := k, g := f^-1.
@@ -94,9 +94,9 @@ We show that |S| ∈ ℕ:
 We have |ℕ_(<l)| = |S|:
 We show that ∃ s : S ↔ ℕ_(<l):
 Choose s := g.
-⇒^[l = |ℕ_(<l)|] l = |S|
+⇒^[l = |ℕ_(<l)|] l = |S|
 l ∈ ℕ
-⇒^[l = |S|] |S| ∈ ℕ
+⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
 def ⇒ f is injective
 Choose m := k, h := f.
@@ -128,7 +128,7 @@ Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is in
 
 S is finite
 
-⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Choose m := n, f := g∣_T. We show that g∣_T is injective:
 
@@ -1864,14 +1864,38 @@ Equivalence.  No proof.
 Well-definedness.  No proof."
 `;
 
-exports[`render hlm library: 1.5.18.8 data/libraries/hlm/Essentials/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
-"Definition 1.5.18.8.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, let J := {i ∈ I : a_i ≠ e_⨂}, assume J is finite. We define:
+exports[`render hlm library: 1.5.18.8 data/libraries/hlm/Essentials/Operations/Iterated%20operations/Operation%20on%20empty%20set 1`] = `
+"Proposition 1.5.18.8.  Let X be a set, ⨂ be an iterated operation on X, let a_i ∈ X for each i ∈ ∅. Then:
+
+  ⨂_(i ∈ ∅) a_i = e_⨂
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.18.9 data/libraries/hlm/Essentials/Operations/Iterated%20operations/Natural%20number%20equalities 1`] = `
+"Proposition 1.5.18.9.  Let X be a set, ⨂ be an iterated operation on X, n ∈ ℕ, let a_i ∈ X for each i ∈ ℕ_(<n). Then:
+
+  ⨂_(i < n) a_i = ⨂_(i = 0)^(n−1) a_i = ⨂_(i ∈ ℕ_(<n)) a_i
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.18.10 data/libraries/hlm/Essentials/Operations/Iterated%20operations/Integer%20equalities 1`] = `
+"Proposition 1.5.18.10.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. Then:
+
+  ⨂_(i = j)^k a_i = ⨂_(i ∈ {j,...,k}) a_i
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.18.11 data/libraries/hlm/Essentials/Operations/Iterated%20operations/indexed%20by%20set%20with%20finite%20support 1`] = `
+"Definition 1.5.18.11.  Let X be a set, ⨂ be an iterated operation on X, I be a set, let a_i ∈ X for each i ∈ I, let J := {i ∈ I : a_i ≠ e_⨂}, assume J is finite. We define:
 
   ⨂_(i ∈ I) a_i := ⨂_(j ∈ J) a_j"
 `;
 
-exports[`render hlm library: 1.5.18.9 data/libraries/hlm/Essentials/Operations/Iterated%20operations/indexed%20by%20finite%20multiset 1`] = `
-"Definition 1.5.18.9.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a/an S-multiset such that 𝑰 is finite, let a_i ∈ X for each i ∈ 𝑰. We define:
+exports[`render hlm library: 1.5.18.12 data/libraries/hlm/Essentials/Operations/Iterated%20operations/indexed%20by%20finite%20multiset 1`] = `
+"Definition 1.5.18.12.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a/an S-multiset such that 𝑰 is finite, let a_i ∈ X for each i ∈ 𝑰. We define:
 
   ⨂_(i ∈ 𝑰) a_i := ⨂_((t,n) ∈ Elems(𝑰)) a_t
    = ⨂_(j ∈ Set(𝑰)) (⨂_(k < mult_𝑰(j)) a_j)
@@ -2372,6 +2396,7 @@ exports[`render hlm library: 1.7.1.17.4 data/libraries/hlm/Essentials/Numbers/Na
   ℕ_(>n) := {m ∈ ℕ : m > n}
    = ℕ ∖ ℕ_(≤n)
    = ℕ_(≥(n+1))
+   = ℕ_(≥n) ∖ {n}
 
 Equality.  No proof."
 `;
@@ -2383,6 +2408,8 @@ exports[`render hlm library: 1.7.1.17.5 data/libraries/hlm/Essentials/Numbers/Na
    = {m ∈ ℕ : m > 0}
    = {n ∈ ℕ : n ≠ 0}
    = ℕ ∖ {0}
+   = ℕ_(≥1)
+   = {m ∈ ℕ : m > 0}
    = {a ∈ ℕ : ∃ b ∈ ℕ : b + 1 = a}
    = {c ∈ ℕ : ∃! d ∈ ℕ : d + 1 = c}
 
@@ -2468,27 +2495,28 @@ We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j�
 We show that ∄ c ∈ M:
 Let c ∈ M.
 f ∈ (ℕ_(<l) ↔ M)
-⇒^def f is bijective
-⇒^def f is surjective
-⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
-⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
+⇒^def f is bijective
+⇒^def f is surjective
+⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
+⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
 s ∈ ℕ_(<0)
-⇒^def s < 0
-⇒^1.7.1.14 s ≥ 0
+⇒^def s < 0
+1.7.1.14 ⇒ s ≥ 0 ⭍
 2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
 1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
 1. Assume M is empty.
-⇒^def M = ∅
+⇒^def M = ∅
 Choose a := 0. We show that M ⊆ ℕ_(≤0):
 1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-⇒^[M = ∅] M ⊆ ℕ_(≤0)
+⇒^[M = ∅] M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
-def ⇒ M ⊆ ℕ_(<(a+1))
-Choose b := (a+1).
+M ⊆ ℕ_(≤a)
+⇒^def M ⊆ ℕ_(<(a+1))
+Choose b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
 1.7.1.17.7 ⇒ ℕ_(<b) is finite
-⇒^1.1.5 M is finite"
+1.1.5 ⇒ M is finite"
 `;
 
 exports[`render hlm library: 1.7.1.20 data/libraries/hlm/Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -2728,12 +2756,12 @@ Proof.  By induction on n.
 
 1. We show that 0 ∈ M:
 M is inductive
-⇒^def 0 ∈ M
+⇒^def 0 ∈ M
 2. Let x ∈ ℕ. Then x + 1 ∈ M:
 1.7.1.36 ⇒ x ∈ M
 M is inductive
-⇒^def ∀ m ∈ M : m + 1 ∈ M
-⇒ x + 1 ∈ M"
+⇒^def ∀ m ∈ M : m + 1 ∈ M
+⇒ x + 1 ∈ M"
 `;
 
 exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
@@ -2993,17 +3021,17 @@ References.
 `;
 
 exports[`render hlm library: 1.7.1.49.2 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20grows 1`] = `
-"Proposition 1.7.1.49.2.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+"Proposition 1.7.1.49.2.  Let I be a finite set, let a_i ∈ ℕ for each i ∈ I, let J ⊆ I. Then:
 
-  ∑_(j < m) a_j ≤ ∑_(k < n) a_k
+  ∑_(i ∈ J) a_i ≤ ∑_(i ∈ I) a_i
 
 No proof."
 `;
 
 exports[`render hlm library: 1.7.1.49.3 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20sum%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.7.1.49.3.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+"Proposition 1.7.1.49.3.  Let I be a finite set, let a_i ∈ ℕ for each i ∈ I, let j ∈ I. Then:
 
-  a_j ≤ ∏_(k < n) a_k
+  a_j ≤ ∑_(i ∈ I) a_i
 
 No proof."
 `;
@@ -3041,33 +3069,33 @@ References.
 `;
 
 exports[`render hlm library: 1.7.1.49.7 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20multiplies 1`] = `
-"Proposition 1.7.1.49.7.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+"Proposition 1.7.1.49.7.  Let I be a finite set, let a_i ∈ ℕ for each i ∈ I, let J ⊆ I. Then:
 
-  (∏_(j < m) a_j) ∣ (∏_(k < n) a_k)
+  (∏_(i ∈ J) a_i) ∣ (∏_(i ∈ I) a_i)
 
 No proof."
 `;
 
 exports[`render hlm library: 1.7.1.49.8 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20grows 1`] = `
-"Proposition 1.7.1.49.8.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let m ∈ ℕ_(≤n). Then:
+"Proposition 1.7.1.49.8.  Let I be a finite set, let a_i ∈ ℕ_+ for each i ∈ I, let J ⊆ I. Then:
 
-  ∏_(j < m) a_j ≤ ∏_(k < n) a_k
+  ∏_(i ∈ J) a_i ≤ ∏_(i ∈ I) a_i
 
 No proof."
 `;
 
 exports[`render hlm library: 1.7.1.49.9 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20is%20a%20multiple%20of%20each%20element 1`] = `
-"Proposition 1.7.1.49.9.  Let n ∈ ℕ, let a_i ∈ ℕ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+"Proposition 1.7.1.49.9.  Let I be a finite set, let a_i ∈ ℕ for each i ∈ I, let j ∈ I. Then:
 
-  a_j ∣ (∏_(k < n) a_k)
+  a_j ∣ (∏_(i ∈ I) a_i)
 
 No proof."
 `;
 
 exports[`render hlm library: 1.7.1.49.10 data/libraries/hlm/Essentials/Numbers/Natural/Iterated%20operators/Iterated%20product%20of%20positive%20numbers%20is%20greater%20or%20equal%20to%20each%20element 1`] = `
-"Proposition 1.7.1.49.10.  Let n ∈ ℕ, let a_i ∈ ℕ_+ for each i ∈ ℕ_(<n), let j ∈ ℕ_(<n). Then:
+"Proposition 1.7.1.49.10.  Let I be a finite set, let a_i ∈ ℕ_+ for each i ∈ I, let j ∈ I. Then:
 
-  a_j ≤ ∏_(k < n) a_k
+  a_j ≤ ∏_(i ∈ I) a_i
 
 No proof."
 `;
@@ -3166,33 +3194,25 @@ exports[`render hlm library: 1.7.1.50.6 data/libraries/hlm/Essentials/Numbers/Na
 
 Proof.  Assume ℙ is finite.
 
-⇒^def ∃ n ∈ ℕ, f : ℕ_(<n) ↔ ℙ
+Let a := ∏_(p ∈ ℙ) p.
 
-Let a := ∏_(i < n) f(i).
+⇒ a ≥ 1:
 
-1.7.1.49.8 ⇒ 1 ≤ a
+1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
 
-Let b := a + 1.
+⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
-1.7.1.16 ⇒ b > a
+⇒^1.7.1.13 a + 1 > 1
 
-⇒^1.7.1.13 b > 1
+⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
 
-⇒^1.7.1.50.5 ∃ prime p : p ∣ b
+⇒^1.7.1.31 p ∣ 1
 
-⇒^def p ∣ (a + 1)
-
-⇒^1.7.1.49.9 f(f^-1(p)) ∣ a
-
-⇒^1.4.25 p ∣ a
-
-⇒^1.7.1.31 p ∣ 1
-
-⇒^1.7.1.30 p ≤ 1
+⇒^1.7.1.30 p ≤ 1
 
 p ∈ ℙ
 
-⇒^def p > 1
+⇒^def p > 1 ⭍
 
 References.
 
@@ -3348,7 +3368,7 @@ Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|.
 
 |ℕ_(<m)| = |ℕ_(<n)|
 
-⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
+⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
 
 1.7.2.1 ⇒ m = n
 
@@ -4113,9 +4133,9 @@ Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x 
 
 (x-0) = (y-0)
 
-⇒^def x + 0 = y + 0
+⇒^def x + 0 = y + 0
 
-⇒^def x = y
+⇒^def x = y
 
 Remarks.
 
@@ -5347,13 +5367,13 @@ exports[`render hlm library: 1.7.6.18 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.  Assume n√p is rational.
 
-⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
-⇒^def p = (b∕a)^n
+⇒^def p = (b∕a)^n
 
-⇒^1.7.6.13 p = b^n∕a^n
+⇒^1.7.6.13 p = b^n∕a^n
 
-⇒^def p ⋅ a^n = b^n
+⇒^def p ⋅ a^n = b^n
 
 We have p ∣ b^n:
 
@@ -5361,29 +5381,31 @@ We show that ∃ x ∈ ℤ : p ⋅ x = b^n:
 
 Choose x := a^n.
 
-⇒^1.7.4.23.1 p ∣ b
+⇒^1.7.4.23.1 p ∣ b
 
-⇒^def ∃ y ∈ ℤ : p ⋅ y = b
+⇒^def ∃ y ∈ ℤ : p ⋅ y = b
 
 n ∈ ℕ_(>1)
 
-⇒^def n > 1
+⇒^def n > 1
 
-⇒^def ∃ m ∈ ℕ_+ : 1 + m = n
+⇒^def ∃ m ∈ ℕ_+ : 1 + m = n
 
 m ∈ ℕ_+
 
-⇒^def ∃ l ∈ ℕ : 1 + l = m
+⇒^def ∃ l ∈ ℕ : 1 + l = m
 
 p ⋅ a^n = b^n
 
-⇒^def b^m ⋅ b = a^n ⋅ p
+⇒^[1+m = n] p ⋅ a^n = b^(1+m)
 
-⇒^def b^l ⋅ b ⋅ b = a^n ⋅ p
+⇒^def p ⋅ a^n = b^m ⋅ b
 
-⇒^[p⋅y = b] b^l ⋅ p ⋅ y ⋅ p ⋅ y = a^n ⋅ p
+⇒^def p ⋅ a^n = b^l ⋅ b ⋅ b
 
-⇒^1.7.4.20 b^l ⋅ p ⋅ y ⋅ y = a^n
+⇒^[p⋅y = b] a^n ⋅ p = b^l ⋅ p ⋅ y ⋅ p ⋅ y
+
+1.7.4.20 ⇒ a^n = b^l ⋅ p ⋅ y ⋅ y
 
 We have p ∣ a^n:
 
@@ -5391,15 +5413,13 @@ We show that ∃ z ∈ ℤ : p ⋅ z = a^n:
 
 Choose z := b^l ⋅ y ⋅ y.
 
-⇒^1.7.4.23.1 p ∣ a
+⇒^1.7.4.23.1 p ∣ a
 
 We have ∃ prime q : [q ∣ a and q ∣ b]:
 
 Choose q := p.
 
-a and b are coprime
-
-⇒^def ∄ prime r : [r ∣ a and r ∣ b]
+We have a and b are not coprime by definition. ⭍
 
 References.
 
@@ -5417,7 +5437,7 @@ Proof.
 
 1.7.1.50.2 ⇒ 2 is prime
 
-⇒^1.7.6.18 2√2 is irrational
+1.7.6.18 ⇒ 2√2 is irrational
 
 References.
 

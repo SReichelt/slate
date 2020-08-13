@@ -273,7 +273,7 @@ $UseCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
 $UseForAll(arguments: %ArgumentList): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseExists(parameters: %ParameterList): %ParameterType {
+$UseExists(parameters: %ParameterList): %ParameterType($Formula) {
   superType = $IntermediateProofStep,
   exports = [parameters]
 }

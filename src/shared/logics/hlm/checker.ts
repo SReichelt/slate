@@ -531,8 +531,10 @@ export class HLMDefinitionChecker {
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: true,
+      followAllAlternatives: false,
       unfoldArguments: false,
-      extractStructuralCasesFromArguments: false
+      substituteStructuralCases: false,
+      extractStructuralCases: false
     };
     let checkSubset = this.utils.getFinalSuperset(subset, typeSearchParameters).then((superset: Fmt.Expression) => {
       if (this.utils.isWildcardFinalSet(superset)) {
@@ -1311,8 +1313,10 @@ export class HLMDefinitionChecker {
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: false,
+      followAllAlternatives: false,
       unfoldArguments: false,
-      extractStructuralCasesFromArguments: false
+      substituteStructuralCases: false,
+      extractStructuralCases: false
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters).then((finalSet: Fmt.Expression) => {
       if (!((finalSet instanceof Fmt.DefinitionRefExpression || finalSet instanceof Fmt.PlaceholderExpression)
@@ -1511,19 +1515,6 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression): void {
-    let resultPromise = CachedPromise.resolve(false);
-    for (let source of sources) {
-      resultPromise = resultPromise.or(() => this.utils.unfoldsTo(source, target));
-    }
-    let check = resultPromise.then((result: boolean) => {
-      if (!result) {
-        this.error(target, sources.length === 1 ? `${sources[0]} does not unfold to ${target}` : `None of the possible goals unfold to ${target}`);
-      }
-    });
-    this.addPendingCheck(target, check);
-  }
-
   private checkProofSteps(object: Object, steps: Fmt.ParameterList, context: HLMCheckerProofStepContext): void {
     let completed = false;
     for (let step of steps) {
@@ -1573,7 +1564,7 @@ export class HLMDefinitionChecker {
         return undefined;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
-      if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists) {
+      if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
         if (!type.parameters.isEquivalentTo(context.previousResult.parameters)) {
           this.error(type.parameters, 'Proof step parameters must match existential quantifier');
         }
@@ -1582,16 +1573,68 @@ export class HLMDefinitionChecker {
         return undefined;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
-      // TODO
+      if (context.previousResult) {
+        let innerContext: HLMCheckerProofStepContext = {
+          ...context,
+          parameters: undefined,
+          goal: undefined,
+          previousResult: undefined
+        };
+        let innerResultContext = this.checkProofStep(type.source, innerContext);
+        if (innerResultContext && (innerResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || innerResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
+          let terms = innerResultContext.previousResult.terms;
+          let sourceIndex = type.sourceSide.toNumber();
+          if (sourceIndex >= 0 && sourceIndex < terms.length) {
+            let sourceTerm = terms[sourceIndex];
+            let targetTerms = terms.slice();
+            targetTerms.splice(sourceIndex, 1);
+            this.checkFormula(type.result, context);
+            if (!this.utils.substitutesTo(context.previousResult, type.result, sourceTerm, targetTerms)) {
+              this.error(step, `Substitution from ${context.previousResult} to ${type.result} is invalid`);
+            }
+          } else {
+            this.error(step, 'Source side is invalid');
+          }
+        } else {
+          this.error(type.source, 'Source proof step does not result in an equality');
+        }
+      } else {
+        this.error(step, 'Previous result not set');
+        return undefined;
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
       if (context.previousResult) {
+        this.checkFormula(type.result, context);
         this.checkUnfolding([context.previousResult], type.result);
       } else {
         this.error(step, 'Previous result not set');
         return undefined;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-      // TODO
+      let useTheorem = type;
+      if (useTheorem.theorem instanceof Fmt.DefinitionRefExpression) {
+        let theorem = useTheorem.theorem;
+        let checkDefinitionRef = this.utils.getOuterDefinition(theorem).then((definition: Fmt.Definition) => {
+          if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+            this.checkDefinitionRefExpression(theorem, [definition], context);
+            if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+              if (context.previousResult) {
+                this.checkEquivalenceCondition(step, context.previousResult, definition.contents.conditions, theorem.path, [definition]);
+                this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, definition.contents.conditions, theorem.path, [definition]);
+              } else {
+                this.error(step, 'Previous result not set');
+              }
+            } else {
+              this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, [definition.contents.claim], theorem.path, [definition]);
+            }
+          } else {
+            this.error(step, 'Referenced definition must be a construction or set operator');
+          }
+        });
+        this.addPendingCheck(step, checkDefinitionRef);
+      } else {
+        this.error(step, 'Referenced definition must be a construction or set operator');
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
       // TODO can prove: in, sub, equals (implicit definition, embedding), existsUnique
       return undefined;
@@ -1676,9 +1719,6 @@ export class HLMDefinitionChecker {
     let result = CachedPromise.resolve(false);
     if (context.goal) {
       let goal = context.goal;
-      if (context.previousResult) {
-        result = this.utils.unfoldsTo(goal, context.previousResult);
-      }
       result = result.or(() => {
         let constraintsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let variableInfo of context.context.getVariables()) {
@@ -1720,6 +1760,35 @@ export class HLMDefinitionChecker {
       constraintType.formula = formula;
       parameters.push(this.utils.createParameter(constraintType, '_1'));
     }
+  }
+
+  private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression): void {
+    let resultPromise = CachedPromise.resolve(false);
+    for (let source of sources) {
+      resultPromise = resultPromise.or(() => this.utils.unfoldsTo(source, target));
+    }
+    let check = resultPromise.then((result: boolean) => {
+      if (!result) {
+        this.error(target, sources.length === 1 ? `${sources[0]} does not unfold to ${target}` : `None of the possible goals unfold to ${target}`);
+      }
+    });
+    this.addPendingCheck(target, check);
+  }
+
+  private checkEquivalenceCondition(object: Object, formula: Fmt.Expression, conditions: Fmt.Expression[], path: Fmt.Path, definitions: Fmt.Definition[]): void {
+    let resultPromise = CachedPromise.resolve(false);
+    for (let condition of conditions) {
+      resultPromise = resultPromise.or(() => {
+        let substitutedCondition = this.utils.substitutePath(condition, path, definitions);
+        return this.utils.areTriviallyEquivalent(formula, substitutedCondition);
+      });
+    }
+    let check = resultPromise.then((result: boolean) => {
+      if (!result) {
+        this.error(object, conditions.length === 1 ? `${formula} is not trivially equivalent to ${this.utils.substitutePath(conditions[0], path, definitions)}` : `${formula} is not trivially equivalent to any of the conditions`);
+      }
+    });
+    this.addPendingCheck(object, check);
   }
 
   private checkBoolConstant(expression: Fmt.Expression | undefined): void {
@@ -1829,8 +1898,10 @@ export class HLMDefinitionChecker {
           followDefinitions: true,
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings && !checkSubset,
+          followAllAlternatives: false,
           unfoldArguments: nextStatus.followedEmbeddings,
-          extractStructuralCasesFromArguments: nextStatus.followedEmbeddings
+          substituteStructuralCases: true,
+          extractStructuralCases: nextStatus.followedEmbeddings
         };
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
           for (let index = 0; index < setTerms.length; index++) {
