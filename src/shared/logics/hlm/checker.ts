@@ -1433,6 +1433,10 @@ export class HLMDefinitionChecker {
   }
 
   private checkProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
+    // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
+    if (proof && !(object instanceof Fmt.Expression)) {
+      object = proof;
+    }
     this.checkProofInternal(object, proof, parameters, [goal], context);
   }
 
@@ -1466,7 +1470,7 @@ export class HLMDefinitionChecker {
         previousResult: undefined
       };
       this.utils.updateInitialProofStepContext(proof, stepContext);
-      this.checkProofSteps(proof, proof.steps, stepContext);
+      this.checkProofSteps(object, proof.steps, stepContext);
     } else if (this.options.warnAboutMissingProofs) {
       if (parameters) {
         context = this.getParameterListContext(parameters, context);

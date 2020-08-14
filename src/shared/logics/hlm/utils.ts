@@ -807,6 +807,9 @@ export class HLMUtils extends GenericUtils {
       if (!(unfoldParameters.followDefinitions || unfoldParameters.unfoldArguments || unfoldParameters.extractStructuralCases)) {
         return CachedPromise.resolve(undefined);
       }
+      if (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === term) {
+        // TODO if any argument refers to a macro, ask that macro to unfold the whole term
+      }
       return this.getOuterDefinition(term).then((definition: Fmt.Definition): Fmt.Expression[] | undefined | CachedPromise<Fmt.Expression[] | undefined> => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
           let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
