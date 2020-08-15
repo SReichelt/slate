@@ -2407,13 +2407,14 @@ exports[`render hlm library: 1.7.1.17.5 data/libraries/hlm/Essentials/Numbers/Na
 "Definition 1.7.1.17.5.  We define:
 
   ℕ_+ := ℕ_(>0)
-   = {m ∈ ℕ : m > 0}
+   = {n ∈ ℕ : n > 0}
    = {n ∈ ℕ : n ≠ 0}
    = ℕ ∖ {0}
    = ℕ_(≥1)
-   = {m ∈ ℕ : m > 0}
-   = {a ∈ ℕ : ∃ b ∈ ℕ : b + 1 = a}
-   = {c ∈ ℕ : ∃! d ∈ ℕ : d + 1 = c}
+   = {n ∈ ℕ : n ≥ 1}
+   = {n ∈ ℕ : ∃ m ∈ ℕ : m + 1 = n}
+   = {n ∈ ℕ : ∃! m ∈ ℕ : m + 1 = n}
+   = {m + 1 : m ∈ ℕ}
 
 Equality.  No proof.
 
@@ -2775,7 +2776,7 @@ exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.
 
 1⇒2. Assume M is inductive. Then M = ℕ:
-⊇. Let n ∈ ℕ. Then n ∈ M:
+⊇. Let n ∈ ℕ.
 1.7.1.36 ⇒ n ∈ M
 
 Remarks.
@@ -5397,27 +5398,21 @@ n ∈ ℕ_(>1)
 
 ⇒^def n > 1
 
-⇒^def ∃ m ∈ ℕ_+ : 1 + m = n
+⇒^def n ≥ 2
 
-m ∈ ℕ_+
+⇒^def ∃ m ∈ ℕ : 2 + m = n
 
-⇒^def ∃ l ∈ ℕ : 1 + l = m
-
-Choose y := b^l ⋅ z ⋅ z.
+Choose y := b^m ⋅ z ⋅ z.
 
 p ⋅ a^n = b^n
 
-⇒^[1+m = n] p ⋅ a^n = b^(1+m)
+⇒^[2+m = n] p ⋅ a^n = b^(2+m)
 
-⇒^def p ⋅ a^n = b^m ⋅ b
+⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
 
-⇒^[1+l = m] p ⋅ a^n = b^(1+l) ⋅ b
+⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-⇒^def p ⋅ a^n = b^l ⋅ b ⋅ b
-
-⇒^[p⋅z = b] p ⋅ a^n = b^l ⋅ p ⋅ z ⋅ p ⋅ z
-
-⇒^1.7.4.20 a^n = b^l ⋅ z ⋅ p ⋅ z
+⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
 ⇒^1.7.4.23.1 p ∣ a
 

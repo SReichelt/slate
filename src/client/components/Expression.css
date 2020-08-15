@@ -92,7 +92,7 @@ span.expr.interactive.link span.expr.interactive {
   min-height: 1em;
 }
 
-.list-item+.list-item {
+.list-item+.list-item, .list-item .paragraph+.paragraph, .list-item .paragraph+.list, .list-item .list+.list {
   margin-top: 0.5ex;
 }
 
