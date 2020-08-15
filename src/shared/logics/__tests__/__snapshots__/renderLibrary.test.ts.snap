@@ -94,9 +94,9 @@ We show that |S| ∈ ℕ:
 We have |ℕ_(<l)| = |S|:
 We show that ∃ s : S ↔ ℕ_(<l):
 Choose s := g.
-⇒ l = |S|
+⇒^[l = |ℕ_(<l)|] l = |S|
 l ∈ ℕ
-⇒ |S| ∈ ℕ
+⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
 def ⇒ f is injective
 Choose m := k, h := f.
@@ -2511,7 +2511,7 @@ s ∈ ℕ_(<0)
 ⇒^def M = ∅
 Choose a := 0. We show that M ⊆ ℕ_(≤0):
 1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-⇒ M ⊆ ℕ_(≤0)
+⇒^[M = ∅] M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
 M ⊆ ℕ_(≤a)
 ⇒^def M ⊆ ℕ_(<(a+1))
@@ -5377,7 +5377,7 @@ Proof.  Assume n√p is rational.
 
 ⇒^def p ⋅ a^n = b^n
 
-We have p ∣ b^n:
+⇒ p ∣ b^n:
 
 We show that ∃ x ∈ ℤ : p ⋅ x = b^n:
 
@@ -5385,7 +5385,13 @@ Choose x := a^n.
 
 ⇒^1.7.4.23.1 p ∣ b
 
-⇒^def ∃ y ∈ ℤ : p ⋅ y = b
+⇒ p ∣ a^n:
+
+We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
+
+p ∣ b
+
+⇒^def ∃ z ∈ ℤ : p ⋅ z = b
 
 n ∈ ℕ_(>1)
 
@@ -5397,31 +5403,32 @@ m ∈ ℕ_+
 
 ⇒^def ∃ l ∈ ℕ : 1 + l = m
 
+Choose y := b^l ⋅ z ⋅ z.
+
 p ⋅ a^n = b^n
 
-⇒ p ⋅ a^n = b^(1+m)
+⇒^[1+m = n] p ⋅ a^n = b^(1+m)
 
 ⇒^def p ⋅ a^n = b^m ⋅ b
 
+⇒^[1+l = m] p ⋅ a^n = b^(1+l) ⋅ b
+
 ⇒^def p ⋅ a^n = b^l ⋅ b ⋅ b
 
-⇒ a^n ⋅ p = b^l ⋅ p ⋅ y ⋅ p ⋅ y
+⇒^[p⋅z = b] p ⋅ a^n = b^l ⋅ p ⋅ z ⋅ p ⋅ z
 
-1.7.4.20 ⇒ a^n = b^l ⋅ p ⋅ y ⋅ y
-
-We have p ∣ a^n:
-
-We show that ∃ z ∈ ℤ : p ⋅ z = a^n:
-
-Choose z := b^l ⋅ y ⋅ y.
+⇒^1.7.4.20 a^n = b^l ⋅ z ⋅ p ⋅ z
 
 ⇒^1.7.4.23.1 p ∣ a
 
-We have ∃ prime q : [q ∣ a and q ∣ b]:
+⇒ a and b are not coprime: ⭍
+
+We show that ∃ prime q : [q ∣ a and q ∣ b]:
 
 Choose q := p.
 
-We have a and b are not coprime by definition. ⭍
+* p ∣ a
+* p ∣ b
 
 References.
 

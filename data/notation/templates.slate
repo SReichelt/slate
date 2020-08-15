@@ -2093,7 +2093,7 @@ $Cases(cases: %Expr[][]): %Template {
  *
  * @param result The conclusion of this proof step.
  * @param source An optional expression indicating the reasoning behind this proof step. This expression will be displayed above the implication arrow.
- * @param formula An optional expression giving a formula related to this proof step. This expression will be displayed below the implication arrow.
+ * @param formula An optional expression giving a formula related to this proof step. This expression will be displayed above or below the implication arrow, depending on whether a source is given.
  */
 $DependentProofStep(result: %Expr, source?: %Expr, formula?: %Expr): %Template {
   notation = [
@@ -2105,7 +2105,15 @@ $DependentProofStep(result: %Expr, source?: %Expr, formula?: %Expr): %Template {
         under = formula,
         style = 'shallow'
       ),
-      '⇒'
+      %opt(
+        formula,
+        $OverUnder(
+          body = '⇒',
+          over = formula,
+          style = 'shallow'
+        ),
+        '⇒'
+      )
     ),
     ' ',
     result
