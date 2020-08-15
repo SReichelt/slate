@@ -2411,7 +2411,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             }
             if (hasContents) {
               row.push(new Notation.TextExpression('Then '));
-            } else {
+            } else if (proof.steps.length) {
               row.push(new Notation.TextExpression('We show that '));
             }
             row.push(this.readOnlyRenderer.renderFormula(proof.goal, fullFormulaSelection));
