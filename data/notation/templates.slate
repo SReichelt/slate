@@ -2089,13 +2089,12 @@ $Cases(cases: %Expr[][]): %Template {
 }
 
 /**
- * A proof step that relies on the conclusion of the previous step.
+ * An implication symbol between two proof steps.
  *
- * @param result The conclusion of this proof step.
- * @param source An optional expression indicating the reasoning behind this proof step. This expression will be displayed above the implication arrow.
- * @param formula An optional expression giving a formula related to this proof step. This expression will be displayed above or below the implication arrow, depending on whether a source is given.
+ * @param source An optional expression indicating the reasoning behind this implication. This expression will be displayed above the implication arrow.
+ * @param formula An optional expression giving a formula related to this implication. This expression will be displayed above or below the implication arrow, depending on whether a source is given.
  */
-$DependentProofStep(result: %Expr, source?: %Expr, formula?: %Expr): %Template {
+$ProofImplication(source?: %Expr, formula?: %Expr): %Template {
   notation = [
     %opt(
       source,
@@ -2114,23 +2113,7 @@ $DependentProofStep(result: %Expr, source?: %Expr, formula?: %Expr): %Template {
         ),
         '⇒'
       )
-    ),
-    ' ',
-    result
-  ]
-}
-
-/**
- * A proof step that relies on a given fact but not on the conclusion of the previous step.
- *
- * @param result The conclusion of this proof step.
- * @param source An expression indicating the reasoning behind this proof step. This expression will be displayed in front of the implication arrow.
- */
-$SourceProofStep(result: %Expr, source: %Expr): %Template {
-  notation = [
-    source,
-    ' ⇒ ',
-    result
+    )
   ]
 }
 
