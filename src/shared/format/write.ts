@@ -189,10 +189,10 @@ export class Writer {
       }
       currentGroup.push(parameter);
     }
+    if (firstGroup) {
+      multiLine = false;
+    }
     if (currentGroup.length) {
-      if (firstGroup) {
-        multiLine = false;
-      }
       this.writeParameterGroupWithPrefix(currentGroup, lastGroupIndent, multiLine, !firstGroup);
     }
     if (multiLine) {

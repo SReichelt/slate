@@ -94,9 +94,9 @@ We show that |S| ∈ ℕ:
 We have |ℕ_(<l)| = |S|:
 We show that ∃ s : S ↔ ℕ_(<l):
 Choose s := g.
-⇒^[l = |ℕ_(<l)|] l = |S|
+⇒ l = |S|
 l ∈ ℕ
-⇒^[l = |S|] |S| ∈ ℕ
+⇒ |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
 def ⇒ f is injective
 Choose m := k, h := f.
@@ -2208,13 +2208,14 @@ References.
 exports[`render hlm library: 1.7.1.6 data/libraries/hlm/Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
 "Lemma 1.7.1.6.  Let n ∈ ℕ. Then:
 
-  0 + n = n
+  (0) + n = n
 
-Proof.  We show that ({0 if n = (0), ((0 + x)+1) if n = (x+1) (x ∈ ℕ)) = n:
+Proof.  By induction on n.
 
-1. We show that 0 = 0: Trivial.
-2. Let x ∈ ℕ. Then ((0 + x)+1) = (x+1):
-1.7.1.6 ⇒ 0 + x = x
+* We show that (0) = (0): Trivial.
+* Let x ∈ ℕ. Then (((0) + x)+1) = (x+1):
+We have (x+1) = (x+1).
+⇒_[(0)+x = x]^1.7.1.6 (((0) + x)+1) = (x+1)
 
 References.
 
@@ -2231,11 +2232,12 @@ exports[`render hlm library: 1.7.1.7 data/libraries/hlm/Essentials/Numbers/Natur
 
   (m+1) + n = ((m + n)+1)
 
-Proof.  We show that ({(m+1) if n = (0), (((m+1) + x)+1) if n = (x+1) (x ∈ ℕ)) = ((m + n)+1):
+Proof.  By induction on n.
 
-1. We show that (m+1) = (m+1): Trivial.
-2. Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
-1.7.1.7 ⇒ (m+1) + x = ((m + x)+1)
+* We show that (m+1) = (m+1): Trivial.
+* Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
+We have (((m + x)+1)+1) = (((m + x)+1)+1).
+⇒_[(m+1)+x = ((m+x)+1)]^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1)
 
 References.
 
@@ -2465,9 +2467,9 @@ exports[`render hlm library: 1.7.1.18 data/libraries/hlm/Essentials/Numbers/Natu
 
 Proof.  By induction on k.
 
-1. Assume k = 0.
+* Assume k = 0. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
 Choose m := f(0).
-2. Let x ∈ ℕ such that k = x + 1.
+* Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
 Let S := ℕ_(≤x).
 1.7.1.18 ⇒ ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
 Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
@@ -2491,7 +2493,7 @@ Proof.
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
 def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
 We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
-1. Assume l = 0. Then M is empty:
+* Assume l = 0. Then M is empty:
 We show that ∄ c ∈ M:
 Let c ∈ M.
 f ∈ (ℕ_(<l) ↔ M)
@@ -2502,14 +2504,14 @@ f ∈ (ℕ_(<l) ↔ M)
 s ∈ ℕ_(<0)
 ⇒^def s < 0
 1.7.1.14 ⇒ s ≥ 0 ⭍
-2. Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
+* Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
 1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
-1. Assume M is empty.
+* Assume M is empty.
 ⇒^def M = ∅
 Choose a := 0. We show that M ⊆ ℕ_(≤0):
 1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-⇒^[M = ∅] M ⊆ ℕ_(≤0)
+⇒ M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
 M ⊆ ℕ_(≤a)
 ⇒^def M ⊆ ℕ_(<(a+1))
@@ -2754,10 +2756,10 @@ exports[`render hlm library: 1.7.1.36 data/libraries/hlm/Essentials/Numbers/Natu
 
 Proof.  By induction on n.
 
-1. We show that 0 ∈ M:
+* We show that 0 ∈ M:
 M is inductive
 ⇒^def 0 ∈ M
-2. Let x ∈ ℕ. Then x + 1 ∈ M:
+* Let x ∈ ℕ. Then x + 1 ∈ M:
 1.7.1.36 ⇒ x ∈ M
 M is inductive
 ⇒^def ∀ m ∈ M : m + 1 ∈ M
@@ -3200,7 +3202,7 @@ Let a := ∏_(p ∈ ℙ) p.
 
 1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
 
-⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
+⇒_[∏_(x∈∅)x = 1]^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
 ⇒^1.7.1.13 a + 1 > 1
 
@@ -5371,7 +5373,7 @@ Proof.  Assume n√p is rational.
 
 ⇒^def p = (b∕a)^n
 
-⇒^1.7.6.13 p = b^n∕a^n
+⇒_[(b∕a)^n = b^n∕a^n]^1.7.6.13 p = b^n∕a^n
 
 ⇒^def p ⋅ a^n = b^n
 
@@ -5397,13 +5399,13 @@ m ∈ ℕ_+
 
 p ⋅ a^n = b^n
 
-⇒^[1+m = n] p ⋅ a^n = b^(1+m)
+⇒ p ⋅ a^n = b^(1+m)
 
 ⇒^def p ⋅ a^n = b^m ⋅ b
 
 ⇒^def p ⋅ a^n = b^l ⋅ b ⋅ b
 
-⇒^[p⋅y = b] a^n ⋅ p = b^l ⋅ p ⋅ y ⋅ p ⋅ y
+⇒ a^n ⋅ p = b^l ⋅ p ⋅ y ⋅ p ⋅ y
 
 1.7.4.20 ⇒ a^n = b^l ⋅ p ⋅ y ⋅ y
 

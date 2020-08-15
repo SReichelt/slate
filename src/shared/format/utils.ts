@@ -51,6 +51,16 @@ export function substituteExpression(expression: Fmt.Expression, originalExpress
   });
 }
 
+export function substituteEquivalentExpressions(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
+  return expression.substitute((subExpression: Fmt.Expression) => {
+    if (originalExpression.isEquivalentTo(subExpression)) {
+      return substitutedExpression;
+    } else {
+      return subExpression;
+    }
+  });
+}
+
 export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: Fmt.Expression): Fmt.Expression {
   return expression.substitute((subExpression: Fmt.Expression) => {
     if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {

@@ -1081,13 +1081,8 @@ export class HLMDefinitionChecker {
         for (let item of formula.formulas) {
           this.checkFormula(item, checkContext);
           if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
-            let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-            if (formula instanceof FmtHLM.MetaRefExpression_or) {
-              constraintType.formula = this.utils.negateFormula(item, false).getImmediateResult()!;
-            } else {
-              constraintType.formula = item;
-            }
-            let constraintParam = this.utils.createParameter(constraintType, '_');
+            let constraintFormula = formula instanceof FmtHLM.MetaRefExpression_or ? this.utils.negateFormula(item, false).getImmediateResult()! : item;
+            let constraintParam = this.createConstraintParameter(constraintFormula, '_');
             checkContext = this.getParameterContext(constraintParam, checkContext);
           }
         }
@@ -1188,7 +1183,33 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, getWellDefinednessProofGoal: (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
+  private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression, caseContext: HLMCheckerContext) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, getWellDefinednessProofGoal: (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
+    let checkCaseInternal = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
+      caseContext = this.getParameterContext(constraintParam, caseContext);
+      checkCase(structuralCase.value, caseContext);
+      if ((getWellDefinednessProofGoal && constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
+        let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+        let replacedParameters: Fmt.ReplacedParameter[] = [];
+        let clonedValue = structuralCase.value;
+        if (structuralCase.parameters) {
+          structuralCase.parameters.clone(clonedParameters, replacedParameters);
+          clonedValue = this.utils.substituteParameters(structuralCase.value, structuralCase.parameters, clonedParameters);
+        }
+        clonedParameters.push(constraintParam.clone(replacedParameters));
+        let goalContext = this.getParameterListContext(clonedParameters, caseContext);
+        let goal = getWellDefinednessProofGoal ? getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters) : new FmtHLM.MetaRefExpression_and;
+        this.checkProof(structuralCase.value, structuralCase.wellDefinednessProof, clonedParameters, goal, caseContext);
+      }
+    };
+    this.checkStructuralCasesInternal(term, construction, cases, checkCaseInternal, replaceCases, context);
+
+    if (checkCompatibility) {
+      let values = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => structuralCase.value);
+      checkCompatibility(values);
+    }
+  }
+
+  private checkStructuralCasesInternal(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCaseInternal: (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => void, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
     this.checkStructuralCaseTerm(term, construction, replaceCases, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
       let constructionPath = construction.path;
@@ -1196,7 +1217,7 @@ export class HLMDefinitionChecker {
       constructionPathWithoutArguments.name = constructionPath.name;
       constructionPathWithoutArguments.parentPath = constructionPath.parentPath;
       let index = 0;
-      let checkConstructor = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor,  substitutedParameters: Fmt.ParameterList) => {
+      let checkConstructor = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
         if (index < cases.length) {
           let structuralCase = cases[index];
           if (structuralCase._constructor instanceof Fmt.DefinitionRefExpression) {
@@ -1224,21 +1245,11 @@ export class HLMDefinitionChecker {
               if (structuralCase.parameters) {
                 caseContext = this.getParameterListContext(structuralCase.parameters, caseContext);
               }
-              let constraintParam = this.utils.createStructuralCaseConstraintParameter(term, constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
-              caseContext = this.getParameterContext(constraintParam, caseContext);
-              checkCase(structuralCase.value, caseContext);
-              if ((constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
-                let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-                let replacedParameters: Fmt.ReplacedParameter[] = [];
-                let clonedValue = structuralCase.value;
-                if (structuralCase.parameters) {
-                  structuralCase.parameters.clone(clonedParameters, replacedParameters);
-                  clonedValue = this.utils.substituteParameters(structuralCase.value, structuralCase.parameters, clonedParameters);
-                }
-                clonedParameters.push(constraintParam.clone(replacedParameters));
-                let goalContext = this.getParameterListContext(clonedParameters, caseContext);
-                this.checkProof(structuralCase.value, structuralCase.wellDefinednessProof, clonedParameters, getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters), caseContext);
-              }
+              let structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
+              let structuralCaseEquality = new FmtHLM.MetaRefExpression_equals;
+              structuralCaseEquality.terms = [term, structuralCaseTerm];
+              let constraintParam = this.createConstraintParameter(structuralCaseEquality, '_');
+              checkCaseInternal(structuralCase, constructorContents, structuralCaseTerm, constraintParam, caseContext);
             } else {
               this.error(structuralCase._constructor, `Expected reference to constructor "${constructorDefinition.name}"`);
             }
@@ -1258,11 +1269,6 @@ export class HLMDefinitionChecker {
       this.addPendingCheck(term, checkCases);
     } else if (!(construction instanceof Fmt.PlaceholderExpression)) {
       this.error(construction, 'Construction reference expected');
-    }
-
-    if (checkCompatibility) {
-      let values = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => structuralCase.value);
-      checkCompatibility(values);
     }
   }
 
@@ -1690,10 +1696,46 @@ export class HLMDefinitionChecker {
       }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
-      // TODO can prove: conjunction, structural cases, regular cases, equality with more than 2 terms, maybe disjunction
+      // TODO can prove: conjunction, structural cases, regular cases, equality with more than 2 terms
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
-      // TODO
+      let proveByInduction = type;
+      if (context.goal) {
+        let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
+          let subProof = new FmtHLM.ObjectContents_Proof;
+          subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+          let parameters: Fmt.ParameterList | undefined = undefined;
+          if (subProof.parameters) {
+            parameters = Object.create(Fmt.ParameterList.prototype);
+            parameters?.push(constraintParam);
+          }
+          let goal = this.utils.getInductionProofGoal(context.goal!, proveByInduction.term, structuralCaseTerm);
+          this.checkProof(structuralCase.value, subProof, parameters, goal, caseContext);
+          if (structuralCase.wellDefinednessProof) {
+            this.error(structuralCase.wellDefinednessProof, 'Superfluous well-definedness proof');
+          }
+        };
+        let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+          for (let newCase of newCases) {
+            let subProof = new FmtHLM.ObjectContents_Proof;
+            subProof.steps = Object.create(Fmt.ParameterList.prototype);
+            let subProofExpression = new Fmt.CompoundExpression;
+            subProof.toCompoundExpression(subProofExpression, true);
+            newCase.value = subProofExpression;
+          }
+          let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction;
+          newProveByInduction.term = proveByInduction.term;
+          newProveByInduction.construction = proveByInduction.construction;
+          newProveByInduction.cases = newCases;
+          return {
+            originalExpression: proveByInduction,
+            filledExpression: newProveByInduction
+          };
+        };
+        this.checkStructuralCasesInternal(proveByInduction.term, proveByInduction.construction, proveByInduction.cases, checkCase, replaceCases, context);
+      } else {
+        this.error(step, 'Goal not set');
+      }
       return undefined;
     } else {
       this.error(step, 'Invalid proof step');
@@ -1760,10 +1802,14 @@ export class HLMDefinitionChecker {
         this.addProofConstraint(parameters, formula.formula);
       }
     } else {
-      let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-      constraintType.formula = formula;
-      parameters.push(this.utils.createParameter(constraintType, '_1'));
+      parameters.push(this.createConstraintParameter(formula, '_1'));
     }
+  }
+
+  private createConstraintParameter(constraint: Fmt.Expression, name: string): Fmt.Parameter {
+    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
+    constraintType.formula = constraint;
+    return this.utils.createParameter(constraintType, name);
   }
 
   private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression): void {

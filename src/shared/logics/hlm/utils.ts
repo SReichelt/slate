@@ -247,13 +247,8 @@ export class HLMUtils extends GenericUtils {
     return result;
   }
 
-  createStructuralCaseConstraintParameter(term: Fmt.Expression, constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorPath: Fmt.Path, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor): Fmt.Parameter {
-    let caseTerm = this.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
-    let constraint = new FmtHLM.MetaRefExpression_equals;
-    constraint.terms = [term, caseTerm];
-    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-    constraintType.formula = constraint;
-    return this.createParameter(constraintType, '_');
+  getInductionProofGoal(originalGoal: Fmt.Expression, term: Fmt.Expression, structuralCaseTerm: Fmt.Expression): Fmt.Expression {
+    return FmtUtils.substituteEquivalentExpressions(originalGoal, term, structuralCaseTerm);
   }
 
   addParameterListSubstitution(originalParameters: Fmt.Parameter[], substitutedParameters: Fmt.Parameter[], context: SubstitutionContext): void {
@@ -1076,7 +1071,7 @@ export class HLMUtils extends GenericUtils {
           let constructorPath = expression.term.path;
           return this.getOuterDefinition(structuralCase._constructor).then((definition: Fmt.Definition) => {
             let innerDefinition = definition.innerDefinitions.getDefinition(constructorPath.name);
-            let substituted = this.substituteParameters(structuralCase.value, structuralCase.parameters!, innerDefinition.parameters);
+            let substituted = structuralCase.parameters ? this.substituteParameters(structuralCase.value, structuralCase.parameters, innerDefinition.parameters) : structuralCase.value;
             return this.substituteArguments(substituted, innerDefinition.parameters, constructorPath.arguments);
           });
         }

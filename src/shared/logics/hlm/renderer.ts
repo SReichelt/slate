@@ -1292,7 +1292,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let termNotation = this.renderElementTerm(term, termSelection);
     let rows: Notation.RenderedExpression[][];
     if (cases.length) {
-      rows = cases.map((structuralCase) => {
+      rows = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
         let constructorNotation: Notation.RenderedExpression;
         if (construction instanceof Fmt.DefinitionRefExpression) {
           let constructorPromise = this.utils.getStructuralCaseTerm(construction.path, structuralCase);
@@ -2515,7 +2515,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addProofsInternal(proof ? [proof] : undefined, undefined, context, undefined, undefined, subParagraphs);
         return new Notation.ParagraphExpression(subParagraphs);
       });
-      let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '1.');
+      let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
       paragraphs.push(list);
     }
   }
@@ -2654,33 +2654,58 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addSubProof(type.proof, subProofContext, startRow, startRowSpacing, paragraphs);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
-        if (!startRow) {
-          startRow = [];
+        let term = type.term;
+        if (type.cases.length > 1) {
+          if (!startRow) {
+            startRow = [];
+          }
+          if (startRowSpacing) {
+            startRow.push(new Notation.TextExpression(startRowSpacing));
+          }
+          let termSelection: ElementTermSelection = {
+            allowCases: false,
+            allowConstructors: false
+          };
+          startRow.push(
+            new Notation.TextExpression('By induction on '),
+            this.readOnlyRenderer.renderElementTerm(term, termSelection),
+            new Notation.TextExpression('.')
+          );
         }
-        if (startRowSpacing) {
-          startRow.push(new Notation.TextExpression(startRowSpacing));
+        if (startRow) {
+          paragraphs.push(new Notation.RowExpression(startRow));
         }
-        let termSelection: ElementTermSelection = {
-          allowCases: false,
-          allowConstructors: false
-        };
-        startRow.push(
-          new Notation.TextExpression('By induction on '),
-          this.readOnlyRenderer.renderElementTerm(type.term, termSelection),
-          new Notation.TextExpression('.')
-        );
-        paragraphs.push(new Notation.RowExpression(startRow));
-        let subProofs: FmtHLM.ObjectContents_Proof[] = [];
-        for (let structuralCase of type.cases) {
-          let subProof = new FmtHLM.ObjectContents_Proof;
-          subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
-          subProofs.push(subProof);
+        if (type.construction instanceof Fmt.DefinitionRefExpression) {
+          let path = type.construction.path;
+          let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
+            let subProof = new FmtHLM.ObjectContents_Proof;
+            subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+            if (structuralCase.parameters) {
+              if (subProof.parameters) {
+                let originalParameters = subProof.parameters.slice();
+                subProof.parameters = Object.create(Fmt.ParameterList.prototype);
+                subProof.parameters!.push(...structuralCase.parameters, ...originalParameters);
+              } else {
+                subProof.parameters = structuralCase.parameters;
+              }
+            }
+            let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
+            let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
+              if (context.goal && !subProof.goal) {
+                subProof.goal = this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm);
+              }
+              let subProofContext: HLMProofStepContext = {
+                stepResults: context.stepResults
+              };
+              let subParagraphs: Notation.RenderedExpression[] = [];
+              this.addProofsInternal(subProof ? [subProof] : undefined, undefined, subProofContext, undefined, undefined, subParagraphs);
+              return new Notation.ParagraphExpression(subParagraphs);
+            });
+            return new Notation.PromiseExpression(subProofPromise);
+          });
+          let list = new Notation.ListExpression(items, '*');
+          paragraphs.push(list);
         }
-        let subProofContext: HLMProofStepContext = {
-          goal: context.goal,
-          stepResults: context.stepResults
-        };
-        this.addSubProofList(subProofs, undefined, subProofContext, paragraphs);
         return undefined;
       }
       if (startRow) {
@@ -2704,26 +2729,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return undefined;
         }
         let dependsOnPreviousPromise = CachedPromise.resolve(context.previousResult !== undefined);
-        let source: Notation.RenderedExpression | undefined = undefined;
+        let sourceFormula: Notation.RenderedExpression | undefined = undefined;
         let sourceType = type;
         if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
           if (type.source.type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
             sourceType = type.source.type;
-          } else {
-            let sourceContext: HLMProofStepContext = {
-              stepResults: context.stepResults
-            };
-            let sourceResult = this.utils.getProofStepResult(type.source, sourceContext);
-            if (sourceResult) {
-              source = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
-              if (!source.styleClasses) {
-                source.styleClasses = [];
-              }
-              source.styleClasses.push('miniature');
-              this.addSemanticLink(source, type.source);
+          }
+          let sourceContext: HLMProofStepContext = {
+            stepResults: context.stepResults
+          };
+          let sourceResult = this.utils.getProofStepResult(type.source, sourceContext);
+          if (sourceResult) {
+            sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
+            if (!sourceFormula.styleClasses) {
+              sourceFormula.styleClasses = [];
             }
+            sourceFormula.styleClasses.push('miniature');
+            this.addSemanticLink(sourceFormula, type.source);
           }
         }
+        let source: Notation.RenderedExpression | undefined = undefined;
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
             || sourceType instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
           source = new Notation.TextExpression('def');
@@ -2752,6 +2777,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         if (source) {
           args['source'] = source;
+        }
+        if (sourceFormula) {
+          args['formula'] = sourceFormula;
         }
         let renderedStepPromise = dependsOnPreviousPromise.then((dependsOnPrevious: boolean) =>
           this.renderTemplate(dependsOnPrevious ? 'DependentProofStep' : 'SourceProofStep', args));
