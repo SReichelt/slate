@@ -50,6 +50,12 @@ interface ParameterListState {
   associatedDefinition?: Fmt.Definition;
 }
 
+interface ProofOutputState {
+  paragraphs: Notation.RenderedExpression[];
+  startRow?: Notation.RenderedExpression[];
+  startRowSpacing?: string;
+}
+
 interface HLMProofStepRenderContext extends HLMProofStepContext {
   originalParameters: Fmt.Parameter[];
   substitutedParameters: Fmt.Parameter[];
@@ -2373,41 +2379,39 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         goal: externalGoal,
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      this.addProofsInternal(proofs, heading, context, undefined, undefined, false, paragraphs);
+      let state: ProofOutputState = {
+        paragraphs: paragraphs
+      };
+      this.addProofsInternal(proofs, heading, context, false, state);
     }
   }
 
-  private addProofsInternal(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, context: HLMProofStepContext, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, indentSteps: boolean, paragraphs: Notation.RenderedExpression[]): void {
+  private addProofsInternal(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     if (proofs && proofs.length) {
       let proofNumber = 1;
       for (let proof of proofs) {
         let proofHeading = heading && proofs.length > 1 ? `${heading} ${proofNumber}` : heading;
-        this.addProofInternal(proof, proofHeading, context, false, startRow, startRowSpacing, indentSteps, paragraphs);
+        this.addProofInternal(proof, proofHeading, context, false, indentSteps, state);
         proofNumber++;
-        startRow = undefined;
-        startRowSpacing = undefined;
       }
     } else {
-      this.addNoProofPlaceholder(heading, startRow, startRowSpacing, paragraphs);
+      this.addNoProofPlaceholder(heading, state);
     }
   }
 
-  private addProofInternal(proof: FmtHLM.ObjectContents_Proof, heading: string | undefined, context: HLMProofStepContext, showExternalGoal: boolean, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, indentSteps: boolean, paragraphs: Notation.RenderedExpression[]): void {
-    if (!startRow) {
-      startRow = [];
+  private addProofInternal(proof: FmtHLM.ObjectContents_Proof, heading: string | undefined, context: HLMProofStepContext, showExternalGoal: boolean, indentSteps: boolean, state: ProofOutputState): void {
+    if (!state.startRow) {
+      state.startRow = [];
     }
-    let spacing = startRowSpacing;
     let hasContents = false;
     if (heading) {
-      startRow.push(this.renderSubHeading(heading));
-      spacing = '  ';
+      state.startRow.push(this.renderSubHeading(heading));
+      state.startRowSpacing = '  ';
     }
     if (proof.parameters && proof.parameters.length) {
-      if (spacing) {
-        startRow.push(new Notation.TextExpression(spacing));
-      }
-      startRow.push(this.readOnlyRenderer.renderParameterList(proof.parameters, true, false, false));
-      spacing = ' ';
+      this.outputStartRowSpacing(state);
+      state.startRow.push(this.readOnlyRenderer.renderParameterList(proof.parameters, true, false, false));
+      state.startRowSpacing = ' ';
       hasContents = true;
     }
     let goal = proof.goal;
@@ -2421,76 +2425,72 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     if (goal) {
-      if (spacing) {
-        startRow.push(new Notation.TextExpression(spacing));
-      }
+      this.outputStartRowSpacing(state);
       if (hasContents) {
-        startRow.push(new Notation.TextExpression('Then '));
+        state.startRow.push(new Notation.TextExpression('Then '));
       } else if (proof.steps.length) {
         if (proof.steps.length === 1) {
           let type = proof.steps[0].type;
           if (type instanceof FmtHLM.MetaRefExpression_Consider) {
-            startRow.push(
+            state.startRow.push(
               this.readOnlyRenderer.renderFormula(goal, fullFormulaSelection),
               new Notation.TextExpression('.')
             );
-            paragraphs.push(new Notation.RowExpression(startRow));
+            this.commitStartRow(state);
             return;
           }
         }
-        startRow.push(new Notation.TextExpression('We show that '));
+        state.startRow.push(new Notation.TextExpression('We show that '));
       }
-      startRow.push(
+      state.startRow.push(
         this.readOnlyRenderer.renderFormula(goal, fullFormulaSelection),
         new Notation.TextExpression(':')
       );
-      spacing = ' ';
+      state.startRowSpacing = ' ';
       hasContents = true;
     }
     if (proof.steps.length) {
       if (hasContents || indentSteps) {
-        if (startRow.length) {
-          paragraphs.push(new Notation.RowExpression(startRow));
-        }
-        startRow = undefined;
-        spacing = undefined;
+        this.commitStartRow(state);
       }
       if (indentSteps) {
-        let subParagraphs: Notation.RenderedExpression[] = [];
-        this.addProofSteps(proof, context, startRow, spacing, subParagraphs);
-        let steps = new Notation.ParagraphExpression(subParagraphs);
+        let indentedState: ProofOutputState = {
+          paragraphs: []
+        };
+        this.addProofSteps(proof, context, indentedState);
+        let steps = new Notation.ParagraphExpression(indentedState.paragraphs);
         steps.styleClasses = ['indented'];
-        paragraphs.push(steps);
+        state.paragraphs.push(steps);
       } else {
-        this.addProofSteps(proof, context, startRow, spacing, paragraphs);
+        this.addProofSteps(proof, context, state);
       }
     } else {
-      if (spacing) {
-        startRow.push(new Notation.TextExpression(spacing));
-      }
+      this.outputStartRowSpacing(state);
       let trivial = new Notation.TextExpression('Trivial.');
       trivial.styleClasses = ['proof-placeholder'];
-      startRow.push(trivial);
-      paragraphs.push(new Notation.RowExpression(startRow));
+      state.startRow.push(trivial);
     }
+    this.commitStartRow(state);
   }
 
-  private addNoProofPlaceholder(heading: string | undefined, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Notation.RenderedExpression[]): void {
-    if (!startRow) {
-      startRow = [];
+  private addNoProofPlaceholder(heading: string | undefined, state: ProofOutputState): void {
+    if (!state.startRow) {
+      state.startRow = [];
     }
-    let spacing = startRowSpacing;
     let noProof = new Notation.TextExpression('No proof.');
     noProof.styleClasses = ['proof-placeholder'];
     if (heading && heading !== 'Proof') {
-      startRow.push(this.renderSubHeading(heading));
-      spacing = '  ';
+      state.startRow.push(this.renderSubHeading(heading));
+      state.startRowSpacing = '  ';
     }
-    if (spacing) {
-      startRow.push(new Notation.TextExpression(spacing));
+    if (state.startRowSpacing) {
+      state.startRow.push(new Notation.TextExpression(state.startRowSpacing));
+      state.startRowSpacing = undefined;
     }
-    startRow.push(noProof);
-    paragraphs.push(new Notation.RowExpression(startRow));
+    state.startRow.push(noProof);
+    state.paragraphs.push(new Notation.RowExpression(state.startRow));
+    state.startRow = undefined;
+    state.startRowSpacing = undefined;
   }
 
   private addProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Notation.RenderedExpression[]): void {
@@ -2498,22 +2498,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProofs(proofs, heading, externalGoal, paragraphs);
   }
 
-  private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, indentSteps: boolean, paragraphs: Notation.RenderedExpression[]): void {
+  private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     let externalGoal = context.goal instanceof FmtHLM.MetaRefExpression_or && !context.goal.formulas ? undefined : context.goal;
     if (proof) {
-      this.addProofInternal(proof, undefined, context, externalGoal !== undefined, startRow, startRowSpacing, indentSteps, paragraphs);
+      this.addProofInternal(proof, undefined, context, externalGoal !== undefined, indentSteps, state);
     } else if (externalGoal) {
-      if (!startRow) {
-        startRow = [];
+      if (!state.startRow) {
+        state.startRow = [];
       }
-      if (startRowSpacing) {
-        startRow.push(new Notation.TextExpression(startRowSpacing));
-      }
-      startRow.push(this.readOnlyRenderer.renderFormula(externalGoal, fullFormulaSelection));
-      startRow.push(new Notation.TextExpression('.'));
-      paragraphs.push(new Notation.RowExpression(startRow));
-    } else if (startRow) {
-      this.addNoProofPlaceholder(undefined, startRow, startRowSpacing, paragraphs);
+      this.outputStartRowSpacing(state);
+      state.startRow.push(this.readOnlyRenderer.renderFormula(externalGoal, fullFormulaSelection));
+      state.startRow.push(new Notation.TextExpression('.'));
+      this.commitStartRow(state);
+    } else if (state.startRow) {
+      this.addNoProofPlaceholder(undefined, state);
     }
   }
 
@@ -2522,21 +2520,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let context: HLMProofStepContext = {
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      this.addIndentedProofInternal(proof, heading, context, paragraphs);
+      let state: ProofOutputState = {
+        paragraphs: paragraphs
+      };
+      this.addIndentedProofInternal(proof, heading, context, state);
     }
   }
 
-  private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, paragraphs: Notation.RenderedExpression[]): void {
-    this.addIndentedProofInternal(proof, undefined, context, paragraphs);
+  private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
+    this.addIndentedProofInternal(proof, undefined, context, state);
   }
 
-  private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, paragraphs: Notation.RenderedExpression[]): void {
-    let subParagraphs: Notation.RenderedExpression[] = [];
+  private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
     let proofs = proof ? [proof] : undefined;
-    this.addProofsInternal(proofs, heading, context, undefined, undefined, false, subParagraphs);
-    let subProof = new Notation.ParagraphExpression(subParagraphs);
-    subProof.styleClasses = ['indented'];
-    paragraphs.push(subProof);
+    let indentedState: ProofOutputState = {
+      paragraphs: []
+    };
+    this.addProofsInternal(proofs, heading, context, false, indentedState);
+    let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
+    indentedProof.styleClasses = ['indented'];
+    state.paragraphs.push(indentedProof);
   }
 
   private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Notation.RenderedExpression[]): void {
@@ -2545,24 +2548,29 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         goal: externalGoal,
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      this.addProofListInternal(proofs, heading, labels, context, paragraphs);
+      let state: ProofOutputState = {
+        paragraphs: paragraphs
+      };
+      this.addProofListInternal(proofs, heading, labels, context, state);
     }
   }
 
-  private addProofListInternal(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, context: HLMProofStepContext, paragraphs: Notation.RenderedExpression[]): void {
+  private addProofListInternal(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
     if (proofs.every((proof) => !proof)) {
-      this.addProofsInternal(undefined, heading, context, undefined, undefined, false, paragraphs);
+      this.addProofsInternal(undefined, heading, context, false, state);
     } else {
       if (heading) {
-        paragraphs.push(this.renderSubHeading(heading));
+        state.paragraphs.push(this.renderSubHeading(heading));
       }
       let items = proofs.map((proof) => {
-        let subParagraphs: Notation.RenderedExpression[] = [];
-        this.addProofsInternal(proof ? [proof] : undefined, undefined, context, undefined, undefined, false, subParagraphs);
-        return new Notation.ParagraphExpression(subParagraphs);
+        let itemState: ProofOutputState = {
+          paragraphs: []
+        };
+        this.addProofsInternal(proof ? [proof] : undefined, undefined, context, false, itemState);
+        return new Notation.ParagraphExpression(itemState.paragraphs);
       });
       let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
-      paragraphs.push(list);
+      state.paragraphs.push(list);
     }
   }
 
@@ -2572,7 +2580,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let labels = this.getEquivalenceProofLabels(proofs, symbol);
         this.addProofList(proofs, heading, labels, undefined, paragraphs);
       } else {
-        this.addNoProofPlaceholder(heading, undefined, undefined, paragraphs);
+        let state: ProofOutputState = {
+          paragraphs: paragraphs
+        };
+        this.addNoProofPlaceholder(heading, state);
       }
     }
   }
@@ -2595,11 +2606,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     });
   }
 
-  private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, context: HLMProofStepContext, paragraphs: Notation.RenderedExpression[]): void {
-    this.addProofListInternal(proofs, undefined, labels, context, paragraphs);
+  private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
+    this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
-  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Notation.RenderedExpression[]): void {
+  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, state: ProofOutputState): void {
     let renderContext: HLMProofStepRenderContext = {
       ...context,
       originalParameters: [],
@@ -2617,21 +2628,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.utils.addParameterListSubstitution(renderContext.originalParameters, renderContext.substitutedParameters, substitutionContext);
         renderedStep = this.utils.applySubstitutionContextToParameter(renderedStep, substitutionContext);
       }
-      let stepResult = this.addProofStep(renderedStep, renderContext, startRow, startRowSpacing, paragraphs);
+      let stepResult = this.addProofStep(renderedStep, renderContext, state);
       if (stepResult) {
         renderContext.stepResults.set(step, stepResult);
       }
       renderContext.previousStep = step;
       renderContext.previousResult = stepResult;
-      startRow = undefined;
       stepIndex++;
-    }
-    if (startRow && startRow.length) {
-      paragraphs.push(new Notation.RowExpression(startRow));
     }
   }
 
-  private addProofStep(step: Fmt.Parameter, context: HLMProofStepRenderContext, startRow: Notation.RenderedExpression[] | undefined, startRowSpacing: string | undefined, paragraphs: Notation.RenderedExpression[]): Fmt.Expression | undefined {
+  private addProofStep(step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
     let isFinishedContradiction = (context.goal instanceof FmtHLM.MetaRefExpression_or && !context.goal.formulas && context.isLastStep);
     let addSuffix = (expression: Notation.RenderedExpression) => {
       if (isFinishedContradiction) {
@@ -2647,10 +2654,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     try {
       let type = step.type;
       if (type instanceof FmtHLM.MetaRefExpression_State) {
-        let row = startRow ?? [];
-        if (startRowSpacing) {
-          row.push(new Notation.TextExpression(startRowSpacing));
+        let row = state.startRow ?? [];
+        if (state.startRowSpacing) {
+          row.push(new Notation.TextExpression(state.startRowSpacing));
         }
+        state.startRow = undefined;
+        state.startRowSpacing = undefined;
         let byDefinition = false;
         let definitionDependency: Fmt.Expression | undefined;
         let proof = type.proof;
@@ -2694,19 +2703,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           } else {
             row.push(new Notation.TextExpression(':'));
           }
-          paragraphs.push(addSuffix(new Notation.RowExpression(row)));
+          state.paragraphs.push(addSuffix(new Notation.RowExpression(row)));
           if (proof) {
             let subProofContext: HLMProofStepContext = {
               goal: type.statement,
               stepResults: context.stepResults
             };
-            this.addIndentedSubProof(proof, subProofContext, paragraphs);
+            this.addIndentedSubProof(proof, subProofContext, state);
           }
         } else {
           if (dot) {
             row.push(new Notation.TextExpression(dot));
           }
-          paragraphs.push(addSuffix(new Notation.RowExpression(row)));
+          state.paragraphs.push(addSuffix(new Notation.RowExpression(row)));
         }
         return type.statement;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
@@ -2714,37 +2723,33 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
-        this.addSubProof(type.proof, subProofContext, startRow, startRowSpacing, false, paragraphs);
+        this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveNeg) {
         let subProofContext: HLMProofStepContext = {
           goal: new FmtHLM.MetaRefExpression_or,
           stepResults: context.stepResults
         };
-        this.addSubProof(type.proof, subProofContext, startRow, startRowSpacing, false, paragraphs);
+        this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
         let term = type.term;
         if (type.cases.length > 1) {
-          if (!startRow) {
-            startRow = [];
+          if (!state.startRow) {
+            state.startRow = [];
           }
-          if (startRowSpacing) {
-            startRow.push(new Notation.TextExpression(startRowSpacing));
-          }
+          this.outputStartRowSpacing(state);
           let termSelection: ElementTermSelection = {
             allowCases: false,
             allowConstructors: false
           };
-          startRow.push(
+          state.startRow.push(
             new Notation.TextExpression('By induction on '),
             this.readOnlyRenderer.renderElementTerm(term, termSelection),
             new Notation.TextExpression('.')
           );
         }
-        if (startRow) {
-          paragraphs.push(new Notation.RowExpression(startRow));
-        }
+        this.commitStartRow(state);
         if (type.construction instanceof Fmt.DefinitionRefExpression) {
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
@@ -2765,26 +2770,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 goal: context.goal ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : undefined,
                 stepResults: context.stepResults
               };
-              let subParagraphs: Notation.RenderedExpression[] = [];
-              this.addSubProof(subProof, subProofContext, undefined, undefined, false, subParagraphs);
-              return new Notation.ParagraphExpression(subParagraphs);
+              let subState: ProofOutputState = {
+                paragraphs: []
+              };
+              this.addSubProof(subProof, subProofContext, false, subState);
+              return new Notation.ParagraphExpression(subState.paragraphs);
             });
             return new Notation.PromiseExpression(subProofPromise);
           });
           let list = new Notation.ListExpression(items, '*');
-          paragraphs.push(list);
+          state.paragraphs.push(list);
         }
         return undefined;
       }
-      if (startRow) {
-        paragraphs.push(new Notation.RowExpression(startRow));
-      }
+      this.commitStartRow(state);
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
-        paragraphs.push(this.renderParameter(step, true, false, false));
+        state.paragraphs.push(this.renderParameter(step, true, false, false));
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
         let result = this.utils.getProofStepResult(step, context);
         if (result) {
-          paragraphs.push(this.readOnlyRenderer.renderFormula(result, fullFormulaSelection));
+          state.paragraphs.push(this.readOnlyRenderer.renderFormula(result, fullFormulaSelection));
         }
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
@@ -2834,6 +2839,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             }
           }
         }
+        // TODO fill proof step grid instead of paragraphs, to align implications and equalities
         let renderedStepPromise = dependsOnPreviousPromise.then((dependsOnPrevious: boolean) => {
           let stepRow: Notation.RenderedExpression[] = [];
           if (source || sourceFormula || dependsOnPrevious) {
@@ -2863,7 +2869,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
           return new Notation.RowExpression(stepRow);
         });
-        paragraphs.push(new Notation.PromiseExpression(renderedStepPromise));
+        state.paragraphs.push(new Notation.PromiseExpression(renderedStepPromise));
         // TODO add sub-proofs (maybe inline like in expressions, or maybe expandable)
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
@@ -2872,34 +2878,35 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           goal: context.goal,
           stepResults: context.stepResults
         };
-        this.addSubProofList(type.caseProofs, undefined, subProofContext, paragraphs);
+        this.addSubProofList(type.caseProofs, undefined, subProofContext, state);
       } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
         if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
           context.originalParameters.push(...type.parameters);
           context.substitutedParameters.push(...context.previousResult.parameters);
           return context.previousResult.formula;
         } else {
-          paragraphs.push(new Notation.ErrorExpression('Previous result is not existentially quantified'));
+          state.paragraphs.push(new Notation.ErrorExpression('Previous result is not existentially quantified'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
         if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
           let argumentList = this.renderArgumentDefinitionList(context.goal.parameters, type.arguments);
-          let row = [
+          state.startRow = [
             new Notation.TextExpression('Choose '),
             argumentList,
             new Notation.TextExpression('.')
           ];
+          state.startRowSpacing = ' ';
           if (type.proof && !(type.proof.steps.length === 1 && type.proof.steps[0].type instanceof FmtHLM.MetaRefExpression_Consider)) {
             let subProofContext: HLMProofStepContext = {
               stepResults: context.stepResults,
               goal: context.goal.formula ? this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments, undefined) : undefined
             };
-            this.addSubProof(type.proof, subProofContext, row, ' ', true, paragraphs);
+            this.addSubProof(type.proof, subProofContext, true, state);
           } else {
-            paragraphs.push(new Notation.RowExpression(row));
+            this.commitStartRow(state);
           }
         } else {
-          paragraphs.push(new Notation.ErrorExpression('Goal is not existentially quantified'));
+          state.paragraphs.push(new Notation.ErrorExpression('Goal is not existentially quantified'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
         let labels: string[];
@@ -2913,14 +2920,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
-        this.addSubProofList(type.proofs, labels, subProofContext, paragraphs);
+        this.addSubProofList(type.proofs, labels, subProofContext, state);
       } else {
-        paragraphs.push(new Notation.ErrorExpression('Unknown proof step type'));
+        state.paragraphs.push(new Notation.ErrorExpression('Unknown proof step type'));
       }
     } catch (e) {
-      paragraphs.push(new Notation.ErrorExpression(e.message));
+      state.paragraphs.push(new Notation.ErrorExpression(e.message));
     }
     return undefined;
+  }
+
+  private outputStartRowSpacing(state: ProofOutputState): void {
+    if (state.startRowSpacing) {
+      state.startRow?.push(new Notation.TextExpression(state.startRowSpacing));
+      state.startRowSpacing = undefined;
+    }
+  }
+
+  private commitStartRow(state: ProofOutputState): void {
+    if (state.startRow) {
+      if (state.startRow.length) {
+        state.paragraphs.push(new Notation.RowExpression(state.startRow));
+      }
+      state.startRow = undefined;
+      state.startRowSpacing = undefined;
+    }
   }
 
   addPlaceholderMenu(placeholder: Fmt.PlaceholderExpression, semanticLink: Notation.SemanticLink): void {
