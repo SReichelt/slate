@@ -50,10 +50,21 @@ interface ParameterListState {
   associatedDefinition?: Fmt.Definition;
 }
 
+interface ProofOutputImplication {
+  dependsOnPrevious: boolean;
+  source?: Notation.RenderedExpression;
+  sourceFormula?: Notation.RenderedExpression;
+  result: Fmt.Expression;
+  resultLink?: Object;
+  resultPrefixes?: Notation.RenderedExpression[];
+  resultSuffixes?: Notation.RenderedExpression[];
+}
+
 interface ProofOutputState {
   paragraphs: Notation.RenderedExpression[];
   startRow?: Notation.RenderedExpression[];
   startRowSpacing?: string;
+  implications?: ProofOutputImplication[];
 }
 
 interface HLMProofStepRenderContext extends HLMProofStepContext {
@@ -2499,7 +2510,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
-    let externalGoal = context.goal instanceof FmtHLM.MetaRefExpression_or && !context.goal.formulas ? undefined : context.goal;
+    this.commitImplications(state, true);
+    let externalGoal = context.goal && !this.utils.isFalseFormula(context.goal) ? context.goal : undefined;
     if (proof) {
       this.addProofInternal(proof, undefined, context, externalGoal !== undefined, indentSteps, state);
     } else if (externalGoal) {
@@ -2528,6 +2540,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndentedSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
+    this.commitImplications(state, true);
     this.addIndentedProofInternal(proof, undefined, context, state);
   }
 
@@ -2607,6 +2620,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
+    this.commitImplications(state, true);
     this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
@@ -2636,90 +2650,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       renderContext.previousResult = stepResult;
       stepIndex++;
     }
+    this.commitImplications(state, false);
   }
 
   private addProofStep(step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
-    let isFinishedContradiction = (context.goal instanceof FmtHLM.MetaRefExpression_or && !context.goal.formulas && context.isLastStep);
-    let addSuffix = (expression: Notation.RenderedExpression) => {
-      if (isFinishedContradiction) {
-        return new Notation.RowExpression([
-          expression,
-          new Notation.TextExpression(' '),
-          this.renderTemplate('Contradiction')
-        ]);
-      } else {
-        return expression;
-      }
-    };
     try {
       let type = step.type;
-      if (type instanceof FmtHLM.MetaRefExpression_State) {
-        let row = state.startRow ?? [];
-        if (state.startRowSpacing) {
-          row.push(new Notation.TextExpression(state.startRowSpacing));
-        }
-        state.startRow = undefined;
-        state.startRowSpacing = undefined;
-        let byDefinition = false;
-        let definitionDependency: Fmt.Expression | undefined;
-        let proof = type.proof;
-        if (proof?.steps.length === 1) {
-          let subStepType = proof.steps[0].type;
-          if (subStepType instanceof FmtHLM.MetaRefExpression_ProveDef) {
-            if (subStepType.proof) {
-              if (subStepType.proof.steps.length === 1 && subStepType.proof.goal instanceof FmtHLM.MetaRefExpression_exists && subStepType.proof.goal.formula) {
-                let subSubStepType = subStepType.proof.steps[0].type;
-                if (subSubStepType instanceof FmtHLM.MetaRefExpression_ProveExists && !subSubStepType.proof) {
-                  byDefinition = true;
-                  definitionDependency = this.utils.substituteArguments(subStepType.proof.goal.formula, subStepType.proof.goal.parameters, subSubStepType.arguments, undefined);
-                }
-              }
-            } else {
-              byDefinition = true;
-            }
+      let isFinishedContradiction = (context.goal && this.utils.isFalseFormula(context.goal) && context.isLastStep);
+      let addSuffix = (implication: ProofOutputImplication) => {
+        if (isFinishedContradiction && !this.utils.isFalseFormula(implication.result)) {
+          if (!implication.resultSuffixes) {
+            implication.resultSuffixes = [];
           }
-        }
-        let dot = '';
-        if (definitionDependency || (context.previousStep && this.utils.referencesParameter(type, context.previousStep))) {
-          if (definitionDependency && !(context.previousResult && definitionDependency.isEquivalentTo(context.previousResult))) {
-            row.push(
-              this.readOnlyRenderer.renderFormula(definitionDependency, fullFormulaSelection),
-              new Notation.TextExpression('\u2000')
-            );
-          }
-          row.push(
-            this.renderTemplate('ProofImplication'),
-            new Notation.TextExpression('\u2000')
+          implication.resultSuffixes.push(
+            new Notation.TextExpression('\u2000'),
+            this.renderTemplate('Contradiction')
           );
-        } else {
-          row.push(new Notation.TextExpression('We have '));
-          dot = '.';
         }
-        row.push(this.renderFormula(type.statement, fullFormulaSelection));
-        if (proof) {
-          if (byDefinition) {
-            row.push(new Notation.TextExpression(' by definition' + dot));
-            proof = undefined;
-          } else {
-            row.push(new Notation.TextExpression(':'));
-          }
-          state.paragraphs.push(addSuffix(new Notation.RowExpression(row)));
-          if (proof) {
-            let subProofContext: HLMProofStepContext = {
-              goal: type.statement,
-              stepResults: context.stepResults
-            };
-            this.addIndentedSubProof(proof, subProofContext, state);
-          }
-        } else {
-          if (dot) {
-            row.push(new Notation.TextExpression(dot));
-          }
-          state.paragraphs.push(addSuffix(new Notation.RowExpression(row)));
-        }
-        return type.statement;
-      } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
-                 || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
+      };
+      if (type instanceof FmtHLM.MetaRefExpression_ProveDef
+          || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
         let subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
@@ -2750,6 +2700,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           );
         }
         this.commitStartRow(state);
+        this.commitImplications(state, false);
         if (type.construction instanceof Fmt.DefinitionRefExpression) {
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
@@ -2785,13 +2736,88 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.commitStartRow(state);
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
+        this.commitImplications(state, false);
         state.paragraphs.push(this.renderParameter(step, true, false, false));
+        return this.utils.getProofStepResult(step, context);
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
         let result = this.utils.getProofStepResult(step, context);
         if (result) {
-          state.paragraphs.push(this.readOnlyRenderer.renderFormula(result, fullFormulaSelection));
+          let implication: ProofOutputImplication = {
+            dependsOnPrevious: false,
+            result: result,
+            resultLink: type.variable
+          };
+          if (state.implications) {
+            state.implications.push(implication);
+          } else {
+            state.implications = [implication];
+          }
         }
         return result;
+      } else if (type instanceof FmtHLM.MetaRefExpression_State) {
+        let byDefinition = false;
+        let definitionDependency: Fmt.Expression | undefined;
+        let proof = type.proof;
+        if (proof?.steps.length === 1) {
+          let subStepType = proof.steps[0].type;
+          if (subStepType instanceof FmtHLM.MetaRefExpression_ProveDef) {
+            if (subStepType.proof) {
+              if (subStepType.proof.steps.length === 1 && subStepType.proof.goal instanceof FmtHLM.MetaRefExpression_exists && subStepType.proof.goal.formula) {
+                let subSubStepType = subStepType.proof.steps[0].type;
+                if (subSubStepType instanceof FmtHLM.MetaRefExpression_ProveExists && !subSubStepType.proof) {
+                  byDefinition = true;
+                  definitionDependency = this.utils.substituteArguments(subStepType.proof.goal.formula, subStepType.proof.goal.parameters, subSubStepType.arguments, undefined);
+                }
+              }
+            } else {
+              byDefinition = true;
+            }
+          }
+        }
+        let implication: ProofOutputImplication = {
+          dependsOnPrevious: false,
+          result: type.statement
+        };
+        let fullSentence = false;
+        if (definitionDependency || (context.previousStep && this.utils.referencesParameter(type, context.previousStep))) {
+          if (definitionDependency && !(context.previousResult && definitionDependency.isEquivalentTo(context.previousResult))) {
+            implication.source = this.readOnlyRenderer.renderFormula(definitionDependency, fullFormulaSelection);
+          } else {
+            implication.dependsOnPrevious = true;
+          }
+        } else {
+          implication.resultPrefixes = [new Notation.TextExpression('We have ')];
+          fullSentence = true;
+        }
+        if (proof) {
+          if (byDefinition) {
+            implication.resultSuffixes = [new Notation.TextExpression(' by definition' + (fullSentence ? '.' : ''))];
+            proof = undefined;
+          } else {
+            implication.resultSuffixes = [new Notation.TextExpression(':')];
+          }
+        } else {
+          if (fullSentence) {
+            implication.resultSuffixes = [new Notation.TextExpression('.')];
+          }
+        }
+        addSuffix(implication);
+        if (state.implications) {
+          state.implications.push(implication);
+        } else {
+          state.implications = [implication];
+        }
+        if (fullSentence) {
+          this.commitImplications(state, true);
+        }
+        if (proof) {
+          let subProofContext: HLMProofStepContext = {
+            goal: type.statement,
+            stepResults: context.stepResults
+          };
+          this.addIndentedSubProof(proof, subProofContext, state);
+        }
+        return type.statement;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
                  || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
                  || type instanceof FmtHLM.MetaRefExpression_UseForAll
@@ -2801,7 +2827,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (!result) {
           return undefined;
         }
-        let dependsOnPreviousPromise = CachedPromise.resolve(context.previousResult !== undefined);
+        let dependsOnPrevious = (context.previousResult !== undefined);
         let sourceFormula: Notation.RenderedExpression | undefined = undefined;
         let sourceType = type;
         if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
@@ -2818,7 +2844,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               sourceFormula.styleClasses = [];
             }
             sourceFormula.styleClasses.push('miniature');
-            this.addSemanticLink(sourceFormula, type.source);
+            this.readOnlyRenderer.addSemanticLink(sourceFormula, type.source);
           }
         }
         let source: Notation.RenderedExpression | undefined = undefined;
@@ -2832,44 +2858,23 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let itemNumberPromise = this.utils.getItemInfo(sourceType.theorem).then((itemInfo: LibraryItemInfo) => new Notation.TextExpression(formatItemNumber(itemInfo.itemNumber)));
             source = new Notation.PromiseExpression(itemNumberPromise);
             source.styleClasses = ['miniature'];
-            this.addSemanticLink(source, sourceType.theorem);
-            if (!(type instanceof FmtHLM.MetaRefExpression_Substitute || (context.previousStep && this.utils.referencesParameter(sourceType, context.previousStep)))) {
-              dependsOnPreviousPromise = this.utils.getDefinition(sourceType.theorem.path).then((definition: Fmt.Definition) =>
-                (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem));
-            }
+            this.readOnlyRenderer.addSemanticLink(source, sourceType.theorem);
+            dependsOnPrevious = (type instanceof FmtHLM.MetaRefExpression_Substitute
+                                 || (context.previousStep !== undefined && this.utils.referencesParameter(sourceType, context.previousStep)));
           }
         }
-        // TODO fill proof step grid instead of paragraphs, to align implications and equalities
-        let renderedStepPromise = dependsOnPreviousPromise.then((dependsOnPrevious: boolean) => {
-          let stepRow: Notation.RenderedExpression[] = [];
-          if (source || sourceFormula || dependsOnPrevious) {
-            let args: RenderedTemplateArguments = {};
-            if (source) {
-              if (dependsOnPrevious) {
-                args['source'] = source;
-              } else {
-                stepRow.push(
-                  source,
-                  new Notation.TextExpression('\u2000')
-                );
-              }
-            }
-            if (sourceFormula) {
-              args['formula'] = sourceFormula;
-            }
-            stepRow.push(
-              this.renderTemplate('ProofImplication', args),
-              new Notation.TextExpression('\u2000')
-            );
-          }
-          if (result instanceof FmtHLM.MetaRefExpression_or && !result.formulas) {
-            stepRow.push(this.renderTemplate('Contradiction'));
-          } else {
-            stepRow.push(addSuffix(this.readOnlyRenderer.renderFormula(result!, fullFormulaSelection)));
-          }
-          return new Notation.RowExpression(stepRow);
-        });
-        state.paragraphs.push(new Notation.PromiseExpression(renderedStepPromise));
+        let implication: ProofOutputImplication = {
+          dependsOnPrevious: dependsOnPrevious,
+          source: source,
+          sourceFormula: sourceFormula,
+          result: result
+        };
+        addSuffix(implication);
+        if (state.implications) {
+          state.implications.push(implication);
+        } else {
+          state.implications = [implication];
+        }
         // TODO add sub-proofs (maybe inline like in expressions, or maybe expandable)
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
@@ -2885,9 +2890,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           context.substitutedParameters.push(...context.previousResult.parameters);
           return context.previousResult.formula;
         } else {
+          this.commitImplications(state, false);
           state.paragraphs.push(new Notation.ErrorExpression('Previous result is not existentially quantified'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
+        this.commitImplications(state, false);
         if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
           let argumentList = this.renderArgumentDefinitionList(context.goal.parameters, type.arguments);
           state.startRow = [
@@ -2922,9 +2929,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         this.addSubProofList(type.proofs, labels, subProofContext, state);
       } else {
+        this.commitImplications(state, false);
         state.paragraphs.push(new Notation.ErrorExpression('Unknown proof step type'));
       }
     } catch (e) {
+      this.commitImplications(state, false);
       state.paragraphs.push(new Notation.ErrorExpression(e.message));
     }
     return undefined;
@@ -2944,6 +2953,60 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       state.startRow = undefined;
       state.startRowSpacing = undefined;
+    }
+  }
+
+  private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean): void {
+    if (state.implications) {
+      this.commitStartRow(state);
+      let prefix: Notation.RenderedExpression[] | undefined = undefined;
+      for (let implication of state.implications) {
+        let row: Notation.RenderedExpression[] = [];
+        if (prefix) {
+          row.push(
+            ...prefix,
+            new Notation.TextExpression('\u2000')
+          );
+        }
+        if (implication.dependsOnPrevious || implication.source) {
+          if (implication.source && !implication.dependsOnPrevious) {
+            row.push(
+              implication.source,
+              new Notation.TextExpression('\u2000')
+            );
+          }
+          row.push(
+            this.renderTemplate('ProofImplication', {
+              'source': implication.dependsOnPrevious ? implication.source : undefined,
+              'formula': implication.sourceFormula
+            }),
+            new Notation.TextExpression('\u2000')
+          );
+        }
+        if (implication.resultPrefixes) {
+          row.push(...implication.resultPrefixes);
+        }
+        let result = (this.utils.isFalseFormula(implication.result)
+                      ? this.renderTemplate('Contradiction')
+                      : this.readOnlyRenderer.renderFormula(implication.result, fullFormulaSelection));
+        if (implication.resultLink) {
+          this.readOnlyRenderer.addSemanticLink(result, implication.result);
+        }
+        row.push(result);
+        if (implication.resultSuffixes) {
+          row.push(...implication.resultSuffixes);
+        }
+        if (implication.dependsOnPrevious || implication.source || forceLeftAlignment) {
+          state.paragraphs.push(new Notation.RowExpression(row));
+          prefix = undefined;
+        } else {
+          prefix = row;
+        }
+      }
+      if (prefix) {
+        state.paragraphs.push(new Notation.RowExpression(prefix));
+      }
+      state.implications = undefined;
     }
   }
 

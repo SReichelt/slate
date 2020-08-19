@@ -1584,15 +1584,15 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       if (context.previousResult) {
-        let innerContext: HLMCheckerProofStepContext = {
+        let sourceContext: HLMCheckerProofStepContext = {
           ...context,
           parameters: undefined,
           goal: undefined,
           previousResult: undefined
         };
-        let innerResultContext = this.checkProofStep(type.source, innerContext);
-        if (innerResultContext && (innerResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || innerResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
-          let terms = innerResultContext.previousResult.terms;
+        let sourceResultContext = this.checkProofStep(type.source, sourceContext);
+        if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
+          let terms = sourceResultContext.previousResult.terms;
           let sourceIndex = type.sourceSide.toNumber();
           if (sourceIndex >= 0 && sourceIndex < terms.length) {
             let sourceTerm = terms[sourceIndex];
@@ -1628,11 +1628,22 @@ export class HLMDefinitionChecker {
           if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
             this.checkDefinitionRefExpression(theorem, [definition], context);
             if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-              if (context.previousResult) {
-                this.checkEquivalenceCondition(step, context.previousResult, definition.contents.conditions, theorem.path, [definition]);
-                this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, definition.contents.conditions, theorem.path, [definition]);
+              if (useTheorem.input) {
+                let inputContext: HLMCheckerProofStepContext = {
+                  ...context,
+                  parameters: undefined,
+                  goal: undefined,
+                  previousResult: undefined
+                };
+                let inputResultContext = this.checkProofStep(useTheorem.input, inputContext);
+                if (inputResultContext?.previousResult) {
+                  this.checkEquivalenceCondition(step, inputResultContext.previousResult, definition.contents.conditions, theorem.path, [definition]);
+                  this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, definition.contents.conditions, theorem.path, [definition]);
+                } else {
+                  this.error(step, 'Invalid input proof step');
+                }
               } else {
-                this.error(step, 'Previous result not set');
+                this.error(step, 'Theorem input required');
               }
             } else {
               this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, [definition.contents.claim], theorem.path, [definition]);

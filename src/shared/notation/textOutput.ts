@@ -53,10 +53,10 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
   } else if (expression instanceof Notation.ParagraphExpression) {
     let paragraphs = expression.paragraphs.map((item) => {
       let ownIndent = '';
-      if (item.styleClasses && item.styleClasses.indexOf('display-math') >= 0 && !options.singleLine) {
+      if (item.styleClasses && (item.styleClasses.indexOf('indented') >= 0 || item.styleClasses.indexOf('display-math') >= 0) && !options.singleLine) {
         ownIndent = options.outputMarkdown ? '\u2007' : '  ';
       }
-      let innerOptions = {
+      let innerOptions: RenderAsTextOptions = {
         ...options,
         indent: options.indent + ownIndent
       };
@@ -72,11 +72,13 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
       } else {
         prefix = expression.style.replace('1', (index + 1).toString());
       }
-      let innerOptions = {
+      prefix += ' ';
+      let innerOptions: RenderAsTextOptions = {
         ...options,
-        allowEmptyLines: false
+        allowEmptyLines: false,
+        indent: options.indent + ' '.repeat(prefix.length)
       };
-      return renderAsText(item, innerOptions).then((text) => prefix + ' ' + text);
+      return renderAsText(item, innerOptions).then((text) => prefix + text);
     });
     return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + options.indent);
   } else if (expression instanceof Notation.TableExpression) {

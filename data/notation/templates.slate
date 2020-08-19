@@ -2101,7 +2101,6 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
       $OverUnder(
         body = '⇒',
         over = source,
-        under = formula,
         style = 'shallow'
       ),
       %opt(

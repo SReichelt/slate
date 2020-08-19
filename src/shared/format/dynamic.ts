@@ -128,6 +128,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   private getArgumentTypeContext(type: Fmt.Expression, parentContext: Ctx.Context): Ctx.Context {
+    while (type instanceof Fmt.IndexedExpression) {
+      type = type.body;
+    }
     if (type instanceof Fmt.DefinitionRefExpression) {
       let path = type.path;
       let context = new ArgumentTypeContext(path.name, parentContext);
@@ -201,10 +204,10 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
-    if (expression instanceof Fmt.ArrayExpression) {
+    if (expression instanceof Fmt.ArrayExpression && metaType instanceof Fmt.IndexedExpression) {
       let context = parentContext;
       for (let item of expression.items) {
-        context = this.getValueExports(item, metaType, context, indexParameterLists);
+        context = this.getValueExports(item, metaType.body, context, indexParameterLists);
       }
       return context;
     } else if (expression instanceof Fmt.ParameterExpression) {

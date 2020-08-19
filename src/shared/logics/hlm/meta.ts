@@ -4955,6 +4955,7 @@ export class MetaRefExpression_UnfoldDef extends Fmt.MetaRefExpression {
 
 export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
   theorem: Fmt.Expression;
+  input?: Fmt.Parameter;
   result: Fmt.Expression;
 
   getName(): string {
@@ -4963,13 +4964,26 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.theorem = argumentList.getValue('theorem', 0);
-    this.result = argumentList.getValue('result', 1);
+    let inputRaw = argumentList.getOptionalValue('input', 1);
+    if (inputRaw !== undefined) {
+      if (inputRaw instanceof Fmt.ParameterExpression && inputRaw.parameters.length === 1) {
+        this.input = inputRaw.parameters[0];
+      } else {
+        throw new Error('input: Parameter expression with single parameter expected');
+      }
+    }
+    this.result = argumentList.getValue('result', 2);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this.theorem, undefined, false);
-    argumentList.add(this.result, undefined, false);
+    if (this.input !== undefined) {
+      let inputExpr = new Fmt.ParameterExpression;
+      inputExpr.parameters.push(this.input);
+      argumentList.add(inputExpr, 'input', true);
+    }
+    argumentList.add(this.result, 'result', false);
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4978,6 +4992,12 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     if (this.theorem) {
       result.theorem = this.theorem.substitute(fn, replacedParameters);
       if (result.theorem !== this.theorem) {
+        changed = true;
+      }
+    }
+    if (this.input) {
+      result.input = this.input.substituteExpression(fn, replacedParameters);
+      if (result.input !== this.input) {
         changed = true;
       }
     }
@@ -4995,6 +5015,9 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
       return false;
     }
     if (!Fmt.areObjectsEquivalent(this.theorem, expression.theorem, fn, replacedParameters)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.input, expression.input, fn, replacedParameters)) {
       return false;
     }
     if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {

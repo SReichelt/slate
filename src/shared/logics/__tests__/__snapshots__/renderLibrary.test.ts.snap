@@ -25,9 +25,7 @@ exports[`render hlm library: 1.1.2 data/libraries/hlm/Essentials/Sets/Empty%20se
 
 Proof.  Let x ∈ ∅. Then x ∈ S:
 
-x ∈ ∅
-
-⇒^def ⭍
+x ∈ ∅ ⇒^def ⭍
 
 References.
 
@@ -47,19 +45,17 @@ exports[`render hlm library: 1.1.3 data/libraries/hlm/Essentials/Sets/empty 1`] 
 Equivalence.
 
 1⇒2. Assume S = ∅. Then S ⊆ ∅:
-S = ∅
-⇒^def S ⊆ ∅
+     S = ∅ ⇒^def S ⊆ ∅
 2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
-Let x ∈ S.
-S ⊆ ∅
-⇒^def ∀ s ∈ S : s ∈ ∅
-⇒ x ∈ ∅
-⇒^def ⭍
+     Let x ∈ S.
+     S ⊆ ∅ ⇒^def ∀ s ∈ S : s ∈ ∅
+     ⇒ x ∈ ∅
+     ⇒^def ⭍
 3⇒1. Assume ∄ x ∈ S. Then S = ∅:
-⊆. Let a ∈ S. Then a ∈ ∅:
-We have ∃ x ∈ S:
-Choose x := a.
-⊇. 1.1.2 ⇒ ∅ ⊆ S
+     ⊆. Let a ∈ S. Then a ∈ ∅:
+        We have ∃ x ∈ S:
+          Choose x := a.
+     ⊇. 1.1.2 ⇒ ∅ ⊆ S
 
 Remarks.
 
@@ -84,25 +80,24 @@ exports[`render hlm library: 1.1.4 data/libraries/hlm/Essentials/Sets/finite 1`]
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-We have |S| = |ℕ_(<|S|)| by definition.
-⇒^def ∃ r : S ↔ ℕ_(<|S|)
-Choose k := |S|, f := r.
+     We have |S| = |ℕ_(<|S|)| by definition.
+     ⇒^def ∃ r : S ↔ ℕ_(<|S|)
+     Choose k := |S|, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
-Choose l := k, g := f^-1.
+     Choose l := k, g := f^-1.
 3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
-We show that |S| ∈ ℕ:
-We have |ℕ_(<l)| = |S|:
-We show that ∃ s : S ↔ ℕ_(<l):
-Choose s := g.
-⇒^[l = |ℕ_(<l)|] l = |S|
-l ∈ ℕ
-⇒^[l = |S|] |S| ∈ ℕ
+     We show that |S| ∈ ℕ:
+     We have |ℕ_(<l)| = |S|:
+       We show that ∃ s : S ↔ ℕ_(<l):
+       Choose s := g.
+     ⇒^[l = |ℕ_(<l)|] l = |S|
+     l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-def ⇒ f is injective
-Choose m := k, h := f.
+     def ⇒ f is injective
+     Choose m := k, h := f.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
-1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
-Choose n := m, i := h∣_S^(ℕ_(≤m)).
+     1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
+     Choose n := m, i := h∣_S^(ℕ_(≤m)).
 
 Remarks.
 
@@ -126,13 +121,11 @@ exports[`render hlm library: 1.1.5 data/libraries/hlm/Essentials/Sets/Subsets%20
 
 Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
 
-S is finite
-
-⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Choose m := n, f := g∣_T. We show that g∣_T is injective:
 
-1.4.17 ⇒ g∣_T is injective
+  1.4.17 ⇒ g∣_T is injective
 
 Remarks.
 
@@ -734,7 +727,7 @@ exports[`render hlm library: 1.3.1 data/libraries/hlm/Essentials/Relations/Relat
 𝓟𝓻𝓹(S × T) =: 𝓡𝓮𝓵(S, T) via
 r = [(s, t) is r]_s ∈ S,t ∈ T
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let ≺ be a relation from S to T” for “let ≺ ∈ 𝓡𝓮𝓵(S, T).”
 
@@ -811,7 +804,7 @@ exports[`render hlm library: 1.3.6 data/libraries/hlm/Essentials/Relations/Endor
 𝓡𝓮𝓵(S, S) =: 𝓡𝓮𝓵(S) via
 ≺ = [s ≺ t]_(s,t ∈ S)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let ≺ be a relation on S” for “let ≺ ∈ 𝓡𝓮𝓵(S).”
 
@@ -1042,11 +1035,11 @@ exports[`render hlm library: 1.3.23 data/libraries/hlm/Essentials/Relations/Equi
 
   [s]_∼ = [t]_∼  :⇔  s ∼ t  (s ∈ S, t ∈ S)
 
-  Reflexivity.  No proof.
+    Reflexivity.  No proof.
 
-  Symmetry.  No proof.
+    Symmetry.  No proof.
 
-  Transitivity.  No proof.
+    Transitivity.  No proof.
 
 Remarks.
 
@@ -1597,7 +1590,7 @@ exports[`render hlm library: 1.5.1 data/libraries/hlm/Essentials/Operations/Oper
 X × Y → Z =: 𝓞𝓹(X, Y, Z) via
 f = (X × Y → Z, (x, y) ↦ f(x, y))
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let ∗ : X × Y → Z be an operation” for “let ∗ ∈ 𝓞𝓹(X, Y, Z).”
 
@@ -1991,7 +1984,7 @@ exports[`render hlm library: 1.6.6 data/libraries/hlm/Essentials/Sequences/Infin
 S^ω =: S^ω via
 (a_j)_(j < ω) = (a_k)_(k ∈ ℕ)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let 𝐚 be a sequence on S” for “let 𝐚 ∈ S^ω.”
 
@@ -2033,7 +2026,7 @@ exports[`render hlm library: 1.6.8 data/libraries/hlm/Essentials/Sequences/Ordin
 S^∗ ⊆: S^⋆ via
 (𝐚)_(S^n) = (𝐚)_(S^n)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let 𝒂 be an ordinal-indexed sequence on S” for “let 𝒂 ∈ S^⋆.”
 
@@ -2214,8 +2207,8 @@ Proof.  By induction on n.
 
 * (0) = (0): Trivial.
 * Let x ∈ ℕ. Then (((0) + x)+1) = (x+1):
-We have (x+1) = (x+1).
-⇒_[(0)+x = x]^1.7.1.6 (((0) + x)+1) = (x+1)
+  We have (x+1) = (x+1).
+  ⇒^1.7.1.6 (((0) + x)+1) = (x+1)
 
 References.
 
@@ -2236,8 +2229,8 @@ Proof.  By induction on n.
 
 * (m+1) = (m+1): Trivial.
 * Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
-We have (((m + x)+1)+1) = (((m + x)+1)+1).
-⇒_[(m+1)+x = ((m+x)+1)]^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1)
+  We have (((m + x)+1)+1) = (((m + x)+1)+1).
+  ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1)
 
 References.
 
@@ -2469,11 +2462,11 @@ exports[`render hlm library: 1.7.1.18 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.  By induction on k.
 
 * Assume k = 0. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
-Choose m := f(0).
+  Choose m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
-Let S := ℕ_(≤x).
-1.7.1.18 ⇒ ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
-Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
+  Let S := ℕ_(≤x).
+  ⇒^1.7.1.18 ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
+  Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
 
 Remarks.
 
@@ -2492,34 +2485,31 @@ exports[`render hlm library: 1.7.1.19 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
-We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
-* Assume l = 0. Then M is empty:
-We show that ∄ c ∈ M:
-Let c ∈ M.
-f ∈ (ℕ_(<l) ↔ M)
-⇒^def f is bijective
-⇒^def f is surjective
-⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
-⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
-s ∈ ℕ_(<0)
-⇒^def s < 0
-1.7.1.14 ⇒ s ≥ 0 ⭍
-* Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
-1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
+     def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
+     We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
+       * Assume l = 0. Then M is empty:
+         We show that ∄ c ∈ M:
+         Let c ∈ M.
+         f ∈ (ℕ_(<l) ↔ M) ⇒^def f is bijective
+         ⇒^def f is surjective
+         ⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
+         ⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
+         s ∈ ℕ_(<0) ⇒^def s < 0
+         1.7.1.14 ⇒ s ≥ 0 ⭍
+       * Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
+         1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
-* Assume M is empty.
-⇒^def M = ∅
-Choose a := 0. We show that M ⊆ ℕ_(≤0):
-1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-⇒^[M = ∅] M ⊆ ℕ_(≤0)
+     * Assume M is empty.
+       ⇒^def M = ∅
+       Choose a := 0. We show that M ⊆ ℕ_(≤0):
+         1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
+         ⇒^[M = ∅] M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
-M ⊆ ℕ_(≤a)
-⇒^def M ⊆ ℕ_(<(a+1))
-Choose b := a + 1.
+     M ⊆ ℕ_(≤a) ⇒^def M ⊆ ℕ_(<(a+1))
+     Choose b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
-1.7.1.17.7 ⇒ ℕ_(<b) is finite
-1.1.5 ⇒ M is finite"
+     1.7.1.17.7 ⇒ ℕ_(<b) is finite
+     1.1.5 ⇒ M is finite"
 `;
 
 exports[`render hlm library: 1.7.1.20 data/libraries/hlm/Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -2758,13 +2748,11 @@ exports[`render hlm library: 1.7.1.36 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.  By induction on n.
 
 * We show that 0 ∈ M:
-M is inductive
-⇒^def 0 ∈ M
+  M is inductive ⇒^def 0 ∈ M
 * Let x ∈ ℕ. Then x + 1 ∈ M:
-1.7.1.36 ⇒ x ∈ M
-M is inductive
-⇒^def ∀ m ∈ M : m + 1 ∈ M
-⇒ x + 1 ∈ M"
+  1.7.1.36 ⇒ x ∈ M
+  M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
+  ⇒ x + 1 ∈ M"
 `;
 
 exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
@@ -2776,8 +2764,8 @@ exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natu
 Proof.
 
 1⇒2. Assume M is inductive. Then M = ℕ:
-⊇. Let n ∈ ℕ.
-1.7.1.36 ⇒ n ∈ M
+     ⊇. Let n ∈ ℕ.
+        1.7.1.36 ⇒ n ∈ M
 
 Remarks.
 
@@ -3201,9 +3189,9 @@ Let a := ∏_(p ∈ ℙ) p.
 
 ⇒ a ≥ 1:
 
-1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
+  1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
 
-⇒_[∏_(x∈∅)x = 1]^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
+  ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
 ⇒^1.7.1.13 a + 1 > 1
 
@@ -3213,9 +3201,7 @@ Let a := ∏_(p ∈ ℙ) p.
 
 ⇒^1.7.1.30 p ≤ 1
 
-p ∈ ℙ
-
-⇒^def p > 1 ⭍
+p ∈ ℙ ⇒^def p > 1 ⭍
 
 References.
 
@@ -3367,13 +3353,11 @@ exports[`render hlm library: 1.7.2.2 data/libraries/hlm/Essentials/Numbers/Cardi
 ℕ ⊆: 𝓒𝓻𝓭 via
 n = |ℕ_(<n)|
 
-Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
+  Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
 
-|ℕ_(<m)| = |ℕ_(<n)|
+  |ℕ_(<m)| = |ℕ_(<n)| ⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
 
-⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
-
-1.7.2.1 ⇒ m = n
+  1.7.2.1 ⇒ m = n
 
 We write “let κ be a cardinal number” for “let κ ∈ 𝓒𝓻𝓭.”
 
@@ -3833,7 +3817,7 @@ exports[`render hlm library: 1.7.3.1 data/libraries/hlm/Essentials/Numbers/Ordin
 ℕ ⊆: 𝓞𝓻𝓭 via
 n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 We write “let α be an ordinal number” for “let α ∈ 𝓞𝓻𝓭.”
 
@@ -4123,22 +4107,20 @@ exports[`render hlm library: 1.7.4.1 data/libraries/hlm/Essentials/Numbers/Integ
 
   (n-m) = (n'-m')  :⇔  n + m' = n' + m  (n, m ∈ ℕ, n', m' ∈ ℕ)
 
-  Reflexivity.  No proof.
+    Reflexivity.  No proof.
 
-  Symmetry.  No proof.
+    Symmetry.  No proof.
 
-  Transitivity.  No proof.
+    Transitivity.  No proof.
 
 ℕ ⊆: ℤ via
 x = (x-0)
 
-Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
+  Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
 
-(x-0) = (y-0)
+  (x-0) = (y-0) ⇒^def x + 0 = y + 0
 
-⇒^def x + 0 = y + 0
-
-⇒^def x = y
+  ⇒^def x = y
 
 Remarks.
 
@@ -4599,16 +4581,16 @@ exports[`render hlm library: 1.7.5.1 data/libraries/hlm/Essentials/Numbers/Ratio
 
   (n/d) = (n'/d')  :⇔  n ⋅ d' = n' ⋅ d  (n ∈ ℤ, d ∈ ℕ_+, n' ∈ ℤ, d' ∈ ℕ_+)
 
-  Reflexivity.  No proof.
+    Reflexivity.  No proof.
 
-  Symmetry.  No proof.
+    Symmetry.  No proof.
 
-  Transitivity.  No proof.
+    Transitivity.  No proof.
 
 ℤ ⊆: ℚ via
 x = (x/1)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 Remarks.
 
@@ -5044,16 +5026,16 @@ exports[`render hlm library: 1.7.6.1 data/libraries/hlm/Essentials/Numbers/Real/
 
   [r] = [r']  :⇔  r − r' converges to 0  (r is a sequence on ℚ, r' is a sequence on ℚ with suitable conditions)
 
-  Reflexivity.  No proof.
+    Reflexivity.  No proof.
 
-  Symmetry.  No proof.
+    Symmetry.  No proof.
 
-  Transitivity.  No proof.
+    Transitivity.  No proof.
 
 ℚ ⊆: ℝ via
 x = [(x)_(k ∈ ℕ)]
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 References.
 
@@ -5374,7 +5356,7 @@ Proof.  Assume n√p is rational.
 
 ⇒^def p = (b∕a)^n
 
-⇒_[(b∕a)^n = b^n∕a^n]^1.7.6.13 p = b^n∕a^n
+⇒^1.7.6.13 p = b^n∕a^n
 
 ⇒^def p ⋅ a^n = b^n
 
@@ -5384,27 +5366,21 @@ Proof.  Assume n√p is rational.
 
 ⇒ p ∣ a^n:
 
-We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
+  We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
 
-p ∣ b
+  p ∣ b ⇒^def ∃ z ∈ ℤ : p ⋅ z = b
 
-⇒^def ∃ z ∈ ℤ : p ⋅ z = b
+  n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
 
-n ∈ ℕ_(>1)
+  Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
-⇒^def ∃ m ∈ ℕ : 2 + m = n
+    p ⋅ a^n = b^n ⇒^[2+m = n] p ⋅ a^n = b^(2+m)
 
-Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
+    ⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
 
-p ⋅ a^n = b^n
+    ⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-⇒^[2+m = n] p ⋅ a^n = b^(2+m)
-
-⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
-
-⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
-
-⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
+    ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
 ⇒^1.7.4.23.1 p ∣ a
 
@@ -5443,7 +5419,7 @@ exports[`render hlm library: 1.7.7.1 data/libraries/hlm/Essentials/Numbers/Compl
 ℝ ⊆: ℂ via
 r = (r+0𝒊)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 Remarks.
 
@@ -6074,7 +6050,7 @@ exports[`render hlm library: 2.3.8.1 data/libraries/hlm/Algebra/Magmas/Free%20ma
 S ⊆: 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S) via
 x = (x)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 For S' ⊆ S, we canonically treat elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S') as elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(S).
 
@@ -7933,7 +7909,7 @@ exports[`render hlm library: 2.8.26.1 data/libraries/hlm/Algebra/Rings/Polynomia
 (𝐑) ⊆: 𝐑[X] via
 a = {(0)_(𝐑[X]) if a = 0_𝐑, ((0)_(𝐑[X])X+a) if a ≠ 0_𝐑
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 Remarks.
 
@@ -9873,7 +9849,7 @@ exports[`render hlm library: 5.4.1 data/libraries/hlm/Formal%20systems/Untyped%2
 V ⊆: 𝓣_V via
 x = (x)
 
-Well-definedness.  No proof.
+  Well-definedness.  No proof.
 
 Remarks.
 

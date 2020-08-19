@@ -212,6 +212,14 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
+  isTrueeFormula(formula: Fmt.Expression): boolean {
+    return (formula instanceof FmtHLM.MetaRefExpression_and && !formula.formulas);
+  }
+
+  isFalseFormula(formula: Fmt.Expression): boolean {
+    return (formula instanceof FmtHLM.MetaRefExpression_or && !formula.formulas);
+  }
+
   getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase): CachedPromise<Fmt.Expression> {
     let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(constructionPath, false);
     let resultPromise = constructionDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {

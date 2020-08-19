@@ -283,7 +283,7 @@ $Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, 
 $UnfoldDef(result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseTheorem(theorem: $Theorem, result: $Formula): %ParameterType($Formula) {
+$UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep), result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $ProveDef(side?: %Int, proof?: $Proof): %ParameterType {
