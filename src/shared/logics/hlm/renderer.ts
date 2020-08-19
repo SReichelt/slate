@@ -2959,54 +2959,52 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean): void {
     if (state.implications) {
       this.commitStartRow(state);
-      let prefix: Notation.RenderedExpression[] | undefined = undefined;
-      for (let implication of state.implications) {
+      for (let index = 0; index < state.implications.length; index++) {
+        let implication = state.implications[index];
         let row: Notation.RenderedExpression[] = [];
-        if (prefix) {
-          row.push(
-            ...prefix,
-            new Notation.TextExpression('\u2000')
-          );
-        }
-        if (implication.dependsOnPrevious || implication.source) {
-          if (implication.source && !implication.dependsOnPrevious) {
-            row.push(
-              implication.source,
-              new Notation.TextExpression('\u2000')
-            );
+        this.outputImplication(implication, row);
+        if (!implication.dependsOnPrevious && !implication.source && index + 1 < state.implications.length) {
+          let nextImplication = state.implications[index + 1];
+          if (nextImplication.dependsOnPrevious && !forceLeftAlignment) {
+            row.push(new Notation.TextExpression('\u2000'));
+            this.outputImplication(nextImplication, row);
+            index++;
           }
-          row.push(
-            this.renderTemplate('ProofImplication', {
-              'source': implication.dependsOnPrevious ? implication.source : undefined,
-              'formula': implication.sourceFormula
-            }),
-            new Notation.TextExpression('\u2000')
-          );
         }
-        if (implication.resultPrefixes) {
-          row.push(...implication.resultPrefixes);
-        }
-        let result = (this.utils.isFalseFormula(implication.result)
-                      ? this.renderTemplate('Contradiction')
-                      : this.readOnlyRenderer.renderFormula(implication.result, fullFormulaSelection));
-        if (implication.resultLink) {
-          this.readOnlyRenderer.addSemanticLink(result, implication.result);
-        }
-        row.push(result);
-        if (implication.resultSuffixes) {
-          row.push(...implication.resultSuffixes);
-        }
-        if (implication.dependsOnPrevious || implication.source || forceLeftAlignment) {
-          state.paragraphs.push(new Notation.RowExpression(row));
-          prefix = undefined;
-        } else {
-          prefix = row;
-        }
-      }
-      if (prefix) {
-        state.paragraphs.push(new Notation.RowExpression(prefix));
+        state.paragraphs.push(new Notation.RowExpression(row));
       }
       state.implications = undefined;
+    }
+  }
+
+  private outputImplication(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
+    if (implication.dependsOnPrevious || implication.source) {
+      if (implication.source && !implication.dependsOnPrevious) {
+        row.push(
+          implication.source,
+          new Notation.TextExpression('\u2000')
+        );
+      }
+      row.push(
+        this.renderTemplate('ProofImplication', {
+          'source': implication.dependsOnPrevious ? implication.source : undefined,
+          'formula': implication.sourceFormula
+        }),
+        new Notation.TextExpression('\u2000')
+      );
+    }
+    if (implication.resultPrefixes) {
+      row.push(...implication.resultPrefixes);
+    }
+    let result = (this.utils.isFalseFormula(implication.result)
+                  ? this.renderTemplate('Contradiction')
+                  : this.readOnlyRenderer.renderFormula(implication.result, fullFormulaSelection));
+    if (implication.resultLink) {
+      this.readOnlyRenderer.addSemanticLink(result, implication.result);
+    }
+    row.push(result);
+    if (implication.resultSuffixes) {
+      row.push(...implication.resultSuffixes);
     }
   }
 
