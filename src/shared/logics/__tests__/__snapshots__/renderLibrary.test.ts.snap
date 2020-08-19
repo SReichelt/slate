@@ -49,8 +49,8 @@ Equivalence.
 2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
      Let x ∈ S.
      S ⊆ ∅ ⇒^def ∀ s ∈ S : s ∈ ∅
-     ⇒ x ∈ ∅
-     ⇒^def ⭍
+      ⇒ x ∈ ∅
+      ⇒^def ⭍
 3⇒1. Assume ∄ x ∈ S. Then S = ∅:
      ⊆. Let a ∈ S. Then a ∈ ∅:
         We have ∃ x ∈ S:
@@ -2491,9 +2491,9 @@ Proof.
          We show that ∄ c ∈ M:
          Let c ∈ M.
          f ∈ (ℕ_(<l) ↔ M) ⇒^def f is bijective
-         ⇒^def f is surjective
-         ⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
-         ⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
+          ⇒^def f is surjective
+          ⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
+          ⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
          s ∈ ℕ_(<0) ⇒^def s < 0
          1.7.1.14 ⇒ s ≥ 0 ⭍
        * Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
@@ -2503,7 +2503,7 @@ Proof.
        ⇒^def M = ∅
        Choose a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-         ⇒^[M = ∅] M ⊆ ℕ_(≤0)
+          ⇒^[M = ∅] M ⊆ ℕ_(≤0)
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
      M ⊆ ℕ_(≤a) ⇒^def M ⊆ ℕ_(<(a+1))
      Choose b := a + 1.
@@ -2752,7 +2752,7 @@ Proof.  By induction on n.
 * Let x ∈ ℕ. Then x + 1 ∈ M:
   1.7.1.36 ⇒ x ∈ M
   M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
-  ⇒ x + 1 ∈ M"
+   ⇒ x + 1 ∈ M"
 `;
 
 exports[`render hlm library: 1.7.1.37 data/libraries/hlm/Essentials/Numbers/Natural/Induction%20principle 1`] = `
@@ -3191,7 +3191,7 @@ Let a := ∏_(p ∈ ℙ) p.
 
   1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
 
-  ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
+   ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
 ⇒^1.7.1.13 a + 1 > 1
 
@@ -4120,7 +4120,7 @@ x = (x-0)
 
   (x-0) = (y-0) ⇒^def x + 0 = y + 0
 
-  ⇒^def x = y
+   ⇒^def x = y
 
 Remarks.
 
@@ -5376,11 +5376,11 @@ Proof.  Assume n√p is rational.
 
     p ⋅ a^n = b^n ⇒^[2+m = n] p ⋅ a^n = b^(2+m)
 
-    ⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
+     ⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
 
-    ⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
+     ⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-    ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
+     ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
 ⇒^1.7.4.23.1 p ∣ a
 

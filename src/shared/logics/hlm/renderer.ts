@@ -67,6 +67,12 @@ interface ProofOutputState {
   implications?: ProofOutputImplication[];
 }
 
+interface ProofGridState {
+  rows: Notation.RenderedExpression[][];
+  implicationSymbolColumn?: number;
+  equalitySymbolColumn?: number;
+}
+
 interface HLMProofStepRenderContext extends HLMProofStepContext {
   originalParameters: Fmt.Parameter[];
   substitutedParameters: Fmt.Parameter[];
@@ -2959,40 +2965,59 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean): void {
     if (state.implications) {
       this.commitStartRow(state);
+      let gridState: ProofGridState = {
+        rows: []
+      };
       for (let index = 0; index < state.implications.length; index++) {
         let implication = state.implications[index];
+        if (!implication.dependsOnPrevious) {
+          this.commitProofGrid(gridState, state.paragraphs);
+        }
         let row: Notation.RenderedExpression[] = [];
-        this.outputImplication(implication, row);
-        if (!implication.dependsOnPrevious && !implication.source && index + 1 < state.implications.length) {
+        this.outputImplication(implication, gridState, row);
+        if (gridState.implicationSymbolColumn === undefined && index + 1 < state.implications.length) {
           let nextImplication = state.implications[index + 1];
           if (nextImplication.dependsOnPrevious && !forceLeftAlignment) {
-            row.push(new Notation.TextExpression('\u2000'));
-            this.outputImplication(nextImplication, row);
+            this.outputImplication(nextImplication, gridState, row);
             index++;
           }
         }
-        state.paragraphs.push(new Notation.RowExpression(row));
+        gridState.rows.push(row);
       }
+      this.commitProofGrid(gridState, state.paragraphs);
       state.implications = undefined;
     }
   }
 
-  private outputImplication(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
+  private outputImplication(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
     if (implication.dependsOnPrevious || implication.source) {
-      if (implication.source && !implication.dependsOnPrevious) {
-        row.push(
-          implication.source,
-          new Notation.TextExpression('\u2000')
-        );
+      if (gridState.implicationSymbolColumn === undefined) {
+        if (implication.source && !implication.dependsOnPrevious) {
+          row.push(implication.source);
+        }
+        gridState.implicationSymbolColumn = row.length;
+      } else {
+        for (let i = 0; i < gridState.implicationSymbolColumn; i++) {
+          row.push(new Notation.EmptyExpression);
+        }
       }
-      row.push(
+      let implicationSymbolRow: Notation.RenderedExpression[] = [];
+      if (gridState.implicationSymbolColumn) {
+        implicationSymbolRow.push(new Notation.TextExpression('\u2000'));
+      }
+      implicationSymbolRow.push(
         this.renderTemplate('ProofImplication', {
           'source': implication.dependsOnPrevious ? implication.source : undefined,
           'formula': implication.sourceFormula
         }),
         new Notation.TextExpression('\u2000')
       );
+      row.push(new Notation.RowExpression(implicationSymbolRow));
     }
+    this.outputImplicationResult(implication, row);
+  }
+
+  private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
     if (implication.resultPrefixes) {
       row.push(...implication.resultPrefixes);
     }
@@ -3006,6 +3031,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (implication.resultSuffixes) {
       row.push(...implication.resultSuffixes);
     }
+  }
+
+  private commitProofGrid(gridState: ProofGridState, paragraphs: Notation.RenderedExpression[]): void {
+    for (let row of gridState.rows) {
+      paragraphs.push(new Notation.RowExpression(row));
+    }
+    gridState.rows.length = 0;
+    gridState.implicationSymbolColumn = undefined;
+    gridState.equalitySymbolColumn = undefined;
   }
 
   addPlaceholderMenu(placeholder: Fmt.PlaceholderExpression, semanticLink: Notation.SemanticLink): void {
