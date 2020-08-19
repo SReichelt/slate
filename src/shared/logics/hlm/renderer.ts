@@ -2970,35 +2970,54 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       for (let index = 0; index < state.implications.length; index++) {
         let implication = state.implications[index];
-        if (!implication.dependsOnPrevious) {
+        let nextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+        let mergeEquality = nextImplication !== undefined && nextImplication.dependsOnPrevious && this.canMergeEquality(implication.result, nextImplication.result);
+        if (!implication.dependsOnPrevious || (mergeEquality && gridState.equalitySymbolColumn === undefined)) {
           this.commitProofGrid(gridState, state.paragraphs);
         }
         let row: Notation.RenderedExpression[] = [];
-        this.outputImplication(implication, gridState, row);
-        if (gridState.implicationSymbolColumn === undefined && index + 1 < state.implications.length) {
-          let nextImplication = state.implications[index + 1];
-          if (nextImplication.dependsOnPrevious && !forceLeftAlignment) {
-            this.outputImplication(nextImplication, gridState, row);
-            index++;
-          }
+        this.outputImplication(implication, gridState, mergeEquality, row);
+        if (gridState.implicationSymbolColumn === undefined
+            && gridState.equalitySymbolColumn === undefined
+            && nextImplication?.dependsOnPrevious
+            && !forceLeftAlignment) {
+          index++;
+          let nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+          mergeEquality = nextNextImplication !== undefined && nextNextImplication.dependsOnPrevious && this.canMergeEquality(nextImplication.result, nextNextImplication.result);
+          this.outputImplication(nextImplication, gridState, mergeEquality, row);
         }
         gridState.rows.push(row);
+        if (gridState.equalitySymbolColumn !== undefined && !mergeEquality) {
+          this.commitProofGrid(gridState, state.paragraphs);
+        }
       }
       this.commitProofGrid(gridState, state.paragraphs);
       state.implications = undefined;
     }
   }
 
-  private outputImplication(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
-    if (implication.dependsOnPrevious || implication.source) {
+  private canMergeEquality(currentResult: Fmt.Expression, nextResult: Fmt.Expression): boolean {
+    return ((currentResult instanceof FmtHLM.MetaRefExpression_setEquals || currentResult instanceof FmtHLM.MetaRefExpression_equals)
+            && currentResult.terms.length === 2
+            && (nextResult instanceof FmtHLM.MetaRefExpression_setEquals || nextResult instanceof FmtHLM.MetaRefExpression_equals)
+            && nextResult.terms.length === 2
+            && currentResult.terms[0].isEquivalentTo(nextResult.terms[0]));
+  }
+
+  private outputImplication(implication: ProofOutputImplication, gridState: ProofGridState, mergeEquality: boolean, row: Notation.RenderedExpression[]): void {
+    if ((implication.dependsOnPrevious || implication.source) && gridState.equalitySymbolColumn === undefined) {
       this.outputImplicationSymbol(implication, gridState, row);
     }
-    this.outputImplicationResult(implication, row);
+    if (mergeEquality || gridState.equalitySymbolColumn !== undefined) {
+      this.outputEquality(implication, gridState, row);
+    } else {
+      this.outputImplicationResult(implication, row);
+    }
   }
 
   private outputImplicationSymbol(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
     if (gridState.implicationSymbolColumn === undefined) {
-      // Implication symbol always needs to be in an odd column because all odd columns are aligned at the center.
+      // Implication symbol always needs to be in an odd column because all odd columns are center-aligned.
       gridState.implicationSymbolColumn = 1;
     }
     if (implication.source && !implication.dependsOnPrevious) {
@@ -3032,6 +3051,44 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       row.push(new Notation.RowExpression(resultRow));
     } else {
       row.push(result);
+    }
+  }
+
+  private outputEquality(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
+    let result = implication.result;
+    let left: Notation.RenderedExpression;
+    let right: Notation.RenderedExpression;
+    if (result instanceof FmtHLM.MetaRefExpression_setEquals && result.terms.length === 2) {
+      left = this.readOnlyRenderer.renderSetTerm(result.terms[0], fullSetTermSelection);
+      right = this.readOnlyRenderer.renderSetTerm(result.terms[1], fullSetTermSelection);
+    } else if (result instanceof FmtHLM.MetaRefExpression_equals && result.terms.length === 2) {
+      left = this.readOnlyRenderer.renderElementTerm(result.terms[0], fullElementTermSelection);
+      right = this.readOnlyRenderer.renderElementTerm(result.terms[1], fullElementTermSelection);
+    } else {
+      // Should never happen according to canMergeEquality.
+      return;
+    }
+    if (gridState.equalitySymbolColumn === undefined) {
+      if (implication.resultPrefixes) {
+        row.push(new Notation.RowExpression([...implication.resultPrefixes, left]));
+      } else {
+        row.push(left);
+      }
+      gridState.equalitySymbolColumn = row.length;
+      row.push(this.renderTemplate('ProofEquality'));
+    } else {
+      while (row.length < gridState.equalitySymbolColumn) {
+        row.push(new Notation.EmptyExpression);
+      }
+      row.push(this.renderTemplate('ProofEquality', {
+                                     'source': implication.source,
+                                     'formula': implication.sourceFormula
+                                   }));
+    }
+    if (implication.resultSuffixes) {
+      row.push(new Notation.RowExpression([right, ...implication.resultSuffixes]));
+    } else {
+      row.push(right);
     }
   }
 

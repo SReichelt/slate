@@ -446,6 +446,10 @@ div.display-math {
   white-space: initial;
 }
 
+.table.proof-grid>.table-row:not(:first-child)>.table-cell {
+  padding-top: 0.5ex;
+}
+
 .fraction {
   display: inline-table;
   text-align: center;

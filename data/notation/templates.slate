@@ -2092,7 +2092,7 @@ $Cases(cases: %Expr[][]): %Template {
  * An implication symbol between two proof steps.
  *
  * @param source An optional expression indicating the reasoning behind this implication. This expression will be displayed above the implication arrow.
- * @param formula An optional expression giving a formula related to this implication. This expression will be displayed above or below the implication arrow, depending on whether a source is given.
+ * @param formula An optional expression giving a formula related to this implication. This expression will be displayed above the implication arrow unless a source is given.
  */
 $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
   notation = [
@@ -2115,6 +2115,28 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
       )
     ),
     ' '
+  ]
+}
+
+/**
+ * An equality symbol in an equational part of a proof.
+ *
+ * @param source An optional expression indicating the reasoning behind this implication. This expression will be displayed above the implication arrow.
+ * @param formula An optional expression giving a formula related to this implication. Currently ignored.
+ */
+$ProofEquality(source?: %Expr, formula?: %Expr): %Template {
+  notation = [
+    ' ',
+    %opt(
+      source,
+      $OverUnder(
+        body = '=',
+        over = source,
+        style = 'shallow'
+      ),
+      '='
+    ),
+    ' '
   ]
 }
 

@@ -5348,8 +5348,10 @@ exports[`render hlm library: 1.7.6.18 data/libraries/hlm/Essentials/Numbers/Real
 Proof.  Assume n√p is rational.
 
  ⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+
  ⇒^def p = (b∕a)^n
- ⇒^1.7.6.13 p = b^n∕a^n
+ =^1.7.6.13 b^n∕a^n
+
  ⇒^def p ⋅ a^n = b^n
  ⇒ p ∣ b^n by definition
  ⇒^1.7.4.23.1 p ∣ b
@@ -5363,9 +5365,11 @@ Proof.  Assume n√p is rational.
 
   Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
-    p ⋅ a^n = b^n ⇒^[2+m = n] p ⋅ a^n = b^(2+m)
-     ⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
-     ⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
+    p ⋅ a^n = b^n
+     = b^(2+m)
+     =^def b^m ⋅ b ⋅ b
+     = b^m ⋅ p ⋅ z ⋅ p ⋅ z
+
      ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
  ⇒^1.7.4.23.1 p ∣ a
