@@ -2096,6 +2096,7 @@ $Cases(cases: %Expr[][]): %Template {
  */
 $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
   notation = [
+    ' ',
     %opt(
       source,
       $OverUnder(
@@ -2112,7 +2113,8 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
         ),
         '⇒'
       )
-    )
+    ),
+    ' '
   ]
 }
 

@@ -81,7 +81,7 @@ Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
      We have |S| = |ℕ_(<|S|)| by definition.
-     ⇒^def ∃ r : S ↔ ℕ_(<|S|)
+      ⇒^def ∃ r : S ↔ ℕ_(<|S|)
      Choose k := |S|, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
      Choose l := k, g := f^-1.
@@ -90,7 +90,7 @@ Equivalence.
      We have |ℕ_(<l)| = |S|:
        We show that ∃ s : S ↔ ℕ_(<l):
        Choose s := g.
-     ⇒^[l = |ℕ_(<l)|] l = |S|
+      ⇒^[l = |ℕ_(<l)|] l = |S|
      l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
      def ⇒ f is injective
@@ -2208,7 +2208,7 @@ Proof.  By induction on n.
 * (0) = (0): Trivial.
 * Let x ∈ ℕ. Then (((0) + x)+1) = (x+1):
   We have (x+1) = (x+1).
-  ⇒^1.7.1.6 (((0) + x)+1) = (x+1)
+   ⇒^1.7.1.6 (((0) + x)+1) = (x+1)
 
 References.
 
@@ -2230,7 +2230,7 @@ Proof.  By induction on n.
 * (m+1) = (m+1): Trivial.
 * Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
   We have (((m + x)+1)+1) = (((m + x)+1)+1).
-  ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1)
+   ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1)
 
 References.
 
@@ -2465,7 +2465,7 @@ Proof.  By induction on k.
   Choose m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
   Let S := ℕ_(≤x).
-  ⇒^1.7.1.18 ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
+   ⇒^1.7.1.18 ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
   Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
 
 Remarks.
@@ -2500,7 +2500,7 @@ Proof.
          1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
-       ⇒^def M = ∅
+        ⇒^def M = ∅
        Choose a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
           ⇒^[M = ∅] M ⊆ ℕ_(≤0)
@@ -3187,19 +3187,15 @@ Proof.  Assume ℙ is finite.
 
 Let a := ∏_(p ∈ ℙ) p.
 
-⇒ a ≥ 1:
+ ⇒ a ≥ 1:
 
   1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
-
    ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
-⇒^1.7.1.13 a + 1 > 1
-
-⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
-
-⇒^1.7.1.31 p ∣ 1
-
-⇒^1.7.1.30 p ≤ 1
+ ⇒^1.7.1.13 a + 1 > 1
+ ⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
+ ⇒^1.7.1.31 p ∣ 1
+ ⇒^1.7.1.30 p ≤ 1
 
 p ∈ ℙ ⇒^def p > 1 ⭍
 
@@ -4119,7 +4115,6 @@ x = (x-0)
   Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
 
   (x-0) = (y-0) ⇒^def x + 0 = y + 0
-
    ⇒^def x = y
 
 Remarks.
@@ -5352,19 +5347,13 @@ exports[`render hlm library: 1.7.6.18 data/libraries/hlm/Essentials/Numbers/Real
 
 Proof.  Assume n√p is rational.
 
-⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
-
-⇒^def p = (b∕a)^n
-
-⇒^1.7.6.13 p = b^n∕a^n
-
-⇒^def p ⋅ a^n = b^n
-
-⇒ p ∣ b^n by definition
-
-⇒^1.7.4.23.1 p ∣ b
-
-⇒ p ∣ a^n:
+ ⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+ ⇒^def p = (b∕a)^n
+ ⇒^1.7.6.13 p = b^n∕a^n
+ ⇒^def p ⋅ a^n = b^n
+ ⇒ p ∣ b^n by definition
+ ⇒^1.7.4.23.1 p ∣ b
+ ⇒ p ∣ a^n:
 
   We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
 
@@ -5375,14 +5364,11 @@ Proof.  Assume n√p is rational.
   Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
     p ⋅ a^n = b^n ⇒^[2+m = n] p ⋅ a^n = b^(2+m)
-
      ⇒^def p ⋅ a^n = b^m ⋅ b ⋅ b
-
      ⇒^[p⋅z = b] p ⋅ a^n = b^m ⋅ p ⋅ z ⋅ p ⋅ z
-
      ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
-⇒^1.7.4.23.1 p ∣ a
+ ⇒^1.7.4.23.1 p ∣ a
 
 p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ⭍
 

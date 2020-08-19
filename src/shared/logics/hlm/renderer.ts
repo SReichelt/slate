@@ -2991,53 +2991,57 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private outputImplication(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
     if (implication.dependsOnPrevious || implication.source) {
-      if (gridState.implicationSymbolColumn === undefined) {
-        if (implication.source && !implication.dependsOnPrevious) {
-          row.push(implication.source);
-        }
-        gridState.implicationSymbolColumn = row.length;
-      } else {
-        for (let i = 0; i < gridState.implicationSymbolColumn; i++) {
-          row.push(new Notation.EmptyExpression);
-        }
-      }
-      let implicationSymbolRow: Notation.RenderedExpression[] = [];
-      if (gridState.implicationSymbolColumn) {
-        implicationSymbolRow.push(new Notation.TextExpression('\u2000'));
-      }
-      implicationSymbolRow.push(
-        this.renderTemplate('ProofImplication', {
-          'source': implication.dependsOnPrevious ? implication.source : undefined,
-          'formula': implication.sourceFormula
-        }),
-        new Notation.TextExpression('\u2000')
-      );
-      row.push(new Notation.RowExpression(implicationSymbolRow));
+      this.outputImplicationSymbol(implication, gridState, row);
     }
     this.outputImplicationResult(implication, row);
   }
 
-  private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
-    if (implication.resultPrefixes) {
-      row.push(...implication.resultPrefixes);
+  private outputImplicationSymbol(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
+    if (gridState.implicationSymbolColumn === undefined) {
+      // Implication symbol always needs to be in an odd column because all odd columns are aligned at the center.
+      gridState.implicationSymbolColumn = 1;
     }
+    if (implication.source && !implication.dependsOnPrevious) {
+      row.push(implication.source);
+    }
+    while (row.length < gridState.implicationSymbolColumn) {
+      row.push(new Notation.EmptyExpression);
+    }
+    row.push(this.renderTemplate('ProofImplication', {
+                                   'source': implication.dependsOnPrevious ? implication.source : undefined,
+                                   'formula': implication.sourceFormula
+                                 }));
+  }
+
+  private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
     let result = (this.utils.isFalseFormula(implication.result)
                   ? this.renderTemplate('Contradiction')
                   : this.readOnlyRenderer.renderFormula(implication.result, fullFormulaSelection));
     if (implication.resultLink) {
       this.readOnlyRenderer.addSemanticLink(result, implication.result);
     }
-    row.push(result);
-    if (implication.resultSuffixes) {
-      row.push(...implication.resultSuffixes);
+    if (implication.resultPrefixes || implication.resultSuffixes) {
+      let resultRow: Notation.RenderedExpression[] = [];
+      if (implication.resultPrefixes) {
+        resultRow.push(...implication.resultPrefixes);
+      }
+      resultRow.push(result);
+      if (implication.resultSuffixes) {
+        resultRow.push(...implication.resultSuffixes);
+      }
+      row.push(new Notation.RowExpression(resultRow));
+    } else {
+      row.push(result);
     }
   }
 
   private commitProofGrid(gridState: ProofGridState, paragraphs: Notation.RenderedExpression[]): void {
-    for (let row of gridState.rows) {
-      paragraphs.push(new Notation.RowExpression(row));
+    if (gridState.rows.length) {
+      let table = new Notation.TableExpression(gridState.rows);
+      table.styleClasses = ['proof-grid'];
+      paragraphs.push(table);
     }
-    gridState.rows.length = 0;
+    gridState.rows = [];
     gridState.implicationSymbolColumn = undefined;
     gridState.equalitySymbolColumn = undefined;
   }

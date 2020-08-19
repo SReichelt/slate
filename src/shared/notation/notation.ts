@@ -11,7 +11,7 @@ export abstract class RenderedExpression {
 
   getLineHeight(): CachedPromise<number> {
     let lineHeight = 1;
-    if (this.styleClasses && this.styleClasses.indexOf('largesym') >= 0) {
+    if (this.hasStyleClass('largesym')) {
       lineHeight = 0;
     }
     return CachedPromise.resolve(lineHeight);
@@ -19,6 +19,10 @@ export abstract class RenderedExpression {
 
   getSurroundingParenStyle(): CachedPromise<string> {
     return CachedPromise.resolve('');
+  }
+
+  hasStyleClass(styleClass: string): boolean {
+    return (this.styleClasses !== undefined && this.styleClasses.indexOf(styleClass) >= 0);
   }
 }
 
@@ -770,7 +774,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     while (expression instanceof IndirectExpression) {
       expression = expression.resolve();
     }
-    if (expression instanceof TextExpression && expression.text && !(expression.styleClasses && expression.styleClasses.indexOf('var') >= 0)) {
+    if (expression instanceof TextExpression && expression.text && !expression.hasStyleClass('var')) {
       return true;
     } else if (expression instanceof RowExpression) {
       for (let item of expression.items) {

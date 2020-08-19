@@ -362,15 +362,16 @@ div.display-math {
   display: inline-table;
   vertical-align: middle;
   border-collapse: collapse;
+  white-space: nowrap;
 }
 
 .table.inline, .table.single-case {
   vertical-align: initial;
+  white-space: initial;
 }
 
 .table.matrix, .table.binom {
   text-align: center;
-  white-space: nowrap;
 }
 
 .table-row {
@@ -393,7 +394,6 @@ div.display-math {
 
 .table.aligned>.table-row>.table-cell:first-child {
   text-align: right;
-  white-space: nowrap;
 }
 
 .table.aligned>.table-row:not(:first-child)>.table-cell {
@@ -404,16 +404,16 @@ div.display-math {
   padding-left: 1ex;
 }
 
-.table.cases>.table-row>.table-cell:not(:last-child), .table.single-case>.table-row>.table-cell:not(:last-child) {
-  white-space: nowrap;
+.table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child {
+  white-space: initial;
 }
 
 .table.definitions>.table-row>.table-cell:nth-child(3) {
   padding-left: 1em;
 }
 
-.table.definitions>.table-row>.table-cell:not(:last-child) {
-  white-space: nowrap;
+.table.definitions>.table-row>.table-cell:last-child {
+  white-space: initial;
 }
 
 .table.construction>.table-row>.table-cell {
@@ -430,12 +430,19 @@ div.display-math {
 
 .table.construction>.table-row>.table-cell:first-child {
   padding-right: 4pt;
-  white-space: nowrap;
 }
 
 .table.construction>.table-row>.table-cell:not(:first-child) {
   border-left: solid 1pt;
   padding-left: 4pt;
+  white-space: initial;
+}
+
+.table.proof-grid>.table-row>.table-cell:nth-child(even) {
+  text-align: center;
+}
+
+.table.proof-grid>.table-row>.table-cell:last-child {
   white-space: initial;
 }
 

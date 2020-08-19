@@ -281,7 +281,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       } else {
         let text = expression.text;
         if (text) {
-          if (expression.styleClasses && expression.styleClasses.indexOf('integer') >= 0) {
+          if (expression.hasStyleClass('integer')) {
             let resultArray = [];
             for (let endIndex = text.length; endIndex > 0; endIndex -= 3) {
               let startIndex = endIndex - 3;

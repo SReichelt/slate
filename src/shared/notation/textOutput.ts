@@ -13,7 +13,7 @@ export interface RenderAsTextOptions {
 
 export function renderAsText(expression: Notation.RenderedExpression, options: RenderAsTextOptions, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   let result = renderAsTextInternal(expression, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
-  if (expression.styleClasses && expression.styleClasses.indexOf('script') >= 0) {
+  if (expression.hasStyleClass('script')) {
     result = result.then((text: string) => shrinkMathSpaces(text));
   }
   return result;
@@ -39,7 +39,7 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
     let text = expression.text;
     if (options.outputMarkdown) {
       text = escapeForMarkdown(text);
-      if (expression.styleClasses && expression.styleClasses.indexOf('var') >= 0) {
+      if (expression.hasStyleClass('var')) {
         text = '_' + text + '_';
       }
     }
@@ -53,7 +53,7 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
   } else if (expression instanceof Notation.ParagraphExpression) {
     let paragraphs = expression.paragraphs.map((item) => {
       let ownIndent = '';
-      if (item.styleClasses && (item.styleClasses.indexOf('indented') >= 0 || item.styleClasses.indexOf('display-math') >= 0) && !options.singleLine) {
+      if ((item.hasStyleClass('indented') || item.hasStyleClass('display-math')) && !options.singleLine) {
         ownIndent = options.outputMarkdown ? '\u2007' : '  ';
       }
       let innerOptions: RenderAsTextOptions = {
@@ -82,9 +82,9 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
     });
     return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + options.indent);
   } else if (expression instanceof Notation.TableExpression) {
-    let isAligned = (expression.styleClasses && expression.styleClasses.indexOf('aligned') >= 0);
-    let isDefinitionList = (expression.styleClasses && expression.styleClasses.indexOf('definitions') >= 0);
-    let isConstruction = (expression.styleClasses && expression.styleClasses.indexOf('construction') >= 0);
+    let isAligned = ((expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid')));
+    let isDefinitionList = expression.hasStyleClass('definitions');
+    let isConstruction = expression.hasStyleClass('construction');
     let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
     let secondarySeparator = isDefinitionList ? '  ' : undefined;
     let rows = expression.items.map((row: Notation.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, singleLineOptions)), separator, secondarySeparator));
