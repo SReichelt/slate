@@ -1,0 +1,13 @@
+[build]
+  publish = "dist/public/"
+  command = "npm run build"
+  functions = "dist/server/server/functions/"
+
+[[redirects]]
+  from = "/*.*"
+  to = "/:splat"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
