@@ -141,7 +141,7 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
 
         let webViewPath = path.join(context.extensionPath, 'webview');
         let webViewURI = vscode.Uri.file(webViewPath + '/');
-        let indexTemplateFileName = path.join(webViewPath, 'public', 'embedded.ejs');
+        let indexTemplateFileName = path.join(webViewPath, 'embedded.ejs');
         if (!fs.existsSync(indexTemplateFileName)) {
             return;
         }

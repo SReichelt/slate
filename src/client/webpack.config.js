@@ -15,12 +15,12 @@ const additionalHeadElementsDefault = `
     font-family: sans-serif;
   }
 </style>
-<link href="public/theme-default.css" rel="stylesheet" />
+<link href="theme-default.css" rel="stylesheet" />
 `;
 const additionalHeadElementsEmbedded = `
 <base href="<%= baseURL %>" />
 <meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
-<link href="public/theme-vscode.css" rel="stylesheet" />
+<link href="theme-vscode.css" rel="stylesheet" />
 `;
 
 const plugins = [
@@ -59,8 +59,7 @@ module.exports = {
   entry: ['babel-polyfill', './client'],
   output: {
     path: path.join(projectRoot, 'dist', 'public'),
-    filename: `[name]-${version}-bundle.js`,
-    publicPath: 'public/'
+    filename: `[name]-${version}-bundle.js`
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx']

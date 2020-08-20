@@ -1,6 +1,6 @@
+import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as express from 'express';
 import * as request from 'request';
 import * as config from '../config';
 import { FileAccessor } from '../../shared/data/fileAccessor';
@@ -63,8 +63,8 @@ class GitHubUpdateChecker extends UpdateChecker {
             console.log(`Head of ${this.repositoryName} branch ${this.branch} unchanged: ${newSHA}`);
             setTimeout(() => this.execute(callback), this.checkIntervalInMS);
           }
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
+          console.error(err);
         }
       }
     });

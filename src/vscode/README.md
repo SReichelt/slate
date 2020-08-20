@@ -37,4 +37,4 @@ To let Slate adapt references when moving files or directories, consider increas
 
 ## Download
 
-Continuously updated builds of the Slate VSCode extension (matching the online version of the theorem prover) are available at http://slate-prover.org/public/download/slate.vsix.
+Continuously updated builds of the Slate VSCode extension (matching the online version of the theorem prover) are available at http://slate-prover.org/download/slate.vsix.

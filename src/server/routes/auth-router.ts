@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import * as express from 'express';
 import * as request from 'request';
 import * as config from '../config';
 
 export function authRouter() {
-  let router = Router();
+  let router = express.Router();
 
   router.get('/github-auth/client-id', (req, res) => {
     if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
