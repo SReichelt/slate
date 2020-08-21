@@ -8,7 +8,7 @@ const mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTranspor
 export function handleSubmission(req: express.Request, res: express.Response): void {
   if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
     let requestPath = decodeURI(req.url);
-    let mail: any = {
+    let mail: nodemailer.SendMailOptions = {
       from: config.MAIL_FROM,
       to: config.MAIL_TO,
       subject: 'Slate submission: ' + requestPath,
@@ -17,7 +17,7 @@ export function handleSubmission(req: express.Request, res: express.Response): v
         filename: path.basename(requestPath),
         contentType: 'text/plain',
         contentTransferEncoding: 'quoted-printable',
-        content: req.body
+        content: req
       }]
     };
     mailTransporter.sendMail(mail, (error) => {
