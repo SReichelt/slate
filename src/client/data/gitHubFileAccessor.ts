@@ -1,3 +1,4 @@
+import { fetchText } from '../utils/fetch';
 import { FileAccessor, WriteFileResult, FileReference } from '../../shared/data/fileAccessor';
 import { WebFileReference } from './webFileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -27,7 +28,7 @@ export class GitHubFileReference extends WebFileReference {
   }
 
   read(): CachedPromise<string> {
-    return this.config.then((config) => {
+    return this.config.then((config: GitHubConfig) => {
       for (let target of config.targets) {
         if (this.uri.startsWith(target.uriPrefix)) {
           if (this.uri.endsWith('.preload')) {
@@ -37,8 +38,9 @@ export class GitHubFileReference extends WebFileReference {
             break;
           }
           let path = this.uri.substring(target.uriPrefix.length);
-          this.uri = GitHub.getDownloadURL(target.repository, path);
-          break;
+          let gitHubUri = GitHub.getDownloadURL(target.repository, path);
+          let result = fetchText(gitHubUri);
+          return new CachedPromise(result);
         }
       }
 
@@ -47,7 +49,7 @@ export class GitHubFileReference extends WebFileReference {
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    return this.config.then((config) => {
+    return this.config.then((config: GitHubConfig) => {
       if (config.apiAccess) {
         for (let target of config.targets) {
           if (this.uri.startsWith(target.uriPrefix)) {
@@ -68,7 +70,7 @@ export class GitHubFileReference extends WebFileReference {
   }
 
   view(openLocally: boolean): CachedPromise<void> {
-    return this.config.then((config) => {
+    return this.config.then((config: GitHubConfig) => {
       if (!openLocally) {
         for (let target of config.targets) {
           if (this.uri.startsWith(target.uriPrefix)) {

@@ -11,8 +11,8 @@ export class WebFileAccessor implements FileAccessor {
 
 export class WebFileReference extends StandardFileReference {
   read(): CachedPromise<string> {
-    let contents = fetchText(this.uri);
-    return new CachedPromise(contents);
+    let result = fetchText(this.uri);
+    return new CachedPromise(result);
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
