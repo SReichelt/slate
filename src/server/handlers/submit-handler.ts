@@ -1,11 +1,11 @@
-import * as express from 'express';
+import { Request, Response } from './types';
 import * as path from 'path';
 import * as nodemailer from 'nodemailer';
 import * as config from '../config';
 
 const mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
 
-export function handleSubmission(req: express.Request, res: express.Response): void {
+export function handleSubmission(req: Request, res: Response): void {
   if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
     let requestPath = decodeURI(req.url);
     let mail: nodemailer.SendMailOptions = {

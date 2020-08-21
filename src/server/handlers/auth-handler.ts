@@ -1,8 +1,8 @@
-import * as express from 'express';
-import * as request from 'request';
+import { Request, Response } from './types';
+import { fetchJSON } from '../../shared/utils/fetch';
 import * as config from '../config';
 
-export function handleGetClientID(req: express.Request, res: express.Response): void {
+export function handleGetClientID(req: Request, res: Response): void {
   if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
     res.json({
       'client_id': config.GITHUB_CLIENT_ID
@@ -12,17 +12,15 @@ export function handleGetClientID(req: express.Request, res: express.Response): 
   }
 }
 
-export function handleAuth(req: express.Request, res: express.Response): void {
+export function handleAuth(req: Request, res: Response): void {
   if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
     let code = req.query['code'];
-    let options: request.CoreOptions = {
-      headers: {
-        'Accept': 'application/json'
-      }
-    };
-    request.post(`https://github.com/login/oauth/access_token?client_id=${config.GITHUB_CLIENT_ID}&client_secret=${config.GITHUB_CLIENT_SECRET}&code=${code}`, options)
-      .on('error', (error) => console.log(error))
-      .pipe(res);
+    fetchJSON(`https://github.com/login/oauth/access_token?client_id=${config.GITHUB_CLIENT_ID}&client_secret=${config.GITHUB_CLIENT_SECRET}&code=${code}`)
+      .then((result: any) => res.json(result))
+      .catch((error) => {
+        console.log(error);
+        res.sendStatus(503);
+      });
   } else {
     res.sendStatus(501);
   }

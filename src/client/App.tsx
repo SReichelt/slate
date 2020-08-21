@@ -26,7 +26,7 @@ import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/data/embedding';
 import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
-import { WebFileAccessor, WebWriteFileResult } from './data/webFileAccessor';
+import { WebFileAccessor, WebWriteFileResult } from '../shared/data/webFileAccessor';
 import { GitHubFileAccessor, GitHubConfig, GitHubWriteFileResult } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';

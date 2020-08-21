@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { OnDocLinkClicked } from './DocLink';
 import renderPromise from '../components/PromiseHelper';
-import { fetchText } from '../utils/fetch';
+import { fetchText } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 const RemarkableReactRenderer = require('remarkable-react').default;

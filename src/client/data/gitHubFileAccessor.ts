@@ -1,6 +1,6 @@
-import { fetchText } from '../utils/fetch';
+import { fetchText } from '../../shared/utils/fetch';
 import { FileAccessor, WriteFileResult, FileReference } from '../../shared/data/fileAccessor';
-import { WebFileReference } from './webFileAccessor';
+import { WebFileReference } from '../../shared/data/webFileAccessor';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
 

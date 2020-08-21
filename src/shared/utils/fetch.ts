@@ -1,5 +1,10 @@
+import type { RequestInfo, RequestInit, Response } from 'node-fetch';
+
+declare const window: any | undefined;
+const fetch = typeof window !== 'undefined' ? window.fetch : require('node-fetch');
+
 export async function fetchAny(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  let response = await window.fetch(input, init);
+  let response = await fetch(input, init);
   if (!response.ok) {
     throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
   }
@@ -16,6 +21,13 @@ export async function fetchText(input: RequestInfo, init?: RequestInit): Promise
 }
 
 export async function fetchJSON(input: RequestInfo, init?: RequestInit): Promise<any> {
+  if (!init) {
+    init = {
+      headers: {
+        'Accept': 'application/json'
+      }
+    };
+  }
   let response = await fetchAny(input, init);
   return await response.json();
 }

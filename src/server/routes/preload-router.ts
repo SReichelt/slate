@@ -1,12 +1,12 @@
 import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as request from 'request';
 import * as config from '../config';
 import { FileAccessor } from '../../shared/data/fileAccessor';
-import { WebFileAccessor } from '../data/webFileAccessor';
+import { WebFileAccessor } from '../../shared/data/webFileAccessor';
 import { PhysicalFileAccessor } from '../../fs/data/physicalFileAccessor';
 import { LibraryPreloader } from '../preload/preload';
+import { fetchJSON } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 abstract class UpdateChecker {
@@ -33,17 +33,9 @@ class GitHubUpdateChecker extends UpdateChecker {
 
   protected execute(callback: () => CachedPromise<void>): void {
     console.log(`Checking head of ${this.repositoryName} branch ${this.branch}...`);
-    let options: request.CoreOptions = {
-      headers: {
-        'User-Agent': 'request'
-      }
-    };
-    request.get(`https://api.github.com/repos/${this.repositoryOwner}/${this.repositoryName}/git/refs/heads/${this.branch}`, options, (error, response, body) => {
-      if (error) {
-        console.error(error);
-      } else if (response.statusCode === 200) {
+    fetchJSON(`https://api.github.com/repos/${this.repositoryOwner}/${this.repositoryName}/git/refs/heads/${this.branch}`)
+      .then((result: any) => {
         try {
-          let result = JSON.parse(body);
           let newSHA = result.object.sha;
           if (this.currentSHA !== newSHA) {
             let executeCallback = () => {
@@ -66,8 +58,8 @@ class GitHubUpdateChecker extends UpdateChecker {
         } catch (err) {
           console.error(err);
         }
-      }
-    });
+      })
+      .catch((error) => console.error(error));
   }
 }
 
