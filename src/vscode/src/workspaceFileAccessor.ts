@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import { TextDecoder } from 'util';
 import { areUrisEqual, replaceDocumentText } from './utils';

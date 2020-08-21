@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import { ParsedDocumentMap } from '../parsedDocument';
 import { RangeInfo } from '../../utils';

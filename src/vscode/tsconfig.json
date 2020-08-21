@@ -13,6 +13,7 @@
         "noImplicitThis": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
+        "alwaysStrict": true,
         "suppressImplicitAnyIndexErrors": true
     },
     "files": [

@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import * as FmtReader from '../../../shared/format/read';
 import * as FmtNotation from '../../../shared/notation/meta';

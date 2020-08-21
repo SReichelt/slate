@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import * as Fmt from '../../../shared/format/format';
 import * as FmtDynamic from '../../../shared/format/dynamic';

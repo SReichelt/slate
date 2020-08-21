@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import { WorkspaceFileAccessor } from './workspaceFileAccessor';
 import { ParseDocumentEvent, HoverEvent } from './events';

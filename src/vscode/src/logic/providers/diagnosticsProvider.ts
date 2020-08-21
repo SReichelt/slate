@@ -1,5 +1,3 @@
-'use strict';
-
 import * as vscode from 'vscode';
 import * as Logic from '../../../../shared/logics/logic';
 import { LibraryDocument, LibraryDocumentProvider } from '../data';
