@@ -1,7 +1,7 @@
 import type { RequestInfo, RequestInit, Response } from 'node-fetch';
 
 declare const window: any | undefined;
-const fetch = typeof window !== 'undefined' ? window.fetch : require('node-fetch');
+const fetch = typeof window !== 'undefined' && window.fetch ? window.fetch : require('node-fetch');
 
 export async function fetchAny(input: RequestInfo, init?: RequestInit): Promise<Response> {
   let response = await fetch(input, init);

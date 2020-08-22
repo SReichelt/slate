@@ -141,17 +141,21 @@ class App extends React.Component<AppProps, AppState> {
       }
       let gitHubAPIAccess = this.createGitHubAPIAccess(gitHubQueryStringResult?.token);
 
+      this.gitHubRepositoryAccess = {
+        repository: libraryRepository
+      };
+
       // When running locally, preloading always returns local files. If the user has logged in to GitHub, we want to load from GitHub instead.
       // When not running locally, preloading is possible as long as there are no local modifications. (See GitHubFileAccessor.)
       if (config.runningLocally) {
         if (gitHubAPIAccess) {
-          libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, libraryRepository);
+          libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess);
         } else {
           libraryFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         }
       } else {
         let fallbackFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
-        libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, libraryRepository, fallbackFileAccessor);
+        libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, fallbackFileAccessor);
       }
     }
 
@@ -325,38 +329,31 @@ class App extends React.Component<AppProps, AppState> {
     return undefined;
   }
 
-  private createGitHubFileAccessor(state: AppState, gitHubAPIAccessPromise: CachedPromise<GitHub.APIAccess> | undefined, repository: GitHub.Repository, fallbackFileAccessor?: FileAccessor): FileAccessor {
+  private createGitHubFileAccessor(state: AppState, gitHubAPIAccessPromise: CachedPromise<GitHub.APIAccess> | undefined, fallbackFileAccessor?: FileAccessor): FileAccessor {
+    let gitHubRepositoryAccess = this.gitHubRepositoryAccess!;
     let gitHubRepositoryAccessPromise: CachedPromise<GitHubRepositoryAccess>;
     if (gitHubAPIAccessPromise) {
       state.gitHubUserInfo = gitHubAPIAccessPromise.then((apiAccess: GitHub.APIAccess) => {
-        this.gitHubRepositoryAccess = {
-          repository: repository,
-          apiAccess: apiAccess
-        };
-        return apiAccess.getUserInfo([repository]);
+        gitHubRepositoryAccess.apiAccess = apiAccess;
+        return apiAccess.getUserInfo([gitHubRepositoryAccess.repository]);
       });
       gitHubRepositoryAccessPromise = state.gitHubUserInfo
         .then(() => {
-          if (this.gitHubRepositoryAccess?.apiAccess) {
-            let apiAccess = this.gitHubRepositoryAccess.apiAccess;
-            if (repository.parentOwner && !repository.hasPullRequest) {
-              return apiAccess.fastForward(repository, false)
-                .then(() => { repository.pullRequestAllowed = true; })
-                .catch(() => { repository.hasLocalChanges = true; });
-            }
+          let {repository, apiAccess} = gitHubRepositoryAccess;
+          if (apiAccess && repository.parentOwner && !repository.hasPullRequest) {
+            return apiAccess.fastForward(repository, false)
+              .then(() => { repository.pullRequestAllowed = true; })
+              .catch(() => { repository.hasLocalChanges = true; });
           }
           return CachedPromise.resolve();
         })
         .catch(() => {})
         .then(() => {
           this.forceUpdate();
-          return this.gitHubRepositoryAccess!;
+          return gitHubRepositoryAccess;
         });
     } else {
-      this.gitHubRepositoryAccess = {
-        repository: repository
-      };
-      gitHubRepositoryAccessPromise = CachedPromise.resolve(this.gitHubRepositoryAccess);
+      gitHubRepositoryAccessPromise = CachedPromise.resolve(gitHubRepositoryAccess);
     }
     return new GitHubFileAccessor(gitHubRepositoryAccessPromise, fallbackFileAccessor);
   }
