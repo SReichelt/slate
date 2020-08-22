@@ -13,6 +13,7 @@
   "scripts": {
     "postinstall": "NODE_ENV= npm install --prefix src/vscode",
     "clean": "rimraf dist src/vscode/webview",
+		"pre-build": "(node_modules/.bin/rimraf .dummy || npm install) && npm run clean",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "test": "jest && src/scripts/checkLibrary.sh",
     "test-accept": "src/scripts/tidyLibrary.sh && jest --updateSnapshot && src/scripts/checkLibrary.sh",
@@ -27,7 +28,7 @@
     "build-vscode": "cd src/vscode && npm run build",
     "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/fonts/HTML-CSS/TeX/woff/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
-    "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,FUNCTS,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-functions\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode"
+    "build": "npm run pre-build && concurrently --prefix \"[{name}]\" --names \"SERVER,FUNCTS,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-functions\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode"
   },
   "engines": {
     "node": ">=13.9.0"
