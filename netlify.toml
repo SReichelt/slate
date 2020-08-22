@@ -4,7 +4,7 @@
   functions = "dist/functions/"
 
 [[redirects]]
-  from = "/libraries/*.slate"
+  from = "/libraries/*"
   to = "/.netlify/functions/submit"
   status = 200
 
