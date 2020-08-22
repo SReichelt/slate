@@ -6,7 +6,11 @@ const fetch = typeof window !== 'undefined' ? window.fetch : require('node-fetch
 export async function fetchAny(input: RequestInfo, init?: RequestInit): Promise<Response> {
   let response = await fetch(input, init);
   if (!response.ok) {
-    throw new Error(`Received HTTP error ${response.status} (${response.statusText})`);
+    let message = `Received HTTP error ${response.status}`;
+    if (response.statusText) {
+      message += ` (${response.statusText})`;
+    }
+    throw new Error(message);
   }
   return response;
 }
