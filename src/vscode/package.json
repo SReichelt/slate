@@ -10,7 +10,7 @@
 		"type": "git",
 		"url": "https://github.com/SReichelt/slate.git"
 	},
-	"homepage": "http://www.slate-prover.org/",
+	"homepage": "http://slate-prover.org/",
 	"categories": [
 		"Programming Languages"
 	],
