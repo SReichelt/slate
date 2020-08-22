@@ -66,6 +66,7 @@ export interface LibraryDataProviderOptions {
   watchForChanges: boolean;
   checkMarkdownCode: boolean;
   allowPlaceholders: boolean;
+  externalURIPrefix?: string;
 }
 
 interface WatchedFile {
@@ -90,6 +91,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private fileAccessor: FileAccessor;
   private path?: Fmt.NamedPathItem;
   private uri: string = '';
+  private externalURI: string;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
   private preloadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private fullyLoadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
@@ -109,7 +111,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       path.parentPath = parent.path;
       this.path = path;
       this.uri = parent.uri + encodeURI(childName) + '/';
+      this.externalURI = parent.externalURI + encodeURI(childName) + '/';
     } else {
+      this.externalURI = options.externalURIPrefix ?? '';
+      if (this.externalURI && !this.externalURI.endsWith('/')) {
+        this.externalURI += '/';
+      }
       this.itemNumber = [];
     }
   }
@@ -293,6 +300,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return left.arguments.isEquivalentTo(right.arguments, unificationFn, replacedParameters);
   }
 
+  private getFileURI(name: string): string {
+    return this.uri + encodeURI(name) + fileExtension;
+  }
+
   private getMainDefinition(file: Fmt.File, expectedName: string): Fmt.Definition {
     if (file.definitions.length !== 1) {
       throw new Error('File is expected to contain exactly one definition');
@@ -399,7 +410,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
     }
     if (!result) {
-      let uri = this.uri + encodeURI(name) + fileExtension;
+      let uri = this.getFileURI(name);
       if (this.fileAccessor.preloadFile && !fullContentsRequired) {
         if (isSection) {
           result = this.fileAccessor.preloadFile(uri + '.preload')
@@ -636,7 +647,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private createLocalDefinition(name: string, isSection: boolean, file: Fmt.File, definition: Fmt.Definition, getMetaModel: Meta.MetaModelGetter): LibraryDefinition {
-    let uri = this.uri + encodeURI(name) + fileExtension;
+    let uri = this.getFileURI(name);
     let fileReference = this.fileAccessor.openFile(uri, true);
     let libraryDefinition: LibraryDefinition = {
       file: file,
@@ -848,7 +859,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   viewLocalItem(name: string, openLocally: boolean): CachedPromise<void> {
-    let uri = this.uri + encodeURI(name) + fileExtension;
+    let uri = this.getFileURI(name);
     return this.fileAccessor.openFile(uri, false).view!(openLocally);
   }
 
@@ -957,12 +968,12 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   pathToURI(path: Fmt.Path): string {
     let parentProvider = this.getProviderForSection(path.parentPath);
-    return parentProvider.uri + encodeURI(path.name);
+    return parentProvider.externalURI + encodeURI(path.name);
   }
 
   uriToPath(uri: string, allowIndex: boolean = false): Fmt.Path | undefined {
-    if (uri.startsWith(this.uri)) {
-      uri = uri.substring(this.uri.length);
+    if (uri.startsWith(this.externalURI)) {
+      uri = uri.substring(this.externalURI.length);
       let path: Fmt.PathItem | undefined = undefined;
       let slashPos = uri.indexOf('/');
       while (slashPos >= 0) {

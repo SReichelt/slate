@@ -168,7 +168,8 @@ class App extends React.Component<AppProps, AppState> {
       fileAccessor: libraryFileAccessor,
       watchForChanges: true,
       checkMarkdownCode: false,
-      allowPlaceholders: config.embedded
+      allowPlaceholders: config.embedded,
+      externalURIPrefix: libraryURI
     };
     this.libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
 
@@ -191,7 +192,7 @@ class App extends React.Component<AppProps, AppState> {
       state.selectedDocURI = uri;
       return true;
     } else if (uri.startsWith(librariesURIPrefix)) {
-      let path = this.libraryDataProvider.uriToPath(uri.substring(librariesURIPrefix.length));
+      let path = this.libraryDataProvider.uriToPath(uri);
       if (path) {
         this.fillSelectionState(state, this.libraryDataProvider, path);
         return true;
@@ -373,7 +374,12 @@ class App extends React.Component<AppProps, AppState> {
   private processEmbeddingResponseMessage(message: Embedding.ResponseMessage): void {
     switch (message.command) {
     case 'SELECT':
-      let showNavigation = !(message.uri && this.navigateToURI(message.uri));
+      let showNavigation = true;
+      let uri = message.uri;
+      if (uri?.startsWith(dataURIPrefix)) {
+        uri = uri.substring(dataURIPrefix.length);
+        showNavigation = !this.navigateToURI(uri);
+      }
       if (this.state.navigationPaneVisible !== showNavigation) {
         this.setState({navigationPaneVisible: showNavigation});
       }
@@ -732,7 +738,7 @@ class App extends React.Component<AppProps, AppState> {
         if (state.selectedItemDefinition?.getImmediateResult()?.state !== LibraryDefinitionState.EditingNew) {
           this.mruList.add(state.selectedItemAbsolutePath);
         }
-        uri = librariesURIPrefix + this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
+        uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
       }
     }
     let title = this.getTitle(state);
