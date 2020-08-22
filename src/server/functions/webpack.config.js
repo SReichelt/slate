@@ -7,6 +7,9 @@ const webpack = require('webpack');
 /**@type {webpack.Configuration}*/
 module.exports = {
     target: 'node',
+    output: {
+        libraryTarget: 'umd'
+    },
     resolve: {
         extensions: ['.ts', '.js']
     },
