@@ -4,20 +4,21 @@
   functions = "dist/functions/"
 
 [[redirects]]
-  from = "/*.*"
-  to = "/:splat"
+  from = "/libraries/*.slate"
+  to = "/.netlify/functions/submit"
+  status = 200
+
+[[redirects]]
+  from = "/github-auth/client-id"
+  to = "/.netlify/functions/auth-client-id"
+  status = 200
+
+[[redirects]]
+  from = "/github-auth/auth"
+  to = "/.netlify/functions/auth"
+  status = 200
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/github-auth/*"
-  to = "/.netlify/functions/github-auth/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/libraries/*"
-  to = "/.netlify/functions/submit"
   status = 200
