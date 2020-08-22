@@ -2,23 +2,33 @@ import * as vscode from 'vscode';
 import { TextDecoder } from 'util';
 import { areUrisEqual, replaceDocumentText } from './utils';
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
-import { StandardFileReference, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
+import { StandardFileAccessor, StandardFileReference, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
 
-export class WorkspaceFileAccessor implements FileAccessor {
-    watchers: StandardFileWatcher[] = [];
-    applyingEdit = false;
+interface WorkspaceFileAccessorState {
+    watchers: StandardFileWatcher[];
+    applyingEdit: boolean;
+}
+
+export class WorkspaceFileAccessor extends StandardFileAccessor implements FileAccessor {
+    constructor(baseURI: string = '', private state: WorkspaceFileAccessorState = {watchers: [], applyingEdit: false}) {
+        super(baseURI);
+    }
 
     openFile(uri: string, createNew: boolean): FileReference {
-        return new WorkspaceFileReference(this, uri, createNew);
+        return new WorkspaceFileReference(this.state, this.baseURI + uri, createNew);
+    }
+
+    createChildAccessor(uri: string): FileAccessor {
+        return new WorkspaceFileAccessor(this.baseURI + uri, this.state);
     }
 
     documentChanged(document: vscode.TextDocument): void {
-        if (this.applyingEdit) {
+        if (this.state.applyingEdit) {
             return;
         }
         let uri = document.uri.toString();
-        for (let watcher of this.watchers) {
+        for (let watcher of this.state.watchers) {
             if (watcher.uri === uri) {
                 watcher.changed(document.getText());
             }
@@ -29,7 +39,7 @@ export class WorkspaceFileAccessor implements FileAccessor {
 export class WorkspaceFileReference extends StandardFileReference implements FileReference {
     private vscodeUri: vscode.Uri;
 
-    constructor(private fileAccessor: WorkspaceFileAccessor, uri: string, private createNew: boolean) {
+    constructor(private state: WorkspaceFileAccessorState, uri: string, private createNew: boolean) {
         super(uri);
         this.vscodeUri = vscode.Uri.parse(uri);
     }
@@ -113,7 +123,7 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
     }
 
     watch(onChange: (newContents: string) => void): FileWatcher {
-        return new StandardFileWatcher(this.uri, this.fileAccessor.watchers, onChange);
+        return new StandardFileWatcher(this.uri, this.state.watchers, onChange);
     }
 
     view(openLocally: boolean): CachedPromise<void> {
@@ -130,8 +140,8 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
         if (notifyWatchers) {
             finished = () => {};
         } else {
-            this.fileAccessor.applyingEdit = true;
-            finished = () => { this.fileAccessor.applyingEdit = false; };
+            this.state.applyingEdit = true;
+            finished = () => { this.state.applyingEdit = false; };
         }
         return vscode.workspace.applyEdit(workspaceEdit)
             .then(finished, finished);

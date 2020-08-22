@@ -9,7 +9,7 @@ export function getClientID(): Promise<string> {
 
 export function getLoginURL(clientID: string, baseURL: string, path: string): string {
   let redirectURL = baseURL;
-  if (path && path !== '/') {
+  if (path) {
     redirectURL += '?path=' + encodeURI(path);
   }
   return `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=public_repo&redirect_uri=${encodeURI(redirectURL)}`;
@@ -31,7 +31,7 @@ export function getRepositoryURL(repository: Repository): string {
 }
 
 export function getInfoURL(repository: Repository, path: string): string {
-  return `https://github.com/${repository.owner}/${repository.name}/blob/${repository.branch}${path}`;
+  return `https://github.com/${repository.owner}/${repository.name}/blob/${repository.branch}/${path}`;
 }
 
 export function getDownloadURL(repository: Repository, path: string): string {
@@ -41,7 +41,7 @@ export function getDownloadURL(repository: Repository, path: string): string {
     // Since raw.githubusercontent.com does not update immediately, we might receive outdated files otherwise.
     owner = repository.parentOwner;
   }
-  return `https://raw.githubusercontent.com/${owner}/${repository.name}/${repository.branch}${path}`;
+  return `https://raw.githubusercontent.com/${owner}/${repository.name}/${repository.branch}/${path}`;
 }
 
 export interface QueryStringResult {
@@ -55,7 +55,7 @@ export function parseQueryString(query: string): QueryStringResult {
     let parsedQuery = queryString.parse(query);
     let code = parsedQuery['code'];
     if (typeof code === 'string') {
-      result.token = fetchJSON(`/github-auth/auth?code=${code}`)
+      result.token = fetchJSON(`github-auth/auth?code=${code}`)
         .then((response) => response['access_token']);
     }
     let path = parsedQuery['path'];
@@ -84,7 +84,7 @@ export class APIAccess {
   constructor(private accessToken: string) {}
 
   private submitRequest(method: string, path: string, request: any = {}): Promise<Response> {
-    let url = `https://api.github.com${path}`;
+    let url = `https://api.github.com/${path}`;
     let options: RequestInit = {
       method: method,
       headers: {
@@ -94,8 +94,10 @@ export class APIAccess {
       }
     };
     if (method === 'GET' || method === 'HEAD') {
+      let delimiter = '?';
       for (let key of Object.keys(request)) {
-        url += `&${encodeURI(key)}=${encodeURI(request[key])}`;
+        url += `${delimiter}${encodeURI(key)}=${encodeURI(request[key])}`;
+        delimiter = '&';
       }
     } else {
       options.body = JSON.stringify(request);
@@ -112,7 +114,7 @@ export class APIAccess {
   }
 
   private runGraphQLRequest(request: any): Promise<any> {
-    return this.runRequest('POST', '/graphql', request);
+    return this.runRequest('POST', 'graphql', request);
   }
 
   async getUserInfo(repositories: Repository[]): Promise<UserInfo> {
@@ -161,10 +163,10 @@ export class APIAccess {
       throw new Error('Cannot synchronize a repository that is not a fork');
     }
 
-    let forkPath = `/repos/${repository.owner}/${repository.name}/git/refs/heads/${repository.branch}`;
+    let forkPath = `repos/${repository.owner}/${repository.name}/git/refs/heads/${repository.branch}`;
     let getResult = await this.runRequest('GET', forkPath);
 
-    let upstreamPath = `/repos/${repository.parentOwner}/${repository.name}/git/refs/heads/${repository.branch}`;
+    let upstreamPath = `repos/${repository.parentOwner}/${repository.name}/git/refs/heads/${repository.branch}`;
     let getUpstreamResult = await this.runRequest('GET', upstreamPath);
 
     if (getResult.object.sha === getUpstreamResult.object.sha) {
@@ -179,7 +181,7 @@ export class APIAccess {
   }
 
   async readFile(repository: Repository, path: string): Promise<string> {
-    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
+    let apiPath = `repos/${repository.owner}/${repository.name}/contents/${path}`;
     let parameters = {
       ref: repository.branch
     };
@@ -190,7 +192,7 @@ export class APIAccess {
   async writeFile(repository: Repository, path: string, contents: string, createNew: boolean, isPartOfGroup: boolean): Promise<PullRequestState | undefined> {
     await this.ensureWriteAccess(repository);
 
-    let apiPath = `/repos/${repository.owner}/${repository.name}/contents${path}`;
+    let apiPath = `repos/${repository.owner}/${repository.name}/contents/${path}`;
     let getParameters = {
       ref: repository.branch
     };
@@ -235,7 +237,7 @@ export class APIAccess {
 
   async ensureWriteAccess(repository: Repository): Promise<void> {
     if (!repository.hasWriteAccess) {
-      let forkPath = `/repos/${repository.owner}/${repository.name}/forks`;
+      let forkPath = `repos/${repository.owner}/${repository.name}/forks`;
       await this.runRequest('POST', forkPath);
       do {
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -247,7 +249,7 @@ export class APIAccess {
 
   private async createPullRequest(repository: Repository, title: string): Promise<PullRequestState | undefined> {
     if (repository.parentOwner && repository.pullRequestAllowed) {
-      let pullRequestPath = `/repos/${repository.parentOwner}/${repository.name}/pulls`;
+      let pullRequestPath = `repos/${repository.parentOwner}/${repository.name}/pulls`;
       let pullRequestParameters = {
         title: title,
         head: `${repository.owner}:${repository.branch}`,

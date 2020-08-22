@@ -1,5 +1,5 @@
 import { PhysicalFileAccessor } from '../../../fs/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, formatItemNumber, defaultLibraryDataProviderOptions } from '../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDataProviderOptions, LibraryDefinition, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataProvider';
 import * as Fmt from '../../format/format';
 import * as FmtReader from '../../format/read';
 import * as FmtLibrary from '../library';
@@ -62,9 +62,16 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
 test('render hlm library', async () => {
   jest.setTimeout(10000);
   let fileAccessor = new PhysicalFileAccessor();
+  let libraryDataProviderOptions: LibraryDataProviderOptions = {
+    logic: Logics.hlm,
+    fileAccessor: fileAccessor.createChildAccessor('data/libraries/hlm'),
+    watchForChanges: false,
+    checkMarkdownCode: false,
+    allowPlaceholders: false
+  };
+  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
   let templateFileReference = fileAccessor.openFile('data/notation/templates.slate', false);
   let templateFileContents = await templateFileReference.read();
   let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
-  let libraryDataProvider = new LibraryDataProvider(Logics.hlm, fileAccessor, 'data/libraries/hlm', defaultLibraryDataProviderOptions, 'Library');
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });

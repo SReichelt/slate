@@ -11,7 +11,11 @@ let panel: vscode.WebviewPanel | undefined = undefined;
 let startCheckTimer: NodeJS.Timeout | undefined = undefined;
 
 function getBaseURI(workspaceFolder: vscode.WorkspaceFolder): string {
-    return workspaceFolder.uri.toString() + '/data/';
+    let result = workspaceFolder.uri.toString();
+    if (!result.endsWith('/')) {
+        result += '/';
+    }
+    return result;
 }
 
 function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.RequestMessage, fileAccessor: FileAccessor): any {

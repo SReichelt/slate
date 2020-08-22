@@ -61,17 +61,12 @@ export const defaultReferences: DefaultReference[] = [
 const defaultReferencesString = defaultReferences.map((ref) => `* ${ref.urlPrefix}...`).reduce((prev, cur) => `${prev}\n${cur}`);
 
 export interface LibraryDataProviderOptions {
-  canPreload: boolean;
+  logic: Logic.Logic;
+  fileAccessor: FileAccessor;
   watchForChanges: boolean;
   checkMarkdownCode: boolean;
   allowPlaceholders: boolean;
 }
-export const defaultLibraryDataProviderOptions: LibraryDataProviderOptions = {
-  canPreload: false,
-  watchForChanges: false,
-  checkMarkdownCode: false,
-  allowPlaceholders: false
-};
 
 interface WatchedFile {
   fileReference: FileReference;
@@ -91,7 +86,10 @@ interface CanonicalPathInfo {
 }
 
 export class LibraryDataProvider implements LibraryDataAccessor {
+  public logic: Logic.Logic;
+  private fileAccessor: FileAccessor;
   private path?: Fmt.NamedPathItem;
+  private uri: string = '';
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
   private preloadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private fullyLoadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
@@ -102,15 +100,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
-  constructor(public logic: Logic.Logic, private fileAccessor: FileAccessor, private uri: string, private config: LibraryDataProviderOptions, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
-    if (this.uri && !this.uri.endsWith('/')) {
-      this.uri += '/';
-    }
-    if (this.parent) {
+  constructor(private options: LibraryDataProviderOptions, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
+    this.logic = options.logic;
+    this.fileAccessor = options.fileAccessor;
+    if (parent) {
       let path = new Fmt.NamedPathItem;
-      path.name = this.childName;
-      path.parentPath = this.parent.path;
+      path.name = childName;
+      path.parentPath = parent.path;
       this.path = path;
+      this.uri = parent.uri + encodeURI(childName) + '/';
     } else {
       this.itemNumber = [];
     }
@@ -152,7 +150,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           provider.itemNumber = itemNumber;
         }
       } else {
-        provider = new LibraryDataProvider(this.logic, this.fileAccessor, this.uri + encodeURI(path.name) + '/', this.config, path.name, this, itemNumber);
+        provider = new LibraryDataProvider(this.options, path.name, this, itemNumber);
         this.subsectionProviderCache.set(path.name, provider);
       }
       return provider;
@@ -308,7 +306,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private createLibraryDefinition(fileReference: FileReference, definitionName: string, getMetaModel: Meta.MetaModelGetter, contents: string): LibraryDefinition {
     let stream = new FmtReader.StringInputStream(contents);
-    let errorHandler = new FmtReader.DefaultErrorHandler(fileReference.fileName, this.config.checkMarkdownCode, this.config.allowPlaceholders);
+    let errorHandler = new FmtReader.DefaultErrorHandler(fileReference.fileName, this.options.checkMarkdownCode, this.options.allowPlaceholders);
     let file = FmtReader.readStream(stream, errorHandler, getMetaModel);
     return {
       file: file,
@@ -318,9 +316,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     };
   }
 
-  private preloadDefinitions(uri: string, definitionName: string): CachedPromise<LibraryDefinition> {
-    let fileReference = this.fileAccessor.openFile(uri, false);
-    if (this.config.watchForChanges && fileReference.watch) {
+  private preloadDefinitions(fileReference: FileReference, definitionName: string): CachedPromise<LibraryDefinition> {
+    if (this.options.watchForChanges && fileReference.watch) {
       let watcher = fileReference.watch(() => {
         this.preloadedDefinitions.clear();
         this.sectionChangeCounter++;
@@ -360,7 +357,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private watchFile(name: string, isSection: boolean, definitionName: string, getMetaModel: Meta.MetaModelGetter, watchedFile: WatchedFile): void {
-    if (this.config.watchForChanges && watchedFile.fileReference.watch) {
+    if (this.options.watchForChanges && watchedFile.fileReference.watch) {
       watchedFile.fileWatcher = watchedFile.fileReference.watch((newContents: string) => {
         let currentEditedDefinition = this.editedDefinitions.get(name);
         try {
@@ -403,15 +400,11 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
     if (!result) {
       let uri = this.uri + encodeURI(name) + fileExtension;
-      if (this.config.canPreload && !fullContentsRequired) {
+      if (this.fileAccessor.preloadFile && !fullContentsRequired) {
         if (isSection) {
-          result = this.preloadDefinitions(uri + '.preload', definitionName)
-            .then((preloadedDefinition: LibraryDefinition) => {
-              return preloadedDefinition;
-            })
-            .catch((error) => {
-              return this.fetchDefinition(name, isSection, definitionName, getMetaModel, true);
-            });
+          result = this.fileAccessor.preloadFile(uri + '.preload')
+            .then((preloadFileReference: FileReference) => this.preloadDefinitions(preloadFileReference, definitionName))
+            .catch(() => this.fetchDefinition(name, isSection, definitionName, getMetaModel, true));
           this.preloadedDefinitions.set(name, result);
         } else {
           result = this.fetchLocalSection(false)
@@ -448,7 +441,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (contents instanceof FmtLibrary.ObjectContents_Section) {
           let index = 0;
           for (let item of contents.items) {
-            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.config.canPreload)) {
+            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.fileAccessor.preloadFile)) {
               let path = (item.ref as Fmt.DefinitionRefExpression).path;
               if (!path.parentPath && !this.preloadedDefinitions.has(path.name) && !this.fullyLoadedDefinitions.has(path.name)) {
                 let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;

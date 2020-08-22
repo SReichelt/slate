@@ -4,9 +4,14 @@
   functions = "dist/functions/"
 
 [[redirects]]
-  from = "/libraries/*"
+  from = "/data/libraries/*"
   to = "/.netlify/functions/submit"
   status = 200
+
+[[redirects]]
+  from = "/preload/*"
+  to = "/fail.preload"
+  status = 404
 
 [[redirects]]
   from = "/github-auth/client-id"

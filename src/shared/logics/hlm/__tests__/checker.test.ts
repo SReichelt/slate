@@ -1,5 +1,5 @@
 import { PhysicalFileAccessor } from '../../../../fs/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDefinition, defaultLibraryDataProviderOptions } from '../../../data/libraryDataProvider';
+import { LibraryDataProvider, LibraryDataProviderOptions, LibraryDefinition } from '../../../data/libraryDataProvider';
 import * as Fmt from '../../../format/format';
 import * as FmtLibrary from '../../library';
 import * as Logic from '../../logic';
@@ -57,8 +57,13 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, definition: L
 }
 
 test('run checker test suite', async () => {
-  let fileAccessor = new PhysicalFileAccessor();
-  let logic = Logics.hlm;
-  let libraryDataProvider = new LibraryDataProvider(logic, fileAccessor, 'src/shared/logics/hlm/__tests__/data', defaultLibraryDataProviderOptions, 'Library');
+  let libraryDataProviderOptions: LibraryDataProviderOptions = {
+    logic: Logics.hlm,
+    fileAccessor: new PhysicalFileAccessor('src/shared/logics/hlm/__tests__/data'),
+    watchForChanges: false,
+    checkMarkdownCode: false,
+    allowPlaceholders: false
+  };
+  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
   await checkSection(libraryDataProvider);
 });

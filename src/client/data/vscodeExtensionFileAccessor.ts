@@ -9,8 +9,18 @@ export class VSCodeExtensionFileAccessor implements FileAccessor {
   static requests = new Map<number, (responseMessage: Embedding.ResponseMessage) => void>();
   static watchers: StandardFileWatcher[] = [];
 
+  constructor(private baseURI: string = '') {
+    if (this.baseURI && !this.baseURI.endsWith('/')) {
+      this.baseURI += '/';
+    }
+  }
+
   openFile(uri: string, createNew: boolean): FileReference {
-    return new VSCodeExtensionFileReference(uri, createNew);
+    return new VSCodeExtensionFileReference(this.baseURI + uri, createNew);
+  }
+
+  createChildAccessor(uri: string): FileAccessor {
+    return new VSCodeExtensionFileAccessor(this.baseURI + uri);
   }
 
   messageReceived(message: Embedding.ResponseMessage): void {

@@ -2,6 +2,8 @@ import CachedPromise from './cachedPromise';
 
 export interface FileAccessor {
   openFile(uri: string, createNew: boolean): FileReference;
+  preloadFile?(uri: string): CachedPromise<FileReference>;
+  createChildAccessor(uri: string): FileAccessor;
 }
 
 export interface FileReference {

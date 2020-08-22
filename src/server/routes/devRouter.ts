@@ -43,17 +43,14 @@ export function devRouter(rootPath: string): express.Router {
 
   let dataPath = path.join(rootPath, 'data');
 
-  router.use(express.static(dataPath));
+  router.use('/data', express.static(dataPath));
   router.use('/docs', express.static(path.join(rootPath, 'docs')));
   router.use('/fonts', express.static(path.join(rootPath, 'node_modules', 'mathjax', 'fonts')));
 
-  router.put('/libraries/*', (request, response) => {
-    console.log(`Received PUT request for: ${request.url}`);
-    saveLocally(request, response, dataPath);
-  });
+  router.put('/data/libraries/*', (request, response) => saveLocally(request, response, rootPath));
 
   router.report('/docs/*', (request, response) => openInVSCode(request, response, rootPath));
-  router.report('/libraries/*', (request, response) => openInVSCode(request, response, dataPath));
+  router.report('/data/libraries/*', (request, response) => openInVSCode(request, response, rootPath));
 
   // All the assets are hosted by Webpack on localhost:8080 (Webpack-dev-server)
   router.use('*.*', createProxyMiddleware({

@@ -1,89 +1,80 @@
 import { fetchText } from '../../shared/utils/fetch';
 import { FileAccessor, WriteFileResult, FileReference } from '../../shared/data/fileAccessor';
-import { WebFileReference } from '../../shared/data/webFileAccessor';
+import { StandardFileAccessor, StandardFileReference } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
 import * as GitHub from './gitHubAPIHandler';
 
-export interface GitHubTarget {
-  uriPrefix: string;
+export interface GitHubRepositoryAccess {
+  apiAccess?: GitHub.APIAccess;
   repository: GitHub.Repository;
 }
 
-export interface GitHubConfig {
-  targets: GitHubTarget[];
-  apiAccess?: GitHub.APIAccess;
-}
-
-export class GitHubFileAccessor implements FileAccessor {
-  constructor(private config: CachedPromise<GitHubConfig>) {}
+export class GitHubFileAccessor extends StandardFileAccessor implements FileAccessor {
+  constructor(private repositoryAccess: CachedPromise<GitHubRepositoryAccess>, private fallbackFileAccessor?: FileAccessor, baseURI: string = '') {
+    super(baseURI);
+  }
 
   openFile(uri: string, createNew: boolean): FileReference {
-    return new GitHubFileReference(this.config, uri, createNew);
+    let fallbackFileReference = this.fallbackFileAccessor?.openFile(uri, createNew);
+    return new GitHubFileReference(this.repositoryAccess, this.baseURI + uri, createNew, fallbackFileReference);
+  }
+
+  preloadFile(uri: string): CachedPromise<FileReference> {
+    return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
+      if (this.fallbackFileAccessor?.preloadFile && !repositoryAccess.repository.hasLocalChanges) {
+        return this.fallbackFileAccessor.preloadFile(uri);
+      } else {
+        return CachedPromise.reject();
+      }
+    });
+  }
+
+  createChildAccessor(uri: string): FileAccessor {
+    let childFallbackFileAccessor = this.fallbackFileAccessor?.createChildAccessor(uri);
+    return new GitHubFileAccessor(this.repositoryAccess, childFallbackFileAccessor, this.baseURI + uri);
   }
 }
 
-export class GitHubFileReference extends WebFileReference {
-  constructor(private config: CachedPromise<GitHubConfig>, uri: string, private createNew: boolean) {
+export class GitHubFileReference extends StandardFileReference {
+  constructor(private repositoryAccess: CachedPromise<GitHubRepositoryAccess>, uri: string, private createNew: boolean, private fallbackFileReference: FileReference | undefined) {
     super(uri);
   }
 
   read(): CachedPromise<string> {
-    return this.config.then((config: GitHubConfig) => {
-      for (let target of config.targets) {
-        if (this.uri.startsWith(target.uriPrefix)) {
-          if (this.uri.endsWith('.preload')) {
-            if (target.repository.hasLocalChanges) {
-              return CachedPromise.reject();
-            }
-            break;
-          }
-          let path = this.uri.substring(target.uriPrefix.length);
-          let gitHubUri = GitHub.getDownloadURL(target.repository, path);
-          let result = fetchText(gitHubUri);
-          return new CachedPromise(result);
-        }
-      }
-
-      return super.read();
+    return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
+      let gitHubUri = GitHub.getDownloadURL(repositoryAccess.repository, this.uri);
+      let result = fetchText(gitHubUri);
+      return new CachedPromise(result);
     });
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    return this.config.then((config: GitHubConfig) => {
-      if (config.apiAccess) {
-        for (let target of config.targets) {
-          if (this.uri.startsWith(target.uriPrefix)) {
-            let path = this.uri.substring(target.uriPrefix.length);
-            let result = config.apiAccess.writeFile(target.repository, path, contents, this.createNew, isPartOfGroup)
-              .then((pullRequestState) => {
-                let writeFileResult = new GitHubWriteFileResult;
-                writeFileResult.pullRequestState = pullRequestState;
-                return writeFileResult;
-              });
-            return new CachedPromise(result);
-          }
-        }
+    return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
+      if (repositoryAccess.apiAccess) {
+        let result = repositoryAccess.apiAccess.writeFile(repositoryAccess.repository, this.uri, contents, this.createNew, isPartOfGroup)
+          .then((pullRequestState) => {
+            let writeFileResult = new GitHubWriteFileResult;
+            writeFileResult.pullRequestState = pullRequestState;
+            return writeFileResult;
+          });
+        return new CachedPromise(result);
+      } else if (this.fallbackFileReference?.write) {
+        return this.fallbackFileReference.write(contents, isPartOfGroup);
+      } else {
+        return CachedPromise.reject();
       }
-
-      return super.write(contents, isPartOfGroup);
     });
   }
 
   view(openLocally: boolean): CachedPromise<void> {
-    return this.config.then((config: GitHubConfig) => {
-      if (!openLocally) {
-        for (let target of config.targets) {
-          if (this.uri.startsWith(target.uriPrefix)) {
-            let path = this.uri.substring(target.uriPrefix.length);
-            let infoURL = GitHub.getInfoURL(target.repository, path);
-            window.open(infoURL, '_blank');
-            return;
-          }
-        }
-      }
-
-      return super.view(openLocally);
-    });
+    if (openLocally) {
+      return CachedPromise.reject();
+    } else {
+      return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
+        let infoURL = GitHub.getInfoURL(repositoryAccess.repository, this.uri);
+        window.open(infoURL, '_blank');
+      });
+    }
   }
 }
 

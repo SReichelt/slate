@@ -8,14 +8,24 @@ export class PhysicalFileAccessor implements FileAccessor {
   constructor(private basePath?: string) {}
 
   openFile(uri: string, createNew: boolean): FileReference {
-    let fileName = decodeURI(uri);
-    if (this.basePath) {
-      fileName = path.join(this.basePath, fileName);
-    }
+    let fileName = this.getFileName(uri);
     if (createNew) {
       this.makeDirectories(fileName);
     }
     return new PhysicalFileReference(fileName);
+  }
+
+  createChildAccessor(uri: string): FileAccessor {
+    let fileName = this.getFileName(uri);
+    return new PhysicalFileAccessor(fileName);
+  }
+
+  private getFileName(uri: string): string {
+    let fileName = decodeURI(uri);
+    if (this.basePath) {
+      fileName = path.join(this.basePath, fileName);
+    }
+    return fileName;
   }
 
   private makeDirectories(fileName: string): void {

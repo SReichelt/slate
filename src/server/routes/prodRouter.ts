@@ -7,7 +7,7 @@ export function prodRouter(rootPath: string): express.Router {
 
   let publicPath = path.join(rootPath, 'dist', 'public');
 
-  router.put('/libraries/*', handleSubmit);
+  router.put('/data/libraries/*', handleSubmit);
 
   // All the assets are in "public" folder (Done by Webpack)
   router.use(express.static(publicPath));

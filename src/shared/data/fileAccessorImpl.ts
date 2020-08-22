@@ -1,5 +1,13 @@
 import { FileWatcher } from './fileAccessor';
 
+export class StandardFileAccessor {
+  constructor(protected baseURI: string = '') {
+    if (this.baseURI && !this.baseURI.endsWith('/')) {
+      this.baseURI += '/';
+    }
+  }
+}
+
 export class StandardFileReference {
   fileName: string;
 

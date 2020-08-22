@@ -100,13 +100,14 @@ export class LibraryDocumentProvider {
                 return undefined;
             }
             let options: LibraryDataProviderOptions = {
-                canPreload: false,
+                logic: logic,
+                fileAccessor: this.fileAccessor.createChildAccessor(libraryUri),
                 watchForChanges: true,
                 checkMarkdownCode: false,
                 allowPlaceholders: true
             };
             library = {
-                libraryDataProvider: new LibraryDataProvider(logic, this.fileAccessor, libraryUri, options, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(options, 'Library'),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);

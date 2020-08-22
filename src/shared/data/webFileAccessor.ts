@@ -1,21 +1,16 @@
 import type { RequestInit } from 'node-fetch';
 import { fetchAny, fetchVoid, fetchText } from '../utils/fetch';
 import { FileAccessor, FileReference, WriteFileResult } from './fileAccessor';
-import { StandardFileReference } from './fileAccessorImpl';
+import { StandardFileAccessor, StandardFileReference } from './fileAccessorImpl';
 import CachedPromise from './cachedPromise';
 
-export class WebFileAccessor implements FileAccessor {
-  constructor(private baseURI?: string) {}
-
+export class WebFileAccessor extends StandardFileAccessor implements FileAccessor {
   openFile(uri: string): FileReference {
-    if (this.baseURI) {
-      if (uri.startsWith('/')) {
-        uri = this.baseURI + uri;
-      } else {
-        uri = this.baseURI + '/' + uri;
-      }
-    }
-    return new WebFileReference(uri);
+    return new WebFileReference(this.baseURI + uri);
+  }
+
+  createChildAccessor(uri: string): FileAccessor {
+    return new WebFileAccessor(this.baseURI + uri);
   }
 }
 
