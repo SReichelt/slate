@@ -10,8 +10,8 @@
 
 [[redirects]]
   from = "/preload/*"
-  to = "/fail.preload"
-  status = 404
+  to = "http://slate-hlm.netlify.app/preload/:splat"
+  status = 200
 
 [[redirects]]
   from = "/github-auth/info"
@@ -24,6 +24,16 @@
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/libraries/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/docs/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/"
   to = "/index.html"
   status = 200

@@ -84,15 +84,14 @@ export function preloadRouter(rootPath: string): express.Router {
       let preloader = new LibraryPreloader(fileAccessor);
       updateChecker.register(() => {
         console.log(`Preloading library "${libraryName}"...`);
-        return preloader.preloadSection('/', 'Library')
+        return preloader.preloadLibrary('Library')
           .then(() => console.log(`Finished preloading library "${libraryName}".`));
       });
       let uriPrefix = '/preload/libraries/' + libraryName;
-      let uriSuffix = '.preload';
-      router.get(uriPrefix + '/*' + uriSuffix, (req, resp) => {
+      router.get(uriPrefix + '/*', (req, resp) => {
         let requestURI = req.url;
-        if (requestURI.startsWith(uriPrefix) && requestURI.endsWith(uriSuffix)) {
-          let preloadedContents = preloader.getPreloadedSection(requestURI.substring(uriPrefix.length, requestURI.length - uriSuffix.length));
+        if (requestURI.startsWith(uriPrefix)) {
+          let preloadedContents = preloader.getPreloadedSection(requestURI.substring(uriPrefix.length));
           if (preloadedContents) {
             resp.send(preloadedContents);
             return;

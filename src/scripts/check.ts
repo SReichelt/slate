@@ -96,6 +96,6 @@ checkLibrary(libraryFileName)
     process.exit(errorCount ? 1 : 0);
   })
   .catch((error) => {
-    console.error(error.message);
+    console.error(error);
     process.exit(1);
   });

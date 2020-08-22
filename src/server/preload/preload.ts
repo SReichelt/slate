@@ -6,26 +6,14 @@ import * as FmtWriter from '../../shared/format/write';
 import * as FmtLibrary from '../../shared/logics/library';
 import CachedPromise from '../../shared/data/cachedPromise';
 
-export class LibraryPreloader {
-  private preloadedSections = new Map<string, string>();
-  private watchers = new Set<FileWatcher>();
-
-  constructor(private fileAccessor: FileAccessor) {}
-
-  private readFile(indexURI: string, uri: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {
-    let fileReference = this.fileAccessor.openFile(uri, false);
-    if (fileReference.watch) {
-      let watcher = fileReference.watch(() => {
-        this.preloadedSections.delete(indexURI);
-        watcher.close();
-        this.watchers.delete(watcher);
-      });
-      this.watchers.add(watcher);
-    }
-    return fileReference.read().then((contents: string) => {
+export abstract class LibraryPreloadGenerator {
+  private readFile(uri: string, preloadURI: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {
+    return this.getFileContents(uri, preloadURI).then((contents: string) => {
       return FmtReader.readString(contents, uri, getMetaModel);
     });
   }
+
+  protected abstract getFileContents(uri: string, preloadURI: string): CachedPromise<string>;
 
   private writeFile(name: string, file: Fmt.File): string {
     let stream = new FmtWriter.StringOutputStream;
@@ -48,9 +36,9 @@ export class LibraryPreloader {
     }
   }
 
-  private getItemContents(indexURI: string, baseURI: string, name: string): CachedPromise<string> {
+  private getItemContents(baseURI: string, preloadURI: string, name: string): CachedPromise<string> {
     let uri = baseURI + encodeURI(name) + '.slate';
-    return this.readFile(indexURI, uri, Meta.getDummyMetaModel)
+    return this.readFile(uri, preloadURI, Meta.getDummyMetaModel)
       .then((file: Fmt.File) => {
         for (let definition of file.definitions) {
           if (definition.contents instanceof Fmt.GenericObjectContents) {
@@ -61,9 +49,14 @@ export class LibraryPreloader {
       });
   }
 
-  preloadSection(baseURI: string, name: string): CachedPromise<void> {
+  preloadLibrary(name: string): CachedPromise<void> {
+    return this.preloadSection('', name);
+  }
+
+  private preloadSection(baseURI: string, name: string): CachedPromise<void> {
     let indexURI = baseURI + encodeURI(name) + '.slate';
-    return this.readFile(indexURI, indexURI, FmtLibrary.getMetaModel)
+    let preloadURI = indexURI + '.preload';
+    return this.readFile(indexURI, preloadURI, FmtLibrary.getMetaModel)
       .then((file: Fmt.File) => {
         let promises: CachedPromise<string>[] = [];
         for (let definition of file.definitions) {
@@ -78,7 +71,7 @@ export class LibraryPreloader {
                       .then(() => '');
                     promises.push(promise);
                   } else {
-                    promises.push(this.getItemContents(indexURI, baseURI, itemPath.name));
+                    promises.push(this.getItemContents(baseURI, preloadURI, itemPath.name));
                   }
                 }
               }
@@ -94,13 +87,39 @@ export class LibraryPreloader {
             return contents;
           });
       })
-      .then((contents: string) => {
-        this.preloadedSections.set(indexURI, contents);
-      });
+      .then((contents: string) => this.outputFile(preloadURI, contents));
   }
 
-  getPreloadedSection(indexUri: string): string | undefined {
-    return this.preloadedSections.get(indexUri);
+  protected abstract outputFile(preloadURI: string, contents: string): void;
+}
+
+export class LibraryPreloader extends LibraryPreloadGenerator {
+  private preloadedSections = new Map<string, string>();
+  private watchers = new Set<FileWatcher>();
+
+  constructor(private fileAccessor: FileAccessor) {
+    super();
+  }
+
+  protected getFileContents(uri: string, preloadURI: string): CachedPromise<string> {
+    let fileReference = this.fileAccessor.openFile(uri, false);
+    if (fileReference.watch) {
+      let watcher = fileReference.watch(() => {
+        this.preloadedSections.delete(preloadURI);
+        watcher.close();
+        this.watchers.delete(watcher);
+      });
+      this.watchers.add(watcher);
+    }
+    return fileReference.read();
+  }
+
+  protected outputFile(preloadURI: string, contents: string): void {
+    this.preloadedSections.set(preloadURI, contents);
+  }
+
+  getPreloadedSection(preloadURI: string): string | undefined {
+    return this.preloadedSections.get(preloadURI);
   }
 
   clear() {
