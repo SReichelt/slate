@@ -1,7 +1,7 @@
 [build]
   publish = "dist/public/"
   command = "npm run build"
-  functions = "dist/server/server/functions/"
+  functions = "dist/functions/"
 
 [[redirects]]
   from = "/*.*"
@@ -10,4 +10,14 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/github-auth/*"
+  to = "/.netlify/functions/github-auth/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/libraries/*"
+  to = "/.netlify/functions/submit"
   status = 200

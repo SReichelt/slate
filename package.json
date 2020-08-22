@@ -11,22 +11,23 @@
   "homepage": "http://www.slate-prover.org/",
   "main": "index.js",
   "scripts": {
-    "postinstall": "NODE_ENV= npm install --prefix ./src/vscode",
+    "postinstall": "NODE_ENV= npm install --prefix src/vscode",
     "clean": "rimraf dist src/vscode/webview",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
     "test": "jest && src/scripts/checkLibrary.sh",
     "test-accept": "src/scripts/tidyLibrary.sh && jest --updateSnapshot && src/scripts/checkLibrary.sh",
-    "start": "node ./dist/server/server/server.js",
-    "start:prod": "cross-env NODE_ENV=production node ./dist/server/server/server.js",
+    "start": "node dist/server/server/server.js",
+    "start:prod": "cross-env NODE_ENV=production node dist/server/server/server.js",
+    "build-server": "tsc -p src/server",
+    "dev-server": "tsc-watch -p src/server --onSuccess \"node --inspect=9229 dist/server/server/server.js\"",
+    "build-functions": "cd src/server/functions && webpack -p authClientIDFunction.ts -o ../../../dist/functions/github-auth/client-id.js && webpack -p authFunction.ts -o ../../../dist/functions/github-auth/auth.js && webpack -p submitFunction.ts -o ../../../dist/functions/submit.js",
     "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd src/client && webpack-dev-server -w",
-    "build-server": "tsc -p ./src/server",
-    "dev-server": "tsc-watch -p ./src/server --onSuccess \"node --inspect=9229 ./dist/server/server/server.js\"",
     "fill-public": "copyfiles -E -u 1 data/*/*.slate dist/public && copyfiles -E docs/* docs/**/* dist/public && copyfiles -E -u 2 node_modules/mathjax/fonts/HTML-CSS/TeX/*/* dist/public",
     "build-vscode": "cd src/vscode && npm run build",
     "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/fonts/HTML-CSS/TeX/woff/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
-    "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode"
+    "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,FUNCTS,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgOrange.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-functions\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode"
   },
   "engines": {
     "node": ">=13.9.0"
@@ -57,6 +58,7 @@
     "utf8": "^3.0.0"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.61",
     "@types/bn.js": "^4.11.6",
     "@types/express": "^4.17.7",
     "@types/http-proxy-middleware": "^0.19.3",

@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { handleGetClientID, handleAuth } from '../handlers/auth-handler';
+import { handleGetClientID, handleAuth } from '../handlers/authHandler';
 
 export function authRouter() {
   let router = express.Router();

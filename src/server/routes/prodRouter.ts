@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as path from 'path';
-import { handleSubmission } from '../handlers/submit-handler';
+import { handleSubmit } from '../handlers/submitHandler';
 
 export function prodRouter(rootPath: string): express.Router {
   let router = express.Router();
 
   let publicPath = path.join(rootPath, 'dist', 'public');
 
-  router.put('/libraries/*', handleSubmission);
+  router.put('/libraries/*', handleSubmit);
 
   // All the assets are in "public" folder (Done by Webpack)
   router.use(express.static(publicPath));

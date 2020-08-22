@@ -5,7 +5,7 @@ import * as config from '../config';
 
 const mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
 
-export function handleSubmission(req: Request, res: Response): void {
+export function handleSubmit(req: Request, res: Response): void {
   if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
     let requestPath = decodeURI(req.url);
     let mail: nodemailer.SendMailOptions = {

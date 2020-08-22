@@ -16,3 +16,5 @@ export interface Response {
   sendStatus(statusCode: number): void;
   json(obj: any): void;
 }
+
+export type Handler = (req: Request, res: Response) => void;

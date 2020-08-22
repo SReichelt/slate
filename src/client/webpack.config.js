@@ -1,3 +1,7 @@
+//@ts-check
+
+'use strict';
+
 const path = require('path');
 const webpack = require('webpack');
 const version = require('../../package.json').version;
@@ -23,6 +27,7 @@ const additionalHeadElementsEmbedded = `
 <link href="theme-vscode.css" rel="stylesheet" />
 `;
 
+/**@type {webpack.Plugin[]}*/
 const plugins = [
   new HtmlWebpackPlugin({
     title: 'Slate',
@@ -53,6 +58,7 @@ if (!config.IS_PRODUCTION) {
   }));
 }
 
+/**@type {webpack.Configuration}*/
 module.exports = {
   mode: config.IS_PRODUCTION ? 'production' : 'development',
   devtool: config.IS_PRODUCTION ? '' : 'inline-source-map',

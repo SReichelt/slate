@@ -1,9 +1,9 @@
 import * as express from 'express';
 import * as path from 'path';
-import { authRouter } from './routes/auth-router';
-import { prodRouter } from './routes/prod-router';
-import { devRouter } from './routes/dev-router';
-import { preloadRouter } from './routes/preload-router';
+import { authRouter } from './routes/authRouter';
+import { prodRouter } from './routes/prodRouter';
+import { devRouter } from './routes/devRouter';
+import { preloadRouter } from './routes/preloadRouter';
 import * as config from './config';
 
 express.static.mime.define({'text/plain': ['slate']});
