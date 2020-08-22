@@ -14,8 +14,8 @@
   status = 404
 
 [[redirects]]
-  from = "/github-auth/client-id"
-  to = "/.netlify/functions/auth-client-id"
+  from = "/github-auth/info"
+  to = "/.netlify/functions/auth-info"
   status = 200
 
 [[redirects]]

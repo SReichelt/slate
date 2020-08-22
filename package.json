@@ -19,7 +19,7 @@
     "test-accept": "src/scripts/tidyLibrary.sh && jest --updateSnapshot && src/scripts/checkLibrary.sh",
     "build-server": "tsc -p src/server",
     "dev-server": "tsc-watch -p src/server --onSuccess \"node --inspect=9229 dist/server/server/server.js\"",
-    "build-functions": "cd src/server/functions && webpack -p authClientIDFunction.ts -o ../../../dist/functions/auth-client-id.js && webpack -p authFunction.ts -o ../../../dist/functions/auth.js && webpack -p submitFunction.ts -o ../../../dist/functions/submit.js",
+    "build-functions": "cd src/server/functions && webpack -p authInfoFunction.ts -o ../../../dist/functions/auth-info.js && webpack -p authFunction.ts -o ../../../dist/functions/auth.js && webpack -p submitFunction.ts -o ../../../dist/functions/submit.js",
     "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd src/client && webpack-dev-server -w",
     "fill-public": "copyfiles -E data/*/*.slate docs/* docs/**/* dist/public && copyfiles -E -u 2 node_modules/mathjax/fonts/HTML-CSS/TeX/*/* dist/public",

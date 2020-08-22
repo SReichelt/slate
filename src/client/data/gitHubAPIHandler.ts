@@ -1,18 +1,20 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
 import { fetchJSON } from '../../shared/utils/fetch';
+import { AuthInfo } from '../../shared/api/auth';
 
-export function getClientID(): Promise<string> {
-  return fetchJSON('github-auth/client-id')
-    .then((response) => response['client_id']);
+export { AuthInfo };
+
+export function getAuthInfo(): Promise<AuthInfo> {
+  return fetchJSON('github-auth/info');
 }
 
-export function getLoginURL(clientID: string, baseURL: string, path: string): string {
-  let redirectURL = baseURL;
-  if (path) {
-    redirectURL += '?path=' + encodeURI(path);
+export function getLoginURL(authInfo: AuthInfo, location: Location): string {
+  let redirectURL = authInfo.redirectURL ?? (location.protocol + '//' + location.host + '/');
+  if (location.pathname) {
+    redirectURL += '?path=' + encodeURI(location.pathname);
   }
-  return `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=public_repo&redirect_uri=${encodeURI(redirectURL)}`;
+  return `https://github.com/login/oauth/authorize?client_id=${authInfo.clientID}&scope=public_repo&redirect_uri=${encodeURI(redirectURL)}`;
 }
 
 export interface Repository {

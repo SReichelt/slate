@@ -24,7 +24,7 @@ import * as FmtLibrary from '../shared/logics/library';
 import * as Dialog from '../shared/notation/dialog';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
-import * as Embedding from '../shared/data/embedding';
+import * as Embedding from '../shared/api/embedding';
 import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from '../shared/data/webFileAccessor';
 import { PreloadingWebFileAccessor } from '../shared/data/preloadingWebFileAccessor';
@@ -67,7 +67,7 @@ interface SelectionState {
 }
 
 interface GitHubState {
-  gitHubClientID?: string;
+  gitHubAuthInfo?: GitHub.AuthInfo;
   gitHubUserInfo?: CachedPromise<GitHub.UserInfo>;
 }
 
@@ -264,8 +264,8 @@ class App extends React.Component<AppProps, AppState> {
         return null;
       };
 
-      GitHub.getClientID()
-        .then((clientID) => this.setState({gitHubClientID: clientID}))
+      GitHub.getAuthInfo()
+        .then((info: GitHub.AuthInfo) => this.setState({gitHubAuthInfo: info}))
         .catch(() => {});
 
       if (this.state.gitHubUserInfo) {
@@ -518,7 +518,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       });
       leftButtons.push(renderPromise(loginInfoPromise, 'user-info'));
-    } else if (this.state.gitHubClientID) {
+    } else if (this.state.gitHubAuthInfo) {
       leftButtons.push(
         <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key="login">
           {getButtonIcon(ButtonType.LogIn)}
@@ -1008,16 +1008,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private logInWithGitHub = (): void => {
-    if (this.state.gitHubClientID) {
-      let location = window.location;
-      let protocol = location.protocol;
-      let host = location.host;
-      if (location.hostname !== 'localhost') {
-        protocol = 'https:';
-        host = location.hostname;
-      }
-      let baseURL = protocol + '//' + host + '/';
-      location.href = GitHub.getLoginURL(this.state.gitHubClientID, baseURL, location.pathname);
+    if (this.state.gitHubAuthInfo) {
+      window.location.href = GitHub.getLoginURL(this.state.gitHubAuthInfo, window.location);
     }
   };
 

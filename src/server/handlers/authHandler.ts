@@ -1,12 +1,15 @@
 import { Request, Response } from './types';
 import { fetchJSON } from '../../shared/utils/fetch';
+import { AuthInfo } from '../../shared/api/auth'
 import * as config from '../config';
 
-export function handleGetClientID(req: Request, res: Response): void {
+export function handleAuthInfo(req: Request, res: Response): void {
   if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {
-    res.json({
-      'client_id': config.GITHUB_CLIENT_ID
-    });
+    let info: AuthInfo = {
+      clientID: config.GITHUB_CLIENT_ID,
+      redirectURL: config.GITHUB_REDIRECT_URL
+    };
+    res.json(info);
   } else {
     res.sendStatus(501);
   }
