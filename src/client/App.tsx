@@ -1010,7 +1010,13 @@ class App extends React.Component<AppProps, AppState> {
   private logInWithGitHub = (): void => {
     if (this.state.gitHubClientID) {
       let location = window.location;
-      let baseURL = location.protocol + '//' + location.host + '/';
+      let protocol = location.protocol;
+      let host = location.host;
+      if (location.hostname !== 'localhost') {
+        protocol = 'https:';
+        host = location.hostname;
+      }
+      let baseURL = protocol + '//' + host + '/';
       location.href = GitHub.getLoginURL(this.state.gitHubClientID, baseURL, location.pathname);
     }
   };
