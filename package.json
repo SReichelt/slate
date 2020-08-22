@@ -35,6 +35,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
     "bn.js": "^5.1.2",
+    "encoding": "^0.1.13",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.5",
     "markdown-escape": "^1.1.0",
