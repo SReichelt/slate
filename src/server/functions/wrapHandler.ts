@@ -1,6 +1,16 @@
 import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult, Context, Callback } from 'aws-lambda';
 import { Readable } from 'stream';
-import { Handler, Request, Response } from '../handlers/types';
+import { Handler, Request, Response, Query } from '../handlers/types';
+
+class AWSRequest extends Readable implements Request {
+  constructor(public url: string, public query: Query, body?: string | null) {
+    super();
+    if (body) {
+      this.push(body);
+    }
+    this.push(null);
+  }
+}
 
 class AWSResponse implements Response {
   constructor(private callback: Callback<APIGatewayProxyResult>) {}
@@ -23,10 +33,7 @@ class AWSResponse implements Response {
 export function wrapHandler(handler: Handler, expectedMethod: string): APIGatewayProxyHandler {
   return (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>) => {
     if (event.httpMethod === expectedMethod) {
-      let req: Request = Object.assign(Readable.from(event.body ?? ''), {
-        url: event.path,
-        query: event.queryStringParameters ?? {}
-      });
+      let req = new AWSRequest(event.path, event.queryStringParameters ?? {}, event.body);
       let res = new AWSResponse(callback);
       handler(req, res);
     } else {
