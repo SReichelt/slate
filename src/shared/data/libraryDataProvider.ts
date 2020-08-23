@@ -860,6 +860,20 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fileAccessor.openFile(uri, false).view!(openLocally);
   }
 
+  isSubsection(name: string): CachedPromise<boolean> {
+    return this.fetchLocalSection(false).then((sectionDefinition: LibraryDefinition) => {
+      let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
+      for (let item of sectionContents.items) {
+        if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
+          if ((item.ref as Fmt.DefinitionRefExpression).path.name === name) {
+            return item instanceof FmtLibrary.MetaRefExpression_subsection;
+          }
+        }
+      }
+      return false;
+    });
+  }
+
   getItemInfo(path: Fmt.Path): CachedPromise<LibraryItemInfo> {
     let parentProvider = this.getProviderForSection(path.parentPath);
     return parentProvider.getLocalItemInfo(path.name);

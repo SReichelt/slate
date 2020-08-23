@@ -62,7 +62,7 @@ interface SelectionState {
   selectedItemAbsolutePath?: Fmt.Path;
   selectedItemProvider?: LibraryDataProvider;
   selectedItemLocalPath?: Fmt.Path;
-  selectedItemDefinition?: CachedPromise<LibraryDefinition>;
+  selectedItemDefinition?: CachedPromise<LibraryDefinition | undefined>;
   selectedItemInfo?: CachedPromise<LibraryItemInfo>;
   interactionHandler?: LibraryItemInteractionHandler;
 }
@@ -206,22 +206,22 @@ class App extends React.Component<AppProps, AppState> {
     state.selectedDocURI = undefined;
     state.selectedItemAbsolutePath = libraryDataProvider.getAbsolutePath(path);
     if (path.parentPath) {
-      state.selectedItemProvider = this.libraryDataProvider.getProviderForSection(state.selectedItemAbsolutePath.parentPath);
-      state.selectedItemLocalPath = state.selectedItemProvider.getRelativePath(state.selectedItemAbsolutePath);
-    } else {
-      // Optimization: path is already local.
-      state.selectedItemProvider = libraryDataProvider;
-      state.selectedItemLocalPath = path;
+      libraryDataProvider = this.libraryDataProvider.getProviderForSection(state.selectedItemAbsolutePath.parentPath);
+      path = libraryDataProvider.getRelativePath(state.selectedItemAbsolutePath);
     }
-    state.selectedItemDefinition = state.selectedItemProvider.fetchLocalItem(path.name, true);
-    state.selectedItemInfo = state.selectedItemProvider.getLocalItemInfo(path.name);
+    state.selectedItemProvider = libraryDataProvider;
+    state.selectedItemLocalPath = path;
+    let isSubsectionPromise = libraryDataProvider.isSubsection(path.name);
+    state.selectedItemDefinition = isSubsectionPromise.then((isSubsection: boolean) =>
+      isSubsection ? undefined : libraryDataProvider.fetchLocalItem(path.name, true));
+    state.selectedItemInfo = libraryDataProvider.getLocalItemInfo(path.name);
   }
 
   private setNewInteractionHandler(state: SelectionState): void {
     state.interactionHandler = this.createInteractionHandler(state.selectedItemProvider, this.state.templates, state.selectedItemDefinition);
   }
 
-  private createInteractionHandler(libraryDataProvider: LibraryDataProvider | undefined, templates: Fmt.File | undefined, selectedItemDefinition: CachedPromise<LibraryDefinition> | undefined): LibraryItemInteractionHandler | undefined {
+  private createInteractionHandler(libraryDataProvider: LibraryDataProvider | undefined, templates: Fmt.File | undefined, selectedItemDefinition: CachedPromise<LibraryDefinition | undefined> | undefined): LibraryItemInteractionHandler | undefined {
     if (libraryDataProvider && templates) {
       return new LibraryItemInteractionHandler(libraryDataProvider, templates, selectedItemDefinition, this.linkClicked);
     } else {
@@ -429,8 +429,8 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedDocURI) {
       mainContents = <DocPage uri={this.state.selectedDocURI} onDocLinkClicked={this.docLinkClicked}/>;
     } else if (this.state.selectedItemDefinition) {
-      let mainContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition) => {
-        if (this.state.selectedItemProvider && this.state.templates) {
+      let mainContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
+        if (definition && this.state.selectedItemProvider && this.state.templates) {
           let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
           let itemInfo = this.state.selectedItemInfo;
           if (editing && this.state.selectedItemLocalPath) {
@@ -462,8 +462,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (!config.embedded) {
         if (this.state.extraContentsVisible) {
-          let extraContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition) => {
-            return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
+          let extraContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
+            if (definition) {
+              return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
+            } else {
+              return null;
+            }
           });
           extraContents = renderPromise(extraContentsPromise, 'source');
         } else {
@@ -488,114 +492,6 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    let leftButtons: React.ReactNode[] = [];
-    if (config.embedded) {
-      leftButtons.push(
-        <Button toolTipText={'Table of Contents'} selected={this.state.navigationPaneVisible} onClick={() => this.setState((prevState) => ({navigationPaneVisible: !prevState.navigationPaneVisible}))} key="view-source">
-          {getButtonIcon(ButtonType.TableOfContents)}
-        </Button>
-      );
-    }
-    if (this.state.gitHubUserInfo) {
-      let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
-        let userID: React.ReactNode[] = [];
-        if (userInfo.avatarUrl) {
-          userID.push(<img src={userInfo.avatarUrl} key="avatar"/>);
-        }
-        if (userInfo.login) {
-          if (userID.length) {
-            userID.push(' ');
-          }
-          userID.push(userInfo.login);
-        }
-        let userMenu: React.ReactNode[] = [
-          (
-            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key="logout">
-              {getButtonIcon(ButtonType.LogOut)}
-            </Button>
-          )
-        ];
-        return (
-          <MenuButton menu={userMenu} menuOnTop={true} openOnHover={true} key="user-menu">
-            {userID}
-          </MenuButton>
-        );
-      });
-      leftButtons.push(renderPromise(loginInfoPromise, 'user-info'));
-    } else if (this.state.gitHubAuthInfo) {
-      leftButtons.push(
-        <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key="login">
-          {getButtonIcon(ButtonType.LogIn)}
-        </Button>
-      );
-    }
-
-    let rightButtons: React.ReactNode[] = [];
-    if (this.state.selectedDocURI) {
-      if (!config.embedded && config.runningLocally) {
-        rightButtons.push(
-          <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openDocPageLocally} key="open-locally">
-            {getButtonIcon(ButtonType.OpenInVSCode)}
-          </Button>
-        );
-      }
-    } else if (this.state.selectedItemDefinition) {
-      let definition = this.state.selectedItemDefinition.getImmediateResult();
-      if (definition && definition.state === LibraryDefinitionState.Submitting) {
-        rightButtons.push(<div className={'submitting'} key="submitting"><Loading width={'1em'} height={'1em'}/></div>);
-        rightButtons.push(' ');
-      } else if (definition && (definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
-        let willSubmit: boolean | undefined;
-        let repository = this.state.selectedItemRepository;
-        if (repository) {
-          willSubmit = (repository.parentOwner && repository.pullRequestAllowed) || !repository.hasWriteAccess;
-        } else {
-          willSubmit = !config.runningLocally;
-        }
-        rightButtons.push(
-          <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key="submit">
-            {getButtonIcon(willSubmit ? ButtonType.Submit : ButtonType.Save)}
-          </Button>
-        );
-        rightButtons.push(
-          <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key="cancel">
-            {getButtonIcon(ButtonType.Cancel)}
-          </Button>
-        );
-        rightButtons.push(' ');
-      } else {
-        let editButtonPromise = this.state.selectedItemDefinition.then(() => (
-          <Button toolTipText={'Edit'} onClick={this.edit} key="edit">
-            {getButtonIcon(ButtonType.Edit)}
-          </Button>
-        ));
-        rightButtons.push(renderPromise(editButtonPromise, 'edit'));
-        if (!config.embedded) {
-          if (config.runningLocally) {
-            rightButtons.push(
-              <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key="open-locally">
-                {getButtonIcon(ButtonType.OpenInVSCode)}
-              </Button>
-            );
-          }
-          if (this.gitHubRepositoryAccess) {
-            rightButtons.push(
-              <Button toolTipText={'View on GitHub'} onClick={this.openRemotely} key="view-on-github">
-                {getButtonIcon(ButtonType.ViewInGitHub)}
-              </Button>
-            );
-          }
-        }
-      }
-    }
-    if (extraContents) {
-      rightButtons.push(
-        <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key="view-source">
-          {getButtonIcon(ButtonType.ViewSource)}
-        </Button>
-      );
-    }
-
     let contentsPane = (
       <div className={'bottom-toolbar-container'} key="main-contents-with-toolbar">
         <div className={'app-pane'}>
@@ -606,12 +502,8 @@ class App extends React.Component<AppProps, AppState> {
           </ScrollPane>
         </div>
         <div className={'bottom-toolbar'} key="toolbar">
-          <div className={'left'}>
-            {leftButtons}
-          </div>
-          <div className={'right'}>
-            {rightButtons}
-          </div>
+          {this.getLeftButtons()}
+          {this.getRightButtons(extraContents !== undefined)}
         </div>
       </div>
     );
@@ -664,6 +556,140 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return result;
+  }
+
+  private getLeftButtons(): React.ReactNode {
+    let leftButtons: React.ReactNode[] = [];
+
+    if (config.embedded) {
+      leftButtons.push(
+        <Button toolTipText={'Table of Contents'} selected={this.state.navigationPaneVisible} onClick={() => this.setState((prevState) => ({navigationPaneVisible: !prevState.navigationPaneVisible}))} key="view-source">
+          {getButtonIcon(ButtonType.TableOfContents)}
+        </Button>
+      );
+    }
+    if (this.state.gitHubUserInfo) {
+      let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
+        let userID: React.ReactNode[] = [];
+        if (userInfo.avatarUrl) {
+          userID.push(<img src={userInfo.avatarUrl} key="avatar"/>);
+        }
+        if (userInfo.login) {
+          if (userID.length) {
+            userID.push(' ');
+          }
+          userID.push(userInfo.login);
+        }
+        let userMenu: React.ReactNode[] = [
+          (
+            <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key="logout">
+              {getButtonIcon(ButtonType.LogOut)}
+            </Button>
+          )
+        ];
+        return (
+          <MenuButton menu={userMenu} menuOnTop={true} openOnHover={true} key="user-menu">
+            {userID}
+          </MenuButton>
+        );
+      });
+      leftButtons.push(renderPromise(loginInfoPromise, 'user-info'));
+    } else if (this.state.gitHubAuthInfo) {
+      leftButtons.push(
+        <Button toolTipText={'Log in with GitHub'} onClick={this.logInWithGitHub} key="login">
+          {getButtonIcon(ButtonType.LogIn)}
+        </Button>
+      );
+    }
+
+    return (
+      <div className={'left'} key="left-buttons">
+        {leftButtons}
+      </div>
+    );
+  }
+
+  private getRightButtons(hasExtraContents: boolean): React.ReactNode {
+    let rightButtonsPromise: CachedPromise<React.ReactNode[]>;
+
+    if (this.state.selectedDocURI) {
+      let rightButtons: React.ReactNode[] = [];
+      if (!config.embedded && config.runningLocally) {
+        rightButtons.push(
+          <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openDocPageLocally} key="open-locally">
+            {getButtonIcon(ButtonType.OpenInVSCode)}
+          </Button>
+        );
+      }
+      rightButtonsPromise = CachedPromise.resolve(rightButtons);
+    } else if (this.state.selectedItemDefinition) {
+      rightButtonsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
+        let rightButtons: React.ReactNode[] = [];
+        if (definition) {
+          if (definition.state === LibraryDefinitionState.Submitting) {
+            rightButtons.push(<div className={'submitting'} key="submitting"><Loading width={'1em'} height={'1em'}/></div>);
+            rightButtons.push(' ');
+          } else if ((definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
+            let willSubmit: boolean | undefined;
+            let repository = this.state.selectedItemRepository;
+            if (repository) {
+              willSubmit = (repository.parentOwner && repository.pullRequestAllowed) || !repository.hasWriteAccess;
+            } else {
+              willSubmit = !config.runningLocally;
+            }
+            rightButtons.push(
+              <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key="submit">
+                {getButtonIcon(willSubmit ? ButtonType.Submit : ButtonType.Save)}
+              </Button>
+            );
+            rightButtons.push(
+              <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key="cancel">
+                {getButtonIcon(ButtonType.Cancel)}
+              </Button>
+            );
+            rightButtons.push(' ');
+          } else {
+            rightButtons.push(
+              <Button toolTipText={'Edit'} onClick={this.edit} key="edit">
+                {getButtonIcon(ButtonType.Edit)}
+              </Button>
+            );
+          }
+          if (!config.embedded) {
+            if (config.runningLocally) {
+              rightButtons.push(
+                <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openLocally} key="open-locally">
+                  {getButtonIcon(ButtonType.OpenInVSCode)}
+                </Button>
+              );
+            }
+            if (this.gitHubRepositoryAccess) {
+              rightButtons.push(
+                <Button toolTipText={'View on GitHub'} onClick={this.openRemotely} key="view-on-github">
+                  {getButtonIcon(ButtonType.ViewInGitHub)}
+                </Button>
+              );
+            }
+          }
+          if (hasExtraContents) {
+            rightButtons.push(
+              <Button toolTipText={'View Source'} selected={this.state.extraContentsVisible} onClick={() => this.setState((prevState) => ({extraContentsVisible: !prevState.extraContentsVisible}))} key="view-source">
+                {getButtonIcon(ButtonType.ViewSource)}
+              </Button>
+            );
+          }
+        }
+        return rightButtons;
+      });
+    } else {
+      rightButtonsPromise = CachedPromise.resolve([]);
+    }
+
+    return renderPromise(rightButtonsPromise.then((rightButtons: React.ReactNode[]) => (
+      <div className={'right'} key="right-buttons">
+        {rightButtons}
+      </div>
+    )));
   }
 
   static getDerivedStateFromError(error: any) {
@@ -890,9 +916,9 @@ class App extends React.Component<AppProps, AppState> {
     let localPath = this.state.selectedItemLocalPath;
     let itemInfoPromise = this.state.selectedItemInfo;
     if (libraryDataProvider && definitionPromise && absolutePath && localPath && itemInfoPromise) {
-      definitionPromise.then((definition: LibraryDefinition) => {
+      definitionPromise.then((definition: LibraryDefinition | undefined) => {
         itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
-          let clonedDefinition = libraryDataProvider!.editLocalItem(definition, itemInfo);
+          let clonedDefinition = libraryDataProvider!.editLocalItem(definition!, itemInfo);
           let clonedDefinitionPromise = CachedPromise.resolve(clonedDefinition);
           let editedDefinition: LibraryItemListEntry = {
             libraryDataProvider: libraryDataProvider!,

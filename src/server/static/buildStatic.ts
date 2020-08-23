@@ -94,7 +94,7 @@ class StaticHTMLRenderer implements HTMLRenderer<string> {
 const htmlRenderer = new StaticHTMLRenderer;
 
 class StaticSiteGenerator {
-  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private outputFileAccessor: FileAccessor) {}
+  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private libraryURL: string, private outputFileAccessor: FileAccessor) {}
 
   async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo, uri: string) {
     let section = await libraryDataProvider.fetchLocalSection();
@@ -123,7 +123,7 @@ class StaticSiteGenerator {
           if (!htmlItem) {
             htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
           }
-          htmlItem = htmlRenderer.renderElement('a', {'href': itemURI}, htmlItem);
+          htmlItem = this.createLink(htmlItem, itemURI);
           htmlItems.push(htmlRenderer.renderElement('li', {}, htmlItem));
         } catch (error) {
           console.error(error);
@@ -160,9 +160,13 @@ class StaticSiteGenerator {
     let outputFileReference = this.outputFileAccessor.openFile(uri + '.html', true);
     outputFileReference.write!(html, true);
   }
+
+  private createLink(content: string, uri: string): string {
+    return htmlRenderer.renderElement('a', {'href': this.libraryURL + uri}, content);
+  }
 }
 
-function buildStaticPages(libraryFileName: string, logicName: string, htmlTemplateFileName: string, notationTemplateFileName: string, outputDirName: string) {
+function buildStaticPages(libraryFileName: string, logicName: string, htmlTemplateFileName: string, notationTemplateFileName: string, libraryURL: string, outputDirName: string) {
   let logic = Logics.findLogic(logicName);
   if (!logic) {
     throw new Error(`Logic ${logicName} not found`);
@@ -177,17 +181,20 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
   let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, path.basename(libraryFileName, fileExtension));
   let templateFileContents = fs.readFileSync(notationTemplateFileName, 'utf8');
   let templates = FmtReader.readString(templateFileContents, notationTemplateFileName, FmtNotation.getMetaModel);
+  if (!libraryURL.endsWith('/')) {
+    libraryURL += '/';
+  }
   let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
-  let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, outputFileAccessor);
+  let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, libraryURL, outputFileAccessor);
   return staticSiteGenerator.buildSection(libraryDataProvider, {itemNumber: []}, 'index');
 }
 
-if (process.argv.length !== 7) {
-  console.error('usage: node buildStatic.js <libraryFile> <logic> <htmlTemplateFile> <notationTemplateFile> <outputDir>');
+if (process.argv.length !== 8) {
+  console.error('usage: node buildStatic.js <libraryFile> <logic> <htmlTemplateFile> <notationTemplateFile> <libraryURL> <outputDir>');
   process.exit(2);
 }
 
-buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6])
+buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7])
   .catch((error) => {
     console.error(error);
     process.exit(1);

@@ -768,6 +768,9 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     if (props.selectedChildPath && !this.clicked) {
       this.setState({opened: true});
     } else if (props.selected && !this.clicked) {
+      if (props.isSubsection) {
+        this.setState({opened: true});
+      }
       if (this.scrollTimer) {
         clearTimeout(this.scrollTimer);
       }
@@ -789,7 +792,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     let icon: React.ReactNode = '\u2001';
     let display: React.ReactNode = this.props.itemInfo ? this.props.itemInfo.title : null;
     if (this.props.isSubsection) {
-      icon = getSectionIcon(this.state.opened, this.props.selectedChildPath !== undefined);
+      icon = getSectionIcon(this.state.opened, this.props.selected || this.props.selectedChildPath !== undefined);
       if (this.state.opened) {
         if (this.libraryDefinitionPromise) {
           let innerLibraryDataProvider = this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo?.itemNumber);

@@ -89,13 +89,17 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
     includeRemarks: false
   };
 
-  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<LibraryDefinition>, private onLinkClicked?: OnLinkClicked) {
+  constructor(private libraryDataProvider: LibraryDataProvider, private templates: Fmt.File, private definition?: CachedPromise<LibraryDefinition | undefined>, private onLinkClicked?: OnLinkClicked) {
     super();
   }
 
   expressionChanged(editorUpdateRequired: boolean = true, notifyLibraryDataProvider: boolean = true): void {
     if (notifyLibraryDataProvider && this.definition) {
-      this.definition.then((definition: LibraryDefinition) => this.libraryDataProvider.localItemModified(definition));
+      this.definition.then((definition: LibraryDefinition | undefined) => {
+        if (definition) {
+          this.libraryDataProvider.localItemModified(definition);
+        }
+      });
     }
     super.expressionChanged(editorUpdateRequired);
   }
