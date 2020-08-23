@@ -65,8 +65,7 @@
 	"main": "./out/vscode/src/extension",
 	"scripts": {
 		"clean": "rimraf out *.vsix",
-		"pre-build": "(node_modules/.bin/rimraf .dummy || npm install) && npm run clean",
-		"build": "npm run pre-build && webpack --mode production",
+		"build": "npm run clean && webpack --mode production",
 		"watch": "tsc --watch -p ./",
 		"package": "vsce package -o slate.vsix"
 	},
