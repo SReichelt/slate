@@ -16,18 +16,17 @@ async function checkSection(libraryDataProvider: LibraryDataProvider, templates:
   let index = 0;
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
+      let ref = item.ref as Fmt.DefinitionRefExpression;
       let itemInfo: LibraryItemInfo = {
         itemNumber: [...sectionItemInfo.itemNumber, index + 1],
         type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
         title: item.title
       };
       if (item instanceof FmtLibrary.MetaRefExpression_item) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
         let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
         let uri = libraryDataProvider.pathToURI(ref.path);
         await checkItem(libraryDataProvider, templates, itemInfo, definition, uri);
       } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-        let ref = item.ref as Fmt.DefinitionRefExpression;
         let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
         await checkSection(childProvider, templates, itemInfo);
       }

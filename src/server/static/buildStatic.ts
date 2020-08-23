@@ -91,37 +91,51 @@ class StaticHTMLRenderer implements HTMLRenderer<string> {
   }
 }
 
+const htmlRenderer = new StaticHTMLRenderer;
+
 class StaticSiteGenerator {
   constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private outputFileAccessor: FileAccessor) {}
 
-  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo) {
+  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo, uri: string) {
     let section = await libraryDataProvider.fetchLocalSection();
     let contents = section.definition.contents as FmtLibrary.ObjectContents_Section;
+    let htmlItems: string[] = [];
     let index = 0;
     for (let item of contents.items) {
       if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
-        let itemInfo: LibraryItemInfo = {
-          itemNumber: [...sectionItemInfo.itemNumber, index + 1],
-          type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
-          title: item.title
-        };
         try {
+          let ref = item.ref as Fmt.DefinitionRefExpression;
+          let itemURI = libraryDataProvider.pathToURI(ref.path);
+          let itemInfo: LibraryItemInfo = {
+            itemNumber: [...sectionItemInfo.itemNumber, index + 1],
+            type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
+            title: item.title
+          };
+          let htmlItem: string | undefined = undefined;
           if (item instanceof FmtLibrary.MetaRefExpression_item) {
-            let ref = item.ref as Fmt.DefinitionRefExpression;
             let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
-            let uri = libraryDataProvider.pathToURI(ref.path);
-            await this.buildItem(libraryDataProvider, itemInfo, definition, uri);
+            htmlItem = await this.buildItem(libraryDataProvider, itemInfo, definition, itemURI);
           } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-            let ref = item.ref as Fmt.DefinitionRefExpression;
             let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
-            await this.buildSection(childProvider, itemInfo);
+            await this.buildSection(childProvider, itemInfo, itemURI);
+            htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
           }
+          if (!htmlItem) {
+            htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
+          }
+          htmlItem = htmlRenderer.renderElement('a', {'href': itemURI}, htmlItem);
+          htmlItems.push(htmlRenderer.renderElement('li', {}, htmlItem));
         } catch (error) {
           console.error(error);
         }
       }
       index++;
     }
+    let htmlContent = '';
+    if (htmlItems.length) {
+      htmlContent = htmlRenderer.renderElement('ul', {}, htmlRenderer.concat(htmlItems));
+    }
+    await this.outputFile(htmlContent, uri);
   }
 
   async buildItem(libraryDataProvider: LibraryDataProvider, itemInfo: LibraryItemInfo, definition: LibraryDefinition, uri: string) {
@@ -131,12 +145,20 @@ class StaticSiteGenerator {
     let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, this.templates, rendererOptions);
     let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
     if (renderedDefinition) {
-      let htmlRenderer = new StaticHTMLRenderer;
       let htmlContent = await renderAsHTML(renderedDefinition, htmlRenderer, unicodeConversionOptions);
-      let html = await ejs.renderFile(this.htmlTemplateFileName, {'content': htmlContent}, ejsOptions);
-      let outputFileReference = this.outputFileAccessor.openFile(uri, true);
-      outputFileReference.write!(html, true);
+      await this.outputFile(htmlContent, uri);
+      let renderedSummary = renderer.renderDefinitionSummary();
+      if (renderedSummary) {
+        return await renderAsHTML(renderedSummary, htmlRenderer, unicodeConversionOptions);
+      }
     }
+    return undefined;
+  }
+
+  private async outputFile(htmlContent: string, uri: string) {
+    let html = await ejs.renderFile(this.htmlTemplateFileName, {'content': htmlContent}, ejsOptions);
+    let outputFileReference = this.outputFileAccessor.openFile(uri + '.html', true);
+    outputFileReference.write!(html, true);
   }
 }
 
@@ -157,7 +179,7 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
   let templates = FmtReader.readString(templateFileContents, notationTemplateFileName, FmtNotation.getMetaModel);
   let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
   let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, outputFileAccessor);
-  return staticSiteGenerator.buildSection(libraryDataProvider, {itemNumber: []});
+  return staticSiteGenerator.buildSection(libraryDataProvider, {itemNumber: []}, 'index');
 }
 
 if (process.argv.length !== 7) {
