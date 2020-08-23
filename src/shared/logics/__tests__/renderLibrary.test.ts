@@ -8,6 +8,7 @@ import * as Logic from '../logic';
 import * as Logics from '../logics';
 import { renderAsText, RenderAsTextOptions } from '../../notation/textOutput';
 import CachedPromise from '../../data/cachedPromise';
+import { fileExtension } from '../../data/constants';
 
 async function checkSection(libraryDataProvider: LibraryDataProvider, templates: Fmt.File, sectionItemInfo: LibraryItemInfo) {
   let section = await libraryDataProvider.fetchLocalSection();
@@ -51,8 +52,7 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
     let options: RenderAsTextOptions = {
       outputMarkdown: false,
       singleLine: false,
-      allowEmptyLines: true,
-      indent: ''
+      allowEmptyLines: true
     };
     let renderedText = renderAsText(renderedDefinition, options);
     expect(renderedText).resolves.toMatchSnapshot(formatItemNumber(itemInfo.itemNumber) + ' ' + uri);
@@ -61,7 +61,7 @@ async function checkItem(libraryDataProvider: LibraryDataProvider, templates: Fm
 
 test('render hlm library', async () => {
   jest.setTimeout(10000);
-  let fileAccessor = new PhysicalFileAccessor();
+  let fileAccessor = new PhysicalFileAccessor;
   let libraryDataProviderOptions: LibraryDataProviderOptions = {
     logic: Logics.hlm,
     fileAccessor: fileAccessor.createChildAccessor('data/libraries/hlm'),
@@ -69,9 +69,9 @@ test('render hlm library', async () => {
     checkMarkdownCode: false,
     allowPlaceholders: false
   };
-  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
-  let templateFileReference = fileAccessor.openFile('data/notation/templates.slate', false);
+  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions);
+  let templateFileReference = fileAccessor.openFile('data/notation/templates' + fileExtension, false);
   let templateFileContents = await templateFileReference.read();
-  let templates = await FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
+  let templates = FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
 });

@@ -5,7 +5,7 @@ import * as FmtDynamic from '../../../../shared/format/dynamic';
 import * as FmtMeta from '../../../../shared/format/meta';
 import * as FmtReader from '../../../../shared/format/read';
 import { escapeIdentifier } from '../../../../shared/format/common';
-import { fileExtension } from '../../../../fs/format/dynamic';
+import { fileExtension } from '../../../../shared/data/constants';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
 import { parseFile } from '../parse';
 import { isDefinitionReferenceToUri, getNameDefinitionLocation, findReferencedDefinition } from '../navigate';

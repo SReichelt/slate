@@ -1,6 +1,6 @@
 import * as Notation from './notation';
 import CachedPromise from '../data/cachedPromise';
-import { shrinkMathSpaces } from '../format/common';
+import { shrinkMathSpaces, useItalicsForVariable } from './unicode';
 
 const escapeForMarkdown = require('markdown-escape');
 
@@ -8,18 +8,11 @@ export interface RenderAsTextOptions {
   outputMarkdown: boolean;
   singleLine: boolean;
   allowEmptyLines: boolean;
-  indent: string;
+  indent?: string;
+  shrinkMathSpaces?: boolean;
 }
 
 export function renderAsText(expression: Notation.RenderedExpression, options: RenderAsTextOptions, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
-  let result = renderAsTextInternal(expression, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
-  if (expression.hasStyleClass('script')) {
-    result = result.then((text: string) => shrinkMathSpaces(text));
-  }
-  return result;
-}
-
-function renderAsTextInternal(expression: Notation.RenderedExpression, options: RenderAsTextOptions, optionalParenLeft: boolean, optionalParenRight: boolean, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<string> {
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
@@ -27,6 +20,13 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
       && optionalParenMaxLevel === undefined
       && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
     return renderAsText(new Notation.ParenExpression(expression, optionalParenStyle), options);
+  }
+  let indent = options.indent ?? '';
+  if (expression.hasStyleClass('script')) {
+    options = {
+      ...options,
+      shrinkMathSpaces: true
+    };
   }
   let singleLineOptions: RenderAsTextOptions = options.singleLine ? options : {
     ...options,
@@ -37,9 +37,12 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
     return CachedPromise.resolve('');
   } else if (expression instanceof Notation.TextExpression) {
     let text = expression.text;
+    if (options.shrinkMathSpaces) {
+      text = shrinkMathSpaces(text);
+    }
     if (options.outputMarkdown) {
       text = escapeForMarkdown(text);
-      if (expression.hasStyleClass('var')) {
+      if (expression.hasStyleClass('var') && useItalicsForVariable(expression.text)) {
         text = '_' + text + '_';
       }
     }
@@ -48,22 +51,22 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
     if (expression.items.length === 1) {
       return renderAsText(expression.items[0], singleLineOptions, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else {
-      return renderList(expression.items.map((item) => renderAsText(item, singleLineOptions)), '');
+      return renderList(expression.items.map((item) => renderAsText(item, singleLineOptions)));
     }
   } else if (expression instanceof Notation.ParagraphExpression) {
-    let paragraphs = expression.paragraphs.map((item) => {
+    let paragraphs = expression.paragraphs.map((item: Notation.RenderedExpression) => {
       let ownIndent = '';
       if ((item.hasStyleClass('indented') || item.hasStyleClass('display-math')) && !options.singleLine) {
         ownIndent = options.outputMarkdown ? '\u2007' : '  ';
       }
       let innerOptions: RenderAsTextOptions = {
         ...options,
-        indent: options.indent + ownIndent
+        indent: indent + ownIndent
       };
       return renderAsText(item, innerOptions)
         .then((result) => ownIndent + result);
     });
-    return renderList(paragraphs, options.singleLine ? ' ' : (options.allowEmptyLines ? '\n\n' : '\n') + options.indent);
+    return renderList(paragraphs, options.singleLine ? ' ' : (options.allowEmptyLines ? '\n\n' : '\n') + indent);
   } else if (expression instanceof Notation.ListExpression) {
     let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
       let prefix: string;
@@ -76,19 +79,20 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
       let innerOptions: RenderAsTextOptions = {
         ...options,
         allowEmptyLines: false,
-        indent: options.indent + ' '.repeat(prefix.length)
+        indent: indent + ' '.repeat(prefix.length)
       };
       return renderAsText(item, innerOptions).then((text) => prefix + text);
     });
-    return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + options.indent);
+    return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Notation.TableExpression) {
     let isAligned = ((expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid')));
     let isDefinitionList = expression.hasStyleClass('definitions');
     let isConstruction = expression.hasStyleClass('construction');
     let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
     let secondarySeparator = isDefinitionList ? '  ' : undefined;
-    let rows = expression.items.map((row: Notation.RenderedExpression[]) => renderList(row.map((cell) => renderAsText(cell, singleLineOptions)), separator, secondarySeparator));
-    return renderList(rows, options.singleLine ? ', ' : (options.outputMarkdown ? '\\\n' : '\n') + options.indent);
+    let rows = expression.items.map((row: Notation.RenderedExpression[]) =>
+      renderList(row.map((cell) => renderAsText(cell, singleLineOptions)), separator, secondarySeparator));
+    return renderList(rows, options.singleLine ? ', ' : (options.outputMarkdown ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Notation.ParenExpression) {
     return expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
       let body = renderAsText(expression.body, singleLineOptions);
@@ -159,13 +163,15 @@ function renderAsTextInternal(expression: Notation.RenderedExpression, options: 
   }
 }
 
-function renderList(items: CachedPromise<string>[], separator: string, secondarySeparator?: string): CachedPromise<string> {
-  let text = CachedPromise.resolve('');
+function renderList(items: CachedPromise<string>[], separator: string = '', secondarySeparator?: string): CachedPromise<string> {
+  let resultPromise = CachedPromise.resolve('');
   let index = 0;
-  for (let item of items) {
+  for (let itemPromise of items) {
     let currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
-    text = text.then((resolvedText) => item.then((resolvedItem) => resolvedText ? resolvedItem ? resolvedText + currentSeparator + resolvedItem : resolvedText : resolvedItem));
+    resultPromise = resultPromise.then((currentResult: string) =>
+      itemPromise.then((item: string) =>
+        currentResult ? (item ? currentResult + currentSeparator + item : currentResult) : item));
     index++;
   }
-  return text;
+  return resultPromise;
 }

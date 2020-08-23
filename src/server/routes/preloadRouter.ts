@@ -84,7 +84,7 @@ export function preloadRouter(rootPath: string): express.Router {
       let preloader = new LibraryPreloader(fileAccessor);
       updateChecker.register(() => {
         console.log(`Preloading library "${libraryName}"...`);
-        return preloader.preloadLibrary('Library')
+        return preloader.preloadLibrary()
           .then(() => console.log(`Finished preloading library "${libraryName}".`));
       });
       let uriPrefix = '/preload/libraries/' + libraryName;

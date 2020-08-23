@@ -32,6 +32,7 @@ import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } fro
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
 import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from '../shared/data/libraryDataProvider';
+import { fileExtension } from '../shared/data/constants';
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
@@ -171,7 +172,7 @@ class App extends React.Component<AppProps, AppState> {
       allowPlaceholders: config.embedded,
       externalURIPrefix: libraryURI
     };
-    this.libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
+    this.libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions);
 
     if (selectionURI) {
       this.updateSelectionState(state, selectionURI);
@@ -281,7 +282,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    let templateFile = this.fileAccessor.openFile('data/notation/templates.slate', false);
+    let templateFile = this.fileAccessor.openFile('data/notation/templates' + fileExtension, false);
     let setTemplates = (contents: string) => {
       let templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
       this.setState({templates: templates});

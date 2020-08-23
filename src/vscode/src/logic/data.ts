@@ -44,7 +44,7 @@ export class LibraryDocumentProvider {
         if (!event.file) {
             return undefined;
         }
-        let isSection = (event.file.metaModelPath.name === 'library');
+        let isSection = (event.file.metaModelPath.name === FmtLibrary.metaModel.name);
         let rangeHandler = new RangeHandler;
         if (isSection) {
             event.file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel, rangeHandler);
@@ -107,7 +107,7 @@ export class LibraryDocumentProvider {
                 allowPlaceholders: true
             };
             library = {
-                libraryDataProvider: new LibraryDataProvider(options, 'Library'),
+                libraryDataProvider: new LibraryDataProvider(options),
                 diagnosticCollection: vscode.languages.createDiagnosticCollection(languageId + '/' + logicName)
             };
             this.libraries.set(libraryUri, library);

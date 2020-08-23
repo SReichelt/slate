@@ -12,7 +12,7 @@ import ExpressionDialog from './ExpressionDialog';
 import Button from './Button';
 import config from '../utils/config';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { shrinkMathSpace } from '../../shared/format/common';
+import { convertUnicode, UnicodeConverter, UnicodeConversionOptions, useItalicsForVariable } from '../../shared/notation/unicode';
 import ReactMarkdownEditor from 'react-simplemde-editor';
 import * as EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
@@ -40,6 +40,32 @@ export interface ExpressionInteractionHandler {
   enterBlocker(): void;
   leaveBlocker(): void;
   isBlocked(): boolean;
+}
+
+class ExpressionUnicodeConverter implements UnicodeConverter {
+  result: React.ReactNode[] = [];
+  childIndex: number = 0;
+
+  outputText(text: string, style?: string | undefined): void {
+    let content: React.ReactNode = text;
+    if (text === '\'') {
+      style = style ? style + ' prime' : 'prime';
+      content = [<span className={'replacement'} key={0}> ′</span>, content];
+    }
+    this.result.push(style ? <span className={style} key={this.childIndex++}>{content}</span> : content);
+  }
+
+  outputLineBreak(): void {
+    this.result.push(<br key={this.childIndex++}/>);
+  }
+
+  outputExtraSpace(standalone: boolean): void {
+    if (standalone) {
+      this.result.push(<span key={this.childIndex++}>{'\u2008'}</span>);
+    } else {
+      this.result.push(<span key={this.childIndex++}>&nbsp;</span>);
+    }
+  }
 }
 
 export interface ExpressionProps {
@@ -116,8 +142,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private updateOptionalProps(props: ExpressionProps): void {
-    this.shrinkMathSpaces = props.shrinkMathSpaces || props.parent?.shrinkMathSpaces || false;
-    this.toolTipPosition = props.toolTipPosition || props.parent?.toolTipPosition || 'bottom';
+    this.shrinkMathSpaces = props.shrinkMathSpaces ?? props.parent?.shrinkMathSpaces ?? false;
+    this.toolTipPosition = props.toolTipPosition ?? props.parent?.toolTipPosition ?? 'bottom';
   }
 
   private clearOpenMenu(): void {
@@ -274,9 +300,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (this.state.inputError) {
           inputClassName += ' input-error';
         }
-        let size = expression.inputLength ?? expression.text.length + 1;
+        let text = expression.text;
+        if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
+          inputClassName += ' italic';
+        }
+        let size = expression.inputLength ?? text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-        result = <input type={'text'} className={inputClassName} value={expression.text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onMouseUp={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
+        result = <input type={'text'} className={inputClassName} value={text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onMouseUp={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
         isInputControl = true;
       } else {
         let text = expression.text;
@@ -300,14 +330,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
               className += ' space-start';
             }
-            if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
-              className += ' charcorner-tr';
-              if (lastChar === 'T' || lastChar === 'Y') {
-                className += ' charcorner-large';
+            if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
+              className += ' italic';
+              if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
+                className += ' charcorner-tr';
+                if (lastChar === 'T' || lastChar === 'Y') {
+                  className += ' charcorner-large';
+                }
               }
-            }
-            if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
-              className += ' charcorner-bl';
+              if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
+                className += ' charcorner-bl';
+              }
             }
             result = this.convertText(text);
           }
@@ -1049,243 +1082,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private convertText(text: string): React.ReactNode {
-    let curText = '';
-    let curStyle: string | undefined = undefined;
-    let result: React.ReactNode[] = [];
-    let childIndex = 0;
-    let flush = () => {
-      if (curText) {
-        result.push(curStyle ? <span className={curStyle} key={childIndex++}>{curText}</span> : curText);
-        curText = '';
-      }
-      curStyle = undefined;
+    let converter = new ExpressionUnicodeConverter;
+    let options: UnicodeConversionOptions = {
+      convertStandardCharacters: true,
+      shrinkMathSpaces: this.shrinkMathSpaces
     };
-    let setStyle = (style: string | undefined) => {
-      if (curStyle !== style) {
-        flush();
-        curStyle = style;
-      }
-    };
-    let iterator = text[Symbol.iterator]();
-    for (let next = iterator.next(); !next.done; next = iterator.next()) {
-      let c = next.value;
-      switch (c) {
-      case '\r':
-        break;
-      case '\n':
-        flush();
-        result.push(<br key={childIndex++}/>);
-        break;
-      case ' ':
-        if (curText) {
-          if (curText.endsWith(' ')) {
-            curText = curText.substring(0, curText.length - 1);
-            flush();
-            result.push(<span key={childIndex++}>&nbsp;</span>);
-          }
-          curText += c;
-        } else {
-          result.push(<span key={childIndex++}>{'\u2008'}</span>);
-        }
-        break;
-      case '\'':
-        flush();
-        result.push(<span className={'prime'} key={childIndex++}><span className={'replacement'}> ′</span>{c}</span>);
-        break;
-      default:
-        let cp = c.codePointAt(0)!;
-        if (cp >= 0x1d400 && cp < 0x1d434) {
-          setStyle('bold');
-          curText += this.convertLatinMathToRegular(cp - 0x1d400);
-        } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
-          setStyle('bold');
-          curText += this.convertGreekMathToRegular(cp - 0x1d6a8);
-        } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
-          setStyle('bold');
-          curText += this.convertDigitMathToRegular(cp - 0x1d7ce);
-        } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
-          setStyle('italic');
-          switch (cp) {
-          case 0x210e:
-            curText += 'h';
-            break;
-          default:
-            curText += this.convertLatinMathToRegular(cp - 0x1d434);
-          }
-        } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
-          setStyle('italic');
-          curText += this.convertGreekMathToRegular(cp - 0x1d6e2);
-        } else if (cp >= 0x1d468 && cp < 0x1d49c) {
-          setStyle('bold italic');
-          curText += this.convertLatinMathToRegular(cp - 0x1d468);
-        } else if (cp >= 0x1d71c && cp < 0x1d756) {
-          setStyle('bold italic');
-          curText += this.convertGreekMathToRegular(cp - 0x1d71c);
-        } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
-          setStyle('sans');
-          curText += this.convertLatinMathToRegular(cp - 0x1d5a0);
-        } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
-          setStyle('sans');
-          curText += this.convertDigitMathToRegular(cp - 0x1d7e2);
-        } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
-          setStyle('sans bold');
-          curText += this.convertLatinMathToRegular(cp - 0x1d5d4);
-        } else if (cp >= 0x1d756 && cp < 0x1d790) {
-          setStyle('sans bold');
-          curText += this.convertGreekMathToRegular(cp - 0x1d756);
-        } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
-          setStyle('sans bold');
-          curText += this.convertDigitMathToRegular(cp - 0x1d7ec);
-        } else if (cp >= 0x1d608 && cp < 0x1d63c) {
-          setStyle('sans italic');
-          curText += this.convertLatinMathToRegular(cp - 0x1d608);
-        } else if (cp >= 0x1d63c && cp < 0x1d670) {
-          setStyle('sans bold italic');
-          curText += this.convertLatinMathToRegular(cp - 0x1d63c);
-        } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
-          setStyle('sans bold italic');
-          curText += this.convertGreekMathToRegular(cp - 0x1d790);
-        } else if ((cp >= 0x1d49c && cp < 0x1d504) || cp === 0x212c || cp === 0x2130 || cp === 0x2131 || cp === 0x210b || cp === 0x2110 || cp === 0x2112 || cp === 0x2133 || cp === 0x211b || cp === 0x212f || cp === 0x210a || cp === 0x2134) {
-          setStyle('calligraphic');
-          switch (cp) {
-          case 0x212c:
-            curText += 'B';
-            break;
-          case 0x2130:
-            curText += 'E';
-            break;
-          case 0x2131:
-            curText += 'F';
-            break;
-          case 0x210b:
-            curText += 'H';
-            break;
-          case 0x2110:
-            curText += 'I';
-            break;
-          case 0x2112:
-            curText += 'L';
-            break;
-          case 0x2133:
-            curText += 'M';
-            break;
-          case 0x211b:
-            curText += 'R';
-            break;
-          case 0x212f:
-            curText += 'e';
-            break;
-          case 0x210a:
-            curText += 'g';
-            break;
-          case 0x2134:
-            curText += 'o';
-            break;
-          default:
-            curText += this.convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
-          }
-        } else if ((cp >= 0x1d504 && cp < 0x1d538) || cp === 0x212d || cp === 0x210c || cp === 0x2111 || cp === 0x211c || cp === 0x2128) {
-          setStyle('fraktur');
-          switch (cp) {
-          case 0x212d:
-            curText += 'C';
-            break;
-          case 0x210c:
-            curText += 'H';
-            break;
-          case 0x2111:
-            curText += 'I';
-            break;
-          case 0x211c:
-            curText += 'R';
-            break;
-          case 0x2128:
-            curText += 'Z';
-            break;
-          default:
-            curText += this.convertLatinMathToRegular(cp - 0x1d504);
-          }
-        } else if ((cp >= 0x1d538 && cp < 0x1d56c) || cp === 0x2102 || cp === 0x210d || cp === 0x2115 || cp === 0x2119 || cp === 0x211a || cp === 0x211d || cp === 0x2124) {
-          setStyle('double-struck');
-          switch (cp) {
-          case 0x2102:
-            curText += 'C';
-            break;
-          case 0x210d:
-            curText += 'H';
-            break;
-          case 0x2115:
-            curText += 'N';
-            break;
-          case 0x2119:
-            curText += 'P';
-            break;
-          case 0x211a:
-            curText += 'Q';
-            break;
-          case 0x211d:
-            curText += 'R';
-            break;
-          case 0x2124:
-            curText += 'Z';
-            break;
-          default:
-            curText += this.convertLatinMathToRegular(cp - 0x1d538);
-          }
-        } else if (cp >= 0x1d56c && cp < 0x1d5a0) {
-          setStyle('fraktur bold');
-          curText += this.convertLatinMathToRegular(cp - 0x1d56c);
-        } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
-          setStyle('double-struck');
-          curText += this.convertDigitMathToRegular(cp - 0x1d7d8);
-        } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
-          setStyle('monospace');
-          curText += this.convertLatinMathToRegular(cp - 0x1d670);
-        } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
-          setStyle('monospace');
-          curText += this.convertDigitMathToRegular(cp - 0x1d7f6);
-        } else {
-          if (curStyle) {
-            flush();
-          }
-          if (this.shrinkMathSpaces) {
-            c = shrinkMathSpace(c);
-          }
-          curText += c;
-        }
-      }
-    }
-    flush();
-    if (result.length === 1) {
-      return result[0];
+    convertUnicode(text, converter, options);
+    if (converter.result.length === 1) {
+      return converter.result[0];
     } else {
-      return result;
+      return converter.result;
     }
-  }
-
-  private convertLatinMathToRegular(cpOffset: number): string {
-    return String.fromCodePoint(cpOffset < 0x1a ? cpOffset + 0x41 :
-                                                  cpOffset - 0x1a + 0x61);
-  }
-
-  private convertGreekMathToRegular(cpOffset: number): string {
-    return String.fromCodePoint(cpOffset === 0x11  ? 0x3f4 :
-                                cpOffset < 0x19    ? cpOffset + 0x391 :
-                                cpOffset === 0x19  ? 0x2207 :
-                                cpOffset < 0x33    ? cpOffset - 0x1a + 0x3b1 :
-                                cpOffset === 0x33  ? 0x2202 :
-                                cpOffset === 0x34  ? 0x3f5 :
-                                cpOffset === 0x35  ? 0x3f0 :
-                                cpOffset === 0x36  ? 0x3d5 :
-                                cpOffset === 0x37  ? 0x3f1 :
-                                cpOffset === 0x38  ? 0x3d6 :
-                                cpOffset === 0x122 ? 0x3dc :
-                                cpOffset === 0x123 ? 0x3dd :
-                                0);
-  }
-
-  private convertDigitMathToRegular(cpOffset: number): string {
-    return String.fromCodePoint(cpOffset + 0x30);
   }
 
   private renderMarkdown(text: string, renderCode?: (code: string) => Notation.RenderedExpression): React.ReactElement {

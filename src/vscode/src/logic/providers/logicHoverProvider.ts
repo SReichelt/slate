@@ -37,8 +37,7 @@ export class SlateLogicHoverProvider {
                 let renderAsTextOptions: RenderAsTextOptions = {
                     outputMarkdown: true,
                     singleLine: false,
-                    allowEmptyLines: true,
-                    indent: ''
+                    allowEmptyLines: true
                 };
                 return renderAsText(renderedDefinition, renderAsTextOptions);
             });

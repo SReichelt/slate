@@ -3,37 +3,47 @@
   command = "npm run build"
   functions = "dist/functions/"
 
+# At the root, just load the app via index.html.
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+# Submission by email.
+# Ideally, we would like to redirect PUT requests only, but Netlify currently doesn't support that.
+# Therefore, we have set things up so that GET requests to data/libraries never happen (in contrast to a development build).
 [[redirects]]
   from = "/data/libraries/*"
   to = "/.netlify/functions/submit"
   status = 200
 
-[[redirects]]
-  from = "/preload/libraries/hlm/*"
-  to = "http://slate-hlm.netlify.app/preload/:splat"
-  status = 200
-
+# GitHub authentication API: get client info.
 [[redirects]]
   from = "/github-auth/info"
   to = "/.netlify/functions/auth-info"
   status = 200
 
+# GitHub authentication API: get access token from code.
 [[redirects]]
   from = "/github-auth/auth"
   to = "/.netlify/functions/auth"
   status = 200
 
+# Enable preloading for the HLM library, via a separate Netlify build.
 [[redirects]]
-  from = "/libraries/*"
-  to = "/index.html"
+  from = "/preload/libraries/hlm/*"
+  to = "http://slate-hlm.netlify.app/preload/:splat"
   status = 200
 
+# Serve static pages for the HLM library (which load the application if JavaScript is available).
+[[redirects]]
+  from = "/libraries/hlm/*"
+  to = "http://slate-hlm.netlify.app/static/:splat"
+  status = 200
+
+# Currently, documentation pages are viewed via the app.
+# TODO generate static pages for these as well
 [[redirects]]
   from = "/docs/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/"
   to = "/index.html"
   status = 200

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as FmtReader from '../../../shared/format/read';
 import * as FmtNotation from '../../../shared/notation/meta';
-import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
-import { fileExtension } from '../../../fs/format/dynamic';
+import { FileAccessor } from '../../../shared/data/fileAccessor';
+import { fileExtension } from '../../../shared/data/constants';
 import { SLATE_MODE } from '../slate';
 import { ParseDocumentEvent, HoverEvent } from '../events';
 import { LibraryDocumentProvider } from './data';

@@ -11,7 +11,7 @@ class SourceCodeView extends LibraryItemBase {
     let renderer = this.getRenderer();
     let stream = new SourceCodeDisplay.SourceCodeStream(renderer);
     let writer = new FmtWriter.Writer(stream, true);
-    let indent = {
+    let indent: FmtWriter.IndentInfo = {
       indent: '',
       outerIndent: ''
     };

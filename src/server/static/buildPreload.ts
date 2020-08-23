@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { FileAccessor } from '../../shared/data/fileAccessor';
+import { fileExtension } from '../../shared/data/constants';
 import { PhysicalFileAccessor } from '../../fs/data/physicalFileAccessor';
 import { LibraryPreloadGenerator } from '../preload/preload';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -20,17 +21,19 @@ class LibraryPreloadWriter extends LibraryPreloadGenerator {
   }
 }
 
+function outputPreload(libraryFileName: string, outputDirName: string): CachedPromise<void> {
+  let inputFileAccessor = new PhysicalFileAccessor(path.dirname(libraryFileName));
+  let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
+  let preloadWriter = new LibraryPreloadWriter(inputFileAccessor, outputFileAccessor);
+  return preloadWriter.preloadLibrary(path.basename(libraryFileName, fileExtension));
+}
+
 if (process.argv.length !== 4) {
   console.error('usage: node buildPreload.js <libraryFile> <outputDir>');
   process.exit(2);
 }
 
-let libraryFileName = process.argv[2];
-let outputDirName = process.argv[3];
-let physicalInputFileAccessor = new PhysicalFileAccessor(path.dirname(libraryFileName));
-let physicalOutputFileAccessor = new PhysicalFileAccessor(outputDirName);
-let preloadWriter = new LibraryPreloadWriter(physicalInputFileAccessor, physicalOutputFileAccessor);
-preloadWriter.preloadLibrary(path.basename(libraryFileName, '.slate'))
+outputPreload(process.argv[2], process.argv[3])
   .catch((error) => {
     console.error(error);
     process.exit(1);

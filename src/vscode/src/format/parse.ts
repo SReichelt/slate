@@ -5,7 +5,7 @@ import * as FmtDynamic from '../../../shared/format/dynamic';
 import * as FmtMeta from '../../../shared/format/meta';
 import * as FmtReader from '../../../shared/format/read';
 import { getFileNameFromPath } from '../../../fs/format/dynamic';
-import { RangeInfo, RangeHandler, convertRange } from '../utils';
+import { RangeHandler, convertRange } from '../utils';
 import { ParsedDocument, NestedArgumentListInfo } from './parsedDocument';
 import { readRange, readRangeRaw } from './utils';
 import { checkReferencedDefinitions } from './checkReferencedDefinitions';

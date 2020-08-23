@@ -64,6 +64,6 @@ test('run checker test suite', async () => {
     checkMarkdownCode: false,
     allowPlaceholders: false
   };
-  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, 'Library');
+  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions);
   await checkSection(libraryDataProvider);
 });

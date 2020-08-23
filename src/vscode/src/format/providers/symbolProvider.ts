@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as Fmt from '../../../../shared/format/format';
 import * as Meta from '../../../../shared/format/metaModel';
 import * as FmtReader from '../../../../shared/format/read';
-import { fileExtension } from '../../../../fs/format/dynamic';
+import { fileExtension } from '../../../../shared/data/constants';
 import { ParsedDocumentMap } from '../parsedDocument';
 import { parseFile } from '../parse';
 import { readRange } from '../utils';

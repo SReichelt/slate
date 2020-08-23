@@ -2157,7 +2157,7 @@ by:
 
 Remarks.
 
-Such recursive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the \\"+\\" symbols appearing in this definition are part of the notation of the successor constructor.
+Such inductive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the \\"+\\" symbols appearing in this definition are part of the notation of the successor constructor.
 
 References.
 
@@ -2971,7 +2971,7 @@ by:
 
 Remarks.
 
-We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition.
+We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition (see \`$\\"Binomial coefficient equality\\"\`).
 
 References.
 
@@ -8559,7 +8559,7 @@ exports[`render hlm library: 2.8.29.1.13.3 Algebra/Rings/Modules/Left%20modules/
 
 by:
 
-  (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 
@@ -8996,7 +8996,7 @@ exports[`render hlm library: 2.8.29.2.13.3 Algebra/Rings/Modules/Right%20modules
 
 by:
 
-  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k<α))_((𝐌)^α)|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 

@@ -537,22 +537,19 @@ div.display-math {
 
 .var, .var>* {
   font-family: 'TeX-Var', serif;
-  font-style: italic;
 }
 
-.var.charcorner-tr:last-child::after, .var.charcorner-tr+*:not(.subsup)::before {
+.charcorner-tr:last-child::after, .charcorner-tr+*:not(.subsup)::before {
   content: ' ';
-  font-family: 'TeX-Var', serif;
-  font-style: italic;
   font-size: smaller;
 }
 
-.var.charcorner-tr.charcorner-large+.space-start::before, .var.charcorner-tr+sup::before {
+.charcorner-tr.charcorner-large+.space-start::before, .charcorner-tr+sup::before {
   content: ' '!important;
   font-size: initial!important;
 }
 
-.var.charcorner-tr+sub::before {
+.charcorner-tr+sub::before {
   content: ''!important;
 }
 
@@ -560,7 +557,7 @@ div.display-math {
   padding-left: 1px;
 }
 
-.var .prime {
+.prime {
   position: relative;
   visibility: hidden;
 }
@@ -569,7 +566,7 @@ div.display-math {
   display: none;
 }
 
-.var .prime .replacement {
+.prime .replacement {
   display: initial;
   position: absolute;
   left: 0;
@@ -677,7 +674,6 @@ div.display-math {
 
 .source-code .var {
   font-family: 'TeX', serif;
-  font-style: italic;
 }
 
 .source-code.string {

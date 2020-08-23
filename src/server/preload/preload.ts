@@ -1,4 +1,5 @@
 import { FileAccessor, FileWatcher } from '../../shared/data/fileAccessor';
+import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from '../../shared/data/constants';
 import * as Fmt from '../../shared/format/format';
 import * as Meta from '../../shared/format/metaModel';
 import * as FmtReader from '../../shared/format/read';
@@ -37,7 +38,7 @@ export abstract class LibraryPreloadGenerator {
   }
 
   private getItemContents(baseURI: string, preloadURI: string, name: string): CachedPromise<string> {
-    let uri = baseURI + encodeURI(name) + '.slate';
+    let uri = baseURI + encodeURI(name) + fileExtension;
     return this.readFile(uri, preloadURI, Meta.getDummyMetaModel)
       .then((file: Fmt.File) => {
         for (let definition of file.definitions) {
@@ -49,13 +50,13 @@ export abstract class LibraryPreloadGenerator {
       });
   }
 
-  preloadLibrary(name: string): CachedPromise<void> {
+  preloadLibrary(name: string = defaultLibraryName): CachedPromise<void> {
     return this.preloadSection('', name);
   }
 
   private preloadSection(baseURI: string, name: string): CachedPromise<void> {
-    let indexURI = baseURI + encodeURI(name) + '.slate';
-    let preloadURI = indexURI + '.preload';
+    let indexURI = baseURI + encodeURI(name) + fileExtension;
+    let preloadURI = indexURI + preloadExtension;
     return this.readFile(indexURI, preloadURI, FmtLibrary.getMetaModel)
       .then((file: Fmt.File) => {
         let promises: CachedPromise<string>[] = [];
@@ -66,7 +67,7 @@ export abstract class LibraryPreloadGenerator {
                 let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
                 if (!itemPath.parentPath) {
                   if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-                    let promise = this.preloadSection(baseURI + encodeURI(itemPath.name) + '/', '_index')
+                    let promise = this.preloadSection(baseURI + encodeURI(itemPath.name) + '/', indexFileName)
                       .catch((error) => console.error(error))
                       .then(() => '');
                     promises.push(promise);

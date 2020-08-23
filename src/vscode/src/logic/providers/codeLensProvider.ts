@@ -78,8 +78,7 @@ export class SlateCodeLensProvider implements vscode.CodeLensProvider {
             let renderAsTextOptions: RenderAsTextOptions = {
                 outputMarkdown: false,
                 singleLine: true,
-                allowEmptyLines: false,
-                indent: ''
+                allowEmptyLines: false
             };
             return renderAsText(codeLens.renderFn(), renderAsTextOptions).then((text: string) => {
                 return new vscode.CodeLens(codeLens.range, {

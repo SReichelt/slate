@@ -1,5 +1,6 @@
 import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber, LibraryItemNumber } from './libraryDataAccessor';
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from './fileAccessor';
+import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from './constants';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as Meta from '../format/metaModel';
@@ -9,10 +10,6 @@ import * as FmtLibrary from '../logics/library';
 import * as Logic from '../logics/logic';
 
 export { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryItemNumber, formatItemNumber };
-
-
-const fileExtension = '.slate';
-const indexFileName = '_index';
 
 export interface DefaultReference {
   title: string;
@@ -102,7 +99,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
-  constructor(private options: LibraryDataProviderOptions, private childName: string, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
+  constructor(private options: LibraryDataProviderOptions, private childName: string = defaultLibraryName, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
     this.logic = options.logic;
     this.fileAccessor = options.fileAccessor;
     if (parent) {
@@ -413,7 +410,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let uri = this.getFileURI(name);
       if (this.fileAccessor.preloadFile && !fullContentsRequired) {
         if (isSection) {
-          result = this.fileAccessor.preloadFile(uri + '.preload')
+          result = this.fileAccessor.preloadFile(uri + preloadExtension)
             .then((preloadFileReference: FileReference) => this.preloadDefinitions(preloadFileReference, definitionName))
             .catch(() => this.fetchDefinition(name, isSection, definitionName, getMetaModel, true));
           this.preloadedDefinitions.set(name, result);

@@ -20,7 +20,7 @@ export class StringOutputStream implements OutputStream {
   }
 }
 
-interface IndentInfo {
+export interface IndentInfo {
   indent: string;
   outerIndent: string;
 }
