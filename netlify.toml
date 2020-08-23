@@ -9,7 +9,7 @@
   status = 200
 
 [[redirects]]
-  from = "/preload/*"
+  from = "/preload/libraries/hlm/*"
   to = "http://slate-hlm.netlify.app/preload/:splat"
   status = 200
 
