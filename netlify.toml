@@ -41,6 +41,9 @@
   to = "http://slate-hlm.netlify.app/static/:splat"
   status = 200
 
+  [redirects.headers]
+    Content-Type = "text/html"
+
 # Currently, documentation pages are viewed via the app.
 # TODO generate static pages for these as well
 [[redirects]]
