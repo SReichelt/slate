@@ -92,6 +92,9 @@ class StaticSiteGenerator {
   constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private outputFileAccessor: FileAccessor) {}
 
   async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo = {itemNumber: []}, targetURI?: string, htmlNavigation?: string) {
+    if (!htmlNavigation) {
+      htmlNavigation = this.createLink('Library', libraryDataProvider.getSectionURI());
+    }
     let section = await libraryDataProvider.fetchLocalSection();
     let contents = section.definition.contents as FmtLibrary.ObjectContents_Section;
     let htmlItems: string[] = [];
@@ -117,8 +120,7 @@ class StaticSiteGenerator {
           } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
             let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
             htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
-            let htmlItemNavigation = htmlNavigation ? htmlNavigation + ' ▹ ' : '';
-            htmlItemNavigation += this.createLink(htmlItem, itemURI);
+            let htmlItemNavigation = htmlNavigation + ' ▹ ' + this.createLink(htmlItem, itemURI);
             await this.buildSection(childProvider, itemInfo, itemTargetURI, htmlItemNavigation);
           }
           if (!htmlItem) {
