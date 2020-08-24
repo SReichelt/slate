@@ -32,7 +32,11 @@ class HTMLUnicodeConverter<T> implements UnicodeConverter {
   }
 }
 
-export function renderAsHTML<T>(expression: Notation.RenderedExpression, renderer: HTMLRenderer<T>, options: UnicodeConversionOptions, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<T> {
+export interface RenderAsHTMLOptions extends UnicodeConversionOptions {
+  getLinkURI?: (semanticLink: Notation.SemanticLink) => string | undefined;
+}
+
+export function renderAsHTML<T>(expression: Notation.RenderedExpression, renderer: HTMLRenderer<T>, options: RenderAsHTMLOptions, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): CachedPromise<T> {
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
@@ -40,6 +44,18 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
       && optionalParenMaxLevel === undefined
       && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
     return renderAsHTML(new Notation.ParenExpression(expression, optionalParenStyle), renderer, options);
+  }
+  let getLinkURI = options.getLinkURI;
+  if (expression.semanticLinks && getLinkURI) {
+    for (let semanticLink of expression.semanticLinks) {
+      let uri = getLinkURI(semanticLink);
+      if (uri) {
+        options = {
+          ...options,
+          getLinkURI: undefined
+        };
+      }
+    }
   }
   let resultPromise: CachedPromise<T>;
   if (expression instanceof Notation.EmptyExpression) {
@@ -145,7 +161,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     resultPromise = renderAsHTML(expression.body, renderer, options, expression.left, expression.right, expression.maxLevel);
   } else if (expression instanceof Notation.SubSupExpression) {
     let items = [renderAsHTML(expression.body, renderer, options)];
-    let innerOptions: UnicodeConversionOptions = {
+    let innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
     };
@@ -168,7 +184,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     resultPromise = renderList(items, renderer);
   } else if (expression instanceof Notation.OverUnderExpression) {
     let items = [renderAsHTML(expression.body, renderer, options)];
-    let innerOptions: UnicodeConversionOptions = {
+    let innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
     };
@@ -201,6 +217,15 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
   } else {
     let error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
     return CachedPromise.resolve(renderer.renderText(`[Error: ${error}]`));
+  }
+  if (expression.semanticLinks && getLinkURI) {
+    for (let semanticLink of expression.semanticLinks) {
+      let uri = getLinkURI(semanticLink);
+      if (uri) {
+        return resultPromise.then((result: T) =>
+          renderer.renderElement('a', {'href': uri, 'class': getClassName('expr', expression)}, result));
+      }
+    }
   }
   if (expression.styleClasses) {
     resultPromise = resultPromise.then((result: T) =>

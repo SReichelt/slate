@@ -1014,6 +1014,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return undefined;
   }
 
+  getSectionURI(): string {
+    if (this.externalURI.endsWith('/')) {
+      return this.externalURI.substring(0, this.externalURI.length - 1);
+    } else {
+      return this.externalURI;
+    }
+  }
+
   private getLogicMetaModelPath(prefix?: Fmt.PathItem): Fmt.Path {
     if (this.parent) {
       let parentPrefix = new Fmt.ParentPathItem;

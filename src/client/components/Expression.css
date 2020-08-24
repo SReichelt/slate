@@ -140,13 +140,12 @@ div.display-math {
   margin-left: 2em;
 }
 
-.addendum {
-  font-size: 75%;
+.addendum, .addendum-hint {
   color: var(--addendum-foreground-color);
 }
 
-.addendum-hint {
-  color: var(--addendum-foreground-color);
+.addendum {
+  font-size: 75%;
 }
 
 .display-math>.aligned-row>.aligned-left, .display-math>.aligned-row>.aligned-right {

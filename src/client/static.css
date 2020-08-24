@@ -1,3 +1,7 @@
+nav {
+  margin-bottom: 1em;
+}
+
 .expr {
   font-family: serif;
 }
@@ -10,47 +14,81 @@ a {
   text-decoration: underline;
 }
 
-.paragraph {
+.label, .sub-heading {
+  font-weight: bold;
+}
+
+.sub-heading {
+  display: inline-block;
+  margin-top: 1em;
+}
+
+.proof-placeholder {
+  display: inline-block;
+  margin-top: 1ex;
+  font-style: italic;
+}
+
+.indented .sub-heading, .indented .proof-placeholder {
+  margin-top: 0;
+}
+
+.label .title {
+  font-weight: normal;
+}
+
+p, ul, ol, .paragraph {
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
 
-.indented, .display-math {
+.display-math {
+  display: inline-block;
+}
+
+div.display-math {
+  display: block;
+}
+
+.paragraph:not(:first-child) .display-math:first-child {
+  margin-top: 1ex;
+}
+
+.paragraph:not(:last-child) .display-math:last-child {
+  margin-bottom: 1ex;
+}
+
+.display-math, .indented {
   margin-left: 2em;
+}
+
+.addendum, .addendum *, .addendum-hint, .addendum-hint * {
+  color: #a0a0a0;
 }
 
 .addendum {
   font-size: 75%;
-  color: #a0a0a0;
-}
-
-.bold, .heading, .sub-heading, .label {
-  font-weight: bold;
-}
-
-.italic, .proof-placeholder {
-  font-style: italic;
-}
-
-.sans {
-  font-family: sans-serif;
-}
-
-.monospace {
-  font-family: monospace;
 }
 
 .table {
   display: inline-table;
+  vertical-align: middle;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.table.inline, .table.single-case {
+  vertical-align: initial;
+  white-space: initial;
 }
 
 .table.matrix, .table.binom {
   text-align: center;
-  vertical-align: middle;
 }
 
 .table-row {
   display: table-row;
+  vertical-align: initial;
 }
 
 .table-cell {
@@ -59,4 +97,31 @@ a {
 
 .table.aligned>.table-row>.table-cell:first-child {
   text-align: right;
+}
+
+.table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child, .table.construction>.table-row>.table-cell:not(:first-child) {
+  white-space: initial;
+}
+
+.bold {
+  font-weight: bold!important;
+  font-style: normal;
+}
+
+.italic, .calligraphic {
+  font-style: italic!important;
+}
+
+.sans, .ctor {
+  font-family: sans-serif;
+  font-style: normal;
+}
+
+.fraktur, .monospace, .source-code {
+  font-family: monospace;
+  font-style: normal;
+}
+
+.largesym {
+  font-size: 110%;
 }
