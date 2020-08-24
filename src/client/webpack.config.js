@@ -26,6 +26,17 @@ const additionalHeadElementsEmbedded = `
 <meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
 <link href="theme-vscode.css" rel="stylesheet" />
 `;
+const additionalContentDefault = `
+<nav id="static-nav">
+  <p>The Slate theorem prover is a web application that requires JavaScript.</p>
+  <p>Otherwise, please follow these links:</p>
+  <ul>
+    <li><a href="libraries/hlm">HLM Library</a> (statically rendered)</li>
+    <li><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</li>
+  </ul>
+</nav>
+<script>document.getElementById("app").removeChild(document.getElementById("static-nav"));</script>
+`;
 
 /**@type {webpack.Plugin[]}*/
 const plugins = [
@@ -43,7 +54,8 @@ const plugins = [
     filename: 'index.html',
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsDefault,
-    'description': 'web-based interactive theorem prover'
+    'description': 'web-based interactive theorem prover',
+    'additionalContent': additionalContentDefault
   }),
   new HtmlWebpackPlugin({
     title: '<%= title %>',
@@ -58,7 +70,8 @@ const plugins = [
     filename: 'embedded.ejs',
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsEmbedded,
-    'description': 'extension for Microsoft Visual Studio Code'
+    'description': 'extension for Microsoft Visual Studio Code',
+    'additionalContent': ''
   })
 ];
 

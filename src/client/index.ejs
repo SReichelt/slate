@@ -50,9 +50,9 @@
     <div id="app">
       <div class="loading-screen">
         <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <%= htmlWebpackPlugin.options.description %>.</p>
-        <p class="loading-screen-loading">Loading...</p>
-        <p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>
+        <script>document.write('<p class="loading-screen-loading">Loading...</p><p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>');</script>
       </div>
+      <%= htmlWebpackPlugin.options.additionalContent %>
     </div>
   </body>
 </html>
