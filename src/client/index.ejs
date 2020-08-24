@@ -3,59 +3,91 @@
   <head>
     <meta charset="utf-8" />
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <%= htmlWebpackPlugin.options.additionalHeadElements %>
-    <style>
-      .loading-screen {
-        text-align: center;
-      }
-      .loading-screen-welcome {
-        margin-top: 3em;
-        margin-bottom: 3em;
-      }
-      .loading-screen-title {
-        display: block;
-        font-size: 300%;
-      }
-      .loading-screen-loading {
-        margin-bottom: 2em;
-      }
-      .preload-font {
-        visibility: hidden;
-      }
-      .preload-font-regular {
-        font-family: 'TeX';
-      }
-      .preload-font-bold {
-        font-family: 'TeX';
-        font-weight: bold;
-      }
-      .preload-font-var {
-        font-family: 'TeX-Var';
-        font-style: italic;
-      }
-      .preload-font-sans {
-        font-family: 'TeX-Sans';
-      }
-      .preload-font-calligraphic {
-        font-family: 'TeX-Calligraphic';
-      }
-      .preload-font-large {
-        font-family: 'TeX-Large';
-      }
-    </style>
+    <% if (htmlWebpackPlugin.options.isEmbedded) { %>
+      <base href="<%= htmlWebpackPlugin.options.outputPlaceholder('baseURL') %>" />
+      <meta http-equiv="Content-Security-Policy" content="default-src <%= htmlWebpackPlugin.options.outputPlaceholder('cspSource') %>; style-src <%= htmlWebpackPlugin.options.outputPlaceholder('cspSource') %> 'unsafe-inline';" />
+      <link href="theme-vscode.css" rel="stylesheet" />
+    <% } else { %>
+      <base href="/" />
+      <style>
+        body {
+          font-family: sans-serif;
+        }
+      </style>
+      <link href="theme-default.css" rel="stylesheet" />
+    <% } %>
     <link href="fonts.css" rel="stylesheet" />
-    <meta name="description" content="Slate is a project to build a web-based interactive theorem prover with a focus on abstract mathematics. It is optimized for being easy to learn." />
-    <meta name="keywords" content="Interactive Theorem Prover, Proof Assistant, Mathematics, Proofs, Library" />
-    <meta name="author" content="Sebastian Reichelt" />
+    <% if (htmlWebpackPlugin.options.isStatic) { %>
+      <link href="static.css" rel="stylesheet" />
+      <link href="<%= htmlWebpackPlugin.options.outputPlaceholder('canonicalURL') %>" rel="canonical" />
+    <% } else { %>
+      <style>
+        .loading-screen {
+          text-align: center;
+        }
+        .loading-screen-welcome {
+          margin-top: 3em;
+          margin-bottom: 3em;
+        }
+        .loading-screen-title {
+          display: block;
+          font-size: 300%;
+        }
+        .loading-screen-loading {
+          margin-bottom: 2em;
+        }
+        .preload-font {
+          visibility: hidden;
+        }
+        .preload-font-regular {
+          font-family: 'TeX';
+        }
+        .preload-font-bold {
+          font-family: 'TeX';
+          font-weight: bold;
+        }
+        .preload-font-var {
+          font-family: 'TeX-Var';
+          font-style: italic;
+        }
+        .preload-font-sans {
+          font-family: 'TeX-Sans';
+        }
+        .preload-font-calligraphic {
+          font-family: 'TeX-Calligraphic';
+        }
+        .preload-font-large {
+          font-family: 'TeX-Large';
+        }
+      </style>
+      <meta name="description" content="Slate is a project to build a web-based interactive theorem prover with a focus on abstract mathematics. It is optimized for being easy to learn." />
+      <meta name="keywords" content="Interactive Theorem Prover, Proof Assistant, Mathematics, Proofs, Library" />
+      <meta name="author" content="Sebastian Reichelt" />
+    <% } %>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
   </head>
   <body>
     <div id="app">
-      <header class="loading-screen">
-        <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <%= htmlWebpackPlugin.options.description %>.</p>
-        <script src="js/loading.js"></script>
-      </header>
-      <%= htmlWebpackPlugin.options.additionalContent %>
+      <% if (htmlWebpackPlugin.options.isStatic) { %>
+        <%= htmlWebpackPlugin.options.outputPlaceholder('content') %>
+      <% } else { %>
+        <header class="loading-screen">
+          <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <% if (htmlWebpackPlugin.options.isEmbedded) { %>extension for Microsoft Visual Studio Code<% } else { %>web-based interactive theorem prover<% } %>.</p>
+          <script src="js/loading.js"></script>
+        </header>
+        <% if (!htmlWebpackPlugin.options.isEmbedded) { %>
+          <div id="static-nav">
+            <p>Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics. It is optimized for being easy to learn.</p>
+            <p>Running Slate in your browser requires that JavaScript is enabled.</p>
+            <p>Otherwise, please follow these links:</p>
+            <ul>
+              <li><p><a href="libraries/hlm">HLM Library</a> (statically rendered)</p></li>
+              <li><p><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</p></li>
+            </ul>
+          </div>
+          <script src="js/remove-static-nav.js"></script>
+        <% } %>
+      <% } %>
     </div>
   </body>
 </html>

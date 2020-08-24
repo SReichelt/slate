@@ -12,32 +12,9 @@ const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 const config = require('../server/config');
 const projectRoot = path.join(__dirname, '..', '..');
 
-const additionalHeadElementsDefault = `
-<base href="/" />
-<style>
-  body {
-    font-family: sans-serif;
-  }
-</style>
-<link href="theme-default.css" rel="stylesheet" />
-`;
-const additionalHeadElementsEmbedded = `
-<base href="<%= baseURL %>" />
-<meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
-<link href="theme-vscode.css" rel="stylesheet" />
-`;
-const additionalContentDefault = `
-<div id="static-nav">
-  <p>Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics. It is optimized for being easy to learn.</p>
-  <p>Running Slate in your browser requires that JavaScript is enabled.</p>
-  <p>Otherwise, please follow these links:</p>
-  <ul>
-    <li><p><a href="libraries/hlm">HLM Library</a> (statically rendered)</p></li>
-    <li><p><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</p></li>
-  </ul>
-</div>
-<script src="js/remove-static-nav.js"></script>
-`;
+function outputPlaceholder(name) {
+  return `<%= ${name} %>`;
+}
 
 /**@type {webpack.Plugin[]}*/
 const plugins = [
@@ -54,26 +31,25 @@ const plugins = [
     favicon: 'public/slate.png',
     filename: 'index.html',
     template: 'index.ejs',
-    'additionalHeadElements': additionalHeadElementsDefault,
-    'description': 'web-based interactive theorem prover',
-    'additionalContent': additionalContentDefault
+    'isStatic': false,
+    'isEmbedded': false
   }),
   new HtmlWebpackPlugin({
     title: '<%= title %>',
     favicon: 'public/slate.png',
     filename: 'static.ejs',
-    template: 'static.ejs',
-    'additionalHeadElements': additionalHeadElementsDefault,
-    'canonicalURL': '<%= canonicalURL %>',
-    'content': '<%= content %>'
+    template: 'index.ejs',
+    'isStatic': true,
+    'isEmbedded': false,
+    'outputPlaceholder': outputPlaceholder
   }),
   new HtmlWebpackPlugin({
     title: 'Slate',
     filename: 'embedded.ejs',
     template: 'index.ejs',
-    'additionalHeadElements': additionalHeadElementsEmbedded,
-    'description': 'extension for Microsoft Visual Studio Code',
-    'additionalContent': ''
+    'isStatic': false,
+    'isEmbedded': true,
+    'outputPlaceholder': outputPlaceholder
   })
 ];
 
