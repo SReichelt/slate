@@ -27,14 +27,15 @@ const additionalHeadElementsEmbedded = `
 <link href="theme-vscode.css" rel="stylesheet" />
 `;
 const additionalContentDefault = `
-<nav id="static-nav">
-  <p>The Slate theorem prover is a web application that requires JavaScript.</p>
+<div id="static-nav">
+  <p>Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics. It is optimized for being easy to learn.</p>
+  <p>Running Slate in your browser requires that JavaScript is enabled.</p>
   <p>Otherwise, please follow these links:</p>
   <ul>
-    <li><a href="libraries/hlm">HLM Library</a> (statically rendered)</li>
-    <li><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</li>
+    <li><p><a href="libraries/hlm">HLM Library</a> (statically rendered)</p></li>
+    <li><p><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</p></li>
   </ul>
-</nav>
+</div>
 <script src="js/remove-static-nav.js"></script>
 `;
 
@@ -60,10 +61,11 @@ const plugins = [
   new HtmlWebpackPlugin({
     title: '<%= title %>',
     favicon: 'public/slate.png',
-    filename: 'download/static/template.ejs',
+    filename: 'static.ejs',
     template: 'static.ejs',
     'additionalHeadElements': additionalHeadElementsDefault,
-    'staticContent': '<%= content %>'
+    'canonicalURL': '<%= canonicalURL %>',
+    'content': '<%= content %>'
   }),
   new HtmlWebpackPlugin({
     title: 'Slate',
