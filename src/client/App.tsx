@@ -416,9 +416,9 @@ class App extends React.Component<AppProps, AppState> {
       navigationPane = (
         <SplitPane split={'horizontal'} size={this.state.editedDefinitions.length ? undefined : 0} resizerStyle={this.state.editedDefinitions.length ? undefined : {'height': 0, 'margin': 0}} key="nav">
           {editListPane}
-          <div className={'app-pane'} key="tree">
+          <nav className={'app-pane'} key="tree">
             <LibraryTree libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} selectedItemPath={this.state.selectedItemAbsolutePath} interactionHandler={this.state.interactionHandler} onItemClicked={this.treeItemClicked} onInsertButtonClicked={this.insert}/>
-          </div>
+          </nav>
         </SplitPane>
       );
     }

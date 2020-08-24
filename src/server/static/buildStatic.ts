@@ -91,7 +91,7 @@ const htmlRenderer = new StaticHTMLRenderer;
 class StaticSiteGenerator {
   constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private outputFileAccessor: FileAccessor) {}
 
-  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo = {itemNumber: []}, targetURI?: string, htmlNavigation?: string) {
+  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo = {itemNumber: [], title: 'Library'}, targetURI?: string, htmlNavigation?: string) {
     if (!htmlNavigation) {
       htmlNavigation = this.createLink('Library', libraryDataProvider.getSectionURI());
     }
@@ -138,7 +138,7 @@ class StaticSiteGenerator {
     if (htmlItems.length) {
       htmlContent = htmlRenderer.renderElement('ul', {}, htmlRenderer.concat(htmlItems));
     }
-    await this.outputFile(htmlContent, htmlNavigation, targetURI ?? 'index');
+    await this.outputFile(sectionItemInfo.title, htmlContent, htmlNavigation, targetURI ?? 'index');
   }
 
   async buildItem(libraryDataProvider: LibraryDataProvider, itemInfo: LibraryItemInfo, definition: LibraryDefinition, targetURI: string, htmlNavigation?: string) {
@@ -148,8 +148,9 @@ class StaticSiteGenerator {
     let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, this.templates, rendererOptions);
     let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
     if (renderedDefinition) {
+      let title = itemInfo.title ?? definition.definition.name;
       let htmlContent = await this.renderExpression(renderedDefinition, libraryDataProvider, definition.definition, false);
-      await this.outputFile(htmlContent, htmlNavigation, targetURI);
+      await this.outputFile(title, htmlContent, htmlNavigation, targetURI);
       let renderedSummary = renderer.renderDefinitionSummary();
       if (renderedSummary) {
         return await this.renderExpression(renderedSummary, libraryDataProvider, definition.definition, true);
@@ -158,11 +159,15 @@ class StaticSiteGenerator {
     return undefined;
   }
 
-  private async outputFile(htmlContent: string, htmlNavigation: string | undefined, targetURI: string) {
+  private async outputFile(title: string | undefined, htmlContent: string, htmlNavigation: string | undefined, targetURI: string) {
     if (htmlNavigation) {
       htmlContent = htmlRenderer.renderElement('nav', {}, htmlNavigation) + htmlContent;
     }
-    let html = await ejs.renderFile(this.htmlTemplateFileName, {'content': htmlContent}, ejsOptions);
+    let data: ejs.Data = {
+      'title': escapeText(title ? `Slate - ${title}` : 'Slate'),
+      'content': htmlContent
+    };
+    let html = await ejs.renderFile(this.htmlTemplateFileName, data, ejsOptions);
     let outputFileReference = this.outputFileAccessor.openFile(targetURI + '.html', true);
     outputFileReference.write!(html, true);
   }

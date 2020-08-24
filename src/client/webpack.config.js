@@ -29,17 +29,25 @@ const additionalHeadElementsEmbedded = `
 
 /**@type {webpack.Plugin[]}*/
 const plugins = [
+  new CopyWebpackPlugin({
+    patterns: [
+      {
+        from: '**/*',
+        context: path.resolve(__dirname, 'public')
+      }
+    ]
+  }),
   new HtmlWebpackPlugin({
     title: 'Slate',
-    favicon: 'slate.png',
+    favicon: 'public/slate.png',
     filename: 'index.html',
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsDefault,
     'description': 'web-based interactive theorem prover'
   }),
   new HtmlWebpackPlugin({
-    title: 'Slate',
-    favicon: 'slate.png',
+    title: '<%= title %>',
+    favicon: 'public/slate.png',
     filename: 'download/static/template.ejs',
     template: 'static.ejs',
     'additionalHeadElements': additionalHeadElementsDefault,
@@ -51,13 +59,6 @@ const plugins = [
     template: 'index.ejs',
     'additionalHeadElements': additionalHeadElementsEmbedded,
     'description': 'extension for Microsoft Visual Studio Code'
-  }),
-  new CopyWebpackPlugin({
-    patterns: [
-      {
-        from: '*.css'
-      }
-    ]
   })
 ];
 
