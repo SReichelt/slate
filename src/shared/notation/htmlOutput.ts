@@ -160,7 +160,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
   } else if (expression instanceof Notation.InnerParenExpression) {
     resultPromise = renderAsHTML(expression.body, renderer, options, expression.left, expression.right, expression.maxLevel);
   } else if (expression instanceof Notation.SubSupExpression) {
-    let items = [renderAsHTML(expression.body, renderer, options)];
+    let items = [renderAsHTML(expression.body, renderer, options, true, true)];
     let innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
@@ -183,7 +183,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     }
     resultPromise = renderList(items, renderer);
   } else if (expression instanceof Notation.OverUnderExpression) {
-    let items = [renderAsHTML(expression.body, renderer, options)];
+    let items = [renderAsHTML(expression.body, renderer, options, true, true)];
     let innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
