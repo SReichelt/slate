@@ -35,7 +35,7 @@ const additionalContentDefault = `
     <li><a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate">Slate Extension</a> for Microsoft Visual Studio Code</li>
   </ul>
 </nav>
-<script>document.getElementById("app").removeChild(document.getElementById("static-nav"));</script>
+<script src="js/remove-static-nav.js"></script>
 `;
 
 /**@type {webpack.Plugin[]}*/
@@ -89,7 +89,7 @@ module.exports = {
   entry: ['babel-polyfill', './client'],
   output: {
     path: path.join(projectRoot, 'dist', 'public'),
-    filename: `[name]-${version}-bundle.js`
+    filename: `js/[name]-${version}-bundle.js`
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
@@ -97,9 +97,19 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
-        commons: {
+        'vendors': {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
+          chunks: 'all'
+        },
+        'vendors-react': {
+          test: /[\\/]node_modules[\\/]react/,
+          name: 'vendors-react',
+          chunks: 'all'
+        },
+        'extras': {
+          test: /[\\/]extras[\\/]/,
+          name: 'extras',
           chunks: 'all'
         }
       }

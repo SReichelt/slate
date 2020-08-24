@@ -24,7 +24,7 @@
     "dev-client": "cd src/client && webpack-dev-server -w",
     "fill-public": "copyfiles -E data/*/*.slate docs/* docs/**/* dist/public && copyfiles -E -u 2 node_modules/mathjax/fonts/HTML-CSS/TeX/*/* dist/public",
     "build-vscode": "cd src/vscode && (ln -s ../../node_modules/.for-vscode node_modules || true) && npm run build",
-    "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/fonts/HTML-CSS/TeX/woff/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
+    "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/js/* dist/public/fonts/HTML-CSS/TeX/woff/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,FUNCTS,STATIC,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgMagenta.bold,bgCyan.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-functions\" \"npm run build-static\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode",
     "start": "cross-env NODE_ENV=production node dist/server/server/server.js",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\""
