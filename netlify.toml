@@ -32,13 +32,13 @@
 # Enable preloading for the HLM library, via a separate Netlify build.
 [[redirects]]
   from = "/preload/libraries/hlm/*"
-  to = "https://hlm.slate-prover.org/preload/:splat"
+  to = "http://hlm.slate-prover.org/preload/:splat"
   status = 200
 
 # Serve static pages for the HLM library (which load the application if JavaScript is available).
 [[redirects]]
   from = "/libraries/hlm/*"
-  to = "https://hlm.slate-prover.org/static/:splat"
+  to = "http://hlm.slate-prover.org/static/:splat"
   status = 200
 
 # Currently, documentation pages are viewed via the app.
