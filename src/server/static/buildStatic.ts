@@ -159,7 +159,7 @@ class StaticSiteGenerator {
     if (htmlNavigation) {
       htmlContent = htmlRenderer.renderElement('nav', {}, htmlNavigation) + htmlContent;
     }
-    htmlContent += htmlRenderer.renderElement('p', {},
+    htmlContent += htmlRenderer.renderElement('footer', {},
       '[' + htmlRenderer.renderElement('a', {'href': this.gitHubURL + uri + fileExtension}, 'View Source') + ']');
     let data: ejs.Data = {
       'title': escapeText(title ? `Slate - ${title}` : 'Slate'),

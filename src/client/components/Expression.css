@@ -569,10 +569,11 @@ div.display-math {
   display: initial;
   position: absolute;
   left: 0;
-  top: -0.5em;
+  top: -0.55em;
   visibility: initial;
   overflow: visible;
   white-space: nowrap;
+  font-style: initial;
   font-size: 70%;
 }
 

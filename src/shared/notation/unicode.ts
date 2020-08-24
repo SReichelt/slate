@@ -253,6 +253,9 @@ export function shrinkMathSpaces(text: string): string {
 }
 
 export function useItalicsForVariable(text: string): boolean {
+  while (text.endsWith('\'')) {
+    text = text.substring(0, text.length - 1);
+  }
   if (text.length === 1) {
     let cp = text.charCodeAt(0)!;
     return ((cp >= 0x41 && cp < 0x5b)
