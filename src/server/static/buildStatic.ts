@@ -90,7 +90,11 @@ class StaticHTMLRenderer implements HTMLRenderer<string> {
 const htmlRenderer = new StaticHTMLRenderer;
 
 class StaticSiteGenerator {
-  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private libraryURL: string, private libraryURI: string, private gitHubURL: string, private outputFileAccessor: FileAccessor) {}
+  private libraryURLWithSlash: string;
+
+  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private libraryURL: string, private libraryURI: string, private gitHubURL: string, private outputFileAccessor: FileAccessor) {
+    this.libraryURLWithSlash = libraryURL.endsWith('/') ? libraryURL : libraryURL + '/';
+  }
 
   async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo, htmlNavigation: string, uri?: string) {
     let section = await libraryDataProvider.fetchLocalSection();
@@ -132,7 +136,7 @@ class StaticSiteGenerator {
     if (htmlItems.length) {
       htmlContent = htmlRenderer.renderElement('ul', {}, htmlRenderer.concat(htmlItems));
     }
-    await this.outputFile(sectionItemInfo.title, htmlContent, htmlNavigation, uri ? uri + '/' + indexFileName : section.definition.name, uri ?? 'index');
+    await this.outputFile(sectionItemInfo.title, htmlContent, htmlNavigation, uri ? uri + '/' + indexFileName : section.definition.name, uri);
   }
 
   async buildItem(libraryDataProvider: LibraryDataProvider, itemInfo: LibraryItemInfo, definition: LibraryDefinition, htmlNavigation: string, uri: string) {
@@ -153,18 +157,18 @@ class StaticSiteGenerator {
     return undefined;
   }
 
-  private async outputFile(title: string | undefined, htmlContent: string, htmlNavigation: string, uri: string, targetURI: string) {
+  private async outputFile(title: string | undefined, htmlContent: string, htmlNavigation: string, uri: string, targetURI?: string) {
     htmlContent =
       htmlRenderer.renderElement('nav', {}, htmlNavigation)
       + htmlContent
       + htmlRenderer.renderElement('footer', {}, '[' + htmlRenderer.renderElement('a', {'href': this.gitHubURL + uri + fileExtension}, 'View Source') + ']');
     let data: ejs.Data = {
       'title': escapeText(title ? `Slate - ${title}` : 'Slate'),
-      'canonicalURL': this.libraryURL + targetURI + '.html',
+      'canonicalURL': targetURI ? this.libraryURLWithSlash + targetURI : this.libraryURL,
       'content': htmlContent
     };
     let html = await ejs.renderFile(this.htmlTemplateFileName, data, ejsOptions);
-    let outputFileReference = this.outputFileAccessor.openFile(targetURI + '.html', true);
+    let outputFileReference = this.outputFileAccessor.openFile((targetURI ?? 'index') + '.html', true);
     outputFileReference.write!(html, true);
   }
 
@@ -233,9 +237,6 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
     libraryURI = libraryURI.substring(1);
   }
   let htmlNavigation = htmlRenderer.renderElement('a', {'href': libraryURI}, escapeText(libraryTitle));
-  if (!libraryURL.endsWith('/')) {
-    libraryURL += '/';
-  }
   if (!libraryURI.endsWith('/')) {
     libraryURI += '/';
   }
