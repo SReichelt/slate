@@ -180,7 +180,7 @@ class App extends React.Component<AppProps, AppState> {
     this.state = state;
     let title = this.getTitle(state);
     if (selectionURI && queryString) {
-      window.history.pushState(null, title, selectionURI);
+      this.setDocumentURI(selectionURI, title);
     }
     this.setDocumentTitle(state, title);
   }
@@ -778,7 +778,7 @@ class App extends React.Component<AppProps, AppState> {
             .catch(() => {});
         }
       } else {
-        window.history.pushState(null, title, uri);
+        this.setDocumentURI(uri, title);
       }
     }
     this.setDocumentTitle(state, title);
@@ -812,6 +812,12 @@ class App extends React.Component<AppProps, AppState> {
       };
       config.vsCodeAPI.postMessage(message);
     }
+  }
+
+  private setDocumentURI(uri: string, title: string): void {
+    try {
+      window.history?.pushState?.(null, title, uri);
+    } catch {}
   }
 
   private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, sectionItemNumber: LibraryItemNumber, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
