@@ -1,0 +1,62 @@
+.expr {
+  font-family: serif;
+}
+
+a {
+  text-decoration: initial;
+}
+
+.expr .markdown a {
+  text-decoration: underline;
+}
+
+.paragraph {
+  margin-top: 1ex;
+  margin-bottom: 1ex;
+}
+
+.indented, .display-math {
+  margin-left: 2em;
+}
+
+.addendum {
+  font-size: 75%;
+  color: #a0a0a0;
+}
+
+.bold, .heading, .sub-heading, .label {
+  font-weight: bold;
+}
+
+.italic, .proof-placeholder {
+  font-style: italic;
+}
+
+.sans {
+  font-family: sans-serif;
+}
+
+.monospace {
+  font-family: monospace;
+}
+
+.table {
+  display: inline-table;
+}
+
+.table.matrix, .table.binom {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table-row {
+  display: table-row;
+}
+
+.table-cell {
+  display: table-cell;
+}
+
+.table.aligned>.table-row>.table-cell:first-child {
+  text-align: right;
+}

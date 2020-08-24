@@ -4,10 +4,55 @@
     <meta charset="utf-8" />
     <title><%= htmlWebpackPlugin.options.title %></title>
     <%= htmlWebpackPlugin.options.additionalHeadElements %>
+    <style>
+      .loading-screen {
+        text-align: center;
+      }
+      .loading-screen-welcome {
+        margin-top: 3em;
+        margin-bottom: 3em;
+      }
+      .loading-screen-title {
+        display: block;
+        font-size: 300%;
+      }
+      .loading-screen-loading {
+        margin-bottom: 2em;
+      }
+      .preload-font {
+        visibility: hidden;
+      }
+      .preload-font-regular {
+        font-family: 'TeX';
+      }
+      .preload-font-bold {
+        font-family: 'TeX';
+        font-weight: bold;
+      }
+      .preload-font-var {
+        font-family: 'TeX-Var';
+        font-style: italic;
+      }
+      .preload-font-sans {
+        font-family: 'TeX-Sans';
+      }
+      .preload-font-calligraphic {
+        font-family: 'TeX-Calligraphic';
+      }
+      .preload-font-large {
+        font-family: 'TeX-Large';
+      }
+    </style>
     <link href="fonts.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
   </head>
   <body>
-    <div id="app"><%= htmlWebpackPlugin.options.initialContent %></div>
+    <div id="app">
+      <div class="loading-screen">
+        <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <%= htmlWebpackPlugin.options.description %>.</p>
+        <p class="loading-screen-loading">Loading...</p>
+        <p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>
+      </div>
+    </div>
   </body>
 </html>

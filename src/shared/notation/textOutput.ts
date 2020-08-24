@@ -16,11 +16,6 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
-  if ((optionalParenLeft || optionalParenRight)
-      && optionalParenMaxLevel === undefined
-      && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
-    return renderAsText(new Notation.ParenExpression(expression, optionalParenStyle), options);
-  }
   let indent = options.indent ?? '';
   if (expression.hasStyleClass('script')) {
     options = {
@@ -85,7 +80,7 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
     });
     return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Notation.TableExpression) {
-    let isAligned = ((expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid')));
+    let isAligned = (expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid'));
     let isDefinitionList = expression.hasStyleClass('definitions');
     let isConstruction = expression.hasStyleClass('construction');
     let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';

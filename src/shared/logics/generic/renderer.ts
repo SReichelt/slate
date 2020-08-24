@@ -117,13 +117,18 @@ export abstract class GenericRenderer {
       suffixes = [];
       underscorePos = rest.indexOf('_');
       while (underscorePos > 0) {
-        suffixes.push(new Notation.TextExpression(rest.substring(0, underscorePos)));
+        let suffix = new Notation.TextExpression(rest.substring(0, underscorePos));
+        suffix.styleClasses = ['var'];
+        suffixes.push(suffix);
         rest = rest.substring(underscorePos + 1);
         underscorePos = rest.indexOf('_');
       }
-      suffixes.push(new Notation.TextExpression(rest));
+      let lastSuffix = new Notation.TextExpression(rest);
+      lastSuffix.styleClasses = ['var'];
+      suffixes.push(lastSuffix);
     }
     let text = new Notation.TextExpression(name);
+    text.styleClasses = ['var'];
     if (isDefinition && this.variableNameEditHandler) {
       this.variableNameEditHandler.addVariableNameEditor(text, param, parameterList);
     }
@@ -132,11 +137,11 @@ export abstract class GenericRenderer {
       let subExpression = new Notation.SubSupExpression(result);
       subExpression.sub = this.renderTemplate('Group', {'items': suffixes, 'separator': ','});
       subExpression.fallback = new Notation.RowExpression([result, new Notation.TextExpression('_'), subExpression.sub]);
+      subExpression.styleClasses = ['var'];
       result = subExpression;
     }
-    result.styleClasses = ['var'];
     if (isDummy) {
-      result.styleClasses.push('dummy');
+      result.styleClasses!.push('dummy');
     }
     result.semanticLinks = [new Notation.SemanticLink(param, isDefinition)];
     if (indices) {

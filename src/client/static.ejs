@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <%= htmlWebpackPlugin.options.additionalHeadElements %>
+    <link href="fonts.css" rel="stylesheet" />
+    <link href="static.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
+  </head>
+  <body>
+    <div id="app"><%= htmlWebpackPlugin.options.staticContent %></div>
+  </body>
+</html>

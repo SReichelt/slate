@@ -21,65 +21,10 @@ const additionalHeadElementsDefault = `
 </style>
 <link href="theme-default.css" rel="stylesheet" />
 `;
-const additionalHeadElementsLoadingScreen = `
-<style>
-  .loading-screen {
-    text-align: center;
-  }
-  .loading-screen-welcome {
-    margin-top: 3em;
-    margin-bottom: 3em;
-  }
-  .loading-screen-title {
-    display: block;
-    font-size: 300%;
-  }
-  .loading-screen-loading {
-    margin-bottom: 2em;
-  }
-  .preload-font {
-    visibility: hidden;
-  }
-  .preload-font-regular {
-    font-family: 'TeX';
-  }
-  .preload-font-bold {
-    font-family: 'TeX';
-    font-weight: bold;
-  }
-  .preload-font-var {
-    font-family: 'TeX-Var';
-    font-style: italic;
-  }
-  .preload-font-sans {
-    font-family: 'TeX-Sans';
-  }
-  .preload-font-calligraphic {
-    font-family: 'TeX-Calligraphic';
-  }
-  .preload-font-large {
-    font-family: 'TeX-Large';
-  }
-</style>
-`;
 const additionalHeadElementsEmbedded = `
 <base href="<%= baseURL %>" />
 <meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
 <link href="theme-vscode.css" rel="stylesheet" />
-`;
-const initialContentDefault = `
-<div class="loading-screen">
-  <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> web-based interactive theorem prover.</p>
-  <p class="loading-screen-loading">Loading...</p>
-  <p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>
-</div>
-`;
-const initialContentStatic = '<%= content %>';
-const initialContentEmbedded = `
-<div class="loading-screen">
-  <p class="loading-screen-loading">Loading...</p>
-  <p class="preload-font"><span class="preload-font-regular"><span class="preload-font-calligraphic">P</span>rel∅ading</span> <span class="preload-font-var">font</span><span class="preload-font-bold">.</span><span class="preload-font-sans">.</span><span class="preload-font-large">.</span></p>
-</div>
 `;
 
 /**@type {webpack.Plugin[]}*/
@@ -89,31 +34,28 @@ const plugins = [
     favicon: 'slate.png',
     filename: 'index.html',
     template: 'index.ejs',
-    'additionalHeadElements': additionalHeadElementsDefault + additionalHeadElementsLoadingScreen,
-    'initialContent': initialContentDefault
+    'additionalHeadElements': additionalHeadElementsDefault,
+    'description': 'web-based interactive theorem prover'
   }),
   new HtmlWebpackPlugin({
     title: 'Slate',
     favicon: 'slate.png',
     filename: 'download/static/template.ejs',
-    template: 'index.ejs',
+    template: 'static.ejs',
     'additionalHeadElements': additionalHeadElementsDefault,
-    'initialContent': initialContentStatic
+    'staticContent': '<%= content %>'
   }),
   new HtmlWebpackPlugin({
     title: 'Slate',
     filename: 'embedded.ejs',
     template: 'index.ejs',
-    'additionalHeadElements': additionalHeadElementsEmbedded + additionalHeadElementsLoadingScreen,
-    'initialContent': initialContentEmbedded
+    'additionalHeadElements': additionalHeadElementsEmbedded,
+    'description': 'extension for Microsoft Visual Studio Code'
   }),
   new CopyWebpackPlugin({
     patterns: [
       {
-        from: 'theme-*.css'
-      },
-      {
-        from: 'fonts.css'
+        from: '*.css'
       }
     ]
   })

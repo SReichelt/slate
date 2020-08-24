@@ -11,6 +11,7 @@ import * as FmtLibrary from '../../shared/logics/library';
 import * as FmtNotation from '../../shared/notation/meta';
 import * as Logic from '../../shared/logics/logic';
 import * as Logics from '../../shared/logics/logics';
+import * as Notation from '../../shared/notation/notation';
 import { renderAsHTML, HTMLAttributes, HTMLRenderer } from '../../shared/notation/htmlOutput';
 import { UnicodeConversionOptions } from '../../shared/notation/unicode';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -74,7 +75,7 @@ class StaticHTMLRenderer implements HTMLRenderer<string> {
       }
     }
     if (content) {
-      return `<${tag}>${content}</${tag}>`;
+      return `<${tag}>${content}</${tagName}>`;
     } else {
       return `<${tag} />`;
     }
@@ -145,11 +146,11 @@ class StaticSiteGenerator {
     let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, this.templates, rendererOptions);
     let renderedDefinition = renderer.renderDefinition(CachedPromise.resolve(itemInfo), renderedDefinitionOptions);
     if (renderedDefinition) {
-      let htmlContent = await renderAsHTML(renderedDefinition, htmlRenderer, unicodeConversionOptions);
+      let htmlContent = await this.renderExpression(renderedDefinition, false);
       await this.outputFile(htmlContent, uri);
       let renderedSummary = renderer.renderDefinitionSummary();
       if (renderedSummary) {
-        return await renderAsHTML(renderedSummary, htmlRenderer, unicodeConversionOptions);
+        return await this.renderExpression(renderedSummary, true);
       }
     }
     return undefined;
@@ -159,6 +160,14 @@ class StaticSiteGenerator {
     let html = await ejs.renderFile(this.htmlTemplateFileName, {'content': htmlContent}, ejsOptions);
     let outputFileReference = this.outputFileAccessor.openFile(uri + '.html', true);
     outputFileReference.write!(html, true);
+  }
+
+  private async renderExpression(expression: Notation.RenderedExpression, inline: boolean) {
+    let htmlContent = await renderAsHTML(expression, htmlRenderer, unicodeConversionOptions);
+    if (htmlContent) {
+      htmlContent = htmlRenderer.renderElement(inline ? 'span' : 'div', {'class': 'expr'}, htmlContent);
+    }
+    return htmlContent;
   }
 
   private createLink(content: string, uri: string): string {

@@ -448,7 +448,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (row.length) {
           let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
             renderCurRow(lineHeight ? '' : ' large'));
-          rows.push(renderPromise(renderRow));
+          rows.push(renderPromise(renderRow, curRowIndex.toString()));
         } else {
           rows.push(renderCurRow());
         }
