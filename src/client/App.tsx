@@ -663,10 +663,10 @@ class App extends React.Component<AppProps, AppState> {
                 </Button>
               );
             }
-            if (this.gitHubRepositoryAccess) {
+            if (this.state.selectedItemProvider?.options.fileAccessor instanceof GitHubFileAccessor) {
               rightButtons.push(
                 <Button toolTipText={'View on GitHub'} onClick={this.openRemotely} key="view-on-github">
-                  {getButtonIcon(ButtonType.ViewInGitHub)}
+                  {getButtonIcon(ButtonType.ViewOnGitHub)}
                 </Button>
               );
             }

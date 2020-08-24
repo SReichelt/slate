@@ -10,7 +10,7 @@ export enum ButtonType {
   Close,
   Edit,
   OpenInVSCode,
-  ViewInGitHub,
+  ViewOnGitHub,
   ViewSource,
   LogIn,
   LogOut,
@@ -125,7 +125,7 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
     return <span style={{'color': getForegroundColor('var(--cancel-color)', enabled)}}>✗</span>;
   case ButtonType.OpenInVSCode:
     return getVSCodeLogo(enabled);
-  case ButtonType.ViewInGitHub:
+  case ButtonType.ViewOnGitHub:
     return getGitHubLogo(enabled);
   case ButtonType.LogIn:
     return [

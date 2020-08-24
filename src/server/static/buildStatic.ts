@@ -4,7 +4,7 @@ import * as ejs from 'ejs';
 import { FileAccessor } from '../../shared/data/fileAccessor';
 import { PhysicalFileAccessor } from '../../fs/data/physicalFileAccessor';
 import { LibraryDataProvider, LibraryDataProviderOptions, LibraryDefinition, LibraryItemInfo } from '../../shared/data/libraryDataProvider';
-import { fileExtension } from '../../shared/data/constants';
+import { fileExtension, indexFileName } from '../../shared/data/constants';
 import * as Fmt from '../../shared/format/format';
 import * as FmtReader from '../../shared/format/read';
 import * as FmtLibrary from '../../shared/logics/library';
@@ -89,9 +89,9 @@ class StaticHTMLRenderer implements HTMLRenderer<string> {
 const htmlRenderer = new StaticHTMLRenderer;
 
 class StaticSiteGenerator {
-  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private outputFileAccessor: FileAccessor) {}
+  constructor(private htmlTemplateFileName: string, private templates: Fmt.File, private libraryURI: string, private gitHubURL: string, private outputFileAccessor: FileAccessor) {}
 
-  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo = {itemNumber: [], title: 'Library'}, targetURI?: string, htmlNavigation?: string) {
+  async buildSection(libraryDataProvider: LibraryDataProvider, sectionItemInfo: LibraryItemInfo = {itemNumber: [], title: 'Library'}, uri?: string, htmlNavigation?: string) {
     if (!htmlNavigation) {
       htmlNavigation = this.createLink('Library', libraryDataProvider.getSectionURI());
     }
@@ -104,10 +104,6 @@ class StaticSiteGenerator {
         try {
           let ref = item.ref as Fmt.DefinitionRefExpression;
           let itemURI = libraryDataProvider.pathToURI(ref.path);
-          let itemTargetURI = encodeURI(ref.path.name);
-          if (targetURI) {
-            itemTargetURI = targetURI + '/' + itemTargetURI;
-          }
           let itemInfo: LibraryItemInfo = {
             itemNumber: [...sectionItemInfo.itemNumber, index + 1],
             type: item instanceof FmtLibrary.MetaRefExpression_item ? item.type : undefined,
@@ -116,12 +112,12 @@ class StaticSiteGenerator {
           let htmlItem: string | undefined = undefined;
           if (item instanceof FmtLibrary.MetaRefExpression_item) {
             let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
-            htmlItem = await this.buildItem(libraryDataProvider, itemInfo, definition, itemTargetURI, htmlNavigation);
+            htmlItem = await this.buildItem(libraryDataProvider, itemInfo, definition, itemURI, htmlNavigation);
           } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
             let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
             htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
             let htmlItemNavigation = htmlNavigation + ' ▹ ' + this.createLink(htmlItem, itemURI);
-            await this.buildSection(childProvider, itemInfo, itemTargetURI, htmlItemNavigation);
+            await this.buildSection(childProvider, itemInfo, itemURI, htmlItemNavigation);
           }
           if (!htmlItem) {
             htmlItem = htmlRenderer.renderText(item.title ?? ref.path.name);
@@ -138,10 +134,10 @@ class StaticSiteGenerator {
     if (htmlItems.length) {
       htmlContent = htmlRenderer.renderElement('ul', {}, htmlRenderer.concat(htmlItems));
     }
-    await this.outputFile(sectionItemInfo.title, htmlContent, htmlNavigation, targetURI ?? 'index');
+    await this.outputFile(sectionItemInfo.title, htmlContent, htmlNavigation, uri ? uri + '/' + indexFileName : section.definition.name, uri ?? 'index');
   }
 
-  async buildItem(libraryDataProvider: LibraryDataProvider, itemInfo: LibraryItemInfo, definition: LibraryDefinition, targetURI: string, htmlNavigation?: string) {
+  async buildItem(libraryDataProvider: LibraryDataProvider, itemInfo: LibraryItemInfo, definition: LibraryDefinition, uri: string, htmlNavigation?: string) {
     let rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: true
     };
@@ -150,7 +146,7 @@ class StaticSiteGenerator {
     if (renderedDefinition) {
       let title = itemInfo.title ?? definition.definition.name;
       let htmlContent = await this.renderExpression(renderedDefinition, libraryDataProvider, definition.definition, false);
-      await this.outputFile(title, htmlContent, htmlNavigation, targetURI);
+      await this.outputFile(title, htmlContent, htmlNavigation, uri, uri);
       let renderedSummary = renderer.renderDefinitionSummary();
       if (renderedSummary) {
         return await this.renderExpression(renderedSummary, libraryDataProvider, definition.definition, true);
@@ -159,10 +155,12 @@ class StaticSiteGenerator {
     return undefined;
   }
 
-  private async outputFile(title: string | undefined, htmlContent: string, htmlNavigation: string | undefined, targetURI: string) {
+  private async outputFile(title: string | undefined, htmlContent: string, htmlNavigation: string | undefined, uri: string, targetURI: string) {
     if (htmlNavigation) {
       htmlContent = htmlRenderer.renderElement('nav', {}, htmlNavigation) + htmlContent;
     }
+    htmlContent += htmlRenderer.renderElement('p', {},
+      '[' + htmlRenderer.renderElement('a', {'href': this.gitHubURL + uri + fileExtension}, 'View Source') + ']');
     let data: ejs.Data = {
       'title': escapeText(title ? `Slate - ${title}` : 'Slate'),
       'content': htmlContent
@@ -176,7 +174,7 @@ class StaticSiteGenerator {
     let getLinkURI = summary ? undefined : (semanticLink: Notation.SemanticLink) => {
       let linkPath = this.getPath(semanticLink, definition);
       if (linkPath) {
-        return libraryDataProvider.pathToURI(linkPath);
+        return this.libraryURI + libraryDataProvider.pathToURI(linkPath);
       }
       return undefined;
     };
@@ -193,7 +191,7 @@ class StaticSiteGenerator {
   }
 
   private createLink(content: string, uri: string): string {
-    return htmlRenderer.renderElement('a', {'href': uri}, content);
+    return htmlRenderer.renderElement('a', {'href': this.libraryURI + uri}, content);
   }
 
   private getPath(semanticLink: Notation.SemanticLink, definition: Fmt.Definition): Fmt.Path | undefined {
@@ -212,7 +210,7 @@ class StaticSiteGenerator {
   }
 }
 
-function buildStaticPages(libraryFileName: string, logicName: string, htmlTemplateFileName: string, notationTemplateFileName: string, libraryURI: string, outputDirName: string) {
+function buildStaticPages(libraryFileName: string, logicName: string, htmlTemplateFileName: string, notationTemplateFileName: string, libraryURI: string, gitHubURL: string, outputDirName: string) {
   let logic = Logics.findLogic(logicName);
   if (!logic) {
     throw new Error(`Logic ${logicName} not found`);
@@ -222,23 +220,28 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
     fileAccessor: new PhysicalFileAccessor(path.dirname(libraryFileName)),
     watchForChanges: false,
     checkMarkdownCode: false,
-    allowPlaceholders: false,
-    externalURIPrefix: libraryURI
+    allowPlaceholders: false
   };
   let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, path.basename(libraryFileName, fileExtension));
   let templateFileContents = fs.readFileSync(notationTemplateFileName, 'utf8');
   let templates = FmtReader.readString(templateFileContents, notationTemplateFileName, FmtNotation.getMetaModel);
+  if (!libraryURI.endsWith('/')) {
+    libraryURI += '/';
+  }
+  if (!gitHubURL.endsWith('/')) {
+    gitHubURL += '/';
+  }
   let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
-  let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, outputFileAccessor);
+  let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, libraryURI, gitHubURL, outputFileAccessor);
   return staticSiteGenerator.buildSection(libraryDataProvider);
 }
 
-if (process.argv.length !== 8) {
-  console.error('usage: node buildStatic.js <libraryFile> <logic> <htmlTemplateFile> <notationTemplateFile> <libraryURI> <outputDir>');
+if (process.argv.length !== 9) {
+  console.error('usage: node buildStatic.js <libraryFile> <logic> <htmlTemplateFile> <notationTemplateFile> <libraryURI> <gitHubURL> <outputDir>');
   process.exit(2);
 }
 
-buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7])
+buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8])
   .catch((error) => {
     console.error(error);
     process.exit(1);

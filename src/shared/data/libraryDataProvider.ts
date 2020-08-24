@@ -99,7 +99,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
-  constructor(private options: LibraryDataProviderOptions, private childName: string = defaultLibraryName, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
+  constructor(public options: LibraryDataProviderOptions, private childName: string = defaultLibraryName, private parent?: LibraryDataProvider, private itemNumber?: LibraryItemNumber) {
     this.logic = options.logic;
     this.fileAccessor = options.fileAccessor;
     if (parent) {
