@@ -889,7 +889,7 @@ export abstract class GenericEditHandler {
     }
   }
 
-  addDefinitionRemarkEditor(markdown: Notation.MarkdownExpression, definition: Fmt.Definition, allKinds: string[], kind: string): void {
+  addDefinitionRemarkEditor(markdown: Notation.MarkdownExpression, definition: Fmt.Definition, allKinds: (string | undefined)[], kind: string | undefined): void {
     markdown.onTextChanged = (newText: string) => {
       let newItems: Fmt.DocumentationItem[] = [];
       for (let otherKind of allKinds) {

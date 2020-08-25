@@ -95,8 +95,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: Logic.RenderedDefinitionOptions): Notation.RenderedExpression | undefined {
-    let space: string | undefined = undefined;
+    let paragraphs: Notation.RenderedExpression[] = [];
     let row: Notation.RenderedExpression[] = [];
+    let space: string | undefined = undefined;
     if (options.includeLabel && itemInfo !== undefined) {
       row.push(this.renderDefinitionLabel(itemInfo));
       space = '  ';
@@ -105,7 +106,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let contents = definition.contents;
     let cases: ExtractedStructuralCase[] | undefined = undefined;
     let hasCases = false;
-    if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
+    if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
+      this.addDefinitionText(paragraphs);
+    } else {
       let hasParameters = definition.parameters.length > 0;
       if (hasParameters || this.editHandler) {
         if (space) {
@@ -161,9 +164,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       }
     }
-    let paragraphs: Notation.RenderedExpression[] = [];
     if (row.length) {
-      paragraphs.push(row.length === 1 ? row[0] : new Notation.RowExpression(row));
+      paragraphs.unshift(row.length === 1 ? row[0] : new Notation.RowExpression(row));
     }
     let definitionRef = this.renderDefinedSymbol([definition]);
     if (hasCases) {
@@ -1438,7 +1440,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderExpression(expression: Fmt.Expression): Notation.RenderedExpression {
     let result: Notation.RenderedExpression | undefined;
-    if (expression instanceof Fmt.DefinitionRefExpression && !expression.path.arguments.length) {
+    if (expression instanceof Fmt.DefinitionRefExpression && !(expression.path.parentPath instanceof Fmt.Path) && !expression.path.arguments.length) {
       let definitionPromise = this.utils.getDefinition(expression.path);
       let expressionPromise = definitionPromise.then((definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {

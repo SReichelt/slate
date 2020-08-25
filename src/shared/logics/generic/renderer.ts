@@ -50,6 +50,8 @@ export interface RenderedTemplateArguments {
   [name: string]: RenderedTemplateArgument;
 }
 
+const allRemarkKinds = [undefined, 'example', 'remarks', 'references'];
+
 export abstract class GenericRenderer {
   private variableNameEditHandler?: GenericEditHandler;
 
@@ -189,14 +191,19 @@ export abstract class GenericRenderer {
     return subHeading;
   }
 
+  protected addDefinitionText(paragraphs: Notation.RenderedExpression[]): void {
+    this.addDefinitionRemarksOfKind(paragraphs, undefined);
+  }
+
   protected addDefinitionRemarks(paragraphs: Notation.RenderedExpression[]): void {
-    const allKinds = ['example', 'remarks', 'references'];
-    for (let kind of allKinds) {
-      this.addDefinitionRemarksOfKind(paragraphs, allKinds, kind);
+    for (let kind of allRemarkKinds) {
+      if (kind) {
+        this.addDefinitionRemarksOfKind(paragraphs, kind);
+      }
     }
   }
 
-  private addDefinitionRemarksOfKind(paragraphs: Notation.RenderedExpression[], allKinds: string[], kind: string): void {
+  private addDefinitionRemarksOfKind(paragraphs: Notation.RenderedExpression[], kind: string | undefined): void {
     let definition = this.definition;
     let texts: string[] = [];
     if (definition.documentation) {
@@ -208,11 +215,6 @@ export abstract class GenericRenderer {
     }
     let canEdit = this.editHandler && kind !== 'example';
     if (texts.length || canEdit) {
-      let headingText = kind.charAt(0).toUpperCase() + kind.slice(1);
-      if (headingText === 'Example' && texts.length > 1) {
-        headingText = 'Examples';
-      }
-      let heading = this.renderSubHeading(headingText);
       let text = texts.join(kind === 'example' ? ', ' : '\n\n');
       let markdown = new Notation.MarkdownExpression(text);
       markdown.onRenderCode = (code: string) => {
@@ -225,11 +227,22 @@ export abstract class GenericRenderer {
         }
       };
       if (canEdit) {
-        this.editHandler!.addDefinitionRemarkEditor(markdown, definition, allKinds, kind);
-        let initiallyUnfolded = text.length > 0 && !this.utils.containsPlaceholders();
-        paragraphs.push(new Notation.FoldableExpression(heading, markdown, initiallyUnfolded));
+        this.editHandler!.addDefinitionRemarkEditor(markdown, definition, allRemarkKinds, kind);
+      }
+      if (kind) {
+        let headingText = kind.charAt(0).toUpperCase() + kind.slice(1);
+        if (headingText === 'Example' && texts.length > 1) {
+          headingText = 'Examples';
+        }
+        let heading = this.renderSubHeading(headingText);
+        if (canEdit) {
+          let initiallyUnfolded = text.length > 0 && !this.utils.containsPlaceholders();
+          paragraphs.push(new Notation.FoldableExpression(heading, markdown, initiallyUnfolded));
+        } else {
+          paragraphs.push(heading, markdown);
+        }
       } else {
-        paragraphs.push(heading, markdown);
+        paragraphs.push(markdown);
       }
     }
   }

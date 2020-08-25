@@ -111,8 +111,7 @@ class App extends React.Component<AppProps, AppState> {
       navigationPaneVisible: true,
       extraContentsVisible: false,
       editedDefinitions: [],
-      showStartPage: !(config.embedded || config.runningLocally),
-      selectedItemRepository: libraryRepository
+      showStartPage: !(config.embedded || config.runningLocally)
     };
 
     let libraryFileAccessor: FileAccessor | undefined = undefined;
@@ -151,12 +150,14 @@ class App extends React.Component<AppProps, AppState> {
       if (config.runningLocally) {
         if (gitHubAPIAccess) {
           libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess);
+          state.selectedItemRepository = libraryRepository;
         } else {
           libraryFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         }
       } else {
         let fallbackFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, fallbackFileAccessor);
+        state.selectedItemRepository = libraryRepository;
       }
     }
 

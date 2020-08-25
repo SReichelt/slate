@@ -1924,7 +1924,13 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/data/vector.html#vector (finite) or https://leanprover-community.github.io/mathlib_docs/data/seq/seq.html#seq (infinite)"
 `;
 
-exports[`render hlm library: 1.6.2 Essentials/Sequences/tuple 1`] = `"Definition 1.6.2 (Tuple)."`;
+exports[`render hlm library: 1.6.2 Essentials/Sequences/tuple 1`] = `
+"Definition 1.6.2 (Tuple).
+
+We write:
+
+\`$tuple(S = {S}, items = [{a_0}, {a_1}, {\\"...\\"}, {\\"a_n-1\\"}])\` := \`$Tuples(S = {S}, α = {n}).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = {n}))), {a = {a_k}}})\`"
+`;
 
 exports[`render hlm library: 1.6.3 Essentials/Sequences/tuple%20from%20function 1`] = `
 "Definition 1.6.3.  Let S be a set, α be an ordinal number, f : 𝓞𝓻𝓭_(<α) → S be a function. We define:
@@ -2134,6 +2140,13 @@ References.
 
 exports[`render hlm library: 1.7.1.2 Essentials/Numbers/Natural/number 1`] = `
 "Definition 1.7.1.2 (Positional notation).
+
+We write:
+* 0 := \`$\\"Natural numbers\\".zero\`
+* 1 := \`$\\"Natural numbers\\".successor(n = {$number(value = 0)})\`
+* 2 := \`$\\"Natural numbers\\".successor(n = {$number(value = 1)})\`
+* 3 := \`$\\"Natural numbers\\".successor(n = {$number(value = 2)})\`
+* ...
 
 Remarks.
 
@@ -2906,7 +2919,11 @@ Remarks.
 This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`). It yields a natural number that is a lower bound for the cardinality of a subset of natural numbers."
 `;
 
-exports[`render hlm library: 1.7.1.44.3 Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `"Definition 1.7.1.44.3 (Tuple)."`;
+exports[`render hlm library: 1.7.1.44.3 Essentials/Numbers/Natural/Sequences/tuple%20of%20numbers 1`] = `
+"Definition 1.7.1.44.3 (Tuple).
+
+This macro provides a shortcut for tuples of natural numbers."
+`;
 
 exports[`render hlm library: 1.7.1.44.4 Essentials/Numbers/Natural/Sequences/sequence%20from%20subset 1`] = `
 "Definition 1.7.1.44.4.  Let M ⊆ ℕ, α := [M]_ω. We define:
@@ -8089,9 +8106,9 @@ References.
 exports[`render hlm library: 2.8.28.1 Algebra/Rings/Matrices/Matrices 1`] = `
 "Definition 2.8.28.1.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  𝐑^(m×n) :=: {(a_i,j)_i < m,j < n | a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
+  𝐑^(m×n) :=: {[a_i,j]_i < m,j < n | a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
 
-  (a_i,j)_i < m,j < n = (b_i,j)_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
+  [a_i,j]_i < m,j < n = [b_i,j]_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
 
 References.
 
@@ -8117,9 +8134,9 @@ References.
 exports[`render hlm library: 2.8.28.3 Algebra/Rings/Matrices/matrix 1`] = `
 "Definition 2.8.28.3 (Matrix notation).
 
-Remarks.
+We write:
 
-This macro implements the usual bracketed notation for matrices with a fixed number of rows and columns."
+\`$matrix(𝐑 = {𝐑}, items = [[{\\"a_0,0\\"}, {\\"a_1,0\\"}, {\\"⋯\\"}, {\\"a_m-1,0\\"}],[{\\"a_0,1\\"}, {\\"a_1,1\\"}, {\\"⋯\\"}, {\\"a_m-1,1\\"}],[{\\"⋮\\"}, {\\"⋮\\"}, {\\" \\"}, {\\"⋮\\"}],[{\\"a_0,n-1\\"}, {\\"a_1,n-1\\"}, {\\"⋯\\"}, {\\"a_m-1,n-1\\"}]])\` := \`$Matrices(𝐑 = {𝐑}, m = {m}, n = {n}).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {m})), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {\\"a_i,j\\"}}})\`"
 `;
 
 exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
@@ -8129,13 +8146,13 @@ exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
 
 by:
 
-  (a_i,j)_i < m,j < n + (b_i,j)_i < m,j < n := (a_i,j + b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_i,j]_i < m,j < n + [b_i,j]_i < m,j < n := [a_i,j + b_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.5 Algebra/Rings/Matrices/zero 1`] = `
 "Definition 2.8.28.5.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  0_(𝐑^(m×n)) := (0_𝐑)_i < m,j < n"
+  0_(𝐑^(m×n)) := [0_𝐑]_i < m,j < n"
 `;
 
 exports[`render hlm library: 2.8.28.6 Algebra/Rings/Matrices/additive%20inverse 1`] = `
@@ -8145,7 +8162,7 @@ exports[`render hlm library: 2.8.28.6 Algebra/Rings/Matrices/additive%20inverse 
 
 by:
 
-  −(a_i,j)_i < m,j < n := (−a_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  −[a_i,j]_i < m,j < n := [−a_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.7 Algebra/Rings/Matrices/difference 1`] = `
@@ -8155,7 +8172,7 @@ exports[`render hlm library: 2.8.28.7 Algebra/Rings/Matrices/difference 1`] = `
 
 by:
 
-  (a_i,j)_i < m,j < n − (b_i,j)_i < m,j < n := (a_i,j − b_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_i,j]_i < m,j < n − [b_i,j]_i < m,j < n := [a_i,j − b_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.8 Algebra/Rings/Matrices/product 1`] = `
@@ -8165,7 +8182,7 @@ exports[`render hlm library: 2.8.28.8 Algebra/Rings/Matrices/product 1`] = `
 
 by:
 
-  (a_i,j)_i < l,j < m ⋅ (b_j,k)_j < m,k < n := (∑_𝐑_(j < m) a_i,j ⋅ b_j,k)_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))
+  [a_i,j]_i < l,j < m ⋅ [b_j,k]_j < m,k < n := [∑_𝐑_(j < m) a_i,j ⋅ b_j,k]_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))
 
 References.
 
@@ -8183,7 +8200,7 @@ exports[`render hlm library: 2.8.28.9 Algebra/Rings/Matrices/product%20with%20le
 
 by:
 
-  r ⋅ (a_i,j)_i < m,j < n := (r ⋅ a_i,j)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  r ⋅ [a_i,j]_i < m,j < n := [r ⋅ a_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.10 Algebra/Rings/Matrices/product%20with%20right%20scalar 1`] = `
@@ -8193,13 +8210,13 @@ exports[`render hlm library: 2.8.28.10 Algebra/Rings/Matrices/product%20with%20r
 
 by:
 
-  (a_i,j)_i < m,j < n ⋅ r := (a_i,j ⋅ r)_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_i,j]_i < m,j < n ⋅ r := [a_i,j ⋅ r]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.11 Algebra/Rings/Matrices/identity 1`] = `
 "Definition 2.8.28.11.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
-  I_(𝐑^(n×n)) := (δ_𝐑,i,j)_i < n,j < n
+  I_(𝐑^(n×n)) := [δ_𝐑,i,j]_i < n,j < n
 
 References.
 
