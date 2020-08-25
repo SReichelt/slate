@@ -12,8 +12,8 @@ $FAIL_indices(_1: %Binder(
   ),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
-  definition = [a[i = {$../Essentials/"Natural numbers".zero}, j = {$../Essentials/"Pointed sets"."pointed set"(
-      S = {$../Essentials/"Natural numbers"},
-      s = {$../Essentials/"Natural numbers".zero}
-  )}]]
+  definition = [a[i = $../Essentials/"Natural numbers".zero, j = $../Essentials/"Pointed sets"."pointed set"(
+      S = $../Essentials/"Natural numbers",
+      s = $../Essentials/"Natural numbers".zero
+  )]]
 }

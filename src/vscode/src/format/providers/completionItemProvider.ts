@@ -348,7 +348,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                             let metaModel = rangeInfo.context.metaModel;
                             try {
                                 let metaDefinition = metaModel.definitions.getDefinition(type.path.name);
-                                if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition)) {
+                                if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition) && !metaModel.canOmitBraces(metaDefinition)) {
                                     insertText = new vscode.SnippetString(assignment + '{$0}');
                                 }
                             } catch (error) {

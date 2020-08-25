@@ -8,7 +8,7 @@ $FAIL_constructorArguments(
   s: %Element(S)
 ): %ExplicitOperator {
   definition = [$../Essentials/"Pointed sets"."pointed set"(
-      S = {$../Essentials/"Natural numbers"},
-      s = {s}
+      S = $../Essentials/"Natural numbers",
+      s = s
   )]
 }

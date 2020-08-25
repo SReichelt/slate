@@ -6,13 +6,13 @@ $Bijections(
 ): %SetOperator {
   definition = [%subset(
     #(f: %Element($Functions(
-      X = {X},
-      Y = {Y}
+      X = X,
+      Y = Y
     ))),
     $bijective(
-      X = {X},
-      Y = {Y},
-      f = {f}
+      X = X,
+      Y = Y,
+      f = f
     )
   )]
 }

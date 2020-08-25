@@ -21,15 +21,15 @@ $FAIL_InvalidEmbedding: %Construction {
       ),
       definition = [%exists(
         #(f: %Element($../Essentials/Bijections(
-          X = {S},
-          Y = {T}
+          X = S,
+          Y = T
         ))),
         formula = %equals(
           $../Essentials/value(
-            X = {S},
-            Y = {T},
-            f = {f},
-            x = {s}
+            X = S,
+            Y = T,
+            f = f,
+            x = s
           ),
           t
         )
@@ -41,8 +41,8 @@ $FAIL_InvalidEmbedding: %Construction {
   embedding = {
     parameter = #(s: %Element($../Essentials/"Natural numbers")),
     target = $../Essentials/"Pointed sets"."pointed set"(
-        S = {$../Essentials/"Natural numbers"},
-        s = {s}
+        S = $../Essentials/"Natural numbers",
+        s = s
     )
   }
 }

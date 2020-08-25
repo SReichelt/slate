@@ -350,6 +350,27 @@ class MetaDeclarationGenerator {
     return outFileStr;
   }
 
+  private canOmitBraces(definition: Fmt.Definition): boolean {
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && !definition.contents.superType && definition.contents.members && definition.contents.members.length) {
+      let first = true;
+      for (let member of definition.contents.members) {
+        if (first) {
+          if (member.optional || this.getMemberContentType(member.type) || member.type instanceof Fmt.IndexedExpression) {
+            return false;
+          }
+        } else {
+          if (!member.optional) {
+            return false;
+          }
+        }
+        first = false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private outputTraversalCode(source: string, type: Fmt.Expression, indent: string): string {
     let outFileStr = '';
     if (type instanceof Fmt.IndexedExpression) {
@@ -551,6 +572,28 @@ class MetaDeclarationGenerator {
         }
         outFileStr += `  }\n`;
         outFileStr += `\n`;
+        if (this.canOmitBraces(definition)) {
+          outFileStr += `  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {\n`;
+          outFileStr += `    if (!outputAllNames`;
+          let firstMemberName: string | undefined = undefined;
+          if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+            for (let member of definition.contents.members) {
+              let memberName = translateMemberName(member.name);
+              if (firstMemberName === undefined) {
+                firstMemberName = memberName;
+              } else {
+                outFileStr += ` && !this.${memberName}`;
+              }
+            }
+          }
+          outFileStr += `) {\n`;
+          outFileStr += `      return this.${firstMemberName!};\n`;
+          outFileStr += `    } else {\n`;
+          outFileStr += `      return super.toExpression(outputAllNames, reportFn);\n`;
+          outFileStr += `    }\n`;
+          outFileStr += `  }\n`;
+          outFileStr += `\n`;
+        }
         outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
         outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
         outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;

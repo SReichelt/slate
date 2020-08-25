@@ -1197,11 +1197,11 @@ We write “let ≃ be a dependent equality on S_i (i ∈ I)” for “let �
 
 Remarks.
 
-This somewhat technical construction exposes the equality relation on \`S[i = {i}]\` in such a way that it becomes possible to ask whether \`%equals(s, t)\` for \`%in(s, S[i = {a}])\` and \`%in(t, S[i = {b}])\` whenever a \`%equals(a, b)\`.
+This somewhat technical construction exposes the equality relation on \`S[i = i]\` in such a way that it becomes possible to ask whether \`%equals(s, t)\` for \`%in(s, S[i = a])\` and \`%in(t, S[i = b])\` whenever a \`%equals(a, b)\`.
 
 It might seem that asking whether \`%equals(s, t)\` should simply be allowed in this case, but the type system of HLM restricts it to the case when \`a\` and \`b\` are literally the same expression. If \`%equals(a, b)\` is given as a proposition, the equality can carry information that needs to be transported from \`I\` to \`S\`.
 
-E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i = {i}]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
+E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i = i]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
 
 Dependent equality is a prerequisite to formalizing arbitrary disjoint unions (see \`$../../Sets/\\"Generalized operators\\"/\\"Generalized disjoint union\\"\`)."
 `;
@@ -1929,7 +1929,7 @@ exports[`render hlm library: 1.6.2 Essentials/Sequences/tuple 1`] = `
 
 We write:
 
-\`$tuple(S = {S}, items = [{a_0}, {a_1}, {\\"...\\"}, {\\"a_n-1\\"}])\` := \`$Tuples(S = {S}, α = {n}).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = {n}))), {a = {a_k}}})\`"
+\`$tuple(S = S, items = [{a_0}, {a_1}, {\\"...\\"}, {\\"a_n-1\\"}])\` := \`$Tuples(S = S, α = n).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = n))), {a = {a_k}}})\`"
 `;
 
 exports[`render hlm library: 1.6.3 Essentials/Sequences/tuple%20from%20function 1`] = `
@@ -2143,9 +2143,9 @@ exports[`render hlm library: 1.7.1.2 Essentials/Numbers/Natural/number 1`] = `
 
 We write:
 * 0 := \`$\\"Natural numbers\\".zero\`
-* 1 := \`$\\"Natural numbers\\".successor(n = {$number(value = 0)})\`
-* 2 := \`$\\"Natural numbers\\".successor(n = {$number(value = 1)})\`
-* 3 := \`$\\"Natural numbers\\".successor(n = {$number(value = 2)})\`
+* 1 := \`$\\"Natural numbers\\".successor(n = $number(value = 0))\`
+* 2 := \`$\\"Natural numbers\\".successor(n = $number(value = 1))\`
+* 3 := \`$\\"Natural numbers\\".successor(n = $number(value = 2))\`
 * ...
 
 Remarks.
@@ -3019,7 +3019,7 @@ exports[`render hlm library: 1.7.1.49.1 Essentials/Numbers/Natural/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Natural numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -3067,7 +3067,7 @@ exports[`render hlm library: 1.7.1.49.6 Essentials/Numbers/Natural/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Natural numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Natural numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -3126,7 +3126,7 @@ Equivalence.  No proof.
 
 Remarks.
 
-Note that this definition presupposes that \`$../less(n = {n}, m = {$../number(value = 1)})\`. Otherwise, not all equivalences would hold.
+Note that this definition presupposes that \`$../less(n = n, m = $../number(value = 1))\`. Otherwise, not all equivalences would hold.
 
 In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the set \`$\\"Prime numbers\\"\` of prime numbers, no such explicit exclusion of 1 is necessary.
 
@@ -3775,7 +3775,7 @@ exports[`render hlm library: 1.7.2.22.1 Essentials/Numbers/Cardinal/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Cardinal numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Cardinal numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -3801,7 +3801,7 @@ exports[`render hlm library: 1.7.2.22.3 Essentials/Numbers/Cardinal/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Cardinal numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Cardinal numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4530,7 +4530,7 @@ exports[`render hlm library: 1.7.4.22.1 Essentials/Numbers/Integer/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Integers, ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4546,7 +4546,7 @@ exports[`render hlm library: 1.7.4.22.2 Essentials/Numbers/Integer/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Integers}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Integers, ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4903,7 +4903,7 @@ exports[`render hlm library: 1.7.5.14.1 Essentials/Numbers/Rational/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Rational numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4919,7 +4919,7 @@ exports[`render hlm library: 1.7.5.14.2 Essentials/Numbers/Rational/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Rational numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Rational numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5332,7 +5332,7 @@ exports[`render hlm library: 1.7.6.17.1 Essentials/Numbers/Real/Iterated%20opera
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Real numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5348,7 +5348,7 @@ exports[`render hlm library: 1.7.6.17.2 Essentials/Numbers/Real/Iterated%20opera
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Real numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Real numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5580,7 +5580,7 @@ exports[`render hlm library: 1.7.7.14.1 Essentials/Numbers/Complex/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated sum\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Complex numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5596,7 +5596,7 @@ exports[`render hlm library: 1.7.7.14.2 Essentials/Numbers/Complex/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../\\"Complex numbers\\"}, ⨂ = {$\\"iterated product\\"}, n = {n}, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Complex numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -6494,7 +6494,7 @@ by:
 
 Example.
 
-\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐌 = {𝐌})}, ⨂ = {$\\"iterated operation\\"(𝐌 = {𝐌})}, n = {n}, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐌 = 𝐌), ⨂ = $\\"iterated operation\\"(𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -6914,7 +6914,7 @@ by:
 
 Example.
 
-\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐆 = {𝐆})}, ⨂ = {$\\"iterated operation\\"(𝐆 = {𝐆})}, n = {n}, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐆 = 𝐆), ⨂ = $\\"iterated operation\\"(𝐆 = 𝐆), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7388,7 +7388,7 @@ exports[`render hlm library: 2.7.15.1 Algebra/Semirings/Iterated%20operations/it
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7404,7 +7404,7 @@ exports[`render hlm library: 2.7.15.2 Algebra/Semirings/Iterated%20operations/it
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated product\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7881,7 +7881,7 @@ exports[`render hlm library: 2.8.25.1 Algebra/Rings/Iterated%20operations/iterat
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑})}, n = {n}, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7897,7 +7897,7 @@ exports[`render hlm library: 2.8.25.2 Algebra/Rings/Iterated%20operations/iterat
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$../Carrier(𝐑 = {𝐑})}, ⨂ = {$\\"iterated product\\"(𝐑 = {𝐑})}, n = {n}, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated product\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8136,7 +8136,7 @@ exports[`render hlm library: 2.8.28.3 Algebra/Rings/Matrices/matrix 1`] = `
 
 We write:
 
-\`$matrix(𝐑 = {𝐑}, items = [[{\\"a_0,0\\"}, {\\"a_1,0\\"}, {\\"⋯\\"}, {\\"a_m-1,0\\"}],[{\\"a_0,1\\"}, {\\"a_1,1\\"}, {\\"⋯\\"}, {\\"a_m-1,1\\"}],[{\\"⋮\\"}, {\\"⋮\\"}, {\\" \\"}, {\\"⋮\\"}],[{\\"a_0,n-1\\"}, {\\"a_1,n-1\\"}, {\\"⋯\\"}, {\\"a_m-1,n-1\\"}]])\` := \`$Matrices(𝐑 = {𝐑}, m = {m}, n = {n}).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {m})), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {\\"a_i,j\\"}}})\`"
+\`$matrix(𝐑 = 𝐑, items = [[{\\"a_0,0\\"}, {\\"a_1,0\\"}, {\\"⋯\\"}, {\\"a_m-1,0\\"}],[{\\"a_0,1\\"}, {\\"a_1,1\\"}, {\\"⋯\\"}, {\\"a_m-1,1\\"}],[{\\"⋮\\"}, {\\"⋮\\"}, {\\" \\"}, {\\"⋮\\"}],[{\\"a_0,n-1\\"}, {\\"a_1,n-1\\"}, {\\"⋯\\"}, {\\"a_m-1,n-1\\"}]])\` := \`$Matrices(𝐑 = 𝐑, m = m, n = n).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = m)), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {\\"a_i,j\\"}}})\`"
 `;
 
 exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
@@ -8362,7 +8362,7 @@ exports[`render hlm library: 2.8.29.1.10 Algebra/Rings/Modules/Left%20modules/it
 
 Example.
 
-\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8566,7 +8566,7 @@ Remarks.
 
 This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝒙\`. This set only depends on the length of \`𝒙\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support.
 
-For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = {𝐑}, 𝐌 = {𝐌}, 𝒙 = {𝒙}, 𝐚 = {𝐚})\`."
+For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
 `;
 
 exports[`render hlm library: 2.8.29.1.13.3 Algebra/Rings/Modules/Left%20modules/Coordinates/linear%20combination 1`] = `
@@ -8813,7 +8813,7 @@ exports[`render hlm library: 2.8.29.2.10 Algebra/Rings/Modules/Right%20modules/i
 
 Example.
 
-\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = {$Carrier(𝐑 = {𝐑}, 𝐌 = {𝐌})}, ⨂ = {$\\"iterated sum\\"(𝐑 = {𝐑}, 𝐌 = {𝐌})}, n = {n}, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = {n}))), {a = {a[i = {i}]}}})\`
+\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -9003,7 +9003,7 @@ Remarks.
 
 This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝒙\`. This set only depends on the length of \`𝒙\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support.
 
-For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = {𝐑}, 𝐌 = {𝐌}, 𝒙 = {𝒙}, 𝐚 = {𝐚})\`."
+For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
 `;
 
 exports[`render hlm library: 2.8.29.2.13.3 Algebra/Rings/Modules/Right%20modules/Coordinates/linear%20combination 1`] = `
@@ -9546,7 +9546,7 @@ exports[`render hlm library: 4.9.1 Category%20theory/Concrete%20categories/eleme
 
 Remarks.
 
-This is one possible formalization of the discrete category obtained from elements of \`S\`. We simply define morphisms to be elements of \`S\` as well, such that \`%setEquals($../Morphisms(u = {u}, 𝓒 = {$elements(u = {u}, S = {S})}, 𝐗 = {a}, 𝐘 = {a}), %enumeration($../identity(u = {u}, 𝓒 = {$elements(u = {u}, S = {S})}, 𝐗 = {a})), %enumeration(a))\`, and \`%setEquals($../Morphisms(u = {u}, 𝓒 = {$elements(u = {u}, S = {S})}, 𝐗 = {a}, 𝐘 = {b}), $../../Essentials/Sets/\\"Empty set\\")\` if \`%not(%equals(a, b))\`.
+This is one possible formalization of the discrete category obtained from elements of \`S\`. We simply define morphisms to be elements of \`S\` as well, such that \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = a), %enumeration($../identity(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a)), %enumeration(a))\`, and \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = b), $../../Essentials/Sets/\\"Empty set\\")\` if \`%not(%equals(a, b))\`.
 
 (Note that the existence of \`x\` in the definition of morphism composition implies that \`%equals(d, e, f)\`.)
 
@@ -9737,7 +9737,7 @@ exports[`render hlm library: 4.9.14 Category%20theory/Concrete%20categories/cate
 
 Remarks.
 
-This defines the category of small categories, or, more generally, a category in \`$../../Essentials/Numbers/Natural/sum(m = {u}, n = {$../../Essentials/Numbers/Natural/number(value = 1)})\` of all categories in \`u\`.
+This defines the category of small categories, or, more generally, a category in \`$../../Essentials/Numbers/Natural/sum(m = u, n = $../../Essentials/Numbers/Natural/number(value = 1))\` of all categories in \`u\`.
 
 References.
 

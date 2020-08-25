@@ -734,6 +734,14 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     }
   }
 
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (!outputAllNames && !this.theorem) {
+      return this.value;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
+    }
+  }
+
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_RewriteDefinition {
     let result = new ObjectContents_RewriteDefinition;
     this.substituteExpression(undefined, result, replacedParameters);
@@ -2491,6 +2499,14 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
   }
 
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (!outputAllNames) {
+      return this.formula;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
+    }
+  }
+
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_PropArg {
     let result = new ObjectContents_PropArg;
     this.substituteExpression(undefined, result, replacedParameters);
@@ -2535,6 +2551,14 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this._set, outputAllNames ? 'set' : undefined, false);
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (!outputAllNames) {
+      return this._set;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
+    }
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetArg {
@@ -2593,6 +2617,14 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
       let subsetProofExpr = this.subsetProof.toExpression(true, reportFn);
       argumentList.add(subsetProofExpr, 'subsetProof', true);
       reportFn?.(subsetProofExpr, this.subsetProof);
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (!outputAllNames && !this.subsetProof) {
+      return this._set;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
     }
   }
 
@@ -2664,6 +2696,14 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
       let elementProofExpr = this.elementProof.toExpression(true, reportFn);
       argumentList.add(elementProofExpr, 'elementProof', true);
       reportFn?.(elementProofExpr, this.elementProof);
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (!outputAllNames && !this.elementProof) {
+      return this.element;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
     }
   }
 

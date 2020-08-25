@@ -9,8 +9,8 @@ $"Cardinal numbers": %Construction {
       leftParameters = #(S: %Set),
       rightParameters = #(T: %Set),
       definition = [%exists(#(f: %Element($Bijections(
-        X = {S},
-        Y = {T}
+        X = S,
+        Y = T
       ))))],
       isomorphic = %true
     }
@@ -18,6 +18,6 @@ $"Cardinal numbers": %Construction {
 
   embedding = {
     parameter = #(n: %Element($"Natural numbers")),
-    target = $"Cardinal numbers".cardinality(S = {$"Pointed sets"})
+    target = $"Cardinal numbers".cardinality(S = $"Pointed sets")
   }
 }

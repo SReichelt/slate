@@ -4,15 +4,15 @@
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
  */
 $FAIL_functionCallResultMismatch(f: %Element($../Essentials/Functions(
-  X = {$../Essentials/"Natural numbers"},
-  Y = {$../Essentials/"Pointed sets"}
+  X = $../Essentials/"Natural numbers",
+  Y = $../Essentials/"Pointed sets"
 ))): %Predicate {
   definition = [%equals(
     $../Essentials/value(
-      X = {$../Essentials/"Natural numbers"},
-      Y = {$../Essentials/"Pointed sets"},
-      f = {f},
-      x = {$../Essentials/"Natural numbers".zero}
+      X = $../Essentials/"Natural numbers",
+      Y = $../Essentials/"Pointed sets",
+      f = f,
+      x = $../Essentials/"Natural numbers".zero
     ),
     $../Essentials/"Natural numbers".zero
   )]

@@ -265,6 +265,33 @@ export class DynamicMetaModel extends Meta.MetaModel {
     return false;
   }
 
+  canOmitBraces(metaDefinition: Fmt.Definition): boolean {
+    if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType && !metaDefinition.contents.superType && metaDefinition.contents.members) {
+      let first = true;
+      for (let member of metaDefinition.contents.members) {
+        if (first) {
+          if (member.optional || member.type instanceof Fmt.IndexedExpression) {
+            return false;
+          }
+          if (member.type instanceof Fmt.DefinitionRefExpression && !member.type.path.parentPath) {
+            let [memberMetaModel, memberMetaDefinition] = this.getMetaDefinition(member.type.path);
+            if (memberMetaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(memberMetaDefinition)) {
+              return false;
+            }
+          }
+        } else {
+          if (!member.optional) {
+            return false;
+          }
+        }
+        first = false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   findMember(metaDefinition: Fmt.Definition, name?: string, index?: number): {result: Fmt.Parameter | undefined, memberCount: number} {
     let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let result: Fmt.Parameter | undefined = undefined;
@@ -554,6 +581,14 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
       memberCount: memberIndex,
       hadOptionalMembers: hadOptionalMembers
     };
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (this.arguments.length === 1 && !this.arguments[0].name) {
+      return this.arguments[0].value;
+    } else {
+      return super.toExpression(outputAllNames, reportFn);
+    }
   }
 }
 

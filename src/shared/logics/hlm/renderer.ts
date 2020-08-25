@@ -1806,12 +1806,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     if (expression instanceof Fmt.DefinitionRefExpression) {
       for (let arg of expression.path.arguments) {
-        if (arg.value instanceof Fmt.CompoundExpression) {
-          for (let compoundArg of arg.value.arguments) {
-            if (compoundArg.value instanceof FmtHLM.MetaRefExpression_setAssociative || compoundArg.value instanceof FmtHLM.MetaRefExpression_associative) {
-              return true;
-            }
-          }
+        let argValue = arg.value;
+        if (argValue instanceof Fmt.CompoundExpression && argValue.arguments.length) {
+          argValue = argValue.arguments[0].value;
+        }
+        if (argValue instanceof FmtHLM.MetaRefExpression_setAssociative || argValue instanceof FmtHLM.MetaRefExpression_associative) {
+          return true;
         }
       }
     }
@@ -3293,6 +3293,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
           index++;
         }
+      } else {
+        this.addGenericExpressionParts(arg.value, result);
       }
     }
   }

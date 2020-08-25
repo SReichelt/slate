@@ -2,7 +2,7 @@
 
 $extractFromPointedNaturalNumbers: %StandardTheorem {
   claim = %equals(
-    $../Essentials/"Pointed set base point"(i = {$../Essentials/"pointed natural numbers"}),
+    $../Essentials/"Pointed set base point"(i = $../Essentials/"pointed natural numbers"),
     $../Essentials/"Natural numbers".zero
   )
 }

@@ -196,33 +196,34 @@ export class HLMRenderUtils extends GenericRenderUtils {
     let newBinderArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
     let changed = false;
     for (let binderArg of binderArgumentList) {
-      if (binderArg.value instanceof Fmt.CompoundExpression && binderArg.value.arguments.length) {
-        let expression = binderArg.value.arguments[0].value;
-        if (expression instanceof Fmt.ParameterExpression) {
+      let binderArgValue = binderArg.value;
+      if (binderArgValue instanceof Fmt.CompoundExpression && binderArgValue.arguments.length > 1 && binderArgValue.arguments[0].value instanceof Fmt.ParameterExpression) {
           // Looks like a nested binder argument; recurse into it.
-          if (binderArg.value.arguments.length > 1) {
-            let nestedArgumentsExpression = binderArg.value.arguments[1].value;
-            if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
-              let allParameters: Fmt.Parameter[] = [];
-              allParameters.push(...parameters);
-              allParameters.push(...expression.parameters);
-              let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
-              if (newNestedArguments !== nestedArgumentsExpression.arguments) {
-                binderArg = binderArg.clone();
-                (binderArg.value as Fmt.CompoundExpression).arguments[0].value = expression;
-                ((binderArg.value as Fmt.CompoundExpression).arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
-                changed = true;
-              }
-            }
-          }
-        } else {
-          // We expect this to be a regular argument.
-          let newExpression = this.convertStructuralCaseToOverride(parameters, expression, elementParameterOverrides);
-          if (newExpression !== expression) {
+        let expression = binderArgValue.arguments[0].value;
+        let nestedArgumentsExpression = binderArgValue.arguments[1].value;
+        if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
+          let allParameters: Fmt.Parameter[] = [];
+          allParameters.push(...parameters);
+          allParameters.push(...expression.parameters);
+          let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
+          if (newNestedArguments !== nestedArgumentsExpression.arguments) {
             binderArg = binderArg.clone();
-            (binderArg.value as Fmt.CompoundExpression).arguments[0].value = newExpression;
+            let newBinderArgValue = binderArg.value as Fmt.CompoundExpression;
+            newBinderArgValue.arguments[0].value = expression;
+            (newBinderArgValue.arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
             changed = true;
           }
+        }
+      } else {
+        // We expect this to be a regular argument.
+        if (binderArgValue instanceof Fmt.CompoundExpression && binderArgValue.arguments.length) {
+          binderArgValue = binderArgValue.arguments[0].value;
+        }
+        let newBinderArgValue = this.convertStructuralCaseToOverride(parameters, binderArgValue, elementParameterOverrides);
+        if (newBinderArgValue !== binderArgValue) {
+          binderArg = binderArg.clone();
+          binderArg.value = newBinderArgValue;
+          changed = true;
         }
       }
       newBinderArgumentList.push(binderArg);

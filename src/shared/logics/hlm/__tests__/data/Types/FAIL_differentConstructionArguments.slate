@@ -1,58 +1,58 @@
 %../../../../../../../data/logics/hlm%
 
 /**
- * @expectedError Type mismatch: $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Natural numbers"}) and $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Cardinal numbers"}) are incompatible
+ * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
  *
- * @expectedError Type mismatch: $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Natural numbers"}) and $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Cardinal numbers"}) are incompatible
+ * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
  *
- * @expectedError Type mismatch: $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Natural numbers"}) and $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Cardinal numbers"}) are incompatible
+ * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
  *
- * @expectedError Type mismatch: $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Natural numbers"}) and $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Cardinal numbers"}) are incompatible
+ * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
  *
- * @expectedError Type mismatch: element of $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Cardinal numbers"}) expected
+ * @expectedError Type mismatch: element of $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") expected
  *
- * @expectedError Type mismatch: element of $../Essentials/Functions(X = {$../Essentials/"Natural numbers"}, Y = {$../Essentials/"Pointed sets"}) expected
+ * @expectedError Type mismatch: element of $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Pointed sets") expected
  */
 $FAIL_differentConstructionArguments(
   s: %Element($../Essentials/Functions(
-    X = {$../Essentials/"Natural numbers"},
-    Y = {$../Essentials/"Natural numbers"}
+    X = $../Essentials/"Natural numbers",
+    Y = $../Essentials/"Natural numbers"
   )),
   t: %Element($../Essentials/Functions(
-    X = {$../Essentials/"Natural numbers"},
-    Y = {$../Essentials/"Cardinal numbers"}
+    X = $../Essentials/"Natural numbers",
+    Y = $../Essentials/"Cardinal numbers"
   )),
   u: %Element($../Essentials/Functions(
-    X = {$../Essentials/"Natural numbers"},
-    Y = {$../Essentials/"Pointed sets"}
+    X = $../Essentials/"Natural numbers",
+    Y = $../Essentials/"Pointed sets"
   ))
 ): %Predicate {
   definition = [
     %in(
       s,
       $../Essentials/Functions(
-        X = {$../Essentials/"Natural numbers"},
-        Y = {$../Essentials/"Cardinal numbers"}
+        X = $../Essentials/"Natural numbers",
+        Y = $../Essentials/"Cardinal numbers"
       )
     ),
     %sub(
       $../Essentials/Functions(
-        X = {$../Essentials/"Natural numbers"},
-        Y = {$../Essentials/"Natural numbers"}
+        X = $../Essentials/"Natural numbers",
+        Y = $../Essentials/"Natural numbers"
       ),
       $../Essentials/Functions(
-        X = {$../Essentials/"Natural numbers"},
-        Y = {$../Essentials/"Cardinal numbers"}
+        X = $../Essentials/"Natural numbers",
+        Y = $../Essentials/"Cardinal numbers"
       )
     ),
     %setEquals(
       $../Essentials/Functions(
-        X = {$../Essentials/"Natural numbers"},
-        Y = {$../Essentials/"Natural numbers"}
+        X = $../Essentials/"Natural numbers",
+        Y = $../Essentials/"Natural numbers"
       ),
       $../Essentials/Functions(
-        X = {$../Essentials/"Natural numbers"},
-        Y = {$../Essentials/"Cardinal numbers"}
+        X = $../Essentials/"Natural numbers",
+        Y = $../Essentials/"Cardinal numbers"
       )
     ),
     %equals(s, t),
@@ -60,8 +60,8 @@ $FAIL_differentConstructionArguments(
       %asElementOf(
         s,
         $../Essentials/Functions(
-          X = {$../Essentials/"Natural numbers"},
-          Y = {$../Essentials/"Cardinal numbers"}
+          X = $../Essentials/"Natural numbers",
+          Y = $../Essentials/"Cardinal numbers"
         )
       ),
       t
@@ -70,8 +70,8 @@ $FAIL_differentConstructionArguments(
       %asElementOf(
         s,
         $../Essentials/Functions(
-          X = {$../Essentials/"Natural numbers"},
-          Y = {$../Essentials/"Pointed sets"}
+          X = $../Essentials/"Natural numbers",
+          Y = $../Essentials/"Pointed sets"
         )
       ),
       u

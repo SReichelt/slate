@@ -7,5 +7,5 @@ $FAIL_missingBinderArgument(_1: %Binder(
   #(i,j: %Element($../Essentials/"Natural numbers")),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
-  definition = [a[i = {$../Essentials/"Natural numbers".zero}]]
+  definition = [a[i = $../Essentials/"Natural numbers".zero]]
 }

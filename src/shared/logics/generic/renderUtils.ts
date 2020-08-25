@@ -177,18 +177,18 @@ export abstract class GenericRenderUtils {
           if (operand instanceof Fmt.VariableRefExpression) {
             let operandArg = constraint.path.arguments.getValue(operand.variable.name);
             if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
-              let operandArgValue = operandArg.arguments[0].value;
-              if (operandArgValue instanceof Fmt.VariableRefExpression && operandArgValue.variable === param) {
-                return {
-                  property: this.getNotationArgument(notation, elements.property, negationCount),
-                  singular: this.getNotationArgument(notation, elements.singular, negationCount),
-                  plural: this.getNotationArgument(notation, elements.plural, negationCount),
-                  article: this.getNotationArgument(notation, elements.article, negationCount),
-                  isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
-                  definitionRef: constraint,
-                  extracted: true
-                };
-              }
+              operandArg = operandArg.arguments[0].value;
+            }
+            if (operandArg instanceof Fmt.VariableRefExpression && operandArg.variable === param) {
+              return {
+                property: this.getNotationArgument(notation, elements.property, negationCount),
+                singular: this.getNotationArgument(notation, elements.singular, negationCount),
+                plural: this.getNotationArgument(notation, elements.plural, negationCount),
+                article: this.getNotationArgument(notation, elements.article, negationCount),
+                isFeature: elements.isFeature instanceof FmtNotation.MetaRefExpression_true,
+                definitionRef: constraint,
+                extracted: true
+              };
             }
           }
         }

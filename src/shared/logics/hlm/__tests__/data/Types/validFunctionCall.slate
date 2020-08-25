@@ -1,19 +1,19 @@
 %../../../../../../../data/logics/hlm%
 
 $validFunctionCall(f: %Element($../Essentials/Functions(
-  X = {$../Essentials/"Natural numbers"},
-  Y = {$../Essentials/"Pointed sets"}
+  X = $../Essentials/"Natural numbers",
+  Y = $../Essentials/"Pointed sets"
 ))): %Predicate {
   definition = [%equals(
     $../Essentials/value(
-      X = {$../Essentials/"Natural numbers"},
-      Y = {$../Essentials/"Pointed sets"},
-      f = {f},
-      x = {$../Essentials/"Natural numbers".zero}
+      X = $../Essentials/"Natural numbers",
+      Y = $../Essentials/"Pointed sets",
+      f = f,
+      x = $../Essentials/"Natural numbers".zero
     ),
     $../Essentials/"Pointed sets"."pointed set"(
-        S = {$../Essentials/"Natural numbers"},
-        s = {$../Essentials/"Natural numbers".zero}
+        S = $../Essentials/"Natural numbers",
+        s = $../Essentials/"Natural numbers".zero
     )
   )]
 }

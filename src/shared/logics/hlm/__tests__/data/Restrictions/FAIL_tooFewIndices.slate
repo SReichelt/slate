@@ -10,5 +10,5 @@ $FAIL_tooFewIndices(_1: %Binder(
     #(a: %Element($../Essentials/"Pointed sets"))
   ))
 )): %ExplicitOperator {
-  definition = [a[j = {$../Essentials/"Natural numbers".zero}]]
+  definition = [a[j = $../Essentials/"Natural numbers".zero]]
 }
