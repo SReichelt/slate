@@ -325,13 +325,10 @@ export class DynamicMetaModel extends Meta.MetaModel {
       }
     } else if (type instanceof Fmt.DefinitionRefExpression) {
       let [metaModel, metaDefinition] = this.getMetaDefinition(type.path);
-      if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition)) {
-        if (!(value instanceof Fmt.CompoundExpression)) {
-          throw new Error('Compound expression expected');
-        }
+      if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition) && value instanceof Fmt.CompoundExpression) {
         let objectContents = new DynamicObjectContents(metaModel, metaDefinition, false, onMemberFound);
         onObjectContentsCreated?.(value, objectContents);
-        objectContents.fromCompoundExpression(value);
+        objectContents.fromExpression(value);
       }
     }
   }

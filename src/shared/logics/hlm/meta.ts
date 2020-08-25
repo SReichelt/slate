@@ -147,22 +147,17 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     super.fromArgumentList(argumentList, reportFn);
     let embeddingRaw = argumentList.getOptionalValue('embedding', 4);
     if (embeddingRaw !== undefined) {
-      if (embeddingRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Embedding;
-        newItem.fromCompoundExpression(embeddingRaw, reportFn);
-        this.embedding = newItem;
-        reportFn?.(embeddingRaw, newItem);
-      } else {
-        throw new Error('embedding: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Embedding;
+      newItem.fromExpression(embeddingRaw, reportFn);
+      this.embedding = newItem;
+      reportFn?.(embeddingRaw, newItem);
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.embedding !== undefined) {
-      let embeddingExpr = new Fmt.CompoundExpression;
-      this.embedding.toCompoundExpression(embeddingExpr, true, reportFn);
+      let embeddingExpr = this.embedding.toExpression(true, reportFn);
       argumentList.add(embeddingExpr, 'embedding', true);
       reportFn?.(embeddingExpr, this.embedding);
     }
@@ -256,14 +251,10 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     this.full = argumentList.getOptionalValue('full', 2);
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 3);
     if (wellDefinednessProofRaw !== undefined) {
-      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(wellDefinednessProofRaw, reportFn);
-        this.wellDefinednessProof = newItem;
-        reportFn?.(wellDefinednessProofRaw, newItem);
-      } else {
-        throw new Error('wellDefinednessProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      this.wellDefinednessProof = newItem;
+      reportFn?.(wellDefinednessProofRaw, newItem);
     }
   }
 
@@ -277,8 +268,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
       argumentList.add(this.full, 'full', true);
     }
     if (this.wellDefinednessProof !== undefined) {
-      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
-      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true, reportFn);
+      let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
       argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
@@ -362,39 +352,29 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     super.fromArgumentList(argumentList, reportFn);
     let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 4);
     if (equalityDefinitionRaw !== undefined) {
-      if (equalityDefinitionRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_EqualityDefinition;
-        newItem.fromCompoundExpression(equalityDefinitionRaw, reportFn);
-        this.equalityDefinition = newItem;
-        reportFn?.(equalityDefinitionRaw, newItem);
-      } else {
-        throw new Error('equalityDefinition: Compound expression expected');
-      }
+      let newItem = new ObjectContents_EqualityDefinition;
+      newItem.fromExpression(equalityDefinitionRaw, reportFn);
+      this.equalityDefinition = newItem;
+      reportFn?.(equalityDefinitionRaw, newItem);
     }
     let rewriteRaw = argumentList.getOptionalValue('rewrite', 5);
     if (rewriteRaw !== undefined) {
-      if (rewriteRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_RewriteDefinition;
-        newItem.fromCompoundExpression(rewriteRaw, reportFn);
-        this.rewrite = newItem;
-        reportFn?.(rewriteRaw, newItem);
-      } else {
-        throw new Error('rewrite: Compound expression expected');
-      }
+      let newItem = new ObjectContents_RewriteDefinition;
+      newItem.fromExpression(rewriteRaw, reportFn);
+      this.rewrite = newItem;
+      reportFn?.(rewriteRaw, newItem);
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.equalityDefinition !== undefined) {
-      let equalityDefinitionExpr = new Fmt.CompoundExpression;
-      this.equalityDefinition.toCompoundExpression(equalityDefinitionExpr, true, reportFn);
+      let equalityDefinitionExpr = this.equalityDefinition.toExpression(true, reportFn);
       argumentList.add(equalityDefinitionExpr, 'equalityDefinition', true);
       reportFn?.(equalityDefinitionExpr, this.equalityDefinition);
     }
     if (this.rewrite !== undefined) {
-      let rewriteExpr = new Fmt.CompoundExpression;
-      this.rewrite.toCompoundExpression(rewriteExpr, true, reportFn);
+      let rewriteExpr = this.rewrite.toExpression(true, reportFn);
       argumentList.add(rewriteExpr, 'rewrite', true);
       reportFn?.(rewriteExpr, this.rewrite);
     }
@@ -512,14 +492,10 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equivalenceProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equivalenceProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equivalenceProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equivalenceProofs: Array expression expected');
@@ -527,36 +503,24 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
     let reflexivityProofRaw = argumentList.getOptionalValue('reflexivityProof', 4);
     if (reflexivityProofRaw !== undefined) {
-      if (reflexivityProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(reflexivityProofRaw, reportFn);
-        this.reflexivityProof = newItem;
-        reportFn?.(reflexivityProofRaw, newItem);
-      } else {
-        throw new Error('reflexivityProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(reflexivityProofRaw, reportFn);
+      this.reflexivityProof = newItem;
+      reportFn?.(reflexivityProofRaw, newItem);
     }
     let symmetryProofRaw = argumentList.getOptionalValue('symmetryProof', 5);
     if (symmetryProofRaw !== undefined) {
-      if (symmetryProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(symmetryProofRaw, reportFn);
-        this.symmetryProof = newItem;
-        reportFn?.(symmetryProofRaw, newItem);
-      } else {
-        throw new Error('symmetryProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(symmetryProofRaw, reportFn);
+      this.symmetryProof = newItem;
+      reportFn?.(symmetryProofRaw, newItem);
     }
     let transitivityProofRaw = argumentList.getOptionalValue('transitivityProof', 6);
     if (transitivityProofRaw !== undefined) {
-      if (transitivityProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(transitivityProofRaw, reportFn);
-        this.transitivityProof = newItem;
-        reportFn?.(transitivityProofRaw, newItem);
-      } else {
-        throw new Error('transitivityProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(transitivityProofRaw, reportFn);
+      this.transitivityProof = newItem;
+      reportFn?.(transitivityProofRaw, newItem);
     }
     this.isomorphic = argumentList.getOptionalValue('isomorphic', 7);
   }
@@ -579,28 +543,24 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equivalenceProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
       argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
     }
     if (this.reflexivityProof !== undefined) {
-      let reflexivityProofExpr = new Fmt.CompoundExpression;
-      this.reflexivityProof.toCompoundExpression(reflexivityProofExpr, true, reportFn);
+      let reflexivityProofExpr = this.reflexivityProof.toExpression(true, reportFn);
       argumentList.add(reflexivityProofExpr, 'reflexivityProof', true);
       reportFn?.(reflexivityProofExpr, this.reflexivityProof);
     }
     if (this.symmetryProof !== undefined) {
-      let symmetryProofExpr = new Fmt.CompoundExpression;
-      this.symmetryProof.toCompoundExpression(symmetryProofExpr, true, reportFn);
+      let symmetryProofExpr = this.symmetryProof.toExpression(true, reportFn);
       argumentList.add(symmetryProofExpr, 'symmetryProof', true);
       reportFn?.(symmetryProofExpr, this.symmetryProof);
     }
     if (this.transitivityProof !== undefined) {
-      let transitivityProofExpr = new Fmt.CompoundExpression;
-      this.transitivityProof.toCompoundExpression(transitivityProofExpr, true, reportFn);
+      let transitivityProofExpr = this.transitivityProof.toExpression(true, reportFn);
       argumentList.add(transitivityProofExpr, 'transitivityProof', true);
       reportFn?.(transitivityProofExpr, this.transitivityProof);
     }
@@ -839,14 +799,10 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
         for (let item of equalityProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equalityProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equalityProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equalityProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equalityProofs: Array expression expected');
@@ -855,14 +811,10 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
     let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
-      if (setRestrictionProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(setRestrictionProofRaw, reportFn);
-        this.setRestrictionProof = newItem;
-        reportFn?.(setRestrictionProofRaw, newItem);
-      } else {
-        throw new Error('setRestrictionProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(setRestrictionProofRaw, reportFn);
+      this.setRestrictionProof = newItem;
+      reportFn?.(setRestrictionProofRaw, newItem);
     }
   }
 
@@ -878,8 +830,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       let equalityProofsExpr = new Fmt.ArrayExpression;
       equalityProofsExpr.items = [];
       for (let item of this.equalityProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equalityProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
@@ -889,8 +840,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       argumentList.add(this.setRestriction, 'setRestriction', true);
     }
     if (this.setRestrictionProof !== undefined) {
-      let setRestrictionProofExpr = new Fmt.CompoundExpression;
-      this.setRestrictionProof.toCompoundExpression(setRestrictionProofExpr, true, reportFn);
+      let setRestrictionProofExpr = this.setRestrictionProof.toExpression(true, reportFn);
       argumentList.add(setRestrictionProofExpr, 'setRestrictionProof', true);
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
@@ -1078,14 +1028,10 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
         for (let item of equalityProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equalityProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equalityProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equalityProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equalityProofs: Array expression expected');
@@ -1094,14 +1040,10 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
     let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
-      if (setRestrictionProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(setRestrictionProofRaw, reportFn);
-        this.setRestrictionProof = newItem;
-        reportFn?.(setRestrictionProofRaw, newItem);
-      } else {
-        throw new Error('setRestrictionProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(setRestrictionProofRaw, reportFn);
+      this.setRestrictionProof = newItem;
+      reportFn?.(setRestrictionProofRaw, newItem);
     }
   }
 
@@ -1117,8 +1059,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       let equalityProofsExpr = new Fmt.ArrayExpression;
       equalityProofsExpr.items = [];
       for (let item of this.equalityProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equalityProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
@@ -1128,8 +1069,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       argumentList.add(this.setRestriction, 'setRestriction', true);
     }
     if (this.setRestrictionProof !== undefined) {
-      let setRestrictionProofExpr = new Fmt.CompoundExpression;
-      this.setRestrictionProof.toCompoundExpression(setRestrictionProofExpr, true, reportFn);
+      let setRestrictionProofExpr = this.setRestrictionProof.toExpression(true, reportFn);
       argumentList.add(setRestrictionProofExpr, 'setRestrictionProof', true);
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
@@ -1292,14 +1232,10 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equivalenceProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equivalenceProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equivalenceProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equivalenceProofs: Array expression expected');
@@ -1307,14 +1243,10 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 7);
     if (wellDefinednessProofRaw !== undefined) {
-      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(wellDefinednessProofRaw, reportFn);
-        this.wellDefinednessProof = newItem;
-        reportFn?.(wellDefinednessProofRaw, newItem);
-      } else {
-        throw new Error('wellDefinednessProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      this.wellDefinednessProof = newItem;
+      reportFn?.(wellDefinednessProofRaw, newItem);
     }
   }
 
@@ -1333,16 +1265,14 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equivalenceProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
       argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
     }
     if (this.wellDefinednessProof !== undefined) {
-      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
-      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true, reportFn);
+      let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
       argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
@@ -1613,14 +1543,10 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equivalenceProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equivalenceProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equivalenceProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equivalenceProofs: Array expression expected');
@@ -1640,8 +1566,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equivalenceProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
@@ -1768,14 +1693,10 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       if (proofsRaw instanceof Fmt.ArrayExpression) {
         this.proofs = [];
         for (let item of proofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.proofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('proofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.proofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('proofs: Array expression expected');
@@ -1790,8 +1711,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       let proofsExpr = new Fmt.ArrayExpression;
       proofsExpr.items = [];
       for (let item of this.proofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         proofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
@@ -1908,14 +1828,10 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          if (item instanceof Fmt.CompoundExpression) {
-            let newItem = new ObjectContents_Proof;
-            newItem.fromCompoundExpression(item, reportFn);
-            this.equivalenceProofs.push(newItem);
-            reportFn?.(item, newItem);
-          } else {
-            throw new Error('equivalenceProofs: Compound expression expected');
-          }
+          let newItem = new ObjectContents_Proof;
+          newItem.fromExpression(item, reportFn);
+          this.equivalenceProofs.push(newItem);
+          reportFn?.(item, newItem);
         }
       } else {
         throw new Error('equivalenceProofs: Array expression expected');
@@ -1935,8 +1851,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       let equivalenceProofsExpr = new Fmt.ArrayExpression;
       equivalenceProofsExpr.items = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new Fmt.CompoundExpression;
-        item.toCompoundExpression(newItem, true, reportFn);
+        let newItem = item.toExpression(true, reportFn);
         equivalenceProofsExpr.items.push(newItem);
         reportFn?.(newItem, item);
       }
@@ -2664,14 +2579,10 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     this._set = argumentList.getValue('set', 0);
     let subsetProofRaw = argumentList.getOptionalValue('subsetProof', 1);
     if (subsetProofRaw !== undefined) {
-      if (subsetProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(subsetProofRaw, reportFn);
-        this.subsetProof = newItem;
-        reportFn?.(subsetProofRaw, newItem);
-      } else {
-        throw new Error('subsetProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(subsetProofRaw, reportFn);
+      this.subsetProof = newItem;
+      reportFn?.(subsetProofRaw, newItem);
     }
   }
 
@@ -2679,8 +2590,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     argumentList.length = 0;
     argumentList.add(this._set, outputAllNames ? 'set' : undefined, false);
     if (this.subsetProof !== undefined) {
-      let subsetProofExpr = new Fmt.CompoundExpression;
-      this.subsetProof.toCompoundExpression(subsetProofExpr, true, reportFn);
+      let subsetProofExpr = this.subsetProof.toExpression(true, reportFn);
       argumentList.add(subsetProofExpr, 'subsetProof', true);
       reportFn?.(subsetProofExpr, this.subsetProof);
     }
@@ -2740,14 +2650,10 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     this.element = argumentList.getValue('element', 0);
     let elementProofRaw = argumentList.getOptionalValue('elementProof', 1);
     if (elementProofRaw !== undefined) {
-      if (elementProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(elementProofRaw, reportFn);
-        this.elementProof = newItem;
-        reportFn?.(elementProofRaw, newItem);
-      } else {
-        throw new Error('elementProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(elementProofRaw, reportFn);
+      this.elementProof = newItem;
+      reportFn?.(elementProofRaw, newItem);
     }
   }
 
@@ -2755,8 +2661,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     argumentList.length = 0;
     argumentList.add(this.element, outputAllNames ? 'element' : undefined, false);
     if (this.elementProof !== undefined) {
-      let elementProofExpr = new Fmt.CompoundExpression;
-      this.elementProof.toCompoundExpression(elementProofExpr, true, reportFn);
+      let elementProofExpr = this.elementProof.toExpression(true, reportFn);
       argumentList.add(elementProofExpr, 'elementProof', true);
       reportFn?.(elementProofExpr, this.elementProof);
     }
@@ -2814,22 +2719,17 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getOptionalValue('proof', 0);
     if (proofRaw !== undefined) {
-      if (proofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(proofRaw, reportFn);
-        this.proof = newItem;
-        reportFn?.(proofRaw, newItem);
-      } else {
-        throw new Error('proof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
     }
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.proof !== undefined) {
-      let proofExpr = new Fmt.CompoundExpression;
-      this.proof.toCompoundExpression(proofExpr, true, reportFn);
+      let proofExpr = this.proof.toExpression(true, reportFn);
       argumentList.add(proofExpr, 'proof', true);
       reportFn?.(proofExpr, this.proof);
     }
@@ -3146,14 +3046,10 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_StructuralCase;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.cases.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('cases: Compound expression expected');
-        }
+        let newItem = new ObjectContents_StructuralCase;
+        newItem.fromExpression(item, reportFn);
+        this.cases.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('cases: Array expression expected');
@@ -3167,8 +3063,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     let casesExpr = new Fmt.ArrayExpression;
     casesExpr.items = [];
     for (let item of this.cases) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       casesExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -3281,28 +3176,20 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_Case;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.cases.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('cases: Compound expression expected');
-        }
+        let newItem = new ObjectContents_Case;
+        newItem.fromExpression(item, reportFn);
+        this.cases.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('cases: Array expression expected');
     }
     let totalityProofRaw = argumentList.getOptionalValue('totalityProof', 1);
     if (totalityProofRaw !== undefined) {
-      if (totalityProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(totalityProofRaw, reportFn);
-        this.totalityProof = newItem;
-        reportFn?.(totalityProofRaw, newItem);
-      } else {
-        throw new Error('totalityProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(totalityProofRaw, reportFn);
+      this.totalityProof = newItem;
+      reportFn?.(totalityProofRaw, newItem);
     }
   }
 
@@ -3311,15 +3198,13 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     let casesExpr = new Fmt.ArrayExpression;
     casesExpr.items = [];
     for (let item of this.cases) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       casesExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
     argumentList.add(casesExpr, undefined, false);
     if (this.totalityProof !== undefined) {
-      let totalityProofExpr = new Fmt.CompoundExpression;
-      this.totalityProof.toCompoundExpression(totalityProofExpr, true, reportFn);
+      let totalityProofExpr = this.totalityProof.toExpression(true, reportFn);
       argumentList.add(totalityProofExpr, 'totalityProof', true);
       reportFn?.(totalityProofExpr, this.totalityProof);
     }
@@ -3386,14 +3271,10 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_StructuralCase;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.cases.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('cases: Compound expression expected');
-        }
+        let newItem = new ObjectContents_StructuralCase;
+        newItem.fromExpression(item, reportFn);
+        this.cases.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('cases: Array expression expected');
@@ -3407,8 +3288,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     let casesExpr = new Fmt.ArrayExpression;
     casesExpr.items = [];
     for (let item of this.cases) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       casesExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -3483,14 +3363,10 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     this._set = argumentList.getValue('set', 1);
     let proofRaw = argumentList.getOptionalValue('proof', 2);
     if (proofRaw !== undefined) {
-      if (proofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(proofRaw, reportFn);
-        this.proof = newItem;
-        reportFn?.(proofRaw, newItem);
-      } else {
-        throw new Error('proof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
     }
   }
 
@@ -3499,8 +3375,7 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     argumentList.add(this.term, undefined, false);
     argumentList.add(this._set, undefined, false);
     if (this.proof !== undefined) {
-      let proofExpr = new Fmt.CompoundExpression;
-      this.proof.toCompoundExpression(proofExpr, true, reportFn);
+      let proofExpr = this.proof.toExpression(true, reportFn);
       argumentList.add(proofExpr, 'proof', true);
       reportFn?.(proofExpr, this.proof);
     }
@@ -4250,14 +4125,10 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_StructuralCase;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.cases.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('cases: Compound expression expected');
-        }
+        let newItem = new ObjectContents_StructuralCase;
+        newItem.fromExpression(item, reportFn);
+        this.cases.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('cases: Array expression expected');
@@ -4271,8 +4142,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     let casesExpr = new Fmt.ArrayExpression;
     casesExpr.items = [];
     for (let item of this.cases) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       casesExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -4540,14 +4410,10 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     this.statement = argumentList.getValue('statement', 0);
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      if (proofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(proofRaw, reportFn);
-        this.proof = newItem;
-        reportFn?.(proofRaw, newItem);
-      } else {
-        throw new Error('proof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
     }
   }
 
@@ -4555,8 +4421,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     argumentList.add(this.statement, undefined, false);
     if (this.proof !== undefined) {
-      let proofExpr = new Fmt.CompoundExpression;
-      this.proof.toCompoundExpression(proofExpr, true, reportFn);
+      let proofExpr = this.proof.toExpression(true, reportFn);
       argumentList.add(proofExpr, 'proof', true);
       reportFn?.(proofExpr, this.proof);
     }
@@ -4674,14 +4539,10 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     if (caseProofsRaw instanceof Fmt.ArrayExpression) {
       this.caseProofs = [];
       for (let item of caseProofsRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.caseProofs.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('caseProofs: Compound expression expected');
-        }
+        let newItem = new ObjectContents_Proof;
+        newItem.fromExpression(item, reportFn);
+        this.caseProofs.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('caseProofs: Array expression expected');
@@ -4698,8 +4559,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     let caseProofsExpr = new Fmt.ArrayExpression;
     caseProofsExpr.items = [];
     for (let item of this.caseProofs) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       caseProofsExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -5046,14 +4906,10 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     }
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      if (proofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(proofRaw, reportFn);
-        this.proof = newItem;
-        reportFn?.(proofRaw, newItem);
-      } else {
-        throw new Error('proof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
     }
   }
 
@@ -5065,8 +4921,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
       argumentList.add(sideExpr, 'side', true);
     }
     if (this.proof !== undefined) {
-      let proofExpr = new Fmt.CompoundExpression;
-      this.proof.toCompoundExpression(proofExpr, true, reportFn);
+      let proofExpr = this.proof.toExpression(true, reportFn);
       argumentList.add(proofExpr, 'proof', true);
       reportFn?.(proofExpr, this.proof);
     }
@@ -5110,20 +4965,15 @@ export class MetaRefExpression_ProveNeg extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getValue('proof', 0);
-    if (proofRaw instanceof Fmt.CompoundExpression) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromCompoundExpression(proofRaw, reportFn);
-      this.proof = newItem;
-      reportFn?.(proofRaw, newItem);
-    } else {
-      throw new Error('proof: Compound expression expected');
-    }
+    let newItem = new ObjectContents_Proof;
+    newItem.fromExpression(proofRaw, reportFn);
+    this.proof = newItem;
+    reportFn?.(proofRaw, newItem);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let proofExpr = new Fmt.CompoundExpression;
-    this.proof.toCompoundExpression(proofExpr, true, reportFn);
+    let proofExpr = this.proof.toExpression(true, reportFn);
     argumentList.add(proofExpr, undefined, false);
     reportFn?.(proofExpr, this.proof);
   }
@@ -5160,20 +5010,15 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getValue('proof', 0);
-    if (proofRaw instanceof Fmt.CompoundExpression) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromCompoundExpression(proofRaw, reportFn);
-      this.proof = newItem;
-      reportFn?.(proofRaw, newItem);
-    } else {
-      throw new Error('proof: Compound expression expected');
-    }
+    let newItem = new ObjectContents_Proof;
+    newItem.fromExpression(proofRaw, reportFn);
+    this.proof = newItem;
+    reportFn?.(proofRaw, newItem);
   }
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let proofExpr = new Fmt.CompoundExpression;
-    this.proof.toCompoundExpression(proofExpr, true, reportFn);
+    let proofExpr = this.proof.toExpression(true, reportFn);
     argumentList.add(proofExpr, undefined, false);
     reportFn?.(proofExpr, this.proof);
   }
@@ -5218,14 +5063,10 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     }
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      if (proofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(proofRaw, reportFn);
-        this.proof = newItem;
-        reportFn?.(proofRaw, newItem);
-      } else {
-        throw new Error('proof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
     }
   }
 
@@ -5235,8 +5076,7 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     argumentsExpr.arguments = this.arguments;
     argumentList.add(argumentsExpr, undefined, false);
     if (this.proof !== undefined) {
-      let proofExpr = new Fmt.CompoundExpression;
-      this.proof.toCompoundExpression(proofExpr, true, reportFn);
+      let proofExpr = this.proof.toExpression(true, reportFn);
       argumentList.add(proofExpr, 'proof', true);
       reportFn?.(proofExpr, this.proof);
     }
@@ -5286,14 +5126,10 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
     if (proofsRaw instanceof Fmt.ArrayExpression) {
       this.proofs = [];
       for (let item of proofsRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.proofs.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('proofs: Compound expression expected');
-        }
+        let newItem = new ObjectContents_Proof;
+        newItem.fromExpression(item, reportFn);
+        this.proofs.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('proofs: Array expression expected');
@@ -5305,8 +5141,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
     let proofsExpr = new Fmt.ArrayExpression;
     proofsExpr.items = [];
     for (let item of this.proofs) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       proofsExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -5370,14 +5205,10 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     if (caseProofsRaw instanceof Fmt.ArrayExpression) {
       this.caseProofs = [];
       for (let item of caseProofsRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.caseProofs.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('caseProofs: Compound expression expected');
-        }
+        let newItem = new ObjectContents_Proof;
+        newItem.fromExpression(item, reportFn);
+        this.caseProofs.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('caseProofs: Array expression expected');
@@ -5394,8 +5225,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     let caseProofsExpr = new Fmt.ArrayExpression;
     caseProofsExpr.items = [];
     for (let item of this.caseProofs) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       caseProofsExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -5460,14 +5290,10 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        if (item instanceof Fmt.CompoundExpression) {
-          let newItem = new ObjectContents_StructuralCase;
-          newItem.fromCompoundExpression(item, reportFn);
-          this.cases.push(newItem);
-          reportFn?.(item, newItem);
-        } else {
-          throw new Error('cases: Compound expression expected');
-        }
+        let newItem = new ObjectContents_StructuralCase;
+        newItem.fromExpression(item, reportFn);
+        this.cases.push(newItem);
+        reportFn?.(item, newItem);
       }
     } else {
       throw new Error('cases: Array expression expected');
@@ -5481,8 +5307,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     let casesExpr = new Fmt.ArrayExpression;
     casesExpr.items = [];
     for (let item of this.cases) {
-      let newItem = new Fmt.CompoundExpression;
-      item.toCompoundExpression(newItem, true, reportFn);
+      let newItem = item.toExpression(true, reportFn);
       casesExpr.items.push(newItem);
       reportFn?.(newItem, item);
     }
@@ -5553,14 +5378,10 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     this.value = argumentList.getValue('value', 1);
     let exclusivityProofRaw = argumentList.getOptionalValue('exclusivityProof', 2);
     if (exclusivityProofRaw !== undefined) {
-      if (exclusivityProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(exclusivityProofRaw, reportFn);
-        this.exclusivityProof = newItem;
-        reportFn?.(exclusivityProofRaw, newItem);
-      } else {
-        throw new Error('exclusivityProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(exclusivityProofRaw, reportFn);
+      this.exclusivityProof = newItem;
+      reportFn?.(exclusivityProofRaw, newItem);
     }
   }
 
@@ -5569,8 +5390,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
     argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
     if (this.exclusivityProof !== undefined) {
-      let exclusivityProofExpr = new Fmt.CompoundExpression;
-      this.exclusivityProof.toCompoundExpression(exclusivityProofExpr, true, reportFn);
+      let exclusivityProofExpr = this.exclusivityProof.toExpression(true, reportFn);
       argumentList.add(exclusivityProofExpr, 'exclusivityProof', true);
       reportFn?.(exclusivityProofExpr, this.exclusivityProof);
     }
@@ -5655,14 +5475,10 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     this.rewrite = argumentList.getOptionalValue('rewrite', 3);
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 4);
     if (wellDefinednessProofRaw !== undefined) {
-      if (wellDefinednessProofRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromCompoundExpression(wellDefinednessProofRaw, reportFn);
-        this.wellDefinednessProof = newItem;
-        reportFn?.(wellDefinednessProofRaw, newItem);
-      } else {
-        throw new Error('wellDefinednessProof: Compound expression expected');
-      }
+      let newItem = new ObjectContents_Proof;
+      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      this.wellDefinednessProof = newItem;
+      reportFn?.(wellDefinednessProofRaw, newItem);
     }
   }
 
@@ -5679,8 +5495,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       argumentList.add(this.rewrite, 'rewrite', true);
     }
     if (this.wellDefinednessProof !== undefined) {
-      let wellDefinednessProofExpr = new Fmt.CompoundExpression;
-      this.wellDefinednessProof.toCompoundExpression(wellDefinednessProofExpr, true, reportFn);
+      let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
       argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }

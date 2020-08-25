@@ -45,10 +45,12 @@ export class RangeHandler implements FmtReader.RangeHandler {
         this.rangeMap.set(info.object, rangeInfo);
     }
 
-    reportConversion(raw: Fmt.CompoundExpression, converted: Fmt.ObjectContents): void {
-        let rangeInfo = this.rangeMap.get(raw);
-        if (rangeInfo) {
-            this.rangeMap.set(converted, rangeInfo);
+    reportConversion(raw: Fmt.Expression, converted: Fmt.ObjectContents): void {
+        if (raw instanceof Fmt.CompoundExpression) {
+            let rangeInfo = this.rangeMap.get(raw);
+            if (rangeInfo) {
+                this.rangeMap.set(converted, rangeInfo);
+            }
         }
     }
 }

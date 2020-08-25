@@ -234,11 +234,12 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   getDefinitionNotation(definition: Fmt.Definition): FmtNotation.ObjectContents_DefinitionNotation | undefined {
-    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.definitionNotation instanceof Fmt.CompoundExpression) {
+    if (definition.contents instanceof FmtHLM.ObjectContents_Definition && definition.contents.definitionNotation) {
       let result = new FmtNotation.ObjectContents_DefinitionNotation;
-      result.fromCompoundExpression(definition.contents.definitionNotation);
+      result.fromExpression(definition.contents.definitionNotation);
       return result;
+    } else {
+      return undefined;
     }
-    return undefined;
   }
 }

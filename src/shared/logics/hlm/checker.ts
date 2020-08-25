@@ -1714,7 +1714,7 @@ export class HLMDefinitionChecker {
       if (context.goal) {
         let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
           let subProof = new FmtHLM.ObjectContents_Proof;
-          subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+          subProof.fromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
           if (subProof.parameters) {
             parameters = Object.create(Fmt.ParameterList.prototype);
@@ -1730,8 +1730,7 @@ export class HLMDefinitionChecker {
           for (let newCase of newCases) {
             let subProof = new FmtHLM.ObjectContents_Proof;
             subProof.steps = Object.create(Fmt.ParameterList.prototype);
-            let subProofExpression = new Fmt.CompoundExpression;
-            subProof.toCompoundExpression(subProofExpression, true);
+            let subProofExpression = subProof.toExpression(true);
             newCase.value = subProofExpression;
           }
           let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction;

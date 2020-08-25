@@ -91,13 +91,9 @@ export class HLMUtils extends GenericUtils {
   }
 
   convertArgument<ContentClass extends Fmt.ObjectContents>(rawArg: Fmt.Expression, contentClass: {new(): ContentClass}): ContentClass {
-    if (rawArg instanceof Fmt.CompoundExpression) {
-      let contents = new contentClass;
-      contents.fromCompoundExpression(rawArg);
-      return contents;
-    } else {
-      throw new Error('Compound expression expected');
-    }
+    let contents = new contentClass;
+    contents.fromExpression(rawArg);
+    return contents;
   }
 
   getArgument<ContentClass extends Fmt.ObjectContents>(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter, contentClass: {new(): ContentClass}): ContentClass | undefined {
@@ -126,26 +122,25 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  // OPT omit proofs during argument conversion, as they are not used
-  private getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
+  getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
     let arg = this.getRawArgument([argumentList], param);
     if (arg) {
-      let type = param.type;
-      if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-        let propArg = this.convertArgument(arg, FmtHLM.ObjectContents_PropArg);
-        return propArg.formula;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-        let setArg = this.convertArgument(arg, FmtHLM.ObjectContents_SetArg);
-        return setArg._set;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-        let subsetArg = this.convertArgument(arg, FmtHLM.ObjectContents_SubsetArg);
-        return subsetArg._set;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-        let elementArg = this.convertArgument(arg, FmtHLM.ObjectContents_ElementArg);
-        return elementArg.element;
-      }
+      return this.extractArgValue(arg);
+    } else {
+      return undefined;
     }
-    return undefined;
+  }
+
+  extractArgValue(arg: Fmt.Expression): Fmt.Expression | undefined {
+    if (arg instanceof Fmt.CompoundExpression) {
+      if (arg.arguments.length && (arg.arguments[0].name === undefined || arg.arguments.length === 1)) {
+        return arg.arguments[0].value;
+      } else {
+        return undefined;
+      }
+    } else {
+      return arg;
+    }
   }
 
   getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
@@ -153,7 +148,6 @@ export class HLMUtils extends GenericUtils {
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
       let arg = new Fmt.Argument;
       arg.name = param.name;
-      let argValue = new Fmt.CompoundExpression;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         let targetType = targetParam ? targetParam.type as FmtHLM.MetaRefExpression_Binder : undefined;
         let binderArg = new FmtHLM.ObjectContents_BinderArg;
@@ -171,7 +165,7 @@ export class HLMUtils extends GenericUtils {
         };
         binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
-        binderArg.toCompoundExpression(argValue, false);
+        arg.value = binderArg.toExpression(false);
       } else {
         let variableRefExpression = new Fmt.VariableRefExpression;
         variableRefExpression.variable = param;
@@ -179,22 +173,23 @@ export class HLMUtils extends GenericUtils {
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
           propArg.formula = expression;
-          propArg.toCompoundExpression(argValue, false);
+          arg.value = propArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = new FmtHLM.ObjectContents_SetArg;
           setArg._set = expression;
-          setArg.toCompoundExpression(argValue, false);
+          arg.value = setArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
           let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
           subsetArg._set = expression;
-          subsetArg.toCompoundExpression(argValue, false);
+          arg.value = subsetArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           let elementArg = new FmtHLM.ObjectContents_ElementArg;
           elementArg.element = expression;
-          elementArg.toCompoundExpression(argValue, false);
+          arg.value = elementArg.toExpression(false);
+        } else {
+          return undefined;
         }
       }
-      arg.value = argValue;
       return arg;
     }
     // No need to adjust context according to parameter; it is only used for binders.
@@ -1006,35 +1001,39 @@ export class HLMUtils extends GenericUtils {
   private replacePropArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-      let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_PropArg;
       newArg.formula = newValue;
-      newArg.toCompoundExpression(resultArg, false);
+      this.replaceArgValue(args, param, newArg);
     }
   }
 
   private replaceSetArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Set) {
-      let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_SetArg;
       newArg._set = newValue;
-      newArg.toCompoundExpression(resultArg, false);
+      this.replaceArgValue(args, param, newArg);
     } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_SubsetArg;
       newArg._set = newValue;
-      newArg.toCompoundExpression(resultArg, false);
+      this.replaceArgValue(args, param, newArg);
     }
   }
 
   private replaceElementArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newValue: Fmt.Expression): void {
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let resultArg = this.getRawArgument([args], param) as Fmt.CompoundExpression;
       let newArg = new FmtHLM.ObjectContents_ElementArg;
       newArg.element = newValue;
-      newArg.toCompoundExpression(resultArg, false);
+      this.replaceArgValue(args, param, newArg);
+    }
+  }
+
+  private replaceArgValue(args: Fmt.ArgumentList, param: Fmt.Parameter, newArg: Fmt.ObjectContents): void {
+    for (let arg of args) {
+      if (arg.name === param.name) {
+        arg.value = newArg.toExpression(false);
+      }
     }
   }
 
@@ -1696,9 +1695,7 @@ export class HLMUtils extends GenericUtils {
   createArgumentItemValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.Expression | undefined {
     let contents = this.createArgumentContents(param, createPlaceholder, createParameterList);
     if (contents) {
-      let argValue = new Fmt.CompoundExpression;
-      contents.toCompoundExpression(argValue, false);
-      return argValue;
+      return contents.toExpression(false);
     }
     let paramType = param.type;
     if (paramType instanceof FmtHLM.MetaRefExpression_Nat) {

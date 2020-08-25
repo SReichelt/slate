@@ -5256,8 +5256,7 @@ class TutorialStates {
   }
 
   private createArg(name: string, value: Fmt.ObjectContents): Fmt.Argument {
-    let valueExpression = new Fmt.CompoundExpression;
-    value.toCompoundExpression(valueExpression, false);
+    let valueExpression = value.toExpression(false);
     return this.createRawArg(name, valueExpression);
   }
 
@@ -5280,8 +5279,8 @@ class TutorialStates {
   }
 
   private getArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
-    let valueExpression = argumentList.getValue(name) as Fmt.CompoundExpression;
-    value.fromCompoundExpression(valueExpression);
+    let valueExpression = argumentList.getValue(name);
+    value.fromExpression(valueExpression);
   }
 
   private getSetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
@@ -5303,8 +5302,7 @@ class TutorialStates {
   }
 
   private setArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
-    let valueExpression = new Fmt.CompoundExpression;
-    value.toCompoundExpression(valueExpression, false);
+    let valueExpression = value.toExpression(false);
     argumentList.setValue(valueExpression, name);
   }
 

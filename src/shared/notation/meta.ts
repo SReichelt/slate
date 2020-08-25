@@ -17,25 +17,17 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     this.useSymbol = argumentList.getOptionalValue('useSymbol', 2);
     let elementsRaw = argumentList.getOptionalValue('elements', 3);
     if (elementsRaw !== undefined) {
-      if (elementsRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_TemplateElements;
-        newItem.fromCompoundExpression(elementsRaw, reportFn);
-        this.elements = newItem;
-        reportFn?.(elementsRaw, newItem);
-      } else {
-        throw new Error('elements: Compound expression expected');
-      }
+      let newItem = new ObjectContents_TemplateElements;
+      newItem.fromExpression(elementsRaw, reportFn);
+      this.elements = newItem;
+      reportFn?.(elementsRaw, newItem);
     }
     let contextRaw = argumentList.getOptionalValue('context', 4);
     if (contextRaw !== undefined) {
-      if (contextRaw instanceof Fmt.CompoundExpression) {
-        let newItem = new ObjectContents_TemplateContext;
-        newItem.fromCompoundExpression(contextRaw, reportFn);
-        this.context = newItem;
-        reportFn?.(contextRaw, newItem);
-      } else {
-        throw new Error('context: Compound expression expected');
-      }
+      let newItem = new ObjectContents_TemplateContext;
+      newItem.fromExpression(contextRaw, reportFn);
+      this.context = newItem;
+      reportFn?.(contextRaw, newItem);
     }
   }
 
@@ -51,14 +43,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
       argumentList.add(this.useSymbol, 'useSymbol', true);
     }
     if (this.elements !== undefined) {
-      let elementsExpr = new Fmt.CompoundExpression;
-      this.elements.toCompoundExpression(elementsExpr, true, reportFn);
+      let elementsExpr = this.elements.toExpression(true, reportFn);
       argumentList.add(elementsExpr, 'elements', true);
       reportFn?.(elementsExpr, this.elements);
     }
     if (this.context !== undefined) {
-      let contextExpr = new Fmt.CompoundExpression;
-      this.context.toCompoundExpression(contextExpr, true, reportFn);
+      let contextExpr = this.context.toExpression(true, reportFn);
       argumentList.add(contextExpr, 'context', true);
       reportFn?.(contextExpr, this.context);
     }

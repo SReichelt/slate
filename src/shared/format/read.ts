@@ -102,7 +102,7 @@ export interface ObjectRangeInfo {
 
 export interface RangeHandler {
   reportRange(info: ObjectRangeInfo): void;
-  reportConversion?(raw: Fmt.CompoundExpression, converted: Fmt.ObjectContents): void;
+  reportConversion?(raw: Fmt.Expression, converted: Fmt.ObjectContents): void;
 }
 
 export class EmptyExpression extends Fmt.Expression {

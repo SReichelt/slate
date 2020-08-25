@@ -220,14 +220,10 @@ class MetaDeclarationGenerator {
         let definition = this.inFile.definitions.getDefinition(path.name);
         if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(definition)) {
           let subTarget = this.makeUniqueName('newItem', type);
-          outFileStr += `${indent}if (${source} instanceof Fmt.CompoundExpression) {\n`;
-          outFileStr += `${indent}  let ${subTarget} = new ObjectContents_${definition.name};\n`;
-          outFileStr += `${indent}  ${subTarget}.fromCompoundExpression(${source}, reportFn);\n`;
-          outFileStr += `${indent}  ${outputBegin}${subTarget}${outputEnd};\n`;
-          outFileStr += `${indent}  reportFn?.(${source}, ${subTarget});\n`;
-          outFileStr += `${indent}} else {\n`;
-          outFileStr += `${indent}  throw new Error('${argName}: Compound expression expected');\n`;
-          outFileStr += `${indent}}\n`;
+          outFileStr += `${indent}let ${subTarget} = new ObjectContents_${definition.name};\n`;
+          outFileStr += `${indent}${subTarget}.fromExpression(${source}, reportFn);\n`;
+          outFileStr += `${indent}${outputBegin}${subTarget}${outputEnd};\n`;
+          outFileStr += `${indent}reportFn?.(${source}, ${subTarget});\n`;
         }
       }
     }
@@ -329,8 +325,7 @@ class MetaDeclarationGenerator {
         if (!path.parentPath) {
           let definition = this.inFile.definitions.getDefinition(path.name);
           if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(definition)) {
-            outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-            outFileStr += `${indent}${source}.toCompoundExpression(${variableName}, true, reportFn);\n`;
+            outFileStr += `${indent}let ${variableName} = ${source}.toExpression(true, reportFn);\n`;
             outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
             outFileStr += `${indent}reportFn?.(${variableName}, ${source});\n`;
           }

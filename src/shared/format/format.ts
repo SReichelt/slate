@@ -6,7 +6,7 @@ export type ExpressionTraversalFn = (subExpression: Expression) => void;
 export type ExpressionSubstitutionFn = (subExpression: Expression, indices?: Index[]) => Expression;
 export type ExpressionUnificationFn = (left: Expression, right: Expression, replacedParameters: ReplacedParameter[]) => boolean;
 
-export type ReportConversionFn = (raw: CompoundExpression, converted: ObjectContents) => void;
+export type ReportConversionFn = (raw: Expression, converted: ObjectContents) => void;
 
 export class File {
   metaModelPath: Path;
@@ -600,12 +600,20 @@ export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
   abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void;
 
-  fromCompoundExpression(expression: CompoundExpression, reportFn?: ReportConversionFn): void {
-    this.fromArgumentList(expression.arguments, reportFn);
+  fromExpression(expression: Expression, reportFn?: ReportConversionFn): void {
+    if (expression instanceof CompoundExpression) {
+      this.fromArgumentList(expression.arguments, reportFn);
+    } else {
+      let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
+      argumentList.add(expression);
+      this.fromArgumentList(argumentList, reportFn);
+    }
   }
 
-  toCompoundExpression(expression: CompoundExpression, outputAllNames: boolean, reportFn?: ReportConversionFn): void {
+  toExpression(outputAllNames: boolean, reportFn?: ReportConversionFn): Expression {
+    let expression = new CompoundExpression;
     this.toArgumentList(expression.arguments, outputAllNames, reportFn);
+    return expression;
   }
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;

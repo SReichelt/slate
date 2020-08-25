@@ -1749,32 +1749,34 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderRegularArgument(rawArg: Fmt.Expression, type: Fmt.Expression, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression {
-    if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_PropArg);
-      let formulaSelection: FormulaSelection = {
-        allowTruthValue: true,
-        allowEquiv: false,
-        allowCases: true
-      };
-      return this.renderFormula(arg.formula, formulaSelection);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SetArg);
-      if (replaceAssociativeArg && arg._set instanceof FmtHLM.MetaRefExpression_setAssociative) {
-        return new Notation.DecoratedExpression(replaceAssociativeArg);
+    if (this.utils.isValueParamType(type)) {
+      let arg = this.utils.extractArgValue(rawArg);
+      if (arg) {
+        if (type instanceof FmtHLM.MetaRefExpression_Prop) {
+          let formulaSelection: FormulaSelection = {
+            allowTruthValue: true,
+            allowEquiv: false,
+            allowCases: true
+          };
+          return this.renderFormula(arg, formulaSelection);
+        } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
+          if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_setAssociative) {
+            return new Notation.DecoratedExpression(replaceAssociativeArg);
+          }
+          return this.renderSetTerm(arg, fullSetTermSelection);
+        } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+          if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_setAssociative) {
+            return new Notation.DecoratedExpression(replaceAssociativeArg);
+          }
+          return this.renderSetTerm(arg, fullSetTermSelection);
+        } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+          if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_associative) {
+            return new Notation.DecoratedExpression(replaceAssociativeArg);
+          }
+          return this.renderElementTerm(arg, fullElementTermSelection);
+        }
       }
-      return this.renderSetTerm(arg._set, fullSetTermSelection);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
-      if (replaceAssociativeArg && arg._set instanceof FmtHLM.MetaRefExpression_setAssociative) {
-        return new Notation.DecoratedExpression(replaceAssociativeArg);
-      }
-      return this.renderSetTerm(arg._set, fullSetTermSelection);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let arg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
-      if (replaceAssociativeArg && arg.element instanceof FmtHLM.MetaRefExpression_associative) {
-        return new Notation.DecoratedExpression(replaceAssociativeArg);
-      }
-      return this.renderElementTerm(arg.element, fullElementTermSelection);
+      return new Notation.ErrorExpression('Malformed argument');
     } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
       let result: Notation.TextExpression;
       if (rawArg instanceof Fmt.PlaceholderExpression) {
@@ -1821,28 +1823,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let innerDefinitionContents = definition.contents;
       if (innerDefinitionContents instanceof FmtHLM.ObjectContents_Definition && innerDefinitionContents.abbreviations) {
         for (let abbreviationExpression of innerDefinitionContents.abbreviations) {
-          if (abbreviationExpression instanceof Fmt.CompoundExpression) {
-            let abbreviation = new FmtNotation.ObjectContents_NotationAbbreviation;
-            abbreviation.fromCompoundExpression(abbreviationExpression);
-            let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
-            if (variableRefExpression && !indexContext) {
-              let abbreviationArgs: RenderedTemplateArguments = {...args};
-              for (let abbreviationParam of abbreviation.parameters) {
-                abbreviationArgs[abbreviationParam.name] = new AbbreviationParamExpression(abbreviationParam);
-              }
-              let param = variableRefExpression.variable;
-              let arg = ArgumentWithInfo.getValue(args[param.name]);
-              let notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
-              let originalExpression = expression;
-              let abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs).then((canAbbreviate: boolean) => {
-                if (canAbbreviate) {
-                  return this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
-                } else {
-                  return originalExpression;
-                }
-              });
-              expression = new Notation.PromiseExpression(abbreviationPromise);
+          let abbreviation = new FmtNotation.ObjectContents_NotationAbbreviation;
+          abbreviation.fromExpression(abbreviationExpression);
+          let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
+          if (variableRefExpression && !indexContext) {
+            let abbreviationArgs: RenderedTemplateArguments = {...args};
+            for (let abbreviationParam of abbreviation.parameters) {
+              abbreviationArgs[abbreviationParam.name] = new AbbreviationParamExpression(abbreviationParam);
             }
+            let param = variableRefExpression.variable;
+            let arg = ArgumentWithInfo.getValue(args[param.name]);
+            let notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
+            let originalExpression = expression;
+            let abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs).then((canAbbreviate: boolean) => {
+              if (canAbbreviate) {
+                return this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
+              } else {
+                return originalExpression;
+              }
+            });
+            expression = new Notation.PromiseExpression(abbreviationPromise);
           }
         }
       }
@@ -2713,7 +2713,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
             let subProof = new FmtHLM.ObjectContents_Proof;
-            subProof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+            subProof.fromExpression(structuralCase.value as Fmt.Expression);
             if (structuralCase.parameters) {
               if (subProof.parameters) {
                 let originalParameters = subProof.parameters.slice();
@@ -3282,9 +3282,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let index = 0;
         for (let item of arg.value.arguments) {
           if (item.name === 'proof' || (item.name && item.name.endsWith('Proof'))) {
-            let value = item.value as Fmt.CompoundExpression;
             let proof = new FmtHLM.ObjectContents_Proof;
-            proof.fromCompoundExpression(value);
+            proof.fromExpression(item.value);
             this.addProofParts(proof, result);
           } else if (item.name === 'arguments') {
             let value = item.value as Fmt.CompoundExpression;
@@ -3359,7 +3358,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       for (let structuralCase of type.cases) {
         this.addGenericExpressionParts(structuralCase._constructor, result);
         let proof = new FmtHLM.ObjectContents_Proof;
-        proof.fromCompoundExpression(structuralCase.value as Fmt.CompoundExpression);
+        proof.fromExpression(structuralCase.value);
         this.addProofParts(proof, result);
       }
     }
