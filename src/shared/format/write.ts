@@ -142,7 +142,7 @@ export class Writer {
           if (definition.innerDefinitions.length) {
             this.writeNewLine(true);
           }
-          this.writeArguments(args, innerIndent, true, true);
+          this.writeArguments(args, innerIndent, true);
         }
         this.writeIndent(indent);
       }
@@ -254,8 +254,7 @@ export class Writer {
   writeArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo): void {
     this.writeRange(args, false, false, false, false, () => {
       this.write('(');
-      let multiLine = args.length > 1 && this.hasLargeArgument(args);
-      this.writeArguments(args, indent, false, multiLine);
+      this.writeArguments(args, indent);
       this.write(')');
     });
   }
@@ -266,29 +265,39 @@ export class Writer {
     }
   }
 
-  writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false, multiLine: boolean = false): void {
+  writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false): void {
     let argIndent = indent;
     let lastArgIndent = indent;
     if (!this.newLineStr) {
       blockMode = false;
     }
+    let multiLine = true;
     if (!blockMode) {
       if (args.length <= 1 || !this.newLineStr) {
         multiLine = false;
       } else {
+        multiLine = args.some((arg: Fmt.Argument) => this.isLargeExpression(arg.value));
         argIndent = this.indent(argIndent);
         lastArgIndent = this.indent(lastArgIndent, !multiLine);
       }
     }
     let index = 0;
+    let prevArg: Fmt.Argument | undefined = undefined;
     for (let arg of args) {
+      let newLine = (multiLine
+                     && (blockMode
+                         || !prevArg
+                         || (prevArg.name && this.isLongName(prevArg.name))
+                         || this.isLargeExpression(prevArg.value)
+                         || (arg.name && this.isLongName(arg.name))
+                         || this.isLargeExpression(arg.value)));
       if (index) {
         this.write(',');
-        if (!multiLine) {
+        if (!newLine) {
           this.writeOptionalSpace();
         }
       }
-      if (multiLine) {
+      if (newLine) {
         if (index || !blockMode) {
           this.writeNewLine();
         }
@@ -296,6 +305,7 @@ export class Writer {
       }
       this.writeArgument(arg, index === args.length - 1 ? lastArgIndent : argIndent);
       index++;
+      prevArg = arg;
     }
     if (multiLine) {
       this.writeNewLine();
@@ -396,7 +406,7 @@ export class Writer {
         this.writeParameterList(expression.parameters, indent, true);
       } else if (expression instanceof Fmt.CompoundExpression) {
         this.write('{');
-        this.writeArguments(expression.arguments, indent, false, true);
+        this.writeArguments(expression.arguments, indent);
         this.write('}');
       } else if (expression instanceof Fmt.ArrayExpression) {
         this.writeExpressionList(expression.items, indent);
@@ -420,16 +430,19 @@ export class Writer {
   }
 
   private isLargeExpression(expression: Fmt.Expression): boolean {
-    return expression instanceof Fmt.MetaRefExpression
-           || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || expression.path.parentPath !== undefined))
-           || expression instanceof Fmt.ParameterExpression
-           || expression instanceof Fmt.CompoundExpression
-           || expression instanceof Fmt.ArrayExpression
-           || (expression instanceof Fmt.IndexedExpression && (this.isLargeExpression(expression.body) || (expression.arguments !== undefined && this.hasLargeArgument(expression.arguments))));
+    return (expression instanceof Fmt.MetaRefExpression
+            || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || expression.path.parentPath !== undefined))
+            || expression instanceof Fmt.ParameterExpression
+            || expression instanceof Fmt.CompoundExpression
+            || expression instanceof Fmt.ArrayExpression
+            || (expression instanceof Fmt.IndexedExpression && (expression.arguments !== undefined || this.isLargeExpression(expression.body))));
   }
 
-  private hasLargeArgument(args: Fmt.ArgumentList): boolean {
-    return args.some((arg: Fmt.Argument) => this.isLargeExpression(arg.value));
+  private isLongName(name: string): boolean {
+    while (name.endsWith('\'')) {
+      name = name.substring(0, name.length - 1);
+    }
+    return name.length > 1 && String.fromCodePoint(name.codePointAt(0)!) !== name;
   }
 
   writeString(str: string, quoteChar: string, breakLines: boolean): void {
