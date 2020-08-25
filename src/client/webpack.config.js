@@ -67,7 +67,7 @@ module.exports = {
   entry: ['babel-polyfill', './client'],
   output: {
     path: path.join(projectRoot, 'dist', 'public'),
-    filename: `js/[name]-${version}-bundle.js`
+    filename: `js/[name].js`
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
@@ -78,17 +78,38 @@ module.exports = {
         'vendors': {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
-          chunks: 'all'
+          chunks: 'all',
+          enforce: true
         },
         'vendors-react': {
-          test: /[\\/]node_modules[\\/]react/,
+          test: /[\\/]node_modules[\\/]@?react/,
           name: 'vendors-react',
-          chunks: 'all'
+          chunks: 'all',
+          enforce: true
+        },
+        'vendors-markdown': {
+          test: /[\\/]node_modules[\\/]@?(markdown|easymde|codemirror)/,
+          name: 'vendors-markdown',
+          chunks: 'all',
+          enforce: true
+        },
+        'vendors-polyfill': {
+          test: /[\\/]node_modules[\\/]@?(babel|browserify|readable-stream)/,
+          name: 'vendors-polyfill',
+          chunks: 'all',
+          enforce: true
         },
         'extras': {
-          test: /[\\/]extras[\\/]/,
+          test: /[\\/]src[\\/]client[\\/]extras[\\/]/,
           name: 'extras',
-          chunks: 'all'
+          chunks: 'all',
+          enforce: true
+        },
+        'client': {
+          test: /[\\/]src[\\/]client[\\/]/,
+          name: 'client',
+          chunks: 'all',
+          enforce: true
         }
       }
     }
@@ -115,6 +136,9 @@ module.exports = {
         use: 'url-loader?limit=10000'
       }
     ]
+  },
+  performance: {
+    maxAssetSize: 1000000
   },
   watchOptions: {
     ignored: /node_modules/
