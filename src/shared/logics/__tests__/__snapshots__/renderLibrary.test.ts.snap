@@ -1929,7 +1929,7 @@ exports[`render hlm library: 1.6.2 Essentials/Sequences/tuple 1`] = `
 
 We write:
 
-\`$tuple(S = S, items = [{a_0}, {a_1}, {\\"...\\"}, {\\"a_n-1\\"}])\` := \`$Tuples(S = S, α = n).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = n))), {a = {a_k}}})\`"
+\`$tuple(S = S, items = [a_0, a_1, \\"...\\", \\"a_n-1\\"])\` := \`$Tuples(S = S, α = n).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = n))), {a = a_k}})\`"
 `;
 
 exports[`render hlm library: 1.6.3 Essentials/Sequences/tuple%20from%20function 1`] = `
@@ -8136,7 +8136,7 @@ exports[`render hlm library: 2.8.28.3 Algebra/Rings/Matrices/matrix 1`] = `
 
 We write:
 
-\`$matrix(𝐑 = 𝐑, items = [[{\\"a_0,0\\"}, {\\"a_1,0\\"}, {\\"⋯\\"}, {\\"a_m-1,0\\"}],[{\\"a_0,1\\"}, {\\"a_1,1\\"}, {\\"⋯\\"}, {\\"a_m-1,1\\"}],[{\\"⋮\\"}, {\\"⋮\\"}, {\\" \\"}, {\\"⋮\\"}],[{\\"a_0,n-1\\"}, {\\"a_1,n-1\\"}, {\\"⋯\\"}, {\\"a_m-1,n-1\\"}]])\` := \`$Matrices(𝐑 = 𝐑, m = m, n = n).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = m)), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {\\"a_i,j\\"}}})\`"
+\`$matrix(𝐑 = 𝐑, items = [[\\"a_0,0\\", \\"a_1,0\\", \\"⋯\\", \\"a_m-1,0\\"],[\\"a_0,1\\", \\"a_1,1\\", \\"⋯\\", \\"a_m-1,1\\"],[\\"⋮\\", \\"⋮\\", \\" \\", \\"⋮\\"],[\\"a_0,n-1\\", \\"a_1,n-1\\", \\"⋯\\", \\"a_m-1,n-1\\"]])\` := \`$Matrices(𝐑 = 𝐑, m = m, n = n).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = m)), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = \\"a_i,j\\"}})\`"
 `;
 
 exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
