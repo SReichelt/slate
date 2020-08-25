@@ -79,7 +79,7 @@ export class Writer {
           this.writeIdentifier(path.name, path, false);
         });
       }
-      this.writeOptionalArgumentList(path.arguments, lastArgumentListIndent, true);
+      this.writeOptionalArgumentList(path.arguments, lastArgumentListIndent);
     });
   }
 
@@ -251,17 +251,18 @@ export class Writer {
     this.writeParameterGroup([parameter], indent);
   }
 
-  writeArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo, multiLine: boolean = false): void {
+  writeArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo): void {
     this.writeRange(args, false, false, false, false, () => {
       this.write('(');
+      let multiLine = args.length > 1 && this.hasLargeArgument(args);
       this.writeArguments(args, indent, false, multiLine);
       this.write(')');
     });
   }
 
-  writeOptionalArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo, multiLine: boolean = false): void {
+  writeOptionalArgumentList(args: Fmt.ArgumentList, indent?: IndentInfo): void {
     if (args.length) {
-      this.writeArgumentList(args, indent, multiLine);
+      this.writeArgumentList(args, indent);
     }
   }
 
@@ -386,14 +387,7 @@ export class Writer {
         });
         let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
         expression.toArgumentList(args);
-        let hasLargeArg = false;
-        for (let arg of args) {
-          if (arg.name || this.isLargeExpression(arg.value)) {
-            hasLargeArg = true;
-            break;
-          }
-        }
-        this.writeOptionalArgumentList(args, indent, hasLargeArg);
+        this.writeOptionalArgumentList(args, indent);
       } else if (expression instanceof Fmt.DefinitionRefExpression) {
         this.write('$');
         this.writePath(expression.path, indent);
@@ -427,10 +421,15 @@ export class Writer {
 
   private isLargeExpression(expression: Fmt.Expression): boolean {
     return expression instanceof Fmt.MetaRefExpression
-           || expression instanceof Fmt.DefinitionRefExpression
+           || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || expression.path.parentPath !== undefined))
            || expression instanceof Fmt.ParameterExpression
            || expression instanceof Fmt.CompoundExpression
-           || expression instanceof Fmt.ArrayExpression;
+           || expression instanceof Fmt.ArrayExpression
+           || (expression instanceof Fmt.IndexedExpression && (this.isLargeExpression(expression.body) || (expression.arguments !== undefined && this.hasLargeArgument(expression.arguments))));
+  }
+
+  private hasLargeArgument(args: Fmt.ArgumentList): boolean {
+    return args.some((arg: Fmt.Argument) => this.isLargeExpression(arg.value));
   }
 
   writeString(str: string, quoteChar: string, breakLines: boolean): void {
