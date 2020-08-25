@@ -40,9 +40,6 @@ export class RangeHandler implements FmtReader.RangeHandler {
     rangeMap: Map<Object, RangeInfo> = new Map<Object, RangeInfo>();
 
     reportRange(info: FmtReader.ObjectRangeInfo): void {
-        if (info.object instanceof Fmt.IndexedExpression && !info.object.arguments) {
-            return;
-        }
         let rangeInfo = convertRangeInfo(info);
         this.rangeList.push(rangeInfo);
         this.rangeMap.set(info.object, rangeInfo);

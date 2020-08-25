@@ -453,8 +453,8 @@ export class Reader {
       } else {
         let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         let [expression, indexParameterLists] = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
-        expression = this.readExpressionIndices(expression, indexParameterLists, argStart, context);
         this.markEnd(argStart, expression, valueContext, valueContext.metaModel.functions, identifierRange);
+        expression = this.readExpressionIndices(expression, indexParameterLists, argStart, context);
         arg.value = expression;
       }
     } else {
@@ -576,8 +576,8 @@ export class Reader {
       }
     }
     if (expression) {
-      expression = this.readExpressionIndices(expression, indexParameterLists, expressionStart, context);
       this.markEnd(expressionStart, expression, context, metaDefinitions, nameRange, nameRange);
+      expression = this.readExpressionIndices(expression, indexParameterLists, expressionStart, context);
     }
     return expression;
   }
