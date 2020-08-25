@@ -673,7 +673,7 @@ div.display-math {
 }
 
 .source-code .var {
-  font-family: 'TeX', serif;
+  font-family: 'TeX-Var', serif;
 }
 
 .source-code.string {

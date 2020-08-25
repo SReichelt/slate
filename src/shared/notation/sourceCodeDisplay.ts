@@ -1,6 +1,7 @@
 import * as Fmt from '../format/format';
 import * as FmtWriter from '../format/write';
 import * as Notation from './notation';
+import { useItalicsForVariable } from './unicode';
 import * as Logic from '../logics/logic';
 
 interface StackItem {
@@ -67,13 +68,22 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
           range.styleClasses.push('meta-ref');
         } else if (object instanceof Fmt.VariableRefExpression && name) {
           range.styleClasses.push('var');
+          if (useItalicsForVariable(object.variable.name)) {
+            range.styleClasses.push('italic');
+          }
           range.semanticLinks = [new Notation.SemanticLink(object.variable)];
         } else if (object instanceof Fmt.Parameter && name) {
           range.styleClasses.push('var');
+          if (useItalicsForVariable(object.name)) {
+            range.styleClasses.push('italic');
+          }
           range.semanticLinks = [new Notation.SemanticLink(object, true)];
         } else if (object instanceof Fmt.Argument && name) {
           range.styleClasses.push('arg');
           range.styleClasses.push('var');
+          if (object.name && useItalicsForVariable(object.name)) {
+            range.styleClasses.push('italic');
+          }
         } else if (object instanceof Fmt.DocumentationComment) {
           range.styleClasses.push('comment');
         } else if (object instanceof Fmt.DocumentationItem && tag) {
