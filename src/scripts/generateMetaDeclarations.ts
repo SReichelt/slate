@@ -358,12 +358,12 @@ class MetaDeclarationGenerator {
           if (member.optional || this.getMemberContentType(member.type) || member.type instanceof Fmt.IndexedExpression) {
             return false;
           }
+          first = false;
         } else {
           if (!member.optional) {
             return false;
           }
         }
-        first = false;
       }
       return true;
     } else {
@@ -572,24 +572,32 @@ class MetaDeclarationGenerator {
         }
         outFileStr += `  }\n`;
         outFileStr += `\n`;
-        if (this.canOmitBraces(definition)) {
+        if (this.canOmitBraces(definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members && definition.contents.members.length) {
+          let firstMemberName = translateMemberName(definition.contents.members[0].name);
+          outFileStr += `  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {\n`;
+          outFileStr += `    if (expression instanceof Fmt.CompoundExpression) {\n`;
+          outFileStr += `      super.fromExpression(expression, reportFn);\n`;
+          outFileStr += `    } else {\n`;
+          outFileStr += `      this.${firstMemberName} = expression;\n`;
+          outFileStr += `    }\n`;
+          outFileStr += `  }\n`;
+          outFileStr += `\n`;
           outFileStr += `  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {\n`;
-          outFileStr += `    if (!outputAllNames`;
-          let firstMemberName: string | undefined = undefined;
-          if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-            for (let member of definition.contents.members) {
-              let memberName = translateMemberName(member.name);
-              if (firstMemberName === undefined) {
-                firstMemberName = memberName;
-              } else {
-                outFileStr += ` && !this.${memberName}`;
-              }
+          outFileStr += `    if (outputAllNames`;
+          let first = true;
+          for (let member of definition.contents.members) {
+            let memberName = translateMemberName(member.name);
+            if (first) {
+              outFileStr += ` || this.${memberName} instanceof Fmt.CompoundExpression`;
+              first = false;
+            } else {
+              outFileStr += ` || this.${memberName}`;
             }
           }
           outFileStr += `) {\n`;
-          outFileStr += `      return this.${firstMemberName!};\n`;
-          outFileStr += `    } else {\n`;
           outFileStr += `      return super.toExpression(outputAllNames, reportFn);\n`;
+          outFileStr += `    } else {\n`;
+          outFileStr += `      return this.${firstMemberName};\n`;
           outFileStr += `    }\n`;
           outFileStr += `  }\n`;
           outFileStr += `\n`;

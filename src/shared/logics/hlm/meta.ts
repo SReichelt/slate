@@ -734,11 +734,19 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     }
   }
 
-  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
-    if (!outputAllNames && !this.theorem) {
-      return this.value;
+  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
+    if (expression instanceof Fmt.CompoundExpression) {
+      super.fromExpression(expression, reportFn);
     } else {
+      this.value = expression;
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (outputAllNames || this.value instanceof Fmt.CompoundExpression || this.theorem) {
       return super.toExpression(outputAllNames, reportFn);
+    } else {
+      return this.value;
     }
   }
 
@@ -2499,11 +2507,19 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
   }
 
-  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
-    if (!outputAllNames) {
-      return this.formula;
+  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
+    if (expression instanceof Fmt.CompoundExpression) {
+      super.fromExpression(expression, reportFn);
     } else {
+      this.formula = expression;
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (outputAllNames || this.formula instanceof Fmt.CompoundExpression) {
       return super.toExpression(outputAllNames, reportFn);
+    } else {
+      return this.formula;
     }
   }
 
@@ -2553,11 +2569,19 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     argumentList.add(this._set, outputAllNames ? 'set' : undefined, false);
   }
 
-  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
-    if (!outputAllNames) {
-      return this._set;
+  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
+    if (expression instanceof Fmt.CompoundExpression) {
+      super.fromExpression(expression, reportFn);
     } else {
+      this._set = expression;
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (outputAllNames || this._set instanceof Fmt.CompoundExpression) {
       return super.toExpression(outputAllNames, reportFn);
+    } else {
+      return this._set;
     }
   }
 
@@ -2620,11 +2644,19 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     }
   }
 
-  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
-    if (!outputAllNames && !this.subsetProof) {
-      return this._set;
+  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
+    if (expression instanceof Fmt.CompoundExpression) {
+      super.fromExpression(expression, reportFn);
     } else {
+      this._set = expression;
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (outputAllNames || this._set instanceof Fmt.CompoundExpression || this.subsetProof) {
       return super.toExpression(outputAllNames, reportFn);
+    } else {
+      return this._set;
     }
   }
 
@@ -2699,11 +2731,19 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
   }
 
-  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
-    if (!outputAllNames && !this.elementProof) {
-      return this.element;
+  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
+    if (expression instanceof Fmt.CompoundExpression) {
+      super.fromExpression(expression, reportFn);
     } else {
+      this.element = expression;
+    }
+  }
+
+  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {
+    if (outputAllNames || this.element instanceof Fmt.CompoundExpression || this.elementProof) {
       return super.toExpression(outputAllNames, reportFn);
+    } else {
+      return this.element;
     }
   }
 
