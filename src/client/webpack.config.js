@@ -99,15 +99,16 @@ module.exports = {
           chunks: 'all',
           enforce: true
         },
-        'extras': {
-          test: /[\\/]src[\\/]client[\\/]extras[\\/]/,
-          name: 'extras',
-          chunks: 'all',
-          enforce: true
-        },
         'client': {
           test: /[\\/]src[\\/]client[\\/]/,
           name: 'client',
+          chunks: 'all',
+          enforce: true
+        },
+        'extras': {
+          test: /[\\/]src[\\/]client[\\/]extras[\\/]/,
+          priority: 1,
+          name: 'extras',
           chunks: 'all',
           enforce: true
         }
@@ -138,7 +139,8 @@ module.exports = {
     ]
   },
   performance: {
-    maxAssetSize: 1000000
+    maxAssetSize: 1000000,
+    maxEntrypointSize: 10000000
   },
   watchOptions: {
     ignored: /node_modules/
