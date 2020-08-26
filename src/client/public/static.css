@@ -1,131 +1,131 @@
-nav {
+.static nav {
   margin-bottom: 1em;
 }
 
-footer {
+.static footer {
   margin-top: 1em;
 }
 
-.expr {
+.static .expr {
   font-family: serif;
 }
 
-a {
+.static a {
   text-decoration: initial;
 }
 
-.expr .markdown a {
+.static .expr .markdown a {
   text-decoration: underline;
 }
 
-.label, .sub-heading {
+.static .label, .sub-heading {
   font-weight: bold;
 }
 
-.sub-heading {
+.static .sub-heading {
   display: inline-block;
   margin-top: 1em;
 }
 
-.proof-placeholder {
+.static .proof-placeholder {
   display: inline-block;
   margin-top: 1ex;
   font-style: italic;
 }
 
-.indented .sub-heading, .indented .proof-placeholder {
+.static .indented .sub-heading, .indented .proof-placeholder {
   margin-top: 0;
 }
 
-.label .title {
+.static .label .title {
   font-weight: normal;
 }
 
-p, ul, ol, .paragraph {
+.static p, ul, ol, .paragraph {
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
 
-.display-math {
+.static .display-math {
   display: inline-block;
 }
 
-div.display-math {
+.static div.display-math {
   display: block;
 }
 
-.paragraph:not(:first-child) .display-math:first-child {
+.static .paragraph:not(:first-child) .display-math:first-child {
   margin-top: 1ex;
 }
 
-.paragraph:not(:last-child) .display-math:last-child {
+.static .paragraph:not(:last-child) .display-math:last-child {
   margin-bottom: 1ex;
 }
 
-.display-math, .indented {
+.static .display-math, .indented {
   margin-left: 2em;
 }
 
-.addendum, .addendum *, .addendum-hint, .addendum-hint * {
+.static .addendum, .addendum *, .addendum-hint, .addendum-hint * {
   color: #a0a0a0;
 }
 
-.addendum {
+.static .addendum {
   font-size: 75%;
 }
 
-.table {
+.static .table {
   display: inline-table;
   vertical-align: middle;
   border-collapse: collapse;
   white-space: nowrap;
 }
 
-.table.inline, .table.single-case {
+.static .table.inline, .table.single-case {
   vertical-align: initial;
   white-space: initial;
 }
 
-.table.matrix, .table.binom {
+.static .table.matrix, .table.binom {
   text-align: center;
 }
 
-.table-row {
+.static .table-row {
   display: table-row;
   vertical-align: initial;
 }
 
-.table-cell {
+.static .table-cell {
   display: table-cell;
 }
 
-.table.aligned>.table-row>.table-cell:first-child {
+.static .table.aligned>.table-row>.table-cell:first-child {
   text-align: right;
 }
 
-.table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child, .table.construction>.table-row>.table-cell:not(:first-child) {
+.static .table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child, .table.construction>.table-row>.table-cell:not(:first-child) {
   white-space: initial;
 }
 
-.bold {
+.static .bold {
   font-weight: bold!important;
   font-style: normal;
 }
 
-.italic, .calligraphic {
+.static .italic, .calligraphic {
   font-style: italic!important;
 }
 
-.sans, .ctor {
+.static .sans, .ctor {
   font-family: sans-serif;
   font-style: normal;
 }
 
-.fraktur, .monospace, .source-code {
+.static .fraktur, .monospace, .source-code {
   font-family: monospace;
   font-style: normal;
 }
 
-.largesym {
+.static .largesym {
   font-size: 110%;
 }

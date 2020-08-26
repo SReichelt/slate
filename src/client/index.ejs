@@ -69,7 +69,9 @@
   <body>
     <div id="app">
       <% if (htmlWebpackPlugin.options.isStatic) { %>
-        <%= htmlWebpackPlugin.options.outputPlaceholder('content') %>
+        <div class="static">
+          <%= htmlWebpackPlugin.options.outputPlaceholder('content') %>
+        </div>
       <% } else { %>
         <header class="loading-screen">
           <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <% if (htmlWebpackPlugin.options.isEmbedded) { %>extension for Microsoft Visual Studio Code<% } else { %>web-based interactive theorem prover<% } %>.</p>
