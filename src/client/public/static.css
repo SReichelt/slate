@@ -18,7 +18,7 @@
   text-decoration: underline;
 }
 
-.static .label, .sub-heading {
+.static .label, .static .sub-heading {
   font-weight: bold;
 }
 
@@ -33,7 +33,7 @@
   font-style: italic;
 }
 
-.static .indented .sub-heading, .indented .proof-placeholder {
+.static .indented .sub-heading, .static .indented .proof-placeholder {
   margin-top: 0;
 }
 
@@ -41,7 +41,7 @@
   font-weight: normal;
 }
 
-.static p, ul, ol, .paragraph {
+.static p, .static ul, .static ol, .static .paragraph {
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
@@ -62,11 +62,11 @@
   margin-bottom: 1ex;
 }
 
-.static .display-math, .indented {
+.static .display-math, .static .indented {
   margin-left: 2em;
 }
 
-.static .addendum, .addendum *, .addendum-hint, .addendum-hint * {
+.static .addendum, .static .addendum *, .static .addendum-hint, .static .addendum-hint * {
   color: #a0a0a0;
 }
 
@@ -81,12 +81,12 @@
   white-space: nowrap;
 }
 
-.static .table.inline, .table.single-case {
+.static .table.inline, .static .table.single-case {
   vertical-align: initial;
   white-space: initial;
 }
 
-.static .table.matrix, .table.binom {
+.static .table.matrix, .static .table.binom {
   text-align: center;
 }
 
@@ -103,7 +103,7 @@
   text-align: right;
 }
 
-.static .table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child, .table.construction>.table-row>.table-cell:not(:first-child) {
+.static .table.cases>.table-row>.table-cell::last-child, .static .table.single-case>.table-row>.table-cell:last-child, .static .table.definitions>.table-row>.table-cell:last-child, .static .table.construction>.table-row>.table-cell:not(:first-child) {
   white-space: initial;
 }
 
@@ -112,16 +112,16 @@
   font-style: normal;
 }
 
-.static .italic, .calligraphic {
+.static .italic, .static .calligraphic {
   font-style: italic!important;
 }
 
-.static .sans, .ctor {
+.static .sans, .static .ctor {
   font-family: sans-serif;
   font-style: normal;
 }
 
-.static .fraktur, .monospace, .source-code {
+.static .fraktur, .static .monospace, .static .source-code {
   font-family: monospace;
   font-style: normal;
 }
