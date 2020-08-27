@@ -7,7 +7,6 @@ import { HLMUtils } from '../utils';
 import * as Macro from '../../macro';
 import * as HLMMacro from '../macro';
 import CachedPromise from '../../../data/cachedPromise';
-import { HLMExpressionType } from '../hlm';
 
 export class TupleMacro implements HLMMacro.HLMMacro {
   name = 'tuple';
@@ -65,6 +64,11 @@ class TupleMacroInvocation implements HLMMacro.HLMMacroInvocation {
 
   getDeclaredSet(): CachedPromise<Fmt.Expression> {
     return CachedPromise.resolve(this.tuplesRef);
+  }
+
+  unfold(): CachedPromise<Fmt.Expression[]> {
+    // TODO
+    return CachedPromise.resolve([]);
   }
 
   getArrayArgumentOperations(subExpression: Fmt.ArrayExpression): Macro.ArrayArgumentOperations | undefined {

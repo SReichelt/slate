@@ -9,4 +9,5 @@ export type HLMMacroInstance = Macro.MacroInstance<HLMMacroInvocation, HLMUtils>
 
 export interface HLMMacroInvocation extends Macro.MacroInvocation {
   getDeclaredSet(): CachedPromise<Fmt.Expression>;
+  unfold(): CachedPromise<Fmt.Expression[]>;
 }

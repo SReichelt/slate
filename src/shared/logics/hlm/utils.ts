@@ -822,7 +822,8 @@ export class HLMUtils extends GenericUtils {
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.ElementTerm, unfoldParameters);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_MacroOperator) {
-          // TODO
+          let macroInvocation = this.getMacroInvocation(term, definition);
+          return macroInvocation.unfold();
         }
         return undefined;
       });

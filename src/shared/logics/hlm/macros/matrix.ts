@@ -97,6 +97,11 @@ class MatrixMacroInvocation implements HLMMacro.HLMMacroInvocation {
     return CachedPromise.resolve(this.matricesRef);
   }
 
+  unfold(): CachedPromise<Fmt.Expression[]> {
+    // TODO
+    return CachedPromise.resolve([]);
+  }
+
   getArrayArgumentOperations(subExpression: Fmt.ArrayExpression): Macro.ArrayArgumentOperations | undefined {
     if (subExpression === this.items) {
       return new MatrixRowOperations(this.config, this.itemsParam, this.expression, this.items);

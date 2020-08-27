@@ -67,6 +67,11 @@ class NumberTupleMacroInvocation implements HLMMacro.HLMMacroInvocation {
     return CachedPromise.resolve(this.tuplesRef);
   }
 
+  unfold(): CachedPromise<Fmt.Expression[]> {
+    // TODO
+    return CachedPromise.resolve([]);
+  }
+
   getArrayArgumentOperations(subExpression: Fmt.ArrayExpression): Macro.ArrayArgumentOperations | undefined {
     if (subExpression === this.items) {
       return new Macro.DefaultArrayArgumentOperations(this.config, this.itemsParam, this.expression, subExpression);

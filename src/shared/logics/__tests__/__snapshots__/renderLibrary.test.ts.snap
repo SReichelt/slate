@@ -2377,7 +2377,8 @@ exports[`render hlm library: 1.7.1.17.1 Essentials/Numbers/Natural/Subsets/Segme
 References.
 
 * https://mathworld.wolfram.com/InitialSegment.html
-* https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based"
+* https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/fin/basic.html#fin"
 `;
 
 exports[`render hlm library: 1.7.1.17.2 Essentials/Numbers/Natural/Subsets/Segment%20(less%20or%20equal) 1`] = `
@@ -3880,7 +3881,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Order_embedding
 * https://proofwiki.org/wiki/Definition:Order_Embedding
-* https://leanprover-community.github.io/mathlib_docs/order/order_iso.html#order_embedding"
+* https://leanprover-community.github.io/mathlib_docs/order/rel_iso.html#order_embedding"
 `;
 
 exports[`render hlm library: 1.7.3.4.2 Essentials/Numbers/Ordinal/Homomorphisms/Isomorphisms 1`] = `
@@ -3897,7 +3898,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Order_isomorphism
 * https://proofwiki.org/wiki/Definition:Order_Isomorphism
-* https://leanprover-community.github.io/mathlib_docs/order/order_iso.html#order_iso"
+* https://leanprover-community.github.io/mathlib_docs/order/rel_iso.html#order_iso"
 `;
 
 exports[`render hlm library: 1.7.3.4.3 Essentials/Numbers/Ordinal/Homomorphisms/Automorphisms 1`] = `
