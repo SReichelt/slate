@@ -504,7 +504,7 @@ class App extends React.Component<AppProps, AppState> {
         </div>
         <div className={'bottom-toolbar'} key="toolbar">
           {this.getLeftButtons()}
-          {this.getRightButtons(extraContents !== undefined)}
+          {this.getRightButtons(extraContents !== null)}
         </div>
       </div>
     );
