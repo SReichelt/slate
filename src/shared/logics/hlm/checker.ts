@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext, FormulaCase } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -1082,7 +1082,7 @@ export class HLMDefinitionChecker {
           this.checkFormula(item, checkContext);
           if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
             let constraintFormula = formula instanceof FmtHLM.MetaRefExpression_or ? this.utils.negateFormula(item, false).getImmediateResult()! : item;
-            let constraintParam = this.createConstraintParameter(constraintFormula, '_');
+            let constraintParam = this.utils.createConstraintParameter(constraintFormula, '_');
             checkContext = this.getParameterContext(constraintParam, checkContext);
           }
         }
@@ -1246,9 +1246,7 @@ export class HLMDefinitionChecker {
                 caseContext = this.getParameterListContext(structuralCase.parameters, caseContext);
               }
               let structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
-              let structuralCaseEquality = new FmtHLM.MetaRefExpression_equals;
-              structuralCaseEquality.terms = [term, structuralCaseTerm];
-              let constraintParam = this.createConstraintParameter(structuralCaseEquality, '_');
+              let constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
               checkCaseInternal(structuralCase, constructorContents, structuralCaseTerm, constraintParam, caseContext);
             } else {
               this.error(structuralCase._constructor, `Expected reference to constructor "${constructorDefinition.name}"`);
@@ -1409,47 +1407,42 @@ export class HLMDefinitionChecker {
   private checkSetTermEquivalenceList(object: Object, list: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
     let checkCompatibility = (terms: Fmt.Expression[], checkContext: HLMCheckerContext) => this.checkSetCompatibility(object, terms, checkContext);
     let checkItem = (term: Fmt.Expression, termContext: HLMCheckerContext) => this.checkSetTerm(term, termContext);
-    let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression) => {
-      let goal = new FmtHLM.MetaRefExpression_sub;
-      goal.subset = from;
-      goal.superset = to;
-      return goal;
-    };
-    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, getEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, this.getSetTermEquivalenceGoal, context);
   }
+
+  private getSetTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
+    let goal = new FmtHLM.MetaRefExpression_sub;
+    goal.subset = from;
+    goal.superset = to;
+    return goal;
+  };
 
   private checkElementTermEquivalenceList(object: Object, list: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
     let checkCompatibility = (terms: Fmt.Expression[], checkContext: HLMCheckerContext) => this.checkElementCompatibility(object, terms, checkContext);
     let checkItem = (term: Fmt.Expression, termContext: HLMCheckerContext) => this.checkElementTerm(term, termContext);
-    let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression) => {
-      let goal = new FmtHLM.MetaRefExpression_equals;
-      goal.terms = [from, to];
-      return goal;
-    };
-    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, getEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, this.getElementTermEquivalenceGoal, context);
   }
+
+  private getElementTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
+    let goal = new FmtHLM.MetaRefExpression_equals;
+    goal.terms = [from, to];
+    return goal;
+  };
 
   private checkFormulaEquivalenceList(object: Object, list: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
     let checkItem = (formula: Fmt.Expression, itemContext: HLMCheckerContext) => this.checkFormula(formula, itemContext);
-    let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
-      this.addProofConstraint(proofParameters, from);
-      return to;
-    };
-    this.checkEquivalenceList(object, list, equivalenceProofs, checkItem, undefined, getEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equivalenceProofs, checkItem, undefined, this.getFormulaEquivalenceGoal, context);
   }
+
+  private getFormulaEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList): Fmt.Expression => {
+    this.addProofConstraint(proofParameters, from);
+    return to;
+  };
 
   private checkProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
     // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
     if (proof && !(object instanceof Fmt.Expression)) {
       object = proof;
-    }
-    this.checkProofInternal(object, proof, parameters, [goal], context);
-  }
-
-  private checkProofInternal(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goals: Fmt.Expression[], context: HLMCheckerContext): void {
-    if (!goals.length) {
-      this.error(proof ?? object, 'Proof goal not known');
-      return;
     }
     if (proof) {
       if (proof.parameters) {
@@ -1465,14 +1458,14 @@ export class HLMDefinitionChecker {
       if (proof.goal) {
         this.checkFormula(proof.goal, context);
         if (parameters && proof.parameters) {
-          goals = goals.map((goal: Fmt.Expression) => this.utils.substituteParameters(goal, parameters, proof.parameters!));
+          goal = this.utils.substituteParameters(goal, parameters, proof.parameters);
         }
-        this.checkUnfolding(goals, proof.goal);
+        this.checkUnfolding(goal, proof.goal, true);
       }
       let stepContext: HLMCheckerProofStepContext = {
         ...context,
         parameters: proof.parameters,
-        goal: proof.goal ?? goals[0],
+        goal: proof.goal ?? goal,
         previousResult: undefined
       };
       this.utils.updateInitialProofStepContext(proof, stepContext);
@@ -1484,10 +1477,10 @@ export class HLMDefinitionChecker {
       let stepContext: HLMCheckerProofStepContext = {
         ...context,
         parameters: parameters,
-        goal: goals[0],
+        goal: goal,
         previousResult: undefined
       };
-      let getMessage = () => goals.length === 1 && !parameters ? `Proof of ${goals[0]} required` : 'Proof required';
+      let getMessage = () => parameters ? 'Proof required' : `Proof of ${goal} required`;
       this.checkTrivialProvability(object, stepContext, getMessage);
     }
   }
@@ -1564,7 +1557,42 @@ export class HLMDefinitionChecker {
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef) {
       // TODO
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
-      // TODO
+      if (context.goal) {
+        if (context.previousResult) {
+          let goal = context.goal;
+          let previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, type.side?.toNumber(), false);
+          if (previousResultCasesPromise) {
+            let caseProofs = type.caseProofs;
+            let checkCases = previousResultCasesPromise.then((previousResultCases: FormulaCase[]) => {
+              let index = 0;
+              for (let previousResultCase of previousResultCases) {
+                if (index < caseProofs.length) {
+                  let caseProof = caseProofs[index];
+                  let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+                  if (previousResultCase.parameters) {
+                    parameters.push(...previousResultCase.parameters);
+                  }
+                  this.addProofConstraint(parameters, previousResultCase.formula);
+                  this.checkProof(caseProof, caseProof, parameters, goal, context);
+                } else {
+                  this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+                }
+                index++;
+              }
+              if (index < caseProofs.length) {
+                this.error(caseProofs[index], 'Superfluous case proof');
+              }
+            });
+            this.addPendingCheck(step, checkCases);
+          } else {
+            this.error(step, 'Invalid cases');
+          }
+        } else {
+          this.error(step, 'Previous result not set');
+        }
+      } else {
+        this.error(step, 'Goal not set');
+      }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
       if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
@@ -1615,7 +1643,7 @@ export class HLMDefinitionChecker {
     } else if (type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
       if (context.previousResult) {
         this.checkFormula(type.result, context);
-        this.checkUnfolding([context.previousResult], type.result);
+        this.checkUnfolding(context.previousResult, type.result, false);
       } else {
         this.error(step, 'Previous result not set');
         return undefined;
@@ -1637,8 +1665,8 @@ export class HLMDefinitionChecker {
                 };
                 let inputResultContext = this.checkProofStep(useTheorem.input, inputContext);
                 if (inputResultContext?.previousResult) {
-                  this.checkEquivalenceCondition(step, inputResultContext.previousResult, definition.contents.conditions, theorem.path, [definition]);
-                  this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, definition.contents.conditions, theorem.path, [definition]);
+                  this.checkCondition(step, inputResultContext.previousResult, definition.contents.conditions, theorem.path, [definition], false);
+                  this.checkCondition(useTheorem.result, useTheorem.result, definition.contents.conditions, theorem.path, [definition], true);
                 } else {
                   this.error(step, 'Invalid input proof step');
                 }
@@ -1646,7 +1674,7 @@ export class HLMDefinitionChecker {
                 this.error(step, 'Theorem input required');
               }
             } else {
-              this.checkEquivalenceCondition(useTheorem.result, useTheorem.result, [definition.contents.claim], theorem.path, [definition]);
+              this.checkCondition(useTheorem.result, useTheorem.result, [definition.contents.claim], theorem.path, [definition], true);
             }
           } else {
             this.error(step, 'Referenced definition must be a construction or set operator');
@@ -1661,13 +1689,17 @@ export class HLMDefinitionChecker {
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveNeg) {
       // TODO if goal is disjunction and type.proof.to is set, negate everything except that term
-      let proveNeg = type;
-      let check = this.utils.negateFormula(context.goal!, true).then((negatedGoal: Fmt.Expression) => {
-        let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
-        this.addProofConstraint(parameters, negatedGoal);
-        this.checkProof(step, proveNeg.proof, parameters, new FmtHLM.MetaRefExpression_or, context);
-      });
-      this.addPendingCheck(step, check);
+      if (context.goal) {
+        let proveNeg = type;
+        let check = this.utils.negateFormula(context.goal, true).then((negatedGoal: Fmt.Expression) => {
+          let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+          this.addProofConstraint(parameters, negatedGoal);
+          this.checkProof(step, proveNeg.proof, parameters, new FmtHLM.MetaRefExpression_or, context);
+        });
+        this.addPendingCheck(step, check);
+      } else {
+        this.error(step, 'Goal not set');
+      }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
       if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
@@ -1689,39 +1721,57 @@ export class HLMDefinitionChecker {
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
       if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals) {
-        let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression) => {
-          let goal = new FmtHLM.MetaRefExpression_sub;
-          goal.subset = from;
-          goal.superset = to;
-          return goal;
-        };
-        this.checkEquivalenceProofs(type.proofs, context.goal.terms, getEquivalenceGoal, context);
+        this.checkEquivalenceProofs(type.proofs, context.goal.terms, this.getSetTermEquivalenceGoal, context);
+      } else if (context.goal instanceof FmtHLM.MetaRefExpression_equals) {
+        this.checkEquivalenceProofs(type.proofs, context.goal.terms, this.getElementTermEquivalenceGoal, context);
       } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
-        let getEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
-          this.addProofConstraint(proofParameters, from);
-          return to;
-        };
-        this.checkEquivalenceProofs(type.proofs, context.goal.formulas, getEquivalenceGoal, context);
+        this.checkEquivalenceProofs(type.proofs, context.goal.formulas, this.getFormulaEquivalenceGoal, context);
       } else {
         this.error(step, 'Goal is not an equivalence');
       }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
-      // TODO can prove: conjunction, structural cases, regular cases, equality with more than 2 terms
+      if (context.goal) {
+        let goalCasesPromise = this.utils.getFormulaCases(context.goal, type.side?.toNumber(), true);
+        if (goalCasesPromise) {
+          let caseProofs = type.caseProofs;
+          let checkCases = goalCasesPromise.then((goalCases: FormulaCase[]) => {
+            let index = 0;
+            for (let goalCase of goalCases) {
+              if (index < caseProofs.length) {
+                let caseProof = caseProofs[index];
+                this.checkProof(caseProof, caseProof, goalCase.parameters, goalCase.formula, context);
+              } else {
+                this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+              }
+              index++;
+            }
+            if (index < caseProofs.length) {
+              this.error(caseProofs[index], 'Superfluous case proof');
+            }
+          });
+          this.addPendingCheck(step, checkCases);
+        } else {
+          this.error(step, 'Invalid cases');
+        }
+      } else {
+        this.error(step, 'Goal not set');
+      }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
-      let proveByInduction = type;
       if (context.goal) {
+        let proveByInduction = type;
+        let goal = context.goal;
         let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
           let subProof = new FmtHLM.ObjectContents_Proof;
           subProof.fromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
           if (subProof.parameters) {
             parameters = Object.create(Fmt.ParameterList.prototype);
-            parameters?.push(constraintParam);
+            parameters!.push(constraintParam);
           }
-          let goal = this.utils.getInductionProofGoal(context.goal!, proveByInduction.term, structuralCaseTerm);
-          this.checkProof(structuralCase.value, subProof, parameters, goal, caseContext);
+          let caseGoal = this.utils.getInductionProofGoal(goal, proveByInduction.term, structuralCaseTerm);
+          this.checkProof(structuralCase.value, subProof, parameters, caseGoal, caseContext);
           if (structuralCase.wellDefinednessProof) {
             this.error(structuralCase.wellDefinednessProof, 'Superfluous well-definedness proof');
           }
@@ -1812,40 +1862,53 @@ export class HLMDefinitionChecker {
         this.addProofConstraint(parameters, formula.formula);
       }
     } else {
-      parameters.push(this.createConstraintParameter(formula, '_1'));
+      parameters.push(this.utils.createConstraintParameter(formula, '_1'));
     }
   }
 
-  private createConstraintParameter(constraint: Fmt.Expression, name: string): Fmt.Parameter {
-    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-    constraintType.formula = constraint;
-    return this.utils.createParameter(constraintType, name);
-  }
-
-  private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression): void {
-    let resultPromise = CachedPromise.resolve(false);
-    for (let source of sources) {
-      resultPromise = resultPromise.or(() => this.utils.unfoldsTo(source, target));
-    }
-    let check = resultPromise.then((result: boolean) => {
-      if (!result) {
-        this.error(target, sources.length === 1 ? `${sources[0]} does not unfold to ${target}` : `None of the possible goals unfold to ${target}`);
+  private checkUnfolding(source: Fmt.Expression, target: Fmt.Expression, sourceIsResult: boolean): void {
+    if (target instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
+      if (target.formulas) {
+        for (let innerTarget of target.formulas) {
+          this.checkUnfolding(source, innerTarget, sourceIsResult);
+        }
       }
-    });
-    this.addPendingCheck(target, check);
+    } else {
+      let check = this.getUnfoldResult(source, target, sourceIsResult).then((result: boolean) => {
+        if (!result) {
+          this.error(target, `${source} does not unfold to ${target}`);
+        }
+      });
+      this.addPendingCheck(target, check);
+    }
   }
 
-  private checkEquivalenceCondition(object: Object, formula: Fmt.Expression, conditions: Fmt.Expression[], path: Fmt.Path, definitions: Fmt.Definition[]): void {
+  private getUnfoldResult(source: Fmt.Expression, target: Fmt.Expression, sourceIsResult: boolean): CachedPromise<boolean> {
+    if (source instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
+      let resultPromise = CachedPromise.resolve(false);
+      if (source.formulas) {
+        for (let innerSource of source.formulas) {
+          resultPromise = resultPromise.or(() => this.getUnfoldResult(innerSource, target, sourceIsResult));
+        }
+      }
+      return resultPromise;
+    } else {
+      return this.utils.unfoldsTo(source, target);
+    }
+  }
+
+  private checkCondition(object: Object, formula: Fmt.Expression, conditions: Fmt.Expression[], path: Fmt.Path, definitions: Fmt.Definition[], formulaIsResult: boolean): void {
     let resultPromise = CachedPromise.resolve(false);
     for (let condition of conditions) {
       resultPromise = resultPromise.or(() => {
         let substitutedCondition = this.utils.substitutePath(condition, path, definitions);
-        return this.utils.areTriviallyEquivalent(formula, substitutedCondition);
+        return formulaIsResult ? this.utils.triviallyImplies(substitutedCondition, formula, true) : this.utils.triviallyImplies(formula, substitutedCondition, true);
       });
     }
     let check = resultPromise.then((result: boolean) => {
       if (!result) {
-        this.error(object, conditions.length === 1 ? `${formula} is not trivially equivalent to ${this.utils.substitutePath(conditions[0], path, definitions)}` : `${formula} is not trivially equivalent to any of the conditions`);
+        let direction = formulaIsResult ? 'does not trivially follow from' : 'does not trivially imply';
+        this.error(object, conditions.length === 1 ? `${formula} ${direction} ${this.utils.substitutePath(conditions[0], path, definitions)}` : `${formula} ${direction} any of the conditions`);
       }
     });
     this.addPendingCheck(object, check);

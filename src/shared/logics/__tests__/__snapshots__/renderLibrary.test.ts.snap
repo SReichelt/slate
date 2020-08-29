@@ -2471,16 +2471,16 @@ References.
 exports[`render hlm library: 1.7.1.18 Essentials/Numbers/Natural/Finiteness%20criterion%20lemma 1`] = `
 "Lemma 1.7.1.18.  Let M ⊆ ℕ, k ∈ ℕ, f : ℕ_(≤k) ↔ M be a bijection. Then:
 
-  ∃ m ∈ M : ∀ n ∈ M : n ≤ m
+  ∃ m ∈ M : m is a ≤-greatest element of M
 
 Proof.  By induction on k.
 
-* Assume k = 0. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
+* Assume k = 0. Then ∃ m ∈ M : m is a ≤-greatest element of M:
   Choose m := f(0).
-* Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : ∀ n ∈ M : n ≤ m:
-  Let S := ℕ_(≤x).
-   ⇒^1.7.1.18 ∃ i ∈ f(S) : ∀ j ∈ f(S) : j ≤ i
-  Choose m := {f(k) if f(k) > i, i if f(k) ≤ i.
+* Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
+  Let N := f(ℕ_(≤x)).
+   ⇒^1.7.1.18 ∃ n ∈ N : n is a ≤-greatest element of N
+  Choose m := {f(k) if f(k) > n, n if f(k) ≤ n.
 
 Remarks.
 
@@ -2499,27 +2499,22 @@ exports[`render hlm library: 1.7.1.19 Essentials/Numbers/Natural/Finiteness%20cr
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-     def ⇒ ∃ l ∈ ℕ, f : ℕ_(<l) ↔ M
-     We have {M is empty if l = 0, ∃ i ∈ M : ∀ j ∈ M : j ≤ i if l = k + 1 (k ∈ ℕ):
-       * Assume l = 0. Then M is empty:
-         We show that ∄ c ∈ M:
-         Let c ∈ M.
-         f ∈ (ℕ_(<l) ↔ M) ⇒^def f is bijective
-          ⇒^def f is surjective
-          ⇒^def ∀ t ∈ M : ∃ s ∈ ℕ_(<0) : f(s) = t
-          ⇒ ∃ s ∈ ℕ_(<0) : f(s) = c
-         s ∈ ℕ_(<0) ⇒^def s < 0
-         1.7.1.14 ⇒ s ≥ 0 ⭍
-       * Let k ∈ ℕ such that l = k + 1. Then ∃ i ∈ M : ∀ j ∈ M : j ≤ i:
-         1.7.1.18 ⇒ ∃ y ∈ M : ∀ z ∈ M : z ≤ y
+     M is finite ⇒^def |M| ∈ ℕ
+     * Assume |M| = 0. Then M is empty by definition.
+     * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
+       We have k + 1 = |M|.
+        ⇒^def ∃ f : ℕ_(<(k+1)) ↔ M
+       1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
+3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M: Trivial.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
         ⇒^def M = ∅
        Choose a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
           ⇒^[M = ∅] M ⊆ ℕ_(≤0)
+     * Let m ∈ M such that m is a ≤-greatest element of M.
+       Choose a := m.
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
-     M ⊆ ℕ_(≤a) ⇒^def M ⊆ ℕ_(<(a+1))
      Choose b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
      1.7.1.17.7 ⇒ ℕ_(<b) is finite

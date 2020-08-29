@@ -41,6 +41,11 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
   extractStructuralCases: false
 };
 
+export interface FormulaCase {
+  parameters?: Fmt.ParameterList;
+  formula: Fmt.Expression;
+}
+
 type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
 type CreateParameterListFn = (source: Fmt.ParameterList) => Fmt.ParameterList;
 
@@ -247,6 +252,21 @@ export class HLMUtils extends GenericUtils {
     if (constructorDefinition.parameters.length) {
       result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!);
     }
+    return result;
+  }
+
+  getStructuralCaseConstraintParameter(term: Fmt.Expression, structuralCaseTerm: Fmt.Expression): Fmt.Parameter {
+    let structuralCaseEquality = new FmtHLM.MetaRefExpression_equals;
+    structuralCaseEquality.terms = [term, structuralCaseTerm];
+    return this.createConstraintParameter(structuralCaseEquality, '_');
+  }
+
+  getStructuralCaseParametersWithConstraint(term: Fmt.Expression, structuralCase: FmtHLM.ObjectContents_StructuralCase, structuralCaseTerm: Fmt.Expression): Fmt.ParameterList {
+    let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    if (structuralCase.parameters) {
+      result.push(...structuralCase.parameters);
+    }
+    result.push(this.getStructuralCaseConstraintParameter(term, structuralCaseTerm));
     return result;
   }
 
@@ -1420,10 +1440,6 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  areTriviallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): CachedPromise<boolean> {
-    return this.unfoldsTo(left, right).or(() => this.unfoldsTo(right, left));
-  }
-
   isTrivialTautology(formula: Fmt.Expression, followDefinitions: boolean): CachedPromise<boolean> {
     if (formula instanceof FmtHLM.MetaRefExpression_and) {
       let resultPromise = CachedPromise.resolve(true);
@@ -1572,10 +1588,20 @@ export class HLMUtils extends GenericUtils {
       }
       return innerResultPromise;
     }
+    if ((sourceFormula instanceof FmtHLM.MetaRefExpression_exists || sourceFormula instanceof FmtHLM.MetaRefExpression_existsUnique)
+        && targetFormula instanceof FmtHLM.MetaRefExpression_exists) {
+      let replacedParameters: Fmt.ReplacedParameter[] = [];
+      if (sourceFormula.parameters.isEquivalentTo(targetFormula.parameters, undefined, replacedParameters)
+          && (!targetFormula.formula || sourceFormula.formula?.isEquivalentTo(targetFormula.formula, undefined, replacedParameters))) {
+        return CachedPromise.resolve(true);
+      }
+    }
     let resultPromise = this.isTrivialContradiction(sourceFormula, followDefinitions)
       .or(() => this.isTrivialTautology(targetFormula, followDefinitions));
     if (followDefinitions) {
-      resultPromise = resultPromise.or(() => this.areTriviallyEquivalent(sourceFormula, targetFormula));
+      resultPromise = resultPromise
+        .or(() => this.unfoldsTo(sourceFormula, targetFormula))
+        .or(() => this.unfoldsTo(targetFormula, sourceFormula));
     }
     if (sourceFormula instanceof FmtHLM.MetaRefExpression_and) {
       if (sourceFormula.formulas) {
@@ -1666,6 +1692,82 @@ export class HLMUtils extends GenericUtils {
     return left.isEquivalentTo(right, fn);
   }
 
+  getFormulaCases(formula: Fmt.Expression, side: number | undefined, isGoal: boolean): CachedPromise<FormulaCase[]> | undefined {
+    if (side === undefined) {
+      if (formula instanceof (isGoal ? FmtHLM.MetaRefExpression_and : FmtHLM.MetaRefExpression_or) && formula.formulas) {
+        return CachedPromise.resolve(formula.formulas.map((item: Fmt.Expression) => ({formula: item})));
+      } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
+        let getValueFormula = (value: Fmt.Expression) => value;
+        return this.getStructuralFormulaCases(formula.construction, formula.term, formula.cases, getValueFormula);
+      }
+    } else {
+      if (formula instanceof FmtHLM.MetaRefExpression_setEquals && side >= 0 && side < formula.terms.length) {
+        let term = formula.terms[side];
+        if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
+          let getValueFormula = (value: Fmt.Expression) => {
+            let valueFormula = new FmtHLM.MetaRefExpression_setEquals;
+            valueFormula.terms = formula.terms.slice();
+            valueFormula.terms[side] = value;
+            return valueFormula;
+          };
+          return this.getStructuralFormulaCases(term.construction, term.term, term.cases, getValueFormula);
+        }
+      } else if (formula instanceof FmtHLM.MetaRefExpression_equals && side >= 0 && side < formula.terms.length) {
+        let term = formula.terms[side];
+        let getValueFormula = (value: Fmt.Expression) => {
+          let valueFormula = new FmtHLM.MetaRefExpression_equals;
+          valueFormula.terms = formula.terms.slice();
+          valueFormula.terms[side] = value;
+          return valueFormula;
+        };
+        if (term instanceof FmtHLM.MetaRefExpression_cases) {
+          let result = term.cases.map((item: FmtHLM.ObjectContents_Case): FormulaCase => {
+            let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+            parameters.push(this.createConstraintParameter(item.formula, '_1'));
+            return {
+              parameters: parameters,
+              formula: getValueFormula(item.value)
+            };
+          });
+          return CachedPromise.resolve(result);
+        } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
+          return this.getStructuralFormulaCases(term.construction, term.term, term.cases, getValueFormula);
+        }
+      } else if (formula instanceof FmtHLM.MetaRefExpression_equiv && side >= 0 && side < formula.formulas.length) {
+        let term = formula.formulas[side];
+        if (term instanceof FmtHLM.MetaRefExpression_structural) {
+          let getValueFormula = (value: Fmt.Expression) => {
+            let valueFormula = new FmtHLM.MetaRefExpression_equiv;
+            valueFormula.formulas = formula.formulas.slice();
+            valueFormula.formulas[side] = value;
+            return valueFormula;
+          };
+          return this.getStructuralFormulaCases(term.construction, term.term, term.cases, getValueFormula);
+        }
+      }
+    }
+    return undefined;
+  }
+
+  private getStructuralFormulaCases(construction: Fmt.Expression, term: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], getValueFormula: (value: Fmt.Expression) => Fmt.Expression): CachedPromise<FormulaCase[]> | undefined {
+    if (construction instanceof Fmt.DefinitionRefExpression) {
+      let resultPromise: CachedPromise<FormulaCase[]> = CachedPromise.resolve([]);
+      for (let structuralCase of cases) {
+        resultPromise = resultPromise.then((currentResult: FormulaCase[]) =>
+          this.getStructuralCaseTerm(construction.path, structuralCase).then((structuralCaseTerm: Fmt.Expression) => {
+            let valueFormula = getValueFormula(structuralCase.value);
+            return currentResult.concat({
+              parameters: this.getStructuralCaseParametersWithConstraint(term, structuralCase, structuralCaseTerm),
+              formula: this.getInductionProofGoal(valueFormula, term, structuralCaseTerm)
+            });
+          }));
+      }
+      return resultPromise;
+    } else {
+      return undefined;
+    }
+  }
+
   fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): void {
     for (let param of params) {
       let argValue = this.createArgumentValue(param, createPlaceholder, createParameterList);
@@ -1738,6 +1840,12 @@ export class HLMUtils extends GenericUtils {
     let elementType = new FmtHLM.MetaRefExpression_Element;
     elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
     return this.createParameter(elementType, defaultName, usedNames);
+  }
+
+  createConstraintParameter(constraint: Fmt.Expression, name: string): Fmt.Parameter {
+    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
+    constraintType.formula = constraint;
+    return this.createParameter(constraintType, name);
   }
 
   createParameterList(source: Fmt.ParameterList, targetPath: Fmt.PathItem | undefined, usedNames?: Set<string>): Fmt.ParameterList {

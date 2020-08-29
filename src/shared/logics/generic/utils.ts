@@ -151,9 +151,24 @@ export class GenericUtils {
     return result;
   }
 
+  referencesSelf(expression: Fmt.Expression): boolean {
+    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.DefinitionRefExpression) {
+        let path = subExpression.path;
+        while (path.parentPath instanceof Fmt.Path) {
+          path = path.parentPath;
+        }
+        if (!path.parentPath && path.name === this.definition.name) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
   referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
-    return this.containsSubExpression(expression, ((subExpression: Fmt.Expression) =>
-      (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param)));
+    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) =>
+      (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param));
   }
 
   findReferencedParameters(expression: Fmt.Expression): Fmt.Parameter[] {
