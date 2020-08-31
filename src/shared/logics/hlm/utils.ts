@@ -166,12 +166,12 @@ export class HLMUtils extends GenericUtils {
         this.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, newContext);
         let targetInnerParameters = targetType?.targetParameters;
         let addNewIndices = (expression: Fmt.Expression) => {
-          let indexedExpression = new Fmt.IndexedExpression;
-          indexedExpression.body = addIndices ? addIndices(expression) : expression;
-          indexedExpression.parameters = binderArg.sourceParameters;
-          indexedExpression.arguments = new Fmt.ArgumentList;
-          this.getParameterArguments(indexedExpression.arguments!, binderArg.sourceParameters, context, undefined, addIndices);
-          return indexedExpression;
+          let index: Fmt.Index = {
+            parameters: binderArg.sourceParameters,
+            arguments: new Fmt.ArgumentList
+          };
+          this.getParameterArguments(index.arguments!, binderArg.sourceParameters, context, undefined, addIndices);
+          return new Fmt.IndexedExpression(addIndices ? addIndices(expression) : expression, index);
         };
         binderArg.targetArguments = new Fmt.ArgumentList;
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);

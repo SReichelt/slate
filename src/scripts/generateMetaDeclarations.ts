@@ -133,10 +133,7 @@ class MetaDeclarationGenerator {
       }
     }
     if (list) {
-      let listType = new Fmt.IndexedExpression;
-      listType.body = type;
-      listType.arguments = new Fmt.ArgumentList;
-      return listType;
+      return new Fmt.IndexedExpression(type);
     } else {
       return type;
     }

@@ -629,12 +629,12 @@ export class HLMEditHandler extends GenericEditHandler {
     let expression: Fmt.Expression = new Fmt.VariableRefExpression(variableInfo.parameter);
     if (variableInfo.indexParameterLists) {
       for (let indexParameterList of variableInfo.indexParameterLists) {
-        let indexedExpression = new Fmt.IndexedExpression;
-        indexedExpression.body = expression;
-        indexedExpression.parameters = indexParameterList;
-        indexedExpression.arguments = new Fmt.ArgumentList;
-        this.utils.fillDefaultPlaceholderArguments(indexParameterList, indexedExpression.arguments!, undefined);
-        expression = indexedExpression;
+        let index: Fmt.Index = {
+          parameters: indexParameterList,
+          arguments: new Fmt.ArgumentList
+        };
+        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments!, undefined);
+        expression = new Fmt.IndexedExpression(expression, index);
       }
     }
     if (checkType && expressionEditInfo.expression) {

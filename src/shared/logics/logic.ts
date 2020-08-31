@@ -33,9 +33,7 @@ export interface LogicDefinitionTypeDescription {
 }
 
 export function createDefinition(definitionType: LogicDefinitionTypeDescription, name: string): Fmt.Definition {
-  let definition = new Fmt.Definition;
-  definition.name = name;
-  definition.type = definitionType.createTypeExpression();
+  let definition = new Fmt.Definition(name, definitionType.createTypeExpression());
   definition.contents = definitionType.createObjectContents();
   return definition;
 }

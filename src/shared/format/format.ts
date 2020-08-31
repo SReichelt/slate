@@ -163,17 +163,15 @@ export class Path extends NamedPathItem {
 }
 
 export class Definition {
-  name: string;
-  type: Expression;
-  parameters: ParameterList = new ParameterList;
   innerDefinitions: DefinitionList = new DefinitionList;
   contents?: ObjectContents;
   documentation?: DocumentationComment;
 
+  constructor(public name: string, public type: Expression, public parameters: ParameterList = new ParameterList) {}
+
   clone(replacedParameters: ReplacedParameter[] = []): Definition {
-    let result = new Definition;
-    result.name = this.name;
-    result.type = this.type.clone(replacedParameters);
+    let type = this.type.clone(replacedParameters);
+    let result = new Definition(this.name, type);
     this.parameters.clone(result.parameters, replacedParameters);
     for (let innerDefinition of this.innerDefinitions) {
       result.innerDefinitions.push(innerDefinition.clone(replacedParameters));
@@ -749,13 +747,12 @@ export class VariableRefExpression extends Expression {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let changed = false;
     let variable = this.variable.findReplacement(replacedParameters);
-    if (variable !== this.variable) {
-      changed = true;
+    if (variable === this.variable && fn) {
+      return fn(this);
     }
     let result = new VariableRefExpression(variable);
-    return this.getSubstitutionResult(fn, result, changed);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -889,27 +886,37 @@ export interface Index {
 }
 
 export class IndexedExpression extends Expression implements Index {
-  body: Expression;
   parameters?: ParameterList;
   arguments?: ArgumentList;
 
+  constructor(public body: Expression, index?: Index) {
+    super();
+    if (index) {
+      this.parameters = index.parameters;
+      this.arguments = index.arguments;
+    } else {
+      this.arguments = new ArgumentList;
+    }
+  }
+
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new IndexedExpression;
     let changed = !fn;
+    let resultIndex: Index = {};
     if (this.arguments) {
-      result.arguments = new ArgumentList;
-      if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
+      resultIndex.arguments = new ArgumentList;
+      if (this.arguments.substituteExpression(fn, resultIndex.arguments, replacedParameters)) {
         changed = true;
       }
     }
-    if (this.assignParameters(result, replacedParameters)) {
+    if (this.assignParameters(resultIndex, replacedParameters)) {
       changed = true;
     }
-    let bodyFn = fn ? (subExpression: Expression, indices?: Index[]) => fn(subExpression, indices ? [result, ...indices] : [result]) : undefined;
-    result.body = this.body.substitute(bodyFn, replacedParameters);
-    if (result.body !== this.body) {
+    let bodyFn = fn ? (subExpression: Expression, indices?: Index[]) => fn(subExpression, indices ? [resultIndex, ...indices] : [resultIndex]) : undefined;
+    let body = this.body.substitute(bodyFn, replacedParameters);
+    if (body !== this.body) {
       changed = true;
     }
+    let result = new IndexedExpression(body, resultIndex);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -918,11 +925,10 @@ export class IndexedExpression extends Expression implements Index {
       let origReplacedParametersLength = replacedParameters.length;
       let testExpression: IndexedExpression = this;
       if (this.isAffectedByReplacedParameters(replacedParameters)) {
-        testExpression = new IndexedExpression;
-        testExpression.body = this.body;
+        testExpression = new IndexedExpression(this.body, {});
         if (this.arguments) {
           testExpression.arguments = new ArgumentList;
-          testExpression.arguments!.push(...this.arguments);
+          testExpression.arguments.push(...this.arguments);
         }
         this.assignParameters(testExpression, replacedParameters);
       }
@@ -936,7 +942,7 @@ export class IndexedExpression extends Expression implements Index {
     }
   }
 
-  private assignParameters(result: IndexedExpression, replacedParameters: ReplacedParameter[]): boolean {
+  private assignParameters(result: Index, replacedParameters: ReplacedParameter[]): boolean {
     if (this.parameters) {
       for (let replacedParameter of replacedParameters) {
         let paramIndex = this.parameters.indexOf(replacedParameter.original);

@@ -367,9 +367,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
   private getReferencedMetaModelFromPath(path: Fmt.Path): Meta.MetaModel | undefined {
     let parentPath = path.parentPath;
     if (parentPath instanceof Fmt.NamedPathItem) {
-      let metaModelPath = new Fmt.Path;
-      metaModelPath.parentPath = parentPath.parentPath;
-      metaModelPath.name = parentPath.name;
+      let metaModelPath = new Fmt.Path(parentPath.name, undefined, parentPath.parentPath);
       return this.getReferencedMetaModel(metaModelPath);
     } else {
       return undefined;

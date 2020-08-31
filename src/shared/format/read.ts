@@ -231,10 +231,10 @@ export class Reader {
     if (!this.tryReadChar('$')) {
       return undefined;
     }
-    let definition = new Fmt.Definition;
     let nameStart = this.markStart();
-    definition.name = this.readIdentifier();
+    let name = this.readIdentifier();
     let nameRange = this.markEnd(nameStart);
+    let definition = new Fmt.Definition(name, new EmptyExpression);
     context = new Ctx.ParentInfoContext(definition, context);
     this.readOptionalParameterList(definition.parameters, context);
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
@@ -589,24 +589,24 @@ export class Reader {
     this.skipWhitespace();
     let indexIndex = 0;
     while (this.tryReadChar('[')) {
-      let indexedExpression = new Fmt.IndexedExpression;
-      indexedExpression.body = expression;
+      let index: Fmt.Index = {
+        arguments: new Fmt.ArgumentList
+      };
       if (indexParameterLists && indexIndex < indexParameterLists.length) {
-        indexedExpression.parameters = indexParameterLists[indexIndex];
+        index.parameters = indexParameterLists[indexIndex];
       }
-      indexedExpression.arguments = new Fmt.ArgumentList;
-      this.readArguments(indexedExpression.arguments!, context);
+      this.readArguments(index.arguments!, context);
       this.readChar(']');
-      this.markEnd(expressionStart, indexedExpression, context);
-      expression = indexedExpression;
+      expression = new Fmt.IndexedExpression(expression, index);
+      this.markEnd(expressionStart, expression, context);
       indexIndex++;
     }
     if (indexParameterLists) {
       for (; indexIndex < indexParameterLists.length; indexIndex++) {
-        let indexedExpression = new Fmt.IndexedExpression;
-        indexedExpression.body = expression;
-        indexedExpression.parameters = indexParameterLists[indexIndex];
-        expression = indexedExpression;
+        let index: Fmt.Index = {
+          parameters: indexParameterLists[indexIndex]
+        };
+        expression = new Fmt.IndexedExpression(expression, index);
       }
     }
     return expression;
