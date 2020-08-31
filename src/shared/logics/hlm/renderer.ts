@@ -2735,7 +2735,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
-        let newGoal = new FmtHLM.MetaRefExpression_or;
+        let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (context.goal instanceof FmtHLM.MetaRefExpression_or && context.goal.formulas) {
           let index = this.utils.translateIndex(type.proof._to);
           if (index !== undefined && index >= 0 && index < context.goal.formulas.length) {

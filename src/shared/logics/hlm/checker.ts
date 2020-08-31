@@ -1517,7 +1517,7 @@ export class HLMDefinitionChecker {
         } else if (toIndex < 0 || toIndex >= items.length) {
           this.error(proof, 'Invalid to index');
         } else {
-          let proofParameters = new Fmt.ParameterList;
+          let proofParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
           let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters!);
           if (!proofParameters!.length) {
             proofParameters = undefined;
@@ -1746,7 +1746,7 @@ export class HLMDefinitionChecker {
       if (context.goal) {
         let proveByContradiction = type;
         let goalToNegate = context.goal;
-        let newGoal = new FmtHLM.MetaRefExpression_or;
+        let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (goalToNegate instanceof FmtHLM.MetaRefExpression_or && goalToNegate.formulas && proveByContradiction.proof._to !== undefined) {
           let index = this.utils.translateIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
