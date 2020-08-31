@@ -679,8 +679,7 @@ export class HLMEditHandler extends GenericEditHandler {
         if (prevResult) {
           return prevResult;
         }
-        let expression = new Fmt.DefinitionRefExpression;
-        expression.path = resultPath;
+        let expression = new Fmt.DefinitionRefExpression(resultPath);
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
             .then((checkResult: Logic.LogicCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
@@ -1041,8 +1040,7 @@ export class HLMEditHandler extends GenericEditHandler {
           if (prevResult) {
             return prevResult;
           }
-          let expression = new Fmt.DefinitionRefExpression;
-          expression.path = resultPath;
+          let expression = new Fmt.DefinitionRefExpression(resultPath);
           return this.checker.checkConstraint(parameterList, expression)
             .then((checkResult: Logic.LogicCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
             .catch(() => undefined);

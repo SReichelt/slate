@@ -62,9 +62,7 @@ class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
           args.add(predecessor, definition.innerDefinitions[1].parameters[0].name);
         }
         let path = new Fmt.Path(name, args, this.naturalNumbersRef.path);
-        let result = new Fmt.DefinitionRefExpression;
-        result.path = path;
-        return [result];
+        return [new Fmt.DefinitionRefExpression(path)];
       } else {
         return [];
       }

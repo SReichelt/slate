@@ -523,7 +523,7 @@ export class Reader {
     } else if (metaDefinitions && !metaDefinitions.allowArbitraryReferences()) {
       // Other expressions not allowed in this case.
     } else if (this.tryReadChar('$')) {
-      let definitionRefExpression = new Fmt.DefinitionRefExpression;
+      let definitionRefExpression = new Fmt.DefinitionRefExpression(new Fmt.Path(''));
       context = new Ctx.ParentInfoContext(definitionRefExpression, context);
       definitionRefExpression.path = this.readPath(context);
       expression = definitionRefExpression;

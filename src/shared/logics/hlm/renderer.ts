@@ -2235,8 +2235,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let substitutionContext = new HLMSubstitutionContext;
         let path = new Fmt.Path(definition.name);
         this.utils.getParameterArguments(path.arguments, definition.parameters, substitutionContext);
-        let term = new Fmt.DefinitionRefExpression;
-        term.path = path;
+        let term = new Fmt.DefinitionRefExpression(path);
         let type = new FmtHLM.MetaRefExpression_Element;
         type._set = term;
         let parameter = this.utils.createParameter(type, definitionNotation.parameter.name);
@@ -2276,8 +2275,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           let path = new Fmt.Path(constructorDefinition.name);
           this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters, substitutionContext);
           path.parentPath = parentPath;
-          let term = new Fmt.DefinitionRefExpression;
-          term.path = path;
+          let term = new Fmt.DefinitionRefExpression(path);
           let type = new FmtHLM.MetaRefExpression_Def;
           type.element = term;
           let parameter = this.utils.createParameter(type, constructorDefinitionNotation.parameter.name);

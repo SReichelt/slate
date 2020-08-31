@@ -478,8 +478,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let localSectionFileName = this.getLocalSectionFileName();
     return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
-      let newSubsectionRef = new Fmt.DefinitionRefExpression;
-      newSubsectionRef.path = new Fmt.Path(name);
+      let newSubsectionRef = new Fmt.DefinitionRefExpression(new Fmt.Path(name));
       let newSubsection = new FmtLibrary.MetaRefExpression_subsection;
       newSubsection.ref = newSubsectionRef;
       newSubsection.title = title || '';
@@ -584,8 +583,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       .then(() => this.fetchSection(localSectionFileName, false, true))
       .then((sectionDefinition: LibraryDefinition) => {
         let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
-        let newItemRef = new Fmt.DefinitionRefExpression;
-        newItemRef.path = new Fmt.Path(name);
+        let newItemRef = new Fmt.DefinitionRefExpression(new Fmt.Path(name));
         let newItem = new FmtLibrary.MetaRefExpression_item;
         newItem.ref = newItemRef;
         newItem.title = title;

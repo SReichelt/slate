@@ -812,13 +812,17 @@ export class GenericMetaRefExpression extends MetaRefExpression {
 }
 
 export class DefinitionRefExpression extends Expression {
-  path: Path;
+  constructor (public path: Path) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new DefinitionRefExpression;
-    result.path = this.path.substituteExpression(fn, replacedParameters);
-    let changed = (result.path !== this.path);
-    return this.getSubstitutionResult(fn, result, changed);
+    let path = this.path.substituteExpression(fn, replacedParameters);
+    if (path === this.path && fn) {
+      return fn(this);
+    }
+    let result = new DefinitionRefExpression(path);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {

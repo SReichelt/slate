@@ -5238,9 +5238,7 @@ class TutorialStates {
       pathItem.parentPath = parentPath;
       parentPath = pathItem;
     }
-    let result = new Fmt.DefinitionRefExpression;
-    result.path = parentPath as Fmt.Path;
-    return result;
+    return new Fmt.DefinitionRefExpression(parentPath as Fmt.Path);
   }
 
   private createRawArg(name: string, value: Fmt.Expression): Fmt.Argument {

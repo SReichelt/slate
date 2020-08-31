@@ -38,9 +38,8 @@ function buildExamplePath(names: string[]): Fmt.Path {
 }
 
 function buildExample(names: string[]): Fmt.DefinitionRefExpression {
-  let result = new Fmt.DefinitionRefExpression;
-  result.path = buildExamplePath(names);
-  return result;
+  let path = buildExamplePath(names);
+  return new Fmt.DefinitionRefExpression(path);
 }
 
 function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageProps): React.ReactNode {

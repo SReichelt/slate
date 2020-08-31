@@ -500,8 +500,7 @@ export class HLMDefinitionChecker {
     this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
     let constructorPath = new Fmt.Path(innerDefinition.name, undefined, constructionPath);
     this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters, substitutionContext);
-    let constructorExpression = new Fmt.DefinitionRefExpression;
-    constructorExpression.path = constructorPath;
+    let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
     this.checkElementCompatibility(rewriteDefinition.value, [constructorExpression, rewriteDefinition.value], context);
     // TODO check whether rewrite definition matches referenced theorem
   }
@@ -516,8 +515,7 @@ export class HLMDefinitionChecker {
     let substitutionContext = new HLMSubstitutionContext;
     let constructionPath = new Fmt.Path(this.definition.name);
     this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
-    let constructionExpression = new Fmt.DefinitionRefExpression;
-    constructionExpression.path = constructionPath;
+    let constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
     this.checkCompatibility(embedding.target, [embedding.target], [constructionExpression], innerContext);
     this.checkEmbeddingWellDefinednessProof(embedding, context);
   }
@@ -1282,8 +1280,7 @@ export class HLMDefinitionChecker {
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
             let newCase = new FmtHLM.ObjectContents_StructuralCase;
             let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
-            let constructorExpression = new Fmt.DefinitionRefExpression;
-            constructorExpression.path = constructorPath;
+            let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
             newCase._constructor = constructorExpression;
             if (substitutedParameters.length) {
               let clonedParameters = new Fmt.ParameterList;

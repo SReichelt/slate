@@ -248,9 +248,7 @@ export class HLMUtils extends GenericUtils {
       let context = new SubstitutionContext;
       this.addTargetPathSubstitution(constructionPath.parentPath, context);
       this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
-      let resultRef = new Fmt.DefinitionRefExpression;
-      resultRef.path = resultPath;
-      result = resultRef;
+      result = new Fmt.DefinitionRefExpression(resultPath);
     }
     if (constructorDefinition.parameters.length) {
       result = this.substituteParameters(result, constructorDefinition.parameters, structuralCase.parameters!);
@@ -1176,8 +1174,7 @@ export class HLMUtils extends GenericUtils {
         }
       } else if (term instanceof Fmt.DefinitionRefExpression) {
         if (term.path.parentPath instanceof Fmt.Path) {
-          let constructionTerm = new Fmt.DefinitionRefExpression;
-          constructionTerm.path = term.path.parentPath;
+          let constructionTerm = new Fmt.DefinitionRefExpression(term.path.parentPath);
           return CachedPromise.resolve(constructionTerm);
         } else {
           for (let visitedDefinition of visitedDefinitions) {

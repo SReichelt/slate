@@ -305,8 +305,7 @@ export abstract class GenericEditHandler {
     } else {
       templateRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => {
         let newPath = new Fmt.Path(template.name);
-        let newNotation = new Fmt.DefinitionRefExpression;
-        newNotation.path = newPath;
+        let newNotation = new Fmt.DefinitionRefExpression(newPath);
         onSetNotation(newNotation);
       });
     }
@@ -339,8 +338,7 @@ export abstract class GenericEditHandler {
       if (isTopLevel) {
         this.preFillArguments(template.parameters, newPath.arguments, variables);
       }
-      newNotation = new Fmt.DefinitionRefExpression;
-      newNotation.path = newPath;
+      newNotation = new Fmt.DefinitionRefExpression(newPath);
     }
     let previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
     let messageItem: Dialog.ExpressionDialogInfoItem | undefined = undefined;

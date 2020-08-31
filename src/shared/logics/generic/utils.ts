@@ -97,9 +97,9 @@ export class GenericUtils {
     if (targetPath) {
       context.substitutionFns.push((subExpression: Fmt.Expression) => {
         if (subExpression instanceof Fmt.DefinitionRefExpression) {
-          let newExpression = new Fmt.DefinitionRefExpression;
           let newPath = GenericUtils.adjustPath(subExpression.path, targetPath);
-          newExpression.path = this.libraryDataAccessor.simplifyPath(newPath);
+          newPath = this.libraryDataAccessor.simplifyPath(newPath);
+          let newExpression = new Fmt.DefinitionRefExpression(newPath);
           return newExpression;
         } else {
           return subExpression;
