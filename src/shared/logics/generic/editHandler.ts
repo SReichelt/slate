@@ -205,8 +205,8 @@ export abstract class GenericEditHandler {
     }
     integerItem.expectedTextLength = 4;
     integerItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newNotation = new Fmt.IntegerExpression;
-      newNotation.value = new Fmt.BN(integerItem.text, 10);
+      let value = new Fmt.BN(integerItem.text, 10);
+      let newNotation = new Fmt.IntegerExpression(value);
       onSetNotation(newNotation);
     });
     let integerRow = new Menu.StandardExpressionMenuRow('Number');
@@ -224,8 +224,7 @@ export abstract class GenericEditHandler {
     }
     textItem.expectedTextLength = 4;
     textItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newNotation = new Fmt.StringExpression;
-      newNotation.value = textItem.text;
+      let newNotation = new Fmt.StringExpression(textItem.text);
       onSetNotation(newNotation);
     });
     let textRow = new Menu.StandardExpressionMenuRow(title);
@@ -241,8 +240,7 @@ export abstract class GenericEditHandler {
         variableItem.selected = true;
       }
       variableItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-        let newNotation = new Fmt.VariableRefExpression;
-        newNotation.variable = variable.param;
+        let newNotation = new Fmt.VariableRefExpression(variable.param);
         onSetNotation(newNotation);
       });
       items.push(variableItem);
@@ -306,8 +304,7 @@ export abstract class GenericEditHandler {
       templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer));
     } else {
       templateRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => {
-        let newPath = new Fmt.Path;
-        newPath.name = template.name;
+        let newPath = new Fmt.Path(template.name);
         let newNotation = new Fmt.DefinitionRefExpression;
         newNotation.path = newPath;
         onSetNotation(newNotation);
@@ -338,8 +335,7 @@ export abstract class GenericEditHandler {
     if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath && notation.path.name === template.name) {
       newNotation = notation.clone() as Fmt.DefinitionRefExpression;
     } else {
-      let newPath = new Fmt.Path;
-      newPath.name = template.name;
+      let newPath = new Fmt.Path(template.name);
       if (isTopLevel) {
         this.preFillArguments(template.parameters, newPath.arguments, variables);
       }
@@ -595,20 +591,18 @@ export abstract class GenericEditHandler {
         arrayValue.items = [];
         if (!(param.type.body instanceof Fmt.IndexedExpression) && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
           for (let variable of requiredVariables) {
-            let value = new Fmt.VariableRefExpression;
-            value.variable = variable.param;
+            let value = new Fmt.VariableRefExpression(variable.param);
             arrayValue.items.push(value);
           }
         }
         args.add(arrayValue, param.name);
       } else {
         if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
-          let value = new Fmt.StringExpression;
-          value.value = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
+          let text = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
+          let value = new Fmt.StringExpression(text);
           args.add(value, param.name);
         } else if (param.name === 'operand' && requiredVariables.length === 1) {
-          let value = new Fmt.VariableRefExpression;
-          value.variable = requiredVariables[0].param;
+          let value = new Fmt.VariableRefExpression(requiredVariables[0].param);
           args.add(value, param.name);
         }
       }
@@ -745,8 +739,7 @@ export abstract class GenericEditHandler {
       if (selectedDefinition) {
         treeItem.onItemClicked(this.libraryDataProvider, selectedDefinition.path);
       } else {
-        let dummyPath = new Fmt.Path;
-        dummyPath.name = '';
+        let dummyPath = new Fmt.Path('');
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
       let dialog = new Dialog.ExpressionDialog;
@@ -788,9 +781,7 @@ export abstract class GenericEditHandler {
         if (definition.innerDefinitions.length) {
           let currentResult = CachedPromise.resolve();
           for (let innerDefinition of definition.innerDefinitions) {
-            let innerPath = new Fmt.Path;
-            innerPath.name = innerDefinition.name;
-            innerPath.parentPath = path;
+            let innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
             currentResult = currentResult.then(() => addAllDefinitions(innerPath, outerDefinition, innerDefinition, rows));
           }
           return currentResult;
@@ -949,8 +940,7 @@ export abstract class GenericEditHandler {
         if (newValue.isNeg() && !negativeValuesAllowed) {
           return false;
         }
-        let newExpression = new Fmt.IntegerExpression;
-        newExpression.value = newValue;
+        let newExpression = new Fmt.IntegerExpression(newValue);
         expressionEditInfo!.onSetValue(newExpression);
         return true;
       };

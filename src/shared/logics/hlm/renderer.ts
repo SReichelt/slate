@@ -2233,8 +2233,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
       if (definitionNotation) {
           let substitutionContext = new HLMSubstitutionContext;
-        let path = new Fmt.Path;
-        path.name = definition.name;
+        let path = new Fmt.Path(definition.name);
         this.utils.getParameterArguments(path.arguments, definition.parameters, substitutionContext);
         let term = new Fmt.DefinitionRefExpression;
         term.path = path;
@@ -2272,11 +2271,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
         if (constructorDefinitionNotation) {
           let substitutionContext = new HLMSubstitutionContext;
-          let parentPath = new Fmt.Path;
-          parentPath.name = definition.name;
+          let parentPath = new Fmt.Path(definition.name);
           this.utils.getParameterArguments(parentPath.arguments, definition.parameters, substitutionContext);
-          let path = new Fmt.Path;
-          path.name = constructorDefinition.name;
+          let path = new Fmt.Path(constructorDefinition.name);
           this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters, substitutionContext);
           path.parentPath = parentPath;
           let term = new Fmt.DefinitionRefExpression;

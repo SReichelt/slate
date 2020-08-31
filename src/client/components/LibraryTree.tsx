@@ -272,8 +272,7 @@ function filterSearchWords(searchWords: string[], texts: (string | undefined)[])
 function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[], section: LibraryDefinition | undefined, visibleItems: Set<LibraryTreeItem> | undefined): React.ReactNodeArray {
   let parentPath: Fmt.Path | undefined = undefined;
   if (props.libraryDefinition) {
-    parentPath = new Fmt.Path;
-    parentPath.name = props.libraryDefinition.definition.name;
+    parentPath = new Fmt.Path(props.libraryDefinition.definition.name);
   }
 
   let selectedItemPathHead: Fmt.NamedPathItem | undefined = undefined;
@@ -281,12 +280,10 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
   if (props.selectedItemPath) {
     if (props.selectedItemPath.parentPath) {
       let item: Fmt.PathItem | undefined = props.selectedItemPath;
-      selectedItemPathTail = new Fmt.Path;
-      selectedItemPathTail.name = props.selectedItemPath.name;
+      selectedItemPathTail = new Fmt.Path(props.selectedItemPath.name);
       selectedItemPathHead = selectedItemPathTail;
       for (item = item.parentPath; item instanceof Fmt.NamedPathItem; item = item.parentPath) {
-        let itemCopy = new Fmt.NamedPathItem;
-        itemCopy.name = item.name;
+        let itemCopy = new Fmt.NamedPathItem(item.name);
         if (item.parentPath) {
           selectedItemPathHead.parentPath = itemCopy;
         }
@@ -311,9 +308,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
       if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
         path = (item.ref as Fmt.DefinitionRefExpression).path;
       } else {
-        path = new Fmt.Path;
-        path.name = item.name;
-        path.parentPath = parentPath;
+        path = new Fmt.Path(item.name, undefined, parentPath);
       }
       let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
       let autoOpen = false;
@@ -442,9 +437,7 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
     let resultPromise = ownResultPromise;
     for (let innerDefinition of definition.innerDefinitions) {
       resultPromise = resultPromise.or(() => {
-        let innerPath = new Fmt.Path;
-        innerPath.name = innerDefinition.name;
-        innerPath.parentPath = path;
+        let innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
         return checkVisibility(libraryDataProvider, innerPath, false, libraryDefinition, innerDefinition, searchWords, onFilter).visible;
       });
     }

@@ -10,9 +10,7 @@ export class MRUList {
     while (path.parentPath instanceof Fmt.Path) {
       path = path.parentPath;
     }
-    let newPath = new Fmt.Path;
-    newPath.name = path.name;
-    newPath.parentPath = path.parentPath;
+    let newPath = new Fmt.Path(path.name, undefined, path.parentPath);
     let index = 0;
     for (let entry of this.entries) {
       if (newPath.isEquivalentTo(entry)) {

@@ -22,9 +22,7 @@ export interface MacroInvocationConfig {
 
 export class DefaultMacroInvocationConfig implements MacroInvocationConfig {
   getNumberExpression(value: number): Fmt.Expression {
-    let result = new Fmt.IntegerExpression;
-    result.value = new Fmt.BN(value);
-    return result;
+    return new Fmt.IntegerExpression(new Fmt.BN(value));
   }
 }
 

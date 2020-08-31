@@ -9,12 +9,10 @@ export type ExpressionUnificationFn = (left: Expression, right: Expression, repl
 export type ReportConversionFn = (raw: Expression, converted: ObjectContents) => void;
 
 export class File {
-  metaModelPath: Path;
-  definitions: DefinitionList = new DefinitionList;
+  constructor(public metaModelPath: Path, public definitions: DefinitionList = new DefinitionList) {}
 
   clone(): File {
-    let result = new File;
-    result.metaModelPath = this.metaModelPath;
+    let result = new File(this.metaModelPath);
     this.definitions.clone(result.definitions);
     return result;
   }
@@ -38,7 +36,7 @@ export interface Comparable<T> {
 }
 
 export abstract class PathItem implements Comparable<PathItem> {
-  parentPath?: PathItem;
+  constructor(public parentPath?: PathItem) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): PathItem {
     return this.substituteExpression(undefined, replacedParameters);
@@ -67,21 +65,18 @@ export abstract class PathItem implements Comparable<PathItem> {
 }
 
 export class NamedPathItem extends PathItem {
-  name: string;
+  constructor(public name: string, parentPath?: PathItem) {
+    super(parentPath);
+  }
 
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): NamedPathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath || !fn) {
-        let result = new NamedPathItem;
-        result.parentPath = newParentPath;
-        result.name = this.name;
-        return result;
+        return new NamedPathItem(this.name, newParentPath);
       }
     } else if (!fn) {
-      let result = new NamedPathItem;
-      result.name = this.name;
-      return result;
+      return new NamedPathItem(this.name);
     }
     return this;
   }
@@ -132,23 +127,28 @@ export class IdentityPathItem extends PathItem {
 }
 
 export class Path extends NamedPathItem {
-  arguments: ArgumentList = new ArgumentList;
+  public arguments: ArgumentList;
+
+  constructor(name: string, args: ArgumentList = new ArgumentList, parentPath?: PathItem) {
+    super(name, parentPath);
+    this.arguments = args;
+  }
 
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Path {
-    let result = new Path;
     let changed = false;
+    let parentPath: PathItem | undefined = undefined;
     if (this.parentPath) {
-      result.parentPath = this.parentPath.substituteExpression(fn, replacedParameters);
-      if (result.parentPath !== this.parentPath) {
+      parentPath = this.parentPath.substituteExpression(fn, replacedParameters);
+      if (parentPath !== this.parentPath) {
         changed = true;
       }
     }
-    result.name = this.name;
-    if (this.arguments.substituteExpression(fn, result.arguments, replacedParameters)) {
+    let args = new ArgumentList;
+    if (this.arguments.substituteExpression(fn, args, replacedParameters)) {
       changed = true;
     }
     if (changed || !fn) {
-      return result;
+      return new Path(this.name, args, parentPath);
     }
     return this;
   }
@@ -380,6 +380,7 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
     }
   }
 
+  // TODO return parameter list instead
   substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     let previousParameter: ReplacedParameter | undefined = undefined;
@@ -536,6 +537,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     }
   }
 
+  // TODO return argument list instead
   clone(result: ArgumentList, replacedParameters: ReplacedParameter[] = []): void {
     this.substituteExpression(undefined, result, replacedParameters);
   }
@@ -546,6 +548,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     }
   }
 
+  // TODO return argument list instead
   substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: ArgumentList, replacedParameters: ReplacedParameter[] = []): boolean {
     let changed = false;
     for (let argument of this) {
@@ -597,6 +600,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
 
 export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
+  // TODO return argument list instead
   abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void;
 
   fromExpression(expression: Expression, reportFn?: ReportConversionFn): void {
@@ -649,6 +653,7 @@ export class GenericObjectContents extends ObjectContents {
     this.arguments.traverse(fn);
   }
 
+  // TODO return object contents instead
   substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: GenericObjectContents, replacedParameters?: ReplacedParameter[]): boolean {
     return this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
   }
@@ -701,15 +706,15 @@ export abstract class Expression implements Comparable<Expression> {
 }
 
 export class IntegerExpression extends Expression {
-  value: BN;
+  constructor(public value: BN) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression {
     if (fn) {
       return fn(this);
     } else {
-      let result = new IntegerExpression;
-      result.value = this.value;
-      return result;
+      return new IntegerExpression(this.value);
     }
   }
 
@@ -720,15 +725,15 @@ export class IntegerExpression extends Expression {
 }
 
 export class StringExpression extends Expression {
-  value: string;
+  constructor(public value: string) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     if (fn) {
       return fn(this);
     } else {
-      let result = new StringExpression;
-      result.value = this.value;
-      return result;
+      return new StringExpression(this.value);
     }
   }
 
@@ -739,15 +744,17 @@ export class StringExpression extends Expression {
 }
 
 export class VariableRefExpression extends Expression {
-  variable: Parameter;
+  constructor(public variable: Parameter) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new VariableRefExpression;
     let changed = false;
-    result.variable = this.variable.findReplacement(replacedParameters);
-    if (result.variable !== this.variable) {
+    let variable = this.variable.findReplacement(replacedParameters);
+    if (variable !== this.variable) {
       changed = true;
     }
+    let result = new VariableRefExpression(variable);
     return this.getSubstitutionResult(fn, result, changed);
   }
 

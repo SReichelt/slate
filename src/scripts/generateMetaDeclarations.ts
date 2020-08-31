@@ -300,12 +300,10 @@ class MetaDeclarationGenerator {
         outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
       } else if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof FmtMeta.MetaRefExpression_Int) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.IntegerExpression;\n`;
-          outFileStr += `${indent}${variableName}.value = ${source};\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.IntegerExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_String) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression;\n`;
-          outFileStr += `${indent}${variableName}.value = ${source};\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
           outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;

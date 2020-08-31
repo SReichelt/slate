@@ -23,19 +23,18 @@ interface StartPageProps {
   onDocLinkClicked: OnDocLinkClicked;
 }
 
-function fillPathItem(names: string[], pathItem: Fmt.NamedPathItem): void {
-  pathItem.name = names.pop()!;
+function getParentPath(names: string[]): Fmt.PathItem | undefined {
   if (names.length) {
-    let parentPath = new Fmt.NamedPathItem;
-    fillPathItem(names, parentPath);
-    pathItem.parentPath = parentPath;
+    let name = names.pop()!;
+    return new Fmt.NamedPathItem(name, getParentPath(names));
+  } else {
+    return undefined;
   }
 }
 
 function buildExamplePath(names: string[]): Fmt.Path {
-  let result = new Fmt.Path;
-  fillPathItem(names, result);
-  return result;
+  let name = names.pop()!;
+  return new Fmt.Path(name, undefined, getParentPath(names));
 }
 
 function buildExample(names: string[]): Fmt.DefinitionRefExpression {

@@ -762,8 +762,7 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this.param, undefined, false);
-    let dimensionExpr = new Fmt.IntegerExpression;
-    dimensionExpr.value = this.dimension;
+    let dimensionExpr = new Fmt.IntegerExpression(this.dimension);
     argumentList.add(dimensionExpr, undefined, false);
     argumentList.add(this.item, undefined, false);
     if (this.separator !== undefined) {

@@ -177,8 +177,7 @@ export class HLMUtils extends GenericUtils {
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
         arg.value = binderArg.toExpression(false);
       } else {
-        let variableRefExpression = new Fmt.VariableRefExpression;
-        variableRefExpression.variable = param;
+        let variableRefExpression = new Fmt.VariableRefExpression(param);
         let expression = addIndices ? addIndices(variableRefExpression) : variableRefExpression;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
@@ -206,6 +205,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
+  // TODO return argument list instead
   getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): void {
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
@@ -244,9 +244,7 @@ export class HLMUtils extends GenericUtils {
       result = constructorContents.rewrite.value;
       result = this.substitutePath(result, constructionPath, [constructionDefinition]);
     } else {
-      let resultPath = new Fmt.Path;
-      resultPath.parentPath = constructionPath;
-      resultPath.name = constructorPath.name;
+      let resultPath = new Fmt.Path(constructorPath.name, undefined, constructionPath);
       let context = new SubstitutionContext;
       this.addTargetPathSubstitution(constructionPath.parentPath, context);
       this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
@@ -518,9 +516,7 @@ export class HLMUtils extends GenericUtils {
       if (variableRefExpression) {
         return variableRefExpression;
       } else {
-        let newVariableRefExpression = new Fmt.VariableRefExpression;
-        newVariableRefExpression.variable = param;
-        return newVariableRefExpression;
+        return new Fmt.VariableRefExpression(param);
       }
     };
     let type = param.type;
@@ -1796,8 +1792,7 @@ export class HLMUtils extends GenericUtils {
       paramType._set = formula.subset;
       let param = this.createParameter(paramType, 'x');
       result.parameters.push(param);
-      let variableRef = new Fmt.VariableRefExpression;
-      variableRef.variable = param;
+      let variableRef = new Fmt.VariableRefExpression(param);
       let resultFormula = new FmtHLM.MetaRefExpression_in;
       resultFormula.element = variableRef;
       resultFormula._set = formula.superset;
@@ -1846,10 +1841,8 @@ export class HLMUtils extends GenericUtils {
       for (let param of formula.parameters) {
         if (param.type instanceof FmtHLM.MetaRefExpression_Element) {
           let equality = new FmtHLM.MetaRefExpression_equals;
-          let originalVariableRef = new Fmt.VariableRefExpression;
-          originalVariableRef.variable = param;
-          let substitutedVariableRef = new Fmt.VariableRefExpression;
-          substitutedVariableRef.variable = param.findReplacement(replacedParameters);
+          let originalVariableRef = new Fmt.VariableRefExpression(param);
+          let substitutedVariableRef = new Fmt.VariableRefExpression(param.findReplacement(replacedParameters));
           equality.terms = [substitutedVariableRef, originalVariableRef];
           equalities.push(equality);
         }

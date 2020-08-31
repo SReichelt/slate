@@ -496,12 +496,9 @@ export class HLMDefinitionChecker {
   private checkRewriteDefinition(innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_RewriteDefinition, context: HLMCheckerContext): void {
     this.checkElementTerm(rewriteDefinition.value, context);
     let substitutionContext = new HLMSubstitutionContext;
-    let constructionPath = new Fmt.Path;
-    constructionPath.name = this.definition.name;
+    let constructionPath = new Fmt.Path(this.definition.name);
     this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
-    let constructorPath = new Fmt.Path;
-    constructorPath.parentPath = constructionPath;
-    constructorPath.name = innerDefinition.name;
+    let constructorPath = new Fmt.Path(innerDefinition.name, undefined, constructionPath);
     this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters, substitutionContext);
     let constructorExpression = new Fmt.DefinitionRefExpression;
     constructorExpression.path = constructorPath;
@@ -517,8 +514,7 @@ export class HLMDefinitionChecker {
     }
     this.checkElementTerm(embedding.target, innerContext);
     let substitutionContext = new HLMSubstitutionContext;
-    let constructionPath = new Fmt.Path;
-    constructionPath.name = this.definition.name;
+    let constructionPath = new Fmt.Path(this.definition.name);
     this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
     let constructionExpression = new Fmt.DefinitionRefExpression;
     constructionExpression.path = constructionPath;
@@ -554,10 +550,8 @@ export class HLMDefinitionChecker {
     let constraint = new FmtHLM.MetaRefExpression_equals;
     constraint.terms = [leftTerm, rightTerm];
     this.addProofConstraint(parameters, constraint);
-    let leftVariableRef = new Fmt.VariableRefExpression;
-    leftVariableRef.variable = leftParam;
-    let rightVariableRef = new Fmt.VariableRefExpression;
-    rightVariableRef.variable = rightParam;
+    let leftVariableRef = new Fmt.VariableRefExpression(leftParam);
+    let rightVariableRef = new Fmt.VariableRefExpression(rightParam);
     let goal = new FmtHLM.MetaRefExpression_equals;
     goal.terms = [leftVariableRef, rightVariableRef];
     this.checkProof(embedding, embedding.wellDefinednessProof, parameters, goal, context);
@@ -1220,9 +1214,7 @@ export class HLMDefinitionChecker {
     this.checkStructuralCaseTerm(term, construction, replaceCases, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
       let constructionPath = construction.path;
-      let constructionPathWithoutArguments = new Fmt.Path;
-      constructionPathWithoutArguments.name = constructionPath.name;
-      constructionPathWithoutArguments.parentPath = constructionPath.parentPath;
+      let constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
       let index = 0;
       let checkConstructor = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
         if (index < cases.length) {
@@ -1284,16 +1276,12 @@ export class HLMDefinitionChecker {
       autoFillFn = (placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn) => {
         let filledConstruction = placeholderValues.get(construction);
         if (filledConstruction instanceof Fmt.DefinitionRefExpression) {
-          let constructionPathWithoutArguments = new Fmt.Path;
-          constructionPathWithoutArguments.name = filledConstruction.path.name;
-          constructionPathWithoutArguments.parentPath = filledConstruction.path.parentPath;
+          let constructionPathWithoutArguments = new Fmt.Path(filledConstruction.path.name, undefined, filledConstruction.path.parentPath);
           let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
           let newParameterLists: Fmt.ParameterList[] = [];
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
             let newCase = new FmtHLM.ObjectContents_StructuralCase;
-            let constructorPath = new Fmt.Path;
-            constructorPath.name = constructorDefinition.name;
-            constructorPath.parentPath = constructionPathWithoutArguments;
+            let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
             let constructorExpression = new Fmt.DefinitionRefExpression;
             constructorExpression.path = constructorPath;
             newCase._constructor = constructorExpression;
@@ -1339,9 +1327,7 @@ export class HLMDefinitionChecker {
   }
 
   private forAllConstructors(construction: Fmt.DefinitionRefExpression, callbackFn: (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, contents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => void): CachedPromise<void> {
-    let constructionPathWithoutArguments = new Fmt.Path;
-    constructionPathWithoutArguments.name = construction.path.name;
-    constructionPathWithoutArguments.parentPath = construction.path.parentPath;
+    let constructionPathWithoutArguments = new Fmt.Path(construction.path.name, undefined, construction.path.parentPath);
     return this.utils.getOuterDefinition(construction)
       .then((constructionDefinition: Fmt.Definition) => {
         if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {

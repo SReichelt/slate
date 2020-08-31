@@ -25,8 +25,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let logicExpr = new Fmt.StringExpression;
-    logicExpr.value = this.logic;
+    let logicExpr = new Fmt.StringExpression(this.logic);
     argumentList.add(logicExpr, outputAllNames ? 'logic' : undefined, false);
     let itemsExpr = new Fmt.ArrayExpression;
     itemsExpr.items = [];
@@ -217,13 +216,11 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     argumentList.add(this.ref, undefined, false);
     if (this.type !== undefined) {
-      let typeExpr = new Fmt.StringExpression;
-      typeExpr.value = this.type;
+      let typeExpr = new Fmt.StringExpression(this.type);
       argumentList.add(typeExpr, 'type', true);
     }
     if (this.title !== undefined) {
-      let titleExpr = new Fmt.StringExpression;
-      titleExpr.value = this.title;
+      let titleExpr = new Fmt.StringExpression(this.title);
       argumentList.add(titleExpr, 'title', true);
     }
   }
@@ -280,8 +277,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     argumentList.add(this.ref, undefined, false);
-    let titleExpr = new Fmt.StringExpression;
-    titleExpr.value = this.title;
+    let titleExpr = new Fmt.StringExpression(this.title);
     argumentList.add(titleExpr, undefined, false);
   }
 

@@ -147,16 +147,16 @@ export class Reader {
 
   readPartialFile(): Fmt.File {
     let fileStart = this.markStart();
-    let file = new Fmt.File;
     this.readChar('%');
-    file.metaModelPath = this.readPath(undefined);
+    let metaModelPath = this.readPath(undefined);
     this.readChar('%');
     try {
-      this.metaModel = this.getMetaModel(file.metaModelPath);
+      this.metaModel = this.getMetaModel(metaModelPath);
     } catch (error) {
       this.error(error.message, this.markEnd(fileStart));
-      this.metaModel = new Meta.DummyMetaModel(file.metaModelPath.name);
+      this.metaModel = new Meta.DummyMetaModel(metaModelPath.name);
     }
+    let file = new Fmt.File(metaModelPath);
     try {
       let context = this.metaModel.getRootContext();
       this.readDefinitions(file.definitions, this.metaModel.definitionTypes, context);
@@ -175,8 +175,7 @@ export class Reader {
       this.skipWhitespace(false);
       let itemStart = this.markStart();
       if (this.tryReadChar('.')) {
-        let item = this.tryReadChar('.') ? new Fmt.ParentPathItem : new Fmt.IdentityPathItem;
-        item.parentPath = parentPath;
+        let item: Fmt.PathItem = this.tryReadChar('.') ? new Fmt.ParentPathItem(parentPath) : new Fmt.IdentityPathItem(parentPath);
         let itemRange = this.markEnd(itemStart);
         this.markEnd(pathStart, item, context, undefined, itemRange);
         parentPath = item;
@@ -185,9 +184,7 @@ export class Reader {
         let identifier = this.readIdentifier();
         this.skipWhitespace(false);
         if (this.peekChar() === '/') {
-          let item = new Fmt.NamedPathItem;
-          item.name = identifier;
-          item.parentPath = parentPath;
+          let item: Fmt.PathItem = new Fmt.NamedPathItem(identifier, parentPath);
           let itemRange = this.markEnd(itemStart);
           this.markEnd(pathStart, item, context, undefined, itemRange);
           parentPath = item;
@@ -196,8 +193,7 @@ export class Reader {
           for (;;) {
             let nameRange = this.markEnd(itemStart);
             let linkRange = this.markEnd(linkStart);
-            let path = new Fmt.Path;
-            path.name = identifier;
+            let path = new Fmt.Path(identifier);
             if (context) {
               this.readOptionalArgumentList(path.arguments, context);
             }
@@ -289,7 +285,7 @@ export class Reader {
       this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
     }
     if (contents) {
-      let args = new Fmt.ArgumentList;
+      let args: Fmt.ArgumentList = new Fmt.ArgumentList;
       let argumentsStart = this.markStart();
       this.readArguments(args, contentsContext);
       try {
@@ -516,7 +512,7 @@ export class Reader {
         expression = genericExpression;
       }
       context = new Ctx.ParentInfoContext(expression, context);
-      let args = new Fmt.ArgumentList;
+      let args: Fmt.ArgumentList = new Fmt.ArgumentList;
       this.readOptionalArgumentList(args, context);
       try {
         let reportFn = this.rangeHandler?.reportConversion?.bind(this.rangeHandler);
@@ -562,15 +558,11 @@ export class Reader {
       } else {
         let str = this.tryReadString('\'');
         if (str !== undefined) {
-          let stringExpression = new Fmt.StringExpression;
-          stringExpression.value = str;
-          expression = stringExpression;
+          expression = new Fmt.StringExpression(str);
         } else {
           let num = this.tryReadInteger();
           if (num !== undefined) {
-            let integerExpression = new Fmt.IntegerExpression;
-            integerExpression.value = num;
-            expression = integerExpression;
+            expression = new Fmt.IntegerExpression(num);
           }
         }
       }
@@ -583,16 +575,14 @@ export class Reader {
   }
 
   private readExpressionAfterIdentifier(identifier: string, identifierRange: Range, context: Ctx.Context): [Fmt.Expression, Fmt.ParameterList[] | undefined] {
-    let expression = new Fmt.VariableRefExpression;
-    let indexParameterLists: Fmt.ParameterList[] | undefined = undefined;
     try {
       let variableInfo = context.getVariable(identifier);
-      expression.variable = variableInfo.parameter;
-      indexParameterLists = variableInfo.indexParameterLists;
+      let expression = new Fmt.VariableRefExpression(variableInfo.parameter);
+      return [expression, variableInfo.indexParameterLists];
     } catch (error) {
       this.error(error.message, identifierRange);
+      return [new EmptyExpression, undefined];
     }
-    return [expression, indexParameterLists];
   }
 
   private readExpressionIndices(expression: Fmt.Expression, indexParameterLists: Fmt.ParameterList[] | undefined, expressionStart: Location, context: Ctx.Context): Fmt.Expression {

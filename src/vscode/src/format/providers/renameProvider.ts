@@ -65,8 +65,7 @@ function addPathItemsAtStart(pathItem: Fmt.PathItem, names: string[]): boolean {
     if (pathItem instanceof Fmt.ParentPathItem) {
         return false;
     }
-    let newItem = new Fmt.NamedPathItem;
-    newItem.name = nameToAdd;
+    let newItem = new Fmt.NamedPathItem(nameToAdd);
     pathItem.parentPath = newItem;
     return addPathItemsAtStart(newItem, names);
 }
@@ -187,9 +186,7 @@ export class SlateRenameProvider implements vscode.RenameProvider {
                                 if (referencedDefinition) {
                                     let oldTargetUri = referencedDefinition.parsedDocument.uri;
                                     let newTargetUri = getNewUri(renamedUris, oldTargetUri);
-                                    let oldPath = new Fmt.Path;
-                                    oldPath.name = rangeInfo.object.name;
-                                    oldPath.parentPath = rangeInfo.object.parentPath?.clone();
+                                    let oldPath = new Fmt.Path(rangeInfo.object.name, undefined, rangeInfo.object.parentPath?.clone());
                                     let newPath = oldPath.clone() as Fmt.Path;
                                     if (newTargetUri) {
                                         changePathTarget(newPath, oldOriginUri, oldTargetUri, newTargetUri);

@@ -4327,13 +4327,11 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this._from !== undefined) {
-      let fromExpr = new Fmt.IntegerExpression;
-      fromExpr.value = this._from;
+      let fromExpr = new Fmt.IntegerExpression(this._from);
       argumentList.add(fromExpr, 'from', true);
     }
     if (this._to !== undefined) {
-      let toExpr = new Fmt.IntegerExpression;
-      toExpr.value = this._to;
+      let toExpr = new Fmt.IntegerExpression(this._to);
       argumentList.add(toExpr, 'to', true);
     }
     if (this.parameters !== undefined) {
@@ -4556,8 +4554,7 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.side !== undefined) {
-      let sideExpr = new Fmt.IntegerExpression;
-      sideExpr.value = this.side;
+      let sideExpr = new Fmt.IntegerExpression(this.side);
       argumentList.add(sideExpr, 'side', true);
     }
     argumentList.add(this.result, 'result', false);
@@ -4626,8 +4623,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.side !== undefined) {
-      let sideExpr = new Fmt.IntegerExpression;
-      sideExpr.value = this.side;
+      let sideExpr = new Fmt.IntegerExpression(this.side);
       argumentList.add(sideExpr, 'side', true);
     }
     let caseProofsExpr = new Fmt.ArrayExpression;
@@ -4804,8 +4800,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     let sourceExpr = new Fmt.ParameterExpression;
     sourceExpr.parameters.push(this.source);
     argumentList.add(sourceExpr, undefined, false);
-    let sourceSideExpr = new Fmt.IntegerExpression;
-    sourceSideExpr.value = this.sourceSide;
+    let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
     argumentList.add(sourceSideExpr, undefined, false);
     argumentList.add(this.result, undefined, false);
   }
@@ -4990,8 +4985,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.side !== undefined) {
-      let sideExpr = new Fmt.IntegerExpression;
-      sideExpr.value = this.side;
+      let sideExpr = new Fmt.IntegerExpression(this.side);
       argumentList.add(sideExpr, 'side', true);
     }
     if (this.proof !== undefined) {
@@ -5292,8 +5286,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.side !== undefined) {
-      let sideExpr = new Fmt.IntegerExpression;
-      sideExpr.value = this.side;
+      let sideExpr = new Fmt.IntegerExpression(this.side);
       argumentList.add(sideExpr, 'side', true);
     }
     let caseProofsExpr = new Fmt.ArrayExpression;

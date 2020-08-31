@@ -842,8 +842,7 @@ class App extends React.Component<AppProps, AppState> {
         let definitionType = dialog.definitionType;
         return libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
-            let localPath = new Fmt.Path;
-            localPath.name = result.name;
+            let localPath = new Fmt.Path(result.name);
             let absolutePath = libraryDataProvider.getAbsolutePath(localPath);
             let itemInfoPromise = libraryDataProvider.getLocalItemInfo(result.name);
             this.navigate({

@@ -103,10 +103,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     this.logic = options.logic;
     this.fileAccessor = options.fileAccessor;
     if (parent) {
-      let path = new Fmt.NamedPathItem;
-      path.name = childName;
-      path.parentPath = parent.path;
-      this.path = path;
+      this.path = new Fmt.NamedPathItem(childName, parent.path);
       this.uri = parent.uri + encodeURI(childName) + '/';
       this.externalURI = parent.externalURI + encodeURI(childName) + '/';
     } else {
@@ -169,16 +166,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   getAbsolutePath(path: Fmt.Path): Fmt.Path {
-    let result = new Fmt.Path;
-    result.name = path.name;
-    result.arguments = path.arguments;
+    let parentPath: Fmt.PathItem | undefined;
     if (path.parentPath instanceof Fmt.Path) {
-      result.parentPath = this.getAbsolutePath(path.parentPath);
+      parentPath = this.getAbsolutePath(path.parentPath);
     } else {
       let parentProvider = this.getProviderForSection(path.parentPath);
-      result.parentPath = parentProvider.path;
+      parentPath = parentProvider.path;
     }
-    return result;
+    return new Fmt.Path(path.name, path.arguments, parentPath);
   }
 
   getRelativePath(absolutePath: Fmt.Path): Fmt.Path {
@@ -233,15 +228,10 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (modified) {
       let result: Fmt.PathItem | undefined = undefined;
       for (let i = 0; i < canonicalPathInfo.parentPathCount; i++) {
-        let parentPathItem = new Fmt.ParentPathItem;
-        parentPathItem.parentPath = result;
-        result = parentPathItem;
+        result = new Fmt.ParentPathItem(result);
       }
       for (let name of canonicalPathInfo.names) {
-        let namedPathItem = new Fmt.NamedPathItem;
-        namedPathItem.name = name;
-        namedPathItem.parentPath = result;
-        result = namedPathItem;
+        result = new Fmt.NamedPathItem(name, result);
       }
       return result;
     }
@@ -489,8 +479,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
       let newSubsectionRef = new Fmt.DefinitionRefExpression;
-      newSubsectionRef.path = new Fmt.Path;
-      newSubsectionRef.path.name = name;
+      newSubsectionRef.path = new Fmt.Path(name);
       let newSubsection = new FmtLibrary.MetaRefExpression_subsection;
       newSubsection.ref = newSubsectionRef;
       newSubsection.title = title || '';
@@ -518,8 +507,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private createLocalSection(metaModelPath: Fmt.Path): LibraryDefinition {
-    let file = new Fmt.File;
-    file.metaModelPath = metaModelPath;
+    let file = new Fmt.File(metaModelPath);
     let definition = new Fmt.Definition;
     definition.name = this.childName;
     definition.type = new FmtLibrary.MetaRefExpression_Section;
@@ -537,8 +525,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (prefetchContents) {
       let result = resultPromise.getImmediateResult();
       if (result && result.state === LibraryDefinitionState.Preloaded) {
-        let path = new Fmt.Path;
-        path.name = name;
+        let path = new Fmt.Path(name);
         this.prefetchQueue.push({
           path: path,
           isSubsection: false
@@ -600,8 +587,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       .then((sectionDefinition: LibraryDefinition) => {
         let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
         let newItemRef = new Fmt.DefinitionRefExpression;
-        newItemRef.path = new Fmt.Path;
-        newItemRef.path.name = name;
+        newItemRef.path = new Fmt.Path(name);
         let newItem = new FmtLibrary.MetaRefExpression_item;
         newItem.ref = newItemRef;
         newItem.title = title;
@@ -618,9 +604,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         this.editedDefinitions.set(localSectionFileName, sectionDefinition);
         this.localDefinitionModified(localSectionFileName, sectionDefinition);
         this.sectionChangeCounter++;
-        let metaModelPath = new Fmt.Path;
-        metaModelPath.name = this.logic.name;
-        metaModelPath.parentPath = sectionDefinition.file.metaModelPath.parentPath;
+        let metaModelPath = new Fmt.Path(this.logic.name, undefined, sectionDefinition.file.metaModelPath.parentPath);
         this.editedItemInfos.set(name, {
           itemNumber: [...this.itemNumber!, position + 1],
           type: type,
@@ -631,8 +615,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private createLocalItem(name: string, definitionType: Logic.LogicDefinitionTypeDescription, metaModelPath: Fmt.Path): LibraryDefinition {
-    let file = new Fmt.File;
-    file.metaModelPath = metaModelPath;
+    let file = new Fmt.File(metaModelPath);
     let definition = Logic.createDefinition(definitionType, name);
     let references = new Fmt.DocumentationItem;
     references.kind = 'references';
@@ -989,10 +972,8 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       let slashPos = uri.indexOf('/');
       while (slashPos >= 0) {
         if (slashPos > 0) {
-          let item = new Fmt.NamedPathItem;
-          item.name = decodeURI(uri.substring(0, slashPos));
-          item.parentPath = path;
-          path = item;
+          let name = decodeURI(uri.substring(0, slashPos));
+          path = new Fmt.NamedPathItem(name, path);
         }
         uri = uri.substring(slashPos + 1);
         slashPos = uri.indexOf('/');
@@ -1005,10 +986,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
         if (name === indexFileName && !allowIndex) {
           return undefined;
         }
-        let result = new Fmt.Path;
-        result.name = name;
-        result.parentPath = path;
-        return result;
+        return new Fmt.Path(name, undefined, path);
       }
     }
     return undefined;
@@ -1024,19 +1002,13 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private getLogicMetaModelPath(prefix?: Fmt.PathItem): Fmt.Path {
     if (this.parent) {
-      let parentPrefix = new Fmt.ParentPathItem;
-      parentPrefix.parentPath = prefix;
+      let parentPrefix = new Fmt.ParentPathItem(prefix);
       return this.parent.getLogicMetaModelPath(parentPrefix);
     } else {
-      let path = new Fmt.Path;
-      path.name = this.logic.name;
-      let parentPath = new Fmt.NamedPathItem;
-      parentPath.name = 'logics';
-      parentPath.parentPath = new Fmt.ParentPathItem;
-      parentPath.parentPath.parentPath = new Fmt.ParentPathItem;
-      parentPath.parentPath.parentPath.parentPath = prefix;
-      path.parentPath = parentPath;
-      return path;
+      let parentParentParentPath = new Fmt.ParentPathItem(prefix);
+      let parentParentPath = new Fmt.ParentPathItem(parentParentParentPath);
+      let parentPath = new Fmt.NamedPathItem('logics', parentParentPath);
+      return new Fmt.Path(this.logic.name, undefined, parentPath);
     }
   }
 }

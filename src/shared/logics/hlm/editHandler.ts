@@ -626,9 +626,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getVariableRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, variableInfo: Ctx.VariableInfo, checkType: boolean): CachedPromise<Fmt.Expression[]> {
-    let variableRefExpression = new Fmt.VariableRefExpression;
-    variableRefExpression.variable = variableInfo.parameter;
-    let expression: Fmt.Expression = variableRefExpression;
+    let expression: Fmt.Expression = new Fmt.VariableRefExpression(variableInfo.parameter);
     if (variableInfo.indexParameterLists) {
       for (let indexParameterList of variableInfo.indexParameterLists) {
         let indexedExpression = new Fmt.IndexedExpression;
@@ -719,8 +717,7 @@ export class HLMEditHandler extends GenericEditHandler {
         parentPaths = [path.parentPath];
       }
       for (let parentPath of parentPaths) {
-        let resultPath = new Fmt.Path;
-        resultPath.name = path.name;
+        let resultPath = new Fmt.Path(path.name);
         this.utils.fillDefaultPlaceholderArguments(definition.parameters, resultPath.arguments, parentPath);
         resultPath.parentPath = parentPath;
         if (notationAlternative) {
@@ -1015,11 +1012,9 @@ export class HLMEditHandler extends GenericEditHandler {
     insertButton.styleClasses = ['mini-placeholder'];
     let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     semanticLink.onMenuOpened = () => {
-      let firstObjectExpression = new Fmt.VariableRefExpression;
-      firstObjectExpression.variable = firstObjectParam;
+      let firstObjectExpression = new Fmt.VariableRefExpression(firstObjectParam);
       let getPropertyFormulas = (formula: Fmt.Expression) => objectParams.map((objectParam: Fmt.Parameter) => {
-        let objectExpression = new Fmt.VariableRefExpression;
-        objectExpression.variable = objectParam;
+        let objectExpression = new Fmt.VariableRefExpression(objectParam);
         return FmtUtils.substituteExpression(formula, firstObjectExpression, objectExpression);
       });
       let onInsertProperty = (formula: Fmt.Expression | undefined) => {

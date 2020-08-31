@@ -12,7 +12,7 @@ export class NumberMacro implements HLMMacro.HLMMacro {
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): NumberMacroInstance {
     let valueParam = definition.parameters.getParameter('value');
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
-    let references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
+    let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
     let naturalNumbers = references.getValue('Natural numbers');
     return new NumberMacroInstance(definition, valueParam, naturalNumbers);
   }
@@ -50,17 +50,18 @@ class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
   unfold(): CachedPromise<Fmt.Expression[]> {
     return this.utils.getDefinition(this.naturalNumbersRef.path).then((definition: Fmt.Definition) => {
       if (definition.innerDefinitions.length === 2 && definition.innerDefinitions[0].parameters.length === 0 && definition.innerDefinitions[1].parameters.length === 1) {
-        let path = new Fmt.Path;
-        path.parentPath = this.naturalNumbersRef.path;
+        let name: string;
+        let args = new Fmt.ArgumentList;
         if (this.value.isZero()) {
-          path.name = definition.innerDefinitions[0].name;
+          name = definition.innerDefinitions[0].name;
         } else {
           let predecessor = this.expression.clone() as Fmt.DefinitionRefExpression;
           let predecessorValue = predecessor.path.arguments.getValue(this.valueParam.name) as Fmt.IntegerExpression;
           predecessorValue.value = this.value.subn(1);
-          path.name = definition.innerDefinitions[1].name;
-          path.arguments.add(predecessor, definition.innerDefinitions[1].parameters[0].name);
+          name = definition.innerDefinitions[1].name;
+          args.add(predecessor, definition.innerDefinitions[1].parameters[0].name);
         }
+        let path = new Fmt.Path(name, args, this.naturalNumbersRef.path);
         let result = new Fmt.DefinitionRefExpression;
         result.path = path;
         return [result];

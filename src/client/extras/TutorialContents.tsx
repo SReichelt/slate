@@ -3118,8 +3118,7 @@ class TutorialStates {
       let body = this.createVariableRefExpression(definition, 'g');
       let sup = this.createVariableRefExpression(definition, 'n');
       let preSub = this.createVariableRefExpression(definition, 'f');
-      let preSup = new Fmt.StringExpression;
-      preSup.value = 'my';
+      let preSup = new Fmt.StringExpression('my');
       contents.notation = this.createDefinitionRefExpression(['SubSup'], [[
         this.createRawArg('body', body),
         this.createRawArg('sup', sup),
@@ -5213,9 +5212,8 @@ class TutorialStates {
   }
 
   private createVariableRefExpression(definition: Fmt.Definition, name: string): Fmt.VariableRefExpression {
-    let result = new Fmt.VariableRefExpression;
-    result.variable = definition.parameters.getParameter(name);
-    return result;
+    let variable = definition.parameters.getParameter(name);
+    return new Fmt.VariableRefExpression(variable);
   }
 
   private createDefinitionRefExpression(path: string[], args: Fmt.Argument[][]): Fmt.DefinitionRefExpression {
@@ -5228,17 +5226,14 @@ class TutorialStates {
       } else if (pathComponent === '..') {
         pathItem = new Fmt.ParentPathItem;
       } else {
-        let namedPathItem = new Fmt.NamedPathItem;
-        namedPathItem.name = pathComponent;
-        pathItem = namedPathItem;
+        pathItem = new Fmt.NamedPathItem(pathComponent);
       }
       pathItem.parentPath = parentPath;
       parentPath = pathItem;
     }
     for (let argIndex = 0; argIndex < args.length; argIndex++) {
       let pathIndex = path.length - args.length + argIndex;
-      let pathItem = new Fmt.Path;
-      pathItem.name = path[pathIndex];
+      let pathItem = new Fmt.Path(path[pathIndex]);
       pathItem.arguments.push(...args[argIndex]);
       pathItem.parentPath = parentPath;
       parentPath = pathItem;
