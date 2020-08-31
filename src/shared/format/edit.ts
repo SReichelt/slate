@@ -78,7 +78,7 @@ export class EditAnalysis {
   }
 
   analyzeArgumentList(args: Fmt.ArgumentList, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
-    let previousArgs: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+    let previousArgs = new Fmt.ArgumentList;
     for (let index = 0; index < args.length; index++) {
       let arg = args[index];
       let onRemove = () => args.splice(index, 1);
@@ -108,7 +108,7 @@ export class EditAnalysis {
     if (contents instanceof Fmt.GenericObjectContents) {
       this.analyzeArgumentList(contents.arguments, undefined, context);
     } else {
-      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      let args = new Fmt.ArgumentList;
       contents.toArgumentList(args, true);
       let onApply = () => contents.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
@@ -145,7 +145,7 @@ export class EditAnalysis {
     if (expression instanceof Fmt.GenericMetaRefExpression) {
       this.analyzeArgumentList(expression.arguments, undefined, context);
     } else {
-      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      let args = new Fmt.ArgumentList;
       expression.toArgumentList(args);
       let onApply = () => expression.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);

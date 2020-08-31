@@ -289,7 +289,7 @@ export class Reader {
       this.readDefinitions(definition.innerDefinitions, metaInnerDefinitionTypes, contentsContext);
     }
     if (contents) {
-      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      let args = new Fmt.ArgumentList;
       let argumentsStart = this.markStart();
       this.readArguments(args, contentsContext);
       try {
@@ -516,7 +516,7 @@ export class Reader {
         expression = genericExpression;
       }
       context = new Ctx.ParentInfoContext(expression, context);
-      let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+      let args = new Fmt.ArgumentList;
       this.readOptionalArgumentList(args, context);
       try {
         let reportFn = this.rangeHandler?.reportConversion?.bind(this.rangeHandler);
@@ -604,7 +604,7 @@ export class Reader {
       if (indexParameterLists && indexIndex < indexParameterLists.length) {
         indexedExpression.parameters = indexParameterLists[indexIndex];
       }
-      indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+      indexedExpression.arguments = new Fmt.ArgumentList;
       this.readArguments(indexedExpression.arguments!, context);
       this.readChar(']');
       this.markEnd(expressionStart, indexedExpression, context);

@@ -286,7 +286,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       }
     }
     if (this.members) {
-      result.members = Object.create(Fmt.ParameterList.prototype);
+      result.members = new Fmt.ParameterList;
       if (this.members.substituteExpression(fn, result.members!, replacedParameters)) {
         changed = true;
       }

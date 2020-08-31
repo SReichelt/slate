@@ -2372,7 +2372,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (hasSubsetEmbedding) {
       let row: Notation.RenderedExpression[] = [];
       row.push(new Notation.TextExpression('For '));
-      let replacementParams: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let replacementParams = new Fmt.ParameterList;
       let hadParameters = false;
       for (let param of definition.parameters) {
         let type = param.type;
@@ -2735,7 +2735,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
-        let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
+        let newGoal = new FmtHLM.MetaRefExpression_or;
         if (context.goal instanceof FmtHLM.MetaRefExpression_or && context.goal.formulas) {
           let index = this.utils.translateIndex(type.proof._to);
           if (index !== undefined && index >= 0 && index < context.goal.formulas.length) {
@@ -2775,7 +2775,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             if (structuralCase.parameters) {
               if (subProof.parameters) {
                 let originalParameters = subProof.parameters.slice();
-                subProof.parameters = Object.create(Fmt.ParameterList.prototype);
+                subProof.parameters = new Fmt.ParameterList;
                 subProof.parameters!.push(...structuralCase.parameters, ...originalParameters);
               } else {
                 subProof.parameters = structuralCase.parameters;

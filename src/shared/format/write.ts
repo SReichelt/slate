@@ -131,7 +131,7 @@ export class Writer {
       this.write('{');
       let args: Fmt.ArgumentList | undefined = undefined;
       if (definition.contents) {
-        args = Object.create(Fmt.ArgumentList.prototype);
+        args = new Fmt.ArgumentList;
         definition.contents.toArgumentList(args!, true);
       }
       if (definition.innerDefinitions.length || (args && args.length)) {
@@ -395,7 +395,7 @@ export class Writer {
           this.write('%');
           this.writeIdentifier(expression.getName(), expression, true);
         });
-        let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+        let args = new Fmt.ArgumentList;
         expression.toArgumentList(args);
         this.writeOptionalArgumentList(args, indent);
       } else if (expression instanceof Fmt.DefinitionRefExpression) {

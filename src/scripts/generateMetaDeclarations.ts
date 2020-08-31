@@ -135,7 +135,7 @@ class MetaDeclarationGenerator {
     if (list) {
       let listType = new Fmt.IndexedExpression;
       listType.body = type;
-      listType.arguments = Object.create(Fmt.ArgumentList.prototype);
+      listType.arguments = new Fmt.ArgumentList;
       return listType;
     } else {
       return type;
@@ -401,11 +401,7 @@ class MetaDeclarationGenerator {
     } else {
       let contentType = this.getMemberContentType(type);
       if (contentType && (!contentType.startsWith('Fmt.') || contentType.endsWith('List'))) {
-        if (contentType.startsWith('Fmt.') && contentType.endsWith('List')) {
-          outFileStr += `${indent}${init} = Object.create(${contentType}.prototype);\n`;
-        } else {
-          outFileStr += `${indent}${init} = new ${contentType};\n`;
-        }
+        outFileStr += `${indent}${init} = new ${contentType};\n`;
         outFileStr += `${indent}if (${source}.substituteExpression(fn, ${subTarget}!, replacedParameters)) {\n`;
         outFileStr += `${indent}  changed = true;\n`;
         outFileStr += `${indent}}\n`;

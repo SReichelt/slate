@@ -1091,7 +1091,7 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_NotationAbbreviation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }

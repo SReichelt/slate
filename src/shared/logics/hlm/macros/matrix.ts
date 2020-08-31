@@ -15,10 +15,10 @@ export class MatrixMacro implements HLMMacro.HLMMacro {
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): MatrixMacroInstance {
     let itemsParam = definition.parameters.getParameter('items');
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
-    let variables: Fmt.ParameterList = contents.variables || Object.create(Fmt.ParameterList.prototype);
+    let variables: Fmt.ParameterList = contents.variables || new Fmt.ParameterList;
     let rows = variables.getParameter('rows');
     let columns = variables.getParameter('columns');
-    let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
+    let references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
     let matrices = references.getValue('Matrices');
     return new MatrixMacroInstance(definition, itemsParam, rows, columns, matrices);
   }

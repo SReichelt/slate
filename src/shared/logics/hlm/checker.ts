@@ -455,30 +455,30 @@ export class HLMDefinitionChecker {
       this.checkIsomorphicProperty(equalityDefinition.leftParameters, equalityDefinition.rightParameters, equalityDefinition.definition[0], context);
     }
     if (!isomorphic || equalityDefinition.reflexivityProof) {
-      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters);
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters, parameters);
       this.checkProof(equalityDefinition, equalityDefinition.reflexivityProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.symmetryProof) {
-      let parameters1: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters1 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters1);
-      let parameters2: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters2 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters2);
-      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters = new Fmt.ParameterList;
       parameters.push(...parameters1, ...parameters2);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition, equalityDefinition.symmetryProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.transitivityProof) {
-      let parameters1: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters1 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters1);
-      let parameters2: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters2 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters2);
-      let parameters3: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters3 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters3);
-      let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let parameters = new Fmt.ParameterList;
       parameters.push(...parameters1, ...parameters2, ...parameters3);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
@@ -549,7 +549,7 @@ export class HLMDefinitionChecker {
     let rightParam = leftParam.shallowClone();
     let leftTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, leftParam);
     let rightTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, rightParam);
-    let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    let parameters = new Fmt.ParameterList;
     parameters.push(leftParam, rightParam);
     let constraint = new FmtHLM.MetaRefExpression_equals;
     constraint.terms = [leftTerm, rightTerm];
@@ -582,7 +582,7 @@ export class HLMDefinitionChecker {
   private checkImplicitOperatorWellDefinednessProof(contents: FmtHLM.ObjectContents_ImplicitOperator, context: HLMCheckerContext): void {
     let param = contents.parameter.clone();
     let goal = new FmtHLM.MetaRefExpression_existsUnique;
-    goal.parameters = Object.create(Fmt.ParameterList.prototype);
+    goal.parameters = new Fmt.ParameterList;
     goal.parameters.push(param);
     goal.formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
     this.checkProof(contents, contents.wellDefinednessProof, undefined, goal, context);
@@ -989,7 +989,7 @@ export class HLMDefinitionChecker {
       for (let item of term.cases) {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
-        let exclusivityParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+        let exclusivityParameters = new Fmt.ParameterList;
         let exclusivityConstraint = new FmtHLM.MetaRefExpression_or;
         exclusivityConstraint.formulas = formulas.slice();
         this.addProofConstraint(exclusivityParameters, exclusivityConstraint);
@@ -1195,7 +1195,7 @@ export class HLMDefinitionChecker {
       caseContext = this.getParameterContext(constraintParam, caseContext);
       checkCase(structuralCase.value, caseContext);
       if ((getWellDefinednessProofGoal && constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
-        let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+        let clonedParameters = new Fmt.ParameterList;
         let replacedParameters: Fmt.ReplacedParameter[] = [];
         let clonedValue = structuralCase.value;
         if (structuralCase.parameters) {
@@ -1298,7 +1298,7 @@ export class HLMDefinitionChecker {
             constructorExpression.path = constructorPath;
             newCase._constructor = constructorExpression;
             if (substitutedParameters.length) {
-              let clonedParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+              let clonedParameters = new Fmt.ParameterList;
               substitutedParameters.clone(clonedParameters);
               newCase.parameters = clonedParameters;
               newParameterLists.push(clonedParameters);
@@ -1517,7 +1517,7 @@ export class HLMDefinitionChecker {
         } else if (toIndex < 0 || toIndex >= items.length) {
           this.error(proof, 'Invalid to index');
         } else {
-          let proofParameters: Fmt.ParameterList | undefined = Object.create(Fmt.ParameterList.prototype);
+          let proofParameters = new Fmt.ParameterList;
           let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters!);
           if (!proofParameters!.length) {
             proofParameters = undefined;
@@ -1607,7 +1607,7 @@ export class HLMDefinitionChecker {
               for (let previousResultCase of previousResultCases) {
                 if (index < caseProofs.length) {
                   let caseProof = caseProofs[index];
-                  let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+                  let parameters = new Fmt.ParameterList;
                   if (previousResultCase.parameters) {
                     parameters.push(...previousResultCase.parameters);
                   }
@@ -1746,7 +1746,7 @@ export class HLMDefinitionChecker {
       if (context.goal) {
         let proveByContradiction = type;
         let goalToNegate = context.goal;
-        let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
+        let newGoal = new FmtHLM.MetaRefExpression_or;
         if (goalToNegate instanceof FmtHLM.MetaRefExpression_or && goalToNegate.formulas && proveByContradiction.proof._to !== undefined) {
           let index = this.utils.translateIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
@@ -1758,7 +1758,7 @@ export class HLMDefinitionChecker {
           }
         }
         let check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
-          let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+          let parameters = new Fmt.ParameterList;
           this.addProofConstraint(parameters, negatedGoal);
           this.checkProof(step, proveByContradiction.proof, parameters, newGoal, context);
         });
@@ -1833,7 +1833,7 @@ export class HLMDefinitionChecker {
           subProof.fromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
           if (subProof.parameters) {
-            parameters = Object.create(Fmt.ParameterList.prototype);
+            parameters = new Fmt.ParameterList;
             parameters!.push(constraintParam);
           }
           let caseGoal = this.utils.getInductionProofGoal(goal, proveByInduction.term, structuralCaseTerm);
@@ -1845,7 +1845,7 @@ export class HLMDefinitionChecker {
         let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
           for (let newCase of newCases) {
             let subProof = new FmtHLM.ObjectContents_Proof;
-            subProof.steps = Object.create(Fmt.ParameterList.prototype);
+            subProof.steps = new Fmt.ParameterList;
             let subProofExpression = subProof.toExpression(true);
             newCase.value = subProofExpression;
           }

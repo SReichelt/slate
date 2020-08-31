@@ -204,8 +204,8 @@ export class HLMEditHandler extends GenericEditHandler {
 
         if (parameterSelection.allowBinder) {
           let binderType = new FmtHLM.MetaRefExpression_Binder;
-          binderType.sourceParameters = Object.create(Fmt.ParameterList.prototype);
-          binderType.targetParameters = Object.create(Fmt.ParameterList.prototype);
+          binderType.sourceParameters = new Fmt.ParameterList;
+          binderType.targetParameters = new Fmt.ParameterList;
           advancedSubMenuRows.push(this.getParameterPlaceholderItem(binderType, '_1', onRenderParam, onInsertParam));
         }
 
@@ -424,7 +424,7 @@ export class HLMEditHandler extends GenericEditHandler {
     subsetExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
 
     let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset;
-    extendedSubsetExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    extendedSubsetExpression.parameters = new Fmt.ParameterList;
     extendedSubsetExpression.term = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
 
     let subsetRow = new Menu.StandardExpressionMenuRow('Subset');
@@ -513,13 +513,13 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getQuantifierRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let forallExpression = new FmtHLM.MetaRefExpression_forall;
-    forallExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    forallExpression.parameters = new Fmt.ParameterList;
     forallExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let existsExpression = new FmtHLM.MetaRefExpression_exists;
-    existsExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    existsExpression.parameters = new Fmt.ParameterList;
     existsExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let existsUniqueExpression = new FmtHLM.MetaRefExpression_existsUnique;
-    existsUniqueExpression.parameters = Object.create(Fmt.ParameterList.prototype);
+    existsUniqueExpression.parameters = new Fmt.ParameterList;
     existsUniqueExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let negatedExistsExpression = new FmtHLM.MetaRefExpression_not;
     negatedExistsExpression.formula = existsExpression;
@@ -634,7 +634,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let indexedExpression = new Fmt.IndexedExpression;
         indexedExpression.body = expression;
         indexedExpression.parameters = indexParameterList;
-        indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+        indexedExpression.arguments = new Fmt.ArgumentList;
         this.utils.fillDefaultPlaceholderArguments(indexParameterList, indexedExpression.arguments!, undefined);
         expression = indexedExpression;
       }
@@ -1167,10 +1167,10 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
     let result = new FmtHLM.ObjectContents_EqualityDefinition;
-    let leftParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    let leftParameters = new Fmt.ParameterList;
     parameters.clone(leftParameters);
     result.leftParameters = leftParameters;
-    let rightParameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    let rightParameters = new Fmt.ParameterList;
     parameters.clone(rightParameters);
     this.addApostrophes(rightParameters);
     result.rightParameters = rightParameters;

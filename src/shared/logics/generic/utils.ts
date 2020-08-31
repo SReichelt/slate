@@ -85,7 +85,7 @@ export class GenericUtils {
 
   applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: SubstitutionContext | undefined): Fmt.ParameterList {
     if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
-      let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+      let result = new Fmt.ParameterList;
       parameters.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), result, context.replacedParameters.slice());
       return result;
     } else {

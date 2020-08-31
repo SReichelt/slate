@@ -81,7 +81,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.properties) {
-      result.properties = Object.create(Fmt.ArgumentList.prototype);
+      result.properties = new Fmt.ArgumentList;
       if (this.properties.substituteExpression(fn, result.properties!, replacedParameters)) {
         changed = true;
       }
@@ -609,13 +609,13 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_EqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.leftParameters) {
-      result.leftParameters = Object.create(Fmt.ParameterList.prototype);
+      result.leftParameters = new Fmt.ParameterList;
       if (this.leftParameters.substituteExpression(fn, result.leftParameters!, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rightParameters) {
-      result.rightParameters = Object.create(Fmt.ParameterList.prototype);
+      result.rightParameters = new Fmt.ParameterList;
       if (this.rightParameters.substituteExpression(fn, result.rightParameters!, replacedParameters)) {
         changed = true;
       }
@@ -1482,13 +1482,13 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.variables) {
-      result.variables = Object.create(Fmt.ParameterList.prototype);
+      result.variables = new Fmt.ParameterList;
       if (this.variables.substituteExpression(fn, result.variables!, replacedParameters)) {
         changed = true;
       }
     }
     if (this.references) {
-      result.references = Object.create(Fmt.ArgumentList.prototype);
+      result.references = new Fmt.ArgumentList;
       if (this.references.substituteExpression(fn, result.references!, replacedParameters)) {
         changed = true;
       }
@@ -2389,13 +2389,13 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_Binder;
     let changed = false;
     if (this.sourceParameters) {
-      result.sourceParameters = Object.create(Fmt.ParameterList.prototype);
+      result.sourceParameters = new Fmt.ParameterList;
       if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
         changed = true;
       }
     }
     if (this.targetParameters) {
-      result.targetParameters = Object.create(Fmt.ParameterList.prototype);
+      result.targetParameters = new Fmt.ParameterList;
       if (this.targetParameters.substituteExpression(fn, result.targetParameters!, replacedParameters)) {
         changed = true;
       }
@@ -2896,13 +2896,13 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_BinderArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.sourceParameters) {
-      result.sourceParameters = Object.create(Fmt.ParameterList.prototype);
+      result.sourceParameters = new Fmt.ParameterList;
       if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
         changed = true;
       }
     }
     if (this.targetArguments) {
-      result.targetArguments = Object.create(Fmt.ArgumentList.prototype);
+      result.targetArguments = new Fmt.ArgumentList;
       if (this.targetArguments.substituteExpression(fn, result.targetArguments!, replacedParameters)) {
         changed = true;
       }
@@ -3082,7 +3082,7 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_extendedSubset;
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -3813,7 +3813,7 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_forall;
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -3873,7 +3873,7 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_exists;
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -3933,7 +3933,7 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_existsUnique;
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -4372,7 +4372,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     result._from = this._from;
     result._to = this._to;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -4384,7 +4384,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
       }
     }
     if (this.steps) {
-      result.steps = Object.create(Fmt.ParameterList.prototype);
+      result.steps = new Fmt.ParameterList;
       if (this.steps.substituteExpression(fn, result.steps!, replacedParameters)) {
         changed = true;
       }
@@ -4709,7 +4709,7 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_UseForAll;
     let changed = false;
     if (this.arguments) {
-      result.arguments = Object.create(Fmt.ArgumentList.prototype);
+      result.arguments = new Fmt.ArgumentList;
       if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
         changed = true;
       }
@@ -4755,7 +4755,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_UseExists;
     let changed = false;
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }
@@ -5160,7 +5160,7 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     let result = new MetaRefExpression_ProveExists;
     let changed = false;
     if (this.arguments) {
-      result.arguments = Object.create(Fmt.ArgumentList.prototype);
+      result.arguments = new Fmt.ArgumentList;
       if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
         changed = true;
       }
@@ -5608,7 +5608,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       }
     }
     if (this.parameters) {
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
         changed = true;
       }

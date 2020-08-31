@@ -14,9 +14,9 @@ export class NumberTupleMacro implements HLMMacro.HLMMacro {
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): NumberTupleMacroInstance {
     let itemsParam = definition.parameters.getParameter('items');
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
-    let variables: Fmt.ParameterList = contents.variables || Object.create(Fmt.ParameterList.prototype);
+    let variables: Fmt.ParameterList = contents.variables || new Fmt.ParameterList;
     let length = variables.getParameter('length');
-    let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
+    let references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
     let tuples = references.getValue('Tuples');
     let tuple = references.getValue('tuple');
     return new NumberTupleMacroInstance(definition, itemsParam, length, tuples, tuple);

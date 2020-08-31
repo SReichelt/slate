@@ -169,11 +169,11 @@ export class HLMUtils extends GenericUtils {
           let indexedExpression = new Fmt.IndexedExpression;
           indexedExpression.body = addIndices ? addIndices(expression) : expression;
           indexedExpression.parameters = binderArg.sourceParameters;
-          indexedExpression.arguments = Object.create(Fmt.ArgumentList.prototype);
+          indexedExpression.arguments = new Fmt.ArgumentList;
           this.getParameterArguments(indexedExpression.arguments!, binderArg.sourceParameters, context, undefined, addIndices);
           return indexedExpression;
         };
-        binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
+        binderArg.targetArguments = new Fmt.ArgumentList;
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
         arg.value = binderArg.toExpression(false);
       } else {
@@ -267,7 +267,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   getStructuralCaseParametersWithConstraint(term: Fmt.Expression, structuralCase: FmtHLM.ObjectContents_StructuralCase, structuralCaseTerm: Fmt.Expression): Fmt.ParameterList {
-    let result: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+    let result = new Fmt.ParameterList;
     if (structuralCase.parameters) {
       result.push(...structuralCase.parameters);
     }
@@ -742,7 +742,7 @@ export class HLMUtils extends GenericUtils {
                 return CachedPromise.resolve(structuralCase.value);
               }
               if (term.term instanceof Fmt.PlaceholderExpression && structuralCase.parameters) {
-                let args: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+                let args = new Fmt.ArgumentList;
                 let createPlaceholder = (placeholderType: HLMExpressionType) => {
                   let result = new Fmt.PlaceholderExpression(placeholderType);
                   result.isTemporary = true;
@@ -1791,7 +1791,7 @@ export class HLMUtils extends GenericUtils {
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       let result = new FmtHLM.MetaRefExpression_forall;
-      result.parameters = Object.create(Fmt.ParameterList.prototype);
+      result.parameters = new Fmt.ParameterList;
       let paramType = new FmtHLM.MetaRefExpression_Element;
       paramType._set = formula.subset;
       let param = this.createParameter(paramType, 'x');
@@ -1839,7 +1839,7 @@ export class HLMUtils extends GenericUtils {
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       let uniquenessFormula = new FmtHLM.MetaRefExpression_forall;
-      uniquenessFormula.parameters = Object.create(Fmt.ParameterList.prototype);
+      uniquenessFormula.parameters = new Fmt.ParameterList;
       let replacedParameters: Fmt.ReplacedParameter[] = [];
       formula.parameters.clone(uniquenessFormula.parameters, replacedParameters);
       let equalities: Fmt.Expression[] = [];
@@ -1907,7 +1907,7 @@ export class HLMUtils extends GenericUtils {
         };
         if (term instanceof FmtHLM.MetaRefExpression_cases) {
           let result = term.cases.map((item: FmtHLM.ObjectContents_Case): HLMFormulaCase => {
-            let parameters: Fmt.ParameterList = Object.create(Fmt.ParameterList.prototype);
+            let parameters = new Fmt.ParameterList;
             parameters.push(this.createConstraintParameter(item.formula, '_1'));
             return {
               parameters: parameters,
@@ -2017,7 +2017,7 @@ export class HLMUtils extends GenericUtils {
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Binder) {
       let binderArg = new FmtHLM.ObjectContents_BinderArg;
       binderArg.sourceParameters = createParameterList(paramType.sourceParameters);
-      binderArg.targetArguments = Object.create(Fmt.ArgumentList.prototype);
+      binderArg.targetArguments = new Fmt.ArgumentList;
       this.fillPlaceholderArguments(paramType.targetParameters, binderArg.targetArguments, createPlaceholder, createParameterList);
       return binderArg;
     } else {
@@ -2041,7 +2041,7 @@ export class HLMUtils extends GenericUtils {
     let substitutionContext = new SubstitutionContext;
     this.addTargetPathSubstitution(targetPath, substitutionContext);
     let substitutedSource = this.applySubstitutionContextToParameterList(source, substitutionContext);
-    let result = Object.create(Fmt.ParameterList.prototype);
+    let result = new Fmt.ParameterList;
     substitutedSource.clone(result);
     if (usedNames) {
       this.adaptParameterNames(result, usedNames);

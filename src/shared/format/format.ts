@@ -10,8 +10,7 @@ export type ReportConversionFn = (raw: Expression, converted: ObjectContents) =>
 
 export class File {
   metaModelPath: Path;
-  // TODO find a better way to initialize lists, especially since some of them are regularly overwritten
-  definitions: DefinitionList = Object.create(DefinitionList.prototype);
+  definitions: DefinitionList = new DefinitionList;
 
   clone(): File {
     let result = new File;
@@ -133,7 +132,7 @@ export class IdentityPathItem extends PathItem {
 }
 
 export class Path extends NamedPathItem {
-  arguments: ArgumentList = Object.create(ArgumentList.prototype);
+  arguments: ArgumentList = new ArgumentList;
 
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Path {
     let result = new Path;
@@ -166,8 +165,8 @@ export class Path extends NamedPathItem {
 export class Definition {
   name: string;
   type: Expression;
-  parameters: ParameterList = Object.create(ParameterList.prototype);
-  innerDefinitions: DefinitionList = Object.create(DefinitionList.prototype);
+  parameters: ParameterList = new ParameterList;
+  innerDefinitions: DefinitionList = new DefinitionList;
   contents?: ObjectContents;
   documentation?: DocumentationComment;
 
@@ -604,7 +603,7 @@ export abstract class ObjectContents {
     if (expression instanceof CompoundExpression) {
       this.fromArgumentList(expression.arguments, reportFn);
     } else {
-      let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
+      let argumentList: ArgumentList = new ArgumentList;
       argumentList.add(expression);
       this.fromArgumentList(argumentList, reportFn);
     }
@@ -621,14 +620,14 @@ export abstract class ObjectContents {
   abstract traverse(fn: ExpressionTraversalFn): void;
 
   toString(): string {
-    let argumentList: ArgumentList = Object.create(ArgumentList.prototype);
+    let argumentList: ArgumentList = new ArgumentList;
     this.toArgumentList(argumentList, false);
     return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
   }
 }
 
 export class GenericObjectContents extends ObjectContents {
-  arguments: ArgumentList = Object.create(ArgumentList.prototype);
+  arguments: ArgumentList = new ArgumentList;
 
   fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void {
     this.arguments.length = 0;
@@ -770,7 +769,7 @@ export abstract class MetaRefExpression extends Expression {
 
 export class GenericMetaRefExpression extends MetaRefExpression {
   name: string;
-  arguments: ArgumentList = Object.create(ArgumentList.prototype);
+  arguments: ArgumentList = new ArgumentList;
 
   getName(): string {
     return this.name;
@@ -825,7 +824,7 @@ export class DefinitionRefExpression extends Expression {
 }
 
 export class ParameterExpression extends Expression {
-  parameters: ParameterList = Object.create(ParameterList.prototype);
+  parameters: ParameterList = new ParameterList;
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new ParameterExpression;
@@ -840,7 +839,7 @@ export class ParameterExpression extends Expression {
 }
 
 export class CompoundExpression extends Expression {
-  arguments: ArgumentList = Object.create(ArgumentList.prototype);
+  arguments: ArgumentList = new ArgumentList;
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let result = new CompoundExpression;
@@ -891,7 +890,7 @@ export class IndexedExpression extends Expression implements Index {
     let result = new IndexedExpression;
     let changed = !fn;
     if (this.arguments) {
-      result.arguments = Object.create(ArgumentList.prototype);
+      result.arguments = new ArgumentList;
       if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
         changed = true;
       }
@@ -915,7 +914,7 @@ export class IndexedExpression extends Expression implements Index {
         testExpression = new IndexedExpression;
         testExpression.body = this.body;
         if (this.arguments) {
-          testExpression.arguments = Object.create(ArgumentList.prototype);
+          testExpression.arguments = new ArgumentList;
           testExpression.arguments!.push(...this.arguments);
         }
         this.assignParameters(testExpression, replacedParameters);
@@ -936,7 +935,7 @@ export class IndexedExpression extends Expression implements Index {
         let paramIndex = this.parameters.indexOf(replacedParameter.original);
         if (paramIndex >= 0) {
           if (!result.parameters) {
-            result.parameters = Object.create(ParameterList.prototype);
+            result.parameters = new ParameterList;
             result.parameters!.push(...this.parameters);
           }
           result.parameters![paramIndex] = replacedParameter.replacement;

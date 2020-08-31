@@ -193,7 +193,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], binderArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {
-    let newBinderArgumentList: Fmt.ArgumentList = Object.create(Fmt.ArgumentList.prototype);
+    let newBinderArgumentList = new Fmt.ArgumentList;
     let changed = false;
     for (let binderArg of binderArgumentList) {
       let binderArgValue = binderArg.value;

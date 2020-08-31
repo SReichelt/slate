@@ -12,7 +12,7 @@ export class NumberMacro implements HLMMacro.HLMMacro {
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): NumberMacroInstance {
     let valueParam = definition.parameters.getParameter('value');
     let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
-    let references: Fmt.ArgumentList = contents.references || Object.create(Fmt.ArgumentList.prototype);
+    let references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
     let naturalNumbers = references.getValue('Natural numbers');
     return new NumberMacroInstance(definition, valueParam, naturalNumbers);
   }
