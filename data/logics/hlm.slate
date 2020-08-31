@@ -5,7 +5,7 @@ $hlm: %MetaModel {
   expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $UnfoldDef, $UseTheorem, $ProveDef, $ProveNeg, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $Unfold, $UseTheorem, $ProveDef, $ProveByContradiction, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction],
   functions = [$true, $false,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
@@ -258,7 +258,7 @@ $Proof: %ExpressionType {
 $IntermediateProofStep: %ParameterType($Formula) {}
 $FinalProofStep: %ParameterType {}
 
-$Consider(variable: %Any, index?: %Int): %ParameterType($Formula) {
+$Consider(variable: %Any, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $State(statement: $Formula, proof?: $Proof): %ParameterType($Formula) {
@@ -280,7 +280,7 @@ $UseExists(parameters: %ParameterList): %ParameterType($Formula) {
 $Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UnfoldDef(result: $Formula): %ParameterType($Formula) {
+$Unfold(result: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep), result: $Formula): %ParameterType($Formula) {
@@ -289,7 +289,7 @@ $UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep),
 $ProveDef(side?: %Int, proof?: $Proof): %ParameterType {
   superType = $FinalProofStep
 }
-$ProveNeg(proof: $Proof): %ParameterType {
+$ProveByContradiction(proof: $Proof): %ParameterType {
   superType = $FinalProofStep
 }
 $ProveForAll(proof: $Proof): %ParameterType {

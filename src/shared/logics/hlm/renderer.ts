@@ -46,6 +46,7 @@ interface ParameterListState {
   inDefinition: boolean;
   inDefinitionNotationGroup: boolean;
   inForEach: boolean;
+  inExistsUnique: boolean;
   associatedParameterList?: Fmt.ParameterList;
   associatedDefinition?: Fmt.Definition;
 }
@@ -349,6 +350,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inDefinition: false,
       inDefinitionNotationGroup: false,
       inForEach: false,
+      inExistsUnique: false,
       associatedParameterList: parameters,
       associatedDefinition: associatedDefinition
     };
@@ -369,7 +371,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inConstraint: false,
       inDefinition: false,
       inDefinitionNotationGroup: false,
-      inForEach: false
+      inForEach: false,
+      inExistsUnique: false
     };
     return this.renderParametersWithInitialState(parameters, initialState, undefined);
   }
@@ -388,7 +391,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inConstraint: false,
       inDefinition: false,
       inDefinitionNotationGroup: false,
-      inForEach: false
+      inForEach: false,
+      inExistsUnique: false
     };
     return this.renderParametersWithInitialState([parameter], initialState);
   }
@@ -505,10 +509,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         GenericEditHandler.lastInsertedParameter = parameter;
       };
       let paramSelection: ParameterSelection = {
+        allowSets: !state.inExistsUnique,
         allowConstraint: state.fullSentence || !isEmpty,
-        allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor),
-        allowDefinition: state.fullSentence,
-        allowBinder: state.associatedDefinition !== undefined && !state.inForEach
+        allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) && !state.inExistsUnique,
+        allowDefinition: state.fullSentence && !state.inExistsUnique,
+        allowBinder: state.associatedDefinition !== undefined && !state.inForEach && !state.inExistsUnique
       };
       this.editHandler.addParameterMenu(semanticLink, onRenderParam, onInsertParam, paramSelection, state.inForEach);
       insertButton.semanticLinks = [semanticLink];
@@ -1239,6 +1244,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
+      let initialState: ParameterListState = {
+        fullSentence: false,
+        sentence: false,
+        abbreviate: true,
+        forcePlural: false,
+        enableSpecializations: true,
+        inInsertMenu: false,
+        started: false,
+        inLetExpr: false,
+        inConstraint: false,
+        inDefinition: false,
+        inDefinitionNotationGroup: false,
+        inForEach: false,
+        inExistsUnique: true,
+        associatedParameterList: formula.parameters
+      };
       if (formula.formula) {
         let formulaSelection: FormulaSelection = {
           allowTruthValue: false,
@@ -1246,12 +1267,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           allowCases: false
         };
         return this.renderTemplate('UniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false),
+                                     'parameters': this.renderParametersWithInitialState(formula.parameters, initialState),
                                      'formula': this.renderFormula(formula.formula, formulaSelection)
                                    }, negationCount);
       } else {
         return this.renderTemplate('PlainUniqueExistentialQuantification', {
-                                     'parameters': this.renderParameterList(formula.parameters, false, true, false)
+                                     'parameters': this.renderParametersWithInitialState(formula.parameters, initialState)
                                    }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
@@ -2234,7 +2255,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           inConstraint: false,
           inDefinition: false,
           inDefinitionNotationGroup: false,
-          inForEach: false
+          inForEach: false,
+          inExistsUnique: false
         };
         row.push(this.renderParametersWithInitialState([parameter], initialState));
         row.push(new Notation.TextExpression('” for “'));
@@ -2276,7 +2298,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             inConstraint: false,
             inDefinition: false,
             inDefinitionNotationGroup: false,
-            inForEach: false
+            inForEach: false,
+            inExistsUnique: false
           };
           row.push(this.renderParametersWithInitialState([parameter], initialState));
           row.push(new Notation.TextExpression('” for “'));
@@ -2446,7 +2469,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         goal = undefined;
       }
     }
-    if (goal) {
+    if (goal && !this.utils.isFalseFormula(goal)) {
       this.outputStartRowSpacing(state);
       let renderedGoal = this.readOnlyRenderer.renderFormula(goal, fullFormulaSelection);
       if (hasContents) {
@@ -2711,9 +2734,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
-      } else if (type instanceof FmtHLM.MetaRefExpression_ProveNeg) {
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
+        let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
+        if (context.goal instanceof FmtHLM.MetaRefExpression_or && context.goal.formulas) {
+          let index = this.utils.translateIndex(type.proof._to);
+          if (index !== undefined && index >= 0 && index < context.goal.formulas.length) {
+            newGoal = context.goal.formulas[index];
+          }
+        }
         let subProofContext: HLMProofStepContext = {
-          goal: new FmtHLM.MetaRefExpression_or,
+          goal: newGoal,
           stepResults: context.stepResults
         };
         this.addSubProof(type.proof, subProofContext, false, state);
@@ -2859,7 +2889,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return type.statement;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-                 || type instanceof FmtHLM.MetaRefExpression_UnfoldDef
+                 || type instanceof FmtHLM.MetaRefExpression_Unfold
                  || type instanceof FmtHLM.MetaRefExpression_UseForAll
                  || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                  || type instanceof FmtHLM.MetaRefExpression_Substitute) {
@@ -2889,7 +2919,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         let source: Notation.RenderedExpression | undefined = undefined;
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
-            || sourceType instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
+            || sourceType instanceof FmtHLM.MetaRefExpression_Unfold) {
           source = new Notation.TextExpression('def');
           source.styleClasses = ['miniature'];
           // TODO link to definition
@@ -2952,13 +2982,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           state.paragraphs.push(new Notation.ErrorExpression('Goal is not existentially quantified'));
         }
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
-        let labels: string[];
+        let labels: string[] | undefined = undefined;
         if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals) {
           labels = this.getEquivalenceProofLabels(type.proofs, '⊆', context.goal.terms.length === 2 ? '⊇' : undefined);
         } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
           labels = this.getEquivalenceProofLabels(type.proofs, '⇒', context.goal.formulas.length === 2 ? '⇐' : undefined);
-        } else {
-          labels = this.getEquivalenceProofLabels(type.proofs, '⇒');
         }
         let subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
@@ -3284,6 +3312,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inDefinition: false,
       inDefinitionNotationGroup: false,
       inForEach: false,
+      inExistsUnique: false,
       associatedDefinition: associatedDefinition
     };
     let currentGroup: Fmt.Parameter[] = [];
@@ -3355,11 +3384,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let type = step.type;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
       this.addParameterParts(step, result);
+    } else if (type instanceof FmtHLM.MetaRefExpression_Consider && type.result) {
+      this.addFormulaParts(type.result, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.addFormulaParts(type.statement, result);
       this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-               || type instanceof FmtHLM.MetaRefExpression_UnfoldDef) {
+               || type instanceof FmtHLM.MetaRefExpression_Unfold) {
       this.addFormulaParts(type.result, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
                || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
@@ -3369,7 +3400,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
       this.addParameterListParts(type.parameters, undefined, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef
-               || type instanceof FmtHLM.MetaRefExpression_ProveNeg
+               || type instanceof FmtHLM.MetaRefExpression_ProveByContradiction
                || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
       this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {

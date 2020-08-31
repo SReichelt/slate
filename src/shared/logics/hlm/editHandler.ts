@@ -19,6 +19,7 @@ import { HLMDefinitionChecker } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export interface ParameterSelection {
+  allowSets: boolean;
   allowConstraint: boolean;
   allowProposition: boolean;
   allowDefinition: boolean;
@@ -165,11 +166,13 @@ export class HLMEditHandler extends GenericEditHandler {
       elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
       rows.push(this.getParameterPlaceholderItem(elementType, inForEach ? 'i' : 'x', onRenderParam, onInsertParam));
 
-      let subsetType = new FmtHLM.MetaRefExpression_Subset;
-      subsetType.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-      rows.push(this.getParameterPlaceholderItem(subsetType, 'S', onRenderParam, onInsertParam));
+      if (parameterSelection.allowSets) {
+        let subsetType = new FmtHLM.MetaRefExpression_Subset;
+        subsetType.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+        rows.push(this.getParameterPlaceholderItem(subsetType, 'S', onRenderParam, onInsertParam));
 
-      rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', onRenderParam, onInsertParam));
+        rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', onRenderParam, onInsertParam));
+      }
 
       if (parameterSelection.allowConstraint) {
         let constraintType = new FmtHLM.MetaRefExpression_Constraint;

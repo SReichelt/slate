@@ -44,17 +44,16 @@ exports[`render hlm library: 1.1.3 Essentials/Sets/empty 1`] = `
 
 Equivalence.
 
-1⇒2. Assume S = ∅. Then S ⊆ ∅:
-     S = ∅ ⇒^def S ⊆ ∅
-2⇒3. Assume S ⊆ ∅. Then ∄ x ∈ S:
+1⇒3. Assume S = ∅. Then ∄ x ∈ S:
      Let x ∈ S.
-     S ⊆ ∅ ⇒^def ∀ s ∈ S : s ∈ ∅
-      ⇒ x ∈ ∅
+      ⇒^[S = ∅] x ∈ ∅
       ⇒^def ⭍
-3⇒1. Assume ∄ x ∈ S. Then S = ∅:
-     ⊆. Let a ∈ S. Then a ∈ ∅:
-        We have ∃ x ∈ S:
-          Choose x := a.
+3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
+     Let a ∈ S.
+     We have ∃ x ∈ S: ⭍
+       Choose x := a.
+2⇒1. Assume S ⊆ ∅. Then S = ∅:
+     ⊆. Trivial.
      ⊇. 1.1.2 ⇒ ∅ ⊆ S
 
 Remarks.
@@ -88,12 +87,13 @@ Equivalence.
 3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
      We show that |S| ∈ ℕ:
      We have |ℕ_(<l)| = |S|:
-       We show that ∃ s : S ↔ ℕ_(<l):
+       We show that ∃ s : ℕ_(<l) ↔ S:
        Choose s := g.
       ⇒^[l = |ℕ_(<l)|] l = |S|
      l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     def ⇒ f is injective
+     f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
+      ⇒^def f is injective
      Choose m := k, h := f.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
      1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
@@ -123,9 +123,7 @@ Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is in
 
 S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
-Choose m := n, f := g∣_T. We show that g∣_T is injective:
-
-  1.4.17 ⇒ g∣_T is injective
+Choose m := n, f := g∣_T. g∣_T is injective by 1.4.17.
 
 Remarks.
 
@@ -2518,7 +2516,7 @@ Proof.
      Choose b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
      1.7.1.17.7 ⇒ ℕ_(<b) is finite
-     1.1.5 ⇒ M is finite"
+      ⇒^1.1.5 M is finite"
 `;
 
 exports[`render hlm library: 1.7.1.20 Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -3210,7 +3208,8 @@ Let a := ∏_(p ∈ ℙ) p.
  ⇒^1.7.1.31 p ∣ 1
  ⇒^1.7.1.30 p ≤ 1
 
-p ∈ ℙ ⇒^def p > 1 ⭍
+p ∈ ℙ ⇒^def p ∈ ℕ_(>1)
+ ⇒^def p > 1 ⭍
 
 References.
 
@@ -5360,7 +5359,7 @@ exports[`render hlm library: 1.7.6.18 Essentials/Numbers/Real/Roots%20of%20prime
 
 Proof.  Assume n√p is rational.
 
- ⇒^def ∃ a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+ ⇒^def ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
  ⇒^def p = (b∕a)^n
  =^1.7.6.13 b^n∕a^n
