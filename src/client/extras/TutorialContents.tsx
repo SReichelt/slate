@@ -3212,7 +3212,7 @@ class TutorialStates {
               contents: (
                 <div>
                   <p>As you have seen, it is possible to create formal mathematical content without editing any source code.</p>
-                  <p>However, if you are interested, you can click here to see the exact details of what you have created. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertTheorem_menu)}>Skip</Button></p>
+                  <p>However, if you are interested, you can click "View Source" to see the exact details of what you have created. <Button className={'tutorial-tooltip-button standalone'} onClick={() => this.changeState(this.insertTheorem_menu)}>Skip</Button></p>
                 </div>
               ),
               position: 'top',

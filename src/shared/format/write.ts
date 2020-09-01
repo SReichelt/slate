@@ -430,7 +430,7 @@ export class Writer {
   }
 
   private isLargeExpression(expression: Fmt.Expression): boolean {
-    return (expression instanceof Fmt.MetaRefExpression
+    return ((expression instanceof Fmt.MetaRefExpression && (expression instanceof Fmt.GenericMetaRefExpression ? expression.arguments.length !== 0 : Object.keys(expression).length !== 0))
             || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || expression.path.parentPath !== undefined))
             || expression instanceof Fmt.ParameterExpression
             || expression instanceof Fmt.CompoundExpression

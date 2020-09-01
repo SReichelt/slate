@@ -443,7 +443,7 @@ class App extends React.Component<AppProps, AppState> {
           if (editing) {
             if (this.state.tutorialState) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
-            } else if (!this.state.gitHubUserInfo && !config.runningLocally) {
+            } else if (this.state.gitHubAuthInfo && !this.state.gitHubUserInfo && !config.runningLocally) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href="https://github.com/" target="_blank">GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
             } else if (this.state.selectedItemRepository) {
               let repository = this.state.selectedItemRepository;
@@ -950,39 +950,44 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryDataProvider && definitionPromise) {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
-        if (this.state.tutorialState) {
-          this.removeEditedDefinition(definition);
+        if (this.state.tutorialState && (config.runningLocally || this.state.gitHubUserInfo)) {
           libraryDataProvider.replaceLocalItem(definition);
-          if (absolutePath) {
-            this.mruList.add(absolutePath);
-          }
+          this.submitted(definition, absolutePath);
         } else {
           libraryDataProvider.submitLocalItem(definition)
             .then((writeFileResult: WriteFileResult) => {
-              this.removeEditedDefinition(definition!);
+              this.submitted(definition!, absolutePath);
               if (writeFileResult instanceof GitHubWriteFileResult) {
                 if (writeFileResult.pullRequestState !== undefined) {
                   let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
                   this.props.alert.info(`GitHub pull request ${action} successfully.`);
                 }
               } else if (writeFileResult instanceof WebWriteFileResult) {
-                if (!writeFileResult.writtenDirectly) {
+                if (!writeFileResult.writtenDirectly && !this.state.tutorialState) {
                   this.props.alert.info('Changes successfully submitted for review. You can continue to work with the changed version as long as the application remains open.');
                 }
               }
-              if (absolutePath) {
-                this.mruList.add(absolutePath);
-              }
             })
             .catch((error) => {
-              this.props.alert.error('Error submitting changes: ' + error.message);
-              this.forceUpdate();
+              if (this.state.tutorialState) {
+                this.submitted(definition!, absolutePath);
+              } else {
+                this.props.alert.error('Error submitting changes: ' + error.message);
+                this.forceUpdate();
+              }
             });
         }
         this.forceUpdate();
       }
     }
   };
+
+  private submitted(definition: LibraryDefinition, absolutePath: Fmt.Path | undefined): void {
+    this.removeEditedDefinition(definition);
+    if (absolutePath) {
+      this.mruList.add(absolutePath);
+    }
+  }
 
   private cancelEditing = (): void => {
     let libraryDataProvider = this.state.selectedItemProvider;
