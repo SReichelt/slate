@@ -974,6 +974,7 @@ class App extends React.Component<AppProps, AppState> {
             })
             .catch((error) => {
               if (this.state.tutorialState) {
+                libraryDataProvider!.replaceLocalItem(definition!);
                 this.submitted(definition!, absolutePath);
               } else {
                 this.props.alert.error('Error submitting changes: ' + error.message);
