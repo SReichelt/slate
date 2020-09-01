@@ -36,10 +36,10 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     argumentList.length = 0;
     if (this.properties !== undefined) {
       let propertiesExpr = new Fmt.CompoundExpression(this.properties);
-      argumentList.add(propertiesExpr, 'properties', true);
+      argumentList.push(new Fmt.Argument('properties', propertiesExpr, true));
     }
     if (this.notation !== undefined) {
-      argumentList.add(this.notation, 'notation', true);
+      argumentList.push(new Fmt.Argument('notation', this.notation, true));
     }
     if (this.abbreviations !== undefined) {
       let abbreviationsExprItems: Fmt.Expression[] = [];
@@ -47,10 +47,10 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
         abbreviationsExprItems.push(item);
       }
       let abbreviationsExpr = new Fmt.ArrayExpression(abbreviationsExprItems);
-      argumentList.add(abbreviationsExpr, 'abbreviations', true);
+      argumentList.push(new Fmt.Argument('abbreviations', abbreviationsExpr, true));
     }
     if (this.definitionNotation !== undefined) {
-      argumentList.add(this.definitionNotation, 'definitionNotation', true);
+      argumentList.push(new Fmt.Argument('definitionNotation', this.definitionNotation, true));
     }
   }
 
@@ -157,7 +157,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.embedding !== undefined) {
       let embeddingExpr = this.embedding.toExpression(true, reportFn);
-      argumentList.add(embeddingExpr, 'embedding', true);
+      argumentList.push(new Fmt.Argument('embedding', embeddingExpr, true));
       reportFn?.(embeddingExpr, this.embedding);
     }
   }
@@ -262,14 +262,14 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     let parameterExprParameters = new Fmt.ParameterList;
     parameterExprParameters.push(this.parameter);
     let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
-    argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
-    argumentList.add(this.target, outputAllNames ? 'target' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'target' : undefined, this.target, false));
     if (this.full !== undefined) {
-      argumentList.add(this.full, 'full', true);
+      argumentList.push(new Fmt.Argument('full', this.full, true));
     }
     if (this.wellDefinednessProof !== undefined) {
       let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
-      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
+      argumentList.push(new Fmt.Argument('wellDefinednessProof', wellDefinednessProofExpr, true));
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
   }
@@ -370,12 +370,12 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.equalityDefinition !== undefined) {
       let equalityDefinitionExpr = this.equalityDefinition.toExpression(true, reportFn);
-      argumentList.add(equalityDefinitionExpr, 'equalityDefinition', true);
+      argumentList.push(new Fmt.Argument('equalityDefinition', equalityDefinitionExpr, true));
       reportFn?.(equalityDefinitionExpr, this.equalityDefinition);
     }
     if (this.rewrite !== undefined) {
       let rewriteExpr = this.rewrite.toExpression(true, reportFn);
-      argumentList.add(rewriteExpr, 'rewrite', true);
+      argumentList.push(new Fmt.Argument('rewrite', rewriteExpr, true));
       reportFn?.(rewriteExpr, this.rewrite);
     }
   }
@@ -528,15 +528,15 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let leftParametersExpr = new Fmt.ParameterExpression(this.leftParameters);
-    argumentList.add(leftParametersExpr, outputAllNames ? 'leftParameters' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'leftParameters' : undefined, leftParametersExpr, false));
     let rightParametersExpr = new Fmt.ParameterExpression(this.rightParameters);
-    argumentList.add(rightParametersExpr, outputAllNames ? 'rightParameters' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'rightParameters' : undefined, rightParametersExpr, false));
     let definitionExprItems: Fmt.Expression[] = [];
     for (let item of this.definition) {
       definitionExprItems.push(item);
     }
     let definitionExpr = new Fmt.ArrayExpression(definitionExprItems);
-    argumentList.add(definitionExpr, outputAllNames ? 'definition' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definition' : undefined, definitionExpr, false));
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equivalenceProofs) {
@@ -545,25 +545,25 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
         reportFn?.(newItem, item);
       }
       let equivalenceProofsExpr = new Fmt.ArrayExpression(equivalenceProofsExprItems);
-      argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
+      argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
     if (this.reflexivityProof !== undefined) {
       let reflexivityProofExpr = this.reflexivityProof.toExpression(true, reportFn);
-      argumentList.add(reflexivityProofExpr, 'reflexivityProof', true);
+      argumentList.push(new Fmt.Argument('reflexivityProof', reflexivityProofExpr, true));
       reportFn?.(reflexivityProofExpr, this.reflexivityProof);
     }
     if (this.symmetryProof !== undefined) {
       let symmetryProofExpr = this.symmetryProof.toExpression(true, reportFn);
-      argumentList.add(symmetryProofExpr, 'symmetryProof', true);
+      argumentList.push(new Fmt.Argument('symmetryProof', symmetryProofExpr, true));
       reportFn?.(symmetryProofExpr, this.symmetryProof);
     }
     if (this.transitivityProof !== undefined) {
       let transitivityProofExpr = this.transitivityProof.toExpression(true, reportFn);
-      argumentList.add(transitivityProofExpr, 'transitivityProof', true);
+      argumentList.push(new Fmt.Argument('transitivityProof', transitivityProofExpr, true));
       reportFn?.(transitivityProofExpr, this.transitivityProof);
     }
     if (this.isomorphic !== undefined) {
-      argumentList.add(this.isomorphic, 'isomorphic', true);
+      argumentList.push(new Fmt.Argument('isomorphic', this.isomorphic, true));
     }
   }
 
@@ -726,9 +726,9 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'value' : undefined, this.value, false));
     if (this.theorem !== undefined) {
-      argumentList.add(this.theorem, 'theorem', true);
+      argumentList.push(new Fmt.Argument('theorem', this.theorem, true));
     }
   }
 
@@ -839,7 +839,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       definitionExprItems.push(item);
     }
     let definitionExpr = new Fmt.ArrayExpression(definitionExprItems);
-    argumentList.add(definitionExpr, outputAllNames ? 'definition' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definition' : undefined, definitionExpr, false));
     if (this.equalityProofs !== undefined) {
       let equalityProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equalityProofs) {
@@ -848,14 +848,14 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
         reportFn?.(newItem, item);
       }
       let equalityProofsExpr = new Fmt.ArrayExpression(equalityProofsExprItems);
-      argumentList.add(equalityProofsExpr, 'equalityProofs', true);
+      argumentList.push(new Fmt.Argument('equalityProofs', equalityProofsExpr, true));
     }
     if (this.setRestriction !== undefined) {
-      argumentList.add(this.setRestriction, 'setRestriction', true);
+      argumentList.push(new Fmt.Argument('setRestriction', this.setRestriction, true));
     }
     if (this.setRestrictionProof !== undefined) {
       let setRestrictionProofExpr = this.setRestrictionProof.toExpression(true, reportFn);
-      argumentList.add(setRestrictionProofExpr, 'setRestrictionProof', true);
+      argumentList.push(new Fmt.Argument('setRestrictionProof', setRestrictionProofExpr, true));
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
   }
@@ -1068,7 +1068,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       definitionExprItems.push(item);
     }
     let definitionExpr = new Fmt.ArrayExpression(definitionExprItems);
-    argumentList.add(definitionExpr, outputAllNames ? 'definition' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definition' : undefined, definitionExpr, false));
     if (this.equalityProofs !== undefined) {
       let equalityProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equalityProofs) {
@@ -1077,14 +1077,14 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
         reportFn?.(newItem, item);
       }
       let equalityProofsExpr = new Fmt.ArrayExpression(equalityProofsExprItems);
-      argumentList.add(equalityProofsExpr, 'equalityProofs', true);
+      argumentList.push(new Fmt.Argument('equalityProofs', equalityProofsExpr, true));
     }
     if (this.setRestriction !== undefined) {
-      argumentList.add(this.setRestriction, 'setRestriction', true);
+      argumentList.push(new Fmt.Argument('setRestriction', this.setRestriction, true));
     }
     if (this.setRestrictionProof !== undefined) {
       let setRestrictionProofExpr = this.setRestrictionProof.toExpression(true, reportFn);
-      argumentList.add(setRestrictionProofExpr, 'setRestrictionProof', true);
+      argumentList.push(new Fmt.Argument('setRestrictionProof', setRestrictionProofExpr, true));
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
   }
@@ -1269,13 +1269,13 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     let parameterExprParameters = new Fmt.ParameterList;
     parameterExprParameters.push(this.parameter);
     let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
-    argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
     let definitionExprItems: Fmt.Expression[] = [];
     for (let item of this.definition) {
       definitionExprItems.push(item);
     }
     let definitionExpr = new Fmt.ArrayExpression(definitionExprItems);
-    argumentList.add(definitionExpr, outputAllNames ? 'definition' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definition' : undefined, definitionExpr, false));
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equivalenceProofs) {
@@ -1284,11 +1284,11 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
         reportFn?.(newItem, item);
       }
       let equivalenceProofsExpr = new Fmt.ArrayExpression(equivalenceProofsExprItems);
-      argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
+      argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
     if (this.wellDefinednessProof !== undefined) {
       let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
-      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
+      argumentList.push(new Fmt.Argument('wellDefinednessProof', wellDefinednessProofExpr, true));
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
   }
@@ -1453,11 +1453,11 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.variables !== undefined) {
       let variablesExpr = new Fmt.ParameterExpression(this.variables);
-      argumentList.add(variablesExpr, 'variables', true);
+      argumentList.push(new Fmt.Argument('variables', variablesExpr, true));
     }
     if (this.references !== undefined) {
       let referencesExpr = new Fmt.CompoundExpression(this.references);
-      argumentList.add(referencesExpr, 'references', true);
+      argumentList.push(new Fmt.Argument('references', referencesExpr, true));
     }
   }
 
@@ -1574,7 +1574,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       definitionExprItems.push(item);
     }
     let definitionExpr = new Fmt.ArrayExpression(definitionExprItems);
-    argumentList.add(definitionExpr, outputAllNames ? 'definition' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definition' : undefined, definitionExpr, false));
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equivalenceProofs) {
@@ -1583,7 +1583,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
         reportFn?.(newItem, item);
       }
       let equivalenceProofsExpr = new Fmt.ArrayExpression(equivalenceProofsExprItems);
-      argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
+      argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
   }
 
@@ -1719,7 +1719,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.claim, outputAllNames ? 'claim' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'claim' : undefined, this.claim, false));
     if (this.proofs !== undefined) {
       let proofsExprItems: Fmt.Expression[] = [];
       for (let item of this.proofs) {
@@ -1728,7 +1728,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
         reportFn?.(newItem, item);
       }
       let proofsExpr = new Fmt.ArrayExpression(proofsExprItems);
-      argumentList.add(proofsExpr, 'proofs', true);
+      argumentList.push(new Fmt.Argument('proofs', proofsExpr, true));
     }
   }
 
@@ -1859,7 +1859,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       conditionsExprItems.push(item);
     }
     let conditionsExpr = new Fmt.ArrayExpression(conditionsExprItems);
-    argumentList.add(conditionsExpr, outputAllNames ? 'conditions' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'conditions' : undefined, conditionsExpr, false));
     if (this.equivalenceProofs !== undefined) {
       let equivalenceProofsExprItems: Fmt.Expression[] = [];
       for (let item of this.equivalenceProofs) {
@@ -1868,7 +1868,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
         reportFn?.(newItem, item);
       }
       let equivalenceProofsExpr = new Fmt.ArrayExpression(equivalenceProofsExprItems);
-      argumentList.add(equivalenceProofsExpr, 'equivalenceProofs', true);
+      argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
   }
 
@@ -2106,7 +2106,7 @@ export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.auto !== undefined) {
-      argumentList.add(this.auto, 'auto', true);
+      argumentList.push(new Fmt.Argument('auto', this.auto, true));
     }
   }
 
@@ -2149,10 +2149,10 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.auto !== undefined) {
-      argumentList.add(this.auto, 'auto', true);
+      argumentList.push(new Fmt.Argument('auto', this.auto, true));
     }
     if (this.embedSubsets !== undefined) {
-      argumentList.add(this.embedSubsets, 'embedSubsets', true);
+      argumentList.push(new Fmt.Argument('embedSubsets', this.embedSubsets, true));
     }
   }
 
@@ -2205,12 +2205,12 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.superset, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.superset, false));
     if (this.auto !== undefined) {
-      argumentList.add(this.auto, 'auto', true);
+      argumentList.push(new Fmt.Argument('auto', this.auto, true));
     }
     if (this.embedSubsets !== undefined) {
-      argumentList.add(this.embedSubsets, 'embedSubsets', true);
+      argumentList.push(new Fmt.Argument('embedSubsets', this.embedSubsets, true));
     }
   }
 
@@ -2270,9 +2270,9 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this._set, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this._set, false));
     if (this.auto !== undefined) {
-      argumentList.add(this.auto, 'auto', true);
+      argumentList.push(new Fmt.Argument('auto', this.auto, true));
     }
   }
 
@@ -2321,7 +2321,7 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.formula, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.formula, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -2375,9 +2375,9 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let sourceParametersExpr = new Fmt.ParameterExpression(this.sourceParameters);
-    argumentList.add(sourceParametersExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, sourceParametersExpr, false));
     let targetParametersExpr = new Fmt.ParameterExpression(this.targetParameters);
-    argumentList.add(targetParametersExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, targetParametersExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -2425,7 +2425,7 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this._set, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this._set, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -2464,7 +2464,7 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.element, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.element, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -2499,7 +2499,7 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'formula' : undefined, this.formula, false));
   }
 
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
@@ -2561,7 +2561,7 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this._set, outputAllNames ? 'set' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'set' : undefined, this._set, false));
   }
 
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
@@ -2631,10 +2631,10 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this._set, outputAllNames ? 'set' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'set' : undefined, this._set, false));
     if (this.subsetProof !== undefined) {
       let subsetProofExpr = this.subsetProof.toExpression(true, reportFn);
-      argumentList.add(subsetProofExpr, 'subsetProof', true);
+      argumentList.push(new Fmt.Argument('subsetProof', subsetProofExpr, true));
       reportFn?.(subsetProofExpr, this.subsetProof);
     }
   }
@@ -2718,10 +2718,10 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.element, outputAllNames ? 'element' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'element' : undefined, this.element, false));
     if (this.elementProof !== undefined) {
       let elementProofExpr = this.elementProof.toExpression(true, reportFn);
-      argumentList.add(elementProofExpr, 'elementProof', true);
+      argumentList.push(new Fmt.Argument('elementProof', elementProofExpr, true));
       reportFn?.(elementProofExpr, this.elementProof);
     }
   }
@@ -2805,7 +2805,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
     argumentList.length = 0;
     if (this.proof !== undefined) {
       let proofExpr = this.proof.toExpression(true, reportFn);
-      argumentList.add(proofExpr, 'proof', true);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
       reportFn?.(proofExpr, this.proof);
     }
   }
@@ -2866,9 +2866,9 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let sourceParametersExpr = new Fmt.ParameterExpression(this.sourceParameters);
-    argumentList.add(sourceParametersExpr, outputAllNames ? 'sourceParameters' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'sourceParameters' : undefined, sourceParametersExpr, false));
     let targetArgumentsExpr = new Fmt.CompoundExpression(this.targetArguments);
-    argumentList.add(targetArgumentsExpr, outputAllNames ? 'targetArguments' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'targetArguments' : undefined, targetArgumentsExpr, false));
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BinderArg {
@@ -2946,7 +2946,7 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.terms !== undefined) {
       for (let termsArg of this.terms) {
-        argumentList.add(termsArg, undefined, true);
+        argumentList.push(new Fmt.Argument(undefined, termsArg, true));
       }
     }
   }
@@ -3010,8 +3010,8 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
     let parameterExprParameters = new Fmt.ParameterList;
     parameterExprParameters.push(this.parameter);
     let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
-    argumentList.add(parameterExpr, undefined, false);
-    argumentList.add(this.formula, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parameterExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.formula, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3067,8 +3067,8 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, undefined, false);
-    argumentList.add(this.term, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parametersExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3131,8 +3131,8 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-    argumentList.add(this.construction, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
+    argumentList.push(new Fmt.Argument(undefined, this.construction, false));
     let casesExprItems: Fmt.Expression[] = [];
     for (let item of this.cases) {
       let newItem = item.toExpression(true, reportFn);
@@ -3140,7 +3140,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
       reportFn?.(newItem, item);
     }
     let casesExpr = new Fmt.ArrayExpression(casesExprItems);
-    argumentList.add(casesExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, casesExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3210,7 +3210,7 @@ export class MetaRefExpression_setAssociative extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3275,10 +3275,10 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let casesExpr = new Fmt.ArrayExpression(casesExprItems);
-    argumentList.add(casesExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, casesExpr, false));
     if (this.totalityProof !== undefined) {
       let totalityProofExpr = this.totalityProof.toExpression(true, reportFn);
-      argumentList.add(totalityProofExpr, 'totalityProof', true);
+      argumentList.push(new Fmt.Argument('totalityProof', totalityProofExpr, true));
       reportFn?.(totalityProofExpr, this.totalityProof);
     }
   }
@@ -3356,8 +3356,8 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-    argumentList.add(this.construction, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
+    argumentList.push(new Fmt.Argument(undefined, this.construction, false));
     let casesExprItems: Fmt.Expression[] = [];
     for (let item of this.cases) {
       let newItem = item.toExpression(true, reportFn);
@@ -3365,7 +3365,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let casesExpr = new Fmt.ArrayExpression(casesExprItems);
-    argumentList.add(casesExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, casesExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3445,11 +3445,11 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-    argumentList.add(this._set, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
+    argumentList.push(new Fmt.Argument(undefined, this._set, false));
     if (this.proof !== undefined) {
       let proofExpr = this.proof.toExpression(true, reportFn);
-      argumentList.add(proofExpr, 'proof', true);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
       reportFn?.(proofExpr, this.proof);
     }
   }
@@ -3508,7 +3508,7 @@ export class MetaRefExpression_associative extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3547,7 +3547,7 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.formula, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.formula, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3602,7 +3602,7 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.formulas !== undefined) {
       for (let formulasArg of this.formulas) {
-        argumentList.add(formulasArg, undefined, true);
+        argumentList.push(new Fmt.Argument(undefined, formulasArg, true));
       }
     }
   }
@@ -3672,7 +3672,7 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.formulas !== undefined) {
       for (let formulasArg of this.formulas) {
-        argumentList.add(formulasArg, undefined, true);
+        argumentList.push(new Fmt.Argument(undefined, formulasArg, true));
       }
     }
   }
@@ -3736,7 +3736,7 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let formulasArg of this.formulas) {
-      argumentList.add(formulasArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, formulasArg, true));
     }
   }
 
@@ -3797,8 +3797,8 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, undefined, false);
-    argumentList.add(this.formula, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parametersExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.formula, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -3854,9 +3854,9 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parametersExpr, false));
     if (this.formula !== undefined) {
-      argumentList.add(this.formula, 'formula', true);
+      argumentList.push(new Fmt.Argument('formula', this.formula, true));
     }
   }
 
@@ -3913,9 +3913,9 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parametersExpr, false));
     if (this.formula !== undefined) {
-      argumentList.add(this.formula, 'formula', true);
+      argumentList.push(new Fmt.Argument('formula', this.formula, true));
     }
   }
 
@@ -3966,8 +3966,8 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.element, undefined, false);
-    argumentList.add(this._set, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.element, false));
+    argumentList.push(new Fmt.Argument(undefined, this._set, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4017,8 +4017,8 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.subset, undefined, false);
-    argumentList.add(this.superset, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.subset, false));
+    argumentList.push(new Fmt.Argument(undefined, this.superset, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4076,7 +4076,7 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let termsArg of this.terms) {
-      argumentList.add(termsArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, termsArg, true));
     }
   }
 
@@ -4139,7 +4139,7 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let termsArg of this.terms) {
-      argumentList.add(termsArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, termsArg, true));
     }
   }
 
@@ -4207,8 +4207,8 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-    argumentList.add(this.construction, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
+    argumentList.push(new Fmt.Argument(undefined, this.construction, false));
     let casesExprItems: Fmt.Expression[] = [];
     for (let item of this.cases) {
       let newItem = item.toExpression(true, reportFn);
@@ -4216,7 +4216,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let casesExpr = new Fmt.ArrayExpression(casesExprItems);
-    argumentList.add(casesExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, casesExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4318,21 +4318,21 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     argumentList.length = 0;
     if (this._from !== undefined) {
       let fromExpr = new Fmt.IntegerExpression(this._from);
-      argumentList.add(fromExpr, 'from', true);
+      argumentList.push(new Fmt.Argument('from', fromExpr, true));
     }
     if (this._to !== undefined) {
       let toExpr = new Fmt.IntegerExpression(this._to);
-      argumentList.add(toExpr, 'to', true);
+      argumentList.push(new Fmt.Argument('to', toExpr, true));
     }
     if (this.parameters !== undefined) {
       let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-      argumentList.add(parametersExpr, 'parameters', true);
+      argumentList.push(new Fmt.Argument('parameters', parametersExpr, true));
     }
     if (this.goal !== undefined) {
-      argumentList.add(this.goal, 'goal', true);
+      argumentList.push(new Fmt.Argument('goal', this.goal, true));
     }
     let stepsExpr = new Fmt.ParameterExpression(this.steps);
-    argumentList.add(stepsExpr, 'steps', false);
+    argumentList.push(new Fmt.Argument('steps', stepsExpr, false));
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Proof {
@@ -4420,9 +4420,9 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.variable, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.variable, false));
     if (this.result !== undefined) {
-      argumentList.add(this.result, 'result', true);
+      argumentList.push(new Fmt.Argument('result', this.result, true));
     }
   }
 
@@ -4479,10 +4479,10 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.statement, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.statement, false));
     if (this.proof !== undefined) {
       let proofExpr = this.proof.toExpression(true, reportFn);
-      argumentList.add(proofExpr, 'proof', true);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
       reportFn?.(proofExpr, this.proof);
     }
   }
@@ -4543,9 +4543,9 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.side !== undefined) {
       let sideExpr = new Fmt.IntegerExpression(this.side);
-      argumentList.add(sideExpr, 'side', true);
+      argumentList.push(new Fmt.Argument('side', sideExpr, true));
     }
-    argumentList.add(this.result, 'result', false);
+    argumentList.push(new Fmt.Argument('result', this.result, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4612,7 +4612,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.side !== undefined) {
       let sideExpr = new Fmt.IntegerExpression(this.side);
-      argumentList.add(sideExpr, 'side', true);
+      argumentList.push(new Fmt.Argument('side', sideExpr, true));
     }
     let caseProofsExprItems: Fmt.Expression[] = [];
     for (let item of this.caseProofs) {
@@ -4621,7 +4621,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let caseProofsExpr = new Fmt.ArrayExpression(caseProofsExprItems);
-    argumentList.add(caseProofsExpr, 'caseProofs', false);
+    argumentList.push(new Fmt.Argument('caseProofs', caseProofsExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4685,7 +4685,7 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let argumentsExpr = new Fmt.CompoundExpression(this.arguments);
-    argumentList.add(argumentsExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, argumentsExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4730,7 +4730,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, parametersExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4786,10 +4786,10 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     let sourceExprParameters = new Fmt.ParameterList;
     sourceExprParameters.push(this.source);
     let sourceExpr = new Fmt.ParameterExpression(sourceExprParameters);
-    argumentList.add(sourceExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
     let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
-    argumentList.add(sourceSideExpr, undefined, false);
-    argumentList.add(this.result, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.result, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4843,7 +4843,7 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.result, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.result, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4893,14 +4893,14 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.theorem, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.theorem, false));
     if (this.input !== undefined) {
       let inputExprParameters = new Fmt.ParameterList;
       inputExprParameters.push(this.input);
       let inputExpr = new Fmt.ParameterExpression(inputExprParameters);
-      argumentList.add(inputExpr, 'input', true);
+      argumentList.push(new Fmt.Argument('input', inputExpr, true));
     }
-    argumentList.add(this.result, 'result', false);
+    argumentList.push(new Fmt.Argument('result', this.result, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -4974,11 +4974,11 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.side !== undefined) {
       let sideExpr = new Fmt.IntegerExpression(this.side);
-      argumentList.add(sideExpr, 'side', true);
+      argumentList.push(new Fmt.Argument('side', sideExpr, true));
     }
     if (this.proof !== undefined) {
       let proofExpr = this.proof.toExpression(true, reportFn);
-      argumentList.add(proofExpr, 'proof', true);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
       reportFn?.(proofExpr, this.proof);
     }
   }
@@ -5030,7 +5030,7 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let proofExpr = this.proof.toExpression(true, reportFn);
-    argumentList.add(proofExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, proofExpr, false));
     reportFn?.(proofExpr, this.proof);
   }
 
@@ -5075,7 +5075,7 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let proofExpr = this.proof.toExpression(true, reportFn);
-    argumentList.add(proofExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, proofExpr, false));
     reportFn?.(proofExpr, this.proof);
   }
 
@@ -5129,10 +5129,10 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let argumentsExpr = new Fmt.CompoundExpression(this.arguments);
-    argumentList.add(argumentsExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, argumentsExpr, false));
     if (this.proof !== undefined) {
       let proofExpr = this.proof.toExpression(true, reportFn);
-      argumentList.add(proofExpr, 'proof', true);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
       reportFn?.(proofExpr, this.proof);
     }
   }
@@ -5200,7 +5200,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let proofsExpr = new Fmt.ArrayExpression(proofsExprItems);
-    argumentList.add(proofsExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, proofsExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -5274,7 +5274,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     if (this.side !== undefined) {
       let sideExpr = new Fmt.IntegerExpression(this.side);
-      argumentList.add(sideExpr, 'side', true);
+      argumentList.push(new Fmt.Argument('side', sideExpr, true));
     }
     let caseProofsExprItems: Fmt.Expression[] = [];
     for (let item of this.caseProofs) {
@@ -5283,7 +5283,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let caseProofsExpr = new Fmt.ArrayExpression(caseProofsExprItems);
-    argumentList.add(caseProofsExpr, 'caseProofs', false);
+    argumentList.push(new Fmt.Argument('caseProofs', caseProofsExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -5356,8 +5356,8 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.term, undefined, false);
-    argumentList.add(this.construction, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.term, false));
+    argumentList.push(new Fmt.Argument(undefined, this.construction, false));
     let casesExprItems: Fmt.Expression[] = [];
     for (let item of this.cases) {
       let newItem = item.toExpression(true, reportFn);
@@ -5365,7 +5365,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
       reportFn?.(newItem, item);
     }
     let casesExpr = new Fmt.ArrayExpression(casesExprItems);
-    argumentList.add(casesExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, casesExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -5441,11 +5441,11 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.formula, outputAllNames ? 'formula' : undefined, false);
-    argumentList.add(this.value, outputAllNames ? 'value' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'formula' : undefined, this.formula, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'value' : undefined, this.value, false));
     if (this.exclusivityProof !== undefined) {
       let exclusivityProofExpr = this.exclusivityProof.toExpression(true, reportFn);
-      argumentList.add(exclusivityProofExpr, 'exclusivityProof', true);
+      argumentList.push(new Fmt.Argument('exclusivityProof', exclusivityProofExpr, true));
       reportFn?.(exclusivityProofExpr, this.exclusivityProof);
     }
   }
@@ -5538,18 +5538,18 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this._constructor, outputAllNames ? 'constructor' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'constructor' : undefined, this._constructor, false));
     if (this.parameters !== undefined) {
       let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-      argumentList.add(parametersExpr, 'parameters', true);
+      argumentList.push(new Fmt.Argument('parameters', parametersExpr, true));
     }
-    argumentList.add(this.value, 'value', false);
+    argumentList.push(new Fmt.Argument('value', this.value, false));
     if (this.rewrite !== undefined) {
-      argumentList.add(this.rewrite, 'rewrite', true);
+      argumentList.push(new Fmt.Argument('rewrite', this.rewrite, true));
     }
     if (this.wellDefinednessProof !== undefined) {
       let wellDefinednessProofExpr = this.wellDefinednessProof.toExpression(true, reportFn);
-      argumentList.add(wellDefinednessProofExpr, 'wellDefinednessProof', true);
+      argumentList.push(new Fmt.Argument('wellDefinednessProof', wellDefinednessProofExpr, true));
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
   }

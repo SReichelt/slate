@@ -3120,10 +3120,10 @@ class TutorialStates {
       let preSub = this.createVariableRefExpression(definition, 'f');
       let preSup = new Fmt.StringExpression('my');
       contents.notation = this.createDefinitionRefExpression(['SubSup'], [[
-        this.createRawArg('body', body),
-        this.createRawArg('sup', sup),
-        this.createRawArg('preSub', preSub),
-        this.createRawArg('preSup', preSup)
+        new Fmt.Argument('body', body),
+        new Fmt.Argument('sup', sup),
+        new Fmt.Argument('preSub', preSub),
+        new Fmt.Argument('preSup', preSup)
       ]]);
     }
   };
@@ -5177,12 +5177,7 @@ class TutorialStates {
   }
 
   private addParameter(definition: Fmt.Definition, name: string, type: Fmt.Expression): void {
-    let param = new Fmt.Parameter;
-    param.name = name;
-    param.type = type;
-    param.optional = false;
-    param.list = false;
-    definition.parameters.push(param);
+    definition.parameters.push(new Fmt.Parameter(name, type));
   }
 
   private addSetParameter(definition: Fmt.Definition, name: string): void {
@@ -5241,16 +5236,9 @@ class TutorialStates {
     return new Fmt.DefinitionRefExpression(parentPath as Fmt.Path);
   }
 
-  private createRawArg(name: string, value: Fmt.Expression): Fmt.Argument {
-    let result = new Fmt.Argument;
-    result.name = name;
-    result.value = value;
-    return result;
-  }
-
   private createArg(name: string, value: Fmt.ObjectContents): Fmt.Argument {
     let valueExpression = value.toExpression(false);
-    return this.createRawArg(name, valueExpression);
+    return new Fmt.Argument(name, valueExpression);
   }
 
   private createSetArg(name: string): Fmt.Argument {
@@ -5296,7 +5284,7 @@ class TutorialStates {
 
   private setArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
     let valueExpression = value.toExpression(false);
-    argumentList.setValue(valueExpression, name);
+    argumentList.setValue(name, undefined, valueExpression);
   }
 
   private setSetArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {

@@ -34,22 +34,22 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.notation !== undefined) {
-      argumentList.add(this.notation, 'notation', true);
+      argumentList.push(new Fmt.Argument('notation', this.notation, true));
     }
     if (this.symbol !== undefined) {
-      argumentList.add(this.symbol, 'symbol', true);
+      argumentList.push(new Fmt.Argument('symbol', this.symbol, true));
     }
     if (this.useSymbol !== undefined) {
-      argumentList.add(this.useSymbol, 'useSymbol', true);
+      argumentList.push(new Fmt.Argument('useSymbol', this.useSymbol, true));
     }
     if (this.elements !== undefined) {
       let elementsExpr = this.elements.toExpression(true, reportFn);
-      argumentList.add(elementsExpr, 'elements', true);
+      argumentList.push(new Fmt.Argument('elements', elementsExpr, true));
       reportFn?.(elementsExpr, this.elements);
     }
     if (this.context !== undefined) {
       let contextExpr = this.context.toExpression(true, reportFn);
-      argumentList.add(contextExpr, 'context', true);
+      argumentList.push(new Fmt.Argument('context', contextExpr, true));
       reportFn?.(contextExpr, this.context);
     }
   }
@@ -188,22 +188,22 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.operand !== undefined) {
-      argumentList.add(this.operand, 'operand', true);
+      argumentList.push(new Fmt.Argument('operand', this.operand, true));
     }
     if (this.property !== undefined) {
-      argumentList.add(this.property, 'property', true);
+      argumentList.push(new Fmt.Argument('property', this.property, true));
     }
     if (this.singular !== undefined) {
-      argumentList.add(this.singular, 'singular', true);
+      argumentList.push(new Fmt.Argument('singular', this.singular, true));
     }
     if (this.plural !== undefined) {
-      argumentList.add(this.plural, 'plural', true);
+      argumentList.push(new Fmt.Argument('plural', this.plural, true));
     }
     if (this.article !== undefined) {
-      argumentList.add(this.article, 'article', true);
+      argumentList.push(new Fmt.Argument('article', this.article, true));
     }
     if (this.isFeature !== undefined) {
-      argumentList.add(this.isFeature, 'isFeature', true);
+      argumentList.push(new Fmt.Argument('isFeature', this.isFeature, true));
     }
   }
 
@@ -317,16 +317,16 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.operator !== undefined) {
-      argumentList.add(this.operator, 'operator', true);
+      argumentList.push(new Fmt.Argument('operator', this.operator, true));
     }
     if (this.predicate !== undefined) {
-      argumentList.add(this.predicate, 'predicate', true);
+      argumentList.push(new Fmt.Argument('predicate', this.predicate, true));
     }
     if (this.definitionNotation !== undefined) {
-      argumentList.add(this.definitionNotation, 'definitionNotation', true);
+      argumentList.push(new Fmt.Argument('definitionNotation', this.definitionNotation, true));
     }
     if (this.argument !== undefined) {
-      argumentList.add(this.argument, 'argument', true);
+      argumentList.push(new Fmt.Argument('argument', this.argument, true));
     }
   }
 
@@ -581,7 +581,7 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.condition, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.condition, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -624,12 +624,12 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.param, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.param, false));
     if (this.valueIfPresent !== undefined) {
-      argumentList.add(this.valueIfPresent, 'valueIfPresent', true);
+      argumentList.push(new Fmt.Argument('valueIfPresent', this.valueIfPresent, true));
     }
     if (this.valueIfMissing !== undefined) {
-      argumentList.add(this.valueIfMissing, 'valueIfMissing', true);
+      argumentList.push(new Fmt.Argument('valueIfMissing', this.valueIfMissing, true));
     }
   }
 
@@ -697,7 +697,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let itemsArg of this.items) {
-      argumentList.add(itemsArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
   }
 
@@ -761,12 +761,12 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.param, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.param, false));
     let dimensionExpr = new Fmt.IntegerExpression(this.dimension);
-    argumentList.add(dimensionExpr, undefined, false);
-    argumentList.add(this.item, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, dimensionExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.item, false));
     if (this.separator !== undefined) {
-      argumentList.add(this.separator, 'separator', true);
+      argumentList.push(new Fmt.Argument('separator', this.separator, true));
     }
   }
 
@@ -886,7 +886,7 @@ export class MetaRefExpression_rev extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.list, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.list, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -935,7 +935,7 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let itemsArg of this.items) {
-      argumentList.add(itemsArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
   }
 
@@ -998,7 +998,7 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     for (let itemsArg of this.items) {
-      argumentList.add(itemsArg, undefined, true);
+      argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
   }
 
@@ -1059,10 +1059,10 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let parametersExpr = new Fmt.ParameterExpression(this.parameters);
-    argumentList.add(parametersExpr, outputAllNames ? 'parameters' : undefined, false);
-    argumentList.add(this.originalParameter, outputAllNames ? 'originalParameter' : undefined, false);
-    argumentList.add(this.originalParameterValue, outputAllNames ? 'originalParameterValue' : undefined, false);
-    argumentList.add(this.abbreviation, outputAllNames ? 'abbreviation' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'parameters' : undefined, parametersExpr, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'originalParameter' : undefined, this.originalParameter, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'originalParameterValue' : undefined, this.originalParameterValue, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'abbreviation' : undefined, this.abbreviation, false));
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
@@ -1160,18 +1160,18 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     let parameterExprParameters = new Fmt.ParameterList;
     parameterExprParameters.push(this.parameter);
     let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
-    argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
     if (this.notation !== undefined) {
-      argumentList.add(this.notation, 'notation', true);
+      argumentList.push(new Fmt.Argument('notation', this.notation, true));
     }
     if (this.singularName !== undefined) {
-      argumentList.add(this.singularName, 'singularName', true);
+      argumentList.push(new Fmt.Argument('singularName', this.singularName, true));
     }
     if (this.pluralName !== undefined) {
-      argumentList.add(this.pluralName, 'pluralName', true);
+      argumentList.push(new Fmt.Argument('pluralName', this.pluralName, true));
     }
     if (this.nameOptional !== undefined) {
-      argumentList.add(this.nameOptional, 'nameOptional', true);
+      argumentList.push(new Fmt.Argument('nameOptional', this.nameOptional, true));
     }
   }
 

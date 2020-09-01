@@ -133,12 +133,8 @@ export class GenericUtils {
   }
 
   createParameter(type: Fmt.Expression, defaultName: string, usedNames?: Set<string>): Fmt.Parameter {
-    let parameter = new Fmt.Parameter;
-    parameter.name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
-    parameter.type = type;
-    parameter.optional = false;
-    parameter.list = false;
-    return parameter;
+    let name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
+    return new Fmt.Parameter(name, type);
   }
 
   containsSubExpression(expression: Fmt.Expression, fn: (subExpression: Fmt.Expression) => boolean): boolean {

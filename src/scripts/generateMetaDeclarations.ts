@@ -280,8 +280,9 @@ class MetaDeclarationGenerator {
       outFileStr += this.outputWriteConvCode(argName, item, target, type, true, false, 0, targetIsList, `${indent}  `);
       outFileStr += `${indent}}\n`;
     } else {
-      let outputBegin = targetIsList ? `${target}.push(` : `${target}.add(`;
-      let outputEnd = targetIsList ? `)` : named > 1 ? `, '${argName}', ${optional})` : named > 0 ? `, outputAllNames ? '${argName}' : undefined, ${optional})` : `, undefined, ${optional})`;
+      let argNameCode = named > 1 ? `'${argName}'` : named > 0 ? `outputAllNames ? '${argName}' : undefined` : 'undefined';
+      let outputBegin = targetIsList ? `${target}.push(` : `${target}.push(new Fmt.Argument(${argNameCode}, `;
+      let outputEnd = targetIsList ? `)` : `, ${optional}))`;
       let variableName = argName + 'Expr';
       if (targetIsList) {
         variableName = this.makeUniqueName('newItem', type);

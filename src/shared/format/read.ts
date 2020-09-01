@@ -352,8 +352,7 @@ export class Reader {
     }
     let nameRanges: Range[] = [this.markEnd(nameStart)];
     for (;;) {
-      let parameter = new Fmt.Parameter;
-      parameter.name = name;
+      let parameter = new Fmt.Parameter(name, new EmptyExpression);
       this.skipWhitespace();
       if (this.tryReadChar('[')) {
         parameter.dependencies = this.readExpressions(context);
@@ -435,7 +434,7 @@ export class Reader {
 
   tryReadArgument(argIndex: number, previousArgs: Fmt.ArgumentList, context: Ctx.Context): Fmt.Argument | undefined {
     let argStart = this.markStart();
-    let arg = new Fmt.Argument;
+    let arg = new Fmt.Argument(undefined, new EmptyExpression);
     let nameRange: Range | undefined = undefined;
     let identifier = this.tryReadIdentifier();
     if (identifier) {
@@ -467,7 +466,7 @@ export class Reader {
 
   readArgument(argIndex: number, previousArguments: Fmt.ArgumentList, context: Ctx.Context): Fmt.Argument {
     this.skipWhitespace();
-    return this.tryReadArgument(argIndex, previousArguments, context) || this.error('Argument expected') || new Fmt.Argument;
+    return this.tryReadArgument(argIndex, previousArguments, context) || this.error('Argument expected') || new Fmt.Argument(undefined, new EmptyExpression);
   }
 
   readType(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Expression {

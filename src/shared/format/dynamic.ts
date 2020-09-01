@@ -455,7 +455,7 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
       }
       if (value) {
         this.metaModel.checkValue(param.type, value);
-        this.arguments.add(value, paramName);
+        this.arguments.push(new Fmt.Argument(paramName, value));
       }
       paramIndex++;
       if (param.list) {
@@ -463,7 +463,7 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
           value = argumentList.getOptionalValue(paramName, paramIndex);
           if (value) {
             this.metaModel.checkValue(param.type, value);
-            this.arguments.add(value, paramName);
+            this.arguments.push(new Fmt.Argument(paramName, value));
           }
           paramIndex++;
         }
@@ -568,7 +568,7 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
           if (value) {
             metaModel.checkValue(member.type, value);
             this.onMemberFound?.(member, value);
-            this.arguments.add(value, memberName);
+            this.arguments.push(new Fmt.Argument(memberName, value));
           }
           memberIndex++;
         }

@@ -225,13 +225,12 @@ export class DefinitionList extends Array<Definition> {
 }
 
 export class Parameter implements Comparable<Parameter> {
-  // TODO
-  name: string;
-  type: Expression;
   defaultValue?: Expression;
-  optional: boolean;
-  list: boolean;
+  optional: boolean = false;
+  list: boolean = false;
   dependencies?: Expression[];
+
+  constructor(public name: string, public type: Expression) {}
 
   findReplacement(replacedParameters: ReplacedParameter[]): Parameter {
     let result: Parameter = this;
@@ -245,9 +244,7 @@ export class Parameter implements Comparable<Parameter> {
   }
 
   shallowClone(): Parameter {
-    let result = new Parameter;
-    result.name = this.name;
-    result.type = this.type;
+    let result = new Parameter(this.name, this.type);
     result.defaultValue = this.defaultValue;
     result.optional = this.optional;
     result.list = this.list;
@@ -421,10 +418,7 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
 }
 
 export class Argument implements Comparable<Argument> {
-  // TODO
-  name?: string;
-  value: Expression;
-  optional?: boolean;
+  constructor(public name: string | undefined, public value: Expression, public optional: boolean = false) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): Argument {
     return this.substituteExpression(undefined, replacedParameters);
@@ -437,11 +431,7 @@ export class Argument implements Comparable<Argument> {
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Argument {
     let newValue = this.value.substitute(fn, replacedParameters);
     if (newValue !== this.value || !fn) {
-      let result = new Argument;
-      result.name = this.name;
-      result.value = newValue;
-      result.optional = this.optional;
-      return result;
+      return new Argument(this.name, newValue, this.optional);
     } else {
       return this;
     }
@@ -461,7 +451,7 @@ export class Argument implements Comparable<Argument> {
 }
 
 export class ArgumentList extends Array<Argument> implements Comparable<ArgumentList> {
-  get(name?: string, index?: number): Argument | undefined {
+  get(name: string | undefined, index?: number): Argument | undefined {
     let curIndex = 0;
     for (let arg of this) {
       if (arg.name !== undefined ? arg.name === name : curIndex === index) {
@@ -472,12 +462,12 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     return undefined;
   }
 
-  getOptionalValue(name?: string, index?: number): Expression | undefined {
+  getOptionalValue(name: string | undefined, index?: number): Expression | undefined {
     let arg = this.get(name, index);
     return arg?.value;
   }
 
-  getValue(name?: string, index?: number): Expression {
+  getValue(name: string | undefined, index?: number): Expression {
     let arg = this.get(name, index);
     if (!arg) {
       if (name !== undefined) {
@@ -491,15 +481,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     return arg.value;
   }
 
-  add(value: Expression, name?: string, optional?: boolean): void {
-    let arg = new Argument;
-    arg.name = name;
-    arg.value = value;
-    arg.optional = optional;
-    this.push(arg);
-  }
-
-  setValue(value: Expression | undefined, name?: string, index?: number, insertAfter: string[] = []) {
+  setValue(name: string | undefined, index: number | undefined, value: Expression | undefined, insertAfter: string[] = []) {
     let curIndex = 0;
     let removeIndex: number | undefined = undefined;
     let insertIndex = 0;
@@ -531,9 +513,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
       if (name === undefined) {
         throw new Error('Argument name required');
       }
-      let arg = new Argument;
-      arg.name = name;
-      arg.value = value;
+      let arg = new Argument(name, value);
       this.splice(insertIndex, 0, arg);
     }
   }
@@ -608,8 +588,8 @@ export abstract class ObjectContents {
     if (expression instanceof CompoundExpression) {
       this.fromArgumentList(expression.arguments, reportFn);
     } else {
-      let argumentList: ArgumentList = new ArgumentList;
-      argumentList.add(expression);
+      let argumentList = new ArgumentList;
+      argumentList.push(new Argument(undefined, expression));
       this.fromArgumentList(argumentList, reportFn);
     }
   }
@@ -818,7 +798,7 @@ export class GenericMetaRefExpression extends MetaRefExpression {
 }
 
 export class DefinitionRefExpression extends Expression {
-  constructor (public path: Path) {
+  constructor(public path: Path) {
     super();
   }
 

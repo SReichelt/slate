@@ -43,14 +43,14 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       definitionTypesExprItems.push(item);
     }
     let definitionTypesExpr = new Fmt.ArrayExpression(definitionTypesExprItems);
-    argumentList.add(definitionTypesExpr, outputAllNames ? 'definitionTypes' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'definitionTypes' : undefined, definitionTypesExpr, false));
     if (this.expressionTypes !== undefined) {
       let expressionTypesExprItems: Fmt.Expression[] = [];
       for (let item of this.expressionTypes) {
         expressionTypesExprItems.push(item);
       }
       let expressionTypesExpr = new Fmt.ArrayExpression(expressionTypesExprItems);
-      argumentList.add(expressionTypesExpr, 'expressionTypes', true);
+      argumentList.push(new Fmt.Argument('expressionTypes', expressionTypesExpr, true));
     }
     if (this.functions !== undefined) {
       let functionsExprItems: Fmt.Expression[] = [];
@@ -58,10 +58,10 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
         functionsExprItems.push(item);
       }
       let functionsExpr = new Fmt.ArrayExpression(functionsExprItems);
-      argumentList.add(functionsExpr, 'functions', true);
+      argumentList.push(new Fmt.Argument('functions', functionsExpr, true));
     }
     if (this.lookup !== undefined) {
-      argumentList.add(this.lookup, 'lookup', true);
+      argumentList.push(new Fmt.Argument('lookup', this.lookup, true));
     }
   }
 
@@ -240,11 +240,11 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.superType !== undefined) {
-      argumentList.add(this.superType, 'superType', true);
+      argumentList.push(new Fmt.Argument('superType', this.superType, true));
     }
     if (this.members !== undefined) {
       let membersExpr = new Fmt.ParameterExpression(this.members);
-      argumentList.add(membersExpr, 'members', true);
+      argumentList.push(new Fmt.Argument('members', membersExpr, true));
     }
     if (this.exports !== undefined) {
       let exportsExprItems: Fmt.Expression[] = [];
@@ -252,7 +252,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         exportsExprItems.push(item);
       }
       let exportsExpr = new Fmt.ArrayExpression(exportsExprItems);
-      argumentList.add(exportsExpr, 'exports', true);
+      argumentList.push(new Fmt.Argument('exports', exportsExpr, true));
     }
   }
 
@@ -352,7 +352,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
         innerDefinitionTypesExprItems.push(item);
       }
       let innerDefinitionTypesExpr = new Fmt.ArrayExpression(innerDefinitionTypesExprItems);
-      argumentList.add(innerDefinitionTypesExpr, 'innerDefinitionTypes', true);
+      argumentList.push(new Fmt.Argument('innerDefinitionTypes', innerDefinitionTypesExpr, true));
     }
   }
 
@@ -419,7 +419,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.resultType !== undefined) {
-      argumentList.add(this.resultType, 'resultType', true);
+      argumentList.push(new Fmt.Argument('resultType', this.resultType, true));
     }
   }
 
@@ -528,13 +528,13 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.optional !== undefined) {
-      argumentList.add(this.optional, 'optional', true);
+      argumentList.push(new Fmt.Argument('optional', this.optional, true));
     }
     if (this.argumentType !== undefined) {
-      argumentList.add(this.argumentType, 'argumentType', true);
+      argumentList.push(new Fmt.Argument('argumentType', this.argumentType, true));
     }
     if (this.canOmit !== undefined) {
-      argumentList.add(this.canOmit, 'canOmit', true);
+      argumentList.push(new Fmt.Argument('canOmit', this.canOmit, true));
     }
   }
 
@@ -610,7 +610,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.variableType !== undefined) {
-      argumentList.add(this.variableType, 'variableType', true);
+      argumentList.push(new Fmt.Argument('variableType', this.variableType, true));
     }
   }
 
@@ -879,7 +879,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     if (this.type !== undefined) {
-      argumentList.add(this.type, 'type', true);
+      argumentList.push(new Fmt.Argument('type', this.type, true));
     }
   }
 

@@ -372,7 +372,7 @@ export abstract class GenericEditHandler {
           }
         };
         let onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
-          newNotation.path.arguments.setValue(newValue, param.name, paramIndex, localPreviousParamNames);
+          newNotation.path.arguments.setValue(param.name, paramIndex, newValue, localPreviousParamNames);
           onUpdateParamNotation();
         };
         let canRemove = param.optional && value !== undefined;
@@ -591,15 +591,15 @@ export abstract class GenericEditHandler {
           }
         }
         let arrayValue = new Fmt.ArrayExpression(items);
-        args.add(arrayValue, param.name);
+        args.push(new Fmt.Argument(param.name, arrayValue));
       } else {
         if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
           let text = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
           let value = new Fmt.StringExpression(text);
-          args.add(value, param.name);
+          args.push(new Fmt.Argument(param.name, value));
         } else if (param.name === 'operand' && requiredVariables.length === 1) {
           let value = new Fmt.VariableRefExpression(requiredVariables[0].param);
-          args.add(value, param.name);
+          args.push(new Fmt.Argument(param.name, value));
         }
       }
     }

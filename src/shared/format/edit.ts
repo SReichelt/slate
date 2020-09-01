@@ -101,7 +101,7 @@ export class EditAnalysis {
       }
       onApplyConvertedArgument?.();
     };
-    this.analyzeExpression(arg.value, arg.optional ?? false, onSetValue, onApplyConvertedArgument, valueContext);
+    this.analyzeExpression(arg.value, arg.optional, onSetValue, onApplyConvertedArgument, valueContext);
   }
 
   analyzeObjectContents(contents: Fmt.ObjectContents, context: Ctx.Context): void {

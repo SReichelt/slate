@@ -26,13 +26,13 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
     let logicExpr = new Fmt.StringExpression(this.logic);
-    argumentList.add(logicExpr, outputAllNames ? 'logic' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'logic' : undefined, logicExpr, false));
     let itemsExprItems: Fmt.Expression[] = [];
     for (let item of this.items) {
       itemsExprItems.push(item);
     }
     let itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
-    argumentList.add(itemsExpr, outputAllNames ? 'items' : undefined, false);
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'items' : undefined, itemsExpr, false));
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
@@ -214,14 +214,14 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.ref, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.ref, false));
     if (this.type !== undefined) {
       let typeExpr = new Fmt.StringExpression(this.type);
-      argumentList.add(typeExpr, 'type', true);
+      argumentList.push(new Fmt.Argument('type', typeExpr, true));
     }
     if (this.title !== undefined) {
       let titleExpr = new Fmt.StringExpression(this.title);
-      argumentList.add(titleExpr, 'title', true);
+      argumentList.push(new Fmt.Argument('title', titleExpr, true));
     }
   }
 
@@ -276,9 +276,9 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    argumentList.add(this.ref, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, this.ref, false));
     let titleExpr = new Fmt.StringExpression(this.title);
-    argumentList.add(titleExpr, undefined, false);
+    argumentList.push(new Fmt.Argument(undefined, titleExpr, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {

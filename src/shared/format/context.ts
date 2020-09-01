@@ -62,9 +62,7 @@ export class DummyContext extends Context {
   }
 
   getVariable(name: string): VariableInfo {
-    let param = new Fmt.Parameter;
-    param.name = name;
-    return {parameter: param};
+    return {parameter: new Fmt.Parameter(name, new Fmt.PlaceholderExpression(undefined))};
   }
 }
 

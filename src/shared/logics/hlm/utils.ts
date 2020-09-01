@@ -156,8 +156,7 @@ export class HLMUtils extends GenericUtils {
   getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
     let type = param.type;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
-      let arg = new Fmt.Argument;
-      arg.name = param.name;
+      let value: Fmt.Expression;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
         let targetType = targetParam ? targetParam.type as FmtHLM.MetaRefExpression_Binder : undefined;
         let binderArg = new FmtHLM.ObjectContents_BinderArg;
@@ -175,31 +174,31 @@ export class HLMUtils extends GenericUtils {
         };
         binderArg.targetArguments = new Fmt.ArgumentList;
         this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
-        arg.value = binderArg.toExpression(false);
+        value = binderArg.toExpression(false);
       } else {
         let variableRefExpression = new Fmt.VariableRefExpression(param);
         let expression = addIndices ? addIndices(variableRefExpression) : variableRefExpression;
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           let propArg = new FmtHLM.ObjectContents_PropArg;
           propArg.formula = expression;
-          arg.value = propArg.toExpression(false);
+          value = propArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           let setArg = new FmtHLM.ObjectContents_SetArg;
           setArg._set = expression;
-          arg.value = setArg.toExpression(false);
+          value = setArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
           let subsetArg = new FmtHLM.ObjectContents_SubsetArg;
           subsetArg._set = expression;
-          arg.value = subsetArg.toExpression(false);
+          value = subsetArg.toExpression(false);
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           let elementArg = new FmtHLM.ObjectContents_ElementArg;
           elementArg.element = expression;
-          arg.value = elementArg.toExpression(false);
+          value = elementArg.toExpression(false);
         } else {
           return undefined;
         }
       }
-      return arg;
+      return new Fmt.Argument(param.name, value);
     }
     // No need to adjust context according to parameter; it is only used for binders.
     return undefined;
@@ -1951,10 +1950,7 @@ export class HLMUtils extends GenericUtils {
     for (let param of params) {
       let argValue = this.createArgumentValue(param, createPlaceholder, createParameterList);
       if (argValue) {
-        let argument = new Fmt.Argument;
-        argument.name = param.name;
-        argument.value = argValue;
-        args.push(argument);
+        args.push(new Fmt.Argument(param.name, argValue));
       }
     }
   }
