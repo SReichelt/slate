@@ -722,13 +722,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
       return CachedPromise.reject(new Error('Internal error: trying to submit definition that is not being edited'));
     }
-    if (editedLibraryDefinition.definition.documentation) {
-      for (let item of editedLibraryDefinition.definition.documentation.items) {
-        if (item.text === defaultReferencesString) {
-          return CachedPromise.reject(new Error('References must be adapted before submitting.'));
-        }
-      }
-    }
     let prevState = editedLibraryDefinition.state;
     editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
     let localSectionFileName = this.getLocalSectionFileName();
@@ -832,6 +825,17 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     this.editedDefinitions.delete(name);
     this.editedItemInfos.delete(name);
     this.originalItemInfos.delete(name);
+  }
+
+  checkDefaultReferences(editedLibraryDefinition: LibraryDefinition): boolean {
+    if (editedLibraryDefinition.definition.documentation) {
+      for (let item of editedLibraryDefinition.definition.documentation.items) {
+        if (item.text === defaultReferencesString) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   viewLocalItem(name: string, openLocally: boolean): CachedPromise<void> {

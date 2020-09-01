@@ -950,6 +950,10 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryDataProvider && definitionPromise) {
       let definition = definitionPromise.getImmediateResult();
       if (definition) {
+        if (!this.state.tutorialState && !libraryDataProvider.checkDefaultReferences(definition)) {
+          this.props.alert.error('References must be adapted before submitting.');
+          return;
+        }
         if (this.state.tutorialState && (config.runningLocally || this.state.gitHubUserInfo)) {
           libraryDataProvider.replaceLocalItem(definition);
           this.submitted(definition, absolutePath);
