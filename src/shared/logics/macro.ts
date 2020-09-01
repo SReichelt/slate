@@ -43,8 +43,7 @@ export class DefaultArrayArgumentOperations implements ArrayArgumentOperations {
     // TODO (low priority) display placeholder menu if applicable, instead of inserting placeholder
     let newItem = this.config.createArgumentExpression?.(this.param);
     if (newItem) {
-      let newSubExpression = new Fmt.ArrayExpression;
-      newSubExpression.items = this.subExpression.items.concat(newItem);
+      let newSubExpression = new Fmt.ArrayExpression(this.subExpression.items.concat(newItem));
       return FmtUtils.substituteExpression(this.expression, this.subExpression, newSubExpression) as Fmt.DefinitionRefExpression;
     } else {
       return undefined;

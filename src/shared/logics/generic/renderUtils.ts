@@ -53,9 +53,7 @@ export abstract class GenericRenderUtils {
           }
         });
         if (resultItems.length) {
-          let arrayExpression = new Fmt.ArrayExpression;
-          arrayExpression.items = resultItems.reverse();
-          result.push(arrayExpression);
+          result.push(new Fmt.ArrayExpression(resultItems.reverse()));
         } else {
           result.push(undefined);
         }

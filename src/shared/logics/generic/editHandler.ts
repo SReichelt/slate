@@ -463,8 +463,7 @@ export abstract class GenericEditHandler {
       if (value instanceof Fmt.ArrayExpression) {
         arrayExpression = value;
       } else {
-        arrayExpression = new Fmt.ArrayExpression;
-        arrayExpression.items = [];
+        arrayExpression = new Fmt.ArrayExpression([]);
         onUpdateNotation = () => onSetNotation(arrayExpression);
       }
       let items: Notation.RenderedExpression[] = [];
@@ -488,8 +487,7 @@ export abstract class GenericEditHandler {
       let insertButton = new Notation.InsertPlaceholderExpression;
       if (type.body instanceof Fmt.IndexedExpression) {
         let onInsertItem = () => {
-          let newItem = new Fmt.ArrayExpression;
-          newItem.items = [];
+          let newItem = new Fmt.ArrayExpression([]);
           arrayExpression.items.push(newItem);
           onUpdateNotation();
         };
@@ -585,14 +583,14 @@ export abstract class GenericEditHandler {
     let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
     for (let param of params) {
       if (param.type instanceof Fmt.IndexedExpression) {
-        let arrayValue = new Fmt.ArrayExpression;
-        arrayValue.items = [];
+        let items: Fmt.Expression[] = [];
         if (!(param.type.body instanceof Fmt.IndexedExpression) && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
           for (let variable of requiredVariables) {
             let value = new Fmt.VariableRefExpression(variable.param);
-            arrayValue.items.push(value);
+            items.push(value);
           }
         }
+        let arrayValue = new Fmt.ArrayExpression(items);
         args.add(arrayValue, param.name);
       } else {
         if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {

@@ -287,13 +287,13 @@ class MetaDeclarationGenerator {
         variableName = this.makeUniqueName('newItem', type);
       }
       if (type instanceof Fmt.IndexedExpression) {
-        outFileStr += `${indent}let ${variableName} = new Fmt.ArrayExpression;\n`;
-        let subTarget = `${variableName}.items`;
-        outFileStr += `${indent}${subTarget} = [];\n`;
+        let subTarget = `${variableName}Items`;
+        outFileStr += `${indent}let ${subTarget}: Fmt.Expression[] = [];\n`;
         let item = this.makeUniqueName('item', type.body);
         outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
         outFileStr += this.outputWriteConvCode(argName, item, subTarget, type.body, true, false, 0, true, `${indent}  `);
         outFileStr += `${indent}}\n`;
+        outFileStr += `${indent}let ${variableName} = new Fmt.ArrayExpression(${subTarget});\n`;
         outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
       } else if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof FmtMeta.MetaRefExpression_Int) {
@@ -303,16 +303,15 @@ class MetaDeclarationGenerator {
           outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
-          outFileStr += `${indent}${variableName}.parameters.push(${source});\n`;
+          outFileStr += `${indent}let ${variableName}Parameters = new Fmt.ParameterList;\n`;
+          outFileStr += `${indent}${variableName}Parameters.push(${source});\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression(${variableName}Parameters);\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression;\n`;
-          outFileStr += `${indent}${variableName}.parameters = ${source};\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_ArgumentList) {
-          outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression;\n`;
-          outFileStr += `${indent}${variableName}.arguments = ${source};\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.CompoundExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         }
       } else if (type instanceof Fmt.DefinitionRefExpression) {
@@ -489,7 +488,7 @@ class MetaDeclarationGenerator {
           } else {
             outFileStr += `, `;
           }
-          outFileStr += `'': Fmt.GenericMetaRefExpression`;
+          outFileStr += `'': null`;
         }
       }
     }

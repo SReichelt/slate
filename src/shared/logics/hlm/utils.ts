@@ -1967,9 +1967,7 @@ export class HLMUtils extends GenericUtils {
 
   createArgumentValue(param: Fmt.Parameter, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): Fmt.Expression | undefined {
     if (param.type instanceof Fmt.IndexedExpression) {
-      let result = new Fmt.ArrayExpression;
-      result.items = [];
-      return result;
+      return new Fmt.ArrayExpression([]);
     }
     return this.createArgumentItemValue(param, createPlaceholder, createParameterList);
   }

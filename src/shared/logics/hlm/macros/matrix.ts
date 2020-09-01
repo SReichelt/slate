@@ -119,8 +119,7 @@ class MatrixRowOperations implements Macro.ArrayArgumentOperations {
   insertItem(): Fmt.DefinitionRefExpression | undefined {
     let newRow = MatrixRowOperations.createRow(this.config, this.itemsParam, this.items);
     if (newRow) {
-      let newItems = new Fmt.ArrayExpression;
-      newItems.items = this.items.items.concat(newRow);
+      let newItems = new Fmt.ArrayExpression(this.items.items.concat(newRow));
       return FmtUtils.substituteExpression(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
     } else {
       return undefined;
@@ -140,9 +139,7 @@ class MatrixRowOperations implements Macro.ArrayArgumentOperations {
         }
       }
     }
-    let result = new Fmt.ArrayExpression;
-    result.items = resultItems;
-    return result;
+    return new Fmt.ArrayExpression(resultItems);
   }
 }
 
@@ -150,19 +147,18 @@ class MatrixColumnOperations implements Macro.ArrayArgumentOperations {
   constructor(private config: Macro.MacroInvocationConfig, private itemsParam: Fmt.Parameter, private expression: Fmt.DefinitionRefExpression, private items: Fmt.ArrayExpression) {}
 
   insertItem(): Fmt.DefinitionRefExpression | undefined {
-    let newItems = new Fmt.ArrayExpression;
-    newItems.items = [];
+    let newRows: Fmt.Expression[] = [];
     for (let row of this.items.items) {
       let oldRow = row as Fmt.ArrayExpression;
       let newItem = this.config.createArgumentExpression?.(this.itemsParam);
       if (newItem) {
-        let newRow = new Fmt.ArrayExpression;
-        newRow.items = oldRow.items.concat(newItem);
-        newItems.items.push(newRow);
+        let newRow = new Fmt.ArrayExpression(oldRow.items.concat(newItem));
+        newRows.push(newRow);
       } else {
         return undefined;
       }
     }
+    let newItems = new Fmt.ArrayExpression(newRows);
     return FmtUtils.substituteExpression(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
   }
 }

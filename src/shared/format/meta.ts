@@ -38,26 +38,26 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let definitionTypesExpr = new Fmt.ArrayExpression;
-    definitionTypesExpr.items = [];
+    let definitionTypesExprItems: Fmt.Expression[] = [];
     for (let item of this.definitionTypes) {
-      definitionTypesExpr.items.push(item);
+      definitionTypesExprItems.push(item);
     }
+    let definitionTypesExpr = new Fmt.ArrayExpression(definitionTypesExprItems);
     argumentList.add(definitionTypesExpr, outputAllNames ? 'definitionTypes' : undefined, false);
     if (this.expressionTypes !== undefined) {
-      let expressionTypesExpr = new Fmt.ArrayExpression;
-      expressionTypesExpr.items = [];
+      let expressionTypesExprItems: Fmt.Expression[] = [];
       for (let item of this.expressionTypes) {
-        expressionTypesExpr.items.push(item);
+        expressionTypesExprItems.push(item);
       }
+      let expressionTypesExpr = new Fmt.ArrayExpression(expressionTypesExprItems);
       argumentList.add(expressionTypesExpr, 'expressionTypes', true);
     }
     if (this.functions !== undefined) {
-      let functionsExpr = new Fmt.ArrayExpression;
-      functionsExpr.items = [];
+      let functionsExprItems: Fmt.Expression[] = [];
       for (let item of this.functions) {
-        functionsExpr.items.push(item);
+        functionsExprItems.push(item);
       }
+      let functionsExpr = new Fmt.ArrayExpression(functionsExprItems);
       argumentList.add(functionsExpr, 'functions', true);
     }
     if (this.lookup !== undefined) {
@@ -243,16 +243,15 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       argumentList.add(this.superType, 'superType', true);
     }
     if (this.members !== undefined) {
-      let membersExpr = new Fmt.ParameterExpression;
-      membersExpr.parameters = this.members;
+      let membersExpr = new Fmt.ParameterExpression(this.members);
       argumentList.add(membersExpr, 'members', true);
     }
     if (this.exports !== undefined) {
-      let exportsExpr = new Fmt.ArrayExpression;
-      exportsExpr.items = [];
+      let exportsExprItems: Fmt.Expression[] = [];
       for (let item of this.exports) {
-        exportsExpr.items.push(item);
+        exportsExprItems.push(item);
       }
+      let exportsExpr = new Fmt.ArrayExpression(exportsExprItems);
       argumentList.add(exportsExpr, 'exports', true);
     }
   }
@@ -348,11 +347,11 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
     if (this.innerDefinitionTypes !== undefined) {
-      let innerDefinitionTypesExpr = new Fmt.ArrayExpression;
-      innerDefinitionTypesExpr.items = [];
+      let innerDefinitionTypesExprItems: Fmt.Expression[] = [];
       for (let item of this.innerDefinitionTypes) {
-        innerDefinitionTypesExpr.items.push(item);
+        innerDefinitionTypesExprItems.push(item);
       }
+      let innerDefinitionTypesExpr = new Fmt.ArrayExpression(innerDefinitionTypesExprItems);
       argumentList.add(innerDefinitionTypesExpr, 'innerDefinitionTypes', true);
     }
   }
@@ -953,9 +952,9 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
   }
 }
 
-const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
-const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': Fmt.GenericMetaRefExpression};
-const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self, 'true': MetaRefExpression_true, 'false': MetaRefExpression_false, '': Fmt.GenericMetaRefExpression};
+const definitionTypes: Fmt.MetaDefinitionList = {'MetaModel': MetaRefExpression_MetaModel, 'DefinitionType': MetaRefExpression_DefinitionType, 'ExpressionType': MetaRefExpression_ExpressionType, 'ParameterType': MetaRefExpression_ParameterType, 'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': null};
+const expressionTypes: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'Type': MetaRefExpression_Type, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'ParameterList': MetaRefExpression_ParameterList, 'SingleParameter': MetaRefExpression_SingleParameter, 'ArgumentList': MetaRefExpression_ArgumentList, '': null};
+const functions: Fmt.MetaDefinitionList = {'Any': MetaRefExpression_Any, 'self': MetaRefExpression_self, 'true': MetaRefExpression_true, 'false': MetaRefExpression_false, '': null};
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {

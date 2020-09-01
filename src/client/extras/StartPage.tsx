@@ -104,7 +104,7 @@ function StartPage(props: StartPageProps) {
   let exampleContents: React.ReactNode = null;
 
   if (props.libraryDataProvider && props.templates) {
-    let dummyDefinition = new Fmt.Definition('', new Fmt.PlaceholderExpression(undefined));
+    let dummyDefinition = new Fmt.Definition('', new Fmt.PlaceholderExpression(undefined), new Fmt.ParameterList);
     let rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false
     };

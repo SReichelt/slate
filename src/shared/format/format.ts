@@ -167,11 +167,11 @@ export class Definition {
   contents?: ObjectContents;
   documentation?: DocumentationComment;
 
-  constructor(public name: string, public type: Expression, public parameters: ParameterList = new ParameterList) {}
+  constructor(public name: string, public type: Expression, public parameters: ParameterList) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): Definition {
     let type = this.type.clone(replacedParameters);
-    let result = new Definition(this.name, type);
+    let result = new Definition(this.name, type, new ParameterList);
     this.parameters.clone(result.parameters, replacedParameters);
     for (let innerDefinition of this.innerDefinitions) {
       result.innerDefinitions.push(innerDefinition.clone(replacedParameters));
@@ -224,6 +224,7 @@ export class DefinitionList extends Array<Definition> {
 }
 
 export class Parameter implements Comparable<Parameter> {
+  // TODO
   name: string;
   type: Expression;
   defaultValue?: Expression;
@@ -419,6 +420,7 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
 }
 
 export class Argument implements Comparable<Argument> {
+  // TODO
   name?: string;
   value: Expression;
   optional?: boolean;
@@ -612,7 +614,7 @@ export abstract class ObjectContents {
   }
 
   toExpression(outputAllNames: boolean, reportFn?: ReportConversionFn): Expression {
-    let expression = new CompoundExpression;
+    let expression = new CompoundExpression(new ArgumentList);
     this.toArgumentList(expression.arguments, outputAllNames, reportFn);
     return expression;
   }
@@ -622,7 +624,7 @@ export abstract class ObjectContents {
   abstract traverse(fn: ExpressionTraversalFn): void;
 
   toString(): string {
-    let argumentList: ArgumentList = new ArgumentList;
+    let argumentList = new ArgumentList;
     this.toArgumentList(argumentList, false);
     return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
   }
@@ -748,7 +750,7 @@ export class VariableRefExpression extends Expression {
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let variable = this.variable.findReplacement(replacedParameters);
-    if (variable === this.variable && fn) {
+    if (fn && variable === this.variable) {
       return fn(this);
     }
     let result = new VariableRefExpression(variable);
@@ -772,8 +774,12 @@ export abstract class MetaRefExpression extends Expression {
 }
 
 export class GenericMetaRefExpression extends MetaRefExpression {
-  name: string;
-  arguments: ArgumentList = new ArgumentList;
+  arguments: ArgumentList;
+
+  constructor(public name: string, args: ArgumentList) {
+    super();
+    this.arguments = args;
+  }
 
   getName(): string {
     return this.name;
@@ -798,8 +804,7 @@ export class GenericMetaRefExpression extends MetaRefExpression {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new GenericMetaRefExpression;
-    result.name = this.name;
+    let result = new GenericMetaRefExpression(this.name, new ArgumentList);
     let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
   }
@@ -818,7 +823,7 @@ export class DefinitionRefExpression extends Expression {
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
     let path = this.path.substituteExpression(fn, replacedParameters);
-    if (path === this.path && fn) {
+    if (fn && path === this.path) {
       return fn(this);
     }
     let result = new DefinitionRefExpression(path);
@@ -832,10 +837,12 @@ export class DefinitionRefExpression extends Expression {
 }
 
 export class ParameterExpression extends Expression {
-  parameters: ParameterList = new ParameterList;
+  constructor(public parameters: ParameterList) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new ParameterExpression;
+    let result = new ParameterExpression(new ParameterList);
     let changed = this.parameters.substituteExpression(fn, result.parameters, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
   }
@@ -847,10 +854,15 @@ export class ParameterExpression extends Expression {
 }
 
 export class CompoundExpression extends Expression {
-  arguments: ArgumentList = new ArgumentList;
+  arguments: ArgumentList;
+
+  constructor(args: ArgumentList) {
+    super();
+    this.arguments = args;
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new CompoundExpression;
+    let result = new CompoundExpression(new ArgumentList);
     let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
     return this.getSubstitutionResult(fn, result, changed);
   }
@@ -862,20 +874,25 @@ export class CompoundExpression extends Expression {
 }
 
 export class ArrayExpression extends Expression {
-  items: Expression[];
+  constructor(public items: Expression[]) {
+    super();
+  }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new ArrayExpression;
-    result.items = [];
+    let items: Expression[] = [];
     let changed = false;
     for (let item of this.items) {
       let newItem = item.substitute(fn, replacedParameters);
       if (newItem !== item) {
         changed = true;
       }
-      result.items.push(newItem);
+      items.push(newItem);
     }
-    return this.getSubstitutionResult(fn, result, changed);
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new ArrayExpression(items);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -1045,7 +1062,7 @@ export class DocumentationItem {
 }
 
 export interface MetaDefinitionList {
-  [name: string]: {new(): MetaRefExpression};
+  [name: string]: {new(): MetaRefExpression} | null;
 }
 
 export interface MetaDefinitionFactory {
@@ -1071,9 +1088,7 @@ export class StandardMetaDefinitionFactory implements MetaDefinitionFactory {
 
 export class GenericMetaDefinitionFactory implements MetaDefinitionFactory {
   createMetaRefExpression(name: string): MetaRefExpression {
-    let result = new GenericMetaRefExpression;
-    result.name = name;
-    return result;
+    return new GenericMetaRefExpression(name, new ArgumentList);
   }
 
   allowArbitraryReferences(): boolean {

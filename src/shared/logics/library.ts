@@ -27,11 +27,11 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     argumentList.length = 0;
     let logicExpr = new Fmt.StringExpression(this.logic);
     argumentList.add(logicExpr, outputAllNames ? 'logic' : undefined, false);
-    let itemsExpr = new Fmt.ArrayExpression;
-    itemsExpr.items = [];
+    let itemsExprItems: Fmt.Expression[] = [];
     for (let item of this.items) {
-      itemsExpr.items.push(item);
+      itemsExprItems.push(item);
     }
+    let itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
     argumentList.add(itemsExpr, outputAllNames ? 'items' : undefined, false);
   }
 
@@ -328,7 +328,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Library': MetaRefExpression_Library, 'Section': MetaRefExpression_Section};
 const expressionTypes: Fmt.MetaDefinitionList = {};
-const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection, '': Fmt.GenericMetaRefExpression};
+const functions: Fmt.MetaDefinitionList = {'item': MetaRefExpression_item, 'subsection': MetaRefExpression_subsection, '': null};
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {

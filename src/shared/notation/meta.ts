@@ -1058,8 +1058,7 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let parametersExpr = new Fmt.ParameterExpression;
-    parametersExpr.parameters = this.parameters;
+    let parametersExpr = new Fmt.ParameterExpression(this.parameters);
     argumentList.add(parametersExpr, outputAllNames ? 'parameters' : undefined, false);
     argumentList.add(this.originalParameter, outputAllNames ? 'originalParameter' : undefined, false);
     argumentList.add(this.originalParameterValue, outputAllNames ? 'originalParameterValue' : undefined, false);
@@ -1158,8 +1157,9 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let parameterExpr = new Fmt.ParameterExpression;
-    parameterExpr.parameters.push(this.parameter);
+    let parameterExprParameters = new Fmt.ParameterList;
+    parameterExprParameters.push(this.parameter);
+    let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
     argumentList.add(parameterExpr, outputAllNames ? 'parameter' : undefined, false);
     if (this.notation !== undefined) {
       argumentList.add(this.notation, 'notation', true);
@@ -1277,7 +1277,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Template': MetaRefExpression_Template};
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Int': MetaRefExpression_Int, 'String': MetaRefExpression_String, 'Expr': MetaRefExpression_Expr};
-const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'not': MetaRefExpression_not, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'first': MetaRefExpression_first, 'last': MetaRefExpression_last, 'rev': MetaRefExpression_rev, 'sel': MetaRefExpression_sel, 'neg': MetaRefExpression_neg, '': Fmt.GenericMetaRefExpression};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'not': MetaRefExpression_not, 'opt': MetaRefExpression_opt, 'add': MetaRefExpression_add, 'for': MetaRefExpression_for, 'first': MetaRefExpression_first, 'last': MetaRefExpression_last, 'rev': MetaRefExpression_rev, 'sel': MetaRefExpression_sel, 'neg': MetaRefExpression_neg, '': null};
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {

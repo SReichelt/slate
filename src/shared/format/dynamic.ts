@@ -434,8 +434,7 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
   originalArguments?: Fmt.ArgumentList;
 
   constructor(public metaModel: DynamicMetaModel, public metaDefinition: Fmt.Definition) {
-    super();
-    this.name = metaDefinition.name;
+    super(metaDefinition.name, new Fmt.ArgumentList);
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
