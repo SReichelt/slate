@@ -1,6 +1,7 @@
 import * as FmtWriter from './write';
+import * as BN from 'bn.js';
 
-export import BN = require('bn.js');
+export { BN };
 
 export type ExpressionTraversalFn = (subExpression: Expression) => void;
 export type ExpressionSubstitutionFn = (subExpression: Expression, indices?: Index[]) => Expression;
