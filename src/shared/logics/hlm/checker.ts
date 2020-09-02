@@ -1434,7 +1434,8 @@ export class HLMDefinitionChecker {
   }
 
   private checkMultiGoalProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goals: Fmt.Expression[], context: HLMCheckerContext): void {
-    // TODO remove all trivially provable parts from the goal, and replace trivial provability check below with check for "true"
+    // TODO remove all trivially provable conjunction parts from the goal, and replace trivial provability check below with check for "true"
+    // TODO likewise, remove all trivially disprovable disjunction parts, possibly resulting in a goal of "false"
     if (proof) {
       // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
       if (!(object instanceof Fmt.Expression)) {
